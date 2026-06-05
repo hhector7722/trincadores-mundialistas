@@ -4,7 +4,7 @@ import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppHeader({ ctx }: { ctx: AppShellContext }) {
   return (
-    <header className="relative z-20 shrink-0 bg-[var(--tm-glass)] px-4 pb-2 pt-3 backdrop-blur-xl">
+    <header className="relative z-20 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
       <div className="relative flex items-center justify-center">
         <h1 className="font-display text-center text-base tracking-wider">
           <AppBrandTitle />

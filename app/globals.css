@@ -1,36 +1,36 @@
 ﻿@import "tailwindcss";
 
 :root {
-  --tm-bg: #4a2890;
-  --tm-bg-light: #6b42b8;
-  --tm-bg-elevated: #5530a3;
+  --tm-bg: #2a1058;
+  --tm-bg-light: #381870;
+  --tm-bg-elevated: #301560;
   --tm-fg: #ffffff;
-  --tm-muted: #d4c8ec;
-  --tm-subtle: #b8a8d4;
+  --tm-muted: #a898c8;
+  --tm-subtle: #8070a0;
   --tm-accent: #d9ff00;
-  --tm-accent-soft: rgba(217, 255, 0, 0.14);
-  --tm-accent-muted: rgba(217, 255, 0, 0.65);
+  --tm-accent-soft: rgba(217, 255, 0, 0.12);
+  --tm-accent-muted: rgba(217, 255, 0, 0.6);
   --tm-primary: #d9ff00;
-  --tm-primary-fg: #2a1058;
-  --tm-primary-soft: rgba(217, 255, 0, 0.12);
-  --tm-purple: #8b5cf6;
-  --tm-purple-deep: #5530a3;
-  --tm-purple-glow: rgba(180, 130, 255, 0.45);
-  --tm-border: rgba(255, 255, 255, 0.2);
-  --tm-border-subtle: rgba(255, 255, 255, 0.1);
-  --tm-surface: rgba(255, 255, 255, 0.1);
-  --tm-surface-elevated: rgba(255, 255, 255, 0.16);
-  --tm-glass: rgba(255, 255, 255, 0.12);
-  --tm-glass-hero: rgba(255, 255, 255, 0.18);
-  --tm-highlight: rgba(217, 255, 0, 0.1);
+  --tm-primary-fg: #1a0838;
+  --tm-primary-soft: rgba(217, 255, 0, 0.1);
+  --tm-purple: #7c3aed;
+  --tm-purple-deep: #1a0838;
+  --tm-purple-glow: rgba(111, 43, 255, 0.32);
+  --tm-border: rgba(130, 70, 220, 0.22);
+  --tm-border-subtle: rgba(255, 255, 255, 0.08);
+  --tm-surface: rgba(255, 255, 255, 0.07);
+  --tm-surface-elevated: rgba(255, 255, 255, 0.11);
+  --tm-glass: rgba(55, 22, 105, 0.52);
+  --tm-glass-hero: rgba(65, 28, 120, 0.58);
+  --tm-highlight: rgba(217, 255, 0, 0.08);
   --tm-live: #d9ff00;
-  --tm-live-soft: rgba(217, 255, 0, 0.18);
+  --tm-live-soft: rgba(217, 255, 0, 0.15);
   --tm-positive: #84cc16;
   --tm-danger: #ef4444;
   --tm-radius: 16px;
   --tm-radius-lg: 24px;
-  --tm-shadow: 0 4px 24px rgba(90, 40, 180, 0.2);
-  --tm-shadow-soft: 0 8px 40px rgba(120, 60, 220, 0.28);
+  --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
+  --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
@@ -39,10 +39,10 @@
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse 90% 70% at 15% -10%, rgba(200, 160, 255, 0.45) 0%, transparent 55%),
-    radial-gradient(ellipse 80% 60% at 95% 20%, rgba(160, 100, 255, 0.35) 0%, transparent 50%),
-    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(120, 60, 220, 0.3) 0%, transparent 55%),
-    linear-gradient(165deg, var(--tm-bg-light) 0%, var(--tm-bg) 45%, var(--tm-purple-deep) 100%);
+    radial-gradient(ellipse 90% 70% at 15% -10%, rgba(120, 60, 220, 0.28) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 95% 20%, rgba(100, 50, 200, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(80, 35, 160, 0.16) 0%, transparent 55%),
+    linear-gradient(165deg, var(--tm-bg-light) 0%, var(--tm-bg) 50%, var(--tm-purple-deep) 100%);
   color: var(--tm-fg);
   font-family: var(--font-ui);
   color-scheme: dark;
@@ -65,7 +65,7 @@ html[data-modal-open] main {
 }
 
 .tm-surface-fade {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--tm-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -86,12 +86,12 @@ html[data-modal-open] main {
 
 .tm-hero-card-gradient {
   background:
-    radial-gradient(ellipse 100% 80% at 30% 0%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 30% 0%, rgba(130, 70, 220, 0.2) 0%, transparent 55%),
     linear-gradient(
       165deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(160, 100, 255, 0.22) 45%,
-      rgba(100, 50, 200, 0.12) 100%
+      rgba(80, 35, 160, 0.18) 0%,
+      rgba(60, 25, 120, 0.28) 45%,
+      rgba(40, 15, 90, 0.15) 100%
     );
 }
 
@@ -127,18 +127,18 @@ html[data-modal-open] main {
   background:
     radial-gradient(
       ellipse 85% 60% at 88% 12%,
-      rgba(220, 180, 255, 0.35) 0%,
-      rgba(160, 100, 255, 0.15) 38%,
+      rgba(130, 70, 220, 0.22) 0%,
+      rgba(90, 40, 180, 0.1) 38%,
       transparent 68%
     ),
     radial-gradient(
       ellipse 75% 50% at 10% 35%,
-      rgba(180, 130, 255, 0.25) 0%,
+      rgba(110, 55, 200, 0.16) 0%,
       transparent 60%
     ),
     radial-gradient(
       ellipse 70% 45% at 50% 80%,
-      rgba(140, 80, 240, 0.18) 0%,
+      rgba(90, 40, 170, 0.12) 0%,
       transparent 65%
     );
 }
@@ -149,8 +149,8 @@ html[data-modal-open] main {
   right: -20%;
   width: 90%;
   height: 60%;
-  background: radial-gradient(circle, rgba(200, 160, 255, 0.4) 0%, transparent 62%);
-  filter: blur(72px);
+  background: radial-gradient(circle, rgba(130, 70, 220, 0.28) 0%, transparent 62%);
+  filter: blur(64px);
   animation: tm-glow-breathe 8s ease-in-out infinite;
 }
 
@@ -160,8 +160,8 @@ html[data-modal-open] main {
   left: -15%;
   width: 70%;
   height: 45%;
-  background: radial-gradient(circle, rgba(160, 100, 255, 0.3) 0%, transparent 65%);
-  filter: blur(64px);
+  background: radial-gradient(circle, rgba(100, 50, 200, 0.2) 0%, transparent 65%);
+  filter: blur(56px);
   animation: tm-glow-breathe 10s ease-in-out infinite reverse;
 }
 
@@ -206,7 +206,7 @@ html[data-modal-open] main {
   background: radial-gradient(
     ellipse 90% 80% at 50% 45%,
     transparent 40%,
-    rgba(60, 25, 120, 0.18) 100%
+    rgba(20, 5, 45, 0.28) 100%
   );
 }
 
@@ -266,7 +266,7 @@ html[data-modal-open] main {
   right: 0;
   bottom: 0;
   height: 2.5rem;
-  background: linear-gradient(to bottom, transparent, rgba(74, 40, 144, 0.35));
+  background: linear-gradient(to bottom, transparent, rgba(42, 16, 88, 0.4));
   pointer-events: none;
   z-index: 3;
 }
@@ -299,12 +299,12 @@ html[data-modal-open] main {
   transform: translate(-42%, 0);
   background: radial-gradient(
     ellipse 50% 48% at 50% 40%,
-    rgba(200, 160, 255, 0.4) 0%,
-    rgba(160, 100, 255, 0.18) 40%,
+    rgba(130, 70, 220, 0.32) 0%,
+    rgba(90, 40, 180, 0.14) 40%,
     transparent 68%
   );
-  filter: blur(56px);
-  opacity: 0.75;
+  filter: blur(52px);
+  opacity: 0.7;
   animation: tm-glow-breathe 8s ease-in-out infinite;
 }
 

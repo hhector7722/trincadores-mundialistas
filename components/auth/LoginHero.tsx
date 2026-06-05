@@ -6,7 +6,7 @@ export function LoginHero() {
     <section className="tm-hero-card relative mb-5 min-h-[13rem] overflow-hidden rounded-3xl p-5 sm:min-h-[14rem]">
       <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(200,160,255,0.25)_0%,transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(120,60,220,0.2)_0%,transparent_55%)]"
         aria-hidden="true"
       />
 
