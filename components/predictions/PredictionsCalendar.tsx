@@ -10,7 +10,7 @@ import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layo
 import {
   buildMonthGrid,
   compareMonth,
-  formatKickoffTime,
+  formatCalendarKickoffHour,
   formatMonthLabel,
   getInitialMonthYear,
   getMonthRangeFromMatches,
@@ -38,7 +38,7 @@ function CalendarMatchFlags({
   match: MatchWithPrediction;
   onOpen: () => void;
 }) {
-  const time = formatKickoffTime(match.kickoff_at);
+  const time = formatCalendarKickoffHour(match.kickoff_at);
   const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)}`;
 
   return (
@@ -48,21 +48,23 @@ function CalendarMatchFlags({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-btn flex min-h-0 min-w-0 w-full flex-1 flex-col items-center justify-center rounded-sm transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        "tm-cal-match-btn flex min-h-0 min-w-0 w-full flex-1 items-center justify-center rounded-sm transition-colors hover:bg-[rgba(111,43,255,0.2)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <div className="tm-cal-flags relative w-full shrink-0">
-        <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
-        </div>
-        <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+      <div className="tm-cal-match-row relative w-full min-w-0">
+        <span className="tm-cal-kickoff absolute left-0 top-1/2 z-10 -translate-y-1/2 font-medium leading-none text-white">
+          {time}
+        </span>
+        <div className="tm-cal-flags relative w-full shrink-0">
+          <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
+          </div>
+          <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+          </div>
         </div>
       </div>
-      <span className="tm-cal-kickoff w-full shrink-0 text-center font-medium leading-none tabular-nums text-white">
-        {time}
-      </span>
     </button>
   );
 }
