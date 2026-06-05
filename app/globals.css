@@ -415,12 +415,7 @@ html[data-modal-open] main {
   }
 
   .tm-porra-calendar .tm-cal-cell {
-    min-height: 2.625rem;
     padding: 0.125rem;
-  }
-
-  .tm-porra-calendar .tm-cal-cell-pad {
-    min-height: 2.625rem;
   }
 
   .tm-porra-calendar .tm-cal-day-num {
@@ -434,13 +429,15 @@ html[data-modal-open] main {
   }
 
   .tm-porra-calendar .tm-cal-match-btn .tm-cal-flag {
-    height: 0.875rem !important;
-    width: 0.875rem !important;
+    height: 1rem !important;
+    width: 1rem !important;
   }
+}
 
-  .tm-porra-calendar .tm-cal-more {
-    font-size: 0.4375rem;
-    line-height: 1;
+@media (min-width: 640px) {
+  .tm-porra-calendar .tm-cal-match-btn .tm-cal-flag {
+    height: 1.75rem !important;
+    width: 1.75rem !important;
   }
 }
 
