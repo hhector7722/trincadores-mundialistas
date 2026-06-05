@@ -21,7 +21,7 @@ export function LoginHero() {
           <AppBrandTitle className="text-[#CCFF00]" />
         </h1>
         <p className="mt-2 text-xs leading-relaxed text-white/50 sm:text-sm">
-          Acceso privado a la porra. Solo alias y codigo del grupo.
+          Aquí lo teneis cracks
         </p>
       </div>
 
@@ -31,7 +31,7 @@ export function LoginHero() {
       >
         <div className="absolute top-1 left-[42%] origin-top-left scale-[1.32] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_62%,rgba(0,0,0,0.82)_74%,rgba(0,0,0,0.38)_88%,rgba(0,0,0,0)_100%)] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_62%,rgba(0,0,0,0.82)_74%,rgba(0,0,0,0.38)_88%,rgba(0,0,0,0)_100%)] sm:top-2 sm:left-[44%] sm:scale-[1.38]">
           <Image
-            src="/icons/ronaldo.png"
+            src="/icons/copa.png"
             alt=""
             width={482}
             height={829}
