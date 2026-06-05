@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
@@ -13,12 +13,16 @@ import {
   getInitialMonthYear,
   getMonthRangeFromMatches,
   indexMatchesByDate,
+  kickoffDateKey,
   shiftMonth,
   WEEKDAY_LABELS,
   type CalendarCell,
   type MonthYear,
 } from "@/lib/pool/match-calendar";
 import { cn } from "@/lib/utils";
+
+const WEEKDAY_LABELS_MOBILE = ["L", "M", "X", "J", "V", "S", "D"] as const;
+const MOBILE_VISIBLE_MATCHES = 2;
 
 type PredictionsCalendarProps = {
   poolId: string;
@@ -28,9 +32,11 @@ type PredictionsCalendarProps = {
 function CalendarMatchFlags({
   match,
   onOpen,
+  compact,
 }: {
   match: MatchWithPrediction;
   onOpen: () => void;
+  compact?: boolean;
 }) {
   const time = formatKickoffTime(match.kickoff_at);
   const title = `${time} · ${match.home_team} vs ${match.away_team}`;
@@ -42,39 +48,97 @@ function CalendarMatchFlags({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "flex w-full min-w-0 items-center justify-center gap-0.5 rounded-md px-0.5 py-0.5 transition-colors hover:bg-[rgba(111,43,255,0.16)]",
-        match.status === "live" && "ring-1 ring-[var(--tm-live)]",
-        !match.prediction && match.serverEditable && "opacity-100",
-        match.prediction && "opacity-100"
+        "tm-cal-match-btn flex w-full min-w-0 items-center justify-center rounded-sm transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        compact ? "gap-px p-0" : "flex-col gap-0.5 px-0.5 py-0.5",
+        match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <TeamFlagBadge name={match.home_team} size="xs" />
-      <span className="text-[8px] leading-none text-[var(--tm-muted)]">·</span>
-      <TeamFlagBadge name={match.away_team} size="xs" />
+      <div className="flex items-center justify-center gap-px sm:gap-0.5">
+        <TeamFlagBadge
+          name={match.home_team}
+          size={compact ? "xxs" : "sm"}
+          className={compact ? "tm-cal-flag" : undefined}
+        />
+        {!compact && (
+          <span className="hidden text-[9px] leading-none text-[var(--tm-muted)] sm:inline">
+            ·
+          </span>
+        )}
+        <TeamFlagBadge
+          name={match.away_team}
+          size={compact ? "xxs" : "sm"}
+          className={compact ? "tm-cal-flag" : undefined}
+        />
+      </div>
+      {!compact && (
+        <span className="hidden text-[9px] font-medium tabular-nums text-[var(--tm-accent)] sm:block">
+          {time}
+        </span>
+      )}
     </button>
   );
 }
 
 function DayCell({
   cell,
+  todayKey,
   onOpenMatch,
 }: {
-  cell: CalendarCell;
+  cell: CalendarCell<MatchWithPrediction>;
+  todayKey: string;
   onOpenMatch: (match: MatchWithPrediction) => void;
 }) {
   if (!cell.inMonth) {
-    return <div className="min-h-[4.5rem] border border-[var(--tm-border)] bg-[rgba(0,0,0,0.12)] sm:min-h-[5.5rem]" />;
+    return (
+      <div
+        className="tm-cal-cell-pad border border-[var(--tm-border)] bg-[rgba(0,0,0,0.18)] sm:min-h-[6.5rem]"
+        aria-hidden="true"
+      />
+    );
   }
 
+  const hasMatches = cell.matches.length > 0;
+  const isToday = cell.dateKey === todayKey;
+  const visibleMatches = cell.matches.slice(0, MOBILE_VISIBLE_MATCHES);
+  const hiddenCount = cell.matches.length - visibleMatches.length;
+
   return (
-    <div className="relative flex min-h-[4.5rem] flex-col border border-[var(--tm-border)] bg-[rgba(111,43,255,0.04)] p-1 sm:min-h-[5.5rem]">
-      <span className="absolute left-1 top-0.5 text-[10px] font-semibold tabular-nums text-[var(--tm-muted)] sm:text-xs">
+    <div
+      className={cn(
+        "tm-cal-cell relative flex flex-col overflow-hidden border border-[var(--tm-border)] sm:min-h-[6.5rem] sm:p-1",
+        hasMatches ? "bg-[rgba(212,255,0,0.05)]" : "bg-[rgba(111,43,255,0.04)]",
+        isToday && "ring-1 ring-inset ring-[var(--tm-accent)]"
+      )}
+    >
+      <span
+        className={cn(
+          "tm-cal-day-num font-semibold tabular-nums sm:text-xs",
+          isToday ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
+        )}
+      >
         {cell.dayNumber}
       </span>
-      <div className="mt-4 flex flex-col gap-0.5">
-        {cell.matches.map((match) => (
-          <CalendarMatchFlags key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
-        ))}
+      <div className="mt-0.5 flex flex-col gap-px sm:mt-1 sm:gap-1">
+        <div className="flex flex-col gap-px sm:hidden">
+          {visibleMatches.map((match) => (
+            <CalendarMatchFlags
+              key={match.id}
+              match={match}
+              compact
+              onOpen={() => onOpenMatch(match)}
+            />
+          ))}
+          {hiddenCount > 0 && (
+            <span className="tm-cal-more text-center font-semibold text-[var(--tm-accent)]">
+              +{hiddenCount}
+            </span>
+          )}
+        </div>
+        <div className="hidden flex-col gap-1 sm:flex">
+          {cell.matches.map((match) => (
+            <CalendarMatchFlags key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -86,10 +150,24 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   const [viewMonth, setViewMonth] = useState<MonthYear>(() => getInitialMonthYear(matches));
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
 
+  useEffect(() => {
+    setViewMonth(getInitialMonthYear(matches));
+  }, [matches]);
+
   const weeks = useMemo(
     () => buildMonthGrid(viewMonth.year, viewMonth.month, matchesByDate),
     [viewMonth, matchesByDate]
   );
+
+  const todayKey = kickoffDateKey(new Date().toISOString());
+  const monthMatchCount = useMemo(() => {
+    const prefix = `${viewMonth.year}-${String(viewMonth.month).padStart(2, "0")}`;
+    let count = 0;
+    for (const [key, dayMatches] of matchesByDate) {
+      if (key.startsWith(prefix)) count += dayMatches.length;
+    }
+    return count;
+  }, [matchesByDate, viewMonth]);
 
   const canGoPrev = monthRange ? compareMonth(viewMonth, monthRange.min) > 0 : false;
   const canGoNext = monthRange ? compareMonth(viewMonth, monthRange.max) < 0 : false;
@@ -102,54 +180,67 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
   return (
     <>
-      <section className="tm-glass-card overflow-hidden p-0">
-        <div className="flex items-center justify-between border-b border-[var(--tm-border)] px-3 py-2">
-          <button
-            type="button"
-            disabled={!canGoPrev}
-            aria-label="Mes anterior"
-            onClick={() => setViewMonth((m) => shiftMonth(m, -1))}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-base">
-            {formatMonthYearLabel(viewMonth.year, viewMonth.month)}
-          </h2>
-          <button
-            type="button"
-            disabled={!canGoNext}
-            aria-label="Mes siguiente"
-            onClick={() => setViewMonth((m) => shiftMonth(m, 1))}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-7 border-b border-[var(--tm-border)]">
-          {WEEKDAY_LABELS.map((label) => (
-            <div
-              key={label}
-              className="border-r border-[var(--tm-border)] py-2 text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)] last:border-r-0 sm:text-xs"
+      <div className="tm-porra-calendar-wrap pb-1">
+        <section className="tm-porra-calendar tm-glass-card overflow-hidden p-0">
+          <div className="flex items-center justify-between border-b border-[var(--tm-border)] px-1 py-1 sm:px-3 sm:py-2">
+            <button
+              type="button"
+              disabled={!canGoPrev}
+              aria-label="Mes anterior"
+              onClick={() => setViewMonth((m) => shiftMonth(m, -1))}
+              className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30 sm:h-10 sm:w-10"
             >
-              {label}
+              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+            <div className="min-w-0 text-center">
+              <h2 className="tm-cal-month-title truncate font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-base">
+                {formatMonthYearLabel(viewMonth.year, viewMonth.month)}
+              </h2>
+              <p className="hidden text-[10px] text-[var(--tm-muted)] sm:block">
+                {monthMatchCount} partido{monthMatchCount === 1 ? "" : "s"} este mes
+              </p>
             </div>
-          ))}
-        </div>
+            <button
+              type="button"
+              disabled={!canGoNext}
+              aria-label="Mes siguiente"
+              onClick={() => setViewMonth((m) => shiftMonth(m, 1))}
+              className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30 sm:h-10 sm:w-10"
+            >
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+          </div>
 
-        {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7">
-            {week.cells.map((cell, cellIndex) => (
-              <DayCell
-                key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
-                cell={cell}
-                onOpenMatch={setActiveMatch}
-              />
+          <div className="grid grid-cols-7 border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)]">
+            {WEEKDAY_LABELS.map((label, index) => (
+              <div
+                key={label}
+                className="tm-cal-weekday border-r border-[var(--tm-border)] text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)] last:border-r-0 sm:py-2 sm:text-xs"
+              >
+                <span className="sm:hidden">{WEEKDAY_LABELS_MOBILE[index]}</span>
+                <span className="hidden sm:inline">{label}</span>
+              </div>
             ))}
           </div>
-        ))}
-      </section>
+
+          {weeks.map((week, weekIndex) => (
+            <div key={weekIndex} className="grid grid-cols-7">
+              {week.cells.map((cell, cellIndex) => (
+                <DayCell
+                  key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
+                  cell={cell}
+                  todayKey={todayKey}
+                  onOpenMatch={setActiveMatch}
+                />
+              ))}
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <p className="hidden text-center text-[10px] text-[var(--tm-muted)] sm:block">
+        Desliza horizontalmente si no ves todas las columnas. Toca las banderas para predecir.
+      </p>
 
       {activeMatch && (
         <QuickPredictionModal

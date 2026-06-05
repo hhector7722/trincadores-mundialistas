@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T17:42:21.844Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T17:53:16.111Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -155,12 +155,19 @@ flowchart TB
 |------------|------|------|--------|
 | `MatchRow` | `components/match/MatchRow.tsx` | server | MatchRow |
 
+#### matches
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `MatchTeamsDisplay` | `components/matches/MatchTeamsDisplay.tsx` | server | MatchTeamsDisplay |
+
 #### predictions
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
+| `PredictionDeadlineCountdown` | `components/predictions/PredictionDeadlineCountdown.tsx` | client | PredictionDeadlineCountdown |
 | `PredictionForm` | `components/predictions/PredictionForm.tsx` | client | PredictionForm |
 | `PredictionsCalendar` | `components/predictions/PredictionsCalendar.tsx` | client | PredictionsCalendar |
 | `PredictionStatusBadge` | `components/predictions/PredictionStatusBadge.tsx` | server | PredictionStatusBadge |
@@ -288,14 +295,15 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/active-pool.ts` | 72 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/match-calendar.ts` | 183 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, groupMatchesByDay, WEEKDAY_LABELS, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
+| `lib/pool/match-calendar.ts` | 192 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 
-**predictions/** — 3 archivos
+**predictions/** — 4 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
 | `lib/predictions/queries.ts` | 287 líneas | assertMatchInPool, fetchMatchEditableFromDb, fetchEditableByMatchIds, getPoolMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |

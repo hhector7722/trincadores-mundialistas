@@ -1,26 +1,28 @@
-import type { MatchWithPrediction } from "@/lib/predictions/queries";
-
 const CALENDAR_TZ = "Europe/Madrid";
+
+export type CalendarMatchLike = {
+  kickoff_at: string;
+};
 
 export const WEEKDAY_LABELS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] as const;
 
-export type MatchDayGroup = {
+export type MatchDayGroup<T extends CalendarMatchLike = CalendarMatchLike> = {
   dateKey: string;
   dayLabel: string;
   monthKey: string;
   monthLabel: string;
-  matches: MatchWithPrediction[];
+  matches: T[];
 };
 
-export type CalendarCell = {
+export type CalendarCell<T extends CalendarMatchLike = CalendarMatchLike> = {
   dateKey: string | null;
   dayNumber: number | null;
   inMonth: boolean;
-  matches: MatchWithPrediction[];
+  matches: T[];
 };
 
-export type CalendarWeek = {
-  cells: CalendarCell[];
+export type CalendarWeek<T extends CalendarMatchLike = CalendarMatchLike> = {
+  cells: CalendarCell<T>[];
 };
 
 export type MonthYear = {
@@ -76,10 +78,10 @@ export function formatKickoffTime(iso: string, timeZone = CALENDAR_TZ): string {
   });
 }
 
-export function indexMatchesByDate(
-  matches: MatchWithPrediction[]
-): Map<string, MatchWithPrediction[]> {
-  const byDay = new Map<string, MatchWithPrediction[]>();
+export function indexMatchesByDate<T extends CalendarMatchLike>(
+  matches: T[]
+): Map<string, T[]> {
+  const byDay = new Map<string, T[]>();
 
   for (const match of matches) {
     const key = kickoffDateKey(match.kickoff_at);
@@ -103,7 +105,7 @@ export function indexMatchesByDate(
   return byDay;
 }
 
-export function getMonthRangeFromMatches(matches: MatchWithPrediction[]): {
+export function getMonthRangeFromMatches<T extends CalendarMatchLike>(matches: T[]): {
   min: MonthYear;
   max: MonthYear;
 } | null {
@@ -115,12 +117,19 @@ export function getMonthRangeFromMatches(matches: MatchWithPrediction[]): {
   return { min, max };
 }
 
-export function getInitialMonthYear(matches: MatchWithPrediction[]): MonthYear {
+export function getInitialMonthYear<T extends CalendarMatchLike>(matches: T[]): MonthYear {
   const range = getMonthRangeFromMatches(matches);
-  if (range) return range.min;
+  if (!range) {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1 };
+  }
 
-  const now = new Date();
-  return { year: now.getFullYear(), month: now.getMonth() + 1 };
+  const todayMonth = parseMonthKey(kickoffDateKey(new Date().toISOString()).slice(0, 7));
+  if (compareMonth(todayMonth, range.min) >= 0 && compareMonth(todayMonth, range.max) <= 0) {
+    return todayMonth;
+  }
+
+  return range.min;
 }
 
 export function shiftMonth({ year, month }: MonthYear, delta: number): MonthYear {
@@ -132,17 +141,17 @@ export function compareMonth(a: MonthYear, b: MonthYear): number {
   return a.year !== b.year ? a.year - b.year : a.month - b.month;
 }
 
-export function buildMonthGrid(
+export function buildMonthGrid<T extends CalendarMatchLike>(
   year: number,
   month: number,
-  matchesByDate: Map<string, MatchWithPrediction[]>
-): CalendarWeek[] {
+  matchesByDate: Map<string, T[]>
+): CalendarWeek<T>[] {
   const firstWeekday = (new Date(year, month - 1, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, month, 0).getDate();
-  const cells: CalendarCell[] = [];
+  const cells: CalendarCell<T>[] = [];
 
   for (let i = 0; i < firstWeekday; i++) {
-    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] });
+    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] as T[] });
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -151,15 +160,15 @@ export function buildMonthGrid(
       dateKey,
       dayNumber: day,
       inMonth: true,
-      matches: matchesByDate.get(dateKey) ?? [],
+      matches: matchesByDate.get(dateKey) ?? ([] as T[]),
     });
   }
 
   while (cells.length % 7 !== 0) {
-    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] });
+    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] as T[] });
   }
 
-  const weeks: CalendarWeek[] = [];
+  const weeks: CalendarWeek<T>[] = [];
   for (let i = 0; i < cells.length; i += 7) {
     weeks.push({ cells: cells.slice(i, i + 7) });
   }
@@ -167,7 +176,7 @@ export function buildMonthGrid(
   return weeks;
 }
 
-export function groupMatchesByDay(matches: MatchWithPrediction[]): MatchDayGroup[] {
+export function groupMatchesByDay<T extends CalendarMatchLike>(matches: T[]): MatchDayGroup<T>[] {
   const byDay = indexMatchesByDate(matches);
 
   return [...byDay.entries()]
