@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
@@ -36,12 +37,23 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     <>
       <section className="tm-glass-card overflow-visible p-0">
         <div className="px-4 pb-3 pt-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
+              {isLive ? "En juego" : "Proximo partido"}
+            </p>
+            <Link
+              href="/predictions"
+              className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            >
+              Ver todos
+            </Link>
+          </div>
+          <div className="mt-2">
           <MatchTeamsDisplay
             homeTeam={match.home_team}
             awayTeam={match.away_team}
             kickoffAt={match.kickoff_at}
             isLive={isLive}
-            showSectionLabel
             centerSlot={
               <div className="inline-block">
                 <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
@@ -80,6 +92,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               </div>
             }
           />
+          </div>
         </div>
       </section>
 
