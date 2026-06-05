@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T22:24:43.828Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:18:22.833Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -298,7 +298,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/calendar-layout.ts` | 103 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/match-calendar.ts` | 241 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
+| `lib/pool/match-calendar.ts` | 253 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 
@@ -546,13 +546,14 @@ sequenceDiagram
 | `CONFIRM_REIMPORT` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | — |
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
-| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | — |
+| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | app/layout.tsx |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/server.ts |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, lib/supabase/client.ts |
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, scripts/bootstrap-participants.ts |
+| `VERCEL_URL` | Ver código | Opcional | `` | app/layout.tsx |
 
 
 ## APIs e integraciones externas
