@@ -96,7 +96,7 @@ function DayCell({
       >
         {cell.dayNumber}
       </span>
-      <div className="mt-0.5 flex flex-1 flex-col gap-px sm:mt-1 sm:gap-1">
+      <div className="mt-0.5 flex flex-1 flex-col gap-px">
         {cell.matches.map((match) => (
           <CalendarMatchLabels key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}
@@ -213,7 +213,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
                 onClick={() => setViewMonth((m) => shiftMonth(m, -1))}
                 className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
               >
-                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                <ChevronLeft className="h-full w-full max-h-full max-w-full" />
               </button>
               <div className="min-w-0 px-0.5 text-center">
                 <h2 className="tm-cal-month-title whitespace-nowrap font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
@@ -230,7 +230,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
                 onClick={() => setViewMonth((m) => shiftMonth(m, 1))}
                 className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
               >
-                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                <ChevronRight className="h-full w-full max-h-full max-w-full" />
               </button>
             </div>
           </div>
