@@ -19,5 +19,5 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     );
   }
 
-  return <AppHeader ctx={ctx} />;
+  return <AppHeader ctx={ctx} stackedTitle={pathname === "/"} />;
 }
