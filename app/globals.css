@@ -506,6 +506,23 @@ html[data-modal-open] main {
   box-shadow: none;
 }
 
+.tm-cal-ko-link {
+  background: transparent;
+  border: none;
+  color: var(--tm-accent);
+  font-size: calc(0.625rem * var(--tm-cal-ui-scale, 1));
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0;
+  text-align: right;
+  text-decoration: none;
+  text-transform: lowercase;
+}
+
+.tm-cal-ko-link:hover {
+  color: var(--tm-accent-muted);
+}
+
 .tm-porra-calendar .tm-cal-body {
   min-height: 0;
   min-width: 0;

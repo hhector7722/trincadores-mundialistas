@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:40:39.358Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:49:53.567Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -98,6 +98,7 @@ flowchart TB
 | `/admin` | `app/(app)/admin/page.tsx` | force-dynamic |
 | `/` | `app/(app)/page.tsx` | force-dynamic |
 | `/predictions/:matchId` | `app/(app)/predictions/[matchId]/page.tsx` | force-dynamic |
+| `/predictions/knockout` | `app/(app)/predictions/knockout/page.tsx` | force-dynamic |
 | `/predictions` | `app/(app)/predictions/page.tsx` | force-dynamic |
 | `/profile/:profileId` | `app/(app)/profile/[profileId]/page.tsx` | force-dynamic |
 | `/profile` | `app/(app)/profile/page.tsx` | force-dynamic |
@@ -167,6 +168,7 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
 | `PredictionDeadlineCountdown` | `components/predictions/PredictionDeadlineCountdown.tsx` | client | PredictionDeadlineCountdown |
@@ -302,13 +304,14 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 
-**predictions/** — 4 archivos
+**predictions/** — 5 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
-| `lib/predictions/queries.ts` | 287 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/queries.ts` | 325 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
 **quiz/** — 1 archivos
@@ -668,6 +671,7 @@ docs/               → AUTH, RLS, SEED
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
+| `lib/predictions/queries.ts` | 325 | Revisar extracción |
 
 ### Código posiblemente sin uso
 

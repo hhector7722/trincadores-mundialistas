@@ -1,5 +1,5 @@
 import { PredictionsCalendar } from "@/components/predictions/PredictionsCalendar";
-import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
+import { getPoolGroupStageMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,7 +12,7 @@ export default async function PredictionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const matches = await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id);
+  const matches = await getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   return (
     <div className="tm-porra-page flex h-[calc(100dvh-var(--tm-tabbar-height)-2rem)] flex-col overflow-hidden pb-0 pt-0 sm:h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)]">
@@ -21,7 +21,7 @@ export default async function PredictionsPage() {
           Porra
         </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Calendario mensual. Toca un partido para marcar. Cierra 5 min antes del pitido.
+          Fase de grupos (junio). Toca un partido para marcar. Cierra 5 min antes del pitido.
         </p>
       </div>
 

@@ -1,22 +1,19 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
 import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
 import {
   buildMonthGrid,
-  compareMonth,
   formatCalendarKickoffHour,
   formatMonthLabel,
-  getInitialMonthYear,
-  getMonthRangeFromMatches,
   indexMatchesByDate,
   kickoffDateKey,
-  shiftMonth,
   trimEmptyMatchWeeks,
   WEEKDAY_LABELS,
   type CalendarCell,
@@ -25,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const WEEKDAY_LABELS_MOBILE = ["L", "M", "X", "J", "V", "S", "D"] as const;
+const GROUP_STAGE_VIEW: MonthYear = GROUP_STAGE_CALENDAR_MONTH;
 
 type PredictionsCalendarProps = {
   poolId: string;
@@ -117,8 +115,7 @@ function DayCell({
 function useCalendarViewportLayout(
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
-  rowCount: number,
-  viewMonth: MonthYear
+  rowCount: number
 ) {
   useLayoutEffect(() => {
     const calendar = calendarRef.current;
@@ -141,45 +138,35 @@ function useCalendarViewportLayout(
       observer.disconnect();
       resetCalendarLayout(calendar);
     };
-  }, [calendarRef, gridRef, rowCount, viewMonth.month, viewMonth.year]);
+  }, [calendarRef, gridRef, rowCount]);
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
-  const monthRange = useMemo(() => getMonthRangeFromMatches(matches), [matches]);
-  const [viewMonth, setViewMonth] = useState<MonthYear>(() => getInitialMonthYear(matches));
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setViewMonth(getInitialMonthYear(matches));
-  }, [matches]);
-
   const weeks = useMemo(() => {
-    const grid = buildMonthGrid(viewMonth.year, viewMonth.month, matchesByDate);
-    const trimmed = trimEmptyMatchWeeks(grid, viewMonth);
+    const grid = buildMonthGrid(
+      GROUP_STAGE_VIEW.year,
+      GROUP_STAGE_VIEW.month,
+      matchesByDate
+    );
+    const trimmed = trimEmptyMatchWeeks(grid, GROUP_STAGE_VIEW);
     return trimmed.length > 0 ? trimmed : grid;
-  }, [viewMonth, matchesByDate]);
+  }, [matchesByDate]);
 
-  useCalendarViewportLayout(calendarRef, gridRef, weeks.length, viewMonth);
+  useCalendarViewportLayout(calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
-  const monthMatchCount = useMemo(() => {
-    const prefix = `${viewMonth.year}-${String(viewMonth.month).padStart(2, "0")}`;
-    let count = 0;
-    for (const [key, dayMatches] of matchesByDate) {
-      if (key.startsWith(prefix)) count += dayMatches.length;
-    }
-    return count;
-  }, [matchesByDate, viewMonth]);
-
-  const canGoPrev = monthRange ? compareMonth(viewMonth, monthRange.min) > 0 : false;
-  const canGoNext = monthRange ? compareMonth(viewMonth, monthRange.max) < 0 : false;
+  const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
 
   if (!matches.length) {
     return (
-      <p className="py-8 text-center text-sm text-[var(--tm-muted)]">No hay partidos cargados.</p>
+      <p className="py-8 text-center text-sm text-[var(--tm-muted)]">
+        No hay partidos de fase de grupos cargados.
+      </p>
     );
   }
 
@@ -190,35 +177,13 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           ref={calendarRef}
           className="tm-porra-calendar tm-porra-calendar--fullbleed tm-glass-card flex min-h-0 flex-1 flex-col p-0"
         >
-          <div className="tm-cal-header flex shrink-0 justify-center border-b border-[var(--tm-border)] px-1 py-1 sm:px-3 sm:py-2">
-            <div className="tm-cal-month-nav inline-flex max-w-full items-center gap-0.5 sm:gap-1.5">
-              <button
-                type="button"
-                disabled={!canGoPrev}
-                aria-label="Mes anterior"
-                onClick={() => setViewMonth((m) => shiftMonth(m, -1))}
-                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
-              >
-                <ChevronLeft className="h-full w-full max-h-full max-w-full" />
-              </button>
-              <div className="min-w-0 px-0.5 text-center">
-                <h2 className="tm-cal-month-title whitespace-nowrap font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
-                  {formatMonthLabel(viewMonth.year, viewMonth.month)}
-                </h2>
-                <p className="hidden whitespace-nowrap text-[10px] text-[var(--tm-muted)] sm:block">
-                  {monthMatchCount} partido{monthMatchCount === 1 ? "" : "s"} este mes
-                </p>
-              </div>
-              <button
-                type="button"
-                disabled={!canGoNext}
-                aria-label="Mes siguiente"
-                onClick={() => setViewMonth((m) => shiftMonth(m, 1))}
-                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
-              >
-                <ChevronRight className="h-full w-full max-h-full max-w-full" />
-              </button>
-            </div>
+          <div className="tm-cal-header flex shrink-0 items-center justify-between gap-2 border-b border-[var(--tm-border)] px-3 py-1.5 sm:py-2">
+            <h2 className="tm-cal-month-title font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
+              {monthLabel}
+            </h2>
+            <Link href="/predictions/knockout" className="tm-cal-ko-link shrink-0">
+              ver fase eliminatoria
+            </Link>
           </div>
 
           <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)]">
@@ -247,10 +212,6 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           </div>
         </section>
       </div>
-
-      <p className="mt-2 hidden shrink-0 px-4 text-center text-[10px] text-[var(--tm-muted)] sm:block">
-        Toca un partido para predecir. Cierra 5 min antes del pitido.
-      </p>
 
       {activeMatch && (
         <QuickPredictionModal

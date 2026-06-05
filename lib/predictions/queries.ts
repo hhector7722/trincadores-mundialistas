@@ -1,4 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  isGroupStageMatchdayKey,
+  isKnockoutMatchdayKey,
+} from "@/lib/predictions/stage-filter";
 import type { MatchStatus, Prediction } from "@/types/database";
 
 export type MatchWithPrediction = {
@@ -8,6 +12,7 @@ export type MatchWithPrediction = {
   kickoff_at: string;
   status: MatchStatus;
   matchday_name: string;
+  matchday_external_key: string | null;
   prediction:
     | Pick<
         Prediction,
@@ -27,17 +32,78 @@ async function getMatchdayMap(poolId: string) {
   const supabase = await createClient();
   const { data: matchdays } = await supabase
     .from("matchdays")
-    .select("id, name")
-    .eq("pool_id", poolId);
+    .select("id, name, external_key, sequence")
+    .eq("pool_id", poolId)
+    .order("sequence", { ascending: true });
 
   if (!matchdays?.length) {
-    return { dayMap: new Map<string, string>(), dayIds: [] as string[] };
+    return {
+      dayMap: new Map<string, string>(),
+      externalKeyMap: new Map<string, string | null>(),
+      dayIds: [] as string[],
+    };
   }
 
   return {
     dayMap: new Map(matchdays.map((d) => [d.id, d.name])),
+    externalKeyMap: new Map(matchdays.map((d) => [d.id, d.external_key])),
     dayIds: matchdays.map((d) => d.id),
   };
+}
+
+async function fetchPoolMatchesWithPredictions(
+  poolId: string,
+  profileId: string,
+  matchdayFilter: (externalKey: string | null) => boolean
+): Promise<MatchWithPrediction[]> {
+  const supabase = await createClient();
+  const { dayMap, externalKeyMap, dayIds } = await getMatchdayMap(poolId);
+  const filteredDayIds = dayIds.filter((id) =>
+    matchdayFilter(externalKeyMap.get(id) ?? null)
+  );
+  if (!filteredDayIds.length) return [];
+
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("id, matchday_id, home_team, away_team, kickoff_at, status, sort_order")
+    .in("matchday_id", filteredDayIds)
+    .order("kickoff_at", { ascending: true });
+
+  if (!matches?.length) return [];
+
+  const matchIds = matches.map((m) => m.id);
+  const { data: predictions } = await supabase
+    .from("predictions")
+    .select("id, match_id, home_goals, away_goals, points_awarded, updated_at")
+    .eq("pool_id", poolId)
+    .eq("profile_id", profileId)
+    .in("match_id", matchIds);
+
+  const predByMatch = new Map((predictions ?? []).map((p) => [p.match_id, p]));
+
+  return matches.map((m) => {
+    const pred = predByMatch.get(m.id);
+    const status = m.status as MatchStatus;
+    return {
+      id: m.id,
+      home_team: m.home_team,
+      away_team: m.away_team,
+      kickoff_at: m.kickoff_at,
+      status,
+      matchday_name: dayMap.get(m.matchday_id) ?? "",
+      matchday_external_key: externalKeyMap.get(m.matchday_id) ?? null,
+      prediction: pred
+        ? {
+            id: pred.id,
+            home_goals: pred.home_goals,
+            away_goals: pred.away_goals,
+            points_awarded: pred.points_awarded,
+            updated_at: pred.updated_at,
+          }
+        : null,
+      serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
+    };
+  });
 }
 
 export async function assertMatchInPool(poolId: string, matchId: string): Promise<boolean> {
@@ -80,50 +146,21 @@ export async function getPoolMatchesWithPredictions(
   poolId: string,
   profileId: string
 ): Promise<MatchWithPrediction[]> {
-  const supabase = await createClient();
-  const { dayMap, dayIds } = await getMatchdayMap(poolId);
-  if (!dayIds.length) return [];
+  return fetchPoolMatchesWithPredictions(poolId, profileId, () => true);
+}
 
-  const { data: matches } = await supabase
-    .from("matches")
-    .select("id, matchday_id, home_team, away_team, kickoff_at, status, sort_order")
-    .in("matchday_id", dayIds)
-    .order("kickoff_at", { ascending: true });
+export async function getPoolGroupStageMatchesWithPredictions(
+  poolId: string,
+  profileId: string
+): Promise<MatchWithPrediction[]> {
+  return fetchPoolMatchesWithPredictions(poolId, profileId, isGroupStageMatchdayKey);
+}
 
-  if (!matches?.length) return [];
-
-  const matchIds = matches.map((m) => m.id);
-  const { data: predictions } = await supabase
-    .from("predictions")
-    .select("id, match_id, home_goals, away_goals, points_awarded, updated_at")
-    .eq("pool_id", poolId)
-    .eq("profile_id", profileId)
-    .in("match_id", matchIds);
-
-  const predByMatch = new Map((predictions ?? []).map((p) => [p.match_id, p]));
-
-  return matches.map((m) => {
-    const pred = predByMatch.get(m.id);
-    const status = m.status as MatchStatus;
-    return {
-      id: m.id,
-      home_team: m.home_team,
-      away_team: m.away_team,
-      kickoff_at: m.kickoff_at,
-      status,
-      matchday_name: dayMap.get(m.matchday_id) ?? "",
-      prediction: pred
-        ? {
-            id: pred.id,
-            home_goals: pred.home_goals,
-            away_goals: pred.away_goals,
-            points_awarded: pred.points_awarded,
-            updated_at: pred.updated_at,
-          }
-        : null,
-      serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
-    };
-  });
+export async function getPoolKnockoutMatchesWithPredictions(
+  poolId: string,
+  profileId: string
+): Promise<MatchWithPrediction[]> {
+  return fetchPoolMatchesWithPredictions(poolId, profileId, isKnockoutMatchdayKey);
 }
 
 export async function getMatchPredictionDetail(
@@ -132,7 +169,7 @@ export async function getMatchPredictionDetail(
   matchId: string
 ): Promise<MatchDetail | null> {
   const supabase = await createClient();
-  const { dayMap, dayIds } = await getMatchdayMap(poolId);
+  const { dayMap, externalKeyMap, dayIds } = await getMatchdayMap(poolId);
   if (!dayIds.length) return null;
 
   const { data: match } = await supabase
@@ -167,6 +204,7 @@ export async function getMatchPredictionDetail(
     kickoff_at: match.kickoff_at,
     status: match.status as MatchStatus,
     matchday_name: dayMap.get(match.matchday_id) ?? "",
+    matchday_external_key: externalKeyMap.get(match.matchday_id) ?? null,
     prediction: prediction
       ? {
           id: prediction.id,

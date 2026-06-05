@@ -216,22 +216,22 @@ export function trimEmptyMatchWeeks<T extends CalendarMatchLike>(
     end--;
   }
 
-  // Julio: eliminar hasta 2 filas finales sin partidos del grid mensual.
-  if (viewMonth?.month === 7) {
-    let julyEnd = weeks.length;
+  // Junio: eliminar la última fila sin partidos de fase de grupos.
+  if (viewMonth?.month === 6) {
+    let juneEnd = weeks.length;
     let removed = 0;
 
-    while (removed < 2 && julyEnd > start) {
-      const week = weeks[julyEnd - 1]!;
+    while (removed < 1 && juneEnd > start) {
+      const week = weeks[juneEnd - 1]!;
       if (!weekHasMatches(week)) {
-        julyEnd--;
+        juneEnd--;
         removed++;
       } else {
         break;
       }
     }
 
-    end = Math.min(end, julyEnd);
+    end = Math.min(end, juneEnd);
   }
 
   return weeks.slice(start, end);
