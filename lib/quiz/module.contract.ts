@@ -1,0 +1,2 @@
+export type QuizModuleContract = { readonly maxPointsPerAttempt: 3; readonly rpcStart: 'start_quiz_attempt'; readonly rpcSubmit: 'submit_quiz_attempt'; readonly rpcStartReturns: 'jsonb'; readonly publicQuestionsView: 'quiz_questions_public'; readonly leaderboardView: 'quiz_leaderboard'; };
+export const QUIZ_MODULE_CONTRACT: QuizModuleContract = { maxPointsPerAttempt: 3, rpcStart: 'start_quiz_attempt', rpcSubmit: 'submit_quiz_attempt', rpcStartReturns: 'jsonb', publicQuestionsView: 'quiz_questions_public', leaderboardView: 'quiz_leaderboard' };
