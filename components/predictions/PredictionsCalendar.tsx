@@ -17,6 +17,7 @@ import {
   indexMatchesByDate,
   kickoffDateKey,
   shiftMonth,
+  trimEmptyMatchWeeks,
   WEEKDAY_LABELS,
   type CalendarCell,
   type MonthYear,
@@ -51,11 +52,15 @@ function CalendarMatchFlags({
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <div className="tm-cal-flags flex shrink-0 items-center justify-center">
-        <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
-        <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+      <div className="tm-cal-flags relative w-full shrink-0">
+        <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
+        </div>
+        <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+        </div>
       </div>
-      <span className="tm-cal-kickoff w-full shrink-0 text-center font-medium leading-none tabular-nums text-[var(--tm-accent)]">
+      <span className="tm-cal-kickoff w-full shrink-0 text-center font-medium leading-none tabular-nums text-white">
         {time}
       </span>
     </button>
@@ -149,10 +154,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     setViewMonth(getInitialMonthYear(matches));
   }, [matches]);
 
-  const weeks = useMemo(
-    () => buildMonthGrid(viewMonth.year, viewMonth.month, matchesByDate),
-    [viewMonth, matchesByDate]
-  );
+  const weeks = useMemo(() => {
+    const grid = buildMonthGrid(viewMonth.year, viewMonth.month, matchesByDate);
+    const trimmed = trimEmptyMatchWeeks(grid);
+    return trimmed.length > 0 ? trimmed : grid;
+  }, [viewMonth, matchesByDate]);
 
   useCalendarViewportLayout(calendarRef, gridRef, weeks.length, viewMonth);
 

@@ -556,7 +556,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-btn {
-  gap: calc(0.0625rem * var(--tm-cal-ui-scale));
+  gap: calc(0.2rem * var(--tm-cal-ui-scale));
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -564,7 +564,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-flags {
-  gap: calc(0.125rem * var(--tm-cal-ui-scale));
+  min-height: calc(0.875rem * var(--tm-cal-ui-scale));
   min-width: 0;
   overflow: hidden;
 }
@@ -585,6 +585,7 @@ html[data-modal-open] main {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+  color: #ffffff;
   font-size: calc(0.4375rem * var(--tm-cal-ui-scale));
   line-height: 1;
 }
@@ -606,6 +607,10 @@ html[data-modal-open] main {
   .tm-porra-calendar .tm-cal-flag-dim {
     height: calc(1rem * var(--tm-cal-ui-scale));
     width: calc(1rem * var(--tm-cal-ui-scale));
+  }
+
+  .tm-porra-calendar .tm-cal-flags {
+    min-height: calc(1rem * var(--tm-cal-ui-scale));
   }
 
   .tm-porra-calendar .tm-cal-kickoff {

@@ -182,6 +182,28 @@ export function buildMonthGrid<T extends CalendarMatchLike>(
   return weeks;
 }
 
+function weekHasMatches<T extends CalendarMatchLike>(week: CalendarWeek<T>): boolean {
+  return week.cells.some((cell) => cell.inMonth && cell.matches.length > 0);
+}
+
+/** Quita semanas iniciales/finales sin partidos para ganar altura en la rejilla. */
+export function trimEmptyMatchWeeks<T extends CalendarMatchLike>(
+  weeks: CalendarWeek<T>[]
+): CalendarWeek<T>[] {
+  let start = 0;
+  let end = weeks.length;
+
+  while (start < end && !weekHasMatches(weeks[start]!)) {
+    start++;
+  }
+
+  while (end > start && !weekHasMatches(weeks[end - 1]!)) {
+    end--;
+  }
+
+  return weeks.slice(start, end);
+}
+
 export function groupMatchesByDay<T extends CalendarMatchLike>(matches: T[]): MatchDayGroup<T>[] {
   const byDay = indexMatchesByDate(matches);
 
