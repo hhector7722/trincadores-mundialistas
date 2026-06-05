@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { isPoolAdmin } from "@/lib/pool/admin";
+import { generateAccessCode } from "@/lib/auth/access-code";
+import { isPoolAdmin, isPoolOwner } from "@/lib/pool/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { assertMatchInPool } from "@/lib/predictions/queries";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
 import { createClient } from "@/lib/supabase/server";
@@ -89,4 +91,85 @@ export async function submitMatchResult(
   revalidatePath(`/predictions/${matchId}`);
   revalidatePath("/");
   return { ok: true };
+}
+
+export async function regenerateAccessCode(
+  poolId: string,
+  targetUsername: string
+): Promise<AdminActionResult & { code?: string }> {
+  const username = targetUsername.trim().toLowerCase();
+  if (!username) {
+    return { ok: false, error: "Alias invalido." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesion no valida." };
+  }
+
+  const owner = await isPoolOwner(poolId, user.id);
+  if (!owner) {
+    return { ok: false, error: "Solo el owner puede regenerar codigos." };
+  }
+
+  const { data: targetProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (profileError || !targetProfile) {
+    return { ok: false, error: "Participante no encontrado." };
+  }
+
+  const { data: membership, error: memberError } = await supabase
+    .from("pool_members")
+    .select("profile_id")
+    .eq("pool_id", poolId)
+    .eq("profile_id", targetProfile.id)
+    .maybeSingle();
+
+  if (memberError || !membership) {
+    return { ok: false, error: "Ese participante no pertenece a esta porra." };
+  }
+
+  const newCode = generateAccessCode();
+  const admin = createAdminClient();
+
+  const { error: updateError } = await admin.auth.admin.updateUserById(targetProfile.id, {
+    password: newCode,
+  });
+
+  if (updateError) {
+    return { ok: false, error: "No se pudo actualizar el codigo." };
+  }
+
+  await admin.auth.admin.signOut(targetProfile.id, "global");
+
+  const rotatedAt = new Date().toISOString();
+  const { error: rotatedError } = await admin
+    .from("profiles")
+    .update({ access_code_rotated_at: rotatedAt })
+    .eq("id", targetProfile.id);
+
+  if (rotatedError) {
+    console.error("[regenerateAccessCode] rotated_at failed:", rotatedError.message);
+  }
+
+  const { error: auditError } = await admin.from("admin_audit_log").insert({
+    pool_id: poolId,
+    actor_id: user.id,
+    action: "access_code_regenerated",
+    details: { target_profile_id: targetProfile.id, target_username: username },
+  });
+
+  if (auditError) {
+    console.error("[regenerateAccessCode] audit failed:", auditError.message);
+  }
+
+  return { ok: true, code: newCode };
 }

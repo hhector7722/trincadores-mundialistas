@@ -1,3 +1,4 @@
+import { computeReliabilityPct } from "@/lib/ranking/reliability";
 import { createClient } from "@/lib/supabase/server";
 
 export type ReferenceMatchday = {
@@ -6,15 +7,20 @@ export type ReferenceMatchday = {
   sequence: number;
 };
 
+export type PositionTrend = "up" | "down" | null;
+
 export type LeaderboardRow = {
   position: number;
+  positionTrend: PositionTrend;
   profileId: string;
   label: string;
   username: string;
+  avatarUrl: string | null;
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
   matchPoints: number;
+  reliabilityPct: number | null;
 };
 
 export type MemberStanding = {
@@ -35,6 +41,7 @@ type MemberRow = {
   profileId: string;
   label: string;
   username: string;
+  avatarUrl: string | null;
 };
 
 type ScoreRow = {
@@ -64,25 +71,37 @@ function compareRows(
   return ka[2].localeCompare(kb[2], "es");
 }
 
-export async function getReferenceMatchday(
-  poolId: string
-): Promise<ReferenceMatchday | null> {
+function toReferenceMatchday(
+  row: { id: string; name: string; sequence: number } | undefined
+): ReferenceMatchday | null {
+  if (!row) return null;
+  return { id: row.id, name: row.name, sequence: row.sequence };
+}
+
+async function getMatchdayPair(poolId: string): Promise<{
+  current: ReferenceMatchday | null;
+  previous: ReferenceMatchday | null;
+}> {
   const supabase = await createClient();
   const { data: matchdays } = await supabase
     .from("matchdays")
     .select("id, name, sequence, created_at")
     .eq("pool_id", poolId)
     .order("sequence", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(2);
 
-  if (!matchdays?.length) return null;
-
-  const top = matchdays[0];
   return {
-    id: top.id,
-    name: top.name,
-    sequence: top.sequence,
+    current: toReferenceMatchday(matchdays?.[0]),
+    previous: toReferenceMatchday(matchdays?.[1]),
   };
+}
+
+export async function getReferenceMatchday(
+  poolId: string
+): Promise<ReferenceMatchday | null> {
+  const { current } = await getMatchdayPair(poolId);
+  return current;
 }
 
 export async function getReferenceMatchdayId(
@@ -104,7 +123,7 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
   const profileIds = memberships.map((m) => m.profile_id);
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, username, display_name")
+    .select("id, username, display_name, avatar_url")
     .in("id", profileIds);
 
   const profileMap = new Map(
@@ -113,6 +132,7 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
       {
         label: p.display_name ?? p.username,
         username: p.username,
+        avatarUrl: p.avatar_url,
       },
     ])
   );
@@ -123,8 +143,34 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
       profileId: m.profile_id,
       label: p?.label ?? " ",
       username: p?.username ?? " ",
+      avatarUrl: p?.avatarUrl ?? null,
     };
   });
+}
+
+async function loadResolvedPredictionStats(
+  poolId: string
+): Promise<Map<string, { resolvedCount: number; totalPoints: number }>> {
+  const supabase = await createClient();
+  const { data: predictions } = await supabase
+    .from("predictions")
+    .select("profile_id, points_awarded")
+    .eq("pool_id", poolId)
+    .not("points_awarded", "is", null);
+
+  const stats = new Map<string, { resolvedCount: number; totalPoints: number }>();
+
+  for (const prediction of predictions ?? []) {
+    const current = stats.get(prediction.profile_id) ?? {
+      resolvedCount: 0,
+      totalPoints: 0,
+    };
+    current.resolvedCount += 1;
+    current.totalPoints += prediction.points_awarded ?? 0;
+    stats.set(prediction.profile_id, current);
+  }
+
+  return stats;
 }
 
 async function loadScoresForMatchday(
@@ -152,43 +198,105 @@ async function loadScoresForMatchday(
   );
 }
 
-function buildLeaderboardRows(
+function buildPositionMap(
   members: MemberRow[],
   scores: Map<string, ScoreRow>
-): Omit<LeaderboardRow, "position">[] {
+): Map<string, number> {
   const merged = members.map((m) => {
     const s = scores.get(m.profileId);
     return {
       profileId: m.profileId,
       label: m.label,
+      cumulativePoints: s?.cumulative_points ?? 0,
+      exactHits: s?.exact_hits ?? 0,
+    };
+  });
+
+  merged.sort((a, b) =>
+    compareRows(
+      {
+        label: a.label,
+        cumulativePoints: a.cumulativePoints,
+        exactHits: a.exactHits,
+      },
+      {
+        label: b.label,
+        cumulativePoints: b.cumulativePoints,
+        exactHits: b.exactHits,
+      }
+    )
+  );
+
+  return new Map(merged.map((row, index) => [row.profileId, index + 1]));
+}
+
+function computePositionTrend(
+  currentPosition: number,
+  previousPosition: number | undefined
+): PositionTrend {
+  if (previousPosition === undefined) return null;
+  if (currentPosition < previousPosition) return "up";
+  if (currentPosition > previousPosition) return "down";
+  return null;
+}
+
+function buildLeaderboardRows(
+  members: MemberRow[],
+  scores: Map<string, ScoreRow>,
+  reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
+  previousPositions: Map<string, number> | null
+): Omit<LeaderboardRow, "position">[] {
+  const merged = members.map((m) => {
+    const s = scores.get(m.profileId);
+    const rel = reliability.get(m.profileId);
+    return {
+      profileId: m.profileId,
+      label: m.label,
       username: m.username,
+      avatarUrl: m.avatarUrl,
       cumulativePoints: s?.cumulative_points ?? 0,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
       matchPoints: s?.match_points ?? 0,
+      reliabilityPct: computeReliabilityPct(
+        rel?.resolvedCount ?? 0,
+        rel?.totalPoints ?? 0
+      ),
     };
   });
 
   merged.sort(compareRows);
-  return merged;
+  return merged.map((row, index) => {
+    const position = index + 1;
+    return {
+      ...row,
+      positionTrend: computePositionTrend(
+        position,
+        previousPositions?.get(row.profileId)
+      ),
+    };
+  });
 }
 
 export async function getPoolLeaderboard(poolId: string): Promise<{
   matchday: ReferenceMatchday | null;
   rows: LeaderboardRow[];
 }> {
-  const matchday = await getReferenceMatchday(poolId);
+  const { current: matchday, previous } = await getMatchdayPair(poolId);
   const members = await loadMembers(poolId);
 
   if (!members.length) {
     return { matchday, rows: [] };
   }
 
-  const scores = matchday
-    ? await loadScoresForMatchday(poolId, matchday.id)
-    : new Map<string, ScoreRow>();
+  const [scores, previousScores, reliability] = await Promise.all([
+    matchday ? loadScoresForMatchday(poolId, matchday.id) : Promise.resolve(new Map<string, ScoreRow>()),
+    previous ? loadScoresForMatchday(poolId, previous.id) : Promise.resolve(new Map<string, ScoreRow>()),
+    loadResolvedPredictionStats(poolId),
+  ]);
 
-  const sorted = buildLeaderboardRows(members, scores);
+  const previousPositions = previous ? buildPositionMap(members, previousScores) : null;
+  const sorted = buildLeaderboardRows(members, scores, reliability, previousPositions);
 
   return {
     matchday,

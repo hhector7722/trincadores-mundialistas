@@ -38,7 +38,9 @@ export default async function PublicProfilePage({
         Volver al ranking
       </Link>
       <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Perfil</h1>
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Perfil
+        </h1>
       </div>
       <MemberStandingCard standing={standing} isSelf={isSelf} />
     </div>

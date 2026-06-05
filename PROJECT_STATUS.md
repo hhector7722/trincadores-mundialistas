@@ -1,9 +1,9 @@
 # Trincadores Mundialistas
 
-## Fase actual: 1d completada (ranking + home + rivales + perfil publico)
+## Fase actual: 2a datos Mundial 2026 importados (OpenFootball)
 
 ## Visual
-- Direccion B refinada (panel claro, cobalto #0047FF, lima solo LIVE)
+- Dark mode morado (#120422) + acento neón lima (#D4FF00), estilo porra deportiva
 
 ## Completado
 - [x] 1a auth
@@ -13,6 +13,11 @@
 - [x] 1d home: tu sitio, top 3, delante/detras
 - [x] 1d predicciones rivales en detalle partido
 - [x] 1d perfil publico /profile/[profileId]
+- [x] 1f acceso cerrado alias + codigo (sin registro abierto)
+- [x] 1f purga demo + bootstrap 11 participantes reales
+- [x] 2a catalogo OpenFootball (competitions, teams, host_cities, tournament_stages)
+- [x] 2a import WC2026: 104 partidos, 23 matchdays, 48 equipos, 16 sedes
 
 ## Siguiente
 - [ ] Fase 1e activity feed real
+- [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)

@@ -1,7 +1,7 @@
 ﻿import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const AUTH_PATHS = ["/login", "/register", "/recover"];
+const AUTH_PATHS = ["/login"];
 
 function isAuthPath(pathname: string): boolean {
   return AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

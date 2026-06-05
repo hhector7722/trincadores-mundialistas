@@ -76,7 +76,7 @@ export function PredictionForm({
           {match.matchday_name && (
             <p className="text-xs text-[var(--tm-muted)]">{match.matchday_name}</p>
           )}
-          <h1 className="text-lg font-semibold text-[var(--tm-fg)]">
+          <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
             {match.home_team} — {match.away_team}
           </h1>
           <p className="mt-1 text-sm text-[var(--tm-subtle)]">{formatKickoff(match.kickoff_at)}</p>

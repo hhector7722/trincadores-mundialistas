@@ -32,7 +32,9 @@ export default async function ProfilePage() {
   return (
     <div className="space-y-4 p-4 pb-8">
       <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Perfil</h1>
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Perfil
+        </h1>
       </div>
       <Card className="space-y-4">
         <div>

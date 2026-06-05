@@ -17,21 +17,24 @@ export function RankingTable({
   }
 
   return (
-    <div>
-      <div className="flex items-center gap-3 border-b border-[var(--tm-border)] px-4 py-2 text-xs font-medium uppercase tracking-wide text-[var(--tm-muted)]">
-        <span className="w-8 shrink-0 text-center">#</span>
-        <span className="flex-1">Jugador</span>
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-2 border-b border-[var(--tm-border)] px-3 py-2 text-xs font-medium uppercase leading-none tracking-wide text-[var(--tm-muted)]">
+        <span className="w-3 shrink-0" aria-hidden="true" />
+        <span className="w-7 shrink-0" aria-hidden="true" />
+        <span className="w-8 shrink-0" aria-hidden="true" />
+        <span className="min-w-0 flex-1">Trincador</span>
         <span className="w-10 shrink-0 text-right">Pts</span>
-        <span className="w-8 shrink-0 text-right">8s</span>
-        <span className="hidden w-8 shrink-0 text-right sm:block">3s</span>
+        <span className="w-12 shrink-0 text-right">Fiab</span>
       </div>
-      {rows.map((row) => (
-        <RankingRow
-          key={row.profileId}
-          row={row}
-          isCurrentUser={row.profileId === currentProfileId}
-        />
-      ))}
+      <div className="flex min-h-0 flex-1 flex-col">
+        {rows.map((row) => (
+          <RankingRow
+            key={row.profileId}
+            row={row}
+            isCurrentUser={row.profileId === currentProfileId}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -25,7 +25,7 @@ export function ScoreStepper({
           aria-label={`Menos goles ${label}`}
           onClick={() => onChange(Math.max(0, value - 1))}
           className={cn(
-            "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)]",
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface-elevated)] text-[var(--tm-fg)] active:border-[var(--tm-accent-muted)]",
             (disabled || value <= 0) && "opacity-40"
           )}
         >
@@ -40,7 +40,7 @@ export function ScoreStepper({
           aria-label={`Mas goles ${label}`}
           onClick={() => onChange(Math.min(MAX_GOALS, value + 1))}
           className={cn(
-            "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)]",
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface-elevated)] text-[var(--tm-fg)] active:border-[var(--tm-accent-muted)]",
             (disabled || value >= MAX_GOALS) && "opacity-40"
           )}
         >

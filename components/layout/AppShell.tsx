@@ -12,7 +12,7 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--tm-bg)]">
       <AppHeader ctx={ctx} />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-[var(--tm-tabbar-height)]">{children}</main>
       <TabBar />
     </div>
   );

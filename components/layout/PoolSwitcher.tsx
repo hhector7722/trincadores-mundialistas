@@ -32,7 +32,7 @@ export function PoolSwitcher({
         });
       }}
       className={cn(
-        "max-w-[10rem] truncate rounded-lg border border-[var(--tm-border)] bg-[var(--tm-surface)] px-2 py-1 text-xs font-medium text-[var(--tm-fg)]",
+        "max-w-[8rem] truncate rounded-lg border border-[var(--tm-border)] bg-[var(--tm-surface)] px-2 py-1 text-[10px] font-medium text-[var(--tm-muted)]",
         pending && "opacity-60"
       )}
       aria-label="Seleccionar porra"

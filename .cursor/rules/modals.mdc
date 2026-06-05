@@ -1,0 +1,53 @@
+---
+description: Comportamiento obligatorio de modales (centrado, backdrop, scroll lock)
+globs: components/**/*modal*.tsx,components/ui/modal.tsx
+alwaysApply: false
+---
+
+# Modales — reglas obligatorias
+
+Todo modal (nuevo o existente) **debe** usar `Modal` de `@/components/ui/modal`. No implementar overlays, portales ni scroll-lock ad hoc.
+
+## Comportamiento visual
+
+| Requisito | Implementación |
+|-----------|----------------|
+| Centro en pantalla | Contenedor `fixed inset-0 flex items-center justify-center` |
+| Ancho < pantalla | `w-full max-w-sm` + padding `p-4` (márgenes mínimos 1rem) |
+| Altura < pantalla | `max-h-[calc(100dvh-2rem)]` en el panel |
+| Fondo difuminado | Backdrop `bg-black/60 backdrop-blur-md` |
+| Clic fuera cierra | Botón backdrop `absolute inset-0` con `onClick={onClose}` |
+
+## Bloqueo de interacción con el fondo
+
+Con el modal abierto:
+
+1. **Sin scroll ni deslizamiento** en `html`, `body` y `main` (`overflow: hidden` + `data-modal-open` en `<html>`).
+2. El backdrop lleva `touch-action: none` y `overscroll-behavior: none` para bloquear gestos táctiles.
+3. **Solo** el backdrop acepta pulsación para cerrar; el contenido detrás no es interactivo.
+4. El panel del modal (`z-10` sobre backdrop) conserva scroll interno si el contenido excede la altura.
+
+## Portal y accesibilidad
+
+- Renderizar con `createPortal(..., document.body)` — nunca dentro de contenedores con `overflow`.
+- `role="dialog"`, `aria-modal="true"`, `aria-labelledby` y cierre con `Escape`.
+- Botón de cierre visible en cabecera (icono X, target táctil ≥ 40px).
+
+## API del componente base
+
+```tsx
+import { Modal } from "@/components/ui/modal";
+
+<Modal open={open} onClose={onClose} title="Título">
+  {/* contenido */}
+</Modal>
+```
+
+Props opcionales: `className` para ancho custom (`max-w-md`, etc.), siempre respetando `max-h-[calc(100dvh-2rem)]`.
+
+## Prohibiciones
+
+- ❌ `items-end` (bottom sheet) — el modal va centrado en todos los breakpoints.
+- ❌ `backdrop-blur-[2px]` u overlay sin blur perceptible.
+- ❌ Modales sin cierre por backdrop o sin bloqueo de scroll del `main`.
+- ❌ Duplicar lógica de portal/scroll-lock en componentes hijos.

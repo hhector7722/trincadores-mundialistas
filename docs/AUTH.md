@@ -1,46 +1,46 @@
-﻿# Auth (Fase 1a)
+﻿# Auth — acceso cerrado (alias + codigo)
 
-## Supabase Dashboard (obligatorio)
+## Modelo
+
+- UI: **alias + codigo de acceso** (sin email visible).
+- Backend: `toAuthEmail(alias)` + `signInWithPassword(codigo)`.
+- Identidad: `auth.users.id` = `profiles.id` = `pool_members.profile_id`.
+- RLS sin cambios estructurales: todo depende de `auth.uid()`.
+
+## Supabase Dashboard
 
 - Desactivar confirmacion de email.
-- `minimum_password_length` >= 6 (app exige 8).
-- Site URL / Redirect URLs: incluir `http://localhost:3000` y `http://localhost:3000/login`.
+- `minimum_password_length` >= 12 (codigos de acceso).
+- Site URL / Redirect URLs: produccion + `http://localhost:3000/login`.
 
 ## Login
 
-- UI: username + password.
-- Backend: `toAuthEmail(username)` + `signInWithPassword`.
+1. Usuario introduce alias + codigo.
+2. Server Action `signIn` valida formato.
+3. `signInWithPassword` crea sesion Supabase (cookies SSR).
+4. Se comprueba `profiles.is_active`.
+5. Cookie de pool activo si hay una sola membresia.
 
-## Registro
+## Registro abierto
 
-- Requiere codigo de invitacion.
-- Orden: signUp -> insert profiles -> RPC `consume_invite_and_join`.
-- Si falla profile o RPC: rollback con `admin.deleteUser` (+ delete profiles si aplica).
+**Desactivado.** No existe `/register`. Los participantes se precargan con `npm run db:bootstrap`.
 
-## Recovery (1a) — limitacion operativa
+## Recuperacion de codigo
 
-- Mecanismo tecnico: `resetPasswordForEmail(toAuthEmail(username))` (email sintetico interno).
-- **No es recovery usable en produccion** salvo que exista un canal de correo real que entregue mensajes a ese dominio (no hay inbox en `auth.trincadores.local`).
-- La UI muestra mensaje generico; eso no implica que el usuario reciba el enlace.
-- Para recovery real en fases posteriores: SMTP operativo y/o `profiles.recovery_email` (futuro).
+No hay recovery por email. El owner regenera codigos con `regenerateAccessCode` (admin).
 
-## Bootstrap pool + owner
+## Bootstrap produccion
 
-- **Fuera de 1a.** Usar `npm run db:seed` o service_role.
-- RPC `create_pool_with_owner`: documentada para fase posterior.
+```bash
+CONFIRM_PURGE=1 npm run db:purge-demo
+ALLOW_BOOTSTRAP=1 npm run db:bootstrap
+```
 
-## Seed dev
+Los codigos se guardan en `access-codes.local.txt` (gitignored). Entregar por canal privado.
 
-- Codigo invitacion: `SEED2026`
-- Usuario ejemplo: `maria` / password `DevSeed2026!` (ver `lib/dev/seed-ids.ts`)
+## Variables
 
-## Probar en local
-
-1. Aplicar migraciones 0b + `20260605000000_phase_1a_auth_rpc.sql`.
-2. `.env.local` con URL, anon key, service role, `AUTH_INTERNAL_DOMAIN`, `NEXT_PUBLIC_SITE_URL`.
-3. `npm run db:seed` (opcional).
-4. `npm run dev` -> http://localhost:3000 (redirige a login si no hay sesion).
-5. Registro con codigo nuevo de invitacion o `SEED2026` y usuario nuevo.
-6. Login con usuario seed.
-7. Logout desde cabecera en `/`.
-8. Recovery en `/recover`: solo verifica que la accion no rompe; no esperes email salvo SMTP configurado.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (solo server/scripts)
+- `DATABASE_URL` (scripts purge/bootstrap)
+- `AUTH_INTERNAL_DOMAIN` (opcional, default `auth.trincadores.local`)

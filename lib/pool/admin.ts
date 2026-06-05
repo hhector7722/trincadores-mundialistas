@@ -15,3 +15,16 @@ export async function isPoolAdmin(poolId: string, profileId: string): Promise<bo
   if (error || !data) return false;
   return ADMIN_ROLES.includes(data.role as PoolMemberRole);
 }
+
+export async function isPoolOwner(poolId: string, profileId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("pool_members")
+    .select("role")
+    .eq("pool_id", poolId)
+    .eq("profile_id", profileId)
+    .maybeSingle();
+
+  if (error || !data) return false;
+  return data.role === "owner";
+}

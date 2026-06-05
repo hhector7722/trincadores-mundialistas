@@ -25,7 +25,9 @@ export default async function AdminPage() {
   return (
     <div className="space-y-4 p-4 pb-8">
       <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Admin resultados</h1>
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Admin
+        </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">
           Minimo operativo: resultado oficial, finished y recalculo RPC.
         </p>

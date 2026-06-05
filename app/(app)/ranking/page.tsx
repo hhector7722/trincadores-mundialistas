@@ -13,18 +13,14 @@ export default async function RankingPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { matchday, rows } = await getPoolLeaderboard(ctx.activePoolId);
+  const { rows } = await getPoolLeaderboard(ctx.activePoolId);
 
   return (
-    <div className="space-y-4 p-4 pb-8">
-      <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Ranking</h1>
-        <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          {ctx.activePoolName} — Clasificacion general
-          {matchday ? ` · ${matchday.name}` : ""}
-        </p>
-      </div>
-      <Card className="overflow-hidden p-0">
+    <div className="flex h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)] flex-col gap-2 p-3 pb-2">
+      <h1 className="shrink-0 font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+        La tabla
+      </h1>
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
         <RankingTable rows={rows} currentProfileId={user!.id} />
       </Card>
     </div>

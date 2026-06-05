@@ -15,9 +15,9 @@ export function Badge({
     <span
       className={cn(
         "inline-flex min-h-6 items-center rounded-md px-2 text-xs font-medium uppercase tracking-wide",
-        variant === "default" && "bg-[var(--tm-primary-soft)] text-[var(--tm-primary)]",
+        variant === "default" && "bg-[var(--tm-accent-soft)] text-[var(--tm-accent)]",
         variant === "live" && "bg-[var(--tm-live-soft)] text-[var(--tm-live)]",
-        variant === "muted" && "bg-[var(--tm-bg)] text-[var(--tm-muted)]",
+        variant === "muted" && "bg-[var(--tm-bg-elevated)] text-[var(--tm-muted)]",
         className
       )}
     >

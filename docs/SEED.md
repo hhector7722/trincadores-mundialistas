@@ -1,19 +1,19 @@
-# Seed de desarrollo (oficial)
+# Seed demo (OBSOLETO ? no usar en produccion)
 
-## Orden
-1. Aplicar `20260604220000_initial_schema.sql`
-2. Aplicar `20260604230000_schema_0b1_alignments.sql`
-3. `npm run db:seed`
+El seed demo (`mundial-seed`, usuarios `maria`/`owner`, password `DevSeed2026!`) fue sustituido por acceso cerrado.
 
-## Variables
-- `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-- Opcional `DATABASE_URL` para aplicar `seed.sql` automatico
-- `AUTH_INTERNAL_DOMAIN=auth.trincadores.local`
+## Produccion
 
-## Usuarios (password `DevSeed2026!`)
-owner, admin, maria, pedro, lucia, diego, ana — ver `lib/dev/seed-ids.ts`
+Usar solo:
 
-## Datos
-- Pool `mundial-seed`, roles owner/admin/player
-- Partido finished 2-1 con puntos recalculados
-- `pool_member_scores` por jornada con rank y cumulative
+```bash
+CONFIRM_PURGE=1 npm run db:purge-demo
+ALLOW_BOOTSTRAP=1 npm run db:bootstrap
+```
+
+## Archivos legacy (solo referencia local)
+
+- `scripts/dev/seed.sql`
+- `lib/dev/seed-ids.ts`
+
+**No hay comando npm** que ejecute el seed demo. No repoblar produccion.

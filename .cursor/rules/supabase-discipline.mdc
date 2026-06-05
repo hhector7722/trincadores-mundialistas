@@ -1,0 +1,87 @@
+---
+description: Disciplina obligatoria para trabajar con Supabase — verificar esquema remoto antes de proponer cambios
+alwaysApply: true
+---
+
+# Supabase — Disciplina de esquema y migraciones
+
+A partir de ahora, trabaja con Supabase conectado en este proyecto (Trincadores Mundialistas) y sigue estas reglas obligatorias.
+
+## Verificación inicial obligatoria
+
+Antes de proponer cualquier cambio de base de datos, esquema, RLS, RPC o query:
+
+1. Confirma que el proyecto Supabase conectado es el correcto:
+   - ref esperado: `savsnkgpvvmdbaujqqoa`
+   - nombre: `Trincadores-Mundialistas`
+   - URL: `https://savsnkgpvvmdbaujqqoa.supabase.co`
+   Si no coincide con `.env.local` o `supabase/.temp/linked-project.json`, DETENTE y avisa.
+
+2. Inspecciona el estado real vía MCP Supabase (no por intuición):
+   - `list_tables` (verbose) → tablas, columnas, FKs
+   - `list_migrations` → migraciones aplicadas en remoto
+   - `execute_sql` → policies RLS, funciones RPC, vistas
+   - `get_advisors` (security) → alertas de RLS/funciones/vistas
+   Solo lectura salvo que el usuario pida explícitamente ejecutar cambios.
+
+3. Contrasta siempre remoto vs repo:
+   - `supabase/migrations/` (fuente de verdad del esquema)
+   - `supabase/seed.sql` + `supabase/seed-auth.ts` (datos demo)
+   - código consumidor: `lib/**/queries.ts`, `actions/`, `lib/supabase/`
+
+4. Si detectas diferencia entre remoto, migraciones y código, repórtala ANTES de tocar nada. No avances con suposiciones.
+
+## Prohibiciones
+
+- No inventes SQL, tablas, columnas, policies ni RPC "porque probablemente existan".
+- No hagas cambios destructivos (DROP, TRUNCATE, reset, `apply_migration` en remoto sin revisión) sin advertencia explícita y confirmación del usuario.
+- No crees tablas manualmente en el dashboard si ya existe estrategia con migraciones.
+- No mezcles datos demo (`mundial-seed`, UUIDs `a0000000…` / `b0000000…`) con datos reales sin control.
+- No uses `apply_migration` en remoto para iterar DDL; itera con `execute_sql` local y genera migración limpia con `supabase migration new` + `supabase db pull` cuando toque commitear.
+- No expongas `SUPABASE_SERVICE_ROLE_KEY` ni ejecutes SQL destructivo en producción sin avisar.
+
+## Esquema de referencia (verificar siempre en remoto, no confiar ciegamente)
+
+Tablas principales: `profiles`, `pools`, `pool_members`, `pool_member_scores`, `matchdays`, `matches`, `match_results`, `predictions`, `invite_codes`, `activity_events`, `news_items`, `notifications`, `quizzes`, `quiz_questions`, `quiz_question_keys`, `quiz_attempts`, `quiz_responses`, `achievements`, `profile_achievements`, `push_subscriptions`, `admin_audit_log`.
+
+Convención crítica: la FK de usuario es `profile_id` (no `user_id`). `auth.uid()` = `profiles.id`.
+
+Migraciones esperadas (4):
+- `20260604220000_initial_schema`
+- `20260604230000_schema_0b1_alignments`
+- `20260604231000_schema_0b2_rls_defaults`
+- `20260605000000_phase_1a_auth_rpc`
+
+## Protocolo para cambios de esquema
+
+Si vas a proponer un cambio, primero explica en este orden:
+
+1. **Diagnóstico breve** — qué hay ahora en remoto vs repo vs código.
+2. **Problema real** — qué resuelve y por qué hace falta.
+3. **Archivos afectados** — migraciones, seed, queries, actions, tipos.
+4. **Migración** — sí/no, nombre propuesto, SQL explícito y reversible si es posible.
+5. **RLS** — policies nuevas/modificadas, impacto en `authenticated`/`anon`.
+6. **Seed/demo** — si afecta `seed.sql` o usuarios de prueba.
+7. **Riesgos** — destructivo, downtime, datos existentes.
+
+Solo ejecuta cambios si el usuario lo pide explícitamente. Nada de cambios silenciosos.
+
+## Protocolo para frontend/queries
+
+Antes de escribir o modificar queries en TypeScript:
+- Verifica nombres reales de tablas y columnas contra Supabase remoto.
+- Respeta RLS: las queries deben funcionar con rol `authenticated`, no asumir bypass.
+- Server Actions usan `@supabase/ssr`; mutaciones críticas vía RPC security definer cuando corresponda.
+- Si la respuesta depende del esquema actual, consulta Supabase primero.
+
+## Forma de trabajar
+
+1. Diagnóstico breve (remoto + diff con repo).
+2. Propuesta concreta (sin ejecutar).
+3. Ejecución solo bajo petición explícita.
+4. Tras cambios de esquema: actualizar migración, revisar seed, correr advisors, verificar con query de prueba.
+
+## Prioridad
+
+Exactitud > consistencia > seguridad > velocidad.
+Si dudas entre avanzar o verificar, verifica.

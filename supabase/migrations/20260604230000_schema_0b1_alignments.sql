@@ -1,10 +1,22 @@
 -- Fase 0b.1: alineacion nucleo
+drop type if exists public.pool_member_role_new;
 create type public.pool_member_role_new as enum ('owner', 'admin', 'player');
+alter table public.pool_members alter column role drop default;
 alter table public.pool_members alter column role type public.pool_member_role_new using (case when role::text = 'admin' then 'admin'::public.pool_member_role_new else 'player'::public.pool_member_role_new end);
 drop type public.pool_member_role;
 alter type public.pool_member_role_new rename to pool_member_role;
 insert into public.pool_members (pool_id, user_id, role) select p.id, p.owner_id, 'owner'::public.pool_member_role from public.pools p where not exists (select 1 from public.pool_members pm where pm.pool_id = p.id and pm.user_id = p.owner_id);
 update public.pool_members pm set role = 'owner'::public.pool_member_role from public.pools p where p.id = pm.pool_id and pm.user_id = p.owner_id;
+drop policy if exists pools_insert on public.pools;
+drop policy if exists pools_update on public.pools;
+create or replace function public.is_pool_admin(p_pool_id uuid, p_user_id uuid default auth.uid())
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.user_id = p_user_id and pm.role in ('admin'::public.pool_member_role, 'owner'::public.pool_member_role));
+$$;
+create or replace function public.is_pool_owner(p_pool_id uuid, p_user_id uuid default auth.uid())
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.user_id = p_user_id and pm.role = 'owner'::public.pool_member_role);
+$$;
 alter table public.pools drop column owner_id;
 alter table public.pool_members rename column user_id to profile_id;
 alter table public.predictions rename column user_id to profile_id;
@@ -26,19 +38,19 @@ alter table public.pool_member_scores add column sign_hits int not null default 
 alter table public.pool_member_scores drop constraint pool_member_scores_pkey;
 alter table public.pool_member_scores add constraint pool_member_scores_pkey primary key (pool_id, profile_id, matchday_id);
 alter table public.quiz_attempts add constraint quiz_attempts_quiz_profile_unique unique (quiz_id, profile_id);
-create or replace function public.is_pool_member(p_pool_id uuid, p_profile_id uuid default auth.uid())
+create or replace function public.is_pool_member(p_pool_id uuid, p_user_id uuid default auth.uid())
 returns boolean language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_profile_id);
+  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_user_id);
 $$;
 
-create or replace function public.is_pool_admin(p_pool_id uuid, p_profile_id uuid default auth.uid())
+create or replace function public.is_pool_admin(p_pool_id uuid, p_user_id uuid default auth.uid())
 returns boolean language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_profile_id and pm.role in ('admin'::public.pool_member_role, 'owner'::public.pool_member_role));
+  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_user_id and pm.role in ('admin'::public.pool_member_role, 'owner'::public.pool_member_role));
 $$;
 
-create or replace function public.is_pool_owner(p_pool_id uuid, p_profile_id uuid default auth.uid())
+create or replace function public.is_pool_owner(p_pool_id uuid, p_user_id uuid default auth.uid())
 returns boolean language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_profile_id and pm.role = 'owner'::public.pool_member_role);
+  select exists (select 1 from public.pool_members pm where pm.pool_id = p_pool_id and pm.profile_id = p_user_id and pm.role = 'owner'::public.pool_member_role);
 $$;
 
 create or replace function public.prediction_edit_allowed(p_match_id uuid)
@@ -46,10 +58,12 @@ returns boolean language sql stable security definer set search_path = public as
   select exists (select 1 from public.matches m where m.id = p_match_id and m.status = 'scheduled' and now() < m.kickoff_at - interval '5 minutes');
 $$;
 
-create or replace view public.quiz_leaderboard as
+drop view if exists public.quiz_leaderboard;
+create view public.quiz_leaderboard as
   select qa.quiz_id, qa.profile_id, max(qa.score) as best_score,
          count(*) filter (where qa.status = 'submitted') as attempts
   from public.quiz_attempts qa where qa.status = 'submitted' group by qa.quiz_id, qa.profile_id;
+grant select on public.quiz_leaderboard to authenticated, anon;
 
 create or replace function public.recalculate_match_scores(p_match_id uuid)
 returns void language plpgsql security definer set search_path = public as $$

@@ -6,7 +6,9 @@ export default function ActivityPage() {
   return (
     <div className="space-y-4 p-4 pb-8">
       <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Actividad</h1>
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Actividad
+        </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">Eventos de la porra.</p>
       </div>
       <Card>

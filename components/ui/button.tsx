@@ -14,11 +14,12 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-medium transition-colors",
-        variant === "primary" && "bg-[var(--tm-primary)] text-white hover:opacity-90",
-        variant === "ghost" && "text-[var(--tm-muted)] hover:text-[var(--tm-fg)]",
+        "inline-flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-semibold transition-colors",
+        variant === "primary" &&
+          "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] hover:brightness-110",
+        variant === "ghost" && "rounded-xl text-[var(--tm-muted)] hover:text-[var(--tm-fg)]",
         variant === "outline" &&
-          "border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)]",
+          "rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] hover:border-[var(--tm-accent-muted)]",
         className
       )}
       {...props}

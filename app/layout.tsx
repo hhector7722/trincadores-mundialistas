@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,10 @@ const archivoBlack = Archivo_Black({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#05010D",
+};
+
 export const metadata: Metadata = {
   title: "Trincadores Mundialistas",
   description: "Porra privada Mundial 2026",
@@ -23,7 +27,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Trincadores",
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
   },
   icons: {
     icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],

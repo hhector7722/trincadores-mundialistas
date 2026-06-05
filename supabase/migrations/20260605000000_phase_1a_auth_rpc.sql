@@ -1,4 +1,4 @@
-﻿-- Fase 1a: registro por codigo de invitacion (SECURITY DEFINER)
+-- Fase 1a: registro por codigo de invitacion (SECURITY DEFINER)
 
 create or replace function public.consume_invite_and_join(p_code text)
 returns uuid

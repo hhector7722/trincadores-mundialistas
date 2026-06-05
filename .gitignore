@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# codigos de acceso generados localmente (nunca commitear)
+access-codes.local.txt
+
 # vercel
 .vercel
 
