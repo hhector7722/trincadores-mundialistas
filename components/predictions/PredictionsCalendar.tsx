@@ -156,7 +156,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
   const weeks = useMemo(() => {
     const grid = buildMonthGrid(viewMonth.year, viewMonth.month, matchesByDate);
-    const trimmed = trimEmptyMatchWeeks(grid);
+    const trimmed = trimEmptyMatchWeeks(grid, viewMonth);
     return trimmed.length > 0 ? trimmed : grid;
   }, [viewMonth, matchesByDate]);
 

@@ -188,8 +188,11 @@ function weekHasMatches<T extends CalendarMatchLike>(week: CalendarWeek<T>): boo
 
 /** Quita semanas iniciales/finales sin partidos para ganar altura en la rejilla. */
 export function trimEmptyMatchWeeks<T extends CalendarMatchLike>(
-  weeks: CalendarWeek<T>[]
+  weeks: CalendarWeek<T>[],
+  viewMonth?: MonthYear
 ): CalendarWeek<T>[] {
+  if (!weeks.length) return weeks;
+
   let start = 0;
   let end = weeks.length;
 
@@ -199,6 +202,24 @@ export function trimEmptyMatchWeeks<T extends CalendarMatchLike>(
 
   while (end > start && !weekHasMatches(weeks[end - 1]!)) {
     end--;
+  }
+
+  // Julio: eliminar hasta 2 filas finales sin partidos del grid mensual.
+  if (viewMonth?.month === 7) {
+    let julyEnd = weeks.length;
+    let removed = 0;
+
+    while (removed < 2 && julyEnd > start) {
+      const week = weeks[julyEnd - 1]!;
+      if (!weekHasMatches(week)) {
+        julyEnd--;
+        removed++;
+      } else {
+        break;
+      }
+    }
+
+    end = Math.min(end, julyEnd);
   }
 
   return weeks.slice(start, end);
