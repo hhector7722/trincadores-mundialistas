@@ -9,7 +9,7 @@ describe("1c.1 editable source of truth", () => {
   it("queries no usa isMatchLikelyEditable", () => {
     const src = readFileSync(join(root, "queries.ts"), "utf8");
     assert.equal(src.includes("isMatchLikelyEditable"), false);
-    assert.equal(src.includes("fetchEditableByMatchIds"), true);
+    assert.equal(src.includes("computePredictionEditableLocally"), true);
     assert.equal(src.includes("fetchMatchEditableFromDb"), true);
   });
 

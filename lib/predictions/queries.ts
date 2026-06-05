@@ -64,16 +64,16 @@ export async function fetchMatchEditableFromDb(matchId: string): Promise<boolean
   return data === true;
 }
 
-/** Fuente unica de verdad: RPC Postgres por partido. */
-export async function fetchEditableByMatchIds(
-  matchIds: string[]
-): Promise<Map<string, boolean>> {
-  if (!matchIds.length) return new Map();
+const PREDICTION_LOCK_MS = 5 * 60 * 1000;
 
-  const entries = await Promise.all(
-    matchIds.map(async (id) => [id, await fetchMatchEditableFromDb(id)] as const)
-  );
-  return new Map(entries);
+/** Misma regla que RPC `prediction_edit_allowed`: scheduled y T-5 min. */
+export function computePredictionEditableLocally(
+  status: MatchStatus,
+  kickoffAtIso: string,
+  nowMs: number = Date.now()
+): boolean {
+  if (status !== "scheduled") return false;
+  return nowMs < new Date(kickoffAtIso).getTime() - PREDICTION_LOCK_MS;
 }
 
 export async function getPoolMatchesWithPredictions(
@@ -101,16 +101,16 @@ export async function getPoolMatchesWithPredictions(
     .in("match_id", matchIds);
 
   const predByMatch = new Map((predictions ?? []).map((p) => [p.match_id, p]));
-  const editableByMatch = await fetchEditableByMatchIds(matchIds);
 
   return matches.map((m) => {
     const pred = predByMatch.get(m.id);
+    const status = m.status as MatchStatus;
     return {
       id: m.id,
       home_team: m.home_team,
       away_team: m.away_team,
       kickoff_at: m.kickoff_at,
-      status: m.status as MatchStatus,
+      status,
       matchday_name: dayMap.get(m.matchday_id) ?? "",
       prediction: pred
         ? {
@@ -121,7 +121,7 @@ export async function getPoolMatchesWithPredictions(
             updated_at: pred.updated_at,
           }
         : null,
-      serverEditable: editableByMatch.get(m.id) ?? false,
+      serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
     };
   });
 }

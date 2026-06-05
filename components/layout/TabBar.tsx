@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useTransition, useState, type MouseEvent } from "react";
 import { Activity, Home, ListOrdered, Target, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,12 +14,42 @@ const TABS = [
   { href: "/profile", label: "Perfil", icon: User },
 ] as const;
 
+const TAB_HREFS = TABS.map((tab) => tab.href);
+
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
 export function TabBar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    for (const href of TAB_HREFS) {
+      router.prefetch(href);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    setOptimisticHref(null);
+  }, [pathname]);
+
+  const displayPath = optimisticHref ?? pathname;
+
+  function handleTabClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    if (isActive(pathname, href)) {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+    setOptimisticHref(href);
+    startTransition(() => {
+      router.push(href);
+    });
+  }
 
   return (
     <nav
@@ -27,15 +58,21 @@ export function TabBar() {
     >
       <ul className="flex h-12 items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
+          const active = isActive(displayPath, href);
+          const navigating = optimisticHref === href;
+
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
+                prefetch
+                scroll
+                onClick={(event) => handleTabClick(event, href)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-full flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium",
-                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
+                  "flex h-full min-h-12 touch-manipulation flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition-colors duration-150 active:opacity-80",
+                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
+                  navigating && "opacity-90"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
