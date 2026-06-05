@@ -57,10 +57,10 @@ function CalendarMatchFlags({
           {time}
         </span>
         <div className="tm-cal-flags relative w-full shrink-0">
-          <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute left-[50%] top-1/2 -translate-x-1/2 -translate-y-1/2">
             <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
           </div>
-          <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute left-[85%] top-1/2 -translate-x-1/2 -translate-y-1/2">
             <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
           </div>
         </div>
