@@ -1,4 +1,4 @@
-﻿import { getActivePoolIdFromCookie, setActivePoolCookie } from "@/lib/auth/session";
+﻿import { getActivePoolIdFromCookie } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
 export type UserPool = {
@@ -42,11 +42,6 @@ export async function loadAppShellContext(userId: string): Promise<AppShellConte
   const cookiePoolId = await getActivePoolIdFromCookie();
   const validCookie = cookiePoolId && pools.some((p) => p.id === cookiePoolId);
   const activePoolId = validCookie ? cookiePoolId! : pools[0].id;
-
-  if (cookiePoolId !== activePoolId) {
-    await setActivePoolCookie(activePoolId);
-  }
-
   const activePool = pools.find((p) => p.id === activePoolId) ?? pools[0];
   const profileLabel = profile?.display_name ?? profile?.username ?? "Jugador";
 

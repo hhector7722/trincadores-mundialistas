@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T19:03:17.149Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T22:24:43.828Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -294,7 +294,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/pool/active-pool.ts` | 72 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
+| `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/calendar-layout.ts` | 103 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
@@ -343,7 +343,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/supabase/admin.ts` | 16 líneas | createAdminClient |
 | `lib/supabase/client.ts` | 11 líneas | createClient |
-| `lib/supabase/middleware.ts` | 55 líneas | updateSession |
+| `lib/supabase/middleware.ts` | 65 líneas | updateSession |
 | `lib/supabase/server.ts` | 30 líneas | createClient |
 
 **teams/** — 2 archivos

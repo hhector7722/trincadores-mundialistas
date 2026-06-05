@@ -3,8 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_PATHS = ["/login"];
 
+const PUBLIC_PATHS = ["/manifest.webmanifest", "/icon", "/apple-icon"];
+
 function isAuthPath(pathname: string): boolean {
   return AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
 export async function updateSession(request: NextRequest) {
@@ -36,6 +42,10 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+
+  if (isPublicPath(pathname)) {
+    return supabaseResponse;
+  }
 
   if (user && isAuthPath(pathname)) {
     const redirectUrl = request.nextUrl.clone();
