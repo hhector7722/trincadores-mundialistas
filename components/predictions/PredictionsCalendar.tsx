@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { formatMatchCalendarAbbr, teamNameEs } from "@/lib/teams/display";
+import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
 import {
   buildMonthGrid,
   compareMonth,
@@ -46,14 +47,14 @@ function CalendarMatchLabels({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-btn flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-0.5 transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        "tm-cal-match-btn flex min-h-0 min-w-0 w-full flex-1 flex-col items-center justify-center rounded-sm transition-colors hover:bg-[rgba(111,43,255,0.2)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <span className="tm-cal-team-label text-center font-semibold leading-tight text-[var(--tm-fg)]">
+      <span className="tm-cal-team-label w-full text-center font-semibold leading-none text-[var(--tm-fg)]">
         {matchLabel}
       </span>
-      <span className="tm-cal-kickoff font-medium tabular-nums text-[var(--tm-accent)]">
+      <span className="tm-cal-kickoff w-full text-center font-medium leading-none tabular-nums text-[var(--tm-accent)]">
         {time}
       </span>
     </button>
@@ -96,7 +97,7 @@ function DayCell({
       >
         {cell.dayNumber}
       </span>
-      <div className="mt-0.5 flex flex-1 flex-col gap-px">
+      <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col">
         {cell.matches.map((match) => (
           <CalendarMatchLabels key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}
@@ -116,37 +117,10 @@ function useCalendarViewportLayout(
     const grid = gridRef.current;
     if (!calendar || !grid || rowCount === 0) return;
 
-    const BASE_ROW_HEIGHT = 52;
-
     const syncLayout = () => {
-      calendar.style.removeProperty("--tm-cal-row-height");
-      calendar.style.removeProperty("--tm-cal-ui-scale");
+      resetCalendarLayout(calendar);
       void calendar.offsetHeight;
-
-      const cells = Array.from(grid.children) as HTMLElement[];
-      let minContentRowHeight = 0;
-
-      for (let row = 0; row < rowCount; row++) {
-        let rowHeight = 0;
-        for (let col = 0; col < 7; col++) {
-          const cell = cells[row * 7 + col];
-          if (!cell) continue;
-          rowHeight = Math.max(rowHeight, cell.scrollHeight);
-        }
-        minContentRowHeight = Math.max(minContentRowHeight, rowHeight);
-      }
-
-      const availableGridHeight = grid.clientHeight;
-      let rowHeight = minContentRowHeight;
-
-      if (availableGridHeight > 0) {
-        rowHeight = Math.max(minContentRowHeight, Math.floor(availableGridHeight / rowCount));
-      }
-
-      const scale = Math.max(0.85, Math.min(2.75, rowHeight / BASE_ROW_HEIGHT));
-
-      calendar.style.setProperty("--tm-cal-row-height", `${rowHeight}px`);
-      calendar.style.setProperty("--tm-cal-ui-scale", scale.toFixed(3));
+      fitCalendarLayout(calendar, grid, rowCount);
     };
 
     syncLayout();
@@ -155,7 +129,10 @@ function useCalendarViewportLayout(
     observer.observe(calendar);
     observer.observe(grid);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      resetCalendarLayout(calendar);
+    };
   }, [calendarRef, gridRef, rowCount, viewMonth.month, viewMonth.year]);
 }
 
@@ -263,7 +240,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       </div>
 
       <p className="mt-2 hidden shrink-0 text-center text-[10px] text-[var(--tm-muted)] sm:block">
-        Desliza horizontalmente si no ves todas las columnas. Toca un partido para predecir.
+        Toca un partido para predecir. Cierra 5 min antes del pitido.
       </p>
 
       {activeMatch && (

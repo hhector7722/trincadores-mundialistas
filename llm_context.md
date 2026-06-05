@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:36:48.385Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:40:42.634Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -289,12 +289,13 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/openfootball/slug.ts` | 52 líneas | toSlug, teamExternalKey, cityExternalKey, groupStageKey, calendarMatchdayKey, poolMatchdayKey, knockoutRoundKey, groupMatchId, knockoutMatchId, isPlaceholderTeam |
 | `lib/openfootball/types.ts` | 70 líneas | COMPETITION_CODE, COMPETITION_YEAR, SOURCE_PATH, ParsedStadium, ParsedTeam, StageType, ParsedStage, ParsedMatch, ParsedCalendarMatchday, ParseFootballTxtResult, ParseCupFinalsResult |
 
-**pool/** — 6 archivos
+**pool/** — 7 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/pool/active-pool.ts` | 72 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
+| `lib/pool/calendar-layout.ts` | 103 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
 | `lib/pool/match-calendar.ts` | 198 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
