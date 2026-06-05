@@ -1,36 +1,36 @@
 ﻿@import "tailwindcss";
 
 :root {
-  --tm-bg: #05010d;
-  --tm-bg-light: #140028;
-  --tm-bg-elevated: #0a0314;
+  --tm-bg: #4a2890;
+  --tm-bg-light: #6b42b8;
+  --tm-bg-elevated: #5530a3;
   --tm-fg: #ffffff;
-  --tm-muted: #9b8fb8;
-  --tm-subtle: #6b5f82;
+  --tm-muted: #d4c8ec;
+  --tm-subtle: #b8a8d4;
   --tm-accent: #d9ff00;
-  --tm-accent-soft: rgba(217, 255, 0, 0.12);
-  --tm-accent-muted: rgba(217, 255, 0, 0.55);
+  --tm-accent-soft: rgba(217, 255, 0, 0.14);
+  --tm-accent-muted: rgba(217, 255, 0, 0.65);
   --tm-primary: #d9ff00;
-  --tm-primary-fg: #05010d;
-  --tm-primary-soft: rgba(217, 255, 0, 0.1);
-  --tm-purple: #6f2bff;
-  --tm-purple-deep: #140028;
-  --tm-purple-glow: rgba(111, 43, 255, 0.35);
-  --tm-border: rgba(120, 50, 255, 0.2);
-  --tm-border-subtle: rgba(255, 255, 255, 0.06);
-  --tm-surface: #0c0419;
-  --tm-surface-elevated: #140028;
-  --tm-glass: rgba(12, 4, 25, 0.75);
-  --tm-glass-hero: rgba(10, 3, 20, 0.8);
-  --tm-highlight: rgba(217, 255, 0, 0.08);
+  --tm-primary-fg: #2a1058;
+  --tm-primary-soft: rgba(217, 255, 0, 0.12);
+  --tm-purple: #8b5cf6;
+  --tm-purple-deep: #5530a3;
+  --tm-purple-glow: rgba(180, 130, 255, 0.45);
+  --tm-border: rgba(255, 255, 255, 0.2);
+  --tm-border-subtle: rgba(255, 255, 255, 0.1);
+  --tm-surface: rgba(255, 255, 255, 0.1);
+  --tm-surface-elevated: rgba(255, 255, 255, 0.16);
+  --tm-glass: rgba(255, 255, 255, 0.12);
+  --tm-glass-hero: rgba(255, 255, 255, 0.18);
+  --tm-highlight: rgba(217, 255, 0, 0.1);
   --tm-live: #d9ff00;
-  --tm-live-soft: rgba(217, 255, 0, 0.15);
+  --tm-live-soft: rgba(217, 255, 0, 0.18);
   --tm-positive: #84cc16;
   --tm-danger: #ef4444;
   --tm-radius: 16px;
   --tm-radius-lg: 24px;
-  --tm-shadow: 0 4px 24px rgba(111, 43, 255, 0.12);
-  --tm-shadow-soft: 0 8px 32px rgba(111, 43, 255, 0.18);
+  --tm-shadow: 0 4px 24px rgba(90, 40, 180, 0.2);
+  --tm-shadow-soft: 0 8px 40px rgba(120, 60, 220, 0.28);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
@@ -38,8 +38,11 @@
 
 body {
   margin: 0;
-  background: var(--tm-bg);
-  background-image: radial-gradient(ellipse 120% 80% at 50% -20%, var(--tm-bg-light) 0%, transparent 55%);
+  background:
+    radial-gradient(ellipse 90% 70% at 15% -10%, rgba(200, 160, 255, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 95% 20%, rgba(160, 100, 255, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(120, 60, 220, 0.3) 0%, transparent 55%),
+    linear-gradient(165deg, var(--tm-bg-light) 0%, var(--tm-bg) 45%, var(--tm-purple-deep) 100%);
   color: var(--tm-fg);
   font-family: var(--font-ui);
   color-scheme: dark;
@@ -62,11 +65,42 @@ html[data-modal-open] main {
 }
 
 .tm-surface-fade {
-  background: linear-gradient(165deg, var(--tm-bg) 0%, var(--tm-bg-light) 100%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .tm-card-surface {
-  background: linear-gradient(165deg, var(--tm-bg) 0%, var(--tm-bg-light) 100%);
+  background: var(--tm-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.tm-hero-card {
+  background: var(--tm-glass-hero);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--tm-border);
+  box-shadow: var(--tm-shadow-soft);
+}
+
+.tm-hero-card-gradient {
+  background:
+    radial-gradient(ellipse 100% 80% at 30% 0%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(160, 100, 255, 0.22) 45%,
+      rgba(100, 50, 200, 0.12) 100%
+    );
+}
+
+.tm-stat-card {
+  background: var(--tm-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--tm-border);
+  box-shadow: var(--tm-shadow);
 }
 
 .tm-accent-link {
@@ -80,12 +114,11 @@ html[data-modal-open] main {
 
 /* ── Home: atmósfera multicapa ── */
 .tm-home-atmosphere {
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  background: #05010d;
 }
 
 .tm-home-layer-radial {
@@ -93,27 +126,43 @@ html[data-modal-open] main {
   inset: 0;
   background:
     radial-gradient(
-      ellipse 80% 55% at 88% 18%,
-      rgba(111, 43, 255, 0.16) 0%,
-      rgba(111, 43, 255, 0.06) 38%,
+      ellipse 85% 60% at 88% 12%,
+      rgba(220, 180, 255, 0.35) 0%,
+      rgba(160, 100, 255, 0.15) 38%,
       transparent 68%
     ),
     radial-gradient(
-      ellipse 70% 40% at 75% 42%,
-      rgba(111, 43, 255, 0.08) 0%,
+      ellipse 75% 50% at 10% 35%,
+      rgba(180, 130, 255, 0.25) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 70% 45% at 50% 80%,
+      rgba(140, 80, 240, 0.18) 0%,
       transparent 65%
     );
 }
 
 .tm-home-layer-glow {
   position: absolute;
-  top: -12%;
-  right: -25%;
-  width: 95%;
-  height: 55%;
-  background: radial-gradient(circle, rgba(111, 43, 255, 0.18) 0%, transparent 62%);
-  filter: blur(56px);
+  top: -15%;
+  right: -20%;
+  width: 90%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(200, 160, 255, 0.4) 0%, transparent 62%);
+  filter: blur(72px);
   animation: tm-glow-breathe 8s ease-in-out infinite;
+}
+
+.tm-home-layer-glow-secondary {
+  position: absolute;
+  bottom: 10%;
+  left: -15%;
+  width: 70%;
+  height: 45%;
+  background: radial-gradient(circle, rgba(160, 100, 255, 0.3) 0%, transparent 65%);
+  filter: blur(64px);
+  animation: tm-glow-breathe 10s ease-in-out infinite reverse;
 }
 
 .tm-home-layer-texture {
@@ -155,9 +204,9 @@ html[data-modal-open] main {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 80% 70% at 50% 45%,
-    transparent 30%,
-    rgba(5, 1, 13, 0.55) 100%
+    ellipse 90% 80% at 50% 45%,
+    transparent 40%,
+    rgba(60, 25, 120, 0.18) 100%
   );
 }
 
@@ -185,8 +234,8 @@ html[data-modal-open] main {
 /* ── Home: glass cards ── */
 .tm-glass-card {
   background: var(--tm-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--tm-border);
   border-radius: var(--tm-radius);
   box-shadow: var(--tm-shadow);
@@ -198,7 +247,7 @@ html[data-modal-open] main {
 
 .tm-glass-card-interactive:hover {
   transform: translateY(-2px);
-  border-color: rgba(120, 50, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.32);
   box-shadow: var(--tm-shadow-soft);
 }
 
@@ -217,7 +266,7 @@ html[data-modal-open] main {
   right: 0;
   bottom: 0;
   height: 2.5rem;
-  background: linear-gradient(to bottom, transparent, var(--tm-bg));
+  background: linear-gradient(to bottom, transparent, rgba(74, 40, 144, 0.35));
   pointer-events: none;
   z-index: 3;
 }
@@ -250,12 +299,12 @@ html[data-modal-open] main {
   transform: translate(-42%, 0);
   background: radial-gradient(
     ellipse 50% 48% at 50% 40%,
-    rgba(111, 43, 255, 0.28) 0%,
-    rgba(111, 43, 255, 0.1) 40%,
+    rgba(200, 160, 255, 0.4) 0%,
+    rgba(160, 100, 255, 0.18) 40%,
     transparent 68%
   );
-  filter: blur(52px);
-  opacity: 0.65;
+  filter: blur(56px);
+  opacity: 0.75;
   animation: tm-glow-breathe 8s ease-in-out infinite;
 }
 
@@ -428,16 +477,26 @@ html[data-modal-open] main {
     padding: 0;
   }
 
-  .tm-porra-calendar .tm-cal-match-btn .tm-cal-flag {
-    height: 1rem !important;
-    width: 1rem !important;
+  .tm-porra-calendar .tm-cal-team-label {
+    font-size: 0.4375rem;
+    line-height: 1.1;
+  }
+
+  .tm-porra-calendar .tm-cal-kickoff {
+    font-size: 0.4375rem;
+    line-height: 1;
   }
 }
 
 @media (min-width: 640px) {
-  .tm-porra-calendar .tm-cal-match-btn .tm-cal-flag {
-    height: 1.75rem !important;
-    width: 1.75rem !important;
+  .tm-porra-calendar .tm-cal-team-label {
+    font-size: 0.5625rem;
+    line-height: 1.15;
+  }
+
+  .tm-porra-calendar .tm-cal-kickoff {
+    font-size: 0.5625rem;
+    line-height: 1;
   }
 }
 
