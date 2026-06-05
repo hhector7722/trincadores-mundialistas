@@ -21,7 +21,7 @@ export default async function PredictionsPage() {
           Porra
         </h1>
         <p className="mt-0.5 hidden text-sm text-[var(--tm-muted)] sm:mt-1 sm:block">
-          Calendario mensual. Toca las banderas para marcar. Cierra 5 min antes del pitido.
+          Calendario mensual. Toca un partido para marcar. Cierra 5 min antes del pitido.
         </p>
       </div>
 

@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { formatTeamCalendarLabel } from "@/lib/teams/display";
 import {
   buildMonthGrid,
   compareMonth,
@@ -28,7 +28,7 @@ type PredictionsCalendarProps = {
   matches: MatchWithPrediction[];
 };
 
-function CalendarMatchFlags({
+function CalendarMatchLabels({
   match,
   onOpen,
 }: {
@@ -36,7 +36,9 @@ function CalendarMatchFlags({
   onOpen: () => void;
 }) {
   const time = formatKickoffTime(match.kickoff_at);
-  const title = `${time} · ${match.home_team} vs ${match.away_team}`;
+  const homeLabel = formatTeamCalendarLabel(match.home_team);
+  const awayLabel = formatTeamCalendarLabel(match.away_team);
+  const title = `${time} · ${homeLabel} vs ${awayLabel}`;
 
   return (
     <button
@@ -45,16 +47,19 @@ function CalendarMatchFlags({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-btn flex w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-0.5 transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        "tm-cal-match-btn flex w-full min-w-0 flex-col items-stretch justify-center gap-0.5 rounded-sm px-0.5 py-0.5 text-left transition-colors hover:bg-[rgba(111,43,255,0.2)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <div className="flex items-center justify-center gap-px sm:gap-0.5">
-        <TeamFlagBadge name={match.home_team} size="xxs" className="tm-cal-flag" />
-        <span className="hidden text-[9px] leading-none text-[var(--tm-muted)] sm:inline">·</span>
-        <TeamFlagBadge name={match.away_team} size="xxs" className="tm-cal-flag" />
+      <div className="tm-cal-team-lines flex min-w-0 flex-col gap-px">
+        <span className="tm-cal-team-label truncate leading-tight text-[var(--tm-fg)]">
+          {homeLabel}
+        </span>
+        <span className="tm-cal-team-label truncate leading-tight text-[var(--tm-muted)]">
+          {awayLabel}
+        </span>
       </div>
-      <span className="hidden text-[9px] font-medium tabular-nums text-[var(--tm-accent)] sm:block">
+      <span className="tm-cal-kickoff hidden font-medium tabular-nums text-[var(--tm-accent)] sm:block">
         {time}
       </span>
     </button>
@@ -99,7 +104,7 @@ function DayCell({
       </span>
       <div className="mt-0.5 flex flex-1 flex-col gap-px sm:mt-1 sm:gap-1">
         {cell.matches.map((match) => (
-          <CalendarMatchFlags key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
+          <CalendarMatchLabels key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}
       </div>
     </div>
@@ -201,7 +206,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       </div>
 
       <p className="hidden text-center text-[10px] text-[var(--tm-muted)] sm:block">
-        Desliza horizontalmente si no ves todas las columnas. Toca las banderas para predecir.
+        Desliza horizontalmente si no ves todas las columnas. Toca un partido para predecir.
       </p>
 
       {activeMatch && (

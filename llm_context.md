@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:08:34.175Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:13:04.429Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -343,10 +343,11 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/supabase/middleware.ts` | 55 líneas | updateSession |
 | `lib/supabase/server.ts` | 30 líneas | createClient |
 
-**teams/** — 1 archivos
+**teams/** — 2 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/teams/display.ts` | 73 líneas | formatTeamCalendarLabel |
 | `lib/teams/flags.ts` | 62 líneas | teamFlagCode, teamFlagUrl |
 
 **utils.ts/** — 1 archivos
@@ -669,6 +670,7 @@ docs/               → AUTH, RLS, SEED
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
+- `components/predictions/TeamFlagBadge.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
