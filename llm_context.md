@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:49:53.567Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:53:32.307Z`.
 
 | Campo | Valor |
 |-------|-------|

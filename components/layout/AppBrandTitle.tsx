@@ -24,7 +24,7 @@ export function AppBrandTitle({ className, stacked = false }: AppBrandTitleProps
     return (
       <span
         className={cn(
-          "font-brand inline-flex items-center gap-1 uppercase tracking-tight text-[var(--tm-accent)]",
+          "font-brand inline-flex items-center gap-1 uppercase tracking-[-0.03em] text-[var(--tm-accent)]",
           className,
         )}
       >
@@ -40,7 +40,7 @@ export function AppBrandTitle({ className, stacked = false }: AppBrandTitleProps
   return (
     <span
       className={cn(
-        "font-brand inline-flex items-center gap-1 uppercase tracking-tight text-[var(--tm-accent)]",
+        "font-brand inline-flex items-center gap-1 uppercase tracking-[-0.03em] text-[var(--tm-accent)]",
         className,
       )}
     >

@@ -1,5 +1,13 @@
 ﻿@import "tailwindcss";
 
+@font-face {
+  font-family: "GIBSFUT";
+  src: url("/fonts/GIBSFUT.otf") format("opentype");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
 :root {
   --tm-bg: #2e1260;
   --tm-bg-top: #5030a8;
@@ -35,7 +43,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
   --font-display: var(--font-archivo), system-ui, sans-serif;
-  --font-brand: var(--font-metal-mania), system-ui, sans-serif;
+  --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
 }
 
