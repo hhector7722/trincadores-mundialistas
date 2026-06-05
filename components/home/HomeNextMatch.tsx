@@ -43,7 +43,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
             </p>
             <Link
               href="/predictions"
-              className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
             >
               Ver todos
             </Link>
