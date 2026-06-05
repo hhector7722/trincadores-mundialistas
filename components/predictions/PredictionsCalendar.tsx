@@ -46,14 +46,14 @@ function CalendarMatchLabels({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-btn flex w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-0.5 transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        "tm-cal-match-btn flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-0.5 transition-colors hover:bg-[rgba(111,43,255,0.2)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
       <span className="tm-cal-team-label text-center font-semibold leading-tight text-[var(--tm-fg)]">
         {matchLabel}
       </span>
-      <span className="tm-cal-kickoff hidden font-medium tabular-nums text-[var(--tm-accent)] sm:block">
+      <span className="tm-cal-kickoff font-medium tabular-nums text-[var(--tm-accent)]">
         {time}
       </span>
     </button>
@@ -84,13 +84,13 @@ function DayCell({
   return (
     <div
       className={cn(
-        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)] sm:p-1",
+        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)]",
         hasMatches ? "bg-[rgba(212,255,0,0.05)]" : "bg-[rgba(111,43,255,0.04)]"
       )}
     >
       <span
         className={cn(
-          "tm-cal-day-num shrink-0 font-semibold tabular-nums sm:text-xs",
+          "tm-cal-day-num shrink-0 font-semibold tabular-nums",
           isToday ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
         )}
       >
@@ -105,44 +105,58 @@ function DayCell({
   );
 }
 
-function useEqualCalendarRowHeights(
+function useCalendarViewportLayout(
+  calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
   rowCount: number,
   viewMonth: MonthYear
 ) {
   useLayoutEffect(() => {
+    const calendar = calendarRef.current;
     const grid = gridRef.current;
-    if (!grid || rowCount === 0) return;
+    if (!calendar || !grid || rowCount === 0) return;
 
-    const syncRowHeights = () => {
-      grid.style.removeProperty("--tm-cal-row-height");
-      void grid.offsetHeight;
+    const BASE_ROW_HEIGHT = 52;
+
+    const syncLayout = () => {
+      calendar.style.removeProperty("--tm-cal-row-height");
+      calendar.style.removeProperty("--tm-cal-ui-scale");
+      void calendar.offsetHeight;
 
       const cells = Array.from(grid.children) as HTMLElement[];
-      let maxRowHeight = 0;
+      let minContentRowHeight = 0;
 
       for (let row = 0; row < rowCount; row++) {
         let rowHeight = 0;
         for (let col = 0; col < 7; col++) {
           const cell = cells[row * 7 + col];
           if (!cell) continue;
-          rowHeight = Math.max(rowHeight, cell.getBoundingClientRect().height);
+          rowHeight = Math.max(rowHeight, cell.scrollHeight);
         }
-        maxRowHeight = Math.max(maxRowHeight, rowHeight);
+        minContentRowHeight = Math.max(minContentRowHeight, rowHeight);
       }
 
-      if (maxRowHeight > 0) {
-        grid.style.setProperty("--tm-cal-row-height", `${Math.ceil(maxRowHeight)}px`);
+      const availableGridHeight = grid.clientHeight;
+      let rowHeight = minContentRowHeight;
+
+      if (availableGridHeight > 0) {
+        rowHeight = Math.max(minContentRowHeight, Math.floor(availableGridHeight / rowCount));
       }
+
+      const scale = Math.max(0.85, Math.min(2.75, rowHeight / BASE_ROW_HEIGHT));
+
+      calendar.style.setProperty("--tm-cal-row-height", `${rowHeight}px`);
+      calendar.style.setProperty("--tm-cal-ui-scale", scale.toFixed(3));
     };
 
-    syncRowHeights();
+    syncLayout();
 
-    const observer = new ResizeObserver(syncRowHeights);
+    const observer = new ResizeObserver(syncLayout);
+    observer.observe(calendar);
     observer.observe(grid);
 
     return () => observer.disconnect();
-  }, [gridRef, rowCount, viewMonth.month, viewMonth.year]);
+  }, [calendarRef, gridRef, rowCount, viewMonth.month, viewMonth.year]);
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
@@ -150,6 +164,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   const monthRange = useMemo(() => getMonthRangeFromMatches(matches), [matches]);
   const [viewMonth, setViewMonth] = useState<MonthYear>(() => getInitialMonthYear(matches));
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
+  const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -161,7 +176,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     [viewMonth, matchesByDate]
   );
 
-  useEqualCalendarRowHeights(gridRef, weeks.length, viewMonth);
+  useCalendarViewportLayout(calendarRef, gridRef, weeks.length, viewMonth);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthMatchCount = useMemo(() => {
@@ -183,22 +198,25 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   }
 
   return (
-    <>
-      <div className="tm-porra-calendar-wrap pb-1">
-        <section className="tm-porra-calendar tm-glass-card p-0">
-          <div className="flex justify-center border-b border-[var(--tm-border)] px-1 py-1 sm:px-3 sm:py-2">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="tm-porra-calendar-wrap flex min-h-0 flex-1 flex-col">
+        <section
+          ref={calendarRef}
+          className="tm-porra-calendar tm-glass-card flex min-h-0 flex-1 flex-col p-0"
+        >
+          <div className="tm-cal-header flex shrink-0 justify-center border-b border-[var(--tm-border)] px-1 py-1 sm:px-3 sm:py-2">
             <div className="tm-cal-month-nav inline-flex max-w-full items-center gap-0.5 sm:gap-1.5">
               <button
                 type="button"
                 disabled={!canGoPrev}
                 aria-label="Mes anterior"
                 onClick={() => setViewMonth((m) => shiftMonth(m, -1))}
-                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30 sm:h-10 sm:w-10"
+                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
               >
                 <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
               <div className="min-w-0 px-0.5 text-center">
-                <h2 className="tm-cal-month-title whitespace-nowrap font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-base">
+                <h2 className="tm-cal-month-title whitespace-nowrap font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
                   {formatMonthLabel(viewMonth.year, viewMonth.month)}
                 </h2>
                 <p className="hidden whitespace-nowrap text-[10px] text-[var(--tm-muted)] sm:block">
@@ -210,18 +228,18 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
                 disabled={!canGoNext}
                 aria-label="Mes siguiente"
                 onClick={() => setViewMonth((m) => shiftMonth(m, 1))}
-                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30 sm:h-10 sm:w-10"
+                className="tm-cal-nav-btn flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[rgba(111,43,255,0.12)] hover:text-[var(--tm-fg)] disabled:opacity-30"
               >
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)]">
+          <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)]">
             {WEEKDAY_LABELS.map((label, index) => (
               <div
                 key={label}
-                className="tm-cal-weekday text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:py-2 sm:text-xs"
+                className="tm-cal-weekday text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)]"
               >
                 <span className="sm:hidden">{WEEKDAY_LABELS_MOBILE[index]}</span>
                 <span className="hidden sm:inline">{label}</span>
@@ -229,7 +247,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
             ))}
           </div>
 
-          <div ref={gridRef} className="tm-cal-body grid grid-cols-7">
+          <div ref={gridRef} className="tm-cal-body grid min-h-0 flex-1 grid-cols-7">
             {weeks.flatMap((week, weekIndex) =>
               week.cells.map((cell, cellIndex) => (
                 <DayCell
@@ -244,7 +262,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         </section>
       </div>
 
-      <p className="hidden text-center text-[10px] text-[var(--tm-muted)] sm:block">
+      <p className="mt-2 hidden shrink-0 text-center text-[10px] text-[var(--tm-muted)] sm:block">
         Desliza horizontalmente si no ves todas las columnas. Toca un partido para predecir.
       </p>
 
@@ -257,6 +275,6 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           match={activeMatch}
         />
       )}
-    </>
+    </div>
   );
 }

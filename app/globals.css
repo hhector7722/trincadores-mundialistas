@@ -472,13 +472,14 @@ html[data-modal-open] main {
   }
 }
 
-/* ── Porra: calendario compacto en móvil ── */
+/* ── Porra: calendario a pantalla completa ── */
 .tm-porra-page {
   max-width: 100%;
   overflow-x: hidden;
 }
 
 .tm-porra-calendar {
+  --tm-cal-ui-scale: 1;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -488,64 +489,55 @@ html[data-modal-open] main {
   min-height: var(--tm-cal-row-height, auto);
 }
 
-@media (max-width: 639px) {
-  .tm-porra-calendar .tm-cal-nav-btn {
-    height: 2rem;
-    width: 2rem;
-  }
-
-  .tm-porra-calendar .tm-cal-nav-btn svg {
-    height: 1rem;
-    width: 1rem;
-  }
-
-  .tm-porra-calendar .tm-cal-month-title {
-    font-size: 0.6875rem;
-    line-height: 1.1;
-  }
-
-  .tm-porra-calendar .tm-cal-weekday {
-    padding-top: 0.125rem;
-    padding-bottom: 0.125rem;
-    font-size: 0.5rem;
-    line-height: 1;
-  }
-
-  .tm-porra-calendar .tm-cal-cell {
-    padding: 0.125rem;
-  }
-
-  .tm-porra-calendar .tm-cal-day-num {
-    font-size: 0.5rem;
-    line-height: 1;
-  }
-
-  .tm-porra-calendar .tm-cal-match-btn {
-    gap: 1px;
-    padding: 0;
-  }
-
-  .tm-porra-calendar .tm-cal-team-label {
-    font-size: 0.4375rem;
-    line-height: 1.1;
-  }
-
-  .tm-porra-calendar .tm-cal-kickoff {
-    font-size: 0.4375rem;
-    line-height: 1;
-  }
+.tm-porra-calendar .tm-cal-month-title {
+  font-size: calc(0.75rem * var(--tm-cal-ui-scale));
+  line-height: 1.1;
 }
 
-@media (min-width: 640px) {
-  .tm-porra-calendar .tm-cal-team-label {
-    font-size: 0.5625rem;
-    line-height: 1.15;
-  }
+.tm-porra-calendar .tm-cal-header p {
+  font-size: calc(0.625rem * var(--tm-cal-ui-scale));
+}
 
-  .tm-porra-calendar .tm-cal-kickoff {
-    font-size: 0.5625rem;
-    line-height: 1;
-  }
+.tm-porra-calendar .tm-cal-nav-btn {
+  height: calc(2rem * var(--tm-cal-ui-scale));
+  width: calc(2rem * var(--tm-cal-ui-scale));
+}
+
+.tm-porra-calendar .tm-cal-nav-btn svg {
+  height: calc(1rem * var(--tm-cal-ui-scale));
+  width: calc(1rem * var(--tm-cal-ui-scale));
+}
+
+.tm-porra-calendar .tm-cal-weekday {
+  padding-top: calc(0.25rem * var(--tm-cal-ui-scale));
+  padding-bottom: calc(0.25rem * var(--tm-cal-ui-scale));
+  font-size: calc(0.5625rem * var(--tm-cal-ui-scale));
+  line-height: 1.1;
+}
+
+.tm-porra-calendar .tm-cal-cell {
+  padding: calc(0.25rem * var(--tm-cal-ui-scale));
+}
+
+.tm-porra-calendar .tm-cal-day-num {
+  font-size: calc(0.5625rem * var(--tm-cal-ui-scale));
+  line-height: 1.1;
+}
+
+.tm-porra-calendar .tm-cal-match-btn {
+  gap: calc(0.125rem * var(--tm-cal-ui-scale));
+  min-height: calc(1.5rem * var(--tm-cal-ui-scale));
+  padding: calc(0.125rem * var(--tm-cal-ui-scale));
+}
+
+.tm-porra-calendar .tm-cal-team-label {
+  font-size: calc(0.5rem * var(--tm-cal-ui-scale));
+  line-height: 1.15;
+}
+
+.tm-porra-calendar .tm-cal-kickoff {
+  font-size: calc(0.4375rem * var(--tm-cal-ui-scale));
+  line-height: 1.1;
 }
 
 @media (min-width: 640px) {
@@ -559,5 +551,25 @@ html[data-modal-open] main {
 
   .tm-porra-calendar {
     min-width: 42rem;
+  }
+
+  .tm-porra-calendar .tm-cal-month-title {
+    font-size: calc(0.875rem * var(--tm-cal-ui-scale));
+  }
+
+  .tm-porra-calendar .tm-cal-weekday {
+    font-size: calc(0.6875rem * var(--tm-cal-ui-scale));
+  }
+
+  .tm-porra-calendar .tm-cal-day-num {
+    font-size: calc(0.75rem * var(--tm-cal-ui-scale));
+  }
+
+  .tm-porra-calendar .tm-cal-team-label {
+    font-size: calc(0.625rem * var(--tm-cal-ui-scale));
+  }
+
+  .tm-porra-calendar .tm-cal-kickoff {
+    font-size: calc(0.5625rem * var(--tm-cal-ui-scale));
   }
 }
