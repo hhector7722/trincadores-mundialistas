@@ -563,19 +563,28 @@ html[data-modal-open] main {
   padding: calc(0.0625rem * var(--tm-cal-ui-scale));
 }
 
-.tm-porra-calendar .tm-cal-team-label,
-.tm-porra-calendar .tm-cal-kickoff {
+.tm-porra-calendar .tm-cal-flags {
+  gap: calc(0.125rem * var(--tm-cal-ui-scale));
   min-width: 0;
   overflow: hidden;
-  white-space: nowrap;
 }
 
-.tm-porra-calendar .tm-cal-team-label {
-  font-size: calc(0.5rem * var(--tm-cal-ui-scale));
+.tm-porra-calendar .tm-cal-flag,
+.tm-porra-calendar .tm-cal-flag-dim {
+  height: calc(0.875rem * var(--tm-cal-ui-scale));
+  width: calc(0.875rem * var(--tm-cal-ui-scale));
+  flex-shrink: 0;
+}
+
+.tm-porra-calendar .tm-cal-flag span {
+  font-size: calc(0.375rem * var(--tm-cal-ui-scale));
   line-height: 1;
 }
 
 .tm-porra-calendar .tm-cal-kickoff {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   font-size: calc(0.4375rem * var(--tm-cal-ui-scale));
   line-height: 1;
 }
@@ -593,8 +602,10 @@ html[data-modal-open] main {
     font-size: calc(0.75rem * var(--tm-cal-ui-scale));
   }
 
-  .tm-porra-calendar .tm-cal-team-label {
-    font-size: calc(0.625rem * var(--tm-cal-ui-scale));
+  .tm-porra-calendar .tm-cal-flag,
+  .tm-porra-calendar .tm-cal-flag-dim {
+    height: calc(1rem * var(--tm-cal-ui-scale));
+    width: calc(1rem * var(--tm-cal-ui-scale));
   }
 
   .tm-porra-calendar .tm-cal-kickoff {

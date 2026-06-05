@@ -4,7 +4,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject }
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import { formatMatchCalendarAbbr, teamNameEs } from "@/lib/teams/display";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { teamNameEs } from "@/lib/teams/display";
 import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
 import {
   buildMonthGrid,
@@ -29,7 +30,7 @@ type PredictionsCalendarProps = {
   matches: MatchWithPrediction[];
 };
 
-function CalendarMatchLabels({
+function CalendarMatchFlags({
   match,
   onOpen,
 }: {
@@ -37,7 +38,6 @@ function CalendarMatchLabels({
   onOpen: () => void;
 }) {
   const time = formatKickoffTime(match.kickoff_at);
-  const matchLabel = formatMatchCalendarAbbr(match.home_team, match.away_team);
   const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)}`;
 
   return (
@@ -51,10 +51,11 @@ function CalendarMatchLabels({
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <span className="tm-cal-team-label w-full text-center font-semibold leading-none text-[var(--tm-fg)]">
-        {matchLabel}
-      </span>
-      <span className="tm-cal-kickoff w-full text-center font-medium leading-none tabular-nums text-[var(--tm-accent)]">
+      <div className="tm-cal-flags flex shrink-0 items-center justify-center">
+        <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
+        <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+      </div>
+      <span className="tm-cal-kickoff w-full shrink-0 text-center font-medium leading-none tabular-nums text-[var(--tm-accent)]">
         {time}
       </span>
     </button>
@@ -99,7 +100,7 @@ function DayCell({
       </span>
       <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col">
         {cell.matches.map((match) => (
-          <CalendarMatchLabels key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
+          <CalendarMatchFlags key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}
       </div>
     </div>

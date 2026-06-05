@@ -29,7 +29,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-btn, .tm-cal-team-label, .tm-cal-kickoff"
+      ".tm-cal-day-num, .tm-cal-match-btn, .tm-cal-flags, .tm-cal-flag, .tm-cal-kickoff"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
