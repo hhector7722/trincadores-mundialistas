@@ -188,7 +188,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       <div className="tm-porra-calendar-wrap flex min-h-0 flex-1 flex-col">
         <section
           ref={calendarRef}
-          className="tm-porra-calendar tm-glass-card flex min-h-0 flex-1 flex-col p-0"
+          className="tm-porra-calendar tm-porra-calendar--fullbleed tm-glass-card flex min-h-0 flex-1 flex-col p-0"
         >
           <div className="tm-cal-header flex shrink-0 justify-center border-b border-[var(--tm-border)] px-1 py-1 sm:px-3 sm:py-2">
             <div className="tm-cal-month-nav inline-flex max-w-full items-center gap-0.5 sm:gap-1.5">
@@ -248,7 +248,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         </section>
       </div>
 
-      <p className="mt-2 hidden shrink-0 text-center text-[10px] text-[var(--tm-muted)] sm:block">
+      <p className="mt-2 hidden shrink-0 px-4 text-center text-[10px] text-[var(--tm-muted)] sm:block">
         Toca un partido para predecir. Cierra 5 min antes del pitido.
       </p>
 

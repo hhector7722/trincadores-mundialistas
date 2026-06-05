@@ -15,8 +15,8 @@ export default async function PredictionsPage() {
   const matches = await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   return (
-    <div className="tm-porra-page flex h-[calc(100dvh-var(--tm-tabbar-height)-2rem)] flex-col gap-2 overflow-hidden p-3 pb-2 sm:h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)] sm:gap-4 sm:p-4">
-      <div className="hidden shrink-0 sm:block">
+    <div className="tm-porra-page flex h-[calc(100dvh-var(--tm-tabbar-height)-2rem)] flex-col overflow-hidden pb-0 pt-0 sm:h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)]">
+      <div className="hidden shrink-0 px-4 pt-4 sm:block">
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Porra
         </h1>

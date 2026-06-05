@@ -474,11 +474,13 @@ html[data-modal-open] main {
 
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-page {
-  max-width: 100%;
+  width: 100%;
+  max-width: 100vw;
   overflow: hidden;
 }
 
 .tm-porra-calendar-wrap {
+  width: 100%;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -490,6 +492,13 @@ html[data-modal-open] main {
   max-width: 100%;
   min-width: 0;
   overflow: hidden;
+}
+
+.tm-porra-calendar--fullbleed {
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .tm-porra-calendar .tm-cal-body {
