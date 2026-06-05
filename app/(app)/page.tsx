@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
+import { HomeHero } from "@/components/home/HomeHero";
+import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { HomeTopThree } from "@/components/home/HomeTopThree";
-import { countPendingPredictions } from "@/lib/predictions/queries";
+import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
 import {
   getPoolLeaderboard,
   memberStandingFromLeaderboard,
@@ -32,78 +34,50 @@ export default async function HomePage() {
   const scheduled = matches.filter((m) => m.status === "scheduled");
   const focus = live[0] ?? scheduled[0] ?? null;
 
-  const pendingDisplay = pending > 0 ? String(pending) : " ";
+  const focusMatch = focus
+    ? await getMatchPredictionDetail(ctx.activePoolId, user!.id, focus.id)
+    : null;
 
   return (
-    <div className="space-y-6 p-4 pb-8">
-      <section>
-        <p className="text-xs font-medium uppercase tracking-wide text-[var(--tm-muted)]">
-          Tu panel
-        </p>
-        <p className="mt-2 font-display text-5xl leading-none text-[var(--tm-fg)]">
-          {pendingDisplay}
-        </p>
-        <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          {pending > 0
-            ? "predicciones pendientes antes del cierre"
-            : "Sin predicciones pendientes en plazo abierto"}
-        </p>
-        {pending > 0 && (
-          <Link
-            href="/predictions"
-            className="mt-3 inline-block text-sm font-medium text-[var(--tm-primary)]"
-          >
-            Ir a porra
-          </Link>
-        )}
-      </section>
+    <div className="relative min-h-full">
+      <HomeAtmosphere />
 
-      <HomeStandingCard standing={standing} />
+      <div className="relative z-10 space-y-3 p-4 pb-8">
+        <HomeHero pendingCount={pending} />
+        {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
+        <HomeStandingCard standing={standing} />
 
-      {focus && (
-        <Card>
-          <p className="text-xs font-medium text-[var(--tm-muted)]">Siguiente en calendario</p>
-          <p className="mt-2 text-base font-semibold text-[var(--tm-fg)]">
-            {focus.home_team} — {focus.away_team}
-          </p>
-          <p className="mt-1 text-sm text-[var(--tm-muted)]">
-            {focus.matchday_name} · {focus.status === "live" ? "En juego" : "Programado"}
-          </p>
-          <Link
-            href={`/predictions/${focus.id}`}
-            className="mt-3 inline-block text-xs font-medium text-[var(--tm-primary)]"
-          >
-            Predecir
-          </Link>
-        </Card>
-      )}
-
-      <HomeTopThree rows={leaderboard.rows} />
-
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[var(--tm-fg)]">Calendario</h2>
-          <Link href="/predictions" className="text-xs font-medium text-[var(--tm-primary)]">
-            Ver todos
-          </Link>
+        <div className="mt-5 space-y-5 md:space-y-6">
+          <HomeTopThree rows={leaderboard.rows} />
         </div>
-        <Card className="divide-y divide-[var(--tm-border)] p-0 px-4">
-          {matches.length === 0 ? (
-            <p className="py-6 text-sm text-[var(--tm-muted)]">No hay partidos en esta porra.</p>
-          ) : (
-            matches.slice(0, 4).map((m) => (
-              <div key={m.id} className="py-3 text-sm text-[var(--tm-fg)]">
-                <span className="font-medium">{m.home_team}</span>
-                <span className="text-[var(--tm-muted)]"> vs </span>
-                <span className="font-medium">{m.away_team}</span>
-                {m.status === "live" && (
-                  <span className="ml-2 text-xs text-[var(--tm-live)]">LIVE</span>
-                )}
-              </div>
-            ))
-          )}
-        </Card>
-      </section>
+
+        <section className="mt-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+              Calendario
+            </h2>
+            <Link href="/predictions" className="tm-accent-link text-xs">
+              Ver todos
+            </Link>
+          </div>
+          <div className="tm-glass-card divide-y divide-[var(--tm-border)] p-0 px-4">
+            {matches.length === 0 ? (
+              <p className="py-6 text-sm text-[var(--tm-muted)]">No hay partidos en esta porra.</p>
+            ) : (
+              matches.slice(0, 4).map((m) => (
+                <div key={m.id} className="py-3 text-sm text-[var(--tm-fg)]">
+                  <span className="font-medium">{m.home_team}</span>
+                  <span className="text-[var(--tm-muted)]"> vs </span>
+                  <span className="font-medium">{m.away_team}</span>
+                  {m.status === "live" && (
+                    <span className="ml-2 text-xs font-semibold text-[var(--tm-live)]">LIVE</span>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

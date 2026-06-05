@@ -1,5 +1,4 @@
-import { Card } from "@/components/ui/card";
-import { MatchPredictionCard } from "@/components/predictions/MatchPredictionCard";
+import { PredictionsCalendar } from "@/components/predictions/PredictionsCalendar";
 import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -18,18 +17,15 @@ export default async function PredictionsPage() {
   return (
     <div className="space-y-4 p-4 pb-8">
       <div>
-        <h1 className="text-lg font-semibold text-[var(--tm-fg)]">Predicciones</h1>
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Porra
+        </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Toca un partido para marcar. Cierra 5 min antes del pitido.
+          Calendario de partidos. Toca uno para marcar. Cierra 5 min antes del pitido.
         </p>
       </div>
-      <Card className="px-4 py-0">
-        {matches.length === 0 ? (
-          <p className="py-8 text-sm text-[var(--tm-muted)]">No hay partidos cargados.</p>
-        ) : (
-          matches.map((m) => <MatchPredictionCard key={m.id} match={m} />)
-        )}
-      </Card>
+
+      <PredictionsCalendar poolId={ctx.activePoolId} matches={matches} />
     </div>
   );
 }
