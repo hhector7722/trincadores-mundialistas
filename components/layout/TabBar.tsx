@@ -22,7 +22,7 @@ export function TabBar() {
 
   return (
     <nav
-      className="tm-surface-fade fixed bottom-0 left-0 right-0 z-50 shrink-0 border-t border-[var(--tm-border)] px-1 pb-[env(safe-area-inset-bottom)]"
+      className="tm-surface-fade fixed bottom-0 left-0 right-0 z-50 shrink-0 border-t border-[var(--tm-border)] px-1 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
       aria-label="Navegacion principal"
     >
       <ul className="flex h-12 items-stretch justify-between">

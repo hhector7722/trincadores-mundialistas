@@ -3,7 +3,7 @@
 ## Fase actual: 2a datos Mundial 2026 importados (OpenFootball)
 
 ## Visual
-- Dark mode morado (#120422) + acento neón lima (#D4FF00), estilo porra deportiva
+- Dark mode morado claro (#4a2890) + difuminado glass + acento neón lima (#D4FF00), estilo porra deportiva
 
 ## Completado
 - [x] 1a auth

@@ -80,7 +80,7 @@ export function Modal({
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 touch-none overscroll-none bg-black/60 backdrop-blur-md"
+        className="absolute inset-0 touch-none overscroll-none bg-[#2a1058]/45 backdrop-blur-lg"
         onClick={onClose}
         onTouchMove={(event) => event.preventDefault()}
       />
@@ -91,7 +91,7 @@ export function Modal({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          "relative z-10 flex w-full max-w-sm max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] shadow-[0_24px_64px_rgba(0,0,0,0.45)] outline-none",
+          "relative z-10 flex w-full max-w-sm max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] outline-none backdrop-blur-xl",
           className
         )}
       >

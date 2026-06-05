@@ -25,9 +25,9 @@ function StatCard({
   accentValue?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-purple-500/20 bg-[#0a0612]/90 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
-      <div className="mb-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-950/80 ring-1 ring-purple-500/25">
-        <Icon className="h-5 w-5 text-purple-400" strokeWidth={2} />
+    <div className="tm-stat-card rounded-2xl p-4">
+      <div className="mb-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
+        <Icon className="h-5 w-5 text-purple-200" strokeWidth={2} />
       </div>
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">
         {label}
@@ -51,7 +51,7 @@ function StatCard({
 export function HomeStandingCard({ standing }: { standing: MemberStanding | null }) {
   if (!standing) {
     return (
-      <div className="rounded-2xl border border-purple-500/20 bg-[#0a0612]/90 p-4">
+      <div className="tm-stat-card rounded-2xl p-4">
         <p className="text-sm text-white/50">Sin datos de clasificacion todavia.</p>
       </div>
     );
@@ -82,10 +82,10 @@ export function HomeStandingCard({ standing }: { standing: MemberStanding | null
       {(standing.ahead || standing.behind) && (
         <Link
           href="/ranking"
-          className="flex min-h-12 items-center gap-3 rounded-2xl border border-purple-500/20 bg-[#0a0612]/90 px-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.25)] transition-colors hover:border-purple-500/35"
+          className="tm-stat-card flex min-h-12 items-center gap-3 rounded-2xl px-4 py-3 transition-colors hover:border-white/30"
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-950/80 ring-1 ring-purple-500/25">
-            <BarChart3 className="h-4 w-4 text-purple-400" strokeWidth={2} />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
+            <BarChart3 className="h-4 w-4 text-purple-200" strokeWidth={2} />
           </div>
 
           <div className="flex min-w-0 flex-1 items-center gap-4">

@@ -45,7 +45,7 @@ export function LoginForm() {
           type="text"
           autoComplete="username"
           required
-          className="mt-1.5 border-purple-500/20 bg-[#05010d]/80"
+          className="mt-1.5 bg-[var(--tm-surface)] backdrop-blur-sm"
           spellCheck={false}
         />
       </div>
@@ -64,7 +64,7 @@ export function LoginForm() {
           autoComplete="current-password"
           required
           minLength={12}
-          className="mt-1.5 border-purple-500/20 bg-[#05010d]/80 font-mono uppercase tracking-wider"
+          className="mt-1.5 bg-[var(--tm-surface)] font-mono uppercase tracking-wider backdrop-blur-sm"
           spellCheck={false}
         />
       </div>

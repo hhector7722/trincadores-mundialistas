@@ -3,13 +3,10 @@ import { AppBrandTitle } from "@/components/layout/AppBrandTitle";
 
 export function LoginHero() {
   return (
-    <section className="relative mb-5 min-h-[13rem] overflow-hidden rounded-3xl border border-white/10 bg-[#120422] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:min-h-[14rem]">
+    <section className="tm-hero-card relative mb-5 min-h-[13rem] overflow-hidden rounded-3xl p-5 sm:min-h-[14rem]">
+      <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1a0a2e] via-[#120422] to-[#060214]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(90,35,175,0.12)_0%,transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(200,160,255,0.25)_0%,transparent_55%)]"
         aria-hidden="true"
       />
 

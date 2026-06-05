@@ -19,7 +19,7 @@ export function Button({
           "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] hover:brightness-110",
         variant === "ghost" && "rounded-xl text-[var(--tm-muted)] hover:text-[var(--tm-fg)]",
         variant === "outline" &&
-          "rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] hover:border-[var(--tm-accent-muted)]",
+          "rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] backdrop-blur-sm hover:border-[var(--tm-accent-muted)]",
         className
       )}
       {...props}

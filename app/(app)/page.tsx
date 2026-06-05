@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
@@ -39,10 +38,7 @@ export default async function HomePage() {
     : null;
 
   return (
-    <div className="relative min-h-full">
-      <HomeAtmosphere />
-
-      <div className="relative z-10 space-y-3 p-4 pb-8">
+    <div className="relative z-10 space-y-3 p-4 pb-8">
         <HomeHero pendingCount={pending} />
         {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
         <HomeStandingCard standing={standing} />
@@ -77,7 +73,6 @@ export default async function HomePage() {
             )}
           </div>
         </section>
-      </div>
     </div>
   );
 }

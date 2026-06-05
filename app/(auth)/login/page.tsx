@@ -6,7 +6,7 @@ export default function LoginPage() {
     <>
       <LoginHero />
 
-      <div className="rounded-2xl border border-purple-500/20 bg-[#0a0612]/90 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.25)] backdrop-blur-sm">
+      <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
         <LoginForm />
       </div>
     </>

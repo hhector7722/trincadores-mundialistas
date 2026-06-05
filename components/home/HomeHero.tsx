@@ -9,13 +9,10 @@ export function HomeHero({ pendingCount }: HomeHeroProps) {
   const pendingDisplay = pendingCount > 0 ? String(pendingCount) : " ";
 
   return (
-    <section className="relative min-h-[12.5rem] overflow-hidden rounded-3xl border border-white/10 bg-[#120422] px-5 pt-5 pb-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:min-h-[13.5rem]">
+    <section className="tm-hero-card relative min-h-[12.5rem] overflow-hidden rounded-3xl px-5 pt-5 pb-3 sm:min-h-[13.5rem]">
+      <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1a0a2e] via-[#120422] to-[#060214]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(90,35,175,0.12)_0%,transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(200,160,255,0.25)_0%,transparent_55%)]"
         aria-hidden="true"
       />
 
@@ -37,7 +34,7 @@ export function HomeHero({ pendingCount }: HomeHeroProps) {
             href="/predictions"
             className="mt-3 inline-flex w-fit items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
           >
-            Mis resultados
+            Mis pronósticos
           </Link>
         </div>
       </div>

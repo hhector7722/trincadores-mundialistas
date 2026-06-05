@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!ctx) {
     return (
-      <main className="flex min-h-dvh flex-col items-center justify-center bg-[var(--tm-bg)] p-6">
+      <main className="relative z-10 flex min-h-dvh flex-col items-center justify-center p-6">
         <p className="text-sm text-[var(--tm-fg)]">No perteneces a ninguna porra.</p>
         <form action={signOut} className="mt-4">
           <Button type="submit" variant="outline">
