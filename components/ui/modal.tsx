@@ -11,6 +11,7 @@ type ModalProps = {
   title: string;
   children: React.ReactNode;
   className?: string;
+  hideHeaderDivider?: boolean;
 };
 
 function lockPageScroll() {
@@ -41,7 +42,14 @@ function lockPageScroll() {
   };
 }
 
-export function Modal({ open, onClose, title, children, className }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  className,
+  hideHeaderDivider = false,
+}: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -87,7 +95,12 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
           className
         )}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--tm-border)] px-4 py-3">
+        <div
+          className={cn(
+            "flex shrink-0 items-center justify-between gap-3 px-4 py-3",
+            !hideHeaderDivider && "border-b border-[var(--tm-border)]"
+          )}
+        >
           <h2 id={titleId} className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
             {title}
           </h2>

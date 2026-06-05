@@ -15,13 +15,13 @@ export default async function PredictionsPage() {
   const matches = await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <div className="tm-porra-page space-y-2 p-3 pb-8 sm:space-y-4 sm:p-4">
       <div>
-        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+        <h1 className="font-display text-base uppercase tracking-wide text-[var(--tm-fg)] sm:text-lg">
           Porra
         </h1>
-        <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Calendario de partidos. Toca uno para marcar. Cierra 5 min antes del pitido.
+        <p className="mt-0.5 hidden text-sm text-[var(--tm-muted)] sm:mt-1 sm:block">
+          Calendario mensual. Toca las banderas para marcar. Cierra 5 min antes del pitido.
         </p>
       </div>
 

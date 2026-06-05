@@ -2,43 +2,15 @@
 
 import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
+import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import { formatKickoff } from "@/lib/pool/format-kickoff";
-import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 
 type HomeNextMatchProps = {
   poolId: string;
   match: MatchWithPrediction;
 };
-
-function TeamBlock({ name }: { name: string }) {
-  const flagCode = teamFlagCode(name);
-
-  return (
-    <div className="inline-flex w-max flex-col items-center gap-1">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] sm:h-11 sm:w-11">
-        {flagCode ? (
-          <img
-            src={teamFlagUrl(flagCode, 160)}
-            alt=""
-            width={44}
-            height={44}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="font-display text-base text-[var(--tm-accent)]">
-            {name.slice(0, 2).toUpperCase()}
-          </span>
-        )}
-      </div>
-      <p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-[var(--tm-fg)] sm:text-xs">
-        {name}
-      </p>
-    </div>
-  );
-}
 
 function hasSavedPrediction(match: MatchWithPrediction): boolean {
   const home = match.prediction?.home_goals ?? null;
@@ -64,28 +36,13 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     <>
       <section className="tm-glass-card overflow-visible p-0">
         <div className="px-4 pb-3 pt-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
-            {isLive ? "En juego" : "Proximo partido"}
-          </p>
-
-          <div className="relative mt-2 w-full min-h-[4.25rem]">
-            <div className="absolute left-[15%] top-0 -translate-x-1/2">
-              <TeamBlock name={match.home_team} />
-            </div>
-
-            <div className="absolute left-[85%] top-0 -translate-x-1/2">
-              <TeamBlock name={match.away_team} />
-            </div>
-
-            <div className="absolute left-1/2 top-0 flex -translate-x-1/2 flex-col items-center gap-1 pt-0.5">
-              <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
-                {formatKickoff(match.kickoff_at)}
-              </p>
-              {isLive && (
-                <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tm-live)]">
-                  Live
-                </span>
-              )}
+          <MatchTeamsDisplay
+            homeTeam={match.home_team}
+            awayTeam={match.away_team}
+            kickoffAt={match.kickoff_at}
+            isLive={isLive}
+            showSectionLabel
+            centerSlot={
               <div className="inline-block">
                 <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
                   Mi pronóstico
@@ -121,8 +78,8 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                   </button>
                 )}
               </div>
-            </div>
-          </div>
+            }
+          />
         </div>
       </section>
 

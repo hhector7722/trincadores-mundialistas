@@ -3,16 +3,22 @@ import { cn } from "@/lib/utils";
 
 type TeamFlagBadgeProps = {
   name: string;
-  size?: "xs" | "sm" | "md";
+  size?: "xxs" | "xs" | "sm" | "md";
   className?: string;
 };
 
 export function TeamFlagBadge({ name, size = "sm", className }: TeamFlagBadgeProps) {
   const flagCode = teamFlagCode(name);
   const dim =
-    size === "xs" ? "h-5 w-5" : size === "sm" ? "h-7 w-7" : "h-9 w-9";
-  const px = size === "xs" ? 40 : size === "sm" ? 80 : 120;
-  const imgSize = size === "xs" ? 20 : size === "sm" ? 28 : 36;
+    size === "xxs"
+      ? "h-3.5 w-3.5"
+      : size === "xs"
+        ? "h-5 w-5"
+        : size === "sm"
+          ? "h-7 w-7"
+          : "h-9 w-9";
+  const px = size === "xxs" ? 28 : size === "xs" ? 40 : size === "sm" ? 80 : 120;
+  const imgSize = size === "xxs" ? 14 : size === "xs" ? 20 : size === "sm" ? 28 : 36;
 
   return (
     <div
@@ -34,7 +40,7 @@ export function TeamFlagBadge({ name, size = "sm", className }: TeamFlagBadgePro
         <span
           className={cn(
             "font-display text-[var(--tm-accent)]",
-            size === "xs" ? "text-[8px]" : "text-[10px]"
+            size === "xxs" ? "text-[6px]" : size === "xs" ? "text-[8px]" : "text-[10px]"
           )}
         >
           {name.slice(0, 2).toUpperCase()}

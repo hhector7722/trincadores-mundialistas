@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { savePrediction } from "@/actions/predictions";
+import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
+import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import { formatKickoff } from "@/lib/pool/format-kickoff";
 
 type QuickPredictionModalProps = {
   open: boolean;
@@ -30,6 +31,7 @@ export function QuickPredictionModal({
   const [away, setAway] = useState(savedAway ?? 0);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const isLive = match.status === "live";
 
   const draftDirty = home !== (savedHome ?? 0) || away !== (savedAway ?? 0);
 
@@ -72,18 +74,16 @@ export function QuickPredictionModal({
     });
   }
 
-  const title =
-    savedHome !== null && savedAway !== null ? "Editar pronóstico" : "Añadir pronóstico";
-
   return (
-    <Modal open={open} onClose={onClose} title={title}>
+    <Modal open={open} onClose={onClose} title="Pronóstico" hideHeaderDivider>
       <div className="space-y-4 px-4 py-4">
-        <div className="text-center">
-          <p className="font-display text-base font-semibold text-[var(--tm-fg)]">
-            {match.home_team} <span className="text-[var(--tm-muted)]">vs</span> {match.away_team}
-          </p>
-          <p className="mt-1 text-xs text-[var(--tm-subtle)]">{formatKickoff(match.kickoff_at)}</p>
-        </div>
+        <MatchTeamsDisplay
+          homeTeam={match.home_team}
+          awayTeam={match.away_team}
+          kickoffAt={match.kickoff_at}
+          isLive={isLive}
+          centerKickoff
+        />
 
         {uiState === "locked" ? (
           <p className="text-center text-sm text-[var(--tm-muted)]">
@@ -91,22 +91,23 @@ export function QuickPredictionModal({
           </p>
         ) : (
           <>
-            <p className="text-center text-xs text-[var(--tm-muted)]">
-              Puedes editar hasta 5 minutos antes del pitido.
-            </p>
-            <div className="flex items-stretch justify-center gap-3 py-1">
+            <PredictionDeadlineCountdown kickoffAt={match.kickoff_at} />
+            <div className="flex items-center justify-center gap-4 py-1">
               <ScoreStepper
                 label={match.home_team}
                 value={home}
                 disabled={controlsDisabled}
                 onChange={setHome}
+                variant="floating"
+                hideLabel
               />
-              <span className="self-center pt-6 text-lg text-[var(--tm-muted)]">:</span>
               <ScoreStepper
                 label={match.away_team}
                 value={away}
                 disabled={controlsDisabled}
                 onChange={setAway}
+                variant="floating"
+                hideLabel
               />
             </div>
           </>
@@ -119,7 +120,7 @@ export function QuickPredictionModal({
         )}
       </div>
 
-      <div className="flex shrink-0 gap-2 border-t border-[var(--tm-border)] bg-[var(--tm-surface)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="flex shrink-0 gap-2 bg-[var(--tm-surface)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
           Cancelar
         </Button>
