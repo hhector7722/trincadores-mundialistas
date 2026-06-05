@@ -1,6 +1,11 @@
 import { cn } from "@/lib/utils";
 
-export function AppBrandTitle({ className }: { className?: string }) {
+type AppBrandTitleProps = {
+  className?: string;
+  stacked?: boolean;
+};
+
+export function AppBrandTitle({ className, stacked = false }: AppBrandTitleProps) {
   return (
     <span
       className={cn(
@@ -17,7 +22,14 @@ export function AppBrandTitle({ className }: { className?: string }) {
           aria-hidden
         />
       </span>
-      <span className="flex items-center text-left leading-tight">Trincadores Mundialistas</span>
+      {stacked ? (
+        <span className="flex flex-col justify-center gap-px text-left leading-tight">
+          <span>Trincadores</span>
+          <span>Mundialistas</span>
+        </span>
+      ) : (
+        <span className="flex items-center text-left leading-tight">Trincadores Mundialistas</span>
+      )}
     </span>
   );
 }
