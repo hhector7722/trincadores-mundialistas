@@ -70,6 +70,12 @@ export function formatMonthYearLabel(year: number, month: number): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
+export function formatMonthLabel(year: number, month: number): string {
+  const date = new Date(year, month - 1, 1);
+  const label = date.toLocaleDateString("es-ES", { month: "long" });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export function formatKickoffTime(iso: string, timeZone = CALENDAR_TZ): string {
   return new Date(iso).toLocaleTimeString("es-ES", {
     hour: "2-digit",

@@ -57,16 +57,25 @@ const TEAM_DISPLAY_BY_SLUG: Record<string, TeamDisplay> = {
   uzbekistan: { nameEs: "Uzbekistán", abbr: "UZB" },
 };
 
-/** Etiqueta compacta para celdas del calendario: "España ESP". */
-export function formatTeamCalendarLabel(teamName: string): string {
+export function teamNameEs(teamName: string): string {
   const entry = TEAM_DISPLAY_BY_SLUG[toSlug(teamName)];
-  if (entry) {
-    return `${entry.nameEs} ${entry.abbr}`;
-  }
+  if (entry) return entry.nameEs;
+
+  const trimmed = teamName.trim();
+  return trimmed || " ";
+}
+
+/** Abreviatura FIFA para celdas del calendario: "ESP". */
+export function teamAbbr(teamName: string): string {
+  const entry = TEAM_DISPLAY_BY_SLUG[toSlug(teamName)];
+  if (entry) return entry.abbr;
 
   const trimmed = teamName.trim();
   if (!trimmed) return " ";
 
-  const abbr = trimmed.slice(0, 3).toUpperCase();
-  return `${trimmed} ${abbr}`;
+  return trimmed.slice(0, 3).toUpperCase();
+}
+
+export function formatMatchCalendarAbbr(homeTeam: string, awayTeam: string): string {
+  return `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
 }

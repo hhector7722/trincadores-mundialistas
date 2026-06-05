@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:22:18.213Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:28:26.979Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -295,7 +295,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/active-pool.ts` | 72 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/match-calendar.ts` | 192 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
+| `lib/pool/match-calendar.ts` | 198 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 
@@ -347,7 +347,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/teams/display.ts` | 73 líneas | formatTeamCalendarLabel |
+| `lib/teams/display.ts` | 82 líneas | teamNameEs, teamAbbr, formatMatchCalendarAbbr |
 | `lib/teams/flags.ts` | 62 líneas | teamFlagCode, teamFlagUrl |
 
 **utils.ts/** — 1 archivos
