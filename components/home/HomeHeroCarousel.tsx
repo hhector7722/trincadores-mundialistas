@@ -30,7 +30,7 @@ function buildSlides(pendingCount: number): Slide[] {
       eyebrow: "Resultados pendientes",
       headline: (
         <p
-          className="mt-0.5 font-display text-[3.25rem] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)] sm:text-[4rem]"
+          className="mt-0.5 max-w-full font-display text-[clamp(2.5rem,14vw,3.25rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)] sm:text-[clamp(3rem,12vw,4rem)]"
           aria-label={pendingCount > 0 ? `${pendingCount} resultados pendientes` : undefined}
         >
           {pendingDisplay}
@@ -43,7 +43,7 @@ function buildSlides(pendingCount: number): Slide[] {
       id: "ranking",
       eyebrow: "Clasificación",
       headline: (
-        <p className="mt-0.5 font-display text-[2.5rem] font-black leading-[0.9] tracking-tight text-white sm:text-[3rem]">
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.75rem,8vw,2.5rem)] font-black leading-[0.95] tracking-tight text-white sm:text-[clamp(2rem,7vw,3rem)]">
           ¿Quién manda?
         </p>
       ),
@@ -54,7 +54,7 @@ function buildSlides(pendingCount: number): Slide[] {
       id: "mundial",
       eyebrow: "Mundial 2026",
       headline: (
-        <p className="mt-0.5 font-display text-[2.5rem] font-black leading-[0.9] tracking-tight text-[#CCFF00] sm:text-[3rem]">
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.75rem,8vw,2.5rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00] sm:text-[clamp(2rem,7vw,3rem)]">
           104 partidos
         </p>
       ),
@@ -95,21 +95,21 @@ export function HomeHeroCarousel({ pendingCount }: HomeHeroCarouselProps) {
     <div className="flex min-w-0 flex-col">
       <div
         ref={scrollRef}
-        className="-mx-1 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-roledescription="carrusel"
       >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className="w-full shrink-0 snap-start snap-always px-1"
+            className="w-full min-w-0 shrink-0 snap-start snap-always"
             aria-hidden={index !== activeIndex}
           >
-            <div className="inline-flex w-max max-w-full flex-col items-start text-left">
-              <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-white/60">
+            <div className="flex w-full min-w-0 flex-col items-start text-left">
+              <p className="max-w-full truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-white/60">
                 {slide.eyebrow}
               </p>
               {slide.headline}
-              <p className="mt-2 max-w-[15rem] text-xs leading-snug text-white/50 sm:max-w-[17rem] sm:text-sm">
+              <p className="mt-2 max-w-full text-xs leading-snug text-white/50 sm:text-sm">
                 {slide.description}
               </p>
               {slide.cta && (
