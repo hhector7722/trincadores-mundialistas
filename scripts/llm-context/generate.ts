@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { LIMITS, OUTPUT_FILE, PROJECT_NAME, ROOT } from "./config.ts";
+import { LIMITS, OUTPUT_FILE, PROJECT_NAME, ROOT } from "./config";
 import {
   extractExports,
   extractRouteFromPage,
@@ -15,7 +15,7 @@ import {
   summarizeList,
   walkDir,
   walkPaths,
-} from "./scan.ts";
+} from "./scan";
 
 const GENERATED_AT = new Date().toISOString();
 

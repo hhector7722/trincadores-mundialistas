@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { IGNORE_DIRS, LIMITS, ROOT } from "./config.ts";
+import { IGNORE_DIRS, LIMITS, ROOT } from "./config";
 
 export type FileEntry = {
   rel: string;
