@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:28:26.979Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T18:30:11.369Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -135,6 +135,7 @@ flowchart TB
 | `BackgroundPlayerLayer` | `components/home/BackgroundPlayerLayer.tsx` | server | BackgroundPlayerLayer |
 | `HomeAtmosphere` | `components/home/HomeAtmosphere.tsx` | server | HomeAtmosphere |
 | `HomeHero` | `components/home/HomeHero.tsx` | server | HomeHero |
+| `HomeHeroCarousel` | `components/home/HomeHeroCarousel.tsx` | client | HomeHeroCarousel |
 | `HomeNextMatch` | `components/home/HomeNextMatch.tsx` | client | HomeNextMatch |
 | `HomeStandingCard` | `components/home/HomeStandingCard.tsx` | server | HomeStandingCard |
 | `HomeTopThree` | `components/home/HomeTopThree.tsx` | server | HomeTopThree |

@@ -1,13 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
+import { HomeHeroCarousel } from "@/components/home/HomeHeroCarousel";
 
 type HomeHeroProps = {
   pendingCount: number;
 };
 
 export function HomeHero({ pendingCount }: HomeHeroProps) {
-  const pendingDisplay = pendingCount > 0 ? String(pendingCount) : " ";
-
   return (
     <section className="tm-hero-card relative min-h-[12.5rem] overflow-hidden rounded-3xl px-5 pt-5 pb-3 sm:min-h-[13.5rem]">
       <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -17,26 +15,7 @@ export function HomeHero({ pendingCount }: HomeHeroProps) {
       />
 
       <div className="relative z-10 max-w-[50%] min-w-0 pr-2 sm:max-w-[52%]">
-        <div className="inline-flex w-max max-w-full flex-col items-center text-center">
-          <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-white/60">
-            Resultados pendientes
-          </p>
-          <p
-            className="mt-0.5 font-display text-[3.25rem] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)] sm:text-[4rem]"
-            aria-label={pendingCount > 0 ? `${pendingCount} resultados pendientes` : undefined}
-          >
-            {pendingDisplay}
-          </p>
-          <p className="mt-2 max-w-[15rem] text-xs leading-snug text-white/50 sm:max-w-[17rem] sm:text-sm">
-            Se cierran 5 min antes de que sonría la redonda
-          </p>
-          <Link
-            href="/predictions"
-            className="mt-3 inline-flex w-fit items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
-          >
-            Mis pronósticos
-          </Link>
-        </div>
+        <HomeHeroCarousel pendingCount={pendingCount} />
       </div>
 
       <div
