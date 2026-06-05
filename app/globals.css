@@ -35,6 +35,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
   --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-brand: var(--font-metal-mania), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
 }
 
@@ -73,6 +74,10 @@ html[data-modal-open] main {
 
 .font-display {
   font-family: var(--font-display);
+}
+
+.font-brand {
+  font-family: var(--font-brand);
 }
 
 .tm-surface-fade {

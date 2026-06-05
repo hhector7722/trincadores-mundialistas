@@ -5,15 +5,15 @@ type AppBrandTitleProps = {
   stacked?: boolean;
 };
 
-const logoClassName =
-  "aspect-square h-full w-auto shrink-0 rounded-[0.12em] object-cover";
-
-function BrandLogo() {
+function BrandLogo({ className }: { className?: string }) {
   return (
     <img
       src="/icons/logo.png"
       alt=""
-      className={logoClassName}
+      className={cn(
+        "aspect-square shrink-0 rounded-[0.1em] object-cover opacity-85",
+        className,
+      )}
       aria-hidden
     />
   );
@@ -24,15 +24,15 @@ export function AppBrandTitle({ className, stacked = false }: AppBrandTitleProps
     return (
       <span
         className={cn(
-          "inline-grid grid-cols-[auto_auto] grid-rows-[auto_auto] items-center gap-x-1.5 gap-y-px uppercase text-[var(--tm-accent)]",
+          "font-brand inline-flex items-center gap-1 uppercase tracking-tight text-[var(--tm-accent)]",
           className,
         )}
       >
-        <span className="col-start-1 row-start-1 row-span-2 flex items-stretch self-stretch">
-          <BrandLogo />
+        <BrandLogo className="size-[0.85em]" />
+        <span className="flex flex-col gap-px text-left leading-tight">
+          <span>Trincadores</span>
+          <span>Mundialistas</span>
         </span>
-        <span className="col-start-2 row-start-1 leading-tight">Trincadores</span>
-        <span className="col-start-2 row-start-2 leading-tight">Mundialistas</span>
       </span>
     );
   }
@@ -40,14 +40,12 @@ export function AppBrandTitle({ className, stacked = false }: AppBrandTitleProps
   return (
     <span
       className={cn(
-        "inline-flex items-stretch gap-1.5 uppercase text-[var(--tm-accent)]",
+        "font-brand inline-flex items-center gap-1 uppercase tracking-tight text-[var(--tm-accent)]",
         className,
       )}
     >
-      <span className="flex shrink-0 items-stretch self-stretch">
-        <BrandLogo />
-      </span>
-      <span className="flex items-center text-left leading-tight">Trincadores Mundialistas</span>
+      <BrandLogo className="size-[0.7em]" />
+      <span className="text-left leading-tight">Trincadores Mundialistas</span>
     </span>
   );
 }

@@ -1,10 +1,17 @@
 ﻿import type { Metadata, Viewport } from "next";
-import { Archivo_Black, Space_Grotesk } from "next/font/google";
+import { Archivo_Black, Metal_Mania, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space",
+  display: "swap",
+});
+
+const metalMania = Metal_Mania({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-metal-mania",
   display: "swap",
 });
 
@@ -71,7 +78,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable}`}>
+    <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${metalMania.variable}`}>
       <body className="min-h-dvh antialiased">{children}</body>
     </html>
   );
