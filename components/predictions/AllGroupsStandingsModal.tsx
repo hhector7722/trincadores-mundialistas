@@ -40,13 +40,13 @@ export function AllGroupsStandingsModal({
               "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
             )}
           >
-            <div className="shrink-0 border-b border-[var(--tm-border)] px-2 py-1">
-              <span className="font-display text-xs font-semibold uppercase text-[var(--tm-accent)]">
+            <div className="shrink-0 border-b border-[var(--tm-border)] px-1 py-px leading-none">
+              <span className="text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] sm:text-[9px]">
                 Grupo {group.code}
               </span>
             </div>
             <div className="min-h-0 flex-1 overflow-hidden">
-              <GroupStandingsTable group={group} compact />
+              <GroupStandingsTable group={group} variant="grid" />
             </div>
           </button>
         ))}

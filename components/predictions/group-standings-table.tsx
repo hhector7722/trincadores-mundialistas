@@ -22,29 +22,53 @@ export function formatGroupDg(value: number): string {
 type GroupStandingsTableProps = {
   group: GroupStandingDetail;
   compact?: boolean;
+  variant?: "default" | "grid";
   className?: string;
 };
 
-export function GroupStandingsTable({ group, compact = false, className }: GroupStandingsTableProps) {
+export function GroupStandingsTable({
+  group,
+  compact = false,
+  variant = "default",
+  className,
+}: GroupStandingsTableProps) {
+  const isGrid = variant === "grid";
+  const isCompact = compact || isGrid;
+
   return (
-    <div className={cn("overflow-x-auto", compact ? "px-1 pb-1" : "px-3 pb-4 sm:px-4", className)}>
+    <div
+      className={cn(
+        "overflow-x-auto",
+        isGrid ? "px-0.5 pb-0.5" : isCompact ? "px-1 pb-1" : "px-3 pb-4 sm:px-4",
+        className
+      )}
+    >
       <table
         className={cn(
           "w-full border-collapse",
-          compact ? "min-w-0 text-[8px] leading-tight sm:text-[9px]" : "min-w-[20rem] text-[11px] sm:text-xs"
+          isGrid
+            ? "min-w-0 text-[7px] leading-tight sm:text-[8px]"
+            : isCompact
+              ? "min-w-0 text-[8px] leading-tight sm:text-[9px]"
+              : "min-w-[20rem] text-[11px] sm:text-xs"
         )}
       >
         <thead>
           <tr className="text-[var(--tm-muted)]">
-            <th className={cn("pr-1 text-left font-medium", compact ? "pb-0.5" : "pb-2 pr-2")}>
-              Equipo
+            <th
+              className={cn(
+                "font-medium",
+                isGrid ? "w-5 pb-0.5 text-center" : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
+              )}
+            >
+              {isGrid ? " " : "Equipo"}
             </th>
             {GROUP_STANDINGS_STAT_COLUMNS.map((col) => (
               <th
                 key={col.key}
                 className={cn(
                   "px-0.5 text-center font-medium tabular-nums",
-                  compact ? "pb-0.5" : "pb-2"
+                  isCompact ? "pb-0.5" : "pb-2"
                 )}
               >
                 {col.label}
@@ -61,45 +85,52 @@ export function GroupStandingsTable({ group, compact = false, className }: Group
                 index === 0 && "text-[var(--tm-fg)]"
               )}
             >
-              <td className={cn(compact ? "py-0.5 pr-1" : "py-2 pr-2")}>
-                <div className="flex min-w-0 items-center gap-0.5">
+              <td className={cn(isGrid ? "py-0.5 pr-0" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
+                <div
+                  className={cn(
+                    "flex min-w-0 items-center",
+                    isGrid ? "justify-center" : "gap-0.5"
+                  )}
+                >
                   <TeamFlagBadge
                     name={row.team}
-                    size={compact ? "xxs" : "xs"}
+                    size={isGrid ? "xs" : isCompact ? "xxs" : "xs"}
                     className="shrink-0"
                   />
-                  <span className={cn("truncate font-medium", compact && "max-w-[3.5rem]")}>
-                    {compact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
-                  </span>
+                  {!isGrid ? (
+                    <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
+                      {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
+                    </span>
+                  ) : null}
                 </div>
               </td>
               <td
                 className={cn(
                   "px-0.5 text-center font-semibold tabular-nums text-[var(--tm-accent)]",
-                  compact ? "py-0.5" : "py-2"
+                  isCompact ? "py-0.5" : "py-2"
                 )}
               >
                 {row.pts}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.pj}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.pg}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.pe}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.pp}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.gf}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {row.gc}
               </td>
-              <td className={cn("px-0.5 text-center tabular-nums", compact ? "py-0.5" : "py-2")}>
+              <td className={cn("px-0.5 text-center tabular-nums", isCompact ? "py-0.5" : "py-2")}>
                 {formatGroupDg(row.dg)}
               </td>
             </tr>

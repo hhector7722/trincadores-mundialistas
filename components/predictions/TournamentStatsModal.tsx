@@ -27,7 +27,7 @@ export function TournamentStatsModal({ open, onClose, matches }: TournamentStats
   const emptyLabel = useMemo(() => {
     switch (activeStat) {
       case "scorers":
-        return "Aún no hay goleadores registrados.";
+        return "Aún no hay goles registrados.";
       case "assists":
         return "Aún no hay asistencias registradas.";
       case "yellow_cards":

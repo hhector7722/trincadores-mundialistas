@@ -21,7 +21,7 @@ export const TOURNAMENT_STAT_TABS: ReadonlyArray<{
   id: TournamentStatKind;
   label: string;
 }> = [
-  { id: "scorers", label: "Goleadores" },
+  { id: "scorers", label: "Goles" },
   { id: "assists", label: "Asistencias" },
   { id: "yellow_cards", label: "Amarillas" },
   { id: "red_cards", label: "Rojas" },

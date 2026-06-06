@@ -38,7 +38,7 @@ export function CalendarSidebarFooter({
   return (
     <div className={cn("tm-cal-sidebar-footer min-h-0", className)}>
       <div className="tm-cal-sidebar-col flex min-h-0 min-w-0 flex-col overflow-hidden">
-        <SidebarColumnTitle>Goleadores</SidebarColumnTitle>
+        <SidebarColumnTitle>Goles</SidebarColumnTitle>
         <ul className="tm-cal-sidebar-scorers mt-0.5 min-h-0 flex-1 overflow-hidden">
           {scorers.length === 0 ? (
             <li className="tm-cal-sidebar-list-row text-[var(--tm-muted)]">Sin datos</li>
@@ -53,7 +53,7 @@ export function CalendarSidebarFooter({
         </ul>
       </div>
 
-      <div className="tm-cal-sidebar-col flex min-h-0 min-w-0 flex-col overflow-hidden">
+      <div className="tm-cal-sidebar-col tm-cal-sidebar-col-tabla flex min-h-0 min-w-0 flex-col overflow-hidden">
         <SidebarColumnTitle>Tabla</SidebarColumnTitle>
         <ul className="tm-cal-sidebar-ranking mt-0.5 min-h-0 flex-1 overflow-hidden">
           {leaderboardRows.length === 0 ? (
@@ -63,11 +63,11 @@ export function CalendarSidebarFooter({
               <li
                 key={row.profileId}
                 className={cn(
-                  "tm-cal-sidebar-list-row flex min-w-0 items-baseline gap-1",
+                  "tm-cal-sidebar-list-row tm-cal-sidebar-ranking-row",
                   row.profileId === currentProfileId && "text-[var(--tm-accent)]"
                 )}
               >
-                <span className="min-w-0 flex-1 truncate">{row.label}</span>
+                <span className="tm-cal-sidebar-ranking-name truncate">{row.label}</span>
                 <span className="shrink-0 tabular-nums">{formatSidebarPoints(row.cumulativePoints)}</span>
               </li>
             ))
