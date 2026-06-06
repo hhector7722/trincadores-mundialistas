@@ -20,6 +20,6 @@ export function BrandLogo({ className }: BrandLogoProps) {
 
 export function BrandLogoFixed() {
   return (
-    <BrandLogo className="fixed left-4 top-[max(0.5rem,env(safe-area-inset-top))] z-30 size-9 rounded-md sm:size-10" />
+    <BrandLogo className="fixed left-5 top-[max(0.5rem,env(safe-area-inset-top))] z-30 size-9 rounded-md sm:left-6 sm:size-10" />
   );
 }

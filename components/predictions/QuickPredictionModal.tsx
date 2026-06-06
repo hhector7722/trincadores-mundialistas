@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { savePrediction } from "@/actions/predictions";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
+import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,12 @@ type QuickPredictionModalProps = {
 
 type DotPosition = "start" | "middle" | "end";
 
+type SlideState = {
+  target: MatchWithPrediction;
+  direction: "next" | "prev";
+  phase: "prep" | "animate";
+};
+
 function sortMatchesByKickoff(items: MatchWithPrediction[]): MatchWithPrediction[] {
   return [...items].sort(
     (a, b) => new Date(a.kickoff_at).getTime() - new Date(b.kickoff_at).getTime()
@@ -37,10 +43,7 @@ function resolveDotPosition(index: number, total: number): DotPosition {
 
 function MatchSwipeDots({ position }: { position: DotPosition }) {
   return (
-    <div
-      className="flex items-center justify-center gap-1.5"
-      aria-hidden="true"
-    >
+    <div className="flex items-center justify-center gap-1.5" aria-hidden="true">
       {[0, 1, 2].map((dot) => {
         const active =
           (position === "start" && dot === 0) ||
@@ -61,14 +64,15 @@ function MatchSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-export function QuickPredictionModal({
-  open,
-  onClose,
+function QuickPredictionPanelBody({
   poolId,
   match,
-  matches,
-  onMatchChange,
-}: QuickPredictionModalProps) {
+  onClose,
+}: {
+  poolId: string;
+  match: MatchWithPrediction;
+  onClose: () => void;
+}) {
   const router = useRouter();
   const savedHome = match.prediction?.home_goals ?? null;
   const savedAway = match.prediction?.away_goals ?? null;
@@ -77,22 +81,6 @@ export function QuickPredictionModal({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const isLive = match.status === "live";
-
-  const orderedMatches = useMemo(
-    () => (matches && matches.length > 0 ? sortMatchesByKickoff(matches) : [match]),
-    [match, matches]
-  );
-
-  const currentIndex = useMemo(
-    () => orderedMatches.findIndex((item) => item.id === match.id),
-    [orderedMatches, match.id]
-  );
-
-  const canSwipe = orderedMatches.length > 1 && Boolean(onMatchChange);
-  const dotPosition = resolveDotPosition(
-    currentIndex >= 0 ? currentIndex : 0,
-    orderedMatches.length
-  );
 
   const draftDirty = home !== (savedHome ?? 0) || away !== (savedAway ?? 0);
 
@@ -114,20 +102,10 @@ export function QuickPredictionModal({
   const canSave = uiState !== "locked" && (uiState !== "saved" || draftDirty);
 
   useEffect(() => {
-    if (!open) return;
     setHome(savedHome ?? 0);
     setAway(savedAway ?? 0);
     setError(null);
-  }, [open, match.id, savedHome, savedAway]);
-
-  function goToMatch(offset: number) {
-    if (!canSwipe || currentIndex < 0) return;
-
-    const nextIndex = currentIndex + offset;
-    if (nextIndex < 0 || nextIndex >= orderedMatches.length) return;
-
-    onMatchChange?.(orderedMatches[nextIndex]!);
-  }
+  }, [match.id, savedHome, savedAway]);
 
   function onSave() {
     setError(null);
@@ -145,16 +123,7 @@ export function QuickPredictionModal({
   }
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Pronóstico"
-      hideHeaderDivider
-      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
-      onSwipeLeft={canSwipe ? () => goToMatch(1) : undefined}
-      onSwipeRight={canSwipe ? () => goToMatch(-1) : undefined}
-      belowPanel={canSwipe ? <MatchSwipeDots position={dotPosition} /> : undefined}
-    >
+    <>
       <div className="space-y-4 px-4 py-4">
         <MatchTeamsDisplay
           homeTeam={match.home_team}
@@ -210,6 +179,104 @@ export function QuickPredictionModal({
           </Button>
         )}
       </div>
+    </>
+  );
+}
+
+export function QuickPredictionModal({
+  open,
+  onClose,
+  poolId,
+  match,
+  matches,
+  onMatchChange,
+}: QuickPredictionModalProps) {
+  const [viewMatch, setViewMatch] = useState(match);
+  const [slide, setSlide] = useState<SlideState | null>(null);
+  const slideLockRef = useRef(false);
+
+  const orderedMatches = useMemo(
+    () => (matches && matches.length > 0 ? sortMatchesByKickoff(matches) : [match]),
+    [match, matches]
+  );
+
+  const currentIndex = useMemo(
+    () => orderedMatches.findIndex((item) => item.id === viewMatch.id),
+    [orderedMatches, viewMatch.id]
+  );
+
+  const canSwipe = orderedMatches.length > 1 && Boolean(onMatchChange);
+  const dotPosition = resolveDotPosition(
+    currentIndex >= 0 ? currentIndex : 0,
+    orderedMatches.length
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    setViewMatch(match);
+    setSlide(null);
+    slideLockRef.current = false;
+  }, [open, match.id]);
+
+  const finishSlide = useCallback(() => {
+    if (!slide) return;
+    setViewMatch(slide.target);
+    onMatchChange?.(slide.target);
+    setSlide(null);
+    slideLockRef.current = false;
+  }, [slide, onMatchChange]);
+
+  const startSlide = useCallback(
+    (offset: 1 | -1) => {
+      if (!canSwipe || slideLockRef.current || currentIndex < 0) return;
+
+      const nextIndex = currentIndex + offset;
+      if (nextIndex < 0 || nextIndex >= orderedMatches.length) return;
+
+      const target = orderedMatches[nextIndex]!;
+      slideLockRef.current = true;
+
+      setSlide({
+        target,
+        direction: offset === 1 ? "next" : "prev",
+        phase: "prep",
+      });
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setSlide((current) =>
+            current ? { ...current, phase: "animate" } : current
+          );
+        });
+      });
+    },
+    [canSwipe, currentIndex, orderedMatches]
+  );
+
+  const panelSlide: ModalPanelSlide | null = slide
+    ? {
+        direction: slide.direction,
+        phase: slide.phase,
+        incoming: (
+          <QuickPredictionPanelBody poolId={poolId} match={slide.target} onClose={onClose} />
+        ),
+        onTransitionEnd: finishSlide,
+      }
+    : null;
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Pronóstico"
+      hideHeaderDivider
+      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      onSwipeLeft={canSwipe ? () => startSlide(1) : undefined}
+      onSwipeRight={canSwipe ? () => startSlide(-1) : undefined}
+      belowPanel={canSwipe ? <MatchSwipeDots position={dotPosition} /> : undefined}
+      panelSlide={panelSlide}
+    >
+      <QuickPredictionPanelBody poolId={poolId} match={viewMatch} onClose={onClose} />
     </Modal>
   );
 }
