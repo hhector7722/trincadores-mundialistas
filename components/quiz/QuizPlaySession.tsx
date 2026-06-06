@@ -140,7 +140,7 @@ export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) 
               setStep(questions.length - 1);
             }}
           >
-            Revisar ultima pregunta
+            Revisar última pregunta
           </Button>
         </div>
       </div>

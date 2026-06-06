@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:44.099Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:59.935Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -102,7 +102,10 @@ flowchart TB
 | `/predictions` | `app/(app)/predictions/page.tsx` | force-dynamic |
 | `/profile/:profileId` | `app/(app)/profile/[profileId]/page.tsx` | force-dynamic |
 | `/profile` | `app/(app)/profile/page.tsx` | force-dynamic |
+| `/quiz/leaderboard` | `app/(app)/quiz/leaderboard/page.tsx` | force-dynamic |
 | `/quiz` | `app/(app)/quiz/page.tsx` | force-dynamic |
+| `/quiz/play` | `app/(app)/quiz/play/page.tsx` | force-dynamic |
+| `/quiz/result` | `app/(app)/quiz/result/page.tsx` | force-dynamic |
 | `/ranking` | `app/(app)/ranking/page.tsx` | force-dynamic |
 | `/login` | `app/(auth)/login/page.tsx` | default |
 
@@ -728,10 +731,6 @@ docs/               → AUTH, RLS, SEED
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
-- `components/quiz/QuizHub.tsx` — posible código muerto
-- `components/quiz/QuizLeaderboardTable.tsx` — posible código muerto
-- `components/quiz/QuizPlaySession.tsx` — posible código muerto
-- `components/quiz/QuizResultSummary.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
@@ -779,7 +778,7 @@ docs/               → AUTH, RLS, SEED
 
 ### Placeholders detectados
 
-- `app/(app)/quiz/page.tsx`
+_Ninguno._
 
 ### TODOs / FIXMEs en código
 

@@ -7,13 +7,6 @@ type QuizResultSummaryProps = {
   result: QuizResultResponse;
 };
 
-function optionLabel(
-  options: { id: string; label: string }[] | undefined,
-  optionId: string
-): string {
-  return options?.find((o) => o.id === optionId)?.label ?? optionId.toUpperCase();
-}
-
 export function QuizResultSummary({ result }: QuizResultSummaryProps) {
   const countsForScore =
     result.kind === "official" && result.scoringMode === "competitive";

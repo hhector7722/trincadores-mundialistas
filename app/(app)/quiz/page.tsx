@@ -1,25 +1,30 @@
-﻿import Link from "next/link";
-import { Card } from "@/components/ui/card";
+﻿import { QuizHub } from "@/components/quiz/QuizHub";
+import { getQuizDayHub } from "@/lib/quiz/queries";
+import { requireActivePoolContext } from "@/lib/pool/require-context";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default function QuizPage() {
+export default async function QuizPage() {
+  const ctx = await requireActivePoolContext();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const hub = await getQuizDayHub(ctx.activePoolId, user!.id);
+
   return (
     <div className="space-y-4 p-4 pb-8">
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-          Quiz
+          Quiz del dia
         </h1>
-        <p className="mt-1 text-sm text-[var(--tm-muted)]">Modulo secundario — fase 2.</p>
-      </div>
-      <Card>
-        <p className="text-sm text-[var(--tm-muted)]">
-          El esquema y las RPC ya existen. La interfaz de juego llegara mas adelante.
+        <p className="mt-1 text-sm text-[var(--tm-muted)]">
+          Trivia diaria del Mundial. Las respuestas se revelan al final.
         </p>
-        <Link href="/" className="mt-4 inline-block text-sm font-medium text-[var(--tm-primary)]">
-          Volver al inicio
-        </Link>
-      </Card>
+      </div>
+      <QuizHub hub={hub} />
     </div>
   );
 }
