@@ -14,6 +14,18 @@ import type {
 } from "@/lib/quiz/types";
 import { createClient } from "@/lib/supabase/server";
 
+type ProfileLabelRow = {
+  display_name: string | null;
+  username: string;
+};
+
+function pickJoinedProfile(profiles: unknown): ProfileLabelRow | null {
+  if (!profiles) return null;
+  const row = Array.isArray(profiles) ? profiles[0] : profiles;
+  if (!row || typeof row !== "object" || !("username" in row)) return null;
+  return row as ProfileLabelRow;
+}
+
 type QuizDbRow = {
   id: string;
   pool_id: string;
@@ -281,10 +293,7 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
 
   const labelByProfile = new Map<string, string>();
   for (const member of members ?? []) {
-    const profile = member.profiles as
-      | { display_name: string | null; username: string }
-      | null
-      | undefined;
+    const profile = pickJoinedProfile(member.profiles);
     if (!profile) continue;
     labelByProfile.set(
       member.profile_id as string,

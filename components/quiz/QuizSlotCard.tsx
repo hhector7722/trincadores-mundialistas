@@ -60,7 +60,7 @@ export function QuizSlotCard({
 
       <p className="text-xs text-[var(--tm-muted)]">{pointsLabel}</p>
 
-      {status === "completed" && score !== null && (
+      {status === "completed" && score !== null && score > 0 && (
         <p className="font-display text-2xl text-[var(--tm-accent)]">
           {score} pts
         </p>

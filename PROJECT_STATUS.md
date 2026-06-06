@@ -18,6 +18,15 @@
 - [x] 2a catalogo OpenFootball (competitions, teams, host_cities, tournament_stages)
 - [x] 2a import WC2026: 104 partidos, 23 matchdays, 48 equipos, 16 sedes
 
+- [x] Quiz MVP Fase 1 SQL (migracion + RPC start/submit)
+- [x] Quiz MVP Fase 2 TypeScript (queries, actions, types)
+- [x] Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training)
+- [x] Quiz MVP Fase 4 hub `/quiz`
+- [x] Quiz MVP Fase 5 play `/quiz/play`
+- [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+
 ## Siguiente
+- [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
+- [ ] TabBar entrada quiz + slide home (opcional)

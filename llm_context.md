@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:59.935Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:20:22.882Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,9 +16,9 @@
 | **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** 1d predicciones rivales en detalle partido · 1d perfil publico /profile/[profileId] · 1f acceso cerrado alias + codigo (sin registro abierto) · 1f purga demo + bootstrap 11 participantes reales · 2a catalogo OpenFootball (competitions, teams, host_cities, tournament_stages) · 2a import WC2026: 104 partidos, 23 matchdays, 48 equipos, 16 sedes
+**Completado reciente:** Quiz MVP Fase 1 SQL (migracion + RPC start/submit) · Quiz MVP Fase 2 TypeScript (queries, actions, types) · Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 
-**Siguiente:** Fase 1e activity feed real
+**Siguiente:** Probar flujo E2E con login real (official + bonus)
 
 
 ## Arquitectura
@@ -349,7 +349,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
 | `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
 | `lib/quiz/parse-session.ts` | 97 líneas | parseQuizStartSession |
-| `lib/quiz/queries.ts` | 329 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
+| `lib/quiz/queries.ts` | 338 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
 | `lib/quiz/seed-day.ts` | 168 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
 | `lib/quiz/slot-status.ts` | 51 líneas | getQuizSlotStatus, canOpenQuizPlay, formatQuizSlotStatusLabel, QuizSlotStatus |
 | `lib/quiz/types.ts` | 94 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
@@ -720,8 +720,8 @@ docs/               → AUTH, RLS, SEED
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
+| `lib/quiz/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/PredictionsCalendar.tsx` | 332 | Revisar extracción |
-| `lib/quiz/queries.ts` | 329 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |
@@ -770,11 +770,19 @@ docs/               → AUTH, RLS, SEED
 - [x] 1f purga demo + bootstrap 11 participantes reales
 - [x] 2a catalogo OpenFootball (competitions, teams, host_cities, tournament_stages)
 - [x] 2a import WC2026: 104 partidos, 23 matchdays, 48 equipos, 16 sedes
+- [x] Quiz MVP Fase 1 SQL (migracion + RPC start/submit)
+- [x] Quiz MVP Fase 2 TypeScript (queries, actions, types)
+- [x] Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training)
+- [x] Quiz MVP Fase 4 hub `/quiz`
+- [x] Quiz MVP Fase 5 play `/quiz/play`
+- [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 
 ### En desarrollo / pendiente
 
+- [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
+- [ ] TabBar entrada quiz + slide home (opcional)
 
 ### Placeholders detectados
 
