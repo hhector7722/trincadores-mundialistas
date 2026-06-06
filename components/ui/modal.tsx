@@ -159,6 +159,7 @@ export function Modal({
 
     if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
 
+    event.preventDefault();
     swipeHandledRef.current = true;
 
     if (deltaX < 0) {
@@ -224,6 +225,7 @@ export function Modal({
                     : "-translate-x-1/2"
               )}
               onTransitionEnd={(event) => {
+                if (event.target !== event.currentTarget) return;
                 if (event.propertyName !== "transform") return;
                 if (!slideAnimate) return;
                 panelSlide.onTransitionEnd();

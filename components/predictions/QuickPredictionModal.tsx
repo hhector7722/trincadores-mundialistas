@@ -29,6 +29,8 @@ type SlideState = {
   phase: "prep" | "animate";
 };
 
+const SLIDE_MS = 300;
+
 function sortMatchesByKickoff(items: MatchWithPrediction[]): MatchWithPrediction[] {
   return [...items].sort(
     (a, b) => new Date(a.kickoff_at).getTime() - new Date(b.kickoff_at).getTime()
@@ -191,49 +193,85 @@ export function QuickPredictionModal({
   matches,
   onMatchChange,
 }: QuickPredictionModalProps) {
-  const [viewMatch, setViewMatch] = useState(match);
-  const [slide, setSlide] = useState<SlideState | null>(null);
-  const slideLockRef = useRef(false);
-
   const orderedMatches = useMemo(
     () => (matches && matches.length > 0 ? sortMatchesByKickoff(matches) : [match]),
     [match, matches]
   );
 
-  const currentIndex = useMemo(
-    () => orderedMatches.findIndex((item) => item.id === viewMatch.id),
-    [orderedMatches, viewMatch.id]
-  );
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [slide, setSlide] = useState<SlideState | null>(null);
+  const slideLockRef = useRef(false);
+  const slideFinishTimerRef = useRef<number | null>(null);
+  const onMatchChangeRef = useRef(onMatchChange);
+  const wasOpenRef = useRef(false);
 
+  onMatchChangeRef.current = onMatchChange;
+
+  const viewMatch = orderedMatches[activeIndex] ?? match;
   const canSwipe = orderedMatches.length > 1 && Boolean(onMatchChange);
-  const dotPosition = resolveDotPosition(
-    currentIndex >= 0 ? currentIndex : 0,
-    orderedMatches.length
-  );
+  const dotPosition = resolveDotPosition(activeIndex, orderedMatches.length);
 
-  useEffect(() => {
-    if (!open) return;
-    setViewMatch(match);
-    setSlide(null);
-    slideLockRef.current = false;
-  }, [open, match.id]);
+  const clearSlideFinishTimer = useCallback(() => {
+    if (slideFinishTimerRef.current !== null) {
+      window.clearTimeout(slideFinishTimerRef.current);
+      slideFinishTimerRef.current = null;
+    }
+  }, []);
 
   const finishSlide = useCallback(() => {
-    if (!slide) return;
-    setViewMatch(slide.target);
-    onMatchChange?.(slide.target);
-    setSlide(null);
+    clearSlideFinishTimer();
+    if (!slideLockRef.current) return;
+
     slideLockRef.current = false;
-  }, [slide, onMatchChange]);
+
+    setSlide((current) => {
+      if (!current) return null;
+
+      const nextIndex = orderedMatches.findIndex((item) => item.id === current.target.id);
+      if (nextIndex >= 0) {
+        setActiveIndex(nextIndex);
+      }
+      onMatchChangeRef.current?.(current.target);
+      return null;
+    });
+  }, [clearSlideFinishTimer, orderedMatches]);
+
+  const finishSlideRef = useRef(finishSlide);
+  finishSlideRef.current = finishSlide;
+
+  useEffect(() => {
+    if (!open) {
+      wasOpenRef.current = false;
+      clearSlideFinishTimer();
+      slideLockRef.current = false;
+      setSlide(null);
+      return;
+    }
+
+    if (!wasOpenRef.current) {
+      wasOpenRef.current = true;
+      const idx = orderedMatches.findIndex((item) => item.id === match.id);
+      setActiveIndex(idx >= 0 ? idx : 0);
+      setSlide(null);
+      slideLockRef.current = false;
+    }
+  }, [open, match.id, orderedMatches, clearSlideFinishTimer]);
+
+  useEffect(() => {
+    return () => clearSlideFinishTimer();
+  }, [clearSlideFinishTimer]);
 
   const startSlide = useCallback(
     (offset: 1 | -1) => {
-      if (!canSwipe || slideLockRef.current || currentIndex < 0) return;
+      if (!canSwipe || slideLockRef.current) return;
 
-      const nextIndex = currentIndex + offset;
+      const nextIndex = activeIndex + offset;
       if (nextIndex < 0 || nextIndex >= orderedMatches.length) return;
 
-      const target = orderedMatches[nextIndex]!;
+      const target = orderedMatches[nextIndex];
+      if (!target) return;
+
+      clearSlideFinishTimer();
       slideLockRef.current = true;
 
       setSlide({
@@ -242,16 +280,22 @@ export function QuickPredictionModal({
         phase: "prep",
       });
 
+      slideFinishTimerRef.current = window.setTimeout(() => {
+        finishSlideRef.current();
+      }, SLIDE_MS + 80);
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setSlide((current) =>
-            current ? { ...current, phase: "animate" } : current
-          );
+          setSlide((current) => (current ? { ...current, phase: "animate" } : current));
         });
       });
     },
-    [canSwipe, currentIndex, orderedMatches]
+    [activeIndex, canSwipe, clearSlideFinishTimer, orderedMatches]
   );
+
+  const handleSlideTransitionEnd = useCallback(() => {
+    finishSlideRef.current();
+  }, []);
 
   const panelSlide: ModalPanelSlide | null = slide
     ? {
@@ -260,7 +304,7 @@ export function QuickPredictionModal({
         incoming: (
           <QuickPredictionPanelBody poolId={poolId} match={slide.target} onClose={onClose} />
         ),
-        onTransitionEnd: finishSlide,
+        onTransitionEnd: handleSlideTransitionEnd,
       }
     : null;
 
@@ -271,8 +315,8 @@ export function QuickPredictionModal({
       title="Pronóstico"
       hideHeaderDivider
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
-      onSwipeLeft={canSwipe ? () => startSlide(1) : undefined}
-      onSwipeRight={canSwipe ? () => startSlide(-1) : undefined}
+      onSwipeLeft={canSwipe && !slide ? () => startSlide(1) : undefined}
+      onSwipeRight={canSwipe && !slide ? () => startSlide(-1) : undefined}
       belowPanel={canSwipe ? <MatchSwipeDots position={dotPosition} /> : undefined}
       panelSlide={panelSlide}
     >

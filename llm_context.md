@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T03:28:00.583Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T04:00:53.826Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -681,7 +681,8 @@ docs/               → AUTH, RLS, SEED
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
 | `lib/predictions/queries.ts` | 328 | Revisar extracción |
-| `components/ui/modal.tsx` | 302 | Revisar extracción |
+| `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
+| `components/ui/modal.tsx` | 304 | Revisar extracción |
 
 ### Código posiblemente sin uso
 
