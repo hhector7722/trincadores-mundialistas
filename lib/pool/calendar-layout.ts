@@ -172,7 +172,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
       MIN_GROUPS_FLAG_PX,
       Math.floor(Math.min(flagByHeight, flagByWidth) * fit)
     );
-    letterFs = Math.max(5, Math.floor(flagSize * 0.52));
+    letterFs = Math.max(4, Math.floor(flagSize * 0.36));
 
     calendar.style.setProperty("--tm-cal-groups-pad", `${GROUPS_EDGE_INSET_PX}px`);
     calendar.style.setProperty("--tm-cal-groups-letter-fs", `${letterFs}px`);

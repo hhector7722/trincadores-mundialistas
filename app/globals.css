@@ -857,13 +857,16 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-sidebar-card-inner {
   display: flex;
+  flex-direction: column;
   min-height: 0;
   min-width: 0;
   height: 100%;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
-  flex: 1 1 auto;
+  flex: 0 0 70%;
+  height: 70%;
+  max-height: 70%;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -911,9 +914,9 @@ html[data-modal-open] main {
   min-height: 0;
   align-items: center;
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  background: rgba(111, 43, 255, 0.16);
   padding: var(--tm-cal-group-card-py, 1px) 2px;
   text-align: left;
   color: inherit;
@@ -921,7 +924,8 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-group-letter {
   width: var(--tm-cal-groups-letter-w, 0.5rem);
-  font-size: var(--tm-cal-groups-letter-fs, 0.375rem);
+  font-size: var(--tm-cal-groups-letter-fs, 0.3125rem);
+  font-weight: 300;
   line-height: 1;
   text-align: center;
   flex-shrink: 0;
