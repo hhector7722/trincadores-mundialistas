@@ -2,12 +2,19 @@
 
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { CalendarGroupsPanel } from "@/components/predictions/CalendarGroupsPanel";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
 import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
+import {
+  buildGroupStandings,
+  CALENDAR_GROUPS_PANEL_DAYS,
+  isCalendarGroupsPanelDay,
+  type GroupStandingRow,
+} from "@/lib/pool/group-standings";
 import {
   buildMonthGrid,
   formatCalendarKickoffHour,
@@ -17,6 +24,7 @@ import {
   trimEmptyMatchWeeks,
   WEEKDAY_LABELS,
   type CalendarCell,
+  type CalendarWeek,
   type MonthYear,
 } from "@/lib/pool/match-calendar";
 import { cn } from "@/lib/utils";
@@ -67,18 +75,82 @@ function CalendarMatchCard({
   );
 }
 
+function weekHasGroupsPanel(week: CalendarWeek<MatchWithPrediction>): boolean {
+  const panelDays = week.cells.filter(
+    (cell) => cell.inMonth && isCalendarGroupsPanelDay(cell.dayNumber)
+  );
+  return panelDays.length === CALENDAR_GROUPS_PANEL_DAYS.length;
+}
+
+function renderCalendarGridCells(
+  weeks: CalendarWeek<MatchWithPrediction>[],
+  todayKey: string,
+  onOpenMatch: (match: MatchWithPrediction) => void,
+  groups: GroupStandingRow[]
+) {
+  return weeks.flatMap((week, weekIndex) => {
+    const row = weekIndex + 1;
+
+    if (weekHasGroupsPanel(week)) {
+      const panelStartCol = week.cells.findIndex(
+        (cell) => cell.inMonth && cell.dayNumber === CALENDAR_GROUPS_PANEL_DAYS[0]
+      );
+      const panelSpan = CALENDAR_GROUPS_PANEL_DAYS.length;
+      const gridColumn =
+        panelStartCol >= 0 ? `${panelStartCol + 1} / ${panelStartCol + 1 + panelSpan}` : "1 / 4";
+
+      const items = [
+        <CalendarGroupsPanel
+          key={`groups-${weekIndex}`}
+          groups={groups}
+          gridColumn={gridColumn}
+          gridRow={row}
+        />,
+      ];
+
+      week.cells.forEach((cell, cellIndex) => {
+        if (isCalendarGroupsPanelDay(cell.dayNumber)) return;
+
+        items.push(
+          <DayCell
+            key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
+            cell={cell}
+            todayKey={todayKey}
+            onOpenMatch={onOpenMatch}
+            style={{ gridColumn: cellIndex + 1, gridRow: row }}
+          />
+        );
+      });
+
+      return items;
+    }
+
+    return week.cells.map((cell, cellIndex) => (
+      <DayCell
+        key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
+        cell={cell}
+        todayKey={todayKey}
+        onOpenMatch={onOpenMatch}
+      />
+    ));
+  });
+}
+
 function DayCell({
   cell,
   todayKey,
   onOpenMatch,
+  style,
 }: {
   cell: CalendarCell<MatchWithPrediction>;
   todayKey: string;
   onOpenMatch: (match: MatchWithPrediction) => void;
+  style?: CSSProperties;
 }) {
   if (!cell.inMonth) {
     return (
       <div
+        style={style}
         className="tm-cal-cell-pad h-full border border-[var(--tm-border)] bg-[rgba(0,0,0,0.12)]"
         aria-hidden="true"
       />
@@ -90,6 +162,7 @@ function DayCell({
 
   return (
     <div
+      style={style}
       className={cn(
         "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)] bg-[var(--tm-glass)]",
         hasMatches && "tm-cal-cell--matches"
@@ -172,6 +245,8 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
+  const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
+
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
@@ -215,16 +290,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         </div>
 
         <div ref={gridRef} className="tm-cal-body min-h-0">
-          {weeks.flatMap((week, weekIndex) =>
-            week.cells.map((cell, cellIndex) => (
-              <DayCell
-                key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
-                cell={cell}
-                todayKey={todayKey}
-                onOpenMatch={setActiveMatch}
-              />
-            ))
-          )}
+          {renderCalendarGridCells(weeks, todayKey, setActiveMatch, groupStandings)}
         </div>
       </section>
 

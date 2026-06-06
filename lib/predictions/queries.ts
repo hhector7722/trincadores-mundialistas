@@ -14,6 +14,8 @@ export type MatchWithPrediction = {
   matchday_name: string;
   matchday_external_key: string | null;
   group_code: string | null;
+  officialHome: number | null;
+  officialAway: number | null;
   prediction:
     | Pick<
         Prediction,
@@ -25,8 +27,6 @@ export type MatchWithPrediction = {
 
 export type MatchDetail = MatchWithPrediction & {
   hasOfficialResult: boolean;
-  officialHome: number | null;
-  officialAway: number | null;
 };
 
 async function getMatchdayMap(poolId: string) {
@@ -82,8 +82,16 @@ async function fetchPoolMatchesWithPredictions(
 
   const predByMatch = new Map((predictions ?? []).map((p) => [p.match_id, p]));
 
+  const { data: results } = await supabase
+    .from("match_results")
+    .select("match_id, home_goals, away_goals")
+    .in("match_id", matchIds);
+
+  const resultByMatch = new Map((results ?? []).map((r) => [r.match_id, r]));
+
   return matches.map((m) => {
     const pred = predByMatch.get(m.id);
+    const result = resultByMatch.get(m.id);
     const status = m.status as MatchStatus;
     return {
       id: m.id,
@@ -94,6 +102,8 @@ async function fetchPoolMatchesWithPredictions(
       matchday_name: dayMap.get(m.matchday_id) ?? "",
       matchday_external_key: externalKeyMap.get(m.matchday_id) ?? null,
       group_code: m.group_code ?? null,
+      officialHome: result?.home_goals ?? null,
+      officialAway: result?.away_goals ?? null,
       prediction: pred
         ? {
             id: pred.id,

@@ -757,3 +757,64 @@ html[data-modal-open] main {
     font-size: 0.4375rem;
   }
 }
+
+.tm-porra-calendar .tm-cal-groups-panel {
+  padding: calc(0.125rem * var(--tm-cal-ui-scale, 1)) calc(0.1875rem * var(--tm-cal-ui-scale, 1));
+}
+
+.tm-porra-calendar .tm-cal-groups-title {
+  font-size: 0.375rem;
+  line-height: 1.1;
+  margin-bottom: 0.0625rem;
+}
+
+.tm-porra-calendar .tm-cal-groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+}
+
+.tm-porra-calendar .tm-cal-group-row {
+  gap: 0.125rem;
+  min-height: 0;
+}
+
+.tm-porra-calendar .tm-cal-group-letter {
+  width: 0.4375rem;
+  font-size: 0.3125rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.tm-porra-calendar .tm-cal-group-flags {
+  gap: 0.0625rem;
+  justify-content: flex-start;
+}
+
+.tm-porra-calendar .tm-cal-group-flag,
+.tm-porra-calendar .tm-cal-group-flag.tm-cal-flag-dim {
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.tm-porra-calendar .tm-cal-group-flag span {
+  font-size: 0.25rem;
+  line-height: 1;
+}
+
+@media (min-width: 640px) {
+  .tm-porra-calendar .tm-cal-groups-title {
+    font-size: 0.4375rem;
+  }
+
+  .tm-porra-calendar .tm-cal-group-letter {
+    width: 0.5rem;
+    font-size: 0.375rem;
+  }
+
+  .tm-porra-calendar .tm-cal-group-flag,
+  .tm-porra-calendar .tm-cal-group-flag.tm-cal-flag-dim {
+    height: 0.75rem;
+    width: 0.75rem;
+  }
+}

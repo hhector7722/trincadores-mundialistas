@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T04:13:04.650Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T04:27:00.771Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -170,6 +170,7 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `CalendarGroupsPanel` | `components/predictions/CalendarGroupsPanel.tsx` | server | CalendarGroupsPanel |
 | `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
@@ -283,7 +284,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/narrative/template-provider.ts` | 16 líneas | — |
 | `lib/narrative/types.ts` | 22 líneas | NarrativeTone, NarrativeContext, NarrativeItem |
 
-**openfootball/** — 6 archivos
+**openfootball/** — 7 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
@@ -293,8 +294,9 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/openfootball/parse-stadiums-csv.ts` | 59 líneas | parseStadiumsCsv |
 | `lib/openfootball/slug.ts` | 52 líneas | toSlug, teamExternalKey, cityExternalKey, groupStageKey, calendarMatchdayKey, poolMatchdayKey, knockoutRoundKey, groupMatchId, knockoutMatchId, isPlaceholderTeam |
 | `lib/openfootball/types.ts` | 70 líneas | COMPETITION_CODE, COMPETITION_YEAR, SOURCE_PATH, ParsedStadium, ParsedTeam, StageType, ParsedStage, ParsedMatch, ParsedCalendarMatchday, ParseFootballTxtResult, ParseCupFinalsResult |
+| `lib/openfootball/wc2026-groups.ts` | 20 líneas | WC2026_GROUP_CODES |
 
-**pool/** — 7 archivos
+**pool/** — 8 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
@@ -302,6 +304,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/calendar-layout.ts` | 151 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
+| `lib/pool/group-standings.ts` | 137 líneas | buildGroupStandings, isCalendarGroupsPanelDay, CALENDAR_GROUPS_PANEL_DAYS, GroupStandingRow |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
@@ -312,7 +315,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
-| `lib/predictions/queries.ts` | 328 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/queries.ts` | 338 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
@@ -680,8 +683,9 @@ docs/               → AUTH, RLS, SEED
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
-| `lib/predictions/queries.ts` | 328 | Revisar extracción |
+| `lib/predictions/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 310 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |
 
 ### Código posiblemente sin uso
