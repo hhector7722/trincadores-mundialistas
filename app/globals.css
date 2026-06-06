@@ -88,6 +88,12 @@ html[data-modal-open] main {
   font-family: var(--font-brand);
 }
 
+.tm-brand-title-text {
+  -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.4);
+  paint-order: stroke fill;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
 .tm-surface-fade {
   background: var(--tm-glass);
   backdrop-filter: blur(20px);
@@ -580,7 +586,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-list {
-  gap: calc(0.125rem * var(--tm-cal-ui-scale));
+  gap: 2px;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -594,14 +600,14 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-match-card {
   flex: 0 0 auto;
-  gap: calc(0.0625rem * var(--tm-cal-ui-scale));
-  height: calc(1.5625rem * var(--tm-cal-ui-scale));
-  min-height: calc(1.5625rem * var(--tm-cal-ui-scale));
-  max-height: calc(1.5625rem * var(--tm-cal-ui-scale));
+  gap: 1px;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  max-height: 1.75rem;
   min-width: 0;
   overflow: hidden;
-  padding: calc(0.125rem * var(--tm-cal-ui-scale));
-  border-radius: calc(0.1875rem * var(--tm-cal-ui-scale));
+  padding: 2px;
+  border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(111, 43, 255, 0.16);
 }
@@ -643,23 +649,23 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-flags {
-  height: calc(0.875rem * var(--tm-cal-ui-scale));
-  min-height: calc(0.875rem * var(--tm-cal-ui-scale));
-  max-height: calc(0.875rem * var(--tm-cal-ui-scale));
+  height: 1rem;
+  min-height: 1rem;
+  max-height: 1rem;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-flag,
 .tm-porra-calendar .tm-cal-flag-dim {
-  height: calc(0.875rem * var(--tm-cal-ui-scale));
-  width: calc(0.875rem * var(--tm-cal-ui-scale));
+  height: 0.875rem;
+  width: 0.875rem;
   flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-flag span {
-  font-size: calc(0.375rem * var(--tm-cal-ui-scale));
+  font-size: 0.375rem;
   line-height: 1;
 }
 
@@ -668,8 +674,9 @@ html[data-modal-open] main {
   overflow: hidden;
   white-space: nowrap;
   color: #ffffff;
-  font-size: calc(0.5rem * var(--tm-cal-ui-scale));
+  font-size: 0.4375rem;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
@@ -687,24 +694,24 @@ html[data-modal-open] main {
 
   .tm-porra-calendar .tm-cal-flag,
   .tm-porra-calendar .tm-cal-flag-dim {
-    height: calc(1rem * var(--tm-cal-ui-scale));
-    width: calc(1rem * var(--tm-cal-ui-scale));
+    height: 1rem;
+    width: 1rem;
   }
 
   .tm-porra-calendar .tm-cal-match-card {
-    height: calc(1.75rem * var(--tm-cal-ui-scale));
-    min-height: calc(1.75rem * var(--tm-cal-ui-scale));
-    max-height: calc(1.75rem * var(--tm-cal-ui-scale));
+    height: 1.9375rem;
+    min-height: 1.9375rem;
+    max-height: 1.9375rem;
   }
 
   .tm-porra-calendar .tm-cal-flags {
-    height: calc(1rem * var(--tm-cal-ui-scale));
-    min-height: calc(1rem * var(--tm-cal-ui-scale));
-    max-height: calc(1rem * var(--tm-cal-ui-scale));
+    height: 1.125rem;
+    min-height: 1.125rem;
+    max-height: 1.125rem;
   }
 
   .tm-porra-calendar .tm-cal-kickoff {
-    font-size: calc(0.4375rem * var(--tm-cal-ui-scale));
+    font-size: 0.5rem;
   }
 
   .tm-cal-ko-link {
