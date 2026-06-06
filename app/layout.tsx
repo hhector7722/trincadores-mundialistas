@@ -49,10 +49,20 @@ export const metadata: Metadata = {
     siteName: "Trincadores Mundialistas",
     title: "Trincadores Mundialistas",
     url: siteUrl.origin,
+    images: [
+      {
+        url: "/app-icon/120",
+        width: 120,
+        height: 120,
+        type: "image/png",
+        alt: "Trincadores Mundialistas",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "Trincadores Mundialistas",
+    images: ["/app-icon/120"],
   },
   icons: {
     icon: [

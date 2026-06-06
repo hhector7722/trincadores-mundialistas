@@ -1,6 +1,6 @@
 import { createAppIcon } from "@/lib/app-icon-image";
 
-const ALLOWED_SIZES = new Set([192, 512]);
+const ALLOWED_SIZES = new Set([120, 192, 512]);
 
 export async function GET(
   _request: Request,

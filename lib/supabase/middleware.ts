@@ -7,8 +7,6 @@ const PUBLIC_PATHS = [
   "/manifest.webmanifest",
   "/icon",
   "/apple-icon",
-  "/opengraph-image",
-  "/twitter-image",
   "/app-icon",
 ];
 
