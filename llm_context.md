@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T00:50:50.486Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T00:53:54.385Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -354,7 +354,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/supabase/admin.ts` | 16 líneas | createAdminClient |
 | `lib/supabase/client.ts` | 11 líneas | createClient |
-| `lib/supabase/middleware.ts` | 73 líneas | updateSession |
+| `lib/supabase/middleware.ts` | 74 líneas | updateSession |
 | `lib/supabase/server.ts` | 30 líneas | createClient |
 
 **teams/** — 2 archivos

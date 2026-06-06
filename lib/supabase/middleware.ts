@@ -9,6 +9,7 @@ const PUBLIC_PATHS = [
   "/apple-icon",
   "/opengraph-image",
   "/twitter-image",
+  "/app-icon",
 ];
 
 function isAuthPath(pathname: string): boolean {
