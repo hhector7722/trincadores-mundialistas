@@ -68,10 +68,15 @@ function CalendarMatchCard({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-card flex min-w-0 w-full shrink-0 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
+        "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
+      {match.group_code ? (
+        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-bold uppercase leading-none text-[var(--tm-accent)]">
+          {match.group_code.toUpperCase()}
+        </span>
+      ) : null}
       <div className="tm-cal-match-card-body">
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}

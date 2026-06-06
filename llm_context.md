@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T05:34:44.950Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:11.884Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -189,6 +189,12 @@ flowchart TB
 | `MemberStandingCard` | `components/profile/MemberStandingCard.tsx` | server | MemberStandingCard |
 | `ProfileAvatar` | `components/profile/ProfileAvatar.tsx` | server | ProfileAvatar |
 
+#### quiz
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `QuizModeBadge` | `components/quiz/QuizModeBadge.tsx` | server | QuizModeBadge |
+
 #### ranking
 
 | Componente | Ruta | Tipo | Exports |
@@ -237,6 +243,9 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `AuthActionResult` | `actions/auth.ts` | `AuthActionResult` |
 | `savePrediction` | `actions/predictions.ts` | `export async function savePrediction( poolId: string, matchId: string, homeGoals` |
 | `PredictionActionResult` | `actions/predictions.ts` | `PredictionActionResult` |
+| `startQuiz` | `actions/quiz.ts` | `export async function startQuiz( poolId: string, quizId: string ): Promise<QuizA` |
+| `submitQuiz` | `actions/quiz.ts` | `export async function submitQuiz( poolId: string, attemptId: string, answers: Re` |
+| `QuizActionResult` | `actions/quiz.ts` | `QuizActionResult` |
 
 ### Detalle de acciones
 
@@ -319,11 +328,19 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
-**quiz/** — 1 archivos
+**quiz/** — 9 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/quiz/date.ts` | 12 líneas | todayQuizDate |
+| `lib/quiz/mode.ts` | 42 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
+| `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
+| `lib/quiz/parse-session.ts` | 97 líneas | parseQuizStartSession |
+| `lib/quiz/queries.ts` | 329 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
+| `lib/quiz/seed-day.ts` | 168 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
+| `lib/quiz/slot-status.ts` | 51 líneas | getQuizSlotStatus, canOpenQuizPlay, formatQuizSlotStatusLabel, QuizSlotStatus |
+| `lib/quiz/types.ts` | 94 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
 
 **ranking/** — 3 archivos
 
@@ -343,7 +360,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/scripts/env-guard.ts` | 44 líneas | getProjectRef, assertProjectRef, assertServiceEnv, assertPurgeConfirmed, assertBootstrapAllowed, assertImportAllowed |
+| `lib/scripts/env-guard.ts` | 50 líneas | getProjectRef, assertProjectRef, assertServiceEnv, assertPurgeConfirmed, assertBootstrapAllowed, assertImportAllowed, assertQuizSeedAllowed |
 
 **site-url.ts/** — 1 archivos
 
@@ -558,9 +575,11 @@ sequenceDiagram
 |----------|-----|-------------|---------|-----------------|
 | `ALLOW_BOOTSTRAP` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `ALLOW_IMPORT` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
+| `ALLOW_QUIZ_SEED` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `AUTH_INTERNAL_DOMAIN` | Dominio email sintético | Opcional | `auth.trincadores.local` | lib/auth/credentials.ts |
 | `CONFIRM_PURGE` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `CONFIRM_REIMPORT` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
+| `CONFIRM_RESEED` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
 | `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | — |
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
 | `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts |
@@ -568,7 +587,9 @@ sequenceDiagram
 | `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, lib/supabase/client.ts |
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
-| `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
+| `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
+| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
+| `QUIZ_DAY_FILE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, scripts/bootstrap-participants.ts |
 | `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 | `VERCEL_URL` | Ver código | Opcional | `` | lib/site-url.ts |
@@ -687,7 +708,8 @@ docs/               → AUTH, RLS, SEED
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 327 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 332 | Revisar extracción |
+| `lib/quiz/queries.ts` | 329 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |
@@ -697,9 +719,11 @@ docs/               → AUTH, RLS, SEED
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
+- `components/quiz/QuizModeBadge.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
+- `lib/quiz/slot-status.ts` — posible código muerto
 - `lib/scripts/env-guard.ts` — posible código muerto
 - `lib/supabase/client.ts` — posible código muerto
 
