@@ -98,7 +98,7 @@ export function formatCalendarKickoffHour(iso: string, timeZone = CALENDAR_TZ): 
     minute: "2-digit",
     timeZone,
   });
-  return `${hour}:${minute}`;
+  return `${hour}:${minute.padStart(2, "0")}`;
 }
 
 export function indexMatchesByDate<T extends CalendarMatchLike>(

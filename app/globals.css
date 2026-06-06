@@ -654,7 +654,7 @@ html[data-modal-open] main {
   min-height: 0;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0;
+  gap: 2px;
 }
 
 .tm-porra-calendar .tm-cal-month-title {
