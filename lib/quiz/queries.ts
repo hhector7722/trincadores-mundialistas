@@ -143,13 +143,12 @@ export async function getQuizDayHub(
   );
 
   const officialQuiz = quizzes.find((q) => q.kind === "official");
-  const bonusQuiz = quizzes.find((q) => q.kind === "bonus");
 
   return {
     quizDate,
     competitive,
     official: slotFrom(officialQuiz, attempts),
-    bonus: slotFrom(bonusQuiz, attempts),
+    bonus: null,
   };
 }
 
@@ -328,7 +327,9 @@ export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | 
 export function isQuizPlayable(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
   if (!slot.attempt) return true;
-  if (slot.attempt.status === "submitted") return false;
+  if (slot.attempt.status === "submitted") {
+    return slot.quiz.scoring_mode === "training";
+  }
   if (slot.attempt.status === "in_progress") {
     if (!slot.attempt.expires_at) return true;
     return Date.now() < new Date(slot.attempt.expires_at).getTime();
