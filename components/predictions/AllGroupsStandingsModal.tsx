@@ -28,14 +28,14 @@ export function AllGroupsStandingsModal({
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
     >
-      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-6 gap-2 overflow-y-auto p-2 sm:grid-cols-3 sm:grid-rows-4 sm:gap-3 sm:p-3 lg:grid-cols-6 lg:grid-rows-2">
+      <div className="grid auto-rows-min grid-cols-2 items-start gap-2 overflow-y-auto p-2 sm:grid-cols-3 sm:gap-3 sm:p-3 lg:grid-cols-6">
         {groups.map((group) => (
           <button
             key={group.code}
             type="button"
             onClick={() => onSelectGroup(group.code)}
             className={cn(
-              "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-[var(--tm-border)]",
+              "flex min-w-0 flex-col overflow-visible rounded-lg border border-[var(--tm-border)]",
               "bg-[rgba(111,43,255,0.12)] text-left transition-colors",
               "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
             )}
@@ -45,7 +45,7 @@ export function AllGroupsStandingsModal({
                 Grupo {group.code}
               </span>
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="overflow-visible">
               <GroupStandingsTable group={group} variant="grid" />
             </div>
           </button>

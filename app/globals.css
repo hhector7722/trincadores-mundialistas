@@ -896,8 +896,8 @@ html[data-modal-open] main {
   height: 25%;
   max-height: 25%;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.52fr) minmax(0, 0.95fr);
-  column-gap: 8px;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  column-gap: 10px;
   row-gap: 3px;
   padding: 2px 4px 4px;
   min-height: 0;
@@ -914,44 +914,31 @@ html[data-modal-open] main {
   line-height: 1.25;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-scorers,
-.tm-porra-calendar .tm-cal-sidebar-ranking {
+.tm-porra-calendar .tm-cal-sidebar-scorers {
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-ranking-row {
-  display: inline-flex;
-  max-width: 100%;
-  align-items: baseline;
-  gap: 2px;
-}
-
-.tm-porra-calendar .tm-cal-sidebar-ranking-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .tm-porra-calendar .tm-cal-sidebar-access-col {
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
-  width: fit-content;
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
   max-width: 100%;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   background: #ccff00;
   color: #000;
-  padding: 2px 5px;
-  font-size: clamp(5px, 1.25cqw, 6.5px);
+  padding: 4px 10px;
+  font-size: clamp(7px, 1.75cqw, 9px);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.04em;

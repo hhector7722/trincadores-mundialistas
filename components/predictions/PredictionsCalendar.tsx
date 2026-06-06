@@ -20,7 +20,6 @@ import {
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
 import { getTournamentTopScorers } from "@/lib/pool/tournament-stats";
-import type { LeaderboardRow } from "@/lib/ranking/queries";
 import {
   buildMonthGrid,
   formatCalendarKickoffHour,
@@ -41,8 +40,6 @@ const GROUP_STAGE_VIEW: MonthYear = GROUP_STAGE_CALENDAR_MONTH;
 type PredictionsCalendarProps = {
   poolId: string;
   matches: MatchWithPrediction[];
-  leaderboardRows: LeaderboardRow[];
-  currentProfileId: string;
 };
 
 function formatCalendarPrediction(match: MatchWithPrediction): string {
@@ -117,8 +114,6 @@ function renderCalendarGridCells(
   onOpenMatch: (match: MatchWithPrediction) => void,
   groups: GroupStandingRow[],
   scorers: ReturnType<typeof getTournamentTopScorers>,
-  leaderboardRows: LeaderboardRow[],
-  currentProfileId: string,
   onGroupClick: (groupCode: string) => void,
   onOpenAllGroups: () => void,
   onOpenStats: () => void
@@ -141,8 +136,6 @@ function renderCalendarGridCells(
           key={`sidebar-${weekIndex}`}
           groups={groups}
           scorers={scorers}
-          leaderboardRows={leaderboardRows}
-          currentProfileId={currentProfileId}
           gridColumn={gridColumn}
           gridRow={row}
           onGroupClick={onGroupClick}
@@ -278,12 +271,7 @@ function useCalendarViewportLayout(
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
 
-export function PredictionsCalendar({
-  poolId,
-  matches,
-  leaderboardRows,
-  currentProfileId,
-}: PredictionsCalendarProps) {
+export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
@@ -352,8 +340,6 @@ export function PredictionsCalendar({
             setActiveMatch,
             groupStandings,
             topScorers,
-            leaderboardRows,
-            currentProfileId,
             setActiveGroupCode,
             () => setAllGroupsOpen(true),
             () => setStatsOpen(true)

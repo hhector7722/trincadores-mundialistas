@@ -1,6 +1,5 @@
 import { CalendarGroupsPanel } from "@/components/predictions/CalendarGroupsPanel";
 import { CalendarSidebarFooter } from "@/components/predictions/CalendarSidebarFooter";
-import type { LeaderboardRow } from "@/lib/ranking/queries";
 import type { GroupStandingRow } from "@/lib/pool/group-standings";
 import type { TournamentScorerRow } from "@/lib/pool/tournament-stats";
 import { cn } from "@/lib/utils";
@@ -9,8 +8,6 @@ import type { CSSProperties } from "react";
 type CalendarSidebarCardProps = {
   groups: GroupStandingRow[];
   scorers: TournamentScorerRow[];
-  leaderboardRows: LeaderboardRow[];
-  currentProfileId?: string;
   gridColumn: string;
   gridRow: number;
   onGroupClick?: (groupCode: string) => void;
@@ -22,8 +19,6 @@ type CalendarSidebarCardProps = {
 export function CalendarSidebarCard({
   groups,
   scorers,
-  leaderboardRows,
-  currentProfileId,
   gridColumn,
   gridRow,
   onGroupClick,
@@ -53,8 +48,6 @@ export function CalendarSidebarCard({
 
         <CalendarSidebarFooter
           scorers={scorers}
-          leaderboardRows={leaderboardRows}
-          currentProfileId={currentProfileId}
           onOpenAllGroups={() => onOpenAllGroups?.()}
           onOpenStats={() => onOpenStats?.()}
         />
