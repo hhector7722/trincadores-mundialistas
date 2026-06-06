@@ -9,6 +9,7 @@ import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
 import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
+import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
   CALENDAR_GROUPS_PANEL_DAYS,
@@ -37,6 +38,18 @@ type PredictionsCalendarProps = {
   matches: MatchWithPrediction[];
 };
 
+function formatCalendarPrediction(match: MatchWithPrediction): string {
+  const prediction = match.prediction;
+  if (
+    !prediction ||
+    !Number.isInteger(prediction.home_goals) ||
+    !Number.isInteger(prediction.away_goals)
+  ) {
+    return "-";
+  }
+  return displayGoals(prediction.home_goals, prediction.away_goals);
+}
+
 function CalendarMatchCard({
   match,
   onOpen,
@@ -45,7 +58,8 @@ function CalendarMatchCard({
   onOpen: () => void;
 }) {
   const time = formatCalendarKickoffHour(match.kickoff_at);
-  const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)}`;
+  const predictionLabel = formatCalendarPrediction(match);
+  const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
 
   return (
     <button
@@ -63,10 +77,13 @@ function CalendarMatchCard({
           {time}
         </span>
         <div className="tm-cal-flags relative w-full shrink-0">
-          <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
             <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
           </div>
-          <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums">
+            {predictionLabel}
+          </span>
+          <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
             <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
           </div>
         </div>
