@@ -1,0 +1,126 @@
+{
+  "quiz_date": "2026-06-06",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿Cuál es el récord de Mundial 2026 en Mundiales?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "3 Mundiales ganados"
+          },
+          {
+            "id": "b",
+            "label": "48 selecciones"
+          },
+          {
+            "id": "c",
+            "label": "7 finales disputadas"
+          },
+          {
+            "id": "d",
+            "label": "16 goles"
+          }
+        ],
+        "correct_option_id": "b",
+        "fact_id": "wc-teams-2026",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026",
+        "source_label": "FIFA — Mundial 2026",
+        "template_id": "record_value",
+        "category": "curiosities"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Quién es el jugador más veterano en marcar en un Mundial?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Mundial 2006"
+          },
+          {
+            "id": "b",
+            "label": "Roger Milla"
+          },
+          {
+            "id": "c",
+            "label": "Mundial 1958"
+          },
+          {
+            "id": "d",
+            "label": "11 segundos (Hakan Şükür, 2002)"
+          }
+        ],
+        "correct_option_id": "b",
+        "fact_id": "wc-oldest-scorer",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/roger-milla-legend",
+        "source_label": "FIFA — Roger Milla",
+        "template_id": "curiosity",
+        "category": "players"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿En qué país se disputó el Mundial 2010?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Brasil"
+          },
+          {
+            "id": "b",
+            "label": "Japón y Corea del Sur"
+          },
+          {
+            "id": "c",
+            "label": "Sudáfrica"
+          },
+          {
+            "id": "d",
+            "label": "Estados Unidos, México y Canadá"
+          }
+        ],
+        "correct_option_id": "c",
+        "fact_id": "wc2010-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2010southafrica",
+        "source_label": "FIFA — Mundial 2010",
+        "template_id": "host_country",
+        "category": "hosts"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-06T16:34:40.322Z",
+    "fact_ids": [
+      "wc-teams-2026",
+      "wc-oldest-scorer",
+      "wc2010-host"
+    ],
+    "templates": [
+      "record_value",
+      "curiosity",
+      "host_country"
+    ],
+    "sources": [
+      {
+        "fact_id": "wc-teams-2026",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026",
+        "source_label": "FIFA — Mundial 2026"
+      },
+      {
+        "fact_id": "wc-oldest-scorer",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/roger-milla-legend",
+        "source_label": "FIFA — Roger Milla"
+      },
+      {
+        "fact_id": "wc2010-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2010southafrica",
+        "source_label": "FIFA — Mundial 2010"
+      }
+    ]
+  }
+}
