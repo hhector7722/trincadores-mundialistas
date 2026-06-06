@@ -600,7 +600,7 @@ html[data-modal-open] main {
   --tm-cal-match-card-border: rgba(255, 255, 255, 0.12);
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
   --tm-cal-sidebar-border: rgba(217, 255, 0, 0.18);
-  --tm-cal-sidebar-row-gap: 6px;
+  --tm-cal-sidebar-heading-fs: clamp(6px, 1.6cqw, 8px);
   --tm-cal-sidebar-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 8px 22px rgba(0, 0, 0, 0.32),
@@ -706,9 +706,9 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-group {
-  font-size: 0.4rem;
-  font-weight: 300;
-  letter-spacing: 0.02em;
+  font-size: var(--tm-cal-sidebar-heading-fs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
   padding: 1px 2px 0 1px;
 }
 
@@ -828,10 +828,6 @@ html[data-modal-open] main {
     font-size: 0.5625rem;
   }
 
-  .tm-porra-calendar .tm-cal-match-group {
-    font-size: 0.375rem;
-  }
-
   .tm-cal-ko-link {
     font-size: 0.4375rem;
   }
@@ -874,10 +870,18 @@ html[data-modal-open] main {
   width: 100%;
 }
 
+.tm-porra-calendar .tm-cal-sidebar-col-title,
 .tm-porra-calendar .tm-cal-groups-title {
+  width: 100%;
+  flex-shrink: 0;
   padding: 3px 4px 2px;
-  font-size: clamp(0.375rem, 2.2cqw, 0.5rem);
-  line-height: 1;
+  text-align: center;
+  font-size: var(--tm-cal-sidebar-heading-fs);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tm-accent);
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
@@ -914,6 +918,36 @@ html[data-modal-open] main {
   display: flex;
   flex-direction: column;
   gap: 1px;
+}
+
+.tm-porra-calendar .tm-cal-sidebar-access-col {
+  align-items: center;
+  justify-content: center;
+}
+
+.tm-porra-calendar .tm-cal-sidebar-access-btn {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 3px;
+  background: #ccff00;
+  color: #000;
+  padding: 2px 5px;
+  font-size: clamp(5px, 1.25cqw, 6.5px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tm-porra-calendar .tm-cal-sidebar-access-btn:hover {
+  transform: translateY(-0.5px);
+  box-shadow: 0 2px 10px rgba(204, 255, 0, 0.28);
 }
 
 .tm-porra-calendar .tm-cal-cell-surface {
@@ -960,7 +994,7 @@ html[data-modal-open] main {
   width: 100%;
   border: 1px solid var(--tm-cal-match-card-border);
   border-radius: 3px;
-  background: var(--tm-cal-match-card-bg);
+  background: var(--tm-cal-cell-bg);
   padding: var(--tm-cal-group-card-py, 1px) 2px;
   text-align: left;
   color: inherit;

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { HeroCtaButton, HeroCtaLink } from "@/components/ui/hero-cta";
+import Link from "next/link";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import type { TournamentScorerRow } from "@/lib/pool/tournament-stats";
 import { cn } from "@/lib/utils";
@@ -17,10 +17,14 @@ type CalendarSidebarFooterProps = {
 
 function SidebarColumnTitle({ children }: { children: ReactNode }) {
   return (
-    <p className="tm-cal-sidebar-col-title shrink-0 truncate text-[clamp(6px,1.6cqw,8px)] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
+    <p className="tm-cal-sidebar-col-title shrink-0 truncate">
       {children}
     </p>
   );
+}
+
+function formatSidebarPoints(points: number): string {
+  return points === 0 ? "-" : String(points);
 }
 
 export function CalendarSidebarFooter({
@@ -63,27 +67,25 @@ export function CalendarSidebarFooter({
                   row.profileId === currentProfileId && "text-[var(--tm-accent)]"
                 )}
               >
-                <span className="w-3 shrink-0 tabular-nums">{row.position}</span>
                 <span className="min-w-0 flex-1 truncate">{row.label}</span>
-                <span className="shrink-0 tabular-nums">{row.cumulativePoints}</span>
+                <span className="shrink-0 tabular-nums">{formatSidebarPoints(row.cumulativePoints)}</span>
               </li>
             ))
           )}
         </ul>
       </div>
 
-      <div className="tm-cal-sidebar-col flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden">
-        <SidebarColumnTitle>Accesos</SidebarColumnTitle>
-        <div className="flex min-h-0 flex-1 flex-col justify-evenly gap-0.5">
-          <HeroCtaLink href="/predictions/knockout" className="min-h-0 py-0.5">
+      <div className="tm-cal-sidebar-col tm-cal-sidebar-access-col flex min-h-0 min-w-0 flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-evenly gap-0.5">
+          <Link href="/predictions/knockout" className="tm-cal-sidebar-access-btn">
             Ver cuadro
-          </HeroCtaLink>
-          <HeroCtaButton onClick={onOpenAllGroups} className="min-h-0 py-0.5">
+          </Link>
+          <button type="button" onClick={onOpenAllGroups} className="tm-cal-sidebar-access-btn">
             Ver grupos
-          </HeroCtaButton>
-          <HeroCtaButton onClick={onOpenStats} className="min-h-0 py-0.5">
+          </button>
+          <button type="button" onClick={onOpenStats} className="tm-cal-sidebar-access-btn">
             Ver stats
-          </HeroCtaButton>
+          </button>
         </div>
       </div>
     </div>

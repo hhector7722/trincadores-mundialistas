@@ -47,9 +47,7 @@ export function CalendarSidebarCard({
     >
       <div className="tm-cal-sidebar-card-inner h-full min-h-0 min-w-0 flex-1">
         <section className="tm-cal-groups-section flex min-h-0 min-w-0 flex-col">
-          <h3 className="tm-cal-groups-title shrink-0 font-display font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
-            GRUPOS
-          </h3>
+          <h3 className="tm-cal-groups-title shrink-0">GRUPOS</h3>
           <CalendarGroupsPanel groups={groups} onGroupClick={onGroupClick} />
         </section>
 

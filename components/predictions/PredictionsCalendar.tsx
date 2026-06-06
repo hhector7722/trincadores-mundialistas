@@ -80,7 +80,7 @@ function CalendarMatchCard({
       )}
     >
       {match.group_code ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-light uppercase leading-none text-[var(--tm-accent)]">
+        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] uppercase leading-none text-[var(--tm-accent)]">
           {match.group_code.toUpperCase()}
         </span>
       ) : null}
