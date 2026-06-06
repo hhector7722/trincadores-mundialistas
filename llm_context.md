@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T13:09:32.435Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T13:18:39.831Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,7 +16,7 @@
 | **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain) · Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
+**Completado reciente:** Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain) · Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno) · Slide home quiz en hero carousel
 
 **Siguiente:** Probar flujo E2E con login real (official + bonus)
 
@@ -343,11 +343,12 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
-**quiz/** — 9 archivos
+**quiz/** — 10 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/quiz/date.ts` | 12 líneas | todayQuizDate |
+| `lib/quiz/home-teaser.ts` | 76 líneas | homeQuizSlideFromHub, HomeQuizSlide |
 | `lib/quiz/mode.ts` | 42 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
 | `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
@@ -781,13 +782,13 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
+- [x] Slide home quiz en hero carousel
 
 ### En desarrollo / pendiente
 
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
-- [ ] Slide home quiz (opcional)
 
 ### Placeholders detectados
 

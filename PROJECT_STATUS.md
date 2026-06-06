@@ -31,4 +31,4 @@
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
-- [ ] Slide home quiz (opcional)
+- [x] Slide home quiz en hero carousel

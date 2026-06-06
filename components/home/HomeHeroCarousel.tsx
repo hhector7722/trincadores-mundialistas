@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { HomeQuizSlide } from "@/lib/quiz/home-teaser";
 import { cn } from "@/lib/utils";
 
 type SlideCta = {
@@ -19,12 +20,13 @@ type Slide = {
 
 type HomeHeroCarouselProps = {
   pendingCount: number;
+  quizSlide: HomeQuizSlide | null;
 };
 
-function buildSlides(pendingCount: number): Slide[] {
+function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Slide[] {
   const pendingDisplay = pendingCount > 0 ? String(pendingCount) : " ";
 
-  return [
+  const slides: Slide[] = [
     {
       id: "pending",
       eyebrow: "Resultados pendientes",
@@ -39,6 +41,24 @@ function buildSlides(pendingCount: number): Slide[] {
       description: "Se cierran 5 min antes de que sonría la redonda",
       cta: { label: "Mis pronósticos", href: "/predictions" },
     },
+  ];
+
+  if (quizSlide) {
+    const training = quizSlide.scoringMode === "training" || !quizSlide.competitive;
+    slides.push({
+      id: "quiz",
+      eyebrow: training ? "Quiz del dia · entrenamiento" : "Quiz del dia · competitivo",
+      headline: (
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
+          {quizSlide.headline}
+        </p>
+      ),
+      description: quizSlide.description,
+      cta: { label: quizSlide.ctaLabel, href: quizSlide.ctaHref },
+    });
+  }
+
+  slides.push(
     {
       id: "ranking",
       eyebrow: "Clasificación",
@@ -60,12 +80,14 @@ function buildSlides(pendingCount: number): Slide[] {
       ),
       description: "Una porra, un grupo y mucho que demostrar",
       cta: { label: "Ver calendario", href: "/predictions" },
-    },
-  ];
+    }
+  );
+
+  return slides;
 }
 
-export function HomeHeroCarousel({ pendingCount }: HomeHeroCarouselProps) {
-  const slides = buildSlides(pendingCount);
+export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselProps) {
+  const slides = buildSlides(pendingCount, quizSlide);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 

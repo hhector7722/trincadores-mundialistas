@@ -1,11 +1,13 @@
 import Image from "next/image";
 import { HomeHeroCarousel } from "@/components/home/HomeHeroCarousel";
+import type { HomeQuizSlide } from "@/lib/quiz/home-teaser";
 
 type HomeHeroProps = {
   pendingCount: number;
+  quizSlide: HomeQuizSlide | null;
 };
 
-export function HomeHero({ pendingCount }: HomeHeroProps) {
+export function HomeHero({ pendingCount, quizSlide }: HomeHeroProps) {
   return (
     <section className="tm-hero-card relative grid grid-cols-[minmax(0,1fr)_9.5rem] overflow-hidden rounded-3xl px-5 pt-4 pb-2 sm:grid-cols-[minmax(0,1fr)_10.5rem]">
       <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -15,7 +17,7 @@ export function HomeHero({ pendingCount }: HomeHeroProps) {
       />
 
       <div className="@container/hero relative z-10 min-w-0 overflow-hidden">
-        <HomeHeroCarousel pendingCount={pendingCount} />
+        <HomeHeroCarousel pendingCount={pendingCount} quizSlide={quizSlide} />
       </div>
 
       <div
