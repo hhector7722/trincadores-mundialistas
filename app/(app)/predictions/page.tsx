@@ -15,7 +15,7 @@ export default async function PredictionsPage() {
   const matches = await getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   return (
-    <div className="tm-porra-page flex h-[calc(100dvh-var(--tm-tabbar-height)-2rem)] flex-col overflow-hidden pb-0 pt-0 sm:h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)]">
+    <div className="tm-porra-page flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <div className="hidden shrink-0 px-4 pt-4 sm:block">
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Porra
@@ -25,7 +25,9 @@ export default async function PredictionsPage() {
         </p>
       </div>
 
-      <PredictionsCalendar poolId={ctx.activePoolId} matches={matches} />
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <PredictionsCalendar poolId={ctx.activePoolId} matches={matches} />
+      </div>
     </div>
   );
 }

@@ -101,7 +101,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           Fase eliminatoria
         </h1>
         <Link href="/predictions" className="tm-cal-ko-link shrink-0">
-          ver fase de grupos
+          VER FASE DE GRUPOS
         </Link>
       </div>
 

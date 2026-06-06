@@ -29,7 +29,7 @@ type PredictionsCalendarProps = {
   matches: MatchWithPrediction[];
 };
 
-function CalendarMatchFlags({
+function CalendarMatchCard({
   match,
   onOpen,
 }: {
@@ -46,21 +46,19 @@ function CalendarMatchFlags({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-btn flex min-h-0 min-w-0 w-full flex-1 items-center justify-center rounded-sm transition-colors hover:bg-[rgba(111,43,255,0.2)]",
+        "tm-cal-match-card flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
-      <div className="tm-cal-match-row relative w-full min-w-0">
-        <span className="tm-cal-kickoff absolute left-0 top-1/2 z-10 -translate-y-1/2 font-medium leading-none text-white">
-          {time}
-        </span>
-        <div className="tm-cal-flags relative w-full shrink-0">
-          <div className="absolute left-[50%] top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
-          </div>
-          <div className="absolute left-[85%] top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
-          </div>
+      <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
+        {time}
+      </span>
+      <div className="tm-cal-flags relative min-h-0 w-full flex-1">
+        <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
+        </div>
+        <div className="absolute left-[80%] top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
         </div>
       </div>
     </button>
@@ -79,7 +77,7 @@ function DayCell({
   if (!cell.inMonth) {
     return (
       <div
-        className="tm-cal-cell-pad h-full border border-[var(--tm-border)] bg-[rgba(0,0,0,0.18)]"
+        className="tm-cal-cell-pad h-full border border-[var(--tm-border)] bg-[rgba(0,0,0,0.12)]"
         aria-hidden="true"
       />
     );
@@ -91,8 +89,8 @@ function DayCell({
   return (
     <div
       className={cn(
-        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)]",
-        hasMatches ? "bg-[rgba(212,255,0,0.05)]" : "bg-[rgba(111,43,255,0.04)]"
+        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)] bg-[var(--tm-glass)]",
+        hasMatches && "tm-cal-cell--matches"
       )}
     >
       <span
@@ -105,7 +103,7 @@ function DayCell({
       </span>
       <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col">
         {cell.matches.map((match) => (
-          <CalendarMatchFlags key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
+          <CalendarMatchCard key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}
       </div>
     </div>
@@ -113,11 +111,13 @@ function DayCell({
 }
 
 function useCalendarViewportLayout(
+  shellRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
   rowCount: number
 ) {
   useLayoutEffect(() => {
+    const shell = shellRef.current;
     const calendar = calendarRef.current;
     const grid = gridRef.current;
     if (!calendar || !grid || rowCount === 0) return;
@@ -131,6 +131,7 @@ function useCalendarViewportLayout(
     syncLayout();
 
     const observer = new ResizeObserver(syncLayout);
+    if (shell) observer.observe(shell);
     observer.observe(calendar);
     observer.observe(grid);
 
@@ -138,12 +139,13 @@ function useCalendarViewportLayout(
       observer.disconnect();
       resetCalendarLayout(calendar);
     };
-  }, [calendarRef, gridRef, rowCount]);
+  }, [shellRef, calendarRef, gridRef, rowCount]);
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -157,7 +159,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
-  useCalendarViewportLayout(calendarRef, gridRef, weeks.length);
+  useCalendarViewportLayout(shellRef, calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
@@ -171,47 +173,46 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="tm-porra-calendar-wrap flex min-h-0 flex-1 flex-col">
-        <section
-          ref={calendarRef}
-          className="tm-porra-calendar tm-porra-calendar--fullbleed tm-glass-card flex min-h-0 flex-1 flex-col p-0"
-        >
-          <div className="tm-cal-header flex shrink-0 items-center justify-between gap-2 border-b border-[var(--tm-border)] px-3 py-1.5 sm:py-2">
-            <h2 className="tm-cal-month-title font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
-              {monthLabel}
-            </h2>
-            <Link href="/predictions/knockout" className="tm-cal-ko-link shrink-0">
-              ver fase eliminatoria
-            </Link>
-          </div>
+    <div ref={shellRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+      <section
+        ref={calendarRef}
+        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0"
+      >
+        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-3 py-1.5 sm:py-2">
+          <div aria-hidden="true" />
+          <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
+            {monthLabel}
+          </h2>
+          <Link href="/predictions/knockout" className="tm-cal-ko-link justify-self-end">
+            VER ELIMINATORIAS
+          </Link>
+        </div>
 
-          <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)]">
-            {WEEKDAY_LABELS.map((label, index) => (
-              <div
-                key={label}
-                className="tm-cal-weekday text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)]"
-              >
-                <span className="sm:hidden">{WEEKDAY_LABELS_MOBILE[index]}</span>
-                <span className="hidden sm:inline">{label}</span>
-              </div>
-            ))}
-          </div>
+        <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)]">
+          {WEEKDAY_LABELS.map((label, index) => (
+            <div
+              key={label}
+              className="tm-cal-weekday text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)]"
+            >
+              <span className="sm:hidden">{WEEKDAY_LABELS_MOBILE[index]}</span>
+              <span className="hidden sm:inline">{label}</span>
+            </div>
+          ))}
+        </div>
 
-          <div ref={gridRef} className="tm-cal-body grid min-h-0 flex-1 grid-cols-7">
-            {weeks.flatMap((week, weekIndex) =>
-              week.cells.map((cell, cellIndex) => (
-                <DayCell
-                  key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
-                  cell={cell}
-                  todayKey={todayKey}
-                  onOpenMatch={setActiveMatch}
-                />
-              ))
-            )}
-          </div>
-        </section>
-      </div>
+        <div ref={gridRef} className="tm-cal-body grid min-h-0 flex-1 grid-cols-7">
+          {weeks.flatMap((week, weekIndex) =>
+            week.cells.map((cell, cellIndex) => (
+              <DayCell
+                key={`${weekIndex}-${cellIndex}-${cell.dateKey ?? "pad"}`}
+                cell={cell}
+                todayKey={todayKey}
+                onOpenMatch={setActiveMatch}
+              />
+            ))
+          )}
+        </div>
+      </section>
 
       {activeMatch && (
         <QuickPredictionModal
