@@ -5,6 +5,8 @@ type AppBrandTitleProps = {
   className?: string;
   stacked?: boolean;
   centered?: boolean;
+  /** Más separación entre líneas del título apilado (p. ej. login). */
+  spacedStack?: boolean;
 };
 
 const brandTextClass = "tm-brand-title-text";
@@ -13,6 +15,7 @@ export function AppBrandTitle({
   className,
   stacked = false,
   centered = false,
+  spacedStack = false,
 }: AppBrandTitleProps) {
   if (stacked) {
     return (
@@ -26,7 +29,8 @@ export function AppBrandTitle({
       >
         <span
           className={cn(
-            "flex flex-col leading-[0.82]",
+            "flex flex-col",
+            spacedStack ? "gap-0.5 leading-[0.9]" : "leading-[0.82]",
             centered ? "items-center text-center" : "text-left",
           )}
         >

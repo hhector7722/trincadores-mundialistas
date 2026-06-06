@@ -15,11 +15,11 @@ export function LoginHero() {
       />
 
       <h1 className="mt-4 font-display text-2xl font-black uppercase tracking-wide sm:text-[1.75rem]">
-        <AppBrandTitle stacked centered className="text-[#CCFF00]" />
+        <AppBrandTitle stacked centered spacedStack className="text-[#CCFF00]" />
       </h1>
 
-      <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60">
-        Mundial 2026
+      <p className="mt-2 text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60 sm:text-[9px]">
+        Convocatoria 2026
       </p>
     </header>
   );
