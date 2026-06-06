@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:28:53.445Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:31:05.308Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,7 +16,7 @@
 | **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Quiz MVP Fase 1 SQL (migracion + RPC start/submit) · Quiz MVP Fase 2 TypeScript (queries, actions, types) · Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+**Completado reciente:** Quiz MVP Fase 2 TypeScript (queries, actions, types) · Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 
 **Siguiente:** Probar flujo E2E con login real (official + bonus)
 
@@ -776,13 +776,14 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz MVP Fase 4 hub `/quiz`
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+- [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 
 ### En desarrollo / pendiente
 
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
-- [ ] TabBar entrada quiz + slide home (opcional)
+- [ ] Slide home quiz (opcional)
 
 ### Placeholders detectados
 

@@ -29,4 +29,5 @@
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)
-- [ ] TabBar entrada quiz + slide home (opcional)
+- [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
+- [ ] Slide home quiz (opcional)

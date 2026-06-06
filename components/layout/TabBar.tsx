@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useTransition, useState, type MouseEvent } from "react";
-import { Activity, Home, ListOrdered, Target, User } from "lucide-react";
+import { Brain, Home, ListOrdered, Target, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABBAR_HEIGHT_FALLBACK = "calc(3rem + env(safe-area-inset-bottom, 0px))";
@@ -23,7 +23,7 @@ const TABS = [
   { href: "/predictions", label: "Porra", icon: Target },
   { href: "/ranking", label: "La tabla", icon: ListOrdered },
   { href: "/", label: "Inicio", icon: Home },
-  { href: "/activity", label: "Actividad", icon: Activity },
+  { href: "/quiz", label: "Quiz", icon: Brain },
   { href: "/profile", label: "Perfil", icon: User },
 ] as const;
 
