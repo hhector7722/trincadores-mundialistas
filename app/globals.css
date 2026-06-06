@@ -648,7 +648,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-group {
-  font-size: 0.3125rem;
+  font-size: 0.375rem;
   letter-spacing: 0.02em;
   padding: 1px 2px 0 1px;
 }
@@ -725,7 +725,7 @@ html[data-modal-open] main {
   overflow: hidden;
   white-space: nowrap;
   color: #ffffff;
-  font-size: 0.4375rem;
+  font-size: 0.5rem;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -736,7 +736,7 @@ html[data-modal-open] main {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--tm-accent);
-  font-size: 0.375rem;
+  font-size: 0.4375rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.01em;
@@ -768,15 +768,15 @@ html[data-modal-open] main {
   }
 
   .tm-porra-calendar .tm-cal-kickoff {
-    font-size: 0.5rem;
+    font-size: 0.5625rem;
   }
 
   .tm-porra-calendar .tm-cal-prediction {
-    font-size: 0.4375rem;
+    font-size: 0.5rem;
   }
 
   .tm-porra-calendar .tm-cal-match-group {
-    font-size: 0.375rem;
+    font-size: 0.4375rem;
   }
 
   .tm-cal-ko-link {
@@ -785,62 +785,56 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-groups-panel {
-  padding: calc(0.125rem * var(--tm-cal-ui-scale, 1)) calc(0.1875rem * var(--tm-cal-ui-scale, 1));
+  padding: var(--tm-cal-groups-pad, 4px);
 }
 
 .tm-porra-calendar .tm-cal-groups-title {
-  font-size: 0.375rem;
+  font-size: var(--tm-cal-groups-title-fs, 0.4375rem);
   line-height: 1.1;
-  margin-bottom: 0.0625rem;
+  margin-bottom: 1px;
+  flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-groups-list {
   display: flex;
   flex-direction: column;
-  gap: 0.0625rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .tm-porra-calendar .tm-cal-group-row {
-  gap: 0.125rem;
+  flex: 1 1 0;
+  gap: 2px;
   min-height: 0;
+  align-items: center;
 }
 
 .tm-porra-calendar .tm-cal-group-letter {
-  width: 0.4375rem;
-  font-size: 0.3125rem;
+  width: var(--tm-cal-groups-letter-w, 0.5rem);
+  font-size: var(--tm-cal-groups-letter-fs, 0.375rem);
   line-height: 1;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-group-flags {
-  gap: 0.0625rem;
-  justify-content: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: var(--tm-cal-groups-flag-gap, 2px);
+  justify-content: space-evenly;
+  align-items: center;
+  padding-inline: 1px;
 }
 
 .tm-porra-calendar .tm-cal-group-flag,
 .tm-porra-calendar .tm-cal-group-flag.tm-cal-flag-dim {
-  height: 0.625rem;
-  width: 0.625rem;
+  height: var(--tm-cal-groups-flag, 0.75rem);
+  width: var(--tm-cal-groups-flag, 0.75rem);
+  flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-group-flag span {
-  font-size: 0.25rem;
+  font-size: calc(var(--tm-cal-groups-flag, 0.75rem) * 0.38);
   line-height: 1;
-}
-
-@media (min-width: 640px) {
-  .tm-porra-calendar .tm-cal-groups-title {
-    font-size: 0.4375rem;
-  }
-
-  .tm-porra-calendar .tm-cal-group-letter {
-    width: 0.5rem;
-    font-size: 0.375rem;
-  }
-
-  .tm-porra-calendar .tm-cal-group-flag,
-  .tm-porra-calendar .tm-cal-group-flag.tm-cal-flag-dim {
-    height: 0.75rem;
-    width: 0.75rem;
-  }
 }

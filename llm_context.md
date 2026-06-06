@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:20:22.882Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:28:53.445Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -323,7 +323,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
-| `lib/pool/calendar-layout.ts` | 151 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
+| `lib/pool/calendar-layout.ts` | 222 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
 | `lib/pool/group-standings.ts` | 137 líneas | buildGroupStandings, isCalendarGroupsPanelDay, CALENDAR_GROUPS_PANEL_DAYS, GroupStandingRow |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
