@@ -30,6 +30,8 @@ export type QuizFact = {
   source_label: string;
   difficulty: QuizFactDifficulty;
   tags: string[];
+  /** Imagen tematica (no debe delatar la respuesta). Ruta publica o URL https. */
+  image_url: string | null;
 };
 
 const FACT_TYPES = new Set<QuizFactType>([
@@ -94,6 +96,12 @@ export function validateQuizFact(raw: unknown, index: number): QuizFact {
     ? row.tags.filter((t): t is string => typeof t === "string" && t.trim().length > 0)
     : [];
 
+  const imageUrlRaw = row.image_url;
+  const imageUrl =
+    typeof imageUrlRaw === "string" && imageUrlRaw.trim().length > 0
+      ? imageUrlRaw.trim()
+      : null;
+
   return {
     id,
     category: category as QuizFactCategory,
@@ -105,6 +113,7 @@ export function validateQuizFact(raw: unknown, index: number): QuizFact {
     source_label: sourceLabel,
     difficulty: difficulty === "medium" || difficulty === "hard" ? difficulty : "easy",
     tags,
+    image_url: imageUrl,
   };
 }
 

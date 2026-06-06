@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { startQuiz, submitQuiz } from "@/actions/quiz";
 import { QuizQuestionStage } from "@/components/quiz/QuizQuestionStage";
-import { Button } from "@/components/ui/button";
+import type { QuestionPhase } from "@/lib/quiz/play-flow";
+import {
+  FEEDBACK_DELAY_MS,
+  nextStepAfterFeedback,
+  pickWrongOptionId,
+  QUESTION_TIME_SEC,
+  shouldAutoSubmit,
+} from "@/lib/quiz/play-flow";
 import type { QuizStartSession } from "@/lib/quiz/types";
 
 type QuizPlaySessionProps = {
@@ -29,10 +36,27 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [confirming, setConfirming] = useState(false);
-  const [countdown, setCountdown] = useState("");
+  const [phase, setPhase] = useState<QuestionPhase>("answering");
+  const [secondsLeft, setSecondsLeft] = useState(QUESTION_TIME_SEC);
+  const [sessionCountdown, setSessionCountdown] = useState("");
   const [loading, startLoading] = useTransition();
   const [submitting, startSubmitting] = useTransition();
+
+  const submittedRef = useRef(false);
+  const advancingRef = useRef(false);
+  const feedbackTimerRef = useRef<number | null>(null);
+  const questionTimerRef = useRef<number | null>(null);
+
+  const clearTimers = useCallback(() => {
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    if (questionTimerRef.current !== null) {
+      window.clearInterval(questionTimerRef.current);
+      questionTimerRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     startLoading(async () => {
@@ -48,7 +72,7 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
 
   useEffect(() => {
     if (!session?.expires_at) return;
-    const tick = () => setCountdown(formatCountdown(session.expires_at));
+    const tick = () => setSessionCountdown(formatCountdown(session.expires_at));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
@@ -56,35 +80,110 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
 
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;
-  const allAnswered = useMemo(
-    () => questions.every((q) => Boolean(answers[q.id])),
-    [questions, answers]
+
+  const handleSubmit = useCallback(
+    (finalAnswers: Record<string, string>) => {
+      if (!session || submittedRef.current) return;
+      submittedRef.current = true;
+      setSubmitError(null);
+
+      startSubmitting(async () => {
+        const result = await submitQuiz(poolId, session.attempt_id, finalAnswers);
+        if (!result.ok) {
+          submittedRef.current = false;
+          setSubmitError(result.error);
+          return;
+        }
+        router.push(`/quiz/result?attempt=${session.attempt_id}`);
+        router.refresh();
+      });
+    },
+    [poolId, router, session]
   );
 
-  function handleSelect(optionId: string) {
-    if (!currentQuestion || confirming) return;
-    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+  const scheduleAdvance = useCallback(
+    (nextAnswers: Record<string, string>) => {
+      if (advancingRef.current) return;
+      advancingRef.current = true;
 
-    if (step < questions.length - 1) {
-      window.setTimeout(() => setStep((s) => s + 1), 180);
-    } else {
-      setConfirming(true);
-    }
-  }
+      feedbackTimerRef.current = window.setTimeout(() => {
+        advancingRef.current = false;
+        feedbackTimerRef.current = null;
 
-  function handleSubmit() {
-    if (!session) return;
-    setSubmitError(null);
-    startSubmitting(async () => {
-      const result = await submitQuiz(poolId, session.attempt_id, answers);
-      if (!result.ok) {
-        setSubmitError(result.error);
-        return;
-      }
-      router.push(`/quiz/result?attempt=${session.attempt_id}`);
-      router.refresh();
+        if (!session) return;
+
+        if (shouldAutoSubmit(step, questions.length)) {
+          handleSubmit(nextAnswers);
+          return;
+        }
+
+        const next = nextStepAfterFeedback(step, questions.length);
+        if (next !== null) {
+          setStep(next);
+          setPhase("answering");
+          setSecondsLeft(QUESTION_TIME_SEC);
+        }
+      }, FEEDBACK_DELAY_MS);
+    },
+    [handleSubmit, questions.length, session, step]
+  );
+
+  const resolveAnswer = useCallback(
+    (optionId: string) => {
+      if (!currentQuestion || phase !== "answering" || advancingRef.current) return;
+
+      clearTimers();
+      setAnswers((prev) => {
+        const next = { ...prev, [currentQuestion.id]: optionId };
+        setPhase("feedback");
+        scheduleAdvance(next);
+        return next;
+      });
+    },
+    [clearTimers, currentQuestion, phase, scheduleAdvance]
+  );
+
+  const handleTimeout = useCallback(() => {
+    if (!currentQuestion || phase !== "answering" || advancingRef.current) return;
+
+    clearTimers();
+    const wrongId = pickWrongOptionId(
+      currentQuestion.options,
+      currentQuestion.correct_option_id
+    );
+
+    setAnswers((prev) => {
+      const next = { ...prev, [currentQuestion.id]: wrongId };
+      setPhase("feedback");
+      scheduleAdvance(next);
+      return next;
     });
-  }
+  }, [clearTimers, currentQuestion, phase, scheduleAdvance]);
+
+  useEffect(() => {
+    if (!currentQuestion || phase !== "answering") return;
+
+    setSecondsLeft(QUESTION_TIME_SEC);
+    clearTimers();
+
+    questionTimerRef.current = window.setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          if (questionTimerRef.current !== null) {
+            window.clearInterval(questionTimerRef.current);
+            questionTimerRef.current = null;
+          }
+          window.setTimeout(() => handleTimeout(), 0);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return clearTimers;
+  }, [clearTimers, currentQuestion?.id, phase, step, handleTimeout]);
+
+  useEffect(() => () => clearTimers(), [clearTimers]);
 
   if (loadError) {
     return (
@@ -105,45 +204,21 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
     );
   }
 
-  if (confirming) {
+  if (submitError) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="tm-quiz-stage space-y-4 rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-5">
-          <p className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-            ¿Enviar respuestas?
-          </p>
-          <p className="text-sm text-[var(--tm-muted)]">
-            Revisaste las {questions.length} preguntas. Las respuestas correctas se
-            revelan al final.
-          </p>
-          {submitError && (
-            <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-              {submitError}
-            </p>
-          )}
-        </div>
-        <div className="tm-quiz-actions mt-4 flex flex-col gap-2">
-          <Button
-            type="button"
-            className="w-full"
-            disabled={submitting || !allAnswered}
-            onClick={handleSubmit}
-          >
-            {submitting ? "Enviando..." : "Confirmar y ver resultado"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            disabled={submitting}
-            onClick={() => {
-              setConfirming(false);
-              setStep(questions.length - 1);
-            }}
-          >
-            Revisar última pregunta
-          </Button>
-        </div>
+      <CardMessage
+        title="Error al enviar"
+        body={submitError}
+        actionHref="/quiz"
+        actionLabel="Volver al quiz"
+      />
+    );
+  }
+
+  if (submitting) {
+    return (
+      <div className="tm-quiz-stage rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-6 text-center text-sm text-[var(--tm-muted)]">
+        Calculando resultado...
       </div>
     );
   }
@@ -159,6 +234,8 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
     );
   }
 
+  const locked = phase === "feedback";
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="flex shrink-0 items-center justify-between gap-3">
@@ -166,7 +243,7 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
           Volver
         </Link>
         <p className="text-xs text-[var(--tm-muted)]">
-          Quiz del dia · {countdown || "--:--"}
+          Sesion · {sessionCountdown || "--:--"}
         </p>
       </div>
 
@@ -176,20 +253,11 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
           questionIndex={step}
           totalQuestions={questions.length}
           selectedOptionId={answers[currentQuestion.id] ?? null}
-          locked={Boolean(answers[currentQuestion.id])}
-          onSelect={handleSelect}
+          phase={phase}
+          secondsLeft={secondsLeft}
+          locked={locked}
+          onSelect={resolveAnswer}
         />
-
-        {step > 0 && !answers[currentQuestion.id] && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full shrink-0"
-            onClick={() => setStep((s) => s - 1)}
-          >
-            Pregunta anterior
-          </Button>
-        )}
       </div>
     </div>
   );

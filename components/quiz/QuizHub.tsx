@@ -41,7 +41,7 @@ export function QuizHub({ hub }: QuizHubProps) {
       ) : (
         <QuizSlotCard
           title="Quiz del dia"
-          subtitle="3 preguntas del Mundial"
+          subtitle="3 preguntas rapidas · 10 segundos cada una"
           slot={hub.official}
           playHref="/quiz/play"
           resultHref={
@@ -50,8 +50,11 @@ export function QuizHub({ hub }: QuizHubProps) {
           pointsLabel={
             officialScoring === "training"
               ? "Modo entrenamiento — puedes volver a jugar"
-              : "Hasta 3 puntos si aciertas las 3"
+              : hub.isOwner
+                ? "Modo competitivo — como owner puedes practicar sin limite"
+                : "Hasta 3 puntos si aciertas las 3"
           }
+          isOwner={hub.isOwner}
         />
       )}
 

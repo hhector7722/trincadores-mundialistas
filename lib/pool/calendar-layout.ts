@@ -122,6 +122,7 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
 function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const panel =
+    grid.querySelector<HTMLElement>(".tm-cal-groups-section .tm-cal-groups-panel") ??
     grid.querySelector<HTMLElement>(".tm-cal-sidebar-card .tm-cal-groups-panel") ??
     grid.querySelector<HTMLElement>(".tm-cal-groups-panel");
   if (!panel) {
@@ -172,7 +173,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
       MIN_GROUPS_FLAG_PX,
       Math.floor(Math.min(flagByHeight, flagByWidth) * fit)
     );
-    letterFs = Math.max(4, Math.floor(flagSize * 0.36));
+    letterFs = Math.max(5, Math.floor(flagSize * 0.48));
 
     calendar.style.setProperty("--tm-cal-groups-pad", `${GROUPS_EDGE_INSET_PX}px`);
     calendar.style.setProperty("--tm-cal-groups-letter-fs", `${letterFs}px`);

@@ -1,3 +1,8 @@
+import {
+  getOptionSemanticType,
+  type OptionSemanticType,
+} from "@/lib/quiz/distractors";
+import type { QuizFact } from "@/lib/quiz/facts";
 import type { GeneratedQuizQuestion } from "@/lib/quiz/generate-question";
 
 const OPTION_IDS = new Set(["a", "b", "c", "d"]);
@@ -6,7 +11,70 @@ const MIN_PROMPT_LEN = 12;
 
 export type QualityResult = { ok: true } | { ok: false; error: string };
 
-export function validateGeneratedQuestion(question: GeneratedQuizQuestion): QualityResult {
+function labelMatchesSemanticType(label: string, semanticType: OptionSemanticType): boolean {
+  const trimmed = label.trim();
+  switch (semanticType) {
+    case "title_count":
+      return /^\d+\s+títulos$/i.test(trimmed);
+    case "year":
+      return /^(19|20)\d{2}$/.test(trimmed);
+    case "mundial_edition":
+      return /^Mundial (19|20)\d{2}$/i.test(trimmed);
+    case "goal_stat":
+      return trimmed.includes("segundos") || trimmed.includes("gol");
+    case "record_stat":
+      return /\d/.test(trimmed) || /mundial/i.test(trimmed) || /finales|goles|selecciones/i.test(trimmed);
+    case "country":
+      return (
+        !/^\d+\s+títulos$/i.test(trimmed) &&
+        !/^(19|20)\d{2}$/.test(trimmed) &&
+        !trimmed.includes("segundos")
+      );
+    case "player":
+      return (
+        !/^\d+\s+títulos$/i.test(trimmed) &&
+        !/^(19|20)\d{2}$/.test(trimmed) &&
+        !trimmed.toLowerCase().startsWith("mundial ")
+      );
+    default:
+      return true;
+  }
+}
+
+export function validateSemanticCoherence(
+  question: GeneratedQuizQuestion,
+  fact?: QuizFact
+): QualityResult {
+  const semanticType = fact
+    ? getOptionSemanticType(fact)
+    : inferSemanticTypeFromQuestion(question);
+
+  for (const opt of question.options) {
+    if (!labelMatchesSemanticType(opt.label, semanticType)) {
+      return {
+        ok: false,
+        error: `opcion "${opt.label}" no coincide con tipo semantico ${semanticType}.`,
+      };
+    }
+  }
+
+  return { ok: true };
+}
+
+function inferSemanticTypeFromQuestion(question: GeneratedQuizQuestion): OptionSemanticType {
+  if (question.template_id === "titles_count") return "title_count";
+  if (question.template_id === "first_winner" || question.template_id === "host_country") {
+    return "country";
+  }
+  if (question.template_id === "top_scorer") return "player";
+  if (question.category === "players") return "player";
+  return "record_stat";
+}
+
+export function validateGeneratedQuestion(
+  question: GeneratedQuizQuestion,
+  fact?: QuizFact
+): QualityResult {
   const prompt = question.prompt.trim();
   if (prompt.length < MIN_PROMPT_LEN) {
     return { ok: false, error: "prompt demasiado corto." };
@@ -47,16 +115,23 @@ export function validateGeneratedQuestion(question: GeneratedQuizQuestion): Qual
     return { ok: false, error: "correct_option_id no encontrado." };
   }
 
+  const semantic = validateSemanticCoherence(question, fact);
+  if (!semantic.ok) return semantic;
+
   return { ok: true };
 }
 
-export function assertGeneratedQuestions(questions: GeneratedQuizQuestion[]): void {
+export function assertGeneratedQuestions(
+  questions: GeneratedQuizQuestion[],
+  factsById?: Map<string, QuizFact>
+): void {
   if (questions.length !== 3) {
     throw new Error("El dia debe tener exactamente 3 preguntas.");
   }
   const factIds = new Set<string>();
   for (const [index, q] of questions.entries()) {
-    const result = validateGeneratedQuestion(q);
+    const fact = factsById?.get(q.fact_id);
+    const result = validateGeneratedQuestion(q, fact);
     if (!result.ok) {
       throw new Error(`Pregunta ${index + 1}: ${result.error}`);
     }

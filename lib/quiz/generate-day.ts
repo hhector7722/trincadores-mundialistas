@@ -68,8 +68,16 @@ export function selectFactsForDay(args: {
   const exclude = args.excludeFactIds ?? new Set<string>();
   const rng = mulberry32(seedFromQuizDate(quizDate));
 
+  const difficultyRank = { hard: 0, medium: 1, easy: 2 } as const;
+
   const eligible = shuffleWithRng(
-    args.facts.filter((f) => !exclude.has(f.id)),
+    args.facts
+      .filter((f) => !exclude.has(f.id))
+      .sort(
+        (a, b) =>
+          difficultyRank[a.difficulty] - difficultyRank[b.difficulty] ||
+          a.id.localeCompare(b.id)
+      ),
     rng
   );
 
@@ -122,7 +130,8 @@ export function generateQuizDay(args: {
     })
   );
 
-  assertGeneratedQuestions(questions);
+  const factsById = new Map(args.facts.map((f) => [f.id, f]));
+  assertGeneratedQuestions(questions, factsById);
 
   return {
     quiz_date: args.quizDate,

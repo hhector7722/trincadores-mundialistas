@@ -22,6 +22,7 @@ type QuizSlotCardProps = {
   playHref: string;
   resultHref?: string | null;
   pointsLabel: string;
+  isOwner?: boolean;
 };
 
 export function QuizSlotCard({
@@ -31,10 +32,12 @@ export function QuizSlotCard({
   playHref,
   resultHref,
   pointsLabel,
+  isOwner = false,
 }: QuizSlotCardProps) {
+  const access = { isOwner };
   const status = getQuizSlotStatus(slot);
-  const playable = canOpenQuizPlay(slot);
-  const replayable = canReplayQuiz(slot);
+  const playable = canOpenQuizPlay(slot, undefined, access);
+  const replayable = canReplayQuiz(slot, access);
   const score = slot?.attempt?.status === "submitted" ? slot.attempt.score : null;
 
   function playLabel(): string {

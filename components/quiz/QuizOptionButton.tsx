@@ -1,11 +1,12 @@
 "use client";
 
+import type { OptionVisualState } from "@/lib/quiz/play-flow";
 import { cn } from "@/lib/utils";
 
 type QuizOptionButtonProps = {
   optionId: string;
   label: string;
-  selected: boolean;
+  visualState: OptionVisualState;
   locked: boolean;
   onSelect: () => void;
 };
@@ -13,7 +14,7 @@ type QuizOptionButtonProps = {
 export function QuizOptionButton({
   optionId,
   label,
-  selected,
+  visualState,
   locked,
   onSelect,
 }: QuizOptionButtonProps) {
@@ -24,18 +25,24 @@ export function QuizOptionButton({
       onClick={onSelect}
       className={cn(
         "tm-quiz-option flex min-h-12 w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition-colors",
-        selected
-          ? "border-[var(--tm-accent)] bg-[var(--tm-accent-soft)] text-[var(--tm-fg)]"
-          : "border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] hover:border-[var(--tm-accent-muted)]",
-        locked && !selected && "opacity-60"
+        visualState === "default" &&
+          "border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] hover:border-[var(--tm-accent-muted)]",
+        visualState === "correct" &&
+          "border-emerald-400/60 bg-emerald-500/20 text-[var(--tm-fg)]",
+        visualState === "wrong" && "border-red-400/60 bg-red-500/20 text-[var(--tm-fg)]",
+        visualState === "revealed" &&
+          "border-emerald-400/40 bg-emerald-500/10 text-[var(--tm-fg)]",
+        locked && visualState === "default" && "opacity-60"
       )}
     >
       <span
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold uppercase",
-          selected
-            ? "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)]"
-            : "bg-white/10 text-white/80"
+          visualState === "correct" || visualState === "revealed"
+            ? "bg-emerald-500 text-white"
+            : visualState === "wrong"
+              ? "bg-red-500 text-white"
+              : "bg-white/10 text-white/80"
         )}
       >
         {optionId}

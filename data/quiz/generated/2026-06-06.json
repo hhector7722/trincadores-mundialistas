@@ -6,16 +6,16 @@
     "questions": [
       {
         "sort_order": 1,
-        "prompt": "¿Cuál es el récord de Mundial 2026 en Mundiales?",
+        "prompt": "¿Cuál es el récord de Miroslav Klose en Mundiales?",
         "image_url": null,
         "options": [
           {
             "id": "a",
-            "label": "3 Mundiales ganados"
+            "label": "32 selecciones"
           },
           {
             "id": "b",
-            "label": "48 selecciones"
+            "label": "16 goles"
           },
           {
             "id": "c",
@@ -23,44 +23,44 @@
           },
           {
             "id": "d",
-            "label": "16 goles"
+            "label": "3 Mundiales ganados"
           }
         ],
         "correct_option_id": "b",
-        "fact_id": "wc-teams-2026",
-        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026",
-        "source_label": "FIFA — Mundial 2026",
+        "fact_id": "top-scorer-goals",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/miroslav-klose-top-scorer",
+        "source_label": "FIFA — récord goleador",
         "template_id": "record_value",
-        "category": "curiosities"
+        "category": "records"
       },
       {
         "sort_order": 2,
-        "prompt": "¿Quién es el jugador más veterano en marcar en un Mundial?",
+        "prompt": "¿En qué país se disputó el Mundial 2018?",
         "image_url": null,
         "options": [
           {
             "id": "a",
-            "label": "Mundial 2006"
+            "label": "Inglaterra"
           },
           {
             "id": "b",
-            "label": "Roger Milla"
+            "label": "Rusia"
           },
           {
             "id": "c",
-            "label": "Mundial 1958"
+            "label": "Japón y Corea del Sur"
           },
           {
             "id": "d",
-            "label": "11 segundos (Hakan Şükür, 2002)"
+            "label": "Catar"
           }
         ],
         "correct_option_id": "b",
-        "fact_id": "wc-oldest-scorer",
-        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/roger-milla-legend",
-        "source_label": "FIFA — Roger Milla",
-        "template_id": "curiosity",
-        "category": "players"
+        "fact_id": "wc2018-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2018russia",
+        "source_label": "FIFA — Mundial 2018",
+        "template_id": "host_country",
+        "category": "hosts"
       },
       {
         "sort_order": 3,
@@ -69,11 +69,11 @@
         "options": [
           {
             "id": "a",
-            "label": "Brasil"
+            "label": "Catar"
           },
           {
             "id": "b",
-            "label": "Japón y Corea del Sur"
+            "label": "Rusia"
           },
           {
             "id": "c",
@@ -81,7 +81,7 @@
           },
           {
             "id": "d",
-            "label": "Estados Unidos, México y Canadá"
+            "label": "Brasil"
           }
         ],
         "correct_option_id": "c",
@@ -94,27 +94,27 @@
     ]
   },
   "_meta": {
-    "generated_at": "2026-06-06T16:34:40.322Z",
+    "generated_at": "2026-06-06T17:33:53.648Z",
     "fact_ids": [
-      "wc-teams-2026",
-      "wc-oldest-scorer",
+      "top-scorer-goals",
+      "wc2018-host",
       "wc2010-host"
     ],
     "templates": [
       "record_value",
-      "curiosity",
+      "host_country",
       "host_country"
     ],
     "sources": [
       {
-        "fact_id": "wc-teams-2026",
-        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026",
-        "source_label": "FIFA — Mundial 2026"
+        "fact_id": "top-scorer-goals",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/miroslav-klose-top-scorer",
+        "source_label": "FIFA — récord goleador"
       },
       {
-        "fact_id": "wc-oldest-scorer",
-        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/roger-milla-legend",
-        "source_label": "FIFA — Roger Milla"
+        "fact_id": "wc2018-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2018russia",
+        "source_label": "FIFA — Mundial 2018"
       },
       {
         "fact_id": "wc2010-host",

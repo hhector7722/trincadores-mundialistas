@@ -9,18 +9,7 @@ type QuizImageProps = {
 
 export function QuizImage({ src, alt, className }: QuizImageProps) {
   if (!src) {
-    return (
-      <div
-        className={cn(
-          "tm-quiz-image-fallback flex aspect-[4/3] w-full items-center justify-center rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)]",
-          className
-        )}
-      >
-        <p className="text-xs uppercase tracking-[0.14em] text-[var(--tm-muted)]">
-          Mundial
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (

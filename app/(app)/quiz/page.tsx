@@ -22,7 +22,7 @@ export default async function QuizPage() {
           Quiz del dia
         </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Trivia diaria del Mundial. Las respuestas se revelan al final.
+          Trivia rapida del Mundial. 10 segundos por pregunta.
         </p>
       </div>
       <QuizHub hub={hub} />

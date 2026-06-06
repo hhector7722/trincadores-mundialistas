@@ -55,9 +55,9 @@ function headlineForSlide(
 
 function descriptionForSlide(scoringMode: QuizScoringMode, competitive: boolean): string {
   if (scoringMode === "training" || !competitive) {
-    return "Modo entrenamiento — las respuestas se revelan al final";
+    return "10 segundos por pregunta — modo entrenamiento";
   }
-  return "Hasta 3 puntos si aciertas las 3 del dia";
+  return "10 segundos por pregunta — hasta 3 puntos";
 }
 
 export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
@@ -66,7 +66,7 @@ export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
   const status = getQuizSlotStatus(hub.official);
   const resultId = getLatestSubmittedAttemptId(hub.official);
   const resultHref = resultId ? `/quiz/result?attempt=${resultId}` : null;
-  const replayable = canReplayQuiz(hub.official);
+  const replayable = canReplayQuiz(hub.official, { isOwner: hub.isOwner });
   const cta = ctaForStatus(status, resultHref, replayable);
   const score =
     hub.official.attempt?.status === "submitted"

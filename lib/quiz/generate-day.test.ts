@@ -20,6 +20,7 @@ test("generateQuizDay produces 3 valid questions", () => {
   const day = generateQuizDay({ quizDate: "2026-06-08", facts });
   assert.equal(day.quiz_date, "2026-06-08");
   assert.equal(day.official.questions.length, 3);
-  assertGeneratedQuestions(day.official.questions);
+  const factsById = new Map(facts.map((f) => [f.id, f]));
+  assertGeneratedQuestions(day.official.questions, factsById);
   assert.equal(day._meta?.fact_ids.length, 3);
 });

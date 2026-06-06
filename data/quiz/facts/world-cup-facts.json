@@ -336,6 +336,30 @@
     "tags": ["2002", "goles"]
   },
   {
+    "id": "wc-messi-captain",
+    "category": "players",
+    "fact_type": "curiosity",
+    "subject": "¿Quién levantó la Copa del Mundo como capitán de Argentina en Qatar 2022?",
+    "value": "Lionel Messi",
+    "year": 2022,
+    "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2022qatar",
+    "source_label": "FIFA — Argentina 2022",
+    "difficulty": "medium",
+    "tags": ["messi", "2022", "argentina"]
+  },
+  {
+    "id": "wc-cafu-captain",
+    "category": "players",
+    "fact_type": "curiosity",
+    "subject": "¿Quién fue el capitán de Brasil en el Mundial 2002?",
+    "value": "Cafu",
+    "year": 2002,
+    "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2002koreajapan",
+    "source_label": "FIFA — Brasil 2002",
+    "difficulty": "hard",
+    "tags": ["cafu", "2002", "brasil"]
+  },
+  {
     "id": "wc-1958-pele-debut",
     "category": "players",
     "fact_type": "curiosity",

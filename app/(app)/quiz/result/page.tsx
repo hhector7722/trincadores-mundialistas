@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizResultSummary } from "@/components/quiz/QuizResultSummary";
-import { getQuizResult } from "@/lib/quiz/queries";
+import { getQuizDayHub, getQuizResult } from "@/lib/quiz/queries";
+import { canReplayQuiz } from "@/lib/quiz/slot-status";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,7 +14,7 @@ type QuizResultPageProps = {
 };
 
 export default async function QuizResultPage({ searchParams }: QuizResultPageProps) {
-  await requireActivePoolContext();
+  const ctx = await requireActivePoolContext();
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,10 +26,16 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
     redirect("/quiz");
   }
 
-  const result = await getQuizResult(attemptId, user!.id);
+  const [result, hub] = await Promise.all([
+    getQuizResult(attemptId, user!.id),
+    getQuizDayHub(ctx.activePoolId, user!.id),
+  ]);
+
   if (!result) {
     notFound();
   }
+
+  const canReplay = canReplayQuiz(hub.official, { isOwner: hub.isOwner });
 
   return (
     <QuizPageShell>
@@ -40,7 +47,13 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
           Quiz del dia
         </Link>
       </div>
-      <QuizResultSummary result={result} />
+      <QuizResultSummary
+        score={result.score}
+        maxPoints={result.maxPoints}
+        scoringMode={result.scoringMode}
+        kind={result.kind}
+        canReplay={canReplay}
+      />
     </QuizPageShell>
   );
 }

@@ -5,23 +5,79 @@ const OPTION_IDS = ["a", "b", "c", "d"] as const;
 
 export type McqOption = { id: string; label: string };
 
-function sameFactTypePool(fact: QuizFact, allFacts: QuizFact[]): QuizFact[] {
-  return allFacts.filter(
-    (f) => f.id !== fact.id && f.fact_type === fact.fact_type && f.value !== fact.value
-  );
-}
+export type OptionSemanticType =
+  | "country"
+  | "player"
+  | "year"
+  | "title_count"
+  | "record_stat"
+  | "goal_stat"
+  | "mundial_edition";
 
-function sameCategoryPool(fact: QuizFact, allFacts: QuizFact[]): QuizFact[] {
-  return allFacts.filter(
-    (f) => f.id !== fact.id && f.category === fact.category && f.value !== fact.value
-  );
-}
-
-function labelFromFact(f: QuizFact): string {
-  if (f.fact_type === "titles_count") {
-    return `${f.value} títulos`;
+export function getOptionSemanticType(fact: QuizFact): OptionSemanticType {
+  switch (fact.fact_type) {
+    case "first_winner":
+    case "host_country":
+      return "country";
+    case "top_scorer":
+      return "player";
+    case "titles_count":
+      return "title_count";
+    case "record_value":
+      return "record_stat";
+    case "curiosity":
+      if (fact.value.toLowerCase().startsWith("mundial ")) return "mundial_edition";
+      if (/^(19|20)\d{2}$/.test(fact.value)) return "year";
+      if (fact.category === "players") return "player";
+      if (fact.category === "hosts" || fact.category === "history") return "country";
+      if (fact.category === "teams") return "title_count";
+      if (fact.tags.some((t) => /^\d{4}$/.test(t))) return "year";
+      if (fact.value.includes("segundos") || fact.subject.toLowerCase().includes("gol")) {
+        return "goal_stat";
+      }
+      return "record_stat";
+    default:
+      return "record_stat";
   }
-  return f.value;
+}
+
+function labelFromFact(fact: QuizFact, semanticType: OptionSemanticType): string {
+  if (semanticType === "title_count") {
+    return `${fact.value} títulos`;
+  }
+  if (semanticType === "year") {
+    if (/^(19|20)\d{2}$/.test(fact.value)) return fact.value;
+    if (fact.year) return String(fact.year);
+  }
+  return fact.value;
+}
+
+function factMatchesSemanticType(fact: QuizFact, semanticType: OptionSemanticType): boolean {
+  return getOptionSemanticType(fact) === semanticType;
+}
+
+function sameSemanticPool(
+  fact: QuizFact,
+  allFacts: QuizFact[],
+  semanticType: OptionSemanticType
+): QuizFact[] {
+  if (semanticType === "year") {
+    const correctYear = fact.year ?? Number(fact.value);
+    return allFacts.filter(
+      (f) =>
+        f.id !== fact.id &&
+        f.year !== null &&
+        f.year !== correctYear &&
+        Number.isInteger(f.year)
+    );
+  }
+
+  return allFacts.filter(
+    (f) =>
+      f.id !== fact.id &&
+      f.value !== fact.value &&
+      factMatchesSemanticType(f, semanticType)
+  );
 }
 
 export function buildDistractorLabels(
@@ -31,25 +87,19 @@ export function buildDistractorLabels(
   rng: () => number,
   count = 3
 ): string[] {
-  const pools = [
-    sameFactTypePool(fact, allFacts),
-    sameCategoryPool(fact, allFacts),
-    allFacts.filter((f) => f.id !== fact.id),
-  ];
-
+  const semanticType = getOptionSemanticType(fact);
+  const pool = sameSemanticPool(fact, allFacts, semanticType);
   const seen = new Set<string>([correctLabel.toLowerCase()]);
   const distractors: string[] = [];
 
-  for (const pool of pools) {
-    const shuffled = shuffleWithRng(pool, rng);
-    for (const candidate of shuffled) {
-      const label = labelFromFact(candidate);
-      const key = label.toLowerCase();
-      if (!label || seen.has(key)) continue;
-      seen.add(key);
-      distractors.push(label);
-      if (distractors.length >= count) return distractors;
-    }
+  const shuffled = shuffleWithRng(pool, rng);
+  for (const candidate of shuffled) {
+    const label = labelFromFact(candidate, semanticType);
+    const key = label.toLowerCase();
+    if (!label || seen.has(key)) continue;
+    seen.add(key);
+    distractors.push(label);
+    if (distractors.length >= count) break;
   }
 
   return distractors;

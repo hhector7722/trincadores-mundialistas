@@ -8,6 +8,8 @@ Los hechos verificables viven en:
 
 Cada hecho incluye `source_url`, `source_label`, `category`, `fact_type` y campos para plantillas deterministas.
 
+Campo opcional `image_url`: ruta publica (`/images/quiz/...`) o URL `https`. Debe ser tematica (estadio, seleccion, era del futbol) y **no delatar** la respuesta correcta.
+
 ## 2. Generar el día (automático)
 
 ```bash
@@ -41,8 +43,16 @@ ALLOW_QUIZ_SEED=1 CONFIRM_RESEED=1 QUIZ_DATE=2026-06-07 npm run db:seed-quiz-day
 
 - **Training**: no puntúa; el usuario puede **volver a jugar** tras completar.
 - **Competitive**: un intento enviado bloquea nuevo juego; puntúa en ranking.
+- **Owner del pool**: puede relanzar rondas ilimitadas (incluso en competitive) para pruebas.
 
 El modo se detecta según el calendario del pool al sembrar.
+
+## 4b. Gameplay play
+
+- 10 segundos por pregunta con cuenta atras visible.
+- Feedback verde/rojo al responder; avance automatico (~1 s).
+- Sin navegacion manual ni confirmacion final; submit automatico al terminar.
+- Resultado: resumen corto (puntuacion/estado), sin desglose pregunta a pregunta.
 
 ## 5. Formato seed (manual o generado)
 

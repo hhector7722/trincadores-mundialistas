@@ -16,6 +16,7 @@ const facts: QuizFact[] = [
     source_label: "FIFA",
     difficulty: "easy",
     tags: [],
+    image_url: null,
   },
   {
     id: "wc1966-winner",
@@ -28,6 +29,7 @@ const facts: QuizFact[] = [
     source_label: "FIFA",
     difficulty: "easy",
     tags: [],
+    image_url: null,
   },
   {
     id: "wc2010-host",
@@ -40,6 +42,33 @@ const facts: QuizFact[] = [
     source_label: "FIFA",
     difficulty: "easy",
     tags: [],
+    image_url: null,
+  },
+  {
+    id: "wc1982-winner",
+    category: "history",
+    fact_type: "first_winner",
+    subject: "Mundial 1982",
+    value: "Italia",
+    year: 1982,
+    source_url: "https://www.fifa.com/en/tournaments/mens/worldcup/1982spain",
+    source_label: "FIFA",
+    difficulty: "easy",
+    tags: [],
+    image_url: null,
+  },
+  {
+    id: "wc2014-host",
+    category: "hosts",
+    fact_type: "host_country",
+    subject: "Mundial 2014",
+    value: "Brasil",
+    year: 2014,
+    source_url: "https://www.fifa.com/en/tournaments/mens/worldcup/2014brazil",
+    source_label: "FIFA",
+    difficulty: "easy",
+    tags: [],
+    image_url: null,
   },
   {
     id: "brazil-titles",
@@ -52,6 +81,7 @@ const facts: QuizFact[] = [
     source_label: "FIFA",
     difficulty: "easy",
     tags: [],
+    image_url: null,
   },
 ];
 

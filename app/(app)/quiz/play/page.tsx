@@ -25,12 +25,12 @@ export default async function QuizPlayPage() {
   const status = getQuizSlotStatus(slot);
   const isCompetitive = slot.quiz.scoring_mode === "competitive";
 
-  if (status === "completed" && isCompetitive) {
+  if (status === "completed" && isCompetitive && !hub.isOwner) {
     const attemptId = getLatestSubmittedAttemptId(slot);
     redirect(attemptId ? `/quiz/result?attempt=${attemptId}` : "/quiz");
   }
 
-  if (!canOpenQuizPlay(slot)) {
+  if (!canOpenQuizPlay(slot, undefined, { isOwner: hub.isOwner })) {
     redirect("/quiz");
   }
 

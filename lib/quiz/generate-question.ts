@@ -45,7 +45,7 @@ export function generateQuestionFromFact(args: {
   return {
     sort_order: args.sortOrder,
     prompt: rendered.prompt,
-    image_url: null,
+    image_url: args.fact.image_url ?? null,
     options: mcq.options,
     correct_option_id: mcq.correct_option_id,
     fact_id: args.fact.id,

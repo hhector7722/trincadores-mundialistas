@@ -28,20 +28,37 @@ export function getQuizSlotStatus(slot: QuizDaySlot | null): QuizSlotStatus {
   return "ready";
 }
 
+export type QuizPlayAccessOptions = {
+  isOwner?: boolean;
+};
+
 export function canOpenQuizPlay(
   slot: QuizDaySlot | null,
-  scoringMode?: QuizScoringMode
+  scoringMode?: QuizScoringMode,
+  options?: QuizPlayAccessOptions
 ): boolean {
   if (!slot) return false;
   const mode = scoringMode ?? slot.quiz.scoring_mode;
   const status = getQuizSlotStatus(slot);
-  if (status === "completed" && mode === "training") return true;
+  const isOwner = options?.isOwner === true;
+
+  if (status === "completed") {
+    if (mode === "training") return true;
+    if (isOwner) return true;
+    return false;
+  }
+
   return status === "ready" || status === "in_progress" || status === "expired";
 }
 
-export function canReplayQuiz(slot: QuizDaySlot | null): boolean {
+export function canReplayQuiz(
+  slot: QuizDaySlot | null,
+  options?: QuizPlayAccessOptions
+): boolean {
   if (!slot) return false;
-  return slot.quiz.scoring_mode === "training" && getQuizSlotStatus(slot) === "completed";
+  if (getQuizSlotStatus(slot) !== "completed") return false;
+  if (slot.quiz.scoring_mode === "training") return true;
+  return options?.isOwner === true;
 }
 
 export function formatQuizSlotStatusLabel(status: QuizSlotStatus): string {

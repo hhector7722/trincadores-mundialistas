@@ -18,6 +18,7 @@ type ModalProps = {
   title: string;
   children: ReactNode;
   className?: string;
+  wrapperClassName?: string;
   hideHeaderDivider?: boolean;
   backdropClassName?: string;
   belowPanel?: ReactNode;
@@ -101,6 +102,7 @@ export function Modal({
   title,
   children,
   className,
+  wrapperClassName,
   hideHeaderDivider = false,
   backdropClassName,
   belowPanel,
@@ -202,7 +204,12 @@ export function Modal({
         onClick={onBackdropClick}
         onTouchMove={hasSwipe ? undefined : (event) => event.preventDefault()}
       />
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-3 pointer-events-none">
+      <div
+        className={cn(
+          "relative z-10 flex w-full max-w-sm flex-col items-center gap-3 pointer-events-none",
+          wrapperClassName
+        )}
+      >
         <div
           ref={panelRef}
           role="dialog"

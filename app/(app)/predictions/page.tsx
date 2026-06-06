@@ -1,6 +1,7 @@
 import { PredictionsCalendar } from "@/components/predictions/PredictionsCalendar";
 import { getPoolGroupStageMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
+import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,10 @@ export default async function PredictionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const matches = await getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id);
+  const [matches, leaderboard] = await Promise.all([
+    getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id),
+    getPoolLeaderboard(ctx.activePoolId),
+  ]);
 
   return (
     <div className="tm-porra-page flex h-full min-h-0 flex-1 flex-col overflow-hidden">
@@ -26,7 +30,12 @@ export default async function PredictionsPage() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        <PredictionsCalendar poolId={ctx.activePoolId} matches={matches} />
+        <PredictionsCalendar
+          poolId={ctx.activePoolId}
+          matches={matches}
+          leaderboardRows={leaderboard.rows}
+          currentProfileId={user!.id}
+        />
       </div>
     </div>
   );

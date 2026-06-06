@@ -1,7 +1,7 @@
 import { parseQuizOptions } from "@/lib/quiz/options";
 import type {
   QuizKind,
-  QuizQuestionPublic,
+  QuizQuestionPlay,
   QuizScoringMode,
   QuizStartSession,
   QuizSummary,
@@ -23,14 +23,17 @@ function asScoringMode(value: unknown): QuizScoringMode | null {
   return value === "training" || value === "competitive" ? value : null;
 }
 
-function parseQuestion(raw: unknown): QuizQuestionPublic | null {
+function parseQuestion(raw: unknown): QuizQuestionPlay | null {
   if (!raw || typeof raw !== "object") return null;
   const row = raw as Record<string, unknown>;
   const id = asString(row.id);
   const sortOrder = asNumber(row.sort_order);
   const prompt = asString(row.prompt);
   const points = asNumber(row.points);
-  if (!id || sortOrder === null || !prompt || points === null) return null;
+  const correctOptionId = asString(row.correct_option_id);
+  if (!id || sortOrder === null || !prompt || points === null || !correctOptionId) {
+    return null;
+  }
 
   return {
     id,
@@ -39,6 +42,7 @@ function parseQuestion(raw: unknown): QuizQuestionPublic | null {
     options: parseQuizOptions(row.options),
     points,
     image_url: asString(row.image_url),
+    correct_option_id: correctOptionId,
   };
 }
 
@@ -83,7 +87,7 @@ export function parseQuizStartSession(raw: unknown): QuizStartSession | null {
   const questionsRaw = Array.isArray(row.questions) ? row.questions : [];
   const questions = questionsRaw
     .map(parseQuestion)
-    .filter((q): q is QuizQuestionPublic => q !== null)
+    .filter((q): q is QuizQuestionPlay => q !== null)
     .sort((a, b) => a.sort_order - b.sort_order);
 
   return {

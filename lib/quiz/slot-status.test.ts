@@ -41,3 +41,10 @@ test("competitive blocks replay after submitted", () => {
   assert.equal(canOpenQuizPlay(s), false);
   assert.equal(canReplayQuiz(s), false);
 });
+
+test("owner can replay competitive after submitted", () => {
+  const s = slot("competitive", "submitted");
+  const access = { isOwner: true };
+  assert.equal(canOpenQuizPlay(s, undefined, access), true);
+  assert.equal(canReplayQuiz(s, access), true);
+});

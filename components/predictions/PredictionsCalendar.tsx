@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { CalendarSidebarCard } from "@/components/predictions/CalendarSidebarCard";
 import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
+import { TournamentStatsModal } from "@/components/predictions/TournamentStatsModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
@@ -18,6 +19,8 @@ import {
   isCalendarSidebarDay,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
+import { getTournamentTopScorers } from "@/lib/pool/tournament-stats";
+import type { LeaderboardRow } from "@/lib/ranking/queries";
 import {
   buildMonthGrid,
   formatCalendarKickoffHour,
@@ -38,6 +41,8 @@ const GROUP_STAGE_VIEW: MonthYear = GROUP_STAGE_CALENDAR_MONTH;
 type PredictionsCalendarProps = {
   poolId: string;
   matches: MatchWithPrediction[];
+  leaderboardRows: LeaderboardRow[];
+  currentProfileId: string;
 };
 
 function formatCalendarPrediction(match: MatchWithPrediction): string {
@@ -111,7 +116,12 @@ function renderCalendarGridCells(
   todayKey: string,
   onOpenMatch: (match: MatchWithPrediction) => void,
   groups: GroupStandingRow[],
-  onGroupClick: (groupCode: string) => void
+  scorers: ReturnType<typeof getTournamentTopScorers>,
+  leaderboardRows: LeaderboardRow[],
+  currentProfileId: string,
+  onGroupClick: (groupCode: string) => void,
+  onOpenAllGroups: () => void,
+  onOpenStats: () => void
 ) {
   return weeks.flatMap((week, weekIndex) => {
     const row = weekIndex + 1;
@@ -130,9 +140,14 @@ function renderCalendarGridCells(
         <CalendarSidebarCard
           key={`sidebar-${weekIndex}`}
           groups={groups}
+          scorers={scorers}
+          leaderboardRows={leaderboardRows}
+          currentProfileId={currentProfileId}
           gridColumn={gridColumn}
           gridRow={row}
           onGroupClick={onGroupClick}
+          onOpenAllGroups={onOpenAllGroups}
+          onOpenStats={onOpenStats}
         />,
       ];
 
@@ -263,10 +278,17 @@ function useCalendarViewportLayout(
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
 
-export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
+export function PredictionsCalendar({
+  poolId,
+  matches,
+  leaderboardRows,
+  currentProfileId,
+}: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
+  const [allGroupsOpen, setAllGroupsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -283,6 +305,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
   const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
   const groupStandingsDetail = useMemo(() => buildGroupStandingsDetail(matches), [matches]);
+  const topScorers = useMemo(() => getTournamentTopScorers(matches), [matches]);
 
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
@@ -304,14 +327,10 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
         className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0"
       >
-        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3">
-          <div aria-hidden="true" />
+        <div className="tm-cal-header flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3">
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
             {monthLabel}
           </h2>
-          <Link href="/predictions/knockout" className="tm-cal-ko-link justify-self-end">
-            VER ELIMINATORIAS
-          </Link>
         </div>
 
         <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)]">
@@ -332,10 +351,31 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
             todayKey,
             setActiveMatch,
             groupStandings,
-            setActiveGroupCode
+            topScorers,
+            leaderboardRows,
+            currentProfileId,
+            setActiveGroupCode,
+            () => setAllGroupsOpen(true),
+            () => setStatsOpen(true)
           )}
         </div>
       </section>
+
+      {allGroupsOpen && (
+        <AllGroupsStandingsModal
+          open
+          onClose={() => setAllGroupsOpen(false)}
+          groups={groupStandingsDetail}
+          onSelectGroup={(code) => {
+            setAllGroupsOpen(false);
+            setActiveGroupCode(code);
+          }}
+        />
+      )}
+
+      {statsOpen && (
+        <TournamentStatsModal open onClose={() => setStatsOpen(false)} matches={matches} />
+      )}
 
       {activeGroupCode && (
         <GroupStandingsModal

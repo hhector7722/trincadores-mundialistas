@@ -35,3 +35,5 @@
 - [x] Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado
 - [x] Quiz training rejugable (migracion RPC/índice)
 - [x] Bonus deprecado en UI/seed
+- [x] Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo
+- [x] Quiz generador: distractores semanticos + owner replay ilimitado

@@ -16,6 +16,11 @@ export type QuizQuestionPublic = {
   image_url: string | null;
 };
 
+/** Pregunta en sesión de play: incluye clave correcta vía RPC start (solo intento activo). */
+export type QuizQuestionPlay = QuizQuestionPublic & {
+  correct_option_id: string;
+};
+
 export type QuizSummary = {
   id: string;
   title: string;
@@ -30,7 +35,7 @@ export type QuizStartSession = {
   expires_at: string;
   resumed: boolean;
   quiz: QuizSummary;
-  questions: QuizQuestionPublic[];
+  questions: QuizQuestionPlay[];
 };
 
 export type QuizRow = {
@@ -65,6 +70,7 @@ export type QuizDaySlot = {
 export type QuizDayHub = {
   quizDate: string;
   competitive: boolean;
+  isOwner: boolean;
   official: QuizDaySlot | null;
   bonus: QuizDaySlot | null;
 };
