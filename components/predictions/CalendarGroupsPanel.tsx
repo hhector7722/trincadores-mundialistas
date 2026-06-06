@@ -1,36 +1,24 @@
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { GroupStandingRow } from "@/lib/pool/group-standings";
 import { cn } from "@/lib/utils";
-import type { CSSProperties } from "react";
 
 type CalendarGroupsPanelProps = {
   groups: GroupStandingRow[];
-  gridColumn: string;
-  gridRow: number;
   className?: string;
   onGroupClick?: (groupCode: string) => void;
 };
 
 export function CalendarGroupsPanel({
   groups,
-  gridColumn,
-  gridRow,
   className,
   onGroupClick,
 }: CalendarGroupsPanelProps) {
-  const style: CSSProperties = {
-    gridColumn,
-    gridRow,
-  };
-
   return (
     <div
-      style={style}
       className={cn(
-        "tm-cal-groups-panel tm-cal-dock-surface tm-surface-fade flex h-full min-h-0 min-w-0 flex-col overflow-hidden backdrop-blur-xl",
+        "tm-cal-groups-panel flex h-full min-h-0 min-w-0 flex-col overflow-hidden",
         className
       )}
-      aria-label="Clasificación de grupos"
     >
       <div className="tm-cal-groups-list min-h-0 flex-1 overflow-hidden">
         {groups.map((group) => (

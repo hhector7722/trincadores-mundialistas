@@ -5,7 +5,10 @@ import {
 
 export const CALENDAR_GROUPS_PANEL_DAYS = [8, 9] as const;
 
-/** Celda columna X en la fila del panel GRUPOS: sin número de día, fondo dock. */
+/** Columnas L, M y X de la primera fila del calendario (días 8–10). */
+export const CALENDAR_SIDEBAR_DAYS = [8, 9, 10] as const;
+
+/** @deprecated Usar CALENDAR_SIDEBAR_DAYS */
 export const CALENDAR_GROUPS_COMPANION_DAY = 10 as const;
 
 export type GroupTeamStanding = {
@@ -209,6 +212,13 @@ export function isCalendarGroupsPanelDay(dayNumber: number | null): boolean {
   return (
     dayNumber != null &&
     (CALENDAR_GROUPS_PANEL_DAYS as readonly number[]).includes(dayNumber)
+  );
+}
+
+export function isCalendarSidebarDay(dayNumber: number | null): boolean {
+  return (
+    dayNumber != null &&
+    (CALENDAR_SIDEBAR_DAYS as readonly number[]).includes(dayNumber)
   );
 }
 

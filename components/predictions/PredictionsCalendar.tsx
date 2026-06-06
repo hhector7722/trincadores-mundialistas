@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
-import { CalendarGroupsPanel } from "@/components/predictions/CalendarGroupsPanel";
+import { CalendarSidebarCard } from "@/components/predictions/CalendarSidebarCard";
 import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -14,9 +14,8 @@ import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
   buildGroupStandingsDetail,
-  CALENDAR_GROUPS_PANEL_DAYS,
-  isCalendarGroupsCompanionDay,
-  isCalendarGroupsPanelDay,
+  CALENDAR_SIDEBAR_DAYS,
+  isCalendarSidebarDay,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
 import {
@@ -101,10 +100,10 @@ function CalendarMatchCard({
 }
 
 function weekHasGroupsPanel(week: CalendarWeek<MatchWithPrediction>): boolean {
-  const panelDays = week.cells.filter(
-    (cell) => cell.inMonth && isCalendarGroupsPanelDay(cell.dayNumber)
+  const sidebarDays = week.cells.filter(
+    (cell) => cell.inMonth && isCalendarSidebarDay(cell.dayNumber)
   );
-  return panelDays.length === CALENDAR_GROUPS_PANEL_DAYS.length;
+  return sidebarDays.length === CALENDAR_SIDEBAR_DAYS.length;
 }
 
 function renderCalendarGridCells(
@@ -118,16 +117,18 @@ function renderCalendarGridCells(
     const row = weekIndex + 1;
 
     if (weekHasGroupsPanel(week)) {
-      const panelStartCol = week.cells.findIndex(
-        (cell) => cell.inMonth && cell.dayNumber === CALENDAR_GROUPS_PANEL_DAYS[0]
+      const sidebarStartCol = week.cells.findIndex(
+        (cell) => cell.inMonth && cell.dayNumber === CALENDAR_SIDEBAR_DAYS[0]
       );
-      const panelSpan = CALENDAR_GROUPS_PANEL_DAYS.length;
+      const sidebarSpan = CALENDAR_SIDEBAR_DAYS.length;
       const gridColumn =
-        panelStartCol >= 0 ? `${panelStartCol + 1} / ${panelStartCol + 1 + panelSpan}` : "1 / 3";
+        sidebarStartCol >= 0
+          ? `${sidebarStartCol + 1} / ${sidebarStartCol + 1 + sidebarSpan}`
+          : "1 / 4";
 
       const items = [
-        <CalendarGroupsPanel
-          key={`groups-${weekIndex}`}
+        <CalendarSidebarCard
+          key={`sidebar-${weekIndex}`}
           groups={groups}
           gridColumn={gridColumn}
           gridRow={row}
@@ -136,7 +137,7 @@ function renderCalendarGridCells(
       ];
 
       week.cells.forEach((cell, cellIndex) => {
-        if (isCalendarGroupsPanelDay(cell.dayNumber)) return;
+        if (isCalendarSidebarDay(cell.dayNumber)) return;
 
         items.push(
           <DayCell
@@ -145,8 +146,6 @@ function renderCalendarGridCells(
             todayKey={todayKey}
             onOpenMatch={onOpenMatch}
             style={{ gridColumn: cellIndex + 1, gridRow: row }}
-            hideDayNumber={isCalendarGroupsCompanionDay(cell.dayNumber)}
-            dockSurface={isCalendarGroupsCompanionDay(cell.dayNumber)}
           />
         );
       });

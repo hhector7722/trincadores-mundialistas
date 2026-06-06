@@ -7,11 +7,12 @@ const MIN_MATCH_CARD_HEIGHT_PX = 22;
 const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
 const GROUPS_FLAG_GAP_PX = 2;
-const GROUPS_CARD_GAP_PX = 2;
+const GROUPS_CARD_GAP_PX = 4;
 const GROUPS_CARD_PAD_Y = 1;
 const GROUPS_LETTER_WIDTH_RATIO = 0.11;
-const GROUPS_SIZE_FIT = 0.98;
-const GROUPS_FLAG_SCALE = 0.88;
+const GROUPS_SIZE_FIT = 0.9;
+const GROUPS_FLAG_SCALE = 0.78;
+const GROUPS_CARD_HEIGHT_RATIO = 0.72;
 const MIN_GROUPS_FLAG_PX = 5;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
@@ -41,7 +42,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -118,7 +119,9 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
 function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void {
-  const panel = grid.querySelector<HTMLElement>(".tm-cal-groups-panel");
+  const panel =
+    grid.querySelector<HTMLElement>(".tm-cal-sidebar-card .tm-cal-groups-panel") ??
+    grid.querySelector<HTMLElement>(".tm-cal-groups-panel");
   if (!panel) {
     calendar.style.removeProperty("--tm-cal-groups-pad");
     calendar.style.removeProperty("--tm-cal-groups-letter-fs");
@@ -146,7 +149,8 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     const listH = innerH;
     const totalCardGap = GROUPS_CARD_GAP_PX * Math.max(0, rowCount - 1);
     const cardSlotH = (listH - totalCardGap) / rowCount;
-    const cardInnerH = Math.max(0, cardSlotH - GROUPS_CARD_PAD_Y * 2);
+    const cardContentH = cardSlotH * GROUPS_CARD_HEIGHT_RATIO;
+    const cardInnerH = Math.max(0, cardContentH - GROUPS_CARD_PAD_Y * 2);
 
     letterW = Math.max(5, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
     const flagsTrackW = Math.max(0, innerW - letterW - 6);

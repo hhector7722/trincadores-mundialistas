@@ -828,6 +828,34 @@ html[data-modal-open] main {
   }
 }
 
+.tm-porra-calendar .tm-cal-sidebar-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 2px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--tm-cal-dock-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--tm-shadow-soft);
+}
+
+.tm-porra-calendar .tm-cal-sidebar-card-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+}
+
+.tm-porra-calendar .tm-cal-sidebar-x {
+  min-height: 0;
+  min-width: 0;
+  border-left: var(--tm-cal-grid-line-width) solid rgba(255, 255, 255, 0.08);
+}
+
 .tm-porra-calendar .tm-cal-cell-surface {
   background: var(--tm-cal-cell-bg);
 }
@@ -849,6 +877,8 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-groups-panel {
   padding: var(--tm-cal-groups-pad, 2px);
+  min-height: 0;
+  min-width: 0;
 }
 
 .tm-porra-calendar .tm-cal-groups-list {
@@ -857,9 +887,9 @@ html[data-modal-open] main {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: stretch;
-  gap: var(--tm-cal-group-card-gap, 2px);
+  gap: var(--tm-cal-group-card-gap, 4px);
 }
 
 .tm-porra-calendar .tm-cal-group-card {
