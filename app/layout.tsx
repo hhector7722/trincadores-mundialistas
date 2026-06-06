@@ -36,7 +36,6 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: "Trincadores Mundialistas",
-  description: "Porra privada Mundial 2026",
   applicationName: "Trincadores",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -49,13 +48,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     siteName: "Trincadores Mundialistas",
     title: "Trincadores Mundialistas",
-    description: "Porra privada Mundial 2026",
     url: siteUrl.origin,
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Trincadores Mundialistas",
-    description: "Porra privada Mundial 2026",
   },
   icons: {
     icon: [

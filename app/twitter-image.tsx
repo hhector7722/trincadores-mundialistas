@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export const alt = "Trincadores Mundialistas";
-export const size = { width: 1200, height: 630 };
+export const size = { width: 400, height: 400 };
 export const contentType = "image/png";
 
 export default async function TwitterImage() {
@@ -18,7 +18,6 @@ export default async function TwitterImage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(180deg, #5030a8 0%, #2a1058 72%, #1a0838 100%)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -27,7 +26,7 @@ export default async function TwitterImage() {
           alt=""
           width={400}
           height={400}
-          style={{ borderRadius: 40 }}
+          style={{ objectFit: "cover" }}
         />
       </div>
     ),
