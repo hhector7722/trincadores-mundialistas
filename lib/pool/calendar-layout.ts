@@ -88,6 +88,5 @@ export function fitCalendarLayout(
 }
 
 export function resetCalendarLayout(calendar: HTMLElement): void {
-  calendar.style.removeProperty("--tm-cal-weeks");
   calendar.style.removeProperty("--tm-cal-ui-scale");
 }

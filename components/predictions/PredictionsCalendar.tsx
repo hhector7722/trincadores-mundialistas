@@ -111,18 +111,23 @@ function DayCell({
 }
 
 function useCalendarViewportLayout(
-  shellRef: RefObject<HTMLElement | null>,
+  rootRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
   rowCount: number
 ) {
   useLayoutEffect(() => {
-    const shell = shellRef.current;
     const calendar = calendarRef.current;
     const grid = gridRef.current;
     if (!calendar || !grid || rowCount === 0) return;
 
+    const layout =
+      rootRef.current?.closest(".tm-porra-layout") ??
+      rootRef.current ??
+      calendar.parentElement;
+
     const syncLayout = () => {
+      calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
       resetCalendarLayout(calendar);
       void calendar.offsetHeight;
       fitCalendarLayout(calendar, grid, rowCount);
@@ -131,21 +136,25 @@ function useCalendarViewportLayout(
     syncLayout();
 
     const observer = new ResizeObserver(syncLayout);
-    if (shell) observer.observe(shell);
+    if (layout instanceof HTMLElement) observer.observe(layout);
     observer.observe(calendar);
     observer.observe(grid);
+    window.addEventListener("resize", syncLayout);
+    window.visualViewport?.addEventListener("resize", syncLayout);
 
     return () => {
       observer.disconnect();
+      window.removeEventListener("resize", syncLayout);
+      window.visualViewport?.removeEventListener("resize", syncLayout);
       resetCalendarLayout(calendar);
     };
-  }, [shellRef, calendarRef, gridRef, rowCount]);
+  }, [rootRef, calendarRef, gridRef, rowCount]);
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -159,7 +168,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
-  useCalendarViewportLayout(shellRef, calendarRef, gridRef, weeks.length);
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
@@ -173,13 +182,13 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   }
 
   return (
-    <div ref={shellRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <div ref={rootRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <section
         ref={calendarRef}
         style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
-        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0 pt-[env(safe-area-inset-top,0px)]"
+        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0"
       >
-        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3 sm:py-1">
+        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3">
           <div aria-hidden="true" />
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
             {monthLabel}
@@ -201,7 +210,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           ))}
         </div>
 
-        <div ref={gridRef} className="tm-cal-body grid min-h-0 flex-1 grid-cols-7">
+        <div ref={gridRef} className="tm-cal-body min-h-0">
           {weeks.flatMap((week, weekIndex) =>
             week.cells.map((cell, cellIndex) => (
               <DayCell
