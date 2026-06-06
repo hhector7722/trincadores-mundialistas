@@ -16,5 +16,5 @@ export type Pool = { id: string; slug: string; name: string; settings_json: Pool
 export type PoolMember = { pool_id: string; profile_id: string; role: PoolMemberRole; joined_at: string };
 export type Prediction = { id: string; pool_id: string; match_id: string; profile_id: string; home_goals: number; away_goals: number; points_awarded: number | null; created_at: string; updated_at: string };
 export type PoolMemberScore = { pool_id: string; profile_id: string; matchday_id: string; match_points: number; exact_hits: number; sign_hits: number; cumulative_points: number; rank: number | null; updated_at: string };
-export type QuizStartPayload = { attempt_id: string; expires_at: string; questions: Array<{ id: string; sort_order: number; prompt: string; options: unknown; points: number }> };
+export type { QuizStartSession as QuizStartPayload } from "@/lib/quiz/types";
 

@@ -10,9 +10,11 @@
     "test:scoring": "tsx --test lib/scoring/compute.test.ts",
     "test:edit-state": "tsx --test lib/predictions/edit-state.test.ts",
     "test:openfootball": "tsx --test lib/openfootball/parse.test.ts",
+    "test:quiz": "tsx --test lib/quiz/date.test.ts lib/quiz/options.test.ts lib/quiz/seed-day.test.ts",
     "db:purge-demo": "tsx --env-file=.env.local scripts/purge-demo-data.ts",
     "db:bootstrap": "tsx --env-file=.env.local scripts/bootstrap-participants.ts",
     "db:import-wc2026": "tsx --env-file=.env.local scripts/import-openfootball-wc2026.ts",
+    "db:seed-quiz-day": "tsx --env-file=.env.local scripts/seed-quiz-day.ts",
     "llm-context": "tsx scripts/generate-llm-context.ts",
     "llm-context:install-hook": "node scripts/install-llm-hook.mjs",
     "prepare": "node scripts/install-llm-hook.mjs"

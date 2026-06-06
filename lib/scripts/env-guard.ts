@@ -41,3 +41,9 @@ export function assertImportAllowed(): void {
     throw new Error("Import bloqueado. Ejecuta con ALLOW_IMPORT=1.");
   }
 }
+
+export function assertQuizSeedAllowed(): void {
+  if (process.env.ALLOW_QUIZ_SEED !== "1") {
+    throw new Error("Seed de quiz bloqueado. Ejecuta con ALLOW_QUIZ_SEED=1.");
+  }
+}

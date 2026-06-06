@@ -1,0 +1,59 @@
+{
+  "quiz_date": "2026-06-06",
+  "title": "¿Quién sabe más de Mundiales?",
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿Qué selección ganó el primer Mundial de la historia en 1930?",
+        "image_url": null,
+        "options": [
+          { "id": "a", "label": "Brasil" },
+          { "id": "b", "label": "Argentina" },
+          { "id": "c", "label": "Uruguay" },
+          { "id": "d", "label": "Italia" }
+        ],
+        "correct_option_id": "c"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Quién es el máximo goleador histórico en la historia de los Mundiales?",
+        "image_url": null,
+        "options": [
+          { "id": "a", "label": "Ronaldo Nazário" },
+          { "id": "b", "label": "Miroslav Klose" },
+          { "id": "c", "label": "Gerd Müller" },
+          { "id": "d", "label": "Pelé" }
+        ],
+        "correct_option_id": "b"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿En qué país se jugó el Mundial 2010?",
+        "image_url": null,
+        "options": [
+          { "id": "a", "label": "Alemania" },
+          { "id": "b", "label": "Sudáfrica" },
+          { "id": "c", "label": "Rusia" },
+          { "id": "d", "label": "Japón" }
+        ],
+        "correct_option_id": "b"
+      }
+    ]
+  },
+  "bonus": {
+    "author_display_name": "Paco",
+    "question": {
+      "sort_order": 1,
+      "prompt": "¿Cuál fue el resultado de la final del Mundial 2010?",
+      "image_url": null,
+      "options": [
+        { "id": "a", "label": "España 1-0 Holanda" },
+        { "id": "b", "label": "España 2-1 Holanda" },
+        { "id": "c", "label": "Holanda 2-1 España" },
+        { "id": "d", "label": "España 0-0 Holanda (penaltis)" }
+      ],
+      "correct_option_id": "a"
+    }
+  }
+}

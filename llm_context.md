@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:11.884Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T06:15:28.623Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -193,7 +193,13 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `QuizHub` | `components/quiz/QuizHub.tsx` | server | QuizHub |
+| `QuizImage` | `components/quiz/QuizImage.tsx` | server | QuizImage |
 | `QuizModeBadge` | `components/quiz/QuizModeBadge.tsx` | server | QuizModeBadge |
+| `QuizOptionButton` | `components/quiz/QuizOptionButton.tsx` | client | QuizOptionButton |
+| `QuizProgressDots` | `components/quiz/QuizProgressDots.tsx` | server | QuizProgressDots |
+| `QuizQuestionStage` | `components/quiz/QuizQuestionStage.tsx` | client | QuizQuestionStage |
+| `QuizSlotCard` | `components/quiz/QuizSlotCard.tsx` | server | QuizSlotCard |
 
 #### ranking
 
@@ -719,11 +725,11 @@ docs/               → AUTH, RLS, SEED
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
-- `components/quiz/QuizModeBadge.tsx` — posible código muerto
+- `components/quiz/QuizHub.tsx` — posible código muerto
+- `components/quiz/QuizQuestionStage.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
-- `lib/quiz/slot-status.ts` — posible código muerto
 - `lib/scripts/env-guard.ts` — posible código muerto
 - `lib/supabase/client.ts` — posible código muerto
 
