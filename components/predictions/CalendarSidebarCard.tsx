@@ -34,7 +34,6 @@ export function CalendarSidebarCard({
     >
       <div className="tm-cal-sidebar-card-inner h-full min-h-0 min-w-0 flex-1">
         <CalendarGroupsPanel groups={groups} onGroupClick={onGroupClick} />
-        <div className="tm-cal-sidebar-x" aria-hidden="true" />
       </div>
     </div>
   );
