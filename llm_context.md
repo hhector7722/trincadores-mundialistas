@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-05T23:53:52.970Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T00:03:07.994Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -111,6 +111,7 @@ flowchart TB
 | Archivo | Rol |
 |---------|-----|
 | `app/(app)/layout.tsx` | Auth/pool guard |
+| `app/(app)/predictions/layout.tsx` | Shell visual |
 | `app/(auth)/layout.tsx` | Shell visual |
 | `app/layout.tsx` | Shell visual |
 
@@ -149,6 +150,7 @@ flowchart TB
 | `AppHeader` | `components/layout/AppHeader.tsx` | server | AppHeader |
 | `AppHeaderGate` | `components/layout/AppHeaderGate.tsx` | client | AppHeaderGate |
 | `AppShell` | `components/layout/AppShell.tsx` | server | AppShell |
+| `BrandLogo` | `components/layout/BrandLogo.tsx` | server | BrandLogo, BrandLogoFixed |
 | `PoolSwitcher` | `components/layout/PoolSwitcher.tsx` | client | PoolSwitcher |
 | `TabBar` | `components/layout/TabBar.tsx` | client | TabBar |
 
