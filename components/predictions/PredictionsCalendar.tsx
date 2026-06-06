@@ -119,7 +119,7 @@ function renderCalendarGridCells(
       );
       const panelSpan = CALENDAR_GROUPS_PANEL_DAYS.length;
       const gridColumn =
-        panelStartCol >= 0 ? `${panelStartCol + 1} / ${panelStartCol + 1 + panelSpan}` : "1 / 4";
+        panelStartCol >= 0 ? `${panelStartCol + 1} / ${panelStartCol + 1 + panelSpan}` : "1 / 3";
 
       const items = [
         <CalendarGroupsPanel

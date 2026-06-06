@@ -209,7 +209,7 @@ export function Modal({
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="pointer-events-auto w-full overflow-hidden"
+          className="pointer-events-auto w-full overflow-hidden outline-none focus:outline-none focus-visible:outline-none"
         >
           {slideActive && panelSlide ? (
             <div

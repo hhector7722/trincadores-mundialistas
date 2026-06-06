@@ -4,11 +4,11 @@ const SCALE_SEARCH_ITERATIONS = 14;
 const OVERFLOW_TOLERANCE_PX = 1;
 const MATCH_CARD_GAP_PX = 4;
 const MIN_MATCH_CARD_HEIGHT_PX = 22;
-const GROUPS_EDGE_INSET_PX = 4;
+const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
 const GROUPS_FLAG_GAP_PX = 2;
-const GROUPS_LETTER_WIDTH_RATIO = 0.1;
-const GROUPS_SIZE_FIT = 0.92;
+const GROUPS_LETTER_WIDTH_RATIO = 0.11;
+const GROUPS_SIZE_FIT = 0.98;
 const MIN_GROUPS_FLAG_PX = 6;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
@@ -138,13 +138,13 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   let letterW = 6;
 
   for (let attempt = 0; attempt < 12; attempt++) {
-    titleFs = Math.max(6, Math.floor(innerH * 0.065 * fit));
-    const titleBlock = titleFs * 1.2 + 2;
+    titleFs = Math.max(6, Math.floor(innerH * 0.07 * fit));
+    const titleBlock = titleFs * 1.15 + 1;
     const listH = Math.max(0, innerH - titleBlock);
     const rowH = listH / rowCount;
 
     letterW = Math.max(6, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
-    const flagsTrackW = Math.max(0, innerW - letterW - 2);
+    const flagsTrackW = Math.max(0, innerW - letterW - 1);
     const flagByHeight = rowH * fit;
     const flagByWidth =
       (flagsTrackW - GROUPS_FLAG_GAP_PX * (GROUPS_FLAGS_PER_ROW - 1)) / GROUPS_FLAGS_PER_ROW;
@@ -152,7 +152,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
       MIN_GROUPS_FLAG_PX,
       Math.floor(Math.min(flagByHeight, flagByWidth) * fit)
     );
-    letterFs = Math.max(5, Math.floor(flagSize * 0.48));
+    letterFs = Math.max(5, Math.floor(flagSize * 0.5));
 
     calendar.style.setProperty("--tm-cal-groups-pad", `${GROUPS_EDGE_INSET_PX}px`);
     calendar.style.setProperty("--tm-cal-groups-title-fs", `${titleFs}px`);

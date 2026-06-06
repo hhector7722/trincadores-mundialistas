@@ -3,7 +3,7 @@ import {
   WC2026_GROUP_SEEDS,
 } from "@/lib/openfootball/wc2026-groups";
 
-export const CALENDAR_GROUPS_PANEL_DAYS = [8, 9, 10] as const;
+export const CALENDAR_GROUPS_PANEL_DAYS = [8, 9] as const;
 
 export type GroupStandingRow = {
   code: string;
