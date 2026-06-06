@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T01:01:39.329Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T02:58:30.059Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -685,8 +685,6 @@ docs/               → AUTH, RLS, SEED
 ### Código posiblemente sin uso
 
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
-- `components/home/HomeStandingCard.tsx` — posible código muerto
-- `components/home/HomeTopThree.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto

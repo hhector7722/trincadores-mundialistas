@@ -1,7 +1,10 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
+import { HomeStandingCard } from "@/components/home/HomeStandingCard";
+import { HomeTopThree } from "@/components/home/HomeTopThree";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
 import { getPoolMatches } from "@/lib/pool/queries";
+import { getPoolLeaderboard, memberStandingFromLeaderboard } from "@/lib/ranking/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,9 +17,10 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [matches, pending] = await Promise.all([
+  const [matches, pending, leaderboard] = await Promise.all([
     getPoolMatches(ctx.activePoolId),
     countPendingPredictions(ctx.activePoolId, user!.id),
+    getPoolLeaderboard(ctx.activePoolId),
   ]);
 
   const live = matches.filter((m) => m.status === "live");
@@ -27,10 +31,14 @@ export default async function HomePage() {
     ? await getMatchPredictionDetail(ctx.activePoolId, user!.id, focus.id)
     : null;
 
+  const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
+
   return (
     <div className="relative z-10 space-y-3 p-4 pb-8">
-        <HomeHero pendingCount={pending} />
-        {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
+      <HomeHero pendingCount={pending} />
+      <HomeStandingCard standing={standing} />
+      {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
+      <HomeTopThree rows={leaderboard.rows} />
     </div>
   );
 }
