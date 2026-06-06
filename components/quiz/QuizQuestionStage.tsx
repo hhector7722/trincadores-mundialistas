@@ -2,9 +2,7 @@
 
 import { QuizImage } from "@/components/quiz/QuizImage";
 import { QuizOptionButton } from "@/components/quiz/QuizOptionButton";
-import { QuizProgressDots } from "@/components/quiz/QuizProgressDots";
 import {
-  QUESTION_TIME_SEC,
   resolveOptionVisualState,
   type QuestionPhase,
 } from "@/lib/quiz/play-flow";
@@ -13,8 +11,6 @@ import { cn } from "@/lib/utils";
 
 type QuizQuestionStageProps = {
   question: QuizQuestionPlay;
-  questionIndex: number;
-  totalQuestions: number;
   selectedOptionId: string | null;
   phase: QuestionPhase;
   secondsLeft: number;
@@ -24,30 +20,21 @@ type QuizQuestionStageProps = {
 
 export function QuizQuestionStage({
   question,
-  questionIndex,
-  totalQuestions,
   selectedOptionId,
   phase,
   secondsLeft,
   locked,
   onSelect,
 }: QuizQuestionStageProps) {
-  const timerUrgent = secondsLeft <= 3 && phase === "answering";
+  const timerUrgent = secondsLeft <= 5 && phase === "answering";
 
   return (
     <div className="tm-quiz-stage flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
-          Pregunta {questionIndex + 1} de {totalQuestions}
-        </p>
-        <QuizProgressDots total={totalQuestions} current={questionIndex + 1} />
-      </div>
-
       <div
         className={cn(
-          "flex items-center justify-center gap-2 rounded-2xl border px-4 py-3",
+          "flex items-center justify-center rounded-2xl border px-4 py-3",
           timerUrgent
-            ? "border-red-400/40 bg-red-500/10"
+            ? "border-red-500/60 bg-red-600"
             : "border-[var(--tm-border)] bg-[var(--tm-surface)]"
         )}
         aria-live="polite"
@@ -56,13 +43,10 @@ export function QuizQuestionStage({
         <span
           className={cn(
             "font-display text-3xl tabular-nums tracking-wide",
-            timerUrgent ? "text-red-300" : "text-[var(--tm-accent)]"
+            timerUrgent ? "text-white" : "text-[var(--tm-accent)]"
           )}
         >
           {secondsLeft}
-        </span>
-        <span className="text-xs uppercase tracking-[0.14em] text-[var(--tm-muted)]">
-          seg
         </span>
       </div>
 
@@ -92,5 +76,3 @@ export function QuizQuestionStage({
     </div>
   );
 }
-
-export { QUESTION_TIME_SEC };

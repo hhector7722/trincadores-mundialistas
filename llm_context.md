@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T18:21:28.655Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T18:35:35.503Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -739,7 +739,7 @@ docs/               → AUTH, RLS, SEED
 | Archivo | Líneas | Nota |
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 403 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 389 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
 | `lib/quiz/queries.ts` | 342 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
@@ -752,6 +752,7 @@ docs/               → AUTH, RLS, SEED
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
+- `components/quiz/QuizProgressDots.tsx` — posible código muerto
 - `components/ui/hero-cta.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto

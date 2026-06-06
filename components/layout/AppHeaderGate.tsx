@@ -6,7 +6,8 @@ import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
   const pathname = usePathname();
-  const hideBrandTitle = pathname.startsWith("/predictions");
+  const hideBrandTitle =
+    pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
   const isHome = pathname === "/";
 
   if (hideBrandTitle) {

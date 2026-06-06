@@ -20,14 +20,7 @@ type QuizPlaySessionProps = {
   quizId: string;
 };
 
-function formatCountdown(expiresAt: string): string {
-  const ms = new Date(expiresAt).getTime() - Date.now();
-  if (ms <= 0) return "0:00";
-  const totalSec = Math.floor(ms / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${min}:${String(sec).padStart(2, "0")}`;
-}
+const PLAY_TITLE = "¿QUIEN SABE MÁS DE LOS MUNDIALES?";
 
 export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const router = useRouter();
@@ -38,7 +31,6 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<QuestionPhase>("answering");
   const [secondsLeft, setSecondsLeft] = useState(QUESTION_TIME_SEC);
-  const [sessionCountdown, setSessionCountdown] = useState("");
   const [loading, startLoading] = useTransition();
   const [submitting, startSubmitting] = useTransition();
 
@@ -46,17 +38,46 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const advancingRef = useRef(false);
   const feedbackTimerRef = useRef<number | null>(null);
   const questionTimerRef = useRef<number | null>(null);
+  const stepRef = useRef(step);
+  const phaseRef = useRef(phase);
+  const sessionRef = useRef(session);
+  const answersRef = useRef(answers);
 
-  const clearTimers = useCallback(() => {
-    if (feedbackTimerRef.current !== null) {
-      window.clearTimeout(feedbackTimerRef.current);
-      feedbackTimerRef.current = null;
-    }
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  const clearQuestionTimer = useCallback(() => {
     if (questionTimerRef.current !== null) {
       window.clearInterval(questionTimerRef.current);
       questionTimerRef.current = null;
     }
   }, []);
+
+  const clearFeedbackTimer = useCallback(() => {
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    advancingRef.current = false;
+  }, []);
+
+  const clearAllTimers = useCallback(() => {
+    clearQuestionTimer();
+    clearFeedbackTimer();
+  }, [clearQuestionTimer, clearFeedbackTimer]);
 
   useEffect(() => {
     startLoading(async () => {
@@ -70,54 +91,52 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
     });
   }, [poolId, quizId]);
 
-  useEffect(() => {
-    if (!session?.expires_at) return;
-    const tick = () => setSessionCountdown(formatCountdown(session.expires_at));
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, [session?.expires_at]);
-
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;
 
   const handleSubmit = useCallback(
     (finalAnswers: Record<string, string>) => {
-      if (!session || submittedRef.current) return;
+      const activeSession = sessionRef.current;
+      if (!activeSession || submittedRef.current) return;
       submittedRef.current = true;
+      clearAllTimers();
       setSubmitError(null);
 
       startSubmitting(async () => {
-        const result = await submitQuiz(poolId, session.attempt_id, finalAnswers);
+        const result = await submitQuiz(poolId, activeSession.attempt_id, finalAnswers);
         if (!result.ok) {
           submittedRef.current = false;
           setSubmitError(result.error);
           return;
         }
-        router.push(`/quiz/result?attempt=${session.attempt_id}`);
+        router.push(`/quiz/result?attempt=${activeSession.attempt_id}`);
         router.refresh();
       });
     },
-    [poolId, router, session]
+    [clearAllTimers, poolId, router]
   );
 
   const scheduleAdvance = useCallback(
     (nextAnswers: Record<string, string>) => {
       if (advancingRef.current) return;
+      clearFeedbackTimer();
       advancingRef.current = true;
 
       feedbackTimerRef.current = window.setTimeout(() => {
-        advancingRef.current = false;
         feedbackTimerRef.current = null;
+        advancingRef.current = false;
 
-        if (!session) return;
+        const activeSession = sessionRef.current;
+        const currentStep = stepRef.current;
+        const total = activeSession?.questions.length ?? 0;
+        if (!activeSession || total === 0) return;
 
-        if (shouldAutoSubmit(step, questions.length)) {
+        if (shouldAutoSubmit(currentStep, total)) {
           handleSubmit(nextAnswers);
           return;
         }
 
-        const next = nextStepAfterFeedback(step, questions.length);
+        const next = nextStepAfterFeedback(currentStep, total);
         if (next !== null) {
           setStep(next);
           setPhase("answering");
@@ -125,54 +144,48 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
         }
       }, FEEDBACK_DELAY_MS);
     },
-    [handleSubmit, questions.length, session, step]
+    [clearFeedbackTimer, handleSubmit]
   );
 
   const resolveAnswer = useCallback(
     (optionId: string) => {
-      if (!currentQuestion || phase !== "answering" || advancingRef.current) return;
+      const question = sessionRef.current?.questions[stepRef.current];
+      if (!question || phaseRef.current !== "answering" || advancingRef.current) return;
 
-      clearTimers();
-      setAnswers((prev) => {
-        const next = { ...prev, [currentQuestion.id]: optionId };
-        setPhase("feedback");
-        scheduleAdvance(next);
-        return next;
-      });
+      clearQuestionTimer();
+      const next = { ...answersRef.current, [question.id]: optionId };
+      setAnswers(next);
+      setPhase("feedback");
+      scheduleAdvance(next);
     },
-    [clearTimers, currentQuestion, phase, scheduleAdvance]
+    [clearQuestionTimer, scheduleAdvance]
   );
 
   const handleTimeout = useCallback(() => {
-    if (!currentQuestion || phase !== "answering" || advancingRef.current) return;
+    const question = sessionRef.current?.questions[stepRef.current];
+    if (!question || phaseRef.current !== "answering" || advancingRef.current) return;
 
-    clearTimers();
-    const wrongId = pickWrongOptionId(
-      currentQuestion.options,
-      currentQuestion.correct_option_id
-    );
-
-    setAnswers((prev) => {
-      const next = { ...prev, [currentQuestion.id]: wrongId };
-      setPhase("feedback");
-      scheduleAdvance(next);
-      return next;
-    });
-  }, [clearTimers, currentQuestion, phase, scheduleAdvance]);
+    clearQuestionTimer();
+    const wrongId = pickWrongOptionId(question.options, question.correct_option_id);
+    const next = { ...answersRef.current, [question.id]: wrongId };
+    setAnswers(next);
+    setPhase("feedback");
+    scheduleAdvance(next);
+  }, [clearQuestionTimer, scheduleAdvance]);
 
   useEffect(() => {
-    if (!currentQuestion || phase !== "answering") return;
+    if (!currentQuestion || phase !== "answering") {
+      clearQuestionTimer();
+      return;
+    }
 
     setSecondsLeft(QUESTION_TIME_SEC);
-    clearTimers();
+    clearQuestionTimer();
 
     questionTimerRef.current = window.setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
-          if (questionTimerRef.current !== null) {
-            window.clearInterval(questionTimerRef.current);
-            questionTimerRef.current = null;
-          }
+          clearQuestionTimer();
           window.setTimeout(() => handleTimeout(), 0);
           return 0;
         }
@@ -180,10 +193,10 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
       });
     }, 1000);
 
-    return clearTimers;
-  }, [clearTimers, currentQuestion?.id, phase, step, handleTimeout]);
+    return clearQuestionTimer;
+  }, [clearQuestionTimer, currentQuestion?.id, handleTimeout, phase, step]);
 
-  useEffect(() => () => clearTimers(), [clearTimers]);
+  useEffect(() => () => clearAllTimers(), [clearAllTimers]);
 
   if (loadError) {
     return (
@@ -234,28 +247,19 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
     );
   }
 
-  const locked = phase === "feedback";
-
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex shrink-0 items-center justify-between gap-3">
-        <Link href="/quiz" className="text-sm font-medium text-[var(--tm-primary)]">
-          Volver
-        </Link>
-        <p className="text-xs text-[var(--tm-muted)]">
-          Sesion · {sessionCountdown || "--:--"}
-        </p>
-      </div>
+      <h1 className="shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
+        {PLAY_TITLE}
+      </h1>
 
       <div className="tm-quiz-stage-scroll flex min-h-0 flex-1 flex-col gap-4">
         <QuizQuestionStage
           question={currentQuestion}
-          questionIndex={step}
-          totalQuestions={questions.length}
           selectedOptionId={answers[currentQuestion.id] ?? null}
           phase={phase}
           secondsLeft={secondsLeft}
-          locked={locked}
+          locked={phase === "feedback"}
           onSelect={resolveAnswer}
         />
       </div>
