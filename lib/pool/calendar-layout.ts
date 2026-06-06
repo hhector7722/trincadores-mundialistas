@@ -10,10 +10,10 @@ const GROUPS_FLAG_GAP_PX = 2;
 const GROUPS_CARD_GAP_PX = 4;
 const GROUPS_CARD_PAD_Y = 1;
 const GROUPS_LETTER_WIDTH_RATIO = 0.11;
-const GROUPS_SIZE_FIT = 0.9;
-const GROUPS_FLAG_SCALE = 0.78;
-const GROUPS_CARD_HEIGHT_RATIO = 0.72;
-const MIN_GROUPS_FLAG_PX = 5;
+const GROUPS_SIZE_FIT = 0.97;
+const GROUPS_FLAG_SCALE = 0.94;
+const GROUPS_CARD_HEIGHT_RATIO = 0.9;
+const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
 
@@ -154,7 +154,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
 
     letterW = Math.max(5, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
     const flagsTrackW = Math.max(0, innerW - letterW - 6);
-    const flagByHeight = cardInnerH * GROUPS_FLAG_SCALE * fit;
+    const flagByHeight = cardInnerH * GROUPS_FLAG_SCALE;
     const flagByWidth =
       ((flagsTrackW - GROUPS_FLAG_GAP_PX * (GROUPS_FLAGS_PER_ROW - 1)) / GROUPS_FLAGS_PER_ROW) *
       GROUPS_FLAG_SCALE;
@@ -162,7 +162,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
       MIN_GROUPS_FLAG_PX,
       Math.floor(Math.min(flagByHeight, flagByWidth) * fit)
     );
-    letterFs = Math.max(5, Math.floor(flagSize * 0.48));
+    letterFs = Math.max(5, Math.floor(flagSize * 0.52));
 
     calendar.style.setProperty("--tm-cal-groups-pad", `${GROUPS_EDGE_INSET_PX}px`);
     calendar.style.setProperty("--tm-cal-groups-letter-fs", `${letterFs}px`);
