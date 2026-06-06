@@ -46,14 +46,14 @@ function CalendarMatchCard({
       aria-label={title}
       onClick={onOpen}
       className={cn(
-        "tm-cal-match-card flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
+        "tm-cal-match-card flex min-w-0 w-full shrink-0 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
       <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
         {time}
       </span>
-      <div className="tm-cal-flags relative min-h-0 w-full flex-1">
+      <div className="tm-cal-flags relative w-full shrink-0">
         <div className="absolute left-[20%] top-1/2 -translate-x-1/2 -translate-y-1/2">
           <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
         </div>
@@ -101,7 +101,7 @@ function DayCell({
       >
         {cell.dayNumber}
       </span>
-      <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col justify-start">
         {cell.matches.map((match) => (
           <CalendarMatchCard key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
         ))}

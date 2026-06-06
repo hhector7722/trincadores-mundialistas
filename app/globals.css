@@ -584,6 +584,8 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+  justify-content: flex-start;
+  align-content: flex-start;
 }
 
 .tm-porra-calendar .tm-cal-cell--matches {
@@ -591,8 +593,11 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-card {
-  gap: calc(0.125rem * var(--tm-cal-ui-scale));
-  min-height: 0;
+  flex: 0 0 auto;
+  gap: calc(0.0625rem * var(--tm-cal-ui-scale));
+  height: calc(1.5625rem * var(--tm-cal-ui-scale));
+  min-height: calc(1.5625rem * var(--tm-cal-ui-scale));
+  max-height: calc(1.5625rem * var(--tm-cal-ui-scale));
   min-width: 0;
   overflow: hidden;
   padding: calc(0.125rem * var(--tm-cal-ui-scale));
@@ -638,9 +643,12 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-flags {
-  min-height: calc(1rem * var(--tm-cal-ui-scale));
+  height: calc(0.875rem * var(--tm-cal-ui-scale));
+  min-height: calc(0.875rem * var(--tm-cal-ui-scale));
+  max-height: calc(0.875rem * var(--tm-cal-ui-scale));
   min-width: 0;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .tm-porra-calendar .tm-cal-flag,
@@ -683,12 +691,20 @@ html[data-modal-open] main {
     width: calc(1rem * var(--tm-cal-ui-scale));
   }
 
+  .tm-porra-calendar .tm-cal-match-card {
+    height: calc(1.75rem * var(--tm-cal-ui-scale));
+    min-height: calc(1.75rem * var(--tm-cal-ui-scale));
+    max-height: calc(1.75rem * var(--tm-cal-ui-scale));
+  }
+
   .tm-porra-calendar .tm-cal-flags {
-    min-height: calc(1.125rem * var(--tm-cal-ui-scale));
+    height: calc(1rem * var(--tm-cal-ui-scale));
+    min-height: calc(1rem * var(--tm-cal-ui-scale));
+    max-height: calc(1rem * var(--tm-cal-ui-scale));
   }
 
   .tm-porra-calendar .tm-cal-kickoff {
-    font-size: calc(0.625rem * var(--tm-cal-ui-scale));
+    font-size: calc(0.4375rem * var(--tm-cal-ui-scale));
   }
 
   .tm-cal-ko-link {
