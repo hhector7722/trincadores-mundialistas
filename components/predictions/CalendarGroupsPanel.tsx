@@ -25,7 +25,7 @@ export function CalendarGroupsPanel({
     <div
       style={style}
       className={cn(
-        "tm-cal-groups-panel tm-surface-fade flex h-full min-h-0 min-w-0 flex-col overflow-hidden border border-[var(--tm-border)]",
+        "tm-cal-groups-panel tm-cal-dock-surface tm-surface-fade flex h-full min-h-0 min-w-0 flex-col overflow-hidden border border-[var(--tm-border)] backdrop-blur-xl",
         className
       )}
       aria-label="Clasificación de grupos"

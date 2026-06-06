@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T11:30:57.788Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T11:39:00.242Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -323,9 +323,9 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
-| `lib/pool/calendar-layout.ts` | 222 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
+| `lib/pool/calendar-layout.ts` | 272 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/group-standings.ts` | 137 líneas | buildGroupStandings, isCalendarGroupsPanelDay, CALENDAR_GROUPS_PANEL_DAYS, GroupStandingRow |
+| `lib/pool/group-standings.ts` | 144 líneas | buildGroupStandings, isCalendarGroupsPanelDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupStandingRow |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
@@ -719,9 +719,9 @@ docs/               → AUTH, RLS, SEED
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 342 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
 | `lib/quiz/queries.ts` | 338 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 332 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |

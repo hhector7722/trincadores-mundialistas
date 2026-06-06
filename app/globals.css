@@ -731,9 +731,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-prediction {
-  max-width: calc(80% - 1.125rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   white-space: nowrap;
   color: var(--tm-accent);
   font-size: 0.4375rem;
@@ -771,10 +769,6 @@ html[data-modal-open] main {
     font-size: 0.5625rem;
   }
 
-  .tm-porra-calendar .tm-cal-prediction {
-    font-size: 0.5rem;
-  }
-
   .tm-porra-calendar .tm-cal-match-group {
     font-size: 0.4375rem;
   }
@@ -784,15 +778,18 @@ html[data-modal-open] main {
   }
 }
 
+.tm-porra-calendar .tm-cal-dock-surface {
+  background: var(--tm-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
 .tm-porra-calendar .tm-cal-groups-panel {
   padding: var(--tm-cal-groups-pad, 2px);
-  background: var(--tm-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
 }
 
 .tm-porra-calendar .tm-cal-groups-title {
-  font-size: var(--tm-cal-groups-title-fs, 0.4375rem);
+  font-size: var(--tm-cal-groups-title-fs, 0.3125rem);
   line-height: 1;
   margin-bottom: 0;
   flex-shrink: 0;

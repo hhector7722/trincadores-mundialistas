@@ -5,6 +5,9 @@ import {
 
 export const CALENDAR_GROUPS_PANEL_DAYS = [8, 9] as const;
 
+/** Celda columna X en la fila del panel GRUPOS: sin número de día, fondo dock. */
+export const CALENDAR_GROUPS_COMPANION_DAY = 10 as const;
+
 export type GroupStandingRow = {
   code: string;
   teams: string[];
@@ -133,4 +136,8 @@ export function isCalendarGroupsPanelDay(dayNumber: number | null): boolean {
     dayNumber != null &&
     (CALENDAR_GROUPS_PANEL_DAYS as readonly number[]).includes(dayNumber)
   );
+}
+
+export function isCalendarGroupsCompanionDay(dayNumber: number | null): boolean {
+  return dayNumber === CALENDAR_GROUPS_COMPANION_DAY;
 }

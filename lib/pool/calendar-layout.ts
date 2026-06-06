@@ -10,6 +10,8 @@ const GROUPS_FLAG_GAP_PX = 2;
 const GROUPS_LETTER_WIDTH_RATIO = 0.11;
 const GROUPS_SIZE_FIT = 0.98;
 const MIN_GROUPS_FLAG_PX = 6;
+const MIN_PREDICTION_FS_PX = 4;
+const MAX_PREDICTION_FS_RATIO = 0.62;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
   cells: T[]
@@ -36,7 +38,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-row"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-row, .tm-cal-prediction"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -138,7 +140,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   let letterW = 6;
 
   for (let attempt = 0; attempt < 12; attempt++) {
-    titleFs = Math.max(6, Math.floor(innerH * 0.07 * fit));
+    titleFs = Math.max(5, Math.floor(innerH * 0.055 * fit));
     const titleBlock = titleFs * 1.15 + 1;
     const listH = Math.max(0, innerH - titleBlock);
     const rowH = listH / rowCount;
@@ -165,6 +167,51 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     const list = panel.querySelector<HTMLElement>(".tm-cal-groups-list");
     if (!list || !elementOverflows(list)) break;
     fit *= 0.9;
+  }
+}
+
+function resetPredictionLabelMetrics(root: ParentNode): void {
+  for (const label of root.querySelectorAll<HTMLElement>(".tm-cal-prediction")) {
+    label.style.removeProperty("font-size");
+    label.style.removeProperty("max-width");
+  }
+}
+
+/** Escala cada pronóstico al máximo tamaño que cabe entre las banderas sin truncar. */
+function fitPredictionLabel(label: HTMLElement): void {
+  const flags = label.closest<HTMLElement>(".tm-cal-flags");
+  if (!flags) return;
+
+  const flagsW = flags.clientWidth;
+  const flagsH = flags.clientHeight;
+  if (flagsW <= 0 || flagsH <= 0) return;
+
+  const flagBadge = flags.querySelector<HTMLElement>(".tm-cal-flag");
+  const flagSize = flagBadge?.offsetWidth ?? Math.min(flagsH, flagsW * 0.18);
+
+  const leftBound = flagsW * 0.1 + flagSize * 0.55;
+  const rightBound = flagsW * 0.9 - flagSize * 0.55;
+  const availW = Math.max(0, Math.floor(rightBound - leftBound - 2));
+
+  label.style.maxWidth = `${availW}px`;
+  label.style.overflow = "visible";
+  label.style.textOverflow = "clip";
+
+  let fs = Math.max(MIN_PREDICTION_FS_PX, Math.floor(flagsH * MAX_PREDICTION_FS_RATIO));
+
+  while (fs >= MIN_PREDICTION_FS_PX) {
+    label.style.fontSize = `${fs}px`;
+    void label.offsetWidth;
+    if (label.scrollWidth <= availW + OVERFLOW_TOLERANCE_PX) break;
+    fs -= 1;
+  }
+
+  label.style.fontSize = `${Math.max(MIN_PREDICTION_FS_PX, fs)}px`;
+}
+
+function syncPredictionLabelMetrics(grid: HTMLElement): void {
+  for (const label of grid.querySelectorAll<HTMLElement>(".tm-cal-prediction")) {
+    fitPredictionLabel(label);
   }
 }
 
@@ -195,6 +242,7 @@ export function fitCalendarLayout(
 
   let matchCardHeight = syncMatchCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
+  syncPredictionLabelMetrics(grid);
 
   for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
@@ -202,6 +250,7 @@ export function fitCalendarLayout(
     void calendar.offsetHeight;
     matchCardHeight = syncMatchCardMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
+    syncPredictionLabelMetrics(grid);
   }
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
@@ -218,4 +267,5 @@ export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-groups-letter-w");
   calendar.style.removeProperty("--tm-cal-groups-flag");
   calendar.style.removeProperty("--tm-cal-groups-flag-gap");
+  resetPredictionLabelMetrics(calendar);
 }

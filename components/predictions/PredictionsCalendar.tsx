@@ -13,6 +13,7 @@ import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
   CALENDAR_GROUPS_PANEL_DAYS,
+  isCalendarGroupsCompanionDay,
   isCalendarGroupsPanelDay,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
@@ -73,7 +74,7 @@ function CalendarMatchCard({
       )}
     >
       {match.group_code ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-bold uppercase leading-none text-[var(--tm-accent)]">
+        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-medium uppercase leading-none text-[var(--tm-accent)]">
           {match.group_code.toUpperCase()}
         </span>
       ) : null}
@@ -140,6 +141,8 @@ function renderCalendarGridCells(
             todayKey={todayKey}
             onOpenMatch={onOpenMatch}
             style={{ gridColumn: cellIndex + 1, gridRow: row }}
+            hideDayNumber={isCalendarGroupsCompanionDay(cell.dayNumber)}
+            dockSurface={isCalendarGroupsCompanionDay(cell.dayNumber)}
           />
         );
       });
@@ -163,11 +166,15 @@ function DayCell({
   todayKey,
   onOpenMatch,
   style,
+  hideDayNumber = false,
+  dockSurface = false,
 }: {
   cell: CalendarCell<MatchWithPrediction>;
   todayKey: string;
   onOpenMatch: (match: MatchWithPrediction) => void;
   style?: CSSProperties;
+  hideDayNumber?: boolean;
+  dockSurface?: boolean;
 }) {
   if (!cell.inMonth) {
     return (
@@ -186,18 +193,21 @@ function DayCell({
     <div
       style={style}
       className={cn(
-        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)] bg-[var(--tm-glass)]",
-        hasMatches && "tm-cal-cell--matches"
+        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)]",
+        dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "bg-[var(--tm-glass)]",
+        hasMatches && !dockSurface && "tm-cal-cell--matches"
       )}
     >
-      <span
-        className={cn(
-          "tm-cal-day-num shrink-0 font-semibold tabular-nums",
-          isToday ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
-        )}
-      >
-        {cell.dayNumber}
-      </span>
+      {!hideDayNumber ? (
+        <span
+          className={cn(
+            "tm-cal-day-num shrink-0 font-semibold tabular-nums",
+            isToday ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
+          )}
+        >
+          {cell.dayNumber}
+        </span>
+      ) : null}
       <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col justify-start">
         {cell.matches.map((match) => (
           <CalendarMatchCard key={match.id} match={match} onOpen={() => onOpenMatch(match)} />
