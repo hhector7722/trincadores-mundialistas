@@ -30,7 +30,7 @@ function buildSlides(pendingCount: number): Slide[] {
       eyebrow: "Resultados pendientes",
       headline: (
         <p
-          className="mt-0.5 max-w-full font-display text-[clamp(2.5rem,14vw,3.25rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)] sm:text-[clamp(3rem,12vw,4rem)]"
+          className="mt-0.5 max-w-full font-display text-[clamp(1.5rem,20cqw,2.75rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)]"
           aria-label={pendingCount > 0 ? `${pendingCount} resultados pendientes` : undefined}
         >
           {pendingDisplay}
@@ -43,7 +43,7 @@ function buildSlides(pendingCount: number): Slide[] {
       id: "ranking",
       eyebrow: "Clasificación",
       headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.75rem,8vw,2.5rem)] font-black leading-[0.95] tracking-tight text-white sm:text-[clamp(2rem,7vw,3rem)]">
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
           ¿Quién manda?
         </p>
       ),
@@ -54,7 +54,7 @@ function buildSlides(pendingCount: number): Slide[] {
       id: "mundial",
       eyebrow: "Mundial 2026",
       headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.75rem,8vw,2.5rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00] sm:text-[clamp(2rem,7vw,3rem)]">
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
           104 partidos
         </p>
       ),
@@ -101,21 +101,21 @@ export function HomeHeroCarousel({ pendingCount }: HomeHeroCarouselProps) {
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className="w-full min-w-0 shrink-0 snap-start snap-always"
+            className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
             aria-hidden={index !== activeIndex}
           >
-            <div className="flex w-full min-w-0 flex-col items-start text-left">
-              <p className="max-w-full truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-white/60">
+            <div className="flex w-full min-w-0 max-w-full flex-col items-start text-left">
+              <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
                 {slide.eyebrow}
               </p>
               {slide.headline}
-              <p className="mt-1.5 max-w-full text-xs leading-snug text-white/50 sm:text-sm">
+              <p className="mt-1.5 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
                 {slide.description}
               </p>
               {slide.cta && (
                 <Link
                   href={slide.cta.href}
-                  className="mt-2 inline-flex w-fit items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
+                  className="mt-2 inline-flex w-fit max-w-full items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)] text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
                 >
                   {slide.cta.label}
                 </Link>

@@ -25,25 +25,27 @@ function StatCard({
   accentValue?: boolean;
 }) {
   return (
-    <div className="tm-stat-card rounded-2xl p-4">
-      <div className="mb-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
-        <Icon className="h-5 w-5 text-purple-200" strokeWidth={2} />
+    <div className="@container min-w-0 rounded-2xl p-[clamp(0.75rem,4cqw,1rem)] tm-stat-card">
+      <div className="mb-3 flex h-[clamp(2rem,10cqw,2.5rem)] w-[clamp(2rem,10cqw,2.5rem)] shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
+        <Icon className="h-[clamp(1rem,5cqw,1.25rem)] w-[clamp(1rem,5cqw,1.25rem)] text-purple-200" strokeWidth={2} />
       </div>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">
+      <p className="truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/50">
         {label}
       </p>
       <p
         className={cn(
-          "mt-1.5 font-display text-4xl leading-none",
-          accentValue ? "text-[#CCFF00]" : "text-white"
+          "mt-1.5 font-display text-[clamp(1.5rem,14cqw,2.25rem)] leading-none",
+          accentValue ? "text-[#CCFF00]" : "text-white",
         )}
       >
         {value}
         {valueSuffix && value.trim() !== "" && (
-          <span className="ml-0.5 text-xl font-semibold text-[#CCFF00]/80">{valueSuffix}</span>
+          <span className="ml-0.5 text-[clamp(0.875rem,7cqw,1.25rem)] font-semibold text-[#CCFF00]/80">
+            {valueSuffix}
+          </span>
         )}
       </p>
-      <p className="mt-1 text-xs text-white/40">{sublabel}</p>
+      <p className="mt-1 truncate text-[clamp(10px,2.8cqw,12px)] text-white/40">{sublabel}</p>
     </div>
   );
 }
