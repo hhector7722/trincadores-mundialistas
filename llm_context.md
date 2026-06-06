@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T05:04:14.999Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T05:26:42.166Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -391,9 +391,9 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 7 archivos en `supabase/migrations/` |
+| Migraciones | 8 archivos en `supabase/migrations/` |
 | Tablas | 25 |
-| Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status |
+| Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
 | Funciones SQL | 13 |
 | Políticas RLS | 0 |
 | Vistas | quiz_leaderboard, quiz_questions_public |
@@ -458,6 +458,8 @@ erDiagram
 - `pool_member_role`
 - `pool_member_role_new`
 - `quiz_attempt_status`
+- `quiz_kind`
+- `quiz_scoring_mode`
 
 ### Funciones SQL críticas
 
@@ -498,6 +500,7 @@ erDiagram
 - `supabase/migrations/20260605120000_phase_1f_closed_access.sql` (14 líneas)
 - `supabase/migrations/20260605140000_openfootball_catalog.sql` (85 líneas)
 - `supabase/migrations/20260605150000_openfootball_grants.sql` (12 líneas)
+- `supabase/migrations/20260606120000_quiz_mvp_fields.sql` (319 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -686,6 +689,7 @@ docs/               → AUTH, RLS, SEED
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/PredictionsCalendar.tsx` | 327 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
+| `supabase/migrations/20260606120000_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |
 
 ### Código posiblemente sin uso
