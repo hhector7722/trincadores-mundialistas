@@ -856,17 +856,17 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card-inner {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
   min-height: 0;
   min-width: 0;
   height: 100%;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
-  grid-column: 1;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
+  width: 100%;
 }
 
 .tm-porra-calendar .tm-cal-cell-surface {
@@ -895,14 +895,14 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-groups-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  justify-content: space-evenly;
-  align-items: stretch;
-  gap: var(--tm-cal-group-card-gap, 4px);
+  align-content: space-evenly;
+  column-gap: var(--tm-cal-groups-col-gap, 3px);
+  row-gap: var(--tm-cal-group-card-gap, 3px);
 }
 
 .tm-porra-calendar .tm-cal-group-card {
@@ -931,8 +931,8 @@ html[data-modal-open] main {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  gap: var(--tm-cal-groups-flag-gap, 2px);
-  justify-content: space-between;
+  gap: var(--tm-cal-groups-flag-gap, 1px);
+  justify-content: flex-start;
   align-items: center;
   padding-inline: 0;
 }

@@ -6,13 +6,15 @@ const MATCH_CARD_GAP_PX = 4;
 const MIN_MATCH_CARD_HEIGHT_PX = 22;
 const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
-const GROUPS_FLAG_GAP_PX = 2;
-const GROUPS_CARD_GAP_PX = 4;
+const GROUPS_LIST_COLUMNS = 2;
+const GROUPS_COL_GAP_PX = 3;
+const GROUPS_FLAG_GAP_PX = 1;
+const GROUPS_CARD_GAP_PX = 3;
 const GROUPS_CARD_PAD_Y = 1;
-const GROUPS_LETTER_WIDTH_RATIO = 0.11;
-const GROUPS_SIZE_FIT = 0.97;
-const GROUPS_FLAG_SCALE = 0.94;
-const GROUPS_CARD_HEIGHT_RATIO = 0.9;
+const GROUPS_LETTER_WIDTH_RATIO = 0.1;
+const GROUPS_SIZE_FIT = 0.98;
+const GROUPS_FLAG_SCALE = 0.96;
+const GROUPS_CARD_HEIGHT_RATIO = 0.88;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
@@ -128,17 +130,25 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     calendar.style.removeProperty("--tm-cal-groups-letter-w");
     calendar.style.removeProperty("--tm-cal-groups-flag");
     calendar.style.removeProperty("--tm-cal-groups-flag-gap");
+    calendar.style.removeProperty("--tm-cal-groups-col-gap");
     calendar.style.removeProperty("--tm-cal-group-card-gap");
     calendar.style.removeProperty("--tm-cal-group-card-py");
     return;
   }
 
-  const rowCount = panel.querySelectorAll(".tm-cal-group-card").length;
-  if (rowCount <= 0) return;
+  const groupCount = panel.querySelectorAll(".tm-cal-group-card").length;
+  if (groupCount <= 0) return;
+
+  const rowCount = Math.ceil(groupCount / GROUPS_LIST_COLUMNS);
 
   const innerW = Math.max(0, panel.clientWidth - GROUPS_EDGE_INSET_PX * 2);
   const innerH = Math.max(0, panel.clientHeight - GROUPS_EDGE_INSET_PX * 2);
   if (innerW < 24 || innerH < 24) return;
+
+  const cardW = Math.max(
+    0,
+    (innerW - GROUPS_COL_GAP_PX * (GROUPS_LIST_COLUMNS - 1)) / GROUPS_LIST_COLUMNS
+  );
 
   let fit = GROUPS_SIZE_FIT;
   let flagSize = MIN_GROUPS_FLAG_PX;
@@ -152,8 +162,8 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     const cardContentH = cardSlotH * GROUPS_CARD_HEIGHT_RATIO;
     const cardInnerH = Math.max(0, cardContentH - GROUPS_CARD_PAD_Y * 2);
 
-    letterW = Math.max(5, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
-    const flagsTrackW = Math.max(0, innerW - letterW - 6);
+    letterW = Math.max(4, Math.floor(cardW * GROUPS_LETTER_WIDTH_RATIO));
+    const flagsTrackW = Math.max(0, cardW - letterW - 4);
     const flagByHeight = cardInnerH * GROUPS_FLAG_SCALE;
     const flagByWidth =
       ((flagsTrackW - GROUPS_FLAG_GAP_PX * (GROUPS_FLAGS_PER_ROW - 1)) / GROUPS_FLAGS_PER_ROW) *
@@ -169,12 +179,15 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     calendar.style.setProperty("--tm-cal-groups-letter-w", `${letterW}px`);
     calendar.style.setProperty("--tm-cal-groups-flag", `${flagSize}px`);
     calendar.style.setProperty("--tm-cal-groups-flag-gap", `${GROUPS_FLAG_GAP_PX}px`);
+    calendar.style.setProperty("--tm-cal-groups-col-gap", `${GROUPS_COL_GAP_PX}px`);
     calendar.style.setProperty("--tm-cal-group-card-gap", `${GROUPS_CARD_GAP_PX}px`);
     calendar.style.setProperty("--tm-cal-group-card-py", `${GROUPS_CARD_PAD_Y}px`);
     void panel.offsetHeight;
 
     const list = panel.querySelector<HTMLElement>(".tm-cal-groups-list");
-    if (!list || !elementOverflows(list)) break;
+    const cards = panel.querySelectorAll<HTMLElement>(".tm-cal-group-card");
+    const cardsOverflow = Array.from(cards).some((card) => elementOverflows(card));
+    if (!list || (!elementOverflows(list) && !cardsOverflow)) break;
     fit *= 0.9;
   }
 }
@@ -275,6 +288,7 @@ export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-groups-letter-w");
   calendar.style.removeProperty("--tm-cal-groups-flag");
   calendar.style.removeProperty("--tm-cal-groups-flag-gap");
+  calendar.style.removeProperty("--tm-cal-groups-col-gap");
   calendar.style.removeProperty("--tm-cal-group-card-gap");
   calendar.style.removeProperty("--tm-cal-group-card-py");
   resetPredictionLabelMetrics(calendar);

@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T16:18:31.865Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T16:28:42.394Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,7 +16,7 @@
 | **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain) · Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno) · Slide home quiz en hero carousel
+**Completado reciente:** TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain) · Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno) · Slide home quiz en hero carousel · Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado · Quiz training rejugable (migracion RPC/índice) · Bonus deprecado en UI/seed
 
 **Siguiente:** Probar flujo E2E con login real (official + bonus)
 
@@ -326,7 +326,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
-| `lib/pool/calendar-layout.ts` | 282 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
+| `lib/pool/calendar-layout.ts` | 296 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
 | `lib/pool/group-standings.ts` | 228 líneas | buildGroupStandingsDetail, buildGroupStandings, findGroupStandingDetail, isCalendarGroupsPanelDay, isCalendarSidebarDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_SIDEBAR_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupTeamStanding, GroupStandingRow, GroupStandingDetail |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
@@ -343,19 +343,27 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
-**quiz/** — 10 archivos
+**quiz/** — 18 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/quiz/date.ts` | 12 líneas | todayQuizDate |
-| `lib/quiz/home-teaser.ts` | 76 líneas | homeQuizSlideFromHub, HomeQuizSlide |
+| `lib/quiz/distractors.ts` | 93 líneas | buildDistractorLabels, buildMcqOptions, McqOption |
+| `lib/quiz/facts.ts` | 130 líneas | validateQuizFact, parseFactsFile, loadFacts, DEFAULT_FACTS_PATH, QuizFactCategory, QuizFactType, QuizFactDifficulty, QuizFact |
+| `lib/quiz/generate-day.ts` | 152 líneas | loadRecentFactIds, selectFactsForDay, generateQuizDay, listGeneratedDates |
+| `lib/quiz/generate-question.ts` | 58 líneas | generateQuestionFromFact, GeneratedQuizQuestion |
+| `lib/quiz/generated-day.ts` | 67 líneas | toSeedQuestion, generatedDayToSeedFile, parseGeneratedOrSeedDay, questionsMetaFromDay, GeneratedQuizDayFile |
+| `lib/quiz/home-teaser.ts` | 87 líneas | homeQuizSlideFromHub, HomeQuizSlide |
 | `lib/quiz/mode.ts` | 42 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
 | `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
 | `lib/quiz/parse-session.ts` | 97 líneas | parseQuizStartSession |
-| `lib/quiz/queries.ts` | 338 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
-| `lib/quiz/seed-day.ts` | 168 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
-| `lib/quiz/slot-status.ts` | 51 líneas | getQuizSlotStatus, canOpenQuizPlay, formatQuizSlotStatusLabel, QuizSlotStatus |
+| `lib/quiz/quality.ts` | 69 líneas | validateGeneratedQuestion, assertGeneratedQuestions, QualityResult |
+| `lib/quiz/queries.ts` | 339 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
+| `lib/quiz/question-templates.ts` | 57 líneas | renderQuestionFromFact, QuestionTemplateResult |
+| `lib/quiz/rng.ts` | 33 líneas | mulberry32, hashString, seedFromQuizDate, shuffleWithRng |
+| `lib/quiz/seed-day.ts` | 154 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
+| `lib/quiz/slot-status.ts` | 61 líneas | getQuizSlotStatus, canOpenQuizPlay, canReplayQuiz, formatQuizSlotStatusLabel, QuizSlotStatus |
 | `lib/quiz/types.ts` | 94 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
 
 **ranking/** — 3 archivos
@@ -424,7 +432,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 8 archivos en `supabase/migrations/` |
+| Migraciones | 9 archivos en `supabase/migrations/` |
 | Tablas | 25 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
 | Funciones SQL | 13 |
@@ -534,6 +542,7 @@ erDiagram
 - `supabase/migrations/20260605140000_openfootball_catalog.sql` (85 líneas)
 - `supabase/migrations/20260605150000_openfootball_grants.sql` (12 líneas)
 - `supabase/migrations/20260606053311_quiz_mvp_fields.sql` (319 líneas)
+- `supabase/migrations/20260607120000_quiz_training_replay.sql` (128 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -604,7 +613,7 @@ sequenceDiagram
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
-| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
+| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/generate-quiz-day.ts, scripts/seed-quiz-day.ts |
 | `QUIZ_DAY_FILE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, scripts/bootstrap-participants.ts |
 | `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
@@ -724,8 +733,8 @@ docs/               → AUTH, RLS, SEED
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `components/predictions/PredictionsCalendar.tsx` | 363 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
+| `lib/quiz/queries.ts` | 339 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
-| `lib/quiz/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 | `components/ui/modal.tsx` | 304 | Revisar extracción |
@@ -783,6 +792,9 @@ docs/               → AUTH, RLS, SEED
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 - [x] Slide home quiz en hero carousel
+- [x] Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado
+- [x] Quiz training rejugable (migracion RPC/índice)
+- [x] Bonus deprecado en UI/seed
 
 ### En desarrollo / pendiente
 
