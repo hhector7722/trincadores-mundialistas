@@ -1,5 +1,6 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -30,11 +31,7 @@ export const viewport: Viewport = {
   themeColor: "#2A1058",
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
-  : process.env.VERCEL_URL
-    ? new URL(`https://${process.env.VERCEL_URL}`)
-    : new URL("http://localhost:3000");
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -53,20 +50,12 @@ export const metadata: Metadata = {
     siteName: "Trincadores Mundialistas",
     title: "Trincadores Mundialistas",
     description: "Porra privada Mundial 2026",
-    images: [
-      {
-        url: "/icons/logo.png",
-        width: 708,
-        height: 708,
-        alt: "Trincadores Mundialistas",
-      },
-    ],
+    url: siteUrl.origin,
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Trincadores Mundialistas",
     description: "Porra privada Mundial 2026",
-    images: ["/icons/logo.png"],
   },
   icons: {
     icon: [

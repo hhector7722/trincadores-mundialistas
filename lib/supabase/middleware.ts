@@ -3,14 +3,22 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_PATHS = ["/login"];
 
-const PUBLIC_PATHS = ["/manifest.webmanifest", "/icon", "/apple-icon"];
+const PUBLIC_PATHS = [
+  "/manifest.webmanifest",
+  "/icon",
+  "/apple-icon",
+  "/opengraph-image",
+  "/twitter-image",
+];
 
 function isAuthPath(pathname: string): boolean {
   return AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
 function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  return PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}?`) || pathname.startsWith(`${p}/`),
+  );
 }
 
 export async function updateSession(request: NextRequest) {

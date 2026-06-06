@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T00:38:41.024Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T00:41:41.184Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -342,13 +342,19 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/scripts/env-guard.ts` | 44 líneas | getProjectRef, assertProjectRef, assertServiceEnv, assertPurgeConfirmed, assertBootstrapAllowed, assertImportAllowed |
 
+**site-url.ts/** — 1 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/site-url.ts` | 19 líneas | getSiteUrl |
+
 **supabase/** — 4 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/supabase/admin.ts` | 16 líneas | createAdminClient |
 | `lib/supabase/client.ts` | 11 líneas | createClient |
-| `lib/supabase/middleware.ts` | 65 líneas | updateSession |
+| `lib/supabase/middleware.ts` | 73 líneas | updateSession |
 | `lib/supabase/server.ts` | 30 líneas | createClient |
 
 **teams/** — 2 archivos
@@ -551,14 +557,15 @@ sequenceDiagram
 | `CONFIRM_REIMPORT` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | — |
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
-| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | app/layout.tsx |
+| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/server.ts |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, lib/supabase/client.ts |
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, scripts/bootstrap-participants.ts |
-| `VERCEL_URL` | Ver código | Opcional | `` | app/layout.tsx |
+| `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
+| `VERCEL_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 
 
 ## APIs e integraciones externas
