@@ -16,10 +16,7 @@ export function RankingRow({
   return (
     <Link
       href={`/profile/${row.profileId}`}
-      className={cn(
-        "flex min-h-0 flex-1 items-center gap-2 border-b border-[var(--tm-border)] px-3 last:border-0",
-        isCurrentUser && "bg-[var(--tm-highlight)]"
-      )}
+      className="flex min-h-0 flex-1 items-center gap-2 border-b border-[var(--tm-border)] px-3 last:border-0"
     >
       <PositionTrendIndicator trend={row.positionTrend} />
       <span className="font-display w-7 shrink-0 text-center text-sm text-[var(--tm-fg)]">
@@ -34,12 +31,7 @@ export function RankingRow({
       >
         {row.label}
       </span>
-      <span
-        className={cn(
-          "font-display w-10 shrink-0 text-right text-sm",
-          isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
-        )}
-      >
+      <span className="font-display w-10 shrink-0 text-right text-sm text-[var(--tm-fg)]">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
       <span className="w-12 shrink-0 text-right text-xs text-[var(--tm-muted)]">

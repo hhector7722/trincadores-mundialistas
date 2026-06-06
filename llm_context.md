@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T03:22:45.027Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T03:27:49.610Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -204,7 +204,7 @@ flowchart TB
 | `button` | `components/ui/button.tsx` | server | Button |
 | `card` | `components/ui/card.tsx` | server | Card |
 | `input` | `components/ui/input.tsx` | server | Input |
-| `modal` | `components/ui/modal.tsx` | client | Modal |
+| `modal` | `components/ui/modal.tsx` | client | Modal, ModalPanelSlide |
 
 
 ### Gestión de estado
@@ -681,6 +681,7 @@ docs/               → AUTH, RLS, SEED
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
 | `lib/predictions/queries.ts` | 328 | Revisar extracción |
+| `components/ui/modal.tsx` | 302 | Revisar extracción |
 
 ### Código posiblemente sin uso
 
