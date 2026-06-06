@@ -15,11 +15,13 @@ export function AppHeader({
       <div className="relative flex items-center justify-center">
         <h1
           className={cn(
-            "font-display text-center tracking-wider",
-            stackedTitle ? "text-xl sm:text-2xl" : "text-base",
+            "font-display tracking-wider",
+            stackedTitle
+              ? "relative left-1/2 w-screen -translate-x-1/2 text-xl sm:text-2xl"
+              : "text-center text-base",
           )}
         >
-          <AppBrandTitle stacked={stackedTitle} />
+          <AppBrandTitle homeHeader={stackedTitle} />
         </h1>
         <div className="absolute right-0 top-1/2 -translate-y-1/2">
           <PoolSwitcher pools={ctx.pools} activePoolId={ctx.activePoolId} />
