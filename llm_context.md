@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T11:39:00.242Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T11:59:28.118Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -174,6 +174,7 @@ flowchart TB
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `CalendarGroupsPanel` | `components/predictions/CalendarGroupsPanel.tsx` | server | CalendarGroupsPanel |
+| `GroupStandingsModal` | `components/predictions/GroupStandingsModal.tsx` | client | GroupStandingsModal |
 | `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
@@ -325,7 +326,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
 | `lib/pool/calendar-layout.ts` | 272 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/group-standings.ts` | 144 líneas | buildGroupStandings, isCalendarGroupsPanelDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupStandingRow |
+| `lib/pool/group-standings.ts` | 218 líneas | buildGroupStandingsDetail, buildGroupStandings, findGroupStandingDetail, isCalendarGroupsPanelDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupTeamStanding, GroupStandingRow, GroupStandingDetail |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
@@ -718,8 +719,8 @@ docs/               → AUTH, RLS, SEED
 | Archivo | Líneas | Nota |
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 367 | Revisar extracción |
 | `lib/ranking/queries.ts` | 355 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 342 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
 | `lib/quiz/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |

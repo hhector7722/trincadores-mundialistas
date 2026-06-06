@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { CalendarGroupsPanel } from "@/components/predictions/CalendarGroupsPanel";
+import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
@@ -12,7 +13,9 @@ import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layo
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
+  buildGroupStandingsDetail,
   CALENDAR_GROUPS_PANEL_DAYS,
+  findGroupStandingDetail,
   isCalendarGroupsCompanionDay,
   isCalendarGroupsPanelDay,
   type GroupStandingRow,
@@ -74,7 +77,7 @@ function CalendarMatchCard({
       )}
     >
       {match.group_code ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-medium uppercase leading-none text-[var(--tm-accent)]">
+        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-normal uppercase leading-none text-[var(--tm-accent)]">
           {match.group_code.toUpperCase()}
         </span>
       ) : null}
@@ -109,7 +112,8 @@ function renderCalendarGridCells(
   weeks: CalendarWeek<MatchWithPrediction>[],
   todayKey: string,
   onOpenMatch: (match: MatchWithPrediction) => void,
-  groups: GroupStandingRow[]
+  groups: GroupStandingRow[],
+  onGroupClick: (groupCode: string) => void
 ) {
   return weeks.flatMap((week, weekIndex) => {
     const row = weekIndex + 1;
@@ -128,6 +132,7 @@ function renderCalendarGridCells(
           groups={groups}
           gridColumn={gridColumn}
           gridRow={row}
+          onGroupClick={onGroupClick}
         />,
       ];
 
@@ -180,7 +185,7 @@ function DayCell({
     return (
       <div
         style={style}
-        className="tm-cal-cell-pad h-full border border-[var(--tm-border)] bg-[rgba(0,0,0,0.12)]"
+        className="tm-cal-cell-pad h-full bg-[rgba(0,0,0,0.12)]"
         aria-hidden="true"
       />
     );
@@ -193,7 +198,7 @@ function DayCell({
     <div
       style={style}
       className={cn(
-        "tm-cal-cell relative flex h-full min-h-0 flex-col border border-[var(--tm-border)]",
+        "tm-cal-cell relative flex h-full min-h-0 flex-col",
         dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "bg-[var(--tm-glass)]",
         hasMatches && !dockSurface && "tm-cal-cell--matches"
       )}
@@ -263,6 +268,7 @@ function useCalendarViewportLayout(
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
   const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
+  const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -278,6 +284,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   }, [matchesByDate]);
 
   const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
+  const groupStandingsDetail = useMemo(() => buildGroupStandingsDetail(matches), [matches]);
+  const activeGroup = useMemo(
+    () => (activeGroupCode ? findGroupStandingDetail(groupStandingsDetail, activeGroupCode) : null),
+    [activeGroupCode, groupStandingsDetail]
+  );
 
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
@@ -322,9 +333,23 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         </div>
 
         <div ref={gridRef} className="tm-cal-body min-h-0">
-          {renderCalendarGridCells(weeks, todayKey, setActiveMatch, groupStandings)}
+          {renderCalendarGridCells(
+            weeks,
+            todayKey,
+            setActiveMatch,
+            groupStandings,
+            setActiveGroupCode
+          )}
         </div>
       </section>
+
+      {activeGroup && (
+        <GroupStandingsModal
+          open
+          onClose={() => setActiveGroupCode(null)}
+          group={activeGroup}
+        />
+      )}
 
       {activeMatch && (
         <QuickPredictionModal

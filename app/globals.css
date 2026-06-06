@@ -551,6 +551,8 @@ html[data-modal-open] main {
   --tm-cal-weeks: 1;
   --tm-cal-match-gap: 4px;
   --tm-cal-match-card-h: 1.75rem;
+  --tm-cal-grid-line: rgba(130, 70, 220, 0.14);
+  --tm-cal-grid-line-width: 0.5px;
   height: 100%;
   width: 100%;
   max-width: 100%;
@@ -594,6 +596,13 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-header {
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+  border-bottom-width: var(--tm-cal-grid-line-width);
+  border-bottom-color: var(--tm-cal-grid-line);
+}
+
+.tm-porra-calendar .tm-cal-weekdays {
+  border-bottom-width: var(--tm-cal-grid-line-width);
+  border-bottom-color: var(--tm-cal-grid-line);
 }
 
 .tm-porra-calendar .tm-cal-body {
@@ -605,6 +614,8 @@ html[data-modal-open] main {
   min-width: 0;
   overflow: hidden;
   background: var(--tm-glass);
+  border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
+  border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 
 .tm-porra-calendar .tm-cal-body > * {
@@ -612,6 +623,9 @@ html[data-modal-open] main {
   height: 100%;
   min-width: 0;
   overflow: hidden;
+  border: 0 solid transparent;
+  border-right: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
+  border-bottom: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 
 .tm-porra-calendar .tm-cal-cell,
@@ -809,6 +823,12 @@ html[data-modal-open] main {
   gap: 1px;
   min-height: 0;
   align-items: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: inherit;
 }
 
 .tm-porra-calendar .tm-cal-group-letter {

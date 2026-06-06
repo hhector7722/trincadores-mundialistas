@@ -8,9 +8,26 @@ export const CALENDAR_GROUPS_PANEL_DAYS = [8, 9] as const;
 /** Celda columna X en la fila del panel GRUPOS: sin número de día, fondo dock. */
 export const CALENDAR_GROUPS_COMPANION_DAY = 10 as const;
 
+export type GroupTeamStanding = {
+  team: string;
+  pts: number;
+  pj: number;
+  pg: number;
+  pe: number;
+  pp: number;
+  gf: number;
+  gc: number;
+  dg: number;
+};
+
 export type GroupStandingRow = {
   code: string;
   teams: string[];
+};
+
+export type GroupStandingDetail = {
+  code: string;
+  teams: GroupTeamStanding[];
 };
 
 type GroupMatchLike = {
@@ -23,13 +40,15 @@ type GroupMatchLike = {
 
 type TeamStats = {
   played: number;
+  won: number;
+  drawn: number;
   points: number;
   gf: number;
   ga: number;
 };
 
 function emptyStats(): TeamStats {
-  return { played: 0, points: 0, gf: 0, ga: 0 };
+  return { played: 0, won: 0, drawn: 0, points: 0, gf: 0, ga: 0 };
 }
 
 function applyResult(
@@ -50,10 +69,14 @@ function applyResult(
   awayStats.ga += homeGoals;
 
   if (homeGoals > awayGoals) {
+    homeStats.won += 1;
     homeStats.points += 3;
   } else if (homeGoals < awayGoals) {
+    awayStats.won += 1;
     awayStats.points += 3;
   } else {
+    homeStats.drawn += 1;
+    awayStats.drawn += 1;
     homeStats.points += 1;
     awayStats.points += 1;
   }
@@ -88,10 +111,45 @@ function sortTeamsInGroup(
   });
 }
 
-/** Clasificación por grupo a partir de resultados oficiales; empate inicial = orden del sorteo. */
-export function buildGroupStandings<T extends GroupMatchLike>(
+function toTeamStanding(team: string, stats: TeamStats): GroupTeamStanding {
+  const pp = stats.played - stats.won - stats.drawn;
+  return {
+    team,
+    pts: stats.points,
+    pj: stats.played,
+    pg: stats.won,
+    pe: stats.drawn,
+    pp,
+    gf: stats.gf,
+    gc: stats.ga,
+    dg: stats.gf - stats.ga,
+  };
+}
+
+function collectGroupTeams<T extends GroupMatchLike>(
+  matches: T[],
+  code: string,
+  seedOrder: readonly string[]
+): string[] {
+  const teamsInMatches = new Set<string>();
+
+  for (const match of matches) {
+    if (match.group_code?.toUpperCase() !== code) continue;
+    teamsInMatches.add(match.home_team);
+    teamsInMatches.add(match.away_team);
+  }
+
+  if (teamsInMatches.size === 0) return [...seedOrder];
+
+  return [
+    ...seedOrder.filter((t) => teamsInMatches.has(t)),
+    ...[...teamsInMatches].filter((t) => !seedOrder.includes(t)),
+  ];
+}
+
+function buildGroupStatsMaps<T extends GroupMatchLike>(
   matches: T[]
-): GroupStandingRow[] {
+): Map<string, Map<string, TeamStats>> {
   const statsByGroup = new Map<string, Map<string, TeamStats>>();
 
   for (const code of WC2026_GROUP_CODES) {
@@ -108,27 +166,43 @@ export function buildGroupStandings<T extends GroupMatchLike>(
     applyResult(groupStats, match.home_team, match.away_team, match.officialHome, match.officialAway);
   }
 
+  return statsByGroup;
+}
+
+/** Clasificación detallada por grupo a partir de resultados oficiales. */
+export function buildGroupStandingsDetail<T extends GroupMatchLike>(
+  matches: T[]
+): GroupStandingDetail[] {
+  const statsByGroup = buildGroupStatsMaps(matches);
+
   return WC2026_GROUP_CODES.map((code) => {
     const seedOrder = WC2026_GROUP_SEEDS[code] ?? [];
-    const teamsInMatches = new Set<string>();
-
-    for (const match of matches) {
-      if (match.group_code?.toUpperCase() !== code) continue;
-      teamsInMatches.add(match.home_team);
-      teamsInMatches.add(match.away_team);
-    }
-
-    const teams =
-      teamsInMatches.size > 0
-        ? [...seedOrder.filter((t) => teamsInMatches.has(t)), ...[...teamsInMatches].filter((t) => !seedOrder.includes(t))]
-        : [...seedOrder];
-
+    const teamNames = collectGroupTeams(matches, code, seedOrder);
     const stats = statsByGroup.get(code) ?? new Map();
+    const sortedTeams = sortTeamsInGroup(teamNames, stats, seedOrder);
+
     return {
       code,
-      teams: sortTeamsInGroup(teams, stats, seedOrder),
+      teams: sortedTeams.map((team) => toTeamStanding(team, stats.get(team) ?? emptyStats())),
     };
   });
+}
+
+/** Clasificación por grupo (solo orden de banderas en calendario). */
+export function buildGroupStandings<T extends GroupMatchLike>(
+  matches: T[]
+): GroupStandingRow[] {
+  return buildGroupStandingsDetail(matches).map((group) => ({
+    code: group.code,
+    teams: group.teams.map((row) => row.team),
+  }));
+}
+
+export function findGroupStandingDetail(
+  groups: GroupStandingDetail[],
+  code: string
+): GroupStandingDetail | null {
+  return groups.find((group) => group.code === code.toUpperCase()) ?? null;
 }
 
 export function isCalendarGroupsPanelDay(dayNumber: number | null): boolean {
