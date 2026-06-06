@@ -9,6 +9,10 @@ export default function LoginPage() {
       <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
         <LoginForm />
       </div>
+
+      <p className="text-center text-xs leading-relaxed text-white/50 sm:text-sm">
+        Para vosotros jugadores
+      </p>
     </div>
   );
 }
