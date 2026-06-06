@@ -7,9 +7,12 @@ const MIN_MATCH_CARD_HEIGHT_PX = 22;
 const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
 const GROUPS_FLAG_GAP_PX = 2;
+const GROUPS_CARD_GAP_PX = 1;
+const GROUPS_CARD_PAD_Y = 1;
 const GROUPS_LETTER_WIDTH_RATIO = 0.11;
 const GROUPS_SIZE_FIT = 0.98;
-const MIN_GROUPS_FLAG_PX = 6;
+const GROUPS_FLAG_SCALE = 0.88;
+const MIN_GROUPS_FLAG_PX = 5;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
 
@@ -38,7 +41,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-row, .tm-cal-prediction"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -123,10 +126,12 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     calendar.style.removeProperty("--tm-cal-groups-letter-w");
     calendar.style.removeProperty("--tm-cal-groups-flag");
     calendar.style.removeProperty("--tm-cal-groups-flag-gap");
+    calendar.style.removeProperty("--tm-cal-group-card-gap");
+    calendar.style.removeProperty("--tm-cal-group-card-py");
     return;
   }
 
-  const rowCount = panel.querySelectorAll(".tm-cal-group-row").length;
+  const rowCount = panel.querySelectorAll(".tm-cal-group-card").length;
   if (rowCount <= 0) return;
 
   const innerW = Math.max(0, panel.clientWidth - GROUPS_EDGE_INSET_PX * 2);
@@ -143,18 +148,21 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     titleFs = Math.max(5, Math.floor(innerH * 0.055 * fit));
     const titleBlock = titleFs * 1.15 + 1;
     const listH = Math.max(0, innerH - titleBlock);
-    const rowH = listH / rowCount;
+    const totalCardGap = GROUPS_CARD_GAP_PX * Math.max(0, rowCount - 1);
+    const cardSlotH = (listH - totalCardGap) / rowCount;
+    const cardInnerH = Math.max(0, cardSlotH - GROUPS_CARD_PAD_Y * 2);
 
-    letterW = Math.max(6, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
-    const flagsTrackW = Math.max(0, innerW - letterW - 1);
-    const flagByHeight = rowH * fit;
+    letterW = Math.max(5, Math.floor(innerW * GROUPS_LETTER_WIDTH_RATIO));
+    const flagsTrackW = Math.max(0, innerW - letterW - 6);
+    const flagByHeight = cardInnerH * GROUPS_FLAG_SCALE * fit;
     const flagByWidth =
-      (flagsTrackW - GROUPS_FLAG_GAP_PX * (GROUPS_FLAGS_PER_ROW - 1)) / GROUPS_FLAGS_PER_ROW;
+      ((flagsTrackW - GROUPS_FLAG_GAP_PX * (GROUPS_FLAGS_PER_ROW - 1)) / GROUPS_FLAGS_PER_ROW) *
+      GROUPS_FLAG_SCALE;
     flagSize = Math.max(
       MIN_GROUPS_FLAG_PX,
       Math.floor(Math.min(flagByHeight, flagByWidth) * fit)
     );
-    letterFs = Math.max(5, Math.floor(flagSize * 0.5));
+    letterFs = Math.max(5, Math.floor(flagSize * 0.48));
 
     calendar.style.setProperty("--tm-cal-groups-pad", `${GROUPS_EDGE_INSET_PX}px`);
     calendar.style.setProperty("--tm-cal-groups-title-fs", `${titleFs}px`);
@@ -162,6 +170,8 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     calendar.style.setProperty("--tm-cal-groups-letter-w", `${letterW}px`);
     calendar.style.setProperty("--tm-cal-groups-flag", `${flagSize}px`);
     calendar.style.setProperty("--tm-cal-groups-flag-gap", `${GROUPS_FLAG_GAP_PX}px`);
+    calendar.style.setProperty("--tm-cal-group-card-gap", `${GROUPS_CARD_GAP_PX}px`);
+    calendar.style.setProperty("--tm-cal-group-card-py", `${GROUPS_CARD_PAD_Y}px`);
     void panel.offsetHeight;
 
     const list = panel.querySelector<HTMLElement>(".tm-cal-groups-list");
@@ -267,5 +277,7 @@ export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-groups-letter-w");
   calendar.style.removeProperty("--tm-cal-groups-flag");
   calendar.style.removeProperty("--tm-cal-groups-flag-gap");
+  calendar.style.removeProperty("--tm-cal-group-card-gap");
+  calendar.style.removeProperty("--tm-cal-group-card-py");
   resetPredictionLabelMetrics(calendar);
 }

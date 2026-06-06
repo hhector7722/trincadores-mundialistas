@@ -41,10 +41,10 @@ export function CalendarGroupsPanel({
             key={group.code}
             type="button"
             onClick={() => onGroupClick?.(group.code)}
-            className="tm-cal-group-row flex min-w-0 min-h-0 flex-1 items-center touch-manipulation transition-colors hover:bg-[rgba(255,255,255,0.04)] active:bg-[rgba(255,255,255,0.07)]"
+            className="tm-cal-group-card flex min-h-0 w-full min-w-0 shrink-0 touch-manipulation items-center transition-colors hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
             aria-label={`Ver clasificación del grupo ${group.code}`}
           >
-            <span className="tm-cal-group-letter shrink-0 font-display font-bold text-[var(--tm-fg)]">
+            <span className="tm-cal-group-letter shrink-0 font-display font-medium text-[var(--tm-fg)]">
               {group.code}
             </span>
             <div className="tm-cal-group-flags flex min-w-0 flex-1 items-center">
@@ -53,7 +53,7 @@ export function CalendarGroupsPanel({
                   key={`${group.code}-${team}`}
                   name={team}
                   size="cal"
-                  className="tm-cal-group-flag shrink-0 pointer-events-none"
+                  className="tm-cal-group-flag pointer-events-none shrink-0"
                 />
               ))}
             </div>

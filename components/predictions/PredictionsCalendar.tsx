@@ -15,7 +15,6 @@ import {
   buildGroupStandings,
   buildGroupStandingsDetail,
   CALENDAR_GROUPS_PANEL_DAYS,
-  findGroupStandingDetail,
   isCalendarGroupsCompanionDay,
   isCalendarGroupsPanelDay,
   type GroupStandingRow,
@@ -77,7 +76,7 @@ function CalendarMatchCard({
       )}
     >
       {match.group_code ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-normal uppercase leading-none text-[var(--tm-accent)]">
+        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] font-display font-light uppercase leading-none text-[var(--tm-accent)]">
           {match.group_code.toUpperCase()}
         </span>
       ) : null}
@@ -285,10 +284,6 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
   const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
   const groupStandingsDetail = useMemo(() => buildGroupStandingsDetail(matches), [matches]);
-  const activeGroup = useMemo(
-    () => (activeGroupCode ? findGroupStandingDetail(groupStandingsDetail, activeGroupCode) : null),
-    [activeGroupCode, groupStandingsDetail]
-  );
 
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
@@ -343,11 +338,13 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         </div>
       </section>
 
-      {activeGroup && (
+      {activeGroupCode && (
         <GroupStandingsModal
           open
           onClose={() => setActiveGroupCode(null)}
-          group={activeGroup}
+          groupCode={activeGroupCode}
+          groups={groupStandingsDetail}
+          onGroupChange={setActiveGroupCode}
         />
       )}
 
