@@ -35,6 +35,7 @@ type MatchTeamsDisplayProps = {
   awayTeam: string;
   kickoffAt: string;
   isLive: boolean;
+  groupCode?: string | null;
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
@@ -45,6 +46,7 @@ export function MatchTeamsDisplay({
   awayTeam,
   kickoffAt,
   isLive,
+  groupCode,
   showSectionLabel = false,
   centerKickoff = false,
   centerSlot,
@@ -75,6 +77,11 @@ export function MatchTeamsDisplay({
           <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
             {formatKickoff(kickoffAt)}
           </p>
+          {groupCode && (
+            <p className="text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)] sm:text-[10px]">
+              GRUPO &apos;{groupCode.toUpperCase()}&apos;
+            </p>
+          )}
           {isLive && (
             <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tm-live)]">
               Live

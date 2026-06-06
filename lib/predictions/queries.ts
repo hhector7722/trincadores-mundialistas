@@ -13,6 +13,7 @@ export type MatchWithPrediction = {
   status: MatchStatus;
   matchday_name: string;
   matchday_external_key: string | null;
+  group_code: string | null;
   prediction:
     | Pick<
         Prediction,
@@ -65,7 +66,7 @@ async function fetchPoolMatchesWithPredictions(
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, matchday_id, home_team, away_team, kickoff_at, status, sort_order")
+    .select("id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code")
     .in("matchday_id", filteredDayIds)
     .order("kickoff_at", { ascending: true });
 
@@ -92,6 +93,7 @@ async function fetchPoolMatchesWithPredictions(
       status,
       matchday_name: dayMap.get(m.matchday_id) ?? "",
       matchday_external_key: externalKeyMap.get(m.matchday_id) ?? null,
+      group_code: m.group_code ?? null,
       prediction: pred
         ? {
             id: pred.id,
@@ -174,7 +176,7 @@ export async function getMatchPredictionDetail(
 
   const { data: match } = await supabase
     .from("matches")
-    .select("id, matchday_id, home_team, away_team, kickoff_at, status")
+    .select("id, matchday_id, home_team, away_team, kickoff_at, status, group_code")
     .eq("id", matchId)
     .in("matchday_id", dayIds)
     .maybeSingle();
@@ -205,6 +207,7 @@ export async function getMatchPredictionDetail(
     status: match.status as MatchStatus,
     matchday_name: dayMap.get(match.matchday_id) ?? "",
     matchday_external_key: externalKeyMap.get(match.matchday_id) ?? null,
+    group_code: match.group_code ?? null,
     prediction: prediction
       ? {
           id: prediction.id,

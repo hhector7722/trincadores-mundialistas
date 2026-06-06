@@ -161,6 +161,7 @@ export function QuickPredictionModal({
           awayTeam={match.away_team}
           kickoffAt={match.kickoff_at}
           isLive={isLive}
+          groupCode={match.group_code}
           centerKickoff
         />
 

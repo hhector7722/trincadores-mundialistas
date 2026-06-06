@@ -549,6 +549,8 @@ html[data-modal-open] main {
 .tm-porra-calendar {
   --tm-cal-ui-scale: 1;
   --tm-cal-weeks: 1;
+  --tm-cal-match-gap: 4px;
+  --tm-cal-match-card-h: 1.75rem;
   height: 100%;
   width: 100%;
   max-width: 100%;
@@ -619,7 +621,7 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-match-list {
-  gap: 2px;
+  gap: var(--tm-cal-match-gap, 4px);
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -633,16 +635,26 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-match-card {
   flex: 0 0 auto;
-  gap: 1px;
-  height: 1.75rem;
-  min-height: 1.75rem;
-  max-height: 1.75rem;
+  gap: 2px;
+  height: var(--tm-cal-match-card-h, 1.75rem);
+  min-height: var(--tm-cal-match-card-h, 1.75rem);
+  max-height: var(--tm-cal-match-card-h, 1.75rem);
   min-width: 0;
   overflow: hidden;
-  padding: 2px;
+  padding: 2px 3px;
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(111, 43, 255, 0.16);
+}
+
+.tm-porra-calendar .tm-cal-match-card-body {
+  display: flex;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
 }
 
 .tm-porra-calendar .tm-cal-month-title {
@@ -729,12 +741,6 @@ html[data-modal-open] main {
   .tm-porra-calendar .tm-cal-flag-dim {
     height: 1rem;
     width: 1rem;
-  }
-
-  .tm-porra-calendar .tm-cal-match-card {
-    height: 1.9375rem;
-    min-height: 1.9375rem;
-    max-height: 1.9375rem;
   }
 
   .tm-porra-calendar .tm-cal-flags {
