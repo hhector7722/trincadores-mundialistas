@@ -1,7 +1,6 @@
 const MIN_UI_SCALE = 0.15;
 const MAX_UI_SCALE = 2.75;
 const SCALE_SEARCH_ITERATIONS = 14;
-const LAYOUT_PASSES = 4;
 const OVERFLOW_TOLERANCE_PX = 1;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
@@ -65,7 +64,7 @@ export type CalendarLayoutResult = {
   uiScale: number;
 };
 
-/** Encuentra filas y escala que caben en alto y ancho sin desbordar celdas. */
+/** Filas iguales vía CSS grid 1fr; escala UI para que el contenido quepa sin desbordar. */
 export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
@@ -73,19 +72,10 @@ export function fitCalendarLayout(
 ): CalendarLayoutResult | null {
   if (rowCount <= 0) return null;
 
-  let rowHeight = 0;
-  let uiScale = MIN_UI_SCALE;
+  calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+  void grid.offsetHeight;
 
-  for (let pass = 0; pass < LAYOUT_PASSES; pass++) {
-    const gridHeight = grid.clientHeight;
-    if (gridHeight <= 0) return null;
-
-    rowHeight = Math.floor(gridHeight / rowCount);
-    calendar.style.setProperty("--tm-cal-row-height", `${rowHeight}px`);
-    void calendar.offsetHeight;
-
-    uiScale = searchMaxScale(calendar, grid);
-  }
+  let uiScale = searchMaxScale(calendar, grid);
 
   while (uiScale > MIN_UI_SCALE && gridHasOverflow(grid)) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
@@ -93,10 +83,11 @@ export function fitCalendarLayout(
     void calendar.offsetHeight;
   }
 
+  const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
   return { rowHeight, uiScale };
 }
 
 export function resetCalendarLayout(calendar: HTMLElement): void {
-  calendar.style.removeProperty("--tm-cal-row-height");
+  calendar.style.removeProperty("--tm-cal-weeks");
   calendar.style.removeProperty("--tm-cal-ui-scale");
 }

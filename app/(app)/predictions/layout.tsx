@@ -1,3 +1,3 @@
 export default function PredictionsLayout({ children }: { children: React.ReactNode }) {
-  return <div className="tm-porra-layout">{children}</div>;
+  return <div className="tm-porra-layout flex h-full min-h-0 flex-col">{children}</div>;
 }

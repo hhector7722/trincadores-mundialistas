@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
@@ -176,9 +176,10 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     <div ref={shellRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <section
         ref={calendarRef}
-        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0"
+        style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
+        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0 pt-[env(safe-area-inset-top,0px)]"
       >
-        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-3 py-1.5 sm:py-2">
+        <div className="tm-cal-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3 sm:py-1">
           <div aria-hidden="true" />
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
             {monthLabel}
