@@ -1,32 +1,60 @@
-# Quiz diario — formato de seed
+# Quiz diario — flujo operativo
 
-Publicar un día:
+## 1. Banco de hechos
+
+Los hechos verificables viven en:
+
+`data/quiz/facts/world-cup-facts.json`
+
+Cada hecho incluye `source_url`, `source_label`, `category`, `fact_type` y campos para plantillas deterministas.
+
+## 2. Generar el día (automático)
 
 ```bash
-ALLOW_QUIZ_SEED=1 npm run db:seed-quiz-day
+QUIZ_DATE=2026-06-07 npm run quiz:generate-day
 ```
 
-Por defecto lee `data/quiz/example-day.json`. También puedes usar:
+Escribe `data/quiz/generated/YYYY-MM-DD.json` con 3 preguntas MCQ, metadata de fuentes y selección variada por categoría.
+
+La selección es determinista por fecha y evita repetir `fact_id` de los últimos 14 días generados.
+
+## 3. Sembrar en Supabase
 
 ```bash
 ALLOW_QUIZ_SEED=1 QUIZ_DATE=2026-06-07 npm run db:seed-quiz-day
-# busca data/quiz/2026-06-07.json si existe
-
-ALLOW_QUIZ_SEED=1 QUIZ_DAY_FILE=data/quiz/mi-dia.json npm run db:seed-quiz-day
 ```
+
+Orden de resolución del archivo:
+
+1. `QUIZ_DAY_FILE` (si se define)
+2. `data/quiz/generated/{QUIZ_DATE}.json`
+3. `data/quiz/{QUIZ_DATE}.json`
+4. `data/quiz/example-day.json` (fallback manual)
 
 Reemplazar un día ya publicado:
 
 ```bash
-ALLOW_QUIZ_SEED=1 CONFIRM_RESEED=1 npm run db:seed-quiz-day
+ALLOW_QUIZ_SEED=1 CONFIRM_RESEED=1 QUIZ_DATE=2026-06-07 npm run db:seed-quiz-day
 ```
 
-## Reglas del JSON
+## 4. Modos de juego
 
-- `quiz_date`: `YYYY-MM-DD` (Europe/Madrid, asignado explícitamente)
-- `official.questions`: exactamente **3** preguntas con `sort_order` 1, 2, 3
-- `options`: siempre 4 (`a`, `b`, `c`, `d`)
-- `bonus` (opcional): 1 pregunta, no puntúa
-- `image_url`: ruta pública (`/quiz/fecha-q1.jpg`) o `null`
+- **Training**: no puntúa; el usuario puede **volver a jugar** tras completar.
+- **Competitive**: un intento enviado bloquea nuevo juego; puntúa en ranking.
 
-El script detecta `training` vs `competitive` según el calendario del pool.
+El modo se detecta según el calendario del pool al sembrar.
+
+## 5. Formato seed (manual o generado)
+
+- `quiz_date`: `YYYY-MM-DD`
+- `official.questions`: exactamente **3** preguntas (`sort_order` 1–3)
+- `options`: 4 respuestas (`a`–`d`)
+- Campos opcionales de trazabilidad: `fact_id`, `source_url`, `source_label`, `template_id`
+
+El bloque `bonus` está **deprecado** y se ignora.
+
+## 6. Tests
+
+```bash
+npm run test:quiz
+```

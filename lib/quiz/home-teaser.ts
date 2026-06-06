@@ -1,5 +1,6 @@
 import { getLatestSubmittedAttemptId } from "@/lib/quiz/queries";
 import {
+  canReplayQuiz,
   formatQuizSlotStatusLabel,
   getQuizSlotStatus,
   type QuizSlotStatus,
@@ -19,8 +20,12 @@ export type HomeQuizSlide = {
 
 function ctaForStatus(
   status: QuizSlotStatus,
-  resultHref: string | null
+  resultHref: string | null,
+  replayable: boolean
 ): { label: string; href: string } {
+  if (replayable) {
+    return { label: "Jugar de nuevo", href: "/quiz/play" };
+  }
   if (status === "completed" && resultHref) {
     return { label: "Ver resultado", href: resultHref };
   }
@@ -33,8 +38,13 @@ function ctaForStatus(
   return { label: "Jugar", href: "/quiz/play" };
 }
 
-function headlineForSlide(status: QuizSlotStatus, score: number | null): string {
+function headlineForSlide(
+  status: QuizSlotStatus,
+  score: number | null,
+  replayable: boolean
+): string {
   if (status === "completed") {
+    if (replayable) return "Vuelve a jugar";
     if (score !== null && score > 0) return `${score} pts`;
     return "Completado";
   }
@@ -56,7 +66,8 @@ export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
   const status = getQuizSlotStatus(hub.official);
   const resultId = getLatestSubmittedAttemptId(hub.official);
   const resultHref = resultId ? `/quiz/result?attempt=${resultId}` : null;
-  const cta = ctaForStatus(status, resultHref);
+  const replayable = canReplayQuiz(hub.official);
+  const cta = ctaForStatus(status, resultHref, replayable);
   const score =
     hub.official.attempt?.status === "submitted"
       ? (hub.official.attempt.score ?? null)
@@ -67,7 +78,7 @@ export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
     statusLabel: formatQuizSlotStatusLabel(status),
     scoringMode: hub.official.quiz.scoring_mode,
     competitive: hub.competitive,
-    headline: headlineForSlide(status, score),
+    headline: headlineForSlide(status, score, replayable),
     description: descriptionForSlide(hub.official.quiz.scoring_mode, hub.competitive),
     ctaLabel: cta.label,
     ctaHref: cta.href,

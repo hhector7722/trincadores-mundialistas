@@ -22,9 +22,7 @@ export function QuizResultSummary({ result }: QuizResultSummaryProps) {
             {result.score}/{result.maxPoints}
           </p>
         ) : (
-          <p className="font-display text-2xl text-[var(--tm-fg)]">
-            {result.kind === "bonus" ? "Bonus completado" : "Entrenamiento"}
-          </p>
+          <p className="font-display text-2xl text-[var(--tm-fg)]">Entrenamiento</p>
         )}
         <p className="text-sm text-[var(--tm-muted)]">
           {countsForScore

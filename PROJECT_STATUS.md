@@ -32,3 +32,6 @@
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 - [x] Slide home quiz en hero carousel
+- [x] Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado
+- [x] Quiz training rejugable (migracion RPC/índice)
+- [x] Bonus deprecado en UI/seed

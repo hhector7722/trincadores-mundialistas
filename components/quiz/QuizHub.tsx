@@ -21,15 +21,7 @@ function formatQuizDate(date: string): string {
 
 export function QuizHub({ hub }: QuizHubProps) {
   const officialScoring = hub.official?.quiz.scoring_mode ?? "training";
-  const bonusAuthor =
-    typeof hub.bonus?.quiz.settings_json?.author_display_name === "string"
-      ? hub.bonus.quiz.settings_json.author_display_name
-      : null;
-
   const officialResultId = getLatestSubmittedAttemptId(hub.official);
-  const bonusResultId = getLatestSubmittedAttemptId(hub.bonus);
-
-  const hasAnyQuiz = Boolean(hub.official || hub.bonus);
 
   return (
     <div className="space-y-4">
@@ -40,46 +32,27 @@ export function QuizHub({ hub }: QuizHubProps) {
         </span>
       </div>
 
-      {!hasAnyQuiz ? (
+      {!hub.official ? (
         <Card>
           <p className="text-sm text-[var(--tm-muted)]">
             Todavia no hay quiz publicado para hoy. Vuelve mas tarde.
           </p>
         </Card>
       ) : (
-        <>
-          <QuizSlotCard
-            title="Oficial"
-            subtitle="3 preguntas del dia"
-            slot={hub.official}
-            playHref="/quiz/play"
-            resultHref={
-              officialResultId ? `/quiz/result?attempt=${officialResultId}` : null
-            }
-            pointsLabel={
-              officialScoring === "training"
-                ? "Modo entrenamiento — no suma puntos"
-                : "Hasta 3 puntos si aciertas las 3"
-            }
-          />
-
-          {hub.bonus && (
-            <QuizSlotCard
-              title="Bonus del grupo"
-              subtitle={
-                bonusAuthor
-                  ? `Pregunta de ${bonusAuthor} — no puntua`
-                  : "Pregunta extra — no puntua"
-              }
-              slot={hub.bonus}
-              playHref="/quiz/play?kind=bonus"
-              resultHref={
-                bonusResultId ? `/quiz/result?attempt=${bonusResultId}` : null
-              }
-              pointsLabel="Solo por diversion. No afecta al ranking."
-            />
-          )}
-        </>
+        <QuizSlotCard
+          title="Quiz del dia"
+          subtitle="3 preguntas del Mundial"
+          slot={hub.official}
+          playHref="/quiz/play"
+          resultHref={
+            officialResultId ? `/quiz/result?attempt=${officialResultId}` : null
+          }
+          pointsLabel={
+            officialScoring === "training"
+              ? "Modo entrenamiento — puedes volver a jugar"
+              : "Hasta 3 puntos si aciertas las 3"
+          }
+        />
       )}
 
       <Link

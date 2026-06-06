@@ -40,20 +40,5 @@
         "correct_option_id": "b"
       }
     ]
-  },
-  "bonus": {
-    "author_display_name": "Paco",
-    "question": {
-      "sort_order": 1,
-      "prompt": "¿Cuál fue el resultado de la final del Mundial 2010?",
-      "image_url": null,
-      "options": [
-        { "id": "a", "label": "España 1-0 Holanda" },
-        { "id": "b", "label": "España 2-1 Holanda" },
-        { "id": "c", "label": "Holanda 2-1 España" },
-        { "id": "d", "label": "España 0-0 Holanda (penaltis)" }
-      ],
-      "correct_option_id": "a"
-    }
   }
 }

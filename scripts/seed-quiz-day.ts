@@ -3,7 +3,10 @@ import { resolve } from "node:path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { REAL_POOL_SLUG } from "../lib/auth/participants";
 import {
-  parseSeedQuizDayFile,
+  questionsMetaFromDay,
+  parseGeneratedOrSeedDay,
+} from "../lib/quiz/generated-day";
+import {
   scoringFieldsForMode,
   type SeedQuizDayFile,
   type SeedQuizQuestion,
@@ -59,30 +62,44 @@ async function isPoolCompetitiveAdmin(admin: AdminClient, poolId: string): Promi
   return Date.now() >= new Date(firstMatch.kickoff_at as string).getTime();
 }
 
-function readSeedFile(): SeedQuizDayFile {
+function resolveSeedPath(): string {
   const quizDate = process.env.QUIZ_DATE?.trim();
   const explicitFile = process.env.QUIZ_DAY_FILE?.trim();
-  const defaultByDate = quizDate ? resolve(process.cwd(), `data/quiz/${quizDate}.json`) : null;
-  const fallback = resolve(process.cwd(), "data/quiz/example-day.json");
+  if (explicitFile) return resolve(process.cwd(), explicitFile);
 
-  const path = explicitFile
-    ? resolve(process.cwd(), explicitFile)
-    : defaultByDate && existsSync(defaultByDate)
-      ? defaultByDate
-      : fallback;
-
-  if (!existsSync(path)) {
-    throw new Error(`Archivo de quiz no encontrado: ${path}`);
+  if (quizDate) {
+    const generated = resolve(process.cwd(), `data/quiz/generated/${quizDate}.json`);
+    if (existsSync(generated)) return generated;
+    const manual = resolve(process.cwd(), `data/quiz/${quizDate}.json`);
+    if (existsSync(manual)) return manual;
   }
 
-  const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
-  const parsed = parseSeedQuizDayFile(raw);
+  const fallback = resolve(process.cwd(), "data/quiz/example-day.json");
+  if (!existsSync(fallback)) {
+    throw new Error(
+      "No hay archivo de quiz. Genera uno con: QUIZ_DATE=YYYY-MM-DD npm run quiz:generate-day"
+    );
+  }
+  return fallback;
+}
+
+function readSeedFile(): { path: string; payload: SeedQuizDayFile; generated: boolean } {
+  const quizDate = process.env.QUIZ_DATE?.trim();
+  const path = resolveSeedPath();
+
+  const raw = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
+  if (raw.bonus) {
+    console.warn("[seed-quiz-day] bonus deprecado — se ignora en el seed.");
+  }
+
+  const parsed = parseGeneratedOrSeedDay(raw);
+  const generated = raw.generated === true;
 
   if (quizDate && parsed.quiz_date !== quizDate) {
     throw new Error(`QUIZ_DATE=${quizDate} no coincide con quiz_date del JSON (${parsed.quiz_date}).`);
   }
 
-  return parsed;
+  return { path, payload: parsed, generated };
 }
 
 async function findQuiz(
@@ -221,7 +238,8 @@ async function main() {
   assertServiceEnv();
   assertQuizSeedAllowed();
 
-  const payload = readSeedFile();
+  const { path: seedPath, payload, generated } = readSeedFile();
+  console.log(`Archivo: ${seedPath}`);
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -248,24 +266,12 @@ async function main() {
     kind: "official",
     scoringMode,
     title: payload.title ?? QUIZ_OFFICIAL_TITLE,
-    settingsJson: {},
+    settingsJson: {
+      generated,
+      questions_meta: questionsMetaFromDay(payload),
+    },
     questions: payload.official.questions,
   });
-
-  if (payload.bonus) {
-    await upsertQuizBundle({
-      admin,
-      poolId,
-      quizDate: payload.quiz_date,
-      kind: "bonus",
-      scoringMode: "training",
-      title: `${payload.title ?? QUIZ_OFFICIAL_TITLE} — Bonus del grupo`,
-      settingsJson: {
-        author_display_name: payload.bonus.author_display_name ?? null,
-      },
-      questions: [payload.bonus.question],
-    });
-  }
 
   console.log("Seed de quiz completado.");
 }

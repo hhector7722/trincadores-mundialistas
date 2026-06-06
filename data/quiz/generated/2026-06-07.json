@@ -1,0 +1,126 @@
+{
+  "quiz_date": "2026-06-07",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿En qué año se celebró el primer Mundial de la historia?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Roger Milla"
+          },
+          {
+            "id": "b",
+            "label": "Mundial 2006"
+          },
+          {
+            "id": "c",
+            "label": "11 segundos (Hakan Şükür, 2002)"
+          },
+          {
+            "id": "d",
+            "label": "1930"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "first-wc-year",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/1930uruguay",
+        "source_label": "FIFA — primer Mundial",
+        "template_id": "curiosity",
+        "category": "history"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Cuántas veces ha ganado el Mundial Brasil?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "3 títulos"
+          },
+          {
+            "id": "b",
+            "label": "4 títulos"
+          },
+          {
+            "id": "c",
+            "label": "2 títulos"
+          },
+          {
+            "id": "d",
+            "label": "5 títulos"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "brazil-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/brazil-five-time-winners",
+        "source_label": "FIFA — Brasil campeón",
+        "template_id": "titles_count",
+        "category": "teams"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿Cuántas veces ha ganado el Mundial Argentina?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "4 títulos"
+          },
+          {
+            "id": "b",
+            "label": "2 títulos"
+          },
+          {
+            "id": "c",
+            "label": "5 títulos"
+          },
+          {
+            "id": "d",
+            "label": "3 títulos"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "argentina-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/argentina-world-cup-history",
+        "source_label": "FIFA — Argentina",
+        "template_id": "titles_count",
+        "category": "teams"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-06T16:26:44.031Z",
+    "fact_ids": [
+      "first-wc-year",
+      "brazil-titles",
+      "argentina-titles"
+    ],
+    "templates": [
+      "curiosity",
+      "titles_count",
+      "titles_count"
+    ],
+    "sources": [
+      {
+        "fact_id": "first-wc-year",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/1930uruguay",
+        "source_label": "FIFA — primer Mundial"
+      },
+      {
+        "fact_id": "brazil-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/brazil-five-time-winners",
+        "source_label": "FIFA — Brasil campeón"
+      },
+      {
+        "fact_id": "argentina-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/argentina-world-cup-history",
+        "source_label": "FIFA — Argentina"
+      }
+    ]
+  }
+}

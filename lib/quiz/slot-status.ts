@@ -1,4 +1,4 @@
-import type { QuizDaySlot } from "@/lib/quiz/types";
+import type { QuizDaySlot, QuizScoringMode } from "@/lib/quiz/types";
 
 export type QuizSlotStatus =
   | "unavailable"
@@ -28,10 +28,20 @@ export function getQuizSlotStatus(slot: QuizDaySlot | null): QuizSlotStatus {
   return "ready";
 }
 
-export function canOpenQuizPlay(slot: QuizDaySlot | null): boolean {
+export function canOpenQuizPlay(
+  slot: QuizDaySlot | null,
+  scoringMode?: QuizScoringMode
+): boolean {
   if (!slot) return false;
+  const mode = scoringMode ?? slot.quiz.scoring_mode;
   const status = getQuizSlotStatus(slot);
+  if (status === "completed" && mode === "training") return true;
   return status === "ready" || status === "in_progress" || status === "expired";
+}
+
+export function canReplayQuiz(slot: QuizDaySlot | null): boolean {
+  if (!slot) return false;
+  return slot.quiz.scoring_mode === "training" && getQuizSlotStatus(slot) === "completed";
 }
 
 export function formatQuizSlotStatusLabel(status: QuizSlotStatus): string {

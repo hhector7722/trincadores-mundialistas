@@ -13,6 +13,11 @@ export type SeedQuizQuestion = {
   image_url?: string | null;
   options: SeedQuizOption[];
   correct_option_id: string;
+  fact_id?: string;
+  source_url?: string;
+  source_label?: string;
+  template_id?: string;
+  category?: string;
 };
 
 export type SeedBonusBlock = {
@@ -55,26 +60,7 @@ export function parseSeedQuizDayFile(raw: unknown): SeedQuizDayFile {
 
   const parsedOfficial = questions.map((q, index) => validateQuestion(q, `official.questions[${index}]`));
 
-  let bonus: SeedBonusBlock | null = null;
-  if (row.bonus !== undefined && row.bonus !== null) {
-    if (typeof row.bonus !== "object") {
-      throw new Error("bonus invalido.");
-    }
-    const bonusRow = row.bonus as Record<string, unknown>;
-    if (!bonusRow.question) {
-      throw new Error("bonus.question es obligatorio si hay bonus.");
-    }
-    bonus = {
-      author_display_name:
-        typeof bonusRow.author_display_name === "string"
-          ? bonusRow.author_display_name.trim()
-          : undefined,
-      question: validateQuestion(bonusRow.question, "bonus.question"),
-    };
-    if (bonus.question.sort_order !== 1) {
-      throw new Error("bonus.question.sort_order debe ser 1.");
-    }
-  }
+  const bonus: SeedBonusBlock | null = null;
 
   const title =
     typeof row.title === "string" && row.title.trim()

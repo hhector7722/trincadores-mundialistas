@@ -34,7 +34,7 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
     <QuizPageShell>
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-          {result.kind === "bonus" ? "Resultado bonus" : "Resultado oficial"}
+          Resultado del quiz
         </h1>
         <Link href="/quiz" className="mt-1 inline-block text-sm text-[var(--tm-muted)]">
           Quiz del dia

@@ -6,12 +6,11 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { startQuiz, submitQuiz } from "@/actions/quiz";
 import { QuizQuestionStage } from "@/components/quiz/QuizQuestionStage";
 import { Button } from "@/components/ui/button";
-import type { QuizKind, QuizStartSession } from "@/lib/quiz/types";
+import type { QuizStartSession } from "@/lib/quiz/types";
 
 type QuizPlaySessionProps = {
   poolId: string;
   quizId: string;
-  kind: QuizKind;
 };
 
 function formatCountdown(expiresAt: string): string {
@@ -23,7 +22,7 @@ function formatCountdown(expiresAt: string): string {
   return `${min}:${String(sec).padStart(2, "0")}`;
 }
 
-export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) {
+export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const router = useRouter();
   const [session, setSession] = useState<QuizStartSession | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -167,7 +166,7 @@ export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) 
           Volver
         </Link>
         <p className="text-xs text-[var(--tm-muted)]">
-          {kind === "bonus" ? "Bonus" : "Oficial"} · {countdown || "--:--"}
+          Quiz del dia · {countdown || "--:--"}
         </p>
       </div>
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import {
   canOpenQuizPlay,
+  canReplayQuiz,
   formatQuizSlotStatusLabel,
   getQuizSlotStatus,
 } from "@/lib/quiz/slot-status";
@@ -33,7 +34,15 @@ export function QuizSlotCard({
 }: QuizSlotCardProps) {
   const status = getQuizSlotStatus(slot);
   const playable = canOpenQuizPlay(slot);
+  const replayable = canReplayQuiz(slot);
   const score = slot?.attempt?.status === "submitted" ? slot.attempt.score : null;
+
+  function playLabel(): string {
+    if (replayable) return "Jugar de nuevo";
+    if (status === "in_progress") return "Continuar";
+    if (status === "expired") return "Nuevo intento";
+    return "Jugar";
+  }
 
   return (
     <Card className="space-y-3 p-4">
@@ -72,16 +81,12 @@ export function QuizSlotCard({
         <div className="flex flex-col gap-2">
           {playable && (
             <Link href={playHref} className={primaryLinkClass}>
-              {status === "in_progress"
-                ? "Continuar"
-                : status === "expired"
-                  ? "Nuevo intento"
-                  : "Jugar"}
+              {playLabel()}
             </Link>
           )}
           {status === "completed" && resultHref && (
             <Link href={resultHref} className={outlineLinkClass}>
-              Ver resultado
+              Ver ultimo resultado
             </Link>
           )}
         </div>
