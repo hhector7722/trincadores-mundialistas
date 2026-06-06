@@ -139,6 +139,8 @@ function useCalendarViewportLayout(
     if (layout instanceof HTMLElement) observer.observe(layout);
     observer.observe(calendar);
     observer.observe(grid);
+    const tabBar = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
+    if (tabBar) observer.observe(tabBar);
     window.addEventListener("resize", syncLayout);
     window.visualViewport?.addEventListener("resize", syncLayout);
 
@@ -226,11 +228,13 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
       {activeMatch && (
         <QuickPredictionModal
-          key={`${activeMatch.id}:${activeMatch.prediction?.updated_at ?? "none"}`}
+          key={activeMatch.id}
           open
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
+          matches={matches}
+          onMatchChange={setActiveMatch}
         />
       )}
     </div>

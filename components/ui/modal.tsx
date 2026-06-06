@@ -12,6 +12,10 @@ type ModalProps = {
   children: React.ReactNode;
   className?: string;
   hideHeaderDivider?: boolean;
+  backdropClassName?: string;
+  belowPanel?: React.ReactNode;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
 };
 
 function lockPageScroll() {
@@ -49,9 +53,15 @@ export function Modal({
   children,
   className,
   hideHeaderDivider = false,
+  backdropClassName,
+  belowPanel,
+  onSwipeLeft,
+  onSwipeRight,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -75,26 +85,58 @@ export function Modal({
 
   if (!open) return null;
 
+  function onTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+    touchStartY.current = event.touches[0]?.clientY ?? null;
+  }
+
+  function onTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    if (deltaX < 0) {
+      onSwipeLeft?.();
+    } else {
+      onSwipeRight?.();
+    }
+  }
+
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 touch-none overscroll-none bg-[#2a1058]/45 backdrop-blur-lg"
+        className={cn(
+          "absolute inset-0 touch-none overscroll-none bg-[#2a1058]/45 backdrop-blur-md",
+          backdropClassName
+        )}
         onClick={onClose}
         onTouchMove={(event) => event.preventDefault()}
       />
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className={cn(
-          "relative z-10 flex w-full max-w-sm max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] outline-none backdrop-blur-xl",
-          className
-        )}
-      >
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-3">
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          className={cn(
+            "flex w-full max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] outline-none backdrop-blur-xl",
+            className
+          )}
+        >
         <div
           className={cn(
             "flex shrink-0 items-center justify-between gap-3 px-4 py-3",
@@ -116,6 +158,8 @@ export function Modal({
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
           {children}
         </div>
+        </div>
+        {belowPanel}
       </div>
     </div>,
     document.body

@@ -2,9 +2,22 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useTransition, useState, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useTransition, useState, type MouseEvent } from "react";
 import { Activity, Home, ListOrdered, Target, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const TABBAR_HEIGHT_FALLBACK = "calc(3rem + env(safe-area-inset-bottom, 0px))";
+
+function syncTabBarHeight(node: HTMLElement) {
+  const height = Math.ceil(node.getBoundingClientRect().height);
+  if (height > 0) {
+    document.documentElement.style.setProperty("--tm-tabbar-height", `${height}px`);
+  }
+}
+
+function resetTabBarHeight() {
+  document.documentElement.style.setProperty("--tm-tabbar-height", TABBAR_HEIGHT_FALLBACK);
+}
 
 const TABS = [
   { href: "/predictions", label: "Porra", icon: Target },
@@ -23,8 +36,28 @@ function isActive(pathname: string, href: string) {
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const navRef = useRef<HTMLElement>(null);
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  useLayoutEffect(() => {
+    const node = navRef.current;
+    if (!node) return;
+
+    const onViewportChange = () => syncTabBarHeight(node);
+
+    syncTabBarHeight(node);
+
+    const observer = new ResizeObserver(onViewportChange);
+    observer.observe(node);
+    window.visualViewport?.addEventListener("resize", onViewportChange);
+
+    return () => {
+      observer.disconnect();
+      window.visualViewport?.removeEventListener("resize", onViewportChange);
+      resetTabBarHeight();
+    };
+  }, []);
 
   useEffect(() => {
     for (const href of TAB_HREFS) {
@@ -53,6 +86,7 @@ export function TabBar() {
 
   return (
     <nav
+      ref={navRef}
       className="tm-surface-fade fixed bottom-0 left-0 right-0 z-50 shrink-0 border-t border-[var(--tm-border)] px-1 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
       aria-label="Navegacion principal"
     >

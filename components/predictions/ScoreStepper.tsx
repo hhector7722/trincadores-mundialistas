@@ -24,7 +24,7 @@ export function ScoreStepper({
   const controlClass = cn(
     "flex shrink-0 items-center justify-center text-[var(--tm-fg)]",
     isFloating
-      ? "h-10 w-10 text-[var(--tm-accent)] transition-opacity hover:opacity-80 active:opacity-60"
+      ? "h-7 w-7 text-[var(--tm-accent)] transition-opacity hover:opacity-80 active:opacity-60"
       : "h-12 w-12 rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface-elevated)] active:border-[var(--tm-accent-muted)]"
   );
 
@@ -35,8 +35,8 @@ export function ScoreStepper({
       )}
       <div
         className={cn(
-          "flex items-center justify-between gap-2",
-          isFloating ? "w-full max-w-[160px]" : "w-full max-w-[140px]"
+          "flex items-center justify-between",
+          isFloating ? "w-full max-w-[108px] gap-0.5" : "w-full max-w-[140px] gap-2"
         )}
       >
         <button
@@ -46,9 +46,14 @@ export function ScoreStepper({
           onClick={() => onChange(Math.max(0, value - 1))}
           className={cn(controlClass, (disabled || value <= 0) && "opacity-40")}
         >
-          <Minus className={cn("h-5 w-5", isFloating && "h-4 w-4")} />
+          <Minus className={cn("h-5 w-5", isFloating && "h-3 w-3 stroke-[2.5]")} />
         </button>
-        <span className="font-display min-w-[2ch] text-center text-3xl text-[var(--tm-fg)]">
+        <span
+          className={cn(
+            "font-display min-w-[1.5ch] text-center text-[var(--tm-fg)]",
+            isFloating ? "text-2xl leading-none" : "text-3xl"
+          )}
+        >
           {value}
         </span>
         <button
@@ -58,7 +63,7 @@ export function ScoreStepper({
           onClick={() => onChange(Math.min(MAX_GOALS, value + 1))}
           className={cn(controlClass, (disabled || value >= MAX_GOALS) && "opacity-40")}
         >
-          <Plus className={cn("h-5 w-5", isFloating && "h-4 w-4")} />
+          <Plus className={cn("h-5 w-5", isFloating && "h-3 w-3 stroke-[2.5]")} />
         </button>
       </div>
     </div>
