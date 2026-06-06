@@ -32,20 +32,13 @@ export function QuizQuestionStage({
     <div className="tm-quiz-stage flex flex-col gap-4">
       <div
         className={cn(
-          "flex items-center justify-center rounded-2xl border px-4 py-3",
-          timerUrgent
-            ? "border-red-500/60 bg-red-600"
-            : "border-[var(--tm-border)] bg-[var(--tm-surface)]"
+          "tm-quiz-timer flex items-center justify-center rounded-2xl px-4 py-3",
+          timerUrgent && "tm-quiz-timer--urgent"
         )}
         aria-live="polite"
         aria-label={`Tiempo restante: ${secondsLeft} segundos`}
       >
-        <span
-          className={cn(
-            "font-display text-3xl tabular-nums tracking-wide",
-            timerUrgent ? "text-white" : "text-[var(--tm-accent)]"
-          )}
-        >
+        <span className="tm-quiz-timer-value font-display text-3xl tabular-nums tracking-wide">
           {secondsLeft}
         </span>
       </div>

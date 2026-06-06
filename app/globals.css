@@ -502,6 +502,7 @@ html[data-modal-open] main {
   display: flex;
   flex-direction: column;
   min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  padding-top: max(1.25rem, calc(0.875rem + env(safe-area-inset-top, 0px)));
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
@@ -527,9 +528,54 @@ html[data-modal-open] main {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
+.tm-quiz-play-title {
+  margin-bottom: 1rem;
+}
+
+.tm-quiz-timer {
+  border: 1px solid var(--tm-border);
+  background: var(--tm-surface);
+}
+
+.tm-quiz-timer--urgent {
+  border-color: rgba(168, 88, 128, 0.42);
+  background: linear-gradient(
+    165deg,
+    rgba(108, 42, 82, 0.68) 0%,
+    rgba(82, 32, 68, 0.74) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(140, 70, 110, 0.14),
+    0 4px 14px rgba(48, 16, 42, 0.22);
+}
+
+.tm-quiz-timer-value {
+  color: var(--tm-accent);
+}
+
+.tm-quiz-timer--urgent .tm-quiz-timer-value {
+  color: #fff;
+}
+
 .tm-quiz-actions {
   flex-shrink: 0;
   padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Ranking: tabla a altura de viewport ── */
+.tm-ranking-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  min-width: 0;
+}
+
+@supports (height: 100dvh) {
+  .tm-ranking-page {
+    min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
+    height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
+  }
 }
 
 /* ── Porra: calendario a pantalla completa ── */
@@ -595,7 +641,7 @@ html[data-modal-open] main {
   --tm-cal-grid-line: rgba(130, 70, 220, 0.18);
   --tm-cal-grid-line-width: 0.75px;
   --tm-cal-dock-bg: rgba(26, 8, 56, 0.9);
-  --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
+  --tm-cal-cell-bg: rgba(18, 5, 42, 0.92);
   --tm-cal-match-card-bg: rgba(111, 43, 255, 0.16);
   --tm-cal-match-card-border: rgba(255, 255, 255, 0.12);
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
@@ -862,9 +908,9 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-section {
-  flex: 0 0 75%;
-  height: 75%;
-  max-height: 75%;
+  flex: 0 0 70%;
+  height: 70%;
+  max-height: 70%;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -874,7 +920,7 @@ html[data-modal-open] main {
 .tm-porra-calendar .tm-cal-groups-title {
   width: 100%;
   flex-shrink: 0;
-  padding: 3px 4px 2px;
+  padding: 2px 4px 0;
   text-align: center;
   font-size: var(--tm-cal-sidebar-heading-fs);
   font-weight: 600;
@@ -889,12 +935,13 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   width: 100%;
+  padding-top: 0;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-footer {
-  flex: 0 0 25%;
-  height: 25%;
-  max-height: 25%;
+  flex: 0 0 30%;
+  height: 30%;
+  max-height: 30%;
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
   column-gap: 10px;
@@ -921,26 +968,37 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-col {
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
+}
+
+.tm-porra-calendar .tm-cal-sidebar-access-stack {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 6px;
+  padding-inline: 2px;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
-  flex: 1 1 0;
-  width: 100%;
-  min-height: 0;
+  flex: 0 0 auto;
+  width: fit-content;
   max-width: 100%;
+  min-height: 0;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 4px;
+  border-radius: 3px;
   background: #ccff00;
   color: #000;
-  padding: 4px 10px;
-  font-size: clamp(7px, 1.75cqw, 9px);
+  padding: 2px 6px;
+  font-size: clamp(7.5px, 1.9cqw, 10px);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -983,9 +1041,9 @@ html[data-modal-open] main {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  align-content: space-evenly;
+  align-content: flex-start;
   column-gap: var(--tm-cal-groups-col-gap, 3px);
-  row-gap: var(--tm-cal-group-card-gap, 3px);
+  row-gap: var(--tm-cal-group-card-gap, 2px);
 }
 
 .tm-porra-calendar .tm-cal-group-card {

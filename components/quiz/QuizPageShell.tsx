@@ -15,8 +15,8 @@ export function QuizPageShell({
   return (
     <div
       className={cn(
-        "tm-quiz-page space-y-4 p-4",
-        variant === "play" && "tm-quiz-page--play",
+        "tm-quiz-page space-y-4",
+        variant === "play" ? "tm-quiz-page--play px-4 pb-4 pt-0" : "p-4",
         variant === "viewport" && "tm-quiz-page--viewport",
         className
       )}

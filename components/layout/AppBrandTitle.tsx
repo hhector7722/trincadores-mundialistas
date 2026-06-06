@@ -5,6 +5,8 @@ type AppBrandTitleProps = {
   className?: string;
   stacked?: boolean;
   centered?: boolean;
+  /** Título plano (p. ej. pantalla La tabla). Sustituye marca + logo. */
+  title?: string;
   /** Home: cada línea centrada en viewport + logo a la izquierda del bloque. */
   homeHeader?: boolean;
   /** Más separación entre líneas del título apilado (p. ej. login). */
@@ -17,9 +19,23 @@ export function AppBrandTitle({
   className,
   stacked = false,
   centered = false,
+  title,
   homeHeader = false,
   spacedStack = false,
 }: AppBrandTitleProps) {
+  if (title) {
+    return (
+      <span
+        className={cn(
+          "font-display uppercase tracking-wider text-[var(--tm-accent)]",
+          className
+        )}
+      >
+        {title}
+      </span>
+    );
+  }
+
   if (homeHeader) {
     return (
       <span

@@ -1,5 +1,9 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
+import { cn } from "@/lib/utils";
+
+const RANKING_GRID =
+  "grid grid-cols-[0.75rem_1.75rem_2rem_minmax(0,1fr)_2.75rem_2.75rem] items-center gap-x-2";
 
 export function RankingTable({
   rows,
@@ -18,15 +22,23 @@ export function RankingTable({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex shrink-0 items-center gap-2 border-b border-[var(--tm-border)] px-3 py-2 text-xs font-medium uppercase leading-none tracking-wide text-[var(--tm-muted)]">
-        <span className="w-3 shrink-0" aria-hidden="true" />
-        <span className="w-7 shrink-0" aria-hidden="true" />
-        <span className="w-8 shrink-0" aria-hidden="true" />
-        <span className="min-w-0 flex-1">Trincador</span>
-        <span className="w-10 shrink-0 text-right">Pts</span>
-        <span className="w-12 shrink-0 text-right">Fiab</span>
+      <div
+        className={cn(
+          RANKING_GRID,
+          "shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-left text-xs font-medium uppercase leading-none tracking-wide text-[var(--tm-muted)]"
+        )}
+      >
+        <span aria-hidden="true" />
+        <span>Pos</span>
+        <span aria-hidden="true" />
+        <span>Trincador</span>
+        <span>Pts</span>
+        <span>Fiab</span>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div
+        className="grid min-h-0 flex-1"
+        style={{ gridTemplateRows: `repeat(${rows.length}, minmax(0, 1fr))` }}
+      >
         {rows.map((row) => (
           <RankingRow
             key={row.profileId}

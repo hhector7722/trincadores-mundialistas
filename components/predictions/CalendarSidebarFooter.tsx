@@ -45,7 +45,7 @@ export function CalendarSidebarFooter({
       </div>
 
       <div className="tm-cal-sidebar-col tm-cal-sidebar-access-col flex min-h-0 min-w-0 flex-col overflow-hidden">
-        <div className="flex min-h-0 flex-1 flex-col items-stretch justify-evenly gap-1 px-0.5">
+        <div className="tm-cal-sidebar-access-stack">
           <Link href="/predictions/knockout" className="tm-cal-sidebar-access-btn">
             Ver cuadro
           </Link>

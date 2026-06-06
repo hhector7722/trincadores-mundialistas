@@ -6,9 +6,11 @@ import type { AppShellContext } from "@/lib/pool/active-pool";
 export function AppHeader({
   ctx,
   stackedTitle = false,
+  title,
 }: {
   ctx: AppShellContext;
   stackedTitle?: boolean;
+  title?: string;
 }) {
   return (
     <header className="relative z-20 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
@@ -21,7 +23,7 @@ export function AppHeader({
               : "text-center text-base",
           )}
         >
-          <AppBrandTitle homeHeader={stackedTitle} />
+          <AppBrandTitle homeHeader={stackedTitle} title={title} />
         </h1>
         <div className="absolute right-0 top-1/2 -translate-y-1/2">
           <PoolSwitcher pools={ctx.pools} activePoolId={ctx.activePoolId} />

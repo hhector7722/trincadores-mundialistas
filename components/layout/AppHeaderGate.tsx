@@ -9,10 +9,17 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
   const hideBrandTitle =
     pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
   const isHome = pathname === "/";
+  const isRanking = pathname === "/ranking";
 
   if (hideBrandTitle) {
     return null;
   }
 
-  return <AppHeader ctx={ctx} stackedTitle={isHome} />;
+  return (
+    <AppHeader
+      ctx={ctx}
+      stackedTitle={isHome}
+      title={isRanking ? "LA TABLA" : undefined}
+    />
+  );
 }

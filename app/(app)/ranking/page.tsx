@@ -16,10 +16,7 @@ export default async function RankingPage() {
   const { rows } = await getPoolLeaderboard(ctx.activePoolId);
 
   return (
-    <div className="flex h-[calc(100dvh-var(--tm-tabbar-height)-3.25rem)] flex-col gap-2 p-3 pb-2">
-      <h1 className="shrink-0 font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
-        La tabla
-      </h1>
+    <div className="tm-ranking-page flex flex-col p-3 pb-2">
       <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
         <RankingTable rows={rows} currentProfileId={user!.id} />
       </Card>

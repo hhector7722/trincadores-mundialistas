@@ -248,8 +248,8 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h1 className="shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
+    <div className="tm-quiz-play-session flex min-h-0 flex-1 flex-col">
+      <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
         {PLAY_TITLE}
       </h1>
 

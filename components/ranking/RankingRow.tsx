@@ -6,6 +6,9 @@ import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
+const RANKING_GRID =
+  "grid grid-cols-[0.75rem_1.75rem_2rem_minmax(0,1fr)_2.75rem_2.75rem] items-center gap-x-2";
+
 export function RankingRow({
   row,
   isCurrentUser,
@@ -16,25 +19,28 @@ export function RankingRow({
   return (
     <Link
       href={`/profile/${row.profileId}`}
-      className="flex min-h-0 flex-1 items-center gap-2 border-b border-[var(--tm-border)] px-3 last:border-0"
+      className={cn(
+        RANKING_GRID,
+        "min-h-0 border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+      )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
-      <span className="font-display w-7 shrink-0 text-center text-sm text-[var(--tm-fg)]">
+      <span className="font-display shrink-0 text-sm tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatar avatarUrl={row.avatarUrl} label={row.label} className="h-8 w-8" />
+      <ProfileAvatar avatarUrl={row.avatarUrl} label={row.label} className="h-8 w-8 shrink-0" />
       <span
         className={cn(
-          "min-w-0 flex-1 truncate text-sm font-medium",
+          "min-w-0 truncate text-sm font-medium",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       >
         {row.label}
       </span>
-      <span className="font-display w-10 shrink-0 text-right text-sm text-[var(--tm-fg)]">
+      <span className="font-display shrink-0 text-sm tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
-      <span className="w-12 shrink-0 text-right text-xs text-[var(--tm-muted)]">
+      <span className="shrink-0 text-xs tabular-nums text-[var(--tm-muted)]">
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
     </Link>
