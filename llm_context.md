@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T12:55:42.696Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T13:03:31.014Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,7 +16,7 @@
 | **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Quiz MVP Fase 2 TypeScript (queries, actions, types) · Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
+**Completado reciente:** Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training) · Quiz MVP Fase 4 hub `/quiz` · Quiz MVP Fase 5 play `/quiz/play` · Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard` · TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain) · Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 
 **Siguiente:** Probar flujo E2E con login real (official + bonus)
 
@@ -202,6 +202,7 @@ flowchart TB
 | `QuizLeaderboardTable` | `components/quiz/QuizLeaderboardTable.tsx` | server | QuizLeaderboardTable |
 | `QuizModeBadge` | `components/quiz/QuizModeBadge.tsx` | server | QuizModeBadge |
 | `QuizOptionButton` | `components/quiz/QuizOptionButton.tsx` | client | QuizOptionButton |
+| `QuizPageShell` | `components/quiz/QuizPageShell.tsx` | server | QuizPageShell |
 | `QuizPlaySession` | `components/quiz/QuizPlaySession.tsx` | client | QuizPlaySession |
 | `QuizProgressDots` | `components/quiz/QuizProgressDots.tsx` | server | QuizProgressDots |
 | `QuizQuestionStage` | `components/quiz/QuizQuestionStage.tsx` | client | QuizQuestionStage |
@@ -778,6 +779,7 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
+- [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 
 ### En desarrollo / pendiente
 

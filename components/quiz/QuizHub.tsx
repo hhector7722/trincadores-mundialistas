@@ -84,7 +84,7 @@ export function QuizHub({ hub }: QuizHubProps) {
 
       <Link
         href="/quiz/leaderboard"
-        className="block text-center text-sm font-medium text-[var(--tm-primary)]"
+        className="tm-quiz-actions block text-center text-sm font-medium text-[var(--tm-primary)]"
       >
         Ver ranking del quiz
       </Link>

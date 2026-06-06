@@ -53,7 +53,7 @@ export function QuizResultSummary({ result }: QuizResultSummaryProps) {
         ))}
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="tm-quiz-actions flex flex-col gap-2">
         <Link
           href="/quiz"
           className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)]"

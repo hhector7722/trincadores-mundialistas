@@ -1,4 +1,5 @@
 ﻿import { QuizHub } from "@/components/quiz/QuizHub";
+import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { getQuizDayHub } from "@/lib/quiz/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -15,7 +16,7 @@ export default async function QuizPage() {
   const hub = await getQuizDayHub(ctx.activePoolId, user!.id);
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <QuizPageShell>
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Quiz del dia
@@ -25,6 +26,6 @@ export default async function QuizPage() {
         </p>
       </div>
       <QuizHub hub={hub} />
-    </div>
+    </QuizPageShell>
   );
 }

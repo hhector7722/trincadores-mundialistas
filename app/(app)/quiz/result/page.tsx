@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizResultSummary } from "@/components/quiz/QuizResultSummary";
 import { getQuizResult } from "@/lib/quiz/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
@@ -30,7 +31,7 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
   }
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <QuizPageShell>
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           {result.kind === "bonus" ? "Resultado bonus" : "Resultado oficial"}
@@ -40,6 +41,6 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
         </Link>
       </div>
       <QuizResultSummary result={result} />
-    </div>
+    </QuizPageShell>
   );
 }

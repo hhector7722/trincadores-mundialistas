@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
 import { getLatestSubmittedAttemptId, getQuizDayHub } from "@/lib/quiz/queries";
 import { canOpenQuizPlay, getQuizSlotStatus } from "@/lib/quiz/slot-status";
@@ -40,12 +41,12 @@ export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) 
   }
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <QuizPageShell variant="play">
       <QuizPlaySession
         poolId={ctx.activePoolId}
         quizId={slot.quiz.id}
         kind={kind}
       />
-    </div>
+    </QuizPageShell>
   );
 }

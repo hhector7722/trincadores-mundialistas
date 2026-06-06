@@ -108,20 +108,22 @@ export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) 
 
   if (confirming) {
     return (
-      <div className="tm-quiz-stage space-y-4 rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-5">
-        <p className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-          ¿Enviar respuestas?
-        </p>
-        <p className="text-sm text-[var(--tm-muted)]">
-          Revisaste las {questions.length} preguntas. Las respuestas correctas se
-          revelan al final.
-        </p>
-        {submitError && (
-          <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-            {submitError}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="tm-quiz-stage space-y-4 rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-5">
+          <p className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+            ¿Enviar respuestas?
           </p>
-        )}
-        <div className="flex flex-col gap-2">
+          <p className="text-sm text-[var(--tm-muted)]">
+            Revisaste las {questions.length} preguntas. Las respuestas correctas se
+            revelan al final.
+          </p>
+          {submitError && (
+            <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+              {submitError}
+            </p>
+          )}
+        </div>
+        <div className="tm-quiz-actions mt-4 flex flex-col gap-2">
           <Button
             type="button"
             className="w-full"
@@ -159,8 +161,8 @@ export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) 
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <div className="flex shrink-0 items-center justify-between gap-3">
         <Link href="/quiz" className="text-sm font-medium text-[var(--tm-primary)]">
           Volver
         </Link>
@@ -169,20 +171,27 @@ export function QuizPlaySession({ poolId, quizId, kind }: QuizPlaySessionProps) 
         </p>
       </div>
 
-      <QuizQuestionStage
-        question={currentQuestion}
-        questionIndex={step}
-        totalQuestions={questions.length}
-        selectedOptionId={answers[currentQuestion.id] ?? null}
-        locked={Boolean(answers[currentQuestion.id])}
-        onSelect={handleSelect}
-      />
+      <div className="tm-quiz-stage-scroll flex min-h-0 flex-1 flex-col gap-4">
+        <QuizQuestionStage
+          question={currentQuestion}
+          questionIndex={step}
+          totalQuestions={questions.length}
+          selectedOptionId={answers[currentQuestion.id] ?? null}
+          locked={Boolean(answers[currentQuestion.id])}
+          onSelect={handleSelect}
+        />
 
-      {step > 0 && !answers[currentQuestion.id] && (
-        <Button type="button" variant="ghost" className="w-full" onClick={() => setStep((s) => s - 1)}>
-          Pregunta anterior
-        </Button>
-      )}
+        {step > 0 && !answers[currentQuestion.id] && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full shrink-0"
+            onClick={() => setStep((s) => s - 1)}
+          >
+            Pregunta anterior
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

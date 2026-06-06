@@ -491,6 +491,47 @@ html[data-modal-open] main {
   }
 }
 
+/* ── Quiz: safe area sobre TabBar fija ── */
+.tm-quiz-page {
+  scroll-padding-bottom: var(--tm-tabbar-height);
+  padding-bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
+}
+
+.tm-quiz-page--play,
+.tm-quiz-page--viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-quiz-page--play > * {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+}
+
+@supports (height: 100dvh) {
+  .tm-quiz-page--play,
+  .tm-quiz-page--viewport {
+    min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
+  }
+}
+
+.tm-quiz-stage-scroll {
+  min-height: 0;
+  flex: 1 1 0%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-quiz-actions {
+  flex-shrink: 0;
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
   box-sizing: border-box;
