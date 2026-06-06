@@ -554,6 +554,7 @@ html[data-modal-open] main {
   --tm-cal-grid-line: rgba(130, 70, 220, 0.18);
   --tm-cal-grid-line-width: 0.75px;
   --tm-cal-dock-bg: rgba(26, 8, 56, 0.9);
+  --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
   height: 100%;
   width: 100%;
   max-width: 100%;
@@ -614,7 +615,7 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  background: var(--tm-glass);
+  background: var(--tm-cal-cell-bg);
   border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
   border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
@@ -633,19 +634,11 @@ html[data-modal-open] main {
 .tm-porra-calendar .tm-cal-cell-pad {
   min-width: 0;
   overflow: hidden;
-}
-
-.tm-porra-calendar .tm-cal-match-list {
-  gap: var(--tm-cal-match-gap, 4px);
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-  justify-content: flex-start;
-  align-content: flex-start;
+  background: var(--tm-cal-cell-bg);
 }
 
 .tm-porra-calendar .tm-cal-cell--matches {
-  background: rgba(212, 255, 0, 0.04);
+  background: rgba(212, 255, 0, 0.035);
 }
 
 .tm-porra-calendar .tm-cal-match-card {
@@ -794,21 +787,27 @@ html[data-modal-open] main {
   }
 }
 
+.tm-porra-calendar .tm-cal-cell-surface {
+  background: var(--tm-cal-cell-bg);
+}
+
 .tm-porra-calendar .tm-cal-dock-surface {
   background: var(--tm-cal-dock-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
 
-.tm-porra-calendar .tm-cal-groups-panel {
-  padding: var(--tm-cal-groups-pad, 2px);
+.tm-porra-calendar .tm-cal-match-list {
+  gap: var(--tm-cal-match-gap, 4px);
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-content: flex-start;
 }
 
-.tm-porra-calendar .tm-cal-groups-title {
-  font-size: var(--tm-cal-groups-title-fs, 0.3125rem);
-  line-height: 1;
-  margin-bottom: 0;
-  flex-shrink: 0;
+.tm-porra-calendar .tm-cal-groups-panel {
+  padding: var(--tm-cal-groups-pad, 2px);
 }
 
 .tm-porra-calendar .tm-cal-groups-list {
@@ -819,7 +818,7 @@ html[data-modal-open] main {
   overflow: hidden;
   justify-content: space-between;
   align-items: stretch;
-  gap: var(--tm-cal-group-card-gap, 1px);
+  gap: var(--tm-cal-group-card-gap, 2px);
 }
 
 .tm-porra-calendar .tm-cal-group-card {

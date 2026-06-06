@@ -184,7 +184,7 @@ function DayCell({
     return (
       <div
         style={style}
-        className="tm-cal-cell-pad h-full bg-[rgba(0,0,0,0.12)]"
+        className="tm-cal-cell-pad h-full"
         aria-hidden="true"
       />
     );
@@ -198,7 +198,7 @@ function DayCell({
       style={style}
       className={cn(
         "tm-cal-cell relative flex h-full min-h-0 flex-col",
-        dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "bg-[var(--tm-glass)]",
+        dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "tm-cal-cell-surface",
         hasMatches && !dockSurface && "tm-cal-cell--matches"
       )}
     >

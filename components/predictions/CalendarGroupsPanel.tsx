@@ -32,9 +32,6 @@ export function CalendarGroupsPanel({
       )}
       aria-label="Clasificación de grupos"
     >
-      <p className="tm-cal-groups-title shrink-0 text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
-        GRUPOS
-      </p>
       <div className="tm-cal-groups-list min-h-0 flex-1 overflow-hidden">
         {groups.map((group) => (
           <button
