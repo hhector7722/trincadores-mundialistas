@@ -84,16 +84,21 @@ export function formatKickoffTime(iso: string, timeZone = CALENDAR_TZ): string {
   });
 }
 
-/** Hora compacta para celdas del calendario: "18 h", "2 h" (sin cero delante). */
+/** Hora compacta para celdas del calendario: "21:00", "9:00" (sin cero delante en la hora). */
 export function formatCalendarKickoffHour(iso: string, timeZone = CALENDAR_TZ): string {
+  const date = new Date(iso);
   const hour = Number(
-    new Date(iso).toLocaleString("en-GB", {
+    date.toLocaleString("en-GB", {
       hour: "numeric",
       hour12: false,
       timeZone,
     })
   );
-  return `${hour} h`;
+  const minute = date.toLocaleString("en-GB", {
+    minute: "2-digit",
+    timeZone,
+  });
+  return `${hour}:${minute}`;
 }
 
 export function indexMatchesByDate<T extends CalendarMatchLike>(
