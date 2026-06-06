@@ -25,18 +25,15 @@ export function LoginHero() {
           </div>
         </div>
 
-        <div
-          className="pointer-events-none shrink-0 overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_72%,rgba(0,0,0,0.45)_88%,rgba(0,0,0,0)_100%)] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_72%,rgba(0,0,0,0.45)_88%,rgba(0,0,0,0)_100%)]"
-          aria-hidden="true"
-        >
+        <div className="pointer-events-none shrink-0" aria-hidden="true">
           <Image
-            src="/icons/copa.png"
+            src="/icons/logo.png"
             alt=""
-            width={482}
-            height={829}
+            width={708}
+            height={708}
             priority
             sizes="(max-width: 640px) 28vw, 6.5rem"
-            className="block h-[9rem] w-[6rem] max-w-none object-contain object-top mix-blend-lighten sm:h-[9.5rem] sm:w-[6.5rem]"
+            className="block size-[6rem] max-w-none rounded-2xl object-cover object-top sm:size-[6.5rem]"
           />
         </div>
       </div>

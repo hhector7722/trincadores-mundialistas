@@ -109,13 +109,13 @@ export function HomeHeroCarousel({ pendingCount }: HomeHeroCarouselProps) {
                 {slide.eyebrow}
               </p>
               {slide.headline}
-              <p className="mt-2 max-w-full text-xs leading-snug text-white/50 sm:text-sm">
+              <p className="mt-1.5 max-w-full text-xs leading-snug text-white/50 sm:text-sm">
                 {slide.description}
               </p>
               {slide.cta && (
                 <Link
                   href={slide.cta.href}
-                  className="mt-3 inline-flex min-h-12 w-fit items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
+                  className="mt-2 inline-flex w-fit items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
                 >
                   {slide.cta.label}
                 </Link>
@@ -126,7 +126,7 @@ export function HomeHeroCarousel({ pendingCount }: HomeHeroCarouselProps) {
       </div>
 
       <div
-        className="mt-3 flex items-center gap-1.5"
+        className="mt-2 flex items-center gap-1.5"
         role="tablist"
         aria-label="Contenido del hero"
       >
