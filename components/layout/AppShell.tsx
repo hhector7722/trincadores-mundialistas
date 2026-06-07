@@ -27,7 +27,7 @@ export function AppShell({
       </Suspense>
       <HomeAtmosphere />
       <AppHeaderGate ctx={ctx} />
-      <main className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-[var(--tm-shell-bg-hex)]">
+      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain bg-[var(--tm-shell-bg-hex)]">
         {children}
       </main>
     </div>

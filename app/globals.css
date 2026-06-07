@@ -606,6 +606,9 @@ html:has(.tm-app-shell) main {
 
 /* ── Ranking: filas a altura natural; scroll en main ── */
 .tm-ranking-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   min-width: 0;
 }
 
