@@ -907,6 +907,43 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
+/* Final: borde inferior arriba al 40%, borde superior abajo al 60% */
+.tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
+  justify-content: flex-start;
+}
+
+.tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
+  top: 40%;
+  height: 20%;
+  transform: translateX(-50%);
+}
+
+.tm-ko-node--center.tm-ko-node--final .tm-ko-slot {
+  height: min(5.5cqh, 22px);
+  max-height: none;
+}
+
+.tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+}
+
+.tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.tm-ko-node--center.tm-ko-node--final .tm-ko-node-score {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .tm-ko-node--saved .tm-ko-slot {
   box-shadow: 0 0 0 1.5px rgba(212, 255, 0, 0.85);
 }
