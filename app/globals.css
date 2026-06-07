@@ -43,7 +43,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-tabbar-height: calc(var(--tm-tabbar-core) + max(0.5rem, var(--tm-safe-bottom)));
   --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
   --tm-vvh-height: 100dvh;
@@ -148,9 +148,17 @@ html:has(.tm-app-shell) body {
   background-color: var(--tm-shell-bg-hex);
 }
 
+html:has(.tm-app-shell) main {
+  box-sizing: border-box;
+  padding-bottom: var(--tm-tabbar-height);
+}
+
 .tm-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
-  flex-shrink: 0;
   box-sizing: border-box;
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
   background-color: var(--tm-tabbar-bg-hex);
@@ -559,7 +567,7 @@ html:has(.tm-app-shell) body {
 .tm-quiz-page--viewport {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
+  min-height: 100%;
   padding-top: max(1.25rem, calc(0.875rem + env(safe-area-inset-top, 0px)));
   padding-bottom: 1rem;
 }

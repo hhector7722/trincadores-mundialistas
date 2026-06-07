@@ -1,6 +1,7 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { TabBar } from "@/components/layout/TabBar";
+import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
@@ -15,6 +16,7 @@ export function AppShell({
 }) {
   return (
     <div className="tm-app-shell relative flex flex-col">
+      <ViewportMetricsInlineScript />
       <div
         id="tm-safe-probe"
         className="pointer-events-none fixed bottom-0 left-0 h-0 w-0 pb-[env(safe-area-inset-bottom)]"
