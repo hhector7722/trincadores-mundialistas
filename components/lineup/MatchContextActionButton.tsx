@@ -9,6 +9,8 @@ type MatchContextActionButtonProps = {
   savedValue?: string | null;
   showEdit?: boolean;
   addIcon?: boolean;
+  hideCaption?: boolean;
+  emptyLabel?: string;
   className?: string;
 };
 
@@ -18,15 +20,20 @@ export function MatchContextActionButton({
   savedValue,
   showEdit = false,
   addIcon = false,
+  hideCaption = false,
+  emptyLabel,
   className,
 }: MatchContextActionButtonProps) {
   const saved = Boolean(savedValue);
+  const emptyText = emptyLabel ?? caption;
 
   return (
     <div className={cn("inline-block w-full min-w-0", className)}>
-      <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-        {saved && showEdit ? "Mi pronóstico" : caption}
-      </p>
+      {!hideCaption ? (
+        <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+          {saved && showEdit ? "Mi pronóstico" : caption}
+        </p>
+      ) : null}
       {saved ? (
         <div className="relative w-0 min-w-full">
           <button
@@ -57,7 +64,7 @@ export function MatchContextActionButton({
             {addIcon ? (
               <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
             ) : null}
-            {caption}
+            {emptyText}
           </span>
         </button>
       )}

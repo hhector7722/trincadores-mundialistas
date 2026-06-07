@@ -116,7 +116,8 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
             />
           </div>
           <MatchContextActionsRow
-            className="mt-3 border-t border-[var(--tm-border)] pt-2"
+            compact
+            className="mt-3"
             match={match}
             onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
             onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}

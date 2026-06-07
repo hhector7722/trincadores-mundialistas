@@ -5,6 +5,7 @@ import { MatchContextActionButton } from "@/components/lineup/MatchContextAction
 type MvpPredictionButtonProps = {
   savedPlayerName?: string | null;
   onClick: () => void;
+  variant?: "default" | "compact";
   className?: string;
 };
 
@@ -12,15 +13,20 @@ type MvpPredictionButtonProps = {
 export function MvpPredictionButton({
   savedPlayerName,
   onClick,
+  variant = "default",
   className,
 }: MvpPredictionButtonProps) {
+  const compact = variant === "compact";
+
   return (
     <MatchContextActionButton
-      caption="MVP +"
+      caption={compact ? "MVP" : "MVP +"}
       onClick={onClick}
       savedValue={savedPlayerName}
       showEdit
-      addIcon
+      addIcon={!compact}
+      hideCaption={compact}
+      emptyLabel={compact ? "Añadir" : undefined}
       className={className}
     />
   );
