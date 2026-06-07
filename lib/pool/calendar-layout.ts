@@ -18,6 +18,11 @@ const GROUPS_CARD_HEIGHT_RATIO = 0.88;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
+const ACCESS_DOCK_ROWS = 2;
+const ACCESS_DOCK_ROW_GAP_PX = 3;
+const ACCESS_DOCK_HEIGHT_RATIO = 0.24;
+const MIN_ACCESS_DOCK_HEIGHT_PX = 28;
+const SIDEBAR_BODY_GAP_PX = 3;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
   cells: T[]
@@ -44,7 +49,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -119,11 +124,40 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
   return cardHeight;
 }
 
+/** Reserva la franja inferior L-M-X para los botones de acceso (2x2). */
+function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
+  if (!slot) {
+    calendar.style.removeProperty("--tm-cal-sidebar-access-dock-h");
+    calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
+    return;
+  }
+
+  const dayNum = slot.querySelector<HTMLElement>(".tm-cal-day-num");
+  const dayNumH = dayNum?.offsetHeight ?? 0;
+  const bodyH = Math.max(
+    0,
+    slot.clientHeight - dayNumH - SIDEBAR_BODY_GAP_PX
+  );
+  const dockH = Math.max(
+    MIN_ACCESS_DOCK_HEIGHT_PX,
+    Math.floor(bodyH * ACCESS_DOCK_HEIGHT_RATIO)
+  );
+  const rowH = Math.max(
+    12,
+    Math.floor((dockH - ACCESS_DOCK_ROW_GAP_PX) / ACCESS_DOCK_ROWS)
+  );
+  const btnFs = Math.max(6, Math.floor(rowH * 0.42));
+
+  calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
+}
+
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
 function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const panel =
+    grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot .tm-cal-groups-panel") ??
     grid.querySelector<HTMLElement>(".tm-cal-groups-section .tm-cal-groups-panel") ??
-    grid.querySelector<HTMLElement>(".tm-cal-sidebar-card .tm-cal-groups-panel") ??
     grid.querySelector<HTMLElement>(".tm-cal-groups-panel");
   if (!panel) {
     calendar.style.removeProperty("--tm-cal-groups-pad");
@@ -295,6 +329,7 @@ export function fitCalendarLayout(
   }
 
   let matchCardHeight = syncMatchCardMetrics(calendar, grid);
+  syncSidebarAccessDockMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
@@ -303,6 +338,7 @@ export function fitCalendarLayout(
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
     matchCardHeight = syncMatchCardMetrics(calendar, grid);
+    syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }
@@ -323,6 +359,8 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-groups-col-gap");
   calendar.style.removeProperty("--tm-cal-group-card-gap");
   calendar.style.removeProperty("--tm-cal-group-card-py");
+  calendar.style.removeProperty("--tm-cal-sidebar-access-dock-h");
+  calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
   resetPredictionLabelMetrics(calendar);
   if (grid) resetCalendarGridHeight(grid);
 }

@@ -2,7 +2,8 @@
 
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
-import { CalendarSidebarCard } from "@/components/predictions/CalendarSidebarCard";
+import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
+import { CalendarSidebarSlot } from "@/components/predictions/CalendarSidebarSlot";
 import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { TournamentStatsModal } from "@/components/predictions/TournamentStatsModal";
@@ -19,7 +20,6 @@ import {
   isCalendarSidebarDay,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
-import { getTournamentTopScorers } from "@/lib/pool/tournament-stats";
 import {
   buildMonthGrid,
   formatCalendarKickoffHour,
@@ -113,10 +113,10 @@ function renderCalendarGridCells(
   todayKey: string,
   onOpenMatch: (match: MatchWithPrediction) => void,
   groups: GroupStandingRow[],
-  scorers: ReturnType<typeof getTournamentTopScorers>,
   onGroupClick: (groupCode: string) => void,
   onOpenAllGroups: () => void,
-  onOpenStats: () => void
+  onOpenStats: () => void,
+  onOpenSquads: () => void
 ) {
   return weeks.flatMap((week, weekIndex) => {
     const row = weekIndex + 1;
@@ -132,15 +132,15 @@ function renderCalendarGridCells(
           : "1 / 4";
 
       const items = [
-        <CalendarSidebarCard
+        <CalendarSidebarSlot
           key={`sidebar-${weekIndex}`}
           groups={groups}
-          scorers={scorers}
           gridColumn={gridColumn}
           gridRow={row}
           onGroupClick={onGroupClick}
           onOpenAllGroups={onOpenAllGroups}
           onOpenStats={onOpenStats}
+          onOpenSquads={onOpenSquads}
         />,
       ];
 
@@ -278,6 +278,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
   const [allGroupsOpen, setAllGroupsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [squadsOpen, setSquadsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -294,7 +295,6 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
   const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
   const groupStandingsDetail = useMemo(() => buildGroupStandingsDetail(matches), [matches]);
-  const topScorers = useMemo(() => getTournamentTopScorers(matches), [matches]);
 
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
@@ -340,10 +340,10 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
             todayKey,
             setActiveMatch,
             groupStandings,
-            topScorers,
             setActiveGroupCode,
             () => setAllGroupsOpen(true),
-            () => setStatsOpen(true)
+            () => setStatsOpen(true),
+            () => setSquadsOpen(true)
           )}
         </div>
       </section>
@@ -362,6 +362,10 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
 
       {statsOpen && (
         <TournamentStatsModal open onClose={() => setStatsOpen(false)} matches={matches} />
+      )}
+
+      {squadsOpen && (
+        <AllTeamsLineupModal open onClose={() => setSquadsOpen(false)} />
       )}
 
       {activeGroupCode && (
