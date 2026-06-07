@@ -76,7 +76,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

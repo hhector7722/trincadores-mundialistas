@@ -42,6 +42,8 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
+  --tm-vvh: 100dvh;
+  --tm-vvh-offset: 0px;
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
@@ -49,7 +51,9 @@
 
 body {
   margin: 0;
-  background:
+  min-height: 100dvh;
+  background-color: var(--tm-purple-deep);
+  background-image:
     radial-gradient(ellipse 110% 65% at 50% -8%, rgba(170, 120, 255, 0.42) 0%, transparent 58%),
     radial-gradient(ellipse 85% 55% at 50% 42%, rgba(140, 90, 240, 0.22) 0%, transparent 68%),
     radial-gradient(ellipse 75% 50% at 8% 8%, rgba(140, 90, 240, 0.28) 0%, transparent 55%),
@@ -66,6 +70,10 @@ body {
   color: var(--tm-fg);
   font-family: var(--font-ui);
   color-scheme: dark;
+}
+
+html {
+  background-color: var(--tm-purple-deep);
 }
 
 html[data-modal-open],
@@ -101,15 +109,27 @@ html[data-modal-open] main {
 }
 
 .tm-app-shell {
-  height: 100dvh;
+  position: fixed;
+  top: var(--tm-vvh-offset);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--tm-vvh);
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 html:has(.tm-app-shell),
 html:has(.tm-app-shell) body {
   overflow: hidden;
-  height: 100%;
   overscroll-behavior: none;
+}
+
+.tm-tabbar {
+  flex-shrink: 0;
 }
 
 .tm-card-surface {
@@ -574,14 +594,14 @@ html:has(.tm-app-shell) body {
   padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* ── Ranking: tabla a altura de viewport ── */
+/* ── Ranking: tabla ocupa el main disponible ── */
 .tm-ranking-page {
+  --tm-ranking-bottom-gap: 0.75rem;
   display: flex;
   flex-direction: column;
-  min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
-  height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  min-height: 0;
   min-width: 0;
-  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--tm-ranking-bottom-gap);
 }
 
 .tm-ranking-head {
@@ -601,51 +621,16 @@ html:has(.tm-app-shell) body {
   -webkit-overflow-scrolling: touch;
 }
 
-@supports (height: 100dvh) {
-  .tm-ranking-page {
-    min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
-    height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
-  }
-}
-
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
   box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 20;
   display: flex;
   flex-direction: column;
-  height: calc(100svh - var(--tm-tabbar-height));
-  max-height: calc(100svh - var(--tm-tabbar-height));
+  width: 100%;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
   background: var(--tm-glass);
-}
-
-@supports (height: 100dvh) {
-  .tm-porra-layout {
-    height: calc(100dvh - var(--tm-tabbar-height));
-    max-height: calc(100dvh - var(--tm-tabbar-height));
-  }
-}
-
-@media (min-width: 640px) {
-  .tm-porra-layout {
-    position: static;
-    z-index: auto;
-    height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
-    max-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
-  }
-
-  @supports (height: 100dvh) {
-    .tm-porra-layout {
-      height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
-      max-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
-    }
-  }
 }
 
 .tm-porra-page {

@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T01:15:19.875Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T01:25:22.289Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -157,6 +157,7 @@ flowchart TB
 | `BrandLogo` | `components/layout/BrandLogo.tsx` | server | BrandLogo, BrandLogoFixed |
 | `PoolSwitcher` | `components/layout/PoolSwitcher.tsx` | client | PoolSwitcher |
 | `TabBar` | `components/layout/TabBar.tsx` | client | TabBar |
+| `ViewportMetricsSync` | `components/layout/ViewportMetricsSync.tsx` | client | ViewportMetricsSync |
 
 #### lineup
 
