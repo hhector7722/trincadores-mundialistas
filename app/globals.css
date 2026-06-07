@@ -42,7 +42,6 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-tabbar-height: calc(3rem + env(safe-area-inset-bottom, 0px));
-  --tm-vvh: 100dvh;
   --tm-vvh-offset: 0px;
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
@@ -112,12 +111,12 @@ html[data-modal-open] main {
   position: fixed;
   top: var(--tm-vvh-offset);
   right: 0;
+  bottom: 0;
   left: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: var(--tm-vvh);
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -126,9 +125,6 @@ html:has(.tm-app-shell),
 html:has(.tm-app-shell) body {
   overflow: hidden;
   overscroll-behavior: none;
-  height: var(--tm-vvh);
-  min-height: var(--tm-vvh);
-  max-height: var(--tm-vvh);
 }
 
 .tm-tabbar {
@@ -180,7 +176,7 @@ html:has(.tm-app-shell) body {
 
 /* ── Home: atmósfera multicapa ── */
 .tm-home-atmosphere {
-  position: fixed;
+  position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;

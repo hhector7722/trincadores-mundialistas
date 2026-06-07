@@ -2,38 +2,31 @@
 
 import { useLayoutEffect } from "react";
 
-function syncViewportMetrics() {
-  const vv = window.visualViewport;
-  const height = Math.round(vv?.height ?? window.innerHeight);
-  const offsetTop = Math.round(vv?.offsetTop ?? 0);
-
-  document.documentElement.style.setProperty("--tm-vvh", `${height}px`);
+function syncViewportOffset() {
+  const offsetTop = Math.round(window.visualViewport?.offsetTop ?? 0);
   document.documentElement.style.setProperty("--tm-vvh-offset", `${offsetTop}px`);
 }
 
-function resetViewportMetrics() {
-  document.documentElement.style.removeProperty("--tm-vvh");
+function resetViewportOffset() {
   document.documentElement.style.removeProperty("--tm-vvh-offset");
 }
 
-/** Sincroniza altura visible real (visualViewport) para evitar huecos arriba/abajo en móvil/PWA. */
+/** Alinea el shell con visualViewport.offsetTop (teclado / barra del navegador). */
 export function ViewportMetricsSync() {
   useLayoutEffect(() => {
-    const onChange = () => syncViewportMetrics();
+    const onChange = () => syncViewportOffset();
 
-    syncViewportMetrics();
+    syncViewportOffset();
 
     window.visualViewport?.addEventListener("resize", onChange);
     window.visualViewport?.addEventListener("scroll", onChange);
-    window.addEventListener("resize", onChange);
     window.addEventListener("orientationchange", onChange);
 
     return () => {
       window.visualViewport?.removeEventListener("resize", onChange);
       window.visualViewport?.removeEventListener("scroll", onChange);
-      window.removeEventListener("resize", onChange);
       window.removeEventListener("orientationchange", onChange);
-      resetViewportMetrics();
+      resetViewportOffset();
     };
   }, []);
 
