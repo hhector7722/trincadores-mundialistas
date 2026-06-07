@@ -989,7 +989,7 @@ html:has(.tm-app-shell) body {
 .tm-porra-calendar .tm-cal-sidebar-card {
   display: flex;
   flex-direction: column;
-  align-self: stretch;
+  align-self: start;
   height: calc(100% - var(--tm-cal-sidebar-row-gap, 6px));
   margin: 3px 3px 0;
   overflow: hidden;
