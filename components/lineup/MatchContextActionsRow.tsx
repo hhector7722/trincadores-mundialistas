@@ -11,10 +11,14 @@ type MatchContextActionsRowProps = {
   onOpenMvp: () => void;
   /** Sin etiquetas grises ni borde superior; MVP con patrón edición compacto. */
   compact?: boolean;
-  /** Alineado a anclas 10% / 50% / 90% (modal de pronóstico). */
+  /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
   layout?: "grid" | "teamAnchors";
   /** Oculta MVP en fila de acciones (p. ej. MVP va en fila intermedia del modal). */
   hideMvp?: boolean;
+  /** Ancla horizontal de alineación local (debe coincidir con `MatchTeamsDisplay`). */
+  homeAnchor?: string;
+  /** Ancla horizontal de alineación visitante. */
+  awayAnchor?: string;
   className?: string;
 };
 
@@ -26,6 +30,8 @@ export function MatchContextActionsRow({
   compact = false,
   layout = "grid",
   hideMvp = false,
+  homeAnchor = "10%",
+  awayAnchor = "90%",
   className,
 }: MatchContextActionsRowProps) {
   const mvpSaved = match.mvpPrediction?.player_name ?? null;
@@ -34,7 +40,10 @@ export function MatchContextActionsRow({
     return (
       <div className={className}>
         <div className="relative min-h-[2.75rem] w-full">
-          <div className="absolute left-[10%] top-0 w-max max-w-[38%] -translate-x-1/2">
+          <div
+            className="absolute top-0 w-max max-w-[38%] -translate-x-1/2"
+            style={{ left: homeAnchor }}
+          >
             <MatchContextActionButton
               caption="Alineación"
               hideCaption={compact}
@@ -50,7 +59,10 @@ export function MatchContextActionsRow({
               />
             </div>
           ) : null}
-          <div className="absolute left-[90%] top-0 w-max max-w-[38%] -translate-x-1/2">
+          <div
+            className="absolute top-0 w-max max-w-[38%] -translate-x-1/2"
+            style={{ left: awayAnchor }}
+          >
             <MatchContextActionButton
               caption="Alineación"
               hideCaption={compact}

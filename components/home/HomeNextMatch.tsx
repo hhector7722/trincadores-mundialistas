@@ -124,6 +124,9 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
           <div onClick={(event) => event.stopPropagation()}>
             <MatchContextActionsRow
               compact
+              layout="teamAnchors"
+              homeAnchor="15%"
+              awayAnchor="85%"
               className="mt-2 [&>div]:min-h-0"
               match={match}
               onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
