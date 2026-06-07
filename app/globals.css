@@ -953,13 +953,15 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   flex: 1 1 auto;
-  gap: 3px;
+  gap: var(--tm-cal-sidebar-body-gap, 6px);
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  height: var(--tm-cal-sidebar-card-h, auto);
+  max-height: calc(100% - var(--tm-cal-sidebar-access-dock-h, 0px) - 6px);
   min-height: 0;
   overflow: hidden;
   border-radius: 10px;
@@ -976,13 +978,14 @@ html[data-modal-open] main {
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  height: 100%;
+  height: auto;
+  flex: 0 0 auto;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-section {
-  flex: 1 1 auto;
-  height: 100%;
-  max-height: 100%;
+  flex: 0 0 auto;
+  height: auto;
+  max-height: none;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -1002,7 +1005,8 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  height: auto;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -1012,22 +1016,26 @@ html[data-modal-open] main {
 .tm-porra-calendar .tm-cal-sidebar-access-dock {
   flex: 0 0 var(--tm-cal-sidebar-access-dock-h, auto);
   height: var(--tm-cal-sidebar-access-dock-h, auto);
-  padding: 0 1px 1px;
+  margin-top: auto;
+  padding: 0 2px 2px;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 3px;
+  gap: var(--tm-cal-sidebar-access-grid-gap, 8px);
+  place-items: center;
+  align-content: center;
   width: 100%;
   height: 100%;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
-  width: 100%;
-  height: 100%;
+  width: var(--tm-cal-sidebar-access-btn-w, auto);
+  height: var(--tm-cal-sidebar-access-btn-h, auto);
+  max-width: calc(100% - 2px);
   min-height: 0;
   align-items: center;
   justify-content: center;
@@ -1035,7 +1043,7 @@ html[data-modal-open] main {
   border-radius: 3px;
   background: #ccff00;
   color: #000;
-  padding: 2px 4px;
+  padding: 1px 3px;
   font-size: var(--tm-cal-sidebar-access-btn-fs, clamp(6px, 1.55cqw, 8.5px));
   font-weight: 700;
   line-height: 1.1;
