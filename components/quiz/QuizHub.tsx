@@ -1,69 +1,99 @@
-import Link from "next/link";
-import { QuizModeBadge } from "@/components/quiz/QuizModeBadge";
-import { QuizSlotCard } from "@/components/quiz/QuizSlotCard";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
 import { Card } from "@/components/ui/card";
-import { getLatestSubmittedAttemptId } from "@/lib/quiz/queries";
-import type { QuizDayHub } from "@/lib/quiz/types";
+import { Modal } from "@/components/ui/modal";
+import { getQuizSlotStatus } from "@/lib/quiz/slot-status";
+import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
+
+const playButtonClass =
+  "inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)] transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
 
 type QuizHubProps = {
   hub: QuizDayHub;
+  leaderboardRows: QuizLeaderboardRow[];
+  currentProfileId: string;
 };
 
-function formatQuizDate(date: string): string {
-  const [year, month, day] = date.split("-").map(Number);
-  const d = new Date(year, month - 1, day);
-  return d.toLocaleDateString("es-ES", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+function hasPlayedToday(hub: QuizDayHub): boolean {
+  const attempt = hub.official?.attempt;
+  return attempt?.status === "submitted";
 }
 
-export function QuizHub({ hub }: QuizHubProps) {
-  const officialScoring = hub.official?.quiz.scoring_mode ?? "training";
-  const officialResultId = getLatestSubmittedAttemptId(hub.official);
+function canStartQuiz(hub: QuizDayHub): boolean {
+  if (!hub.official) return false;
+  const status = getQuizSlotStatus(hub.official);
+  return status === "ready" || status === "in_progress" || status === "expired";
+}
+
+export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps) {
+  const router = useRouter();
+  const [waitModalOpen, setWaitModalOpen] = useState(false);
+
+  const quizAvailable = Boolean(hub.official);
+  const playedToday = hasPlayedToday(hub);
+  const canPlay = canStartQuiz(hub);
+
+  function handlePlay() {
+    if (!quizAvailable) return;
+
+    if (playedToday) {
+      setWaitModalOpen(true);
+      return;
+    }
+
+    if (canPlay) {
+      router.push("/quiz/play");
+    }
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <QuizModeBadge competitive={hub.competitive} scoringMode={officialScoring} />
-        <span className="text-xs text-[var(--tm-muted)] capitalize">
-          {formatQuizDate(hub.quizDate)}
-        </span>
-      </div>
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={handlePlay}
+          disabled={!quizAvailable}
+          className={playButtonClass}
+        >
+          JUGAR
+        </button>
 
-      {!hub.official ? (
-        <Card>
-          <p className="text-sm text-[var(--tm-muted)]">
+        {!quizAvailable && (
+          <p className="text-center text-sm text-[var(--tm-muted)]">
             Todavia no hay quiz publicado para hoy. Vuelve mas tarde.
           </p>
-        </Card>
-      ) : (
-        <QuizSlotCard
-          title="Quiz del dia"
-          subtitle="3 preguntas rapidas · 10 segundos cada una"
-          slot={hub.official}
-          playHref="/quiz/play"
-          resultHref={
-            officialResultId ? `/quiz/result?attempt=${officialResultId}` : null
-          }
-          pointsLabel={
-            officialScoring === "training"
-              ? "Modo entrenamiento — puedes volver a jugar"
-              : hub.isOwner
-                ? "Modo competitivo — como owner puedes practicar sin limite"
-                : "Hasta 3 puntos si aciertas las 3"
-          }
-          isOwner={hub.isOwner}
-        />
-      )}
+        )}
 
-      <Link
-        href="/quiz/leaderboard"
-        className="tm-quiz-actions block text-center text-sm font-medium text-[var(--tm-primary)]"
+        <p className="text-center text-xs leading-relaxed text-[var(--tm-muted)]">
+          Un intento diario. Puntuan a partir del 11 de junio. Los intentos previos son de
+          entrenamiento.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+          Clasificacion del quiz
+        </h2>
+        <Card className="overflow-hidden p-0">
+          <QuizLeaderboardTable
+            rows={leaderboardRows}
+            currentProfileId={currentProfileId}
+          />
+        </Card>
+      </div>
+
+      <Modal
+        open={waitModalOpen}
+        onClose={() => setWaitModalOpen(false)}
+        title="Quiz del dia"
       >
-        Ver ranking del quiz
-      </Link>
+        <p className="text-sm text-[var(--tm-fg)]">
+          Espera hasta mañana para un nuevo quiz crack
+        </p>
+      </Modal>
     </div>
   );
 }

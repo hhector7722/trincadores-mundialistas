@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { cn } from "@/lib/utils";
 
@@ -354,6 +355,7 @@ export function QuickPredictionModal({
       : null;
 
   const activePanelSlide = entityPanelSlide ?? matchPanelSlide;
+  const isLineupView = panelView.kind === "lineup";
 
   return (
     <Modal
@@ -361,6 +363,8 @@ export function QuickPredictionModal({
       onClose={onClose}
       title={quickPanelTitle(panelView)}
       hideHeaderDivider
+      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
+      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeMatches && atPredictionRoot && !activePanelSlide ? () => startMatchSlide(1) : undefined

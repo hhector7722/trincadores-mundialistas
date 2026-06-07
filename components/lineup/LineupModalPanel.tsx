@@ -73,10 +73,11 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
+      <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
         <TeamLineupGraphic
           slots={lineup.slots}
           formation={lineup.formation}
+          size="modal"
           onPlayerClick={onPlayerClick}
         />
 

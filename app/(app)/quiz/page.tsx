@@ -1,6 +1,6 @@
 ﻿import { QuizHub } from "@/components/quiz/QuizHub";
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
-import { getQuizDayHub } from "@/lib/quiz/queries";
+import { getQuizDayHub, getQuizLeaderboard } from "@/lib/quiz/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,19 +13,18 @@ export default async function QuizPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const hub = await getQuizDayHub(ctx.activePoolId, user!.id);
+  const [hub, leaderboardRows] = await Promise.all([
+    getQuizDayHub(ctx.activePoolId, user!.id),
+    getQuizLeaderboard(ctx.activePoolId),
+  ]);
 
   return (
     <QuizPageShell>
-      <div>
-        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-          Quiz del dia
-        </h1>
-        <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Trivia rapida del Mundial. 10 segundos por pregunta.
-        </p>
-      </div>
-      <QuizHub hub={hub} />
+      <QuizHub
+        hub={hub}
+        leaderboardRows={leaderboardRows}
+        currentProfileId={user!.id}
+      />
     </QuizPageShell>
   );
 }

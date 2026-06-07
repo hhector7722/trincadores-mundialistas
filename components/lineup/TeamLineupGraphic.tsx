@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
+import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
 import type { FormationId, LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +8,8 @@ type TeamLineupGraphicProps = {
   slots: LineupSlot[];
   formation: FormationId;
   className?: string;
+  /** `modal`: ocupa el ancho del panel de alineaciones. */
+  size?: "default" | "modal";
   onPlayerClick?: (playerName: string) => void;
 };
 
@@ -14,21 +17,25 @@ export function TeamLineupGraphic({
   slots,
   formation,
   className,
+  size = "default",
   onPlayerClick,
 }: TeamLineupGraphicProps) {
+  const isModal = size === "modal";
+
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full max-w-[300px] shrink-0 self-center sm:max-w-[360px]",
+        "relative aspect-[3/2] w-full shrink-0 self-center",
+        isModal ? "max-w-none" : "max-w-[300px] sm:max-w-[360px]",
         className
       )}
     >
       <Image
-        src="/icons/goya.png"
+        src={GOYA_FIELD_SRC}
         alt=""
         fill
         className="object-contain object-center"
-        sizes="(max-width: 360px) 100vw, 360px"
+        sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
         priority
       />
 

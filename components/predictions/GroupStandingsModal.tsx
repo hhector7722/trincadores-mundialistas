@@ -8,6 +8,7 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { cn } from "@/lib/utils";
@@ -237,6 +238,7 @@ export function GroupStandingsModal({
       : null;
 
   const activePanelSlide = entityPanelSlide ?? groupPanelSlide;
+  const isLineupView = panelView.kind === "lineup";
 
   return (
     <Modal
@@ -244,6 +246,8 @@ export function GroupStandingsModal({
       onClose={onClose}
       title={groupPanelTitle(panelView)}
       hideHeaderDivider
+      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
+      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeGroups && atStandingsRoot && !activePanelSlide ? () => startGroupSlide(1) : undefined

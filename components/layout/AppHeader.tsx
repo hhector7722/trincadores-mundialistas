@@ -7,10 +7,12 @@ export function AppHeader({
   ctx,
   stackedTitle = false,
   title,
+  titleClassName,
 }: {
   ctx: AppShellContext;
   stackedTitle?: boolean;
   title?: string;
+  titleClassName?: string;
 }) {
   return (
     <header className="tm-app-header relative z-20 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
@@ -21,6 +23,7 @@ export function AppHeader({
             stackedTitle
               ? "relative left-1/2 w-screen -translate-x-1/2 text-xl sm:text-2xl"
               : "text-center text-base",
+            titleClassName,
           )}
         >
           <AppBrandTitle homeHeader={stackedTitle} title={title} />

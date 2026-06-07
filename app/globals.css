@@ -1034,17 +1034,17 @@ html[data-modal-open] main {
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
   width: fit-content;
-  max-width: calc(100% - 4px);
+  max-width: calc(100% - 8px);
   height: auto;
-  min-height: 0;
+  min-height: var(--tm-cal-sidebar-access-btn-min-h, 22px);
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   background: #ccff00;
   color: #000;
-  padding: 1px 5px;
-  font-size: clamp(7.5px, 1.9cqw, 10px);
+  padding: 2px var(--tm-cal-sidebar-access-btn-px, 8px);
+  font-size: var(--tm-cal-sidebar-access-btn-fs, clamp(8px, 2.1cqw, 11px));
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: 0.04em;

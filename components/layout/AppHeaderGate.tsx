@@ -10,6 +10,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
   const isHome = pathname === "/";
   const isRanking = pathname === "/ranking";
+  const isQuizHub = pathname === "/quiz";
 
   if (hideBrandTitle) {
     return null;
@@ -19,7 +20,14 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     <AppHeader
       ctx={ctx}
       stackedTitle={isHome}
-      title={isRanking ? "LA TABLA" : undefined}
+      title={
+        isRanking
+          ? "LA TABLA"
+          : isQuizHub
+            ? "¿QUIEN SABE MÁS DE LOS MUNDIALES?"
+            : undefined
+      }
+      titleClassName={isQuizHub ? "text-sm sm:text-base" : undefined}
     />
   );
 }

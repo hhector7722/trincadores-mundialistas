@@ -7,7 +7,9 @@ import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
+import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
+import { cn } from "@/lib/utils";
 
 type EntityModalControllerProps = {
   open: boolean;
@@ -78,14 +80,16 @@ export function EntityModalController({
     })
   );
 
+  const isLineupView = current.kind === "lineup";
+
   return (
     <Modal
       open={open}
       onClose={onClose}
       title={entityModalTitleContent(current)}
       hideHeaderDivider
-      className={className}
-      wrapperClassName={wrapperClassName}
+      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]", className)}
+      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onBack={canGoBack && !isSliding ? pop : undefined}
       panelSlide={panelSlide}
