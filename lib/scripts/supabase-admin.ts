@@ -23,7 +23,9 @@ export async function upsertChunks<T extends Record<string, unknown>>(
   let written = 0;
   for (let i = 0; i < rows.length; i += chunkSize) {
     const chunk = rows.slice(i, i + chunkSize);
-    const { error } = await admin.from(table).upsert(chunk, { onConflict });
+    const { error } = await admin
+      .from(table)
+      .upsert(chunk as unknown as Record<string, unknown>[], { onConflict });
     if (error) throw new Error(`${table}: ${error.message}`);
     written += chunk.length;
   }

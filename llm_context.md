@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T00:44:00.877Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T00:54:41.752Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -422,7 +422,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/scripts/cli.ts` | 63 líneas | parseScriptCli, logCliOptions, ScriptCliOptions |
 | `lib/scripts/env-guard.ts` | 50 líneas | getProjectRef, assertProjectRef, assertServiceEnv, assertPurgeConfirmed, assertBootstrapAllowed, assertImportAllowed, assertQuizSeedAllowed |
-| `lib/scripts/supabase-admin.ts` | 32 líneas | upsertChunks, createAdminClient, AdminClient |
+| `lib/scripts/supabase-admin.ts` | 34 líneas | upsertChunks, createAdminClient, AdminClient |
 
 **site-url.ts/** — 1 archivos
 
