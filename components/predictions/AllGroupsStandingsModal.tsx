@@ -64,6 +64,65 @@ function GroupStandingsViewToggle({
   );
 }
 
+function ViewSwipeDots({ activeIndex }: { activeIndex: 0 | 1 }) {
+  const labels = ["Live", "Pronóstico"] as const;
+
+  return (
+    <div
+      className="flex items-center justify-center gap-2 py-1"
+      role="tablist"
+      aria-label="Vista de clasificación"
+    >
+      {labels.map((label, index) => (
+        <span
+          key={label}
+          role="tab"
+          aria-selected={activeIndex === index}
+          aria-label={label}
+          className={cn(
+            "rounded-full transition-all duration-200",
+            activeIndex === index ? "h-2 w-2 bg-white" : "h-1.5 w-1.5 bg-white/35"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GroupsGrid({
+  groups,
+  onSelectGroup,
+}: {
+  groups: GroupStandingDetail[];
+  onSelectGroup: (groupCode: string) => void;
+}) {
+  return (
+    <div className="grid min-h-0 flex-1 auto-rows-auto grid-cols-3 items-stretch gap-2 overflow-y-auto px-2.5 pb-2.5 sm:gap-2.5 sm:px-3 sm:pb-3">
+      {groups.map((group) => (
+        <button
+          key={group.code}
+          type="button"
+          onClick={() => onSelectGroup(group.code)}
+          className={cn(
+            "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-[var(--tm-border)]",
+            "bg-[rgba(111,43,255,0.12)] text-left transition-colors",
+            "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
+          )}
+        >
+          <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-0.5 py-0.5 leading-none">
+            <span className="text-[7px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
+              Grupo {group.code}
+            </span>
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col overflow-visible">
+            <GroupStandingsTable group={group} variant="grid" />
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 type AllGroupsStandingsModalProps = {
   open: boolean;
   onClose: () => void;
@@ -81,6 +140,7 @@ export function AllGroupsStandingsModal({
 }: AllGroupsStandingsModalProps) {
   const [view, setView] = useState<GroupStandingsView>("official");
   const groups = view === "official" ? officialGroups : predictedGroups;
+  const activeDotIndex = view === "official" ? 0 : 1;
 
   return (
     <Modal
@@ -92,6 +152,9 @@ export function AllGroupsStandingsModal({
       className="flex max-h-[calc(100dvh-1rem)] flex-col"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      onSwipeLeft={view === "official" ? () => setView("predictions") : undefined}
+      onSwipeRight={view === "predictions" ? () => setView("official") : undefined}
+      belowPanel={<ViewSwipeDots activeIndex={activeDotIndex} />}
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 px-2.5 pb-2 pt-2.5 sm:px-3 sm:pt-3">
@@ -109,29 +172,7 @@ export function AllGroupsStandingsModal({
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 auto-rows-auto grid-cols-3 items-stretch gap-2 overflow-y-auto px-2.5 pb-2.5 sm:gap-2.5 sm:px-3 sm:pb-3">
-          {groups.map((group) => (
-            <button
-              key={group.code}
-              type="button"
-              onClick={() => onSelectGroup(group.code)}
-              className={cn(
-                "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-[var(--tm-border)]",
-                "bg-[rgba(111,43,255,0.12)] text-left transition-colors",
-                "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
-              )}
-            >
-              <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-0.5 py-0.5 leading-none">
-                <span className="text-[7px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
-                  Grupo {group.code}
-                </span>
-              </div>
-              <div className="flex min-h-0 flex-1 flex-col overflow-visible">
-                <GroupStandingsTable group={group} variant="grid" />
-              </div>
-            </button>
-          ))}
-        </div>
+        <GroupsGrid groups={groups} onSelectGroup={onSelectGroup} />
       </div>
     </Modal>
   );

@@ -53,7 +53,7 @@ export function GroupStandingsTable({
   function renderTeamCell(row: GroupStandingTeamRow) {
     const fullName = teamNameEs(row.team);
     const abbr = teamAbbr(row.team);
-    const flagSize = isGrid ? "xxs" : isCompact ? "xxs" : "xs";
+    const flagSize = isGrid ? "xs" : isCompact ? "xxs" : "xs";
     const displayLabel = isGrid || isCompact ? abbr : fullName;
 
     const inner = (
@@ -74,7 +74,7 @@ export function GroupStandingsTable({
 
     const cellClass = cn(
       "flex items-center",
-      isGrid ? "flex-row gap-0.5" : "min-w-0 gap-0.5"
+      isGrid ? "flex-row gap-1" : "min-w-0 gap-0.5"
     );
 
     if (onTeamClick) {
