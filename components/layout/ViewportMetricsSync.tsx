@@ -3,20 +3,15 @@
 import { useLayoutEffect } from "react";
 
 function syncViewportMetrics() {
-  const vv = window.visualViewport;
-  const offsetTop = Math.round(vv?.offsetTop ?? 0);
-  const height = Math.round(vv?.height ?? window.innerHeight);
-
+  const offsetTop = Math.round(window.visualViewport?.offsetTop ?? 0);
   document.documentElement.style.setProperty("--tm-vvh-offset", `${offsetTop}px`);
-  document.documentElement.style.setProperty("--tm-vvh-height", `${height}px`);
 }
 
 function resetViewportMetrics() {
   document.documentElement.style.removeProperty("--tm-vvh-offset");
-  document.documentElement.style.removeProperty("--tm-vvh-height");
 }
 
-/** Alinea top + alto del shell con visualViewport (teclado, barra Safari, chin iOS). */
+/** Ajusta top del shell al visual viewport (teclado / barra Safari en iOS). El fondo usa bottom: 0. */
 export function ViewportMetricsSync() {
   useLayoutEffect(() => {
     const onChange = () => syncViewportMetrics();

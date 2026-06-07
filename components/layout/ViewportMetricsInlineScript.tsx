@@ -3,12 +3,8 @@ import Script from "next/script";
 const VIEWPORT_SYNC = `
 (function () {
   function sync() {
-    var vv = window.visualViewport;
-    var top = Math.round(vv ? vv.offsetTop : 0);
-    var height = Math.round(vv ? vv.height : window.innerHeight);
-    var root = document.documentElement;
-    root.style.setProperty("--tm-vvh-offset", top + "px");
-    root.style.setProperty("--tm-vvh-height", height + "px");
+    var top = Math.round(window.visualViewport ? window.visualViewport.offsetTop : 0);
+    document.documentElement.style.setProperty("--tm-vvh-offset", top + "px");
   }
 
   sync();
@@ -21,7 +17,7 @@ const VIEWPORT_SYNC = `
 })();
 `;
 
-/** Sincroniza viewport antes de hidratar React (evita flash de chin en iOS PWA). */
+/** Sincroniza offset superior antes de hidratar React (iOS PWA). */
 export function ViewportMetricsInlineScript() {
   return <Script id="tm-viewport-metrics-inline" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: VIEWPORT_SYNC }} />;
 }

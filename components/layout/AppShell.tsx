@@ -22,13 +22,9 @@ export function AppShell({
         <ViewportLayoutDebug />
       </Suspense>
       <HomeAtmosphere />
-      <div className="tm-app-frame">
-        <AppHeaderGate ctx={ctx} />
-        <div className="tm-app-body">
-          <main className="tm-app-main">{children}</main>
-          <TabBar />
-        </div>
-      </div>
+      <AppHeaderGate ctx={ctx} />
+      <main className="tm-app-main">{children}</main>
+      <TabBar />
     </div>
   );
 }
