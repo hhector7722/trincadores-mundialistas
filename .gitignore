@@ -43,3 +43,6 @@ access-codes.local.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*

@@ -18,6 +18,7 @@ type LayoutMetrics = {
   gapBelowShell: number;
   gapBelowVisual: number;
   cssTabbarHeight: string;
+  shellCssHeight: string;
 };
 
 function readSafeBottom(): number {
@@ -33,6 +34,7 @@ function collectMetrics(): LayoutMetrics {
   const shellRect = shell?.getBoundingClientRect();
   const tabbarRect = tabbar?.getBoundingClientRect();
   const visualBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  const dvhProbe = document.querySelector<HTMLElement>(".tm-app-shell");
 
   return {
     vvHeight: Math.round(vv?.height ?? 0),
@@ -49,6 +51,7 @@ function collectMetrics(): LayoutMetrics {
     gapBelowShell: Math.round(window.innerHeight - (shellRect?.bottom ?? 0)),
     gapBelowVisual: Math.round(visualBottom - (tabbarRect?.bottom ?? 0)),
     cssTabbarHeight: getComputedStyle(document.documentElement).getPropertyValue("--tm-tabbar-height").trim(),
+    shellCssHeight: dvhProbe ? getComputedStyle(dvhProbe).height : "n/a",
   };
 }
 
@@ -89,7 +92,7 @@ export function ViewportLayoutDebug() {
           <p>vv.h={metrics.vvHeight} vv.top={metrics.vvOffsetTop} innerH={metrics.innerHeight}</p>
           <p>safeBottom={metrics.safeBottom}px</p>
           <p>
-            shell {metrics.shellTop}→{metrics.shellBottom} (h={metrics.shellHeight})
+            shell {metrics.shellTop}→{metrics.shellBottom} (h={metrics.shellHeight} css={metrics.shellCssHeight})
           </p>
           <p>
             tabbar {metrics.tabbarTop}→{metrics.tabbarBottom} (h={metrics.tabbarHeight}) css={metrics.cssTabbarHeight}
