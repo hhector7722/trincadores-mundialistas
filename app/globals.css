@@ -908,9 +908,8 @@ html[data-modal-open] main {
 }
 
 /*
- * Cuartos: 2 conjuntos (4 arriba / 4 abajo). Revertidos a slots individuales.
- * Conjunto superior: centro al medio entre ubicación base (33.75%) y W97/W99 (42.5%) → 38.125%.
- * Inferior: 58% / 74.5%.
+ * Cuartos: conjunto superior (W89–W92, M97/M99) centrado al 40%.
+ * Conjunto inferior (W93–W96, M98/M100) centrado al 60%.
  */
 .tm-ko-node--qf-upper .tm-ko-node-pair,
 .tm-ko-node--qf-lower .tm-ko-node-pair {
@@ -924,55 +923,55 @@ html[data-modal-open] main {
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair::before {
-  top: 29.875%;
-  height: 16.5%;
+  top: 35%;
+  height: 10%;
   transform: translateX(-50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 29.875%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 46.375%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-score {
   position: absolute;
-  top: 38.125%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair::before {
-  top: 58%;
-  height: 16.5%;
+  top: 55%;
+  height: 10%;
   transform: translateX(-50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 58%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 74.5%;
+  top: 65%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-score {
   position: absolute;
-  top: 66.25%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
