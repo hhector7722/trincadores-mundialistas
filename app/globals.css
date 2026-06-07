@@ -635,11 +635,8 @@ html:has(.tm-app-shell) main {
   padding-bottom: 0.25rem;
 }
 
-/* ── Ranking: tabla ocupa el main disponible ── */
+/* ── Ranking: filas a altura natural; scroll en main ── */
 .tm-ranking-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   min-width: 0;
 }
 
@@ -652,10 +649,6 @@ html:has(.tm-app-shell) main {
 
 .tm-ranking-row {
   line-height: 1.2;
-}
-
-.tm-ranking-body {
-  min-height: 0;
 }
 
 /* ── Porra: calendario a pantalla completa ── */

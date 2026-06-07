@@ -19,7 +19,7 @@ export function RankingRow({
       href={`/profile/${row.profileId}`}
       className={cn(
         RANKING_GRID,
-        "tm-ranking-row h-full min-h-0 w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+        "tm-ranking-row min-h-11 w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />

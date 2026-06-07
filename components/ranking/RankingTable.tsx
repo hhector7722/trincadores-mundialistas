@@ -19,11 +19,11 @@ export function RankingTable({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="tm-ranking-table">
       <div
         className={cn(
           RANKING_GRID,
-          "tm-ranking-head shrink-0 border-b border-[var(--tm-border)] px-3 text-left font-medium uppercase tracking-wide text-[var(--tm-muted)]"
+          "tm-ranking-head tm-card-surface sticky top-0 z-10 border-b border-[var(--tm-border)] px-3 text-left font-medium uppercase tracking-wide text-[var(--tm-muted)]"
         )}
       >
         <span aria-hidden="true" />
@@ -33,10 +33,7 @@ export function RankingTable({
         <span>Fiab</span>
         <span>Quiz</span>
       </div>
-      <div
-        className="tm-ranking-body grid min-h-0 flex-1 overflow-hidden"
-        style={{ gridTemplateRows: `repeat(${rows.length}, minmax(0, 1fr))` }}
-      >
+      <div className="tm-ranking-body">
         {rows.map((row) => (
           <RankingRow
             key={row.profileId}
