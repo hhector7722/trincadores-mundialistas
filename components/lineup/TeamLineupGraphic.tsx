@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 type TeamLineupGraphicProps = {
   slots: LineupSlot[];
   formation: FormationId;
+  teamName: string;
   className?: string;
   /** `modal`: ocupa el ancho del panel de alineaciones. */
   size?: "default" | "modal";
@@ -16,6 +17,7 @@ type TeamLineupGraphicProps = {
 export function TeamLineupGraphic({
   slots,
   formation,
+  teamName,
   className,
   size = "default",
   onPlayerClick,
@@ -56,6 +58,7 @@ export function TeamLineupGraphic({
         >
           <LineupPlayerChip
             slot={slot}
+            teamName={teamName}
             variant={isModal ? "modal" : "default"}
             onClick={
               onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined

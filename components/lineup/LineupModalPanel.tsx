@@ -77,6 +77,7 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
         <TeamLineupGraphic
           slots={lineup.slots}
           formation={lineup.formation}
+          teamName={teamName}
           size="modal"
           onPlayerClick={onPlayerClick}
         />

@@ -1,17 +1,26 @@
-import { cn } from "@/lib/utils";
+import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { LineupSlot } from "@/lib/lineup/types";
+import { cn } from "@/lib/utils";
 
 type LineupPlayerChipProps = {
   slot: LineupSlot;
+  teamName: string;
   onClick?: () => void;
   variant?: "default" | "modal";
 };
 
-export function LineupPlayerChip({ slot, onClick, variant = "default" }: LineupPlayerChipProps) {
+export function LineupPlayerChip({
+  slot,
+  teamName,
+  onClick,
+  variant = "default",
+}: LineupPlayerChipProps) {
   const isModal = variant === "modal";
+  const kit = getTeamKitColors(teamName);
   const dorsal = slot.shirtNumber != null && slot.shirtNumber > 0 ? String(slot.shirtNumber) : "—";
   const interactive = Boolean(onClick) && !slot.isPlaceholder;
+  const useKitColors = !slot.isPlaceholder;
 
   const content = (
     <>
@@ -19,23 +28,27 @@ export function LineupPlayerChip({ slot, onClick, variant = "default" }: LineupP
         className={cn(
           "flex shrink-0 items-center justify-center border shadow-sm",
           isModal
-            ? "h-5 w-5 rounded-full border-[var(--tm-accent)]/45 bg-[rgba(10,8,24,0.82)]"
-            : "h-10 w-10 rounded-lg sm:h-11 sm:w-11",
-          !isModal &&
-            (slot.isPlaceholder
-              ? "border-dashed border-white/25 bg-black/30"
-              : "border-[var(--tm-accent)]/40 bg-[rgba(10,8,24,0.85)]"),
-          isModal &&
-            slot.isPlaceholder &&
-            "border-dashed border-white/25 bg-black/30",
+            ? "h-5 w-5 rounded-full"
+            : "h-10 w-10 rounded-full sm:h-11 sm:w-11",
+          slot.isPlaceholder && "border-dashed border-white/25 bg-black/30",
           interactive && "transition-transform active:scale-95"
         )}
+        style={
+          useKitColors
+            ? {
+                backgroundColor: kit.kit,
+                borderColor: kit.border,
+              }
+            : undefined
+        }
       >
         <span
           className={cn(
-            "font-display font-bold text-[var(--tm-accent)]",
-            isModal ? "text-[7px] leading-none" : "text-sm sm:text-base"
+            "font-display font-bold leading-none",
+            isModal ? "text-[7px]" : "text-sm sm:text-base",
+            !useKitColors && "text-[var(--tm-accent)]"
           )}
+          style={useKitColors ? { color: kit.dorsal } : undefined}
         >
           {dorsal}
         </span>

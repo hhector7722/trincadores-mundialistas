@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
+
+test("getTeamKitColors usa color de camiseta y dorsal con contraste", () => {
+  const spain = getTeamKitColors("Spain");
+  assert.equal(spain.kit, "#C60B1E");
+  assert.equal(spain.dorsal, "#FFFFFF");
+
+  const brazil = getTeamKitColors("Brazil");
+  assert.equal(brazil.kit, "#FFE900");
+  assert.equal(brazil.dorsal, "#111111");
+
+  const england = getTeamKitColors("England");
+  assert.equal(england.kit, "#FFFFFF");
+  assert.equal(england.dorsal, "#111111");
+});
+
+test("getTeamKitColors resuelve equipos con slug alternativo", () => {
+  const bosnia = getTeamKitColors("Bosnia & Herzegovina");
+  assert.equal(bosnia.kit, "#002395");
+});
