@@ -198,49 +198,6 @@ html[data-modal-open] main {
   color: var(--tm-accent-muted);
 }
 
-/* ── Cabecera sticky: barra sólida (resto de rutas) ── */
-.tm-app-header--bar {
-  background: rgba(42, 16, 88, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-/* ── Cabecera home: título fijo + recorte difuminado al scroll ── */
-.tm-app-header--home {
-  isolation: isolate;
-  padding-bottom: 0.875rem;
-  margin-bottom: -0.625rem;
-}
-
-.tm-app-header--home::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  bottom: -1rem;
-  z-index: -1;
-  background: linear-gradient(
-    to bottom,
-    rgba(42, 16, 88, 0.94) 0%,
-    rgba(42, 16, 88, 0.82) 52%,
-    rgba(42, 16, 88, 0.48) 78%,
-    rgba(42, 16, 88, 0) 100%
-  );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  pointer-events: none;
-}
-
-.tm-app-header--home::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1.125rem;
-  height: 1.5rem;
-  background: linear-gradient(to bottom, rgba(42, 16, 88, 0.55), transparent);
-  pointer-events: none;
-}
-
 /* ── Home: atmósfera multicapa ── */
 .tm-home-atmosphere {
   position: fixed;
