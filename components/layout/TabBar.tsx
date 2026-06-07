@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useTransition, useState, type Mouse
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TABBAR_HEIGHT_FALLBACK = "calc(var(--tm-tabbar-core) + max(0.5rem, var(--tm-safe-bottom)))";
+const TABBAR_HEIGHT_FALLBACK = "calc(var(--tm-tabbar-core) + var(--tm-safe-bottom))";
 
 function syncTabBarHeight(node: HTMLElement) {
   const height = Math.ceil(node.getBoundingClientRect().height);
@@ -87,7 +87,7 @@ export function TabBar() {
   return (
     <nav
       ref={navRef}
-      className="tm-tabbar border-t border-[var(--tm-border)] px-1"
+      className="tm-tabbar shrink-0 border-t border-[var(--tm-border)] px-1"
       aria-label="Navegacion principal"
     >
       <ul className="flex h-12 items-stretch justify-between">

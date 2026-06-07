@@ -43,7 +43,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + max(0.5rem, var(--tm-safe-bottom)));
+  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
   --tm-vvh-height: 100dvh;
@@ -165,6 +165,20 @@ html:has(.tm-app-shell) main {
   background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smartphone: TabBar al fondo del visual viewport (sin chin bajo la barra en iOS PWA) */
+@media (max-width: 639px) {
+  .tm-tabbar {
+    position: relative;
+    flex-shrink: 0;
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  html:has(.tm-app-shell) main {
+    padding-bottom: 0;
+  }
 }
 
 .tm-card-surface {
