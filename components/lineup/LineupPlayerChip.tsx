@@ -32,7 +32,7 @@ export function LineupPlayerChip({
         aria-hidden
         className={cn(
           "shrink-0",
-          isModal ? "h-[22px] w-[18px]" : "h-11 w-9 sm:h-12 sm:w-10",
+          isModal ? "h-[28px] w-[23px]" : "h-14 w-11 sm:h-16 sm:w-12",
           interactive && "transition-transform active:scale-95"
         )}
       >
@@ -50,7 +50,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isModal ? "12" : "17"}
+          fontSize={isModal ? "13" : "18"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >

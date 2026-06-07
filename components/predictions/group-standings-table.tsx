@@ -1,6 +1,6 @@
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
-import { teamNameEs } from "@/lib/teams/display";
+import { teamAbbr, teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 export const GROUP_STANDINGS_STAT_COLUMNS = [
@@ -38,8 +38,10 @@ export function GroupStandingsTable({
   const isCompact = compact || isGrid;
 
   function renderTeamCell(row: GroupStandingDetail["teams"][number]) {
-    const label = teamNameEs(row.team);
-    const flagSize = isGrid ? "xs" : isCompact ? "xxs" : "xs";
+    const fullName = teamNameEs(row.team);
+    const abbr = teamAbbr(row.team);
+    const flagSize = isGrid ? "xxs" : isCompact ? "xxs" : "xs";
+    const displayLabel = isGrid || isCompact ? abbr : fullName;
 
     const inner = (
       <>
@@ -52,11 +54,11 @@ export function GroupStandingsTable({
           className={cn(
             "font-medium leading-tight",
             isGrid
-              ? "max-w-[5.5rem] truncate text-center text-[7px] sm:max-w-[6rem] sm:text-[8px]"
+              ? "max-w-[3rem] truncate text-center text-[7px] font-semibold uppercase tracking-wide sm:max-w-[3.25rem] sm:text-[8px]"
               : cn("truncate", isCompact && "max-w-[3.5rem] text-[8px]", !isCompact && "text-[11px] sm:text-xs")
           )}
         >
-          {isCompact && !isGrid ? row.team.slice(0, 3).toUpperCase() : label}
+          {displayLabel}
         </span>
       </>
     );
@@ -76,7 +78,7 @@ export function GroupStandingsTable({
             "rounded-md transition-colors hover:bg-[rgba(111,43,255,0.16)]",
             isGrid ? "w-full py-0.5" : "p-0.5"
           )}
-          aria-label={`Ver alineación de ${label}`}
+          aria-label={`Ver alineación de ${fullName}`}
         >
           {inner}
         </button>
