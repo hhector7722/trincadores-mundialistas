@@ -58,10 +58,10 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
   return (
     <>
       <section
-        className="tm-glass-card cursor-pointer overflow-visible p-0"
+        className="tm-glass-card cursor-pointer overflow-hidden p-0"
         onClick={() => openScoreModal()}
       >
-        <div className="px-4 pb-3 pt-2">
+        <div className="px-4 pb-2 pt-2">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
               {isLive ? "En juego" : "Proximo partido"}
@@ -74,7 +74,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               Ver todos
             </Link>
           </div>
-          <div className="mt-2">
+          <div className="relative mt-2 min-h-[6.75rem]">
             <MatchTeamsDisplay
               homeTeam={match.home_team}
               awayTeam={match.away_team}
@@ -91,14 +91,14 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                     <div className="relative w-0 min-w-full">
                       <button
                         type="button"
-                      onClick={() => openScoreModal()}
-                      className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                    >
-                      {scoreText}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => openScoreModal()}
+                        onClick={() => openScoreModal()}
+                        className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      >
+                        {scoreText}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openScoreModal()}
                         aria-label="Editar pronóstico"
                         className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                       >
@@ -120,19 +120,22 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 </div>
               }
             />
-          </div>
-          <div onClick={(event) => event.stopPropagation()}>
-            <MatchContextActionsRow
-              compact
-              layout="teamAnchors"
-              homeAnchor="15%"
-              awayAnchor="85%"
-              className="mt-2 [&>div]:min-h-0"
-              match={match}
-              onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
-              onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
-              onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
-            />
+            <div
+              className="absolute inset-x-0 bottom-0"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <MatchContextActionsRow
+                compact
+                layout="teamAnchors"
+                homeAnchor="15%"
+                awayAnchor="85%"
+                className="[&>div]:min-h-[2rem]"
+                match={match}
+                onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
+                onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
+                onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
+              />
+            </div>
           </div>
         </div>
       </section>
