@@ -1,6 +1,6 @@
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 
-export type BracketRoundKey = "r32" | "r16" | "qf" | "sf" | "final" | "third";
+export type BracketRoundKey = "r32" | "r16" | "qf" | "sf" | "final";
 
 export type BracketTreeSlot = {
   side: "left" | "right" | "center";
@@ -9,7 +9,6 @@ export type BracketTreeSlot = {
   column: number;
   rowStart: number;
   rowSpan: number;
-  horizontal?: boolean;
 };
 
 /** Cuadro simétrico WC2026: bordes → centro (16 filas × 9 columnas). */
@@ -41,7 +40,6 @@ export const BRACKET_TREE_LAYOUT: BracketTreeSlot[] = [
     column: 4,
     rowStart: 1,
     rowSpan: 16,
-    horizontal: true,
   },
   // Der — semifinal
   { side: "right", round: "sf", matchNumber: 102, column: 5, rowStart: 1, rowSpan: 16 },
@@ -63,16 +61,6 @@ export const BRACKET_TREE_LAYOUT: BracketTreeSlot[] = [
   { side: "right", round: "r32", matchNumber: 87, column: 8, rowStart: 13, rowSpan: 2 },
   { side: "right", round: "r32", matchNumber: 88, column: 8, rowStart: 15, rowSpan: 2 },
 ];
-
-export const BRACKET_THIRD_PLACE: BracketTreeSlot = {
-  side: "center",
-  round: "third",
-  matchNumber: 103,
-  column: 4,
-  rowStart: 1,
-  rowSpan: 1,
-  horizontal: true,
-};
 
 const MATCH_NUMBER_BY_PAIR: Record<number, { home: string; away: string }> = {
   73: { home: "2A", away: "2B" },

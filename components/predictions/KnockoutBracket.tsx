@@ -9,7 +9,6 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  BRACKET_THIRD_PLACE,
   BRACKET_TREE_LAYOUT,
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
@@ -77,7 +76,6 @@ function BracketTreeMatch({
         slot.side === "left" && "tm-ko-node--left",
         slot.side === "right" && "tm-ko-node--right",
         slot.side === "center" && "tm-ko-node--center",
-        slot.horizontal && "tm-ko-node--horizontal",
         !match && "tm-ko-node--missing",
         isLive && "tm-ko-node--live",
         state === "saved" && "tm-ko-node--saved",
@@ -89,12 +87,7 @@ function BracketTreeMatch({
           : `Partido ${slot.matchNumber} sin datos`
       }
     >
-      <span
-        className={cn(
-          "tm-ko-node-pair",
-          slot.horizontal && "tm-ko-node-pair--horizontal"
-        )}
-      >
+      <span className="tm-ko-node-pair">
         <BracketTeamSlot name={homeName} />
         {scoreText.trim() ? <span className="tm-ko-node-score">{scoreText}</span> : null}
         <BracketTeamSlot name={awayName} />
@@ -106,7 +99,6 @@ function BracketTreeMatch({
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
-  const thirdPlaceMatch = resolveBracketMatch(matchMap, BRACKET_THIRD_PLACE.matchNumber);
 
   if (!matches.length) {
     return (
@@ -139,26 +131,6 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           ))}
         </div>
       </div>
-
-      {thirdPlaceMatch ? (
-        <div className="tm-ko-third">
-          <span className="tm-ko-third-label">3.er</span>
-          <button
-            type="button"
-            onClick={() => setActiveMatch(thirdPlaceMatch)}
-            className="tm-ko-third-btn"
-          >
-            <BracketTeamSlot name={thirdPlaceMatch.home_team} />
-            <span className="tm-ko-third-score">
-              {formatListScore(
-                thirdPlaceMatch.prediction?.home_goals ?? null,
-                thirdPlaceMatch.prediction?.away_goals ?? null
-              )}
-            </span>
-            <BracketTeamSlot name={thirdPlaceMatch.away_team} />
-          </button>
-        </div>
-      ) : null}
 
       {activeMatch ? (
         <QuickPredictionModal
