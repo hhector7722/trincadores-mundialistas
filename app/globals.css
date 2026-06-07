@@ -1010,15 +1010,15 @@ html[data-modal-open] main {
   flex: 0 0 var(--tm-cal-sidebar-access-dock-h, auto);
   height: var(--tm-cal-sidebar-access-dock-h, auto);
   margin-top: auto;
-  padding: 0 2px 2px;
+  padding: 0 0 2px;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: var(--tm-cal-sidebar-access-grid-gap, 8px);
-  place-items: center;
+  gap: var(--tm-cal-sidebar-access-grid-gap, 6px);
+  place-items: stretch;
   align-content: center;
   width: 100%;
   height: 100%;
@@ -1026,8 +1026,10 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
-  width: fit-content;
-  max-width: calc(100% - 8px);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: auto;
   min-height: var(--tm-cal-sidebar-access-btn-min-h, 22px);
   align-items: center;
@@ -1036,11 +1038,11 @@ html[data-modal-open] main {
   border-radius: 4px;
   background: #ccff00;
   color: #000;
-  padding: 2px var(--tm-cal-sidebar-access-btn-px, 8px);
+  padding: 2px var(--tm-cal-sidebar-access-btn-px, 6px);
   font-size: var(--tm-cal-sidebar-access-btn-fs, clamp(8px, 2.1cqw, 11px));
   font-weight: 700;
   line-height: 1.15;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
   transition: transform 0.15s ease, box-shadow 0.15s ease;

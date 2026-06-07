@@ -21,6 +21,8 @@ type ModalProps = {
   className?: string;
   wrapperClassName?: string;
   hideHeaderDivider?: boolean;
+  hideTitle?: boolean;
+  ariaLabel?: string;
   backdropClassName?: string;
   belowPanel?: ReactNode;
   onSwipeLeft?: () => void;
@@ -67,6 +69,7 @@ function ModalPanelShell({
   onClose,
   onBack,
   hideHeaderDivider,
+  hideTitle = false,
   className,
   children,
   loading = false,
@@ -76,6 +79,7 @@ function ModalPanelShell({
   onClose: () => void;
   onBack?: () => void;
   hideHeaderDivider?: boolean;
+  hideTitle?: boolean;
   className?: string;
   children: ReactNode;
   loading?: boolean;
@@ -84,7 +88,8 @@ function ModalPanelShell({
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
       <div
         className={cn(
-          "flex shrink-0 items-center gap-2 px-4 py-3",
+          "flex shrink-0 items-center gap-2 px-4",
+          hideTitle ? "py-2" : "py-3",
           !hideHeaderDivider && "border-b border-[var(--tm-border)]"
         )}
       >
@@ -98,14 +103,18 @@ function ModalPanelShell({
             <ChevronLeft className="h-5 w-5" />
           </button>
         ) : (
-          <span className="w-10 shrink-0" aria-hidden="true" />
+          <span className={cn("shrink-0", hideTitle ? "w-0" : "w-10")} aria-hidden="true" />
         )}
-        <h2
-          id={titleId}
-          className="min-w-0 flex-1 truncate font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]"
-        >
-          {title}
-        </h2>
+        {!hideTitle ? (
+          <h2
+            id={titleId}
+            className="min-w-0 flex-1 truncate font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]"
+          >
+            {title}
+          </h2>
+        ) : (
+          <div id={titleId} className="min-w-0 flex-1" />
+        )}
         <button
           type="button"
           aria-label="Cerrar modal"
@@ -131,6 +140,8 @@ export function Modal({
   className,
   wrapperClassName,
   hideHeaderDivider = false,
+  hideTitle = false,
+  ariaLabel,
   backdropClassName,
   belowPanel,
   onSwipeLeft,
@@ -244,6 +255,7 @@ export function Modal({
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
+          aria-label={hideTitle ? ariaLabel : undefined}
           tabIndex={-1}
           className="pointer-events-auto w-full overflow-hidden outline-none focus:outline-none focus-visible:outline-none"
         >
@@ -276,6 +288,7 @@ export function Modal({
                       onClose={onClose}
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
+                      hideTitle={hideTitle}
                       className={className}
                       loading={loading}
                     >
@@ -289,6 +302,7 @@ export function Modal({
                       onClose={onClose}
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
+                      hideTitle={hideTitle}
                       className={className}
                       loading={loading}
                     >
@@ -305,6 +319,7 @@ export function Modal({
                       onClose={onClose}
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
+                      hideTitle={hideTitle}
                       className={className}
                       loading={loading}
                     >
@@ -318,6 +333,7 @@ export function Modal({
                       onClose={onClose}
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
+                      hideTitle={hideTitle}
                       className={className}
                       loading={loading}
                     >
@@ -334,6 +350,7 @@ export function Modal({
               onClose={onClose}
               onBack={onBack}
               hideHeaderDivider={hideHeaderDivider}
+              hideTitle={hideTitle}
               className={className}
               loading={loading}
             >

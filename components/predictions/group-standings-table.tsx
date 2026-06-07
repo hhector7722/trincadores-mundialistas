@@ -60,7 +60,9 @@ export function GroupStandingsTable({
             <th
               className={cn(
                 "font-medium",
-                isGrid ? "w-3.5 pb-px text-center" : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
+                isGrid
+                  ? "w-4 min-w-4 pb-px text-center"
+                  : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
               )}
             >
               {isGrid ? " " : "Equipo"}
@@ -87,7 +89,7 @@ export function GroupStandingsTable({
                 index === 0 && "text-[var(--tm-fg)]"
               )}
             >
-              <td className={cn(isGrid ? "py-px pr-0" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
+              <td className={cn(isGrid ? "py-px pr-0 text-center" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
                 {onTeamClick ? (
                   <button
                     type="button"
@@ -101,7 +103,7 @@ export function GroupStandingsTable({
                     <TeamFlagBadge
                       name={row.team}
                       size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
-                      className="shrink-0"
+                      className={cn("shrink-0", isGrid && "mx-auto")}
                     />
                     {!isGrid ? (
                       <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
@@ -119,7 +121,7 @@ export function GroupStandingsTable({
                     <TeamFlagBadge
                       name={row.team}
                       size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
-                      className="shrink-0"
+                      className={cn("shrink-0", isGrid && "mx-auto")}
                     />
                     {!isGrid ? (
                       <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>

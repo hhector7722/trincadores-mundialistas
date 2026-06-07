@@ -33,13 +33,32 @@ export type GroupStandingDetail = {
   teams: GroupTeamStanding[];
 };
 
-type GroupMatchLike = {
+export type GroupStandingsSource = "official" | "predictions";
+
+export type GroupMatchLike = {
   group_code: string | null;
   home_team: string;
   away_team: string;
   officialHome: number | null;
   officialAway: number | null;
+  predictedHome?: number | null;
+  predictedAway?: number | null;
 };
+
+function resolveMatchScore(
+  match: GroupMatchLike,
+  source: GroupStandingsSource
+): { home: number; away: number } | null {
+  if (source === "official") {
+    if (match.officialHome == null || match.officialAway == null) return null;
+    return { home: match.officialHome, away: match.officialAway };
+  }
+
+  const home = match.predictedHome;
+  const away = match.predictedAway;
+  if (!Number.isInteger(home) || !Number.isInteger(away)) return null;
+  return { home: home as number, away: away as number };
+}
 
 type TeamStats = {
   played: number;
@@ -151,7 +170,8 @@ function collectGroupTeams<T extends GroupMatchLike>(
 }
 
 function buildGroupStatsMaps<T extends GroupMatchLike>(
-  matches: T[]
+  matches: T[],
+  source: GroupStandingsSource = "official"
 ): Map<string, Map<string, TeamStats>> {
   const statsByGroup = new Map<string, Map<string, TeamStats>>();
 
@@ -161,22 +181,24 @@ function buildGroupStatsMaps<T extends GroupMatchLike>(
 
   for (const match of matches) {
     const code = match.group_code?.toUpperCase();
-    if (!code || match.officialHome == null || match.officialAway == null) continue;
+    const score = resolveMatchScore(match, source);
+    if (!code || !score) continue;
 
     const groupStats = statsByGroup.get(code);
     if (!groupStats) continue;
 
-    applyResult(groupStats, match.home_team, match.away_team, match.officialHome, match.officialAway);
+    applyResult(groupStats, match.home_team, match.away_team, score.home, score.away);
   }
 
   return statsByGroup;
 }
 
-/** Clasificación detallada por grupo a partir de resultados oficiales. */
+/** Clasificación detallada por grupo (oficial o según pronósticos del usuario). */
 export function buildGroupStandingsDetail<T extends GroupMatchLike>(
-  matches: T[]
+  matches: T[],
+  source: GroupStandingsSource = "official"
 ): GroupStandingDetail[] {
-  const statsByGroup = buildGroupStatsMaps(matches);
+  const statsByGroup = buildGroupStatsMaps(matches, source);
 
   return WC2026_GROUP_CODES.map((code) => {
     const seedOrder = WC2026_GROUP_SEEDS[code] ?? [];
@@ -193,9 +215,10 @@ export function buildGroupStandingsDetail<T extends GroupMatchLike>(
 
 /** Clasificación por grupo (solo orden de banderas en calendario). */
 export function buildGroupStandings<T extends GroupMatchLike>(
-  matches: T[]
+  matches: T[],
+  source: GroupStandingsSource = "official"
 ): GroupStandingRow[] {
-  return buildGroupStandingsDetail(matches).map((group) => ({
+  return buildGroupStandingsDetail(matches, source).map((group) => ({
     code: group.code,
     teams: group.teams.map((row) => row.team),
   }));

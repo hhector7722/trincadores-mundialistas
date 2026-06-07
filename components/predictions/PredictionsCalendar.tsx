@@ -18,6 +18,7 @@ import {
   buildGroupStandingsDetail,
   CALENDAR_SIDEBAR_DAYS,
   isCalendarSidebarDay,
+  type GroupMatchLike,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
 import {
@@ -293,8 +294,32 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
-  const groupStandings = useMemo(() => buildGroupStandings(matches), [matches]);
-  const groupStandingsDetail = useMemo(() => buildGroupStandingsDetail(matches), [matches]);
+  const groupMatchRows = useMemo<GroupMatchLike[]>(
+    () =>
+      matches.map((match) => ({
+        group_code: match.group_code,
+        home_team: match.home_team,
+        away_team: match.away_team,
+        officialHome: match.officialHome,
+        officialAway: match.officialAway,
+        predictedHome: match.prediction?.home_goals ?? null,
+        predictedAway: match.prediction?.away_goals ?? null,
+      })),
+    [matches]
+  );
+
+  const groupStandings = useMemo(
+    () => buildGroupStandings(groupMatchRows, "official"),
+    [groupMatchRows]
+  );
+  const groupStandingsDetail = useMemo(
+    () => buildGroupStandingsDetail(groupMatchRows, "official"),
+    [groupMatchRows]
+  );
+  const groupStandingsPredicted = useMemo(
+    () => buildGroupStandingsDetail(groupMatchRows, "predictions"),
+    [groupMatchRows]
+  );
 
   useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
@@ -352,7 +377,8 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
         <AllGroupsStandingsModal
           open
           onClose={() => setAllGroupsOpen(false)}
-          groups={groupStandingsDetail}
+          officialGroups={groupStandingsDetail}
+          predictedGroups={groupStandingsPredicted}
           onSelectGroup={(code) => {
             setAllGroupsOpen(false);
             setActiveGroupCode(code);
