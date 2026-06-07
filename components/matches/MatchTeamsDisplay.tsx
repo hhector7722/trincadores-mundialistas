@@ -93,7 +93,7 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
-  /** Modal de pronóstico: equipos en 10%/90%, etiqueta arriba y steppers en fila con banderas. */
+  /** Modal de pronóstico: equipos en 10%/90%, steppers centrados entre banderas. */
   layout?: "default" | "predictionModal";
   predictionLabel?: string;
   homeScoreSlot?: ReactNode;
@@ -130,18 +130,19 @@ export function MatchTeamsDisplay({
         </p>
 
         <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <div className="flex items-center gap-0.5">
-            {homeScoreSlot}
-            <TeamFlagButton name={homeTeam} onClick={onHomeTeamClick} />
-          </div>
+          <TeamFlagButton name={homeTeam} onClick={onHomeTeamClick} />
           <TeamNameLabel name={homeTeam} />
         </div>
 
-        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <div className="flex items-center gap-0.5">
-            <TeamFlagButton name={awayTeam} onClick={onAwayTeamClick} />
+        {homeScoreSlot || awayScoreSlot ? (
+          <div className="absolute left-1/2 top-[1.15rem] flex h-10 -translate-x-1/2 items-center justify-center gap-0.5 sm:h-11">
+            {homeScoreSlot}
             {awayScoreSlot}
           </div>
+        ) : null}
+
+        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
+          <TeamFlagButton name={awayTeam} onClick={onAwayTeamClick} />
           <TeamNameLabel name={awayTeam} />
         </div>
       </div>
