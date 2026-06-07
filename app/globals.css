@@ -870,14 +870,14 @@ html[data-modal-open] main {
   right: 0;
 }
 
-/* Semis: local arriba al 25%, visitante abajo al 75% del cuadro */
+/* Semis: centros al 35% y 65% (medio camino hacia 45%/55% desde 25%/75%) */
 .tm-ko-node--sf .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--sf .tm-ko-node-pair::before {
-  top: 25%;
-  height: 50%;
+  top: 35%;
+  height: 30%;
   transform: translateX(-50%);
 }
 
@@ -888,14 +888,14 @@ html[data-modal-open] main {
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 25%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 75%;
+  top: 65%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -907,14 +907,14 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
-/* Final: borde inferior arriba al 40%, borde superior abajo al 60% */
+/* Final: borde inferior arriba al 45%, borde superior abajo al 55% */
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
-  top: 40%;
-  height: 20%;
+  top: 45%;
+  height: 10%;
   transform: translateX(-50%);
 }
 
@@ -925,14 +925,14 @@ html[data-modal-open] main {
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -100%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 60%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, 0);
 }
