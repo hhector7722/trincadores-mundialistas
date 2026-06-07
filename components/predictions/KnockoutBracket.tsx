@@ -73,6 +73,7 @@ function BracketTreeMatch({
       className={cn(
         "tm-ko-node",
         slot.round === "final" && "tm-ko-node--final",
+        slot.round === "sf" && "tm-ko-node--sf",
         slot.side === "left" && "tm-ko-node--left",
         slot.side === "right" && "tm-ko-node--right",
         slot.side === "center" && "tm-ko-node--center",
