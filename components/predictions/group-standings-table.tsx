@@ -58,7 +58,12 @@ export function GroupStandingsTable({
 
     const inner = (
       <>
-        <TeamFlagBadge name={row.team} size={flagSize} className="shrink-0" />
+        <TeamFlagBadge
+          name={row.team}
+          size={flagSize}
+          className="shrink-0"
+          loading={isGrid ? "eager" : "lazy"}
+        />
         <span
           className={cn(
             "font-medium leading-none",

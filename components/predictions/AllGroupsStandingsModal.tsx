@@ -3,19 +3,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
-import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import { Modal } from "@/components/ui/modal";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { cn } from "@/lib/utils";
 
 type GroupStandingsView = "official" | "predictions";
 
 type ViewSlideState = {
-  target: GroupStandingsView;
-  direction: "next" | "prev";
+  from: 0 | 1;
+  to: 0 | 1;
   phase: "prep" | "animate";
 };
 
 const SLIDE_MS = 300;
+
+function viewToIndex(view: GroupStandingsView): 0 | 1 {
+  return view === "official" ? 0 : 1;
+}
+
+function indexToView(index: 0 | 1): GroupStandingsView {
+  return index === 0 ? "official" : "predictions";
+}
 
 function LivePulseIcon() {
   return (
@@ -151,12 +159,9 @@ export function AllGroupsStandingsModal({
   const viewSlideLockRef = useRef(false);
   const viewSlideTimerRef = useRef<number | null>(null);
 
-  const activeDotIndex = view === "official" ? 0 : 1;
-
-  const groupsForView = useCallback(
-    (target: GroupStandingsView) => (target === "official" ? officialGroups : predictedGroups),
-    [officialGroups, predictedGroups]
-  );
+  const viewIndex = viewToIndex(view);
+  const activeDotIndex = (viewSlide ? viewSlide.to : viewIndex) as 0 | 1;
+  const toggleView = indexToView(viewSlide ? viewSlide.to : viewIndex);
 
   const clearViewSlideTimer = useCallback(() => {
     if (viewSlideTimerRef.current !== null) {
@@ -172,7 +177,7 @@ export function AllGroupsStandingsModal({
 
     setViewSlide((current) => {
       if (!current) return null;
-      setView(current.target);
+      setView(indexToView(current.to));
       return null;
     });
   }, [clearViewSlideTimer]);
@@ -193,13 +198,14 @@ export function AllGroupsStandingsModal({
 
   const startViewSlide = useCallback(
     (target: GroupStandingsView) => {
-      if (viewSlideLockRef.current || viewSlide || target === view) return;
+      const targetIndex = viewToIndex(target);
+      if (viewSlideLockRef.current || viewSlide || targetIndex === viewIndex) return;
 
       clearViewSlideTimer();
       viewSlideLockRef.current = true;
       setViewSlide({
-        target,
-        direction: target === "predictions" ? "next" : "prev",
+        from: viewIndex,
+        to: targetIndex,
         phase: "prep",
       });
 
@@ -213,38 +219,14 @@ export function AllGroupsStandingsModal({
         });
       });
     },
-    [clearViewSlideTimer, view, viewSlide]
+    [clearViewSlideTimer, viewIndex, viewSlide]
   );
 
-  const renderViewPanel = (target: GroupStandingsView) => (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 px-2.5 pb-2 pt-2.5 sm:px-3 sm:pt-3">
-        <span aria-hidden="true" />
-        <div className="flex justify-center">
-          <GroupStandingsViewToggle value={target} onChange={startViewSlide} />
-        </div>
-        <button
-          type="button"
-          aria-label="Cerrar modal"
-          onClick={onClose}
-          className="flex h-10 w-10 shrink-0 items-center justify-center justify-self-end rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-
-      <GroupsGrid groups={groupsForView(target)} onSelectGroup={onSelectGroup} />
-    </div>
-  );
-
-  const viewPanelSlide: ModalPanelSlide | null = viewSlide
-    ? {
-        direction: viewSlide.direction,
-        phase: viewSlide.phase,
-        incoming: renderViewPanel(viewSlide.target),
-        onTransitionEnd: () => finishViewSlideRef.current(),
-      }
-    : null;
+  const slideTranslateIndex = viewSlide
+    ? viewSlide.phase === "prep"
+      ? viewSlide.from
+      : viewSlide.to
+    : viewIndex;
 
   return (
     <Modal
@@ -256,14 +238,49 @@ export function AllGroupsStandingsModal({
       className="flex max-h-[calc(100dvh-1rem)] flex-col"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
-      onSwipeLeft={view === "official" && !viewPanelSlide ? () => startViewSlide("predictions") : undefined}
-      onSwipeRight={
-        view === "predictions" && !viewPanelSlide ? () => startViewSlide("official") : undefined
-      }
+      onSwipeLeft={viewIndex === 0 && !viewSlide ? () => startViewSlide("predictions") : undefined}
+      onSwipeRight={viewIndex === 1 && !viewSlide ? () => startViewSlide("official") : undefined}
       belowPanel={<ViewSwipeDots activeIndex={activeDotIndex} />}
-      panelSlide={viewPanelSlide}
     >
-      {renderViewPanel(view)}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 px-2.5 pb-2 pt-2.5 sm:px-3 sm:pt-3">
+          <span aria-hidden="true" />
+          <div className="flex justify-center">
+            <GroupStandingsViewToggle value={toggleView} onChange={startViewSlide} />
+          </div>
+          <button
+            type="button"
+            aria-label="Cerrar modal"
+            onClick={onClose}
+            className="flex h-10 w-10 shrink-0 items-center justify-center justify-self-end rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <div
+            className={cn(
+              "flex h-full w-[200%]",
+              viewSlide?.phase === "animate" && "transform-gpu transition-transform duration-300 ease-in-out",
+              slideTranslateIndex === 1 ? "-translate-x-1/2" : "translate-x-0"
+            )}
+            onTransitionEnd={(event) => {
+              if (event.target !== event.currentTarget) return;
+              if (event.propertyName !== "transform") return;
+              if (viewSlide?.phase !== "animate") return;
+              finishViewSlideRef.current();
+            }}
+          >
+            <div className="flex h-full w-1/2 min-h-0 min-w-0 flex-col" aria-hidden={slideTranslateIndex !== 0}>
+              <GroupsGrid groups={officialGroups} onSelectGroup={onSelectGroup} />
+            </div>
+            <div className="flex h-full w-1/2 min-h-0 min-w-0 flex-col" aria-hidden={slideTranslateIndex !== 1}>
+              <GroupsGrid groups={predictedGroups} onSelectGroup={onSelectGroup} />
+            </div>
+          </div>
+        </div>
+      </div>
     </Modal>
   );
 }

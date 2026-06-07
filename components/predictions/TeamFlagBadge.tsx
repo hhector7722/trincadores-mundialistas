@@ -5,9 +5,10 @@ type TeamFlagBadgeProps = {
   name: string;
   size?: "cal" | "xxs" | "xs" | "sm" | "md";
   className?: string;
+  loading?: "lazy" | "eager";
 };
 
-export function TeamFlagBadge({ name, size = "sm", className }: TeamFlagBadgeProps) {
+export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }: TeamFlagBadgeProps) {
   const flagCode = teamFlagCode(name);
   const scaled = size === "cal";
   const dim = scaled
@@ -37,7 +38,7 @@ export function TeamFlagBadge({ name, size = "sm", className }: TeamFlagBadgePro
           width={imgSize}
           height={imgSize}
           className="h-full w-full object-cover"
-          loading="lazy"
+          loading={loading}
           decoding="async"
         />
       ) : (
