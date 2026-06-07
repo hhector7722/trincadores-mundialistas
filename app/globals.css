@@ -132,6 +132,8 @@ html[data-modal-open] .tm-app-main {
   box-sizing: border-box;
   position: relative;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   flex: 1 1 0%;
   overflow-x: hidden;
