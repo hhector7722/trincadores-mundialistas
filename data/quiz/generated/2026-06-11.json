@@ -1,0 +1,128 @@
+{
+  "quiz_date": "2026-06-11",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿Cuál es el récord de Pelé en Mundiales?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "3 Mundiales ganados"
+          },
+          {
+            "id": "b",
+            "label": "32 selecciones"
+          },
+          {
+            "id": "c",
+            "label": "13 goles en un solo Mundial"
+          },
+          {
+            "id": "d",
+            "label": "16 goles"
+          }
+        ],
+        "correct_option_id": "a",
+        "fact_id": "pele-titles-player",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/pele-world-cup-legend",
+        "source_label": "FIFA — Pelé",
+        "template_id": "record_value",
+        "category": "players"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿En qué país se disputó el Mundial 2002?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Rusia"
+          },
+          {
+            "id": "b",
+            "label": "Uruguay"
+          },
+          {
+            "id": "c",
+            "label": "Brasil"
+          },
+          {
+            "id": "d",
+            "label": "Japón y Corea del Sur"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "wc2002-host-jp",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2002koreajapan",
+        "source_label": "FIFA — Mundial 2002",
+        "template_id": "host_country",
+        "category": "hosts"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿Qué selección ganó el Mundial de 1930?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Italia"
+          },
+          {
+            "id": "b",
+            "label": "Japón y Corea del Sur"
+          },
+          {
+            "id": "c",
+            "label": "Uruguay"
+          },
+          {
+            "id": "d",
+            "label": "Inglaterra"
+          }
+        ],
+        "correct_option_id": "c",
+        "fact_id": "wc1930-winner",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/1930uruguay",
+        "source_label": "FIFA — Mundial 1930",
+        "template_id": "first_winner",
+        "category": "history"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-07T00:17:17.785Z",
+    "fact_ids": [
+      "pele-titles-player",
+      "wc2002-host-jp",
+      "wc1930-winner"
+    ],
+    "templates": [
+      "record_value",
+      "host_country",
+      "first_winner"
+    ],
+    "sources": [
+      {
+        "fact_id": "pele-titles-player",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/pele-world-cup-legend",
+        "source_label": "FIFA — Pelé"
+      },
+      {
+        "fact_id": "wc2002-host-jp",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2002koreajapan",
+        "source_label": "FIFA — Mundial 2002"
+      },
+      {
+        "fact_id": "wc1930-winner",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/1930uruguay",
+        "source_label": "FIFA — Mundial 1930"
+      }
+    ],
+    "facts_source": "world-cup-facts.json",
+    "facts_pool_size": 32
+  }
+}

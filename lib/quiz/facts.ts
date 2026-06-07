@@ -32,6 +32,8 @@ export type QuizFact = {
   tags: string[];
   /** Imagen tematica (no debe delatar la respuesta). Ruta publica o URL https. */
   image_url: string | null;
+  /** Pool opcional desde DB cuando el banco semántico es pequeño. */
+  distractor_pool?: string[];
 };
 
 const FACT_TYPES = new Set<QuizFactType>([

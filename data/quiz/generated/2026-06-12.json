@@ -1,0 +1,128 @@
+{
+  "quiz_date": "2026-06-12",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿Qué selección ganó el Mundial de 1966?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Argentina"
+          },
+          {
+            "id": "b",
+            "label": "Italia"
+          },
+          {
+            "id": "c",
+            "label": "Korea, Japan"
+          },
+          {
+            "id": "d",
+            "label": "Inglaterra"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "fj-wc1966-winner",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "first_winner",
+        "category": "history"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Cuál es el récord de Goles en una final de Mundial en Mundiales?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "2 goles"
+          },
+          {
+            "id": "b",
+            "label": "5 goles"
+          },
+          {
+            "id": "c",
+            "label": "3 goles"
+          },
+          {
+            "id": "d",
+            "label": "12 goles"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "fj-record-highest-scoring-final",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "record_value",
+        "category": "records"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿En qué país se disputó el Mundial 1978?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Italia"
+          },
+          {
+            "id": "b",
+            "label": "Francia"
+          },
+          {
+            "id": "c",
+            "label": "España"
+          },
+          {
+            "id": "d",
+            "label": "Argentina"
+          }
+        ],
+        "correct_option_id": "d",
+        "fact_id": "fj-wc1978-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "host_country",
+        "category": "hosts"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-07T00:20:19.408Z",
+    "fact_ids": [
+      "fj-wc1966-winner",
+      "fj-record-highest-scoring-final",
+      "fj-wc1978-host"
+    ],
+    "templates": [
+      "first_winner",
+      "record_value",
+      "host_country"
+    ],
+    "sources": [
+      {
+        "fact_id": "fj-wc1966-winner",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      },
+      {
+        "fact_id": "fj-record-highest-scoring-final",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      },
+      {
+        "fact_id": "fj-wc1978-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      }
+    ],
+    "facts_source": "quiz_facts_worldcup",
+    "facts_pool_size": 71
+  }
+}

@@ -1,0 +1,35 @@
+# Datos externos (copia bruta)
+
+Los CSV vendoreados viven aquí. La DB sólo guarda tablas normalizadas.
+
+## Fjelstul (histórico)
+
+```bash
+ALLOW_IMPORT=1 npm run db:import-wc-historic -- --download
+```
+
+Descarga a `data/external/fjelstul-worldcup/` desde
+[jfjelstul/worldcup/data-csv](https://github.com/jfjelstul/worldcup/tree/master/data-csv).
+
+Atribución: Joshua C. Fjelstul, Ph.D. — CC-BY-SA 4.0.
+
+**Filtro de género (intencional):** el dataset Fjelstul incluye Mundiales masculinos y femeninos.
+En esta fase solo importamos torneos masculinos (`isMenTournament` en `lib/fjelstul-worldcup/normalize.ts`):
+IDs femeninos excluidos (`WC-1991` … `WC-2019`) o nombre con "Women"/"Femenin".
+Partidos, goles, plantillas, awards y quiz facts derivan solo de esos torneos.
+
+## worldcup2026 (feed 2026)
+
+Copia manual o clone los CSV del repo
+[rezarahiminia/worldcup2026](https://github.com/rezarahiminia/worldcup2026):
+
+- `worldcup2026.teams.csv`
+- `worldcup2026.groups.csv`
+- `worldcup2026.stadia.csv`
+- `worldcup2026.games.csv`
+
+```bash
+ALLOW_IMPORT=1 npm run db:import-wc2026-feed
+```
+
+Este script **no** reimporta el catálogo OpenFootball; sólo `external_id_map` y `match_live_state`.

@@ -102,6 +102,16 @@ export function buildDistractorLabels(
     if (distractors.length >= count) break;
   }
 
+  if (distractors.length < count && fact.distractor_pool?.length) {
+    for (const label of fact.distractor_pool) {
+      const key = label.toLowerCase();
+      if (!label || seen.has(key)) continue;
+      seen.add(key);
+      distractors.push(label);
+      if (distractors.length >= count) break;
+    }
+  }
+
   return distractors;
 }
 

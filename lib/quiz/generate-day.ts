@@ -6,6 +6,11 @@ import { assertGeneratedQuestions } from "@/lib/quiz/quality";
 import { mulberry32, seedFromQuizDate, shuffleWithRng } from "@/lib/quiz/rng";
 import type { GeneratedQuizDayFile } from "@/lib/quiz/generated-day";
 import { QUIZ_OFFICIAL_TITLE } from "@/lib/quiz/seed-day";
+import {
+  loadQuizFactsWithFallback,
+  type LoadQuizFactsDeps,
+  type QuizFactsLoadResult,
+} from "@/lib/quiz/worldcup-facts-source";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const GENERATED_DIR = resolve(process.cwd(), "data/quiz/generated");
@@ -149,6 +154,41 @@ export function generateQuizDay(args: {
       })),
     },
   };
+}
+
+export function attachFactsSourceMeta(
+  day: GeneratedQuizDayFile,
+  loadResult: QuizFactsLoadResult
+): GeneratedQuizDayFile {
+  return {
+    ...day,
+    _meta: {
+      ...day._meta,
+      generated_at: day._meta?.generated_at ?? new Date().toISOString(),
+      fact_ids: day._meta?.fact_ids ?? [],
+      templates: day._meta?.templates ?? [],
+      sources: day._meta?.sources ?? [],
+      facts_source: loadResult.source,
+      facts_pool_size: loadResult.facts.length,
+    },
+  };
+}
+
+/** Genera el quiz del día leyendo hechos desde DB (fallback JSON estático). */
+export async function generateQuizDayFromSources(args: {
+  quizDate: string;
+  excludeFactIds?: Set<string>;
+  title?: string;
+  factsDeps?: LoadQuizFactsDeps;
+}): Promise<GeneratedQuizDayFile> {
+  const loadResult = await loadQuizFactsWithFallback(args.factsDeps);
+  const day = generateQuizDay({
+    quizDate: args.quizDate,
+    facts: loadResult.facts,
+    excludeFactIds: args.excludeFactIds,
+    title: args.title,
+  });
+  return attachFactsSourceMeta(day, loadResult);
 }
 
 export function listGeneratedDates(): string[] {

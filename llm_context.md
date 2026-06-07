@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-06T19:17:12.156Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T00:44:00.877Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -13,12 +13,12 @@
 | **Objetivo** | PWA de porras privadas para el Mundial 2026: predicciones de marcador, ranking por jornada, administración de resultados |
 | **Problema** | Centralizar quinielas entre amigos con reglas claras (8/5/3/0), visibilidad controlada de predicciones rivales y multi-porra |
 | **Usuarios** | Jugadores (`player`), administradores de porra (`admin`), propietarios (`owner`) |
-| **Fase actual** | 2a datos Mundial 2026 importados (OpenFootball) |
+| **Fase actual** | 2b datos externos Mundiales (Fjelstul + worldcup2026 feed) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
 **Completado reciente:** Slide home quiz en hero carousel · Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado · Quiz training rejugable (migracion RPC/índice) · Bonus deprecado en UI/seed · Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo · Quiz generador: distractores semanticos + owner replay ilimitado
 
-**Siguiente:** Probar flujo E2E con login real (official + bonus)
+**Siguiente:** Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
 
 
 ## Arquitectura
@@ -107,6 +107,7 @@ flowchart TB
 | `/quiz/play` | `app/(app)/quiz/play/page.tsx` | force-dynamic |
 | `/quiz/result` | `app/(app)/quiz/result/page.tsx` | force-dynamic |
 | `/ranking` | `app/(app)/ranking/page.tsx` | force-dynamic |
+| `/teams/:teamSlug/lineup` | `app/(app)/teams/[teamSlug]/lineup/page.tsx` | force-dynamic |
 | `/login` | `app/(auth)/login/page.tsx` | default |
 
 ### Layouts
@@ -156,6 +157,14 @@ flowchart TB
 | `BrandLogo` | `components/layout/BrandLogo.tsx` | server | BrandLogo, BrandLogoFixed |
 | `PoolSwitcher` | `components/layout/PoolSwitcher.tsx` | client | PoolSwitcher |
 | `TabBar` | `components/layout/TabBar.tsx` | client | TabBar |
+
+#### lineup
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `LineupPlayerChip` | `components/lineup/LineupPlayerChip.tsx` | server | LineupPlayerChip |
+| `ProbableXI` | `components/lineup/ProbableXI.tsx` | server | ProbableXI |
+| `TeamLineupGraphic` | `components/lineup/TeamLineupGraphic.tsx` | server | TeamLineupGraphic |
 
 #### match
 
@@ -304,6 +313,23 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/dev/seed-ids.ts` | 32 líneas | DEV_SEED_PASSWORD, SEED_USER_IDS, SEED_POOL_ID, SEED_MATCHDAY_ID, SEED_MATCH_FINISHED_ID, SEED_MATCH_LIVE_ID, SEED_MATCH_SCHEDULED_ID, SEED_QUIZ_ID, SEED_INVITE_CODE_ID |
 
+**fjelstul-worldcup/** — 3 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/fjelstul-worldcup/download.ts` | 43 líneas | downloadFjelstulCsv, FJELSTUL_CSV_FILES, FjelstulCsvFile |
+| `lib/fjelstul-worldcup/normalize.ts` | 274 líneas | isWomenTournament, isMenTournament, inferGender, onlyMenTournaments, menTournamentExternalIds, filterByMenTournaments, playerDisplayName, normalizeTournaments, normalizeTeams, normalizeStadiums, normalizeMatches, normalizeGoals, normalizeAwardWinners, normalizeStandings, normalizeSquads, assertErrorRate, WOMENS_WC_TOURNAMENT_IDS, NormalizeStats |
+| `lib/fjelstul-worldcup/parse-csv.ts` | 79 líneas | parseCsvContent, readBool, readInt, readOptionalText, CsvRow |
+
+**lineup/** — 4 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/lineup/build-probable-xi.ts` | 126 líneas | buildProbableXI |
+| `lib/lineup/position-map.ts` | 86 líneas | normalizePositionRole, positionLabelEs, formationRoleCounts, pickFormation, coordinatesForFormation |
+| `lib/lineup/squad-name.ts` | 32 líneas | squadTeamNameFromSlug, squadSlugFromTeamName |
+| `lib/lineup/types.ts` | 30 líneas | PositionRole, FormationId, LineupPlayerInput, LineupPlayer, FieldCoordinate, LineupSlot, ProbableXIResult |
+
 **narrative/** — 4 archivos
 
 | Archivo | Tamaño | Exports |
@@ -349,16 +375,17 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
-**quiz/** — 19 archivos
+**quiz/** — 22 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/quiz/date.ts` | 12 líneas | todayQuizDate |
-| `lib/quiz/distractors.ts` | 143 líneas | getOptionSemanticType, buildDistractorLabels, buildMcqOptions, McqOption, OptionSemanticType |
-| `lib/quiz/facts.ts` | 139 líneas | validateQuizFact, parseFactsFile, loadFacts, DEFAULT_FACTS_PATH, QuizFactCategory, QuizFactType, QuizFactDifficulty, QuizFact |
-| `lib/quiz/generate-day.ts` | 161 líneas | loadRecentFactIds, selectFactsForDay, generateQuizDay, listGeneratedDates |
+| `lib/quiz/distractors.ts` | 153 líneas | getOptionSemanticType, buildDistractorLabels, buildMcqOptions, McqOption, OptionSemanticType |
+| `lib/quiz/facts.ts` | 141 líneas | validateQuizFact, parseFactsFile, loadFacts, DEFAULT_FACTS_PATH, QuizFactCategory, QuizFactType, QuizFactDifficulty, QuizFact |
+| `lib/quiz/generate-day.ts` | 201 líneas | generateQuizDayFromSources, loadRecentFactIds, selectFactsForDay, generateQuizDay, attachFactsSourceMeta, listGeneratedDates |
 | `lib/quiz/generate-question.ts` | 58 líneas | generateQuestionFromFact, GeneratedQuizQuestion |
-| `lib/quiz/generated-day.ts` | 67 líneas | toSeedQuestion, generatedDayToSeedFile, parseGeneratedOrSeedDay, questionsMetaFromDay, GeneratedQuizDayFile |
+| `lib/quiz/generate-worldcup-facts.ts` | 217 líneas | buildWorldcupFactsFromHistoric |
+| `lib/quiz/generated-day.ts` | 69 líneas | toSeedQuestion, generatedDayToSeedFile, parseGeneratedOrSeedDay, questionsMetaFromDay, GeneratedQuizDayFile |
 | `lib/quiz/home-teaser.ts` | 87 líneas | homeQuizSlideFromHub, HomeQuizSlide |
 | `lib/quiz/mode.ts` | 42 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
@@ -368,10 +395,12 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/quality.ts` | 144 líneas | validateSemanticCoherence, validateGeneratedQuestion, assertGeneratedQuestions, QualityResult |
 | `lib/quiz/queries.ts` | 342 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
 | `lib/quiz/question-templates.ts` | 57 líneas | renderQuestionFromFact, QuestionTemplateResult |
+| `lib/quiz/quiz-facts-repository.ts` | 118 líneas | upsertWorldcupFacts, shouldPersistFacts, validateWorldcupFactRow, prepareFactsForUpsert, toUpsertPayload, QUIZ_FACTS_WORLDCUP_TABLE, PrepareFactsResult, UpsertFactsResult, UpsertWorldcupFactsDeps |
 | `lib/quiz/rng.ts` | 33 líneas | mulberry32, hashString, seedFromQuizDate, shuffleWithRng |
 | `lib/quiz/seed-day.ts` | 154 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
 | `lib/quiz/slot-status.ts` | 78 líneas | getQuizSlotStatus, canOpenQuizPlay, canReplayQuiz, formatQuizSlotStatusLabel, QuizSlotStatus, QuizPlayAccessOptions |
 | `lib/quiz/types.ts` | 100 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizQuestionPlay, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
+| `lib/quiz/worldcup-facts-source.ts` | 189 líneas | fetchWorldcupFactsFromDb, loadQuizFactsWithFallback, isMenQuizFact, mapWorldcupRowToQuizFact, parseWorldcupFactsRows, mergeFactPools, MIN_FACTS_FOR_DAY, MIN_FACTS_POOL, QuizFactsSourceKind, QuizFactsLoadResult, LoadQuizFactsDeps |
 
 **ranking/** — 3 archivos
 
@@ -387,11 +416,13 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/scoring/compute.ts` | 36 líneas | matchOutcome, computeMatchPoints, ScoreInput |
 
-**scripts/** — 1 archivos
+**scripts/** — 3 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/scripts/cli.ts` | 63 líneas | parseScriptCli, logCliOptions, ScriptCliOptions |
 | `lib/scripts/env-guard.ts` | 50 líneas | getProjectRef, assertProjectRef, assertServiceEnv, assertPurgeConfirmed, assertBootstrapAllowed, assertImportAllowed, assertQuizSeedAllowed |
+| `lib/scripts/supabase-admin.ts` | 32 líneas | upsertChunks, createAdminClient, AdminClient |
 
 **site-url.ts/** — 1 archivos
 
@@ -421,6 +452,21 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/utils.ts` | 4 líneas | cn |
 
+**worldcup-data/** — 2 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/worldcup-data/squad-queries.ts` | 53 líneas | getTeamSquadByName, TeamSquadWithPlayers |
+| `lib/worldcup-data/types.ts` | 195 líneas | FJELSTUL_SOURCE, FJELSTUL_SOURCE_URL, FJELSTUL_SOURCE_LABEL, WC2026_FEED_SOURCE, OPENFOOTBALL_SOURCE, WcHistoricGender, WcHistoricTournamentRow, WcHistoricTeamRow, WcHistoricStadiumRow, WcHistoricMatchRow, WcHistoricGoalRow, WcHistoricAwardWinnerRow, WcHistoricStandingRow, TeamSquadRow, TeamSquadPlayerRow, QuizFactWorldcupRow, Wc2026TeamRow, Wc2026StadiumRow, Wc2026GameRow, ExternalIdMapRow, MatchLiveStateRow, OpenFootballMatchRef, OpenFootballTeamRef, OpenFootballHostCityRef |
+
+**worldcup2026/** — 3 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/worldcup2026/api-client.ts` | 41 líneas | fetchWc2026Games, fetchWc2026Teams, Wc2026ApiGame |
+| `lib/worldcup2026/match-mapper.ts` | 132 líneas | buildTeamLookup, mapGamesToOpenFootball, mapStadiumsToHostCities, MatchMappingResult |
+| `lib/worldcup2026/parse-csv.ts` | 83 líneas | parseWc2026TeamsCsv, parseWc2026StadiaCsv, parseWc2026GamesCsv, parseWc2026GroupsCsv, wc2026ExternalKey |
+
 
 ### Jobs / Cron / Webhooks
 
@@ -439,8 +485,8 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 10 archivos en `supabase/migrations/` |
-| Tablas | 25 |
+| Migraciones | 11 archivos en `supabase/migrations/` |
+| Tablas | 38 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
 | Funciones SQL | 13 |
 | Políticas RLS | 0 |
@@ -478,8 +524,11 @@ erDiagram
 | `activity_events` | Eventos para feed de actividad (fase 1e) | RLS habilitado |
 | `admin_audit_log` | Auditoría acciones administrativas | RLS habilitado |
 | `competitions` | Ver migraciones SQL | RLS habilitado |
+| `data_source_registry` | Ver migraciones SQL | RLS habilitado |
+| `external_id_map` | Ver migraciones SQL | RLS habilitado |
 | `host_cities` | Ver migraciones SQL | RLS habilitado |
 | `invite_codes` | Códigos de invitación (solo RPC, sin SELECT directo) | RLS habilitado |
+| `match_live_state` | Ver migraciones SQL | RLS habilitado |
 | `match_results` | Marcador oficial (1:1 con match) | RLS habilitado |
 | `matchdays` | Jornadas de competición dentro de una porra | RLS habilitado |
 | `matches` | Partidos con kickoff, equipos y status | RLS habilitado |
@@ -493,12 +542,22 @@ erDiagram
 | `profiles` | Perfil 1:1 con auth.users (username, display_name) | RLS habilitado |
 | `push_subscriptions` | Suscripciones Web Push (pendiente) | RLS habilitado |
 | `quiz_attempts` | Intento de quiz por usuario | RLS habilitado |
+| `quiz_facts_worldcup` | Ver migraciones SQL | RLS habilitado |
 | `quiz_question_keys` | Respuestas correctas (acceso revocado) | RLS habilitado |
 | `quiz_questions` | Preguntas de un quiz | RLS habilitado |
 | `quiz_responses` | Respuestas individuales por intento | RLS habilitado |
 | `quizzes` | Cuestionarios opcionales por porra | RLS habilitado |
+| `team_squad_players` | Ver migraciones SQL | RLS habilitado |
+| `team_squads` | Ver migraciones SQL | RLS habilitado |
 | `teams` | Ver migraciones SQL | RLS habilitado |
 | `tournament_stages` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_award_winners` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_goals` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_matches` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_stadiums` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_teams` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_tournament_standings` | Ver migraciones SQL | RLS habilitado |
+| `wc_historic_tournaments` | Ver migraciones SQL | RLS habilitado |
 
 ### Enums
 
@@ -551,6 +610,7 @@ erDiagram
 - `supabase/migrations/20260606053311_quiz_mvp_fields.sql` (319 líneas)
 - `supabase/migrations/20260607120000_quiz_training_replay.sql` (128 líneas)
 - `supabase/migrations/20260607140000_quiz_play_keys_owner.sql` (129 líneas)
+- `supabase/migrations/20260608000000_worldcup_external_data.sql` (285 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -617,15 +677,17 @@ sequenceDiagram
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
 | `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/server.ts |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, lib/supabase/client.ts |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
 | `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
 | `QUIZ_DATE` | Ver código | Opcional | `` | scripts/generate-quiz-day.ts, scripts/seed-quiz-day.ts |
 | `QUIZ_DAY_FILE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/supabase/admin.ts, scripts/bootstrap-participants.ts |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
 | `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 | `VERCEL_URL` | Ver código | Opcional | `` | lib/site-url.ts |
+| `WC2026_API_BASE` | Ver código | Opcional | `` | lib/worldcup2026/api-client.ts |
+| `WC2026_API_TOKEN` | Ver código | Opcional | `` | lib/worldcup2026/api-client.ts |
 
 
 ## APIs e integraciones externas
@@ -756,9 +818,12 @@ docs/               → AUTH, RLS, SEED
 - `components/ui/hero-cta.tsx` — posible código muerto
 - `lib/auth/participants.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
+- `lib/fjelstul-worldcup/download.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
-- `lib/scripts/env-guard.ts` — posible código muerto
+- `lib/quiz/generate-worldcup-facts.ts` — posible código muerto
+- `lib/scripts/cli.ts` — posible código muerto
 - `lib/supabase/client.ts` — posible código muerto
+- `lib/worldcup2026/api-client.ts` — posible código muerto
 
 ### Deuda técnica conocida
 
@@ -778,7 +843,7 @@ docs/               → AUTH, RLS, SEED
 
 ### Fase
 
-**2a datos Mundial 2026 importados (OpenFootball)**
+**2b datos externos Mundiales (Fjelstul + worldcup2026 feed)**
 
 ### Funcionalidades completadas
 
@@ -793,12 +858,18 @@ docs/               → AUTH, RLS, SEED
 - [x] 1f purga demo + bootstrap 11 participantes reales
 - [x] 2a catalogo OpenFootball (competitions, teams, host_cities, tournament_stages)
 - [x] 2a import WC2026: 104 partidos, 23 matchdays, 48 equipos, 16 sedes
+- [x] 2b migracion wc_historic_* + external_id_map + match_live_state + team_squads + quiz_facts_worldcup
+- [x] 2b scripts: import-worldcup-historic, import-worldcup-2026 (feed), generate-quiz-facts (preview)
+- [x] 2b lib: fjelstul-worldcup parsers, worldcup2026 match-mapper, squad-queries
 - [x] Quiz MVP Fase 1 SQL (migracion + RPC start/submit)
 - [x] Quiz MVP Fase 2 TypeScript (queries, actions, types)
 - [x] Quiz MVP Fase 3 seed dia (`2026-06-06` official+bonus, training)
 - [x] Quiz MVP Fase 4 hub `/quiz`
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+- [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
+- [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
+- [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 - [x] Slide home quiz en hero carousel
@@ -810,6 +881,7 @@ docs/               → AUTH, RLS, SEED
 
 ### En desarrollo / pendiente
 
+- [ ] Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
 - [ ] Entregar codigos de acceso al grupo (access-codes.local.txt)

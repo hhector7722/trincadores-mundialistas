@@ -12,6 +12,8 @@ export type GeneratedQuizDayFile = {
     generated_at: string;
     fact_ids: string[];
     templates: string[];
+    facts_source?: string;
+    facts_pool_size?: number;
     sources: Array<{
       fact_id: string;
       source_url: string;
