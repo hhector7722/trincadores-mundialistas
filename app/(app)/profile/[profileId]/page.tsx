@@ -33,7 +33,7 @@ export default async function PublicProfilePage({
   const isSelf = user!.id === profileId;
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <div className="space-y-4 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
       <Link href="/ranking" className="text-sm font-medium text-[var(--tm-primary)]">
         Volver al ranking
       </Link>

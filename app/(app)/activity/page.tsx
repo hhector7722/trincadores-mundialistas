@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 export default function ActivityPage() {
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <div className="space-y-4 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Actividad

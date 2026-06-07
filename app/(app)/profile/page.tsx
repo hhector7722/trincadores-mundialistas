@@ -18,7 +18,7 @@ export default async function ProfilePage() {
   const admin = await isPoolAdmin(ctx.activePoolId, user!.id);
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <div className="space-y-4 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Perfil

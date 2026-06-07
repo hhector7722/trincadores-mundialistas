@@ -23,7 +23,7 @@ export default async function AdminPage() {
   const matches = await getAdminOpenMatches(ctx.activePoolId);
 
   return (
-    <div className="space-y-4 p-4 pb-8">
+    <div className="space-y-4 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
       <div>
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Admin

@@ -1,7 +1,7 @@
 export default function AppSectionLoading() {
   return (
     <div
-      className="relative z-10 animate-pulse space-y-3 p-4 pb-8"
+      className="relative z-10 animate-pulse space-y-3 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]"
       aria-busy="true"
       aria-label="Cargando seccion"
     >
