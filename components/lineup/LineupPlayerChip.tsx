@@ -28,11 +28,11 @@ export function LineupPlayerChip({
   const content = (
     <>
       <svg
-        viewBox="0 0 48 52"
+        viewBox="0 3 48 45"
         aria-hidden
         className={cn(
-          "shrink-0",
-          isModal ? "h-[28px] w-[23px]" : "h-14 w-11 sm:h-16 sm:w-12",
+          "block shrink-0",
+          isModal ? "h-[38px] w-[32px]" : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
           interactive && "transition-transform active:scale-95"
         )}
       >
@@ -50,14 +50,14 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isModal ? "13" : "18"}
+          fontSize={isModal ? "14" : "19"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
           {dorsal}
         </text>
       </svg>
-      <div className="w-full rounded-md border border-white/10 bg-black/55 px-1 py-0.5 text-center backdrop-blur-sm">
+      <div className="-mt-px w-full rounded-md border border-white/10 bg-black/55 px-1 py-0.5 text-center backdrop-blur-sm">
         <p
           className={cn(
             "whitespace-normal text-center font-semibold leading-tight text-white",
@@ -76,8 +76,8 @@ export function LineupPlayerChip({
   );
 
   const shellClass = cn(
-    "flex shrink-0 flex-col items-center gap-0.5",
-    isModal ? "w-[3.25rem] min-h-9" : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
+    "flex shrink-0 flex-col items-center gap-0",
+    isModal ? "w-[3.5rem] min-h-9" : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
     slot.isPlaceholder && "opacity-70"
   );
 
