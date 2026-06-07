@@ -125,7 +125,6 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
-  overscroll-behavior: none;
   background-color: var(--tm-shell-bg-hex);
 }
 
@@ -136,25 +135,29 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
   flex: 1 1 0%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
   overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-bottom: var(--tm-tabbar-height);
   background-color: var(--tm-shell-bg-hex);
 }
 
-.tm-app-main:has(> .tm-porra-layout) {
-  overflow: hidden;
+.tm-app-main-inner {
+  box-sizing: border-box;
+  min-height: 100%;
 }
 
 .tm-app-main > .tm-porra-layout {
-  height: 100%;
-  min-height: 0;
+  min-width: 0;
 }
 
 .tm-tabbar {
-  position: relative;
-  z-index: 20;
-  flex: 0 0 auto;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
   box-sizing: border-box;
   width: 100%;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -162,6 +165,17 @@ html[data-modal-open] .tm-app-main {
   background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* PWA instalada: anclar shell al borde físico (viewport-fit: cover) */
+@media (display-mode: standalone) {
+  .tm-app-shell {
+    top: 0;
+    bottom: 0;
+    height: auto;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+  }
 }
 
 html:has(.tm-app-shell) {
@@ -579,11 +593,15 @@ html:has(.tm-app-shell) body {
   scroll-padding-bottom: 1.25rem;
 }
 
-.tm-quiz-page--play,
-.tm-quiz-page--viewport {
+.tm-quiz-page--play {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  padding-top: max(1.25rem, calc(0.875rem + env(safe-area-inset-top, 0px)));
+  padding-bottom: 1rem;
+}
+
+.tm-quiz-page--viewport {
   padding-top: max(1.25rem, calc(0.875rem + env(safe-area-inset-top, 0px)));
   padding-bottom: 1rem;
 }
@@ -598,8 +616,10 @@ html:has(.tm-app-shell) body {
 .tm-quiz-stage-scroll {
   min-height: 0;
   flex: 1 1 0%;
-  overflow-y: auto;
+  overflow-y: scroll;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding-bottom: 0.5rem;
 }
 
@@ -653,38 +673,33 @@ html:has(.tm-app-shell) body {
   line-height: 1.2;
 }
 
-/* ── Porra: calendario a pantalla completa ── */
+/* ── Porra: calendario con filas altas; scroll vertical en main ── */
 .tm-porra-layout {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+  min-width: 0;
   background: var(--tm-glass);
 }
 
 .tm-porra-page {
   width: 100%;
-  height: 100%;
   max-width: 100vw;
-  min-height: 0;
-  overflow: hidden;
+  min-width: 0;
 }
 
 .tm-porra-calendar-wrap {
   width: 100%;
-  min-height: 0;
   min-width: 0;
-  overflow: hidden;
 }
 
 .tm-porra-calendar {
   --tm-cal-ui-scale: 1;
   --tm-cal-weeks: 1;
+  --tm-cal-row-min-height: 6.5rem;
   --tm-cal-match-gap: 4px;
-  --tm-cal-match-card-h: 1.75rem;
+  --tm-cal-match-card-h: 2.25rem;
   --tm-cal-grid-line: rgba(130, 70, 220, 0.18);
   --tm-cal-grid-line-width: 0.75px;
   --tm-cal-dock-bg: rgba(26, 8, 56, 0.9);
@@ -698,11 +713,9 @@ html:has(.tm-app-shell) body {
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 8px 22px rgba(0, 0, 0, 0.32),
     0 3px 10px rgba(111, 43, 255, 0.22);
-  height: 100%;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
   background: var(--tm-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -753,11 +766,10 @@ html:has(.tm-app-shell) body {
 .tm-porra-calendar .tm-cal-body {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: repeat(var(--tm-cal-weeks, 1), minmax(0, 1fr));
-  flex: 1 1 auto;
-  min-height: 0;
+  grid-template-rows: repeat(var(--tm-cal-weeks, 1), minmax(var(--tm-cal-row-min-height), auto));
+  min-height: calc(var(--tm-cal-weeks, 1) * var(--tm-cal-row-min-height));
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   background: var(--tm-cal-cell-bg);
   border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
   border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);

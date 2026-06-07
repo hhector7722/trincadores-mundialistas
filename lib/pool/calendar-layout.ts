@@ -1,9 +1,6 @@
-const MIN_UI_SCALE = 0.15;
-const MAX_UI_SCALE = 2.75;
-const SCALE_SEARCH_ITERATIONS = 14;
 const OVERFLOW_TOLERANCE_PX = 1;
 const MATCH_CARD_GAP_PX = 4;
-const MIN_MATCH_CARD_HEIGHT_PX = 22;
+const MIN_MATCH_CARD_HEIGHT_PX = 28;
 const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
 const GROUPS_LIST_COLUMNS = 2;
@@ -36,43 +33,6 @@ function elementOverflows(el: HTMLElement): boolean {
     el.scrollHeight > el.clientHeight + OVERFLOW_TOLERANCE_PX ||
     el.scrollWidth > el.clientWidth + OVERFLOW_TOLERANCE_PX
   );
-}
-
-function gridHasOverflow(grid: HTMLElement): boolean {
-  const cells = Array.from(grid.children) as HTMLElement[];
-  for (const cell of cells) {
-    if (elementOverflows(cell)) return true;
-
-    const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
-    );
-    for (const node of inner) {
-      if (node instanceof HTMLElement && elementOverflows(node)) return true;
-    }
-  }
-  return false;
-}
-
-function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
-  let lo = MIN_UI_SCALE;
-  let hi = MAX_UI_SCALE;
-  let best = MIN_UI_SCALE;
-
-  for (let i = 0; i < SCALE_SEARCH_ITERATIONS; i++) {
-    const mid = (lo + hi) / 2;
-    calendar.style.setProperty("--tm-cal-ui-scale", mid.toFixed(4));
-    void calendar.offsetHeight;
-
-    if (gridHasOverflow(grid)) {
-      hi = mid;
-    } else {
-      best = mid;
-      lo = mid;
-    }
-  }
-
-  calendar.style.setProperty("--tm-cal-ui-scale", best.toFixed(4));
-  return best;
 }
 
 function findBusiestMatchCell(grid: HTMLElement): HTMLElement | null {
@@ -244,7 +204,7 @@ export type CalendarLayoutResult = {
   matchCardHeight: number;
 };
 
-/** Filas iguales vía CSS grid 1fr; tarjetas compartidas según el día más cargado. */
+/** Filas con altura mínima fija; el scroll vertical lo gestiona `.tm-app-main`. */
 export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
@@ -253,31 +213,15 @@ export function fitCalendarLayout(
   if (rowCount <= 0) return null;
 
   calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+  calendar.style.setProperty("--tm-cal-ui-scale", "1");
   void grid.offsetHeight;
 
-  let uiScale = searchMaxScale(calendar, grid);
-
-  while (uiScale > MIN_UI_SCALE && gridHasOverflow(grid)) {
-    uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
-    calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
-    void calendar.offsetHeight;
-  }
-
-  let matchCardHeight = syncMatchCardMetrics(calendar, grid);
+  const matchCardHeight = syncMatchCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
-  for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
-    uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
-    calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
-    void calendar.offsetHeight;
-    matchCardHeight = syncMatchCardMetrics(calendar, grid);
-    syncGroupsPanelMetrics(calendar, grid);
-    syncPredictionLabelMetrics(grid);
-  }
-
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
-  return { rowHeight, uiScale, matchCardHeight };
+  return { rowHeight, uiScale: 1, matchCardHeight };
 }
 
 export function resetCalendarLayout(calendar: HTMLElement): void {

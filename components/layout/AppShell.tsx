@@ -1,4 +1,5 @@
 ﻿import { Suspense } from "react";
+import { ElasticMainScroll } from "@/components/layout/ElasticMainScroll";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { TabBar } from "@/components/layout/TabBar";
 import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
@@ -23,7 +24,9 @@ export function AppShell({
       </Suspense>
       <HomeAtmosphere />
       <AppHeaderGate ctx={ctx} />
-      <main className="tm-app-main">{children}</main>
+      <main className="tm-app-main">
+        <ElasticMainScroll>{children}</ElasticMainScroll>
+      </main>
       <TabBar />
     </div>
   );

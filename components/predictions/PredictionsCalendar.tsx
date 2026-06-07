@@ -309,11 +309,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   }
 
   return (
-    <div ref={rootRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <div ref={rootRef} className="flex flex-col">
       <section
         ref={calendarRef}
         style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
-        className="tm-porra-calendar tm-porra-calendar--fullbleed flex h-full min-h-0 flex-1 flex-col overflow-hidden p-0"
+        className="tm-porra-calendar tm-porra-calendar--fullbleed flex flex-col p-0"
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3">
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">

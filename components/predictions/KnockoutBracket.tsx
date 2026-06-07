@@ -95,7 +95,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex flex-col">
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--tm-border)] px-3 py-2">
         <h1 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)] sm:text-base">
           Fase eliminatoria
@@ -105,7 +105,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
         </Link>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+      <div className="pb-2">
         {rounds.map((round) => (
           <section
             key={round.key}
