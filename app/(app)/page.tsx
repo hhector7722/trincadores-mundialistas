@@ -39,7 +39,7 @@ export default async function HomePage() {
   const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
 
   return (
-    <div className="relative z-10 space-y-3 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="relative z-10 min-h-full space-y-3 p-4">
       <HomeHero pendingCount={pending} quizSlide={quizSlide} />
       <HomeStandingCard standing={standing} />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}

@@ -124,21 +124,13 @@ html[data-modal-open] .tm-app-main {
   background-color: var(--tm-shell-bg-hex);
 }
 
-.tm-app-shell-grid {
+.tm-app-main {
+  box-sizing: border-box;
   position: absolute;
   inset: 0;
   z-index: 10;
   display: flex;
-  flex-direction: column;
   min-height: 0;
-}
-
-.tm-app-main {
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  min-height: 0;
-  flex: 1 1 0%;
   flex-direction: column;
   overflow-y: auto;
   overscroll-behavior-y: contain;
