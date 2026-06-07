@@ -37,10 +37,59 @@ export function GroupStandingsTable({
   const isGrid = variant === "grid";
   const isCompact = compact || isGrid;
 
+  function renderTeamCell(row: GroupStandingDetail["teams"][number]) {
+    const label = teamNameEs(row.team);
+    const flagSize = isGrid ? "xs" : isCompact ? "xxs" : "xs";
+
+    const inner = (
+      <>
+        <TeamFlagBadge
+          name={row.team}
+          size={flagSize}
+          className={cn("shrink-0", isGrid && "mx-auto")}
+        />
+        <span
+          className={cn(
+            "font-medium leading-tight",
+            isGrid
+              ? "max-w-[5.5rem] truncate text-center text-[7px] sm:max-w-[6rem] sm:text-[8px]"
+              : cn("truncate", isCompact && "max-w-[3.5rem] text-[8px]", !isCompact && "text-[11px] sm:text-xs")
+          )}
+        >
+          {isCompact && !isGrid ? row.team.slice(0, 3).toUpperCase() : label}
+        </span>
+      </>
+    );
+
+    const cellClass = cn(
+      "flex min-w-0 items-center",
+      isGrid ? "flex-col gap-0.5 px-0.5" : "gap-0.5"
+    );
+
+    if (onTeamClick) {
+      return (
+        <button
+          type="button"
+          onClick={() => onTeamClick(row.team)}
+          className={cn(
+            cellClass,
+            "rounded-md transition-colors hover:bg-[rgba(111,43,255,0.16)]",
+            isGrid ? "w-full py-0.5" : "p-0.5"
+          )}
+          aria-label={`Ver alineación de ${label}`}
+        >
+          {inner}
+        </button>
+      );
+    }
+
+    return <div className={cellClass}>{inner}</div>;
+  }
+
   return (
     <div
       className={cn(
-        isGrid ? "overflow-x-auto overflow-y-visible px-0.5 pb-0.5" : "overflow-x-auto",
+        isGrid ? "flex min-h-0 flex-1 flex-col overflow-x-auto overflow-y-visible px-1 pb-1" : "overflow-x-auto",
         !isGrid && (isCompact ? "px-1 pb-1" : "px-3 pb-4 sm:px-4"),
         className
       )}
@@ -49,7 +98,7 @@ export function GroupStandingsTable({
         className={cn(
           "w-full border-collapse",
           isGrid
-            ? "min-w-0 text-[6px] leading-none sm:text-[7px]"
+            ? "min-w-0 flex-1 text-[8px] leading-tight sm:text-[9px]"
             : isCompact
               ? "min-w-0 text-[8px] leading-tight sm:text-[9px]"
               : "min-w-[20rem] text-[11px] sm:text-xs"
@@ -61,18 +110,18 @@ export function GroupStandingsTable({
               className={cn(
                 "font-medium",
                 isGrid
-                  ? "w-4 min-w-4 pb-px text-center"
+                  ? "min-w-[3.25rem] pb-0.5 text-center sm:min-w-[3.75rem]"
                   : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
               )}
             >
-              {isGrid ? " " : "Equipo"}
+              {isGrid ? "Sel." : "Equipo"}
             </th>
             {GROUP_STANDINGS_STAT_COLUMNS.map((col) => (
               <th
                 key={col.key}
                 className={cn(
                   "px-px text-center font-medium tabular-nums",
-                  isGrid ? "pb-px" : isCompact ? "pb-0.5" : "pb-2"
+                  isGrid ? "pb-0.5" : isCompact ? "pb-0.5" : "pb-2"
                 )}
               >
                 {col.label}
@@ -89,52 +138,13 @@ export function GroupStandingsTable({
                 index === 0 && "text-[var(--tm-fg)]"
               )}
             >
-              <td className={cn(isGrid ? "py-px pr-0 text-center" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
-                {onTeamClick ? (
-                  <button
-                    type="button"
-                    onClick={() => onTeamClick(row.team)}
-                    className={cn(
-                      "flex min-w-0 items-center rounded-md transition-colors hover:bg-[rgba(111,43,255,0.16)]",
-                      isGrid ? "justify-center p-0.5" : "gap-0.5 p-0.5"
-                    )}
-                    aria-label={`Ver alineación de ${teamNameEs(row.team)}`}
-                  >
-                    <TeamFlagBadge
-                      name={row.team}
-                      size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
-                      className={cn("shrink-0", isGrid && "mx-auto")}
-                    />
-                    {!isGrid ? (
-                      <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
-                        {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
-                      </span>
-                    ) : null}
-                  </button>
-                ) : (
-                  <div
-                    className={cn(
-                      "flex min-w-0 items-center",
-                      isGrid ? "justify-center" : "gap-0.5"
-                    )}
-                  >
-                    <TeamFlagBadge
-                      name={row.team}
-                      size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
-                      className={cn("shrink-0", isGrid && "mx-auto")}
-                    />
-                    {!isGrid ? (
-                      <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
-                        {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
-                      </span>
-                    ) : null}
-                  </div>
-                )}
+              <td className={cn(isGrid ? "py-0.5 pr-0 align-top" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
+                {renderTeamCell(row)}
               </td>
               <td
                 className={cn(
                   "text-center font-semibold tabular-nums text-[var(--tm-accent)]",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.pts}
@@ -142,7 +152,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.pj}
@@ -150,7 +160,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.pg}
@@ -158,7 +168,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.pe}
@@ -166,7 +176,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.pp}
@@ -174,7 +184,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.gf}
@@ -182,7 +192,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {row.gc}
@@ -190,7 +200,7 @@ export function GroupStandingsTable({
               <td
                 className={cn(
                   "text-center tabular-nums",
-                  isGrid ? "px-px py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                 )}
               >
                 {formatGroupDg(row.dg)}

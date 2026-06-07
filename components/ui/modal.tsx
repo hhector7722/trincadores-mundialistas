@@ -22,6 +22,8 @@ type ModalProps = {
   wrapperClassName?: string;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
+  /** Controles en la cabecera, a la izquierda del botón cerrar. */
+  headerTrailing?: ReactNode;
   ariaLabel?: string;
   backdropClassName?: string;
   belowPanel?: ReactNode;
@@ -70,6 +72,7 @@ function ModalPanelShell({
   onBack,
   hideHeaderDivider,
   hideTitle = false,
+  headerTrailing,
   className,
   children,
   loading = false,
@@ -80,6 +83,7 @@ function ModalPanelShell({
   onBack?: () => void;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
+  headerTrailing?: ReactNode;
   className?: string;
   children: ReactNode;
   loading?: boolean;
@@ -115,6 +119,7 @@ function ModalPanelShell({
         ) : (
           <div id={titleId} className="min-w-0 flex-1" />
         )}
+        {headerTrailing ? <div className="shrink-0">{headerTrailing}</div> : null}
         <button
           type="button"
           aria-label="Cerrar modal"
@@ -149,6 +154,7 @@ export function Modal({
   onBack,
   panelSlide = null,
   loading = false,
+  headerTrailing,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -289,6 +295,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
                     >
@@ -303,6 +310,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
                     >
@@ -320,6 +328,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
                     >
@@ -334,6 +343,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
                     >
@@ -351,6 +361,7 @@ export function Modal({
               onBack={onBack}
               hideHeaderDivider={hideHeaderDivider}
               hideTitle={hideTitle}
+              headerTrailing={headerTrailing}
               className={className}
               loading={loading}
             >

@@ -8,13 +8,14 @@ import { cn } from "@/lib/utils";
 
 type GroupStandingsView = "official" | "predictions";
 
-type AllGroupsStandingsModalProps = {
-  open: boolean;
-  onClose: () => void;
-  officialGroups: GroupStandingDetail[];
-  predictedGroups: GroupStandingDetail[];
-  onSelectGroup: (groupCode: string) => void;
-};
+function LivePulseIcon() {
+  return (
+    <span className="relative inline-flex h-2 w-2 shrink-0" aria-hidden="true">
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--tm-danger)] opacity-80" />
+      <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--tm-danger)]" />
+    </span>
+  );
+}
 
 function GroupStandingsViewToggle({
   value,
@@ -35,13 +36,14 @@ function GroupStandingsViewToggle({
         aria-selected={value === "official"}
         onClick={() => onChange("official")}
         className={cn(
-          "min-h-7 rounded-full px-2.5 text-[9px] font-semibold uppercase tracking-wide transition-colors",
+          "inline-flex min-h-7 items-center gap-1 rounded-full px-2 text-[9px] font-semibold uppercase tracking-wide transition-colors",
           value === "official"
             ? "bg-[var(--tm-accent)] text-[#2a1058]"
             : "text-[var(--tm-muted)] hover:text-[var(--tm-fg)]"
         )}
       >
-        Real
+        <LivePulseIcon />
+        Live
       </button>
       <button
         type="button"
@@ -55,11 +57,19 @@ function GroupStandingsViewToggle({
             : "text-[var(--tm-muted)] hover:text-[var(--tm-fg)]"
         )}
       >
-        Mi porra
+        Pronostico
       </button>
     </div>
   );
 }
+
+type AllGroupsStandingsModalProps = {
+  open: boolean;
+  onClose: () => void;
+  officialGroups: GroupStandingDetail[];
+  predictedGroups: GroupStandingDetail[];
+  onSelectGroup: (groupCode: string) => void;
+};
 
 export function AllGroupsStandingsModal({
   open,
@@ -76,34 +86,30 @@ export function AllGroupsStandingsModal({
       open={open}
       onClose={onClose}
       title="Clasificación de grupos"
-      hideTitle
       hideHeaderDivider
-      ariaLabel="Clasificación de grupos"
-      className="max-h-[calc(100dvh-1rem)]"
+      headerTrailing={<GroupStandingsViewToggle value={view} onChange={setView} />}
+      className="flex max-h-[calc(100dvh-1rem)] flex-col"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
     >
-      <div className="flex shrink-0 justify-center border-b border-[var(--tm-border)] px-2 py-1.5">
-        <GroupStandingsViewToggle value={view} onChange={setView} />
-      </div>
-      <div className="grid auto-rows-min grid-cols-2 items-start gap-2 overflow-y-auto p-2 sm:grid-cols-3 sm:gap-3 sm:p-3 lg:grid-cols-6">
+      <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-2 items-stretch gap-2.5 overflow-y-auto p-2.5 sm:grid-cols-3 sm:gap-3 sm:p-3 lg:grid-cols-6">
         {groups.map((group) => (
           <button
             key={group.code}
             type="button"
             onClick={() => onSelectGroup(group.code)}
             className={cn(
-              "flex min-w-0 flex-col overflow-visible rounded-lg border border-[var(--tm-border)]",
+              "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-[var(--tm-border)]",
               "bg-[rgba(111,43,255,0.12)] text-left transition-colors",
               "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
             )}
           >
-            <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-0.5 py-0 leading-none">
-              <span className="text-[7px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
+            <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-1 py-1 leading-none">
+              <span className="text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] sm:text-[9px]">
                 Grupo {group.code}
               </span>
             </div>
-            <div className="overflow-visible">
+            <div className="flex min-h-0 flex-1 flex-col overflow-visible">
               <GroupStandingsTable group={group} variant="grid" />
             </div>
           </button>

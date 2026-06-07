@@ -26,7 +26,7 @@ export function MvpPredictionButton({
       showEdit
       addIcon={!compact}
       hideCaption={compact}
-      emptyLabel={compact ? "Añadir" : undefined}
+      emptyLabel={compact ? "Añadir MVP" : undefined}
       className={className}
     />
   );

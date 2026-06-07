@@ -49,23 +49,23 @@ export function AllTeamsLineupModal({ open, onClose }: AllTeamsLineupModalProps)
         title="Plantillas"
         hideHeaderDivider
         className="max-h-[calc(100dvh-1rem)]"
-        wrapperClassName="max-w-[min(100vw-1rem,36rem)]"
+        wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
         backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       >
-        <ul className="grid max-h-[min(70dvh,32rem)] grid-cols-1 gap-1.5 overflow-y-auto p-2 sm:grid-cols-2 sm:gap-2 sm:p-3">
+        <ul className="grid grid-cols-6 gap-2 overflow-y-auto p-2.5 sm:gap-2.5 sm:p-3">
           {teams.map((team) => (
-            <li key={team}>
+            <li key={team} className="min-w-0">
               <button
                 type="button"
                 onClick={() => setSelectedTeam(team)}
                 className={cn(
-                  "flex min-h-12 w-full min-w-0 items-center gap-2.5 rounded-lg border border-[var(--tm-border)]",
-                  "bg-[rgba(111,43,255,0.12)] px-2.5 py-2 text-left transition-colors",
+                  "flex w-full min-w-0 flex-col items-center gap-1 rounded-lg border border-[var(--tm-border)]",
+                  "bg-[rgba(111,43,255,0.12)] px-1 py-2 text-center transition-colors",
                   "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
                 )}
               >
-                <TeamFlagBadge name={team} size="md" className="shrink-0" />
-                <span className="min-w-0 truncate text-sm font-medium text-[var(--tm-fg)]">
+                <TeamFlagBadge name={team} size="sm" className="shrink-0" />
+                <span className="w-full min-w-0 text-center text-[8px] font-medium leading-tight text-[var(--tm-fg)] sm:text-[10px]">
                   {teamNameEs(team)}
                 </span>
               </button>
