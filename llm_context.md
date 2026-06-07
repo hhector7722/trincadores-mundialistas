@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T11:42:53.655Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T11:53:18.675Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -198,6 +198,7 @@ flowchart TB
 | `GroupStandingsModal` | `components/predictions/GroupStandingsModal.tsx` | client | GroupStandingsModal |
 | `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
+| `MvpPredictionButton` | `components/predictions/MvpPredictionButton.tsx` | client | MvpPredictionButton |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
 | `PredictionDeadlineCountdown` | `components/predictions/PredictionDeadlineCountdown.tsx` | client | PredictionDeadlineCountdown |
 | `PredictionForm` | `components/predictions/PredictionForm.tsx` | client | PredictionForm |
@@ -381,7 +382,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 | `lib/pool/tournament-stats.ts` | 70 líneas | tournamentHasGoals, getTournamentTopScorers, getTournamentStatRows, TournamentScorerRow, TournamentStatRow, TournamentStatKind |
 
-**predictions/** — 6 archivos
+**predictions/** — 7 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
@@ -389,6 +390,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
 | `lib/predictions/mvp-queries.ts` | 50 líneas | fetchMvpPredictionsForMatches, getMvpPredictionForMatch, MvpPrediction |
 | `lib/predictions/queries.ts` | 346 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/scoring.ts` | 14 líneas | formatMvpPointsLabel, MVP_PREDICTION_POINTS, MATCH_SCORE_POINTS |
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
@@ -511,7 +513,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Migraciones | 12 archivos en `supabase/migrations/` |
 | Tablas | 39 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
-| Funciones SQL | 15 |
+| Funciones SQL | 16 |
 | Políticas RLS | 0 |
 | Vistas | quiz_leaderboard, quiz_questions_public |
 
@@ -617,6 +619,7 @@ erDiagram
 | `is_pool_admin` | RPC / trigger |
 | `is_pool_member` | RPC / trigger |
 | `is_pool_owner` | RPC / trigger |
+| `mvp_prediction_points` | RPC / trigger |
 | `prediction_edit_allowed` | RPC / trigger |
 | `rebuild_pool_member_scores` | RPC / trigger |
 | `recalculate_match_mvp_scores` | RPC / trigger |
@@ -637,7 +640,7 @@ erDiagram
 - `supabase/migrations/20260607120000_quiz_training_replay.sql` (128 líneas)
 - `supabase/migrations/20260607140000_quiz_play_keys_owner.sql` (129 líneas)
 - `supabase/migrations/20260608000000_worldcup_external_data.sql` (285 líneas)
-- `supabase/migrations/20260608120000_match_mvp_predictions.sql` (177 líneas)
+- `supabase/migrations/20260608120000_match_mvp_predictions.sql` (186 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -894,7 +897,9 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz MVP Fase 4 hub `/quiz`
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+- [x] MVP partido: prediccion por partido, scoring +5 pts, modal reutilizable (home/calendario/pronostico)
 - [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
+- [x] Migracion `match_mvp_predictions` aplicada en remoto (MCP)
 - [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
 - [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)

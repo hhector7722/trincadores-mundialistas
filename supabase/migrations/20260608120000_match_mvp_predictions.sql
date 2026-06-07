@@ -53,6 +53,14 @@ create policy match_mvp_predictions_delete on public.match_mvp_predictions
 grant select, insert, update, delete on public.match_mvp_predictions to authenticated;
 grant all on public.match_mvp_predictions to service_role;
 
+-- Constante centralizada: mantener en sync con lib/predictions/scoring.ts (MVP_PREDICTION_POINTS)
+create or replace function public.mvp_prediction_points() returns int
+language sql
+immutable
+as $$
+  select 5;
+$$;
+
 create or replace function public.compute_mvp_points(
   pred_player text,
   pred_team text,
@@ -66,7 +74,7 @@ as $$
     when res_player is not null
       and lower(trim(pred_player)) = lower(trim(res_player))
       and lower(trim(pred_team)) = lower(trim(res_team))
-    then 5
+    then public.mvp_prediction_points()
     else 0
   end;
 $$;
@@ -141,7 +149,7 @@ begin
     union all
     select mvp.pool_id, mvp.profile_id, m.matchday_id, coalesce(mvp.points_awarded, 0) as pts,
       0 as exact_hit,
-      case when mvp.points_awarded = 5 then 1 else 0 end as sign_hit
+      case when mvp.points_awarded = public.mvp_prediction_points() then 1 else 0 end as sign_hit
     from public.match_mvp_predictions mvp
     join public.matches m on m.id = mvp.match_id
     where mvp.pool_id = p_pool_id and mvp.points_awarded is not null
@@ -172,5 +180,6 @@ begin
 end;
 $$;
 
+grant execute on function public.mvp_prediction_points() to authenticated;
 grant execute on function public.compute_mvp_points(text, text, text, text) to authenticated;
 grant execute on function public.recalculate_match_mvp_scores(uuid) to authenticated;

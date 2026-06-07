@@ -27,9 +27,11 @@
 - [x] Quiz MVP Fase 4 hub `/quiz`
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
+- [x] MVP partido: prediccion por partido, scoring +5 pts, modal reutilizable (home/calendario/pronostico)
 
 ## Siguiente
 - [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
+- [x] Migracion `match_mvp_predictions` aplicada en remoto (MCP)
 - [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
 - [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
 - [ ] Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026

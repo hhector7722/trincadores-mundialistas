@@ -1,6 +1,7 @@
 "use client";
 
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
+import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 
 type MatchContextActionsRowProps = {
@@ -27,13 +28,7 @@ export function MatchContextActionsRow({
           <MatchContextActionButton caption="Alineación" onClick={onOpenHomeLineup} />
         </div>
         <div className="flex justify-center px-1">
-          <MatchContextActionButton
-            caption="MVP +"
-            onClick={onOpenMvp}
-            savedValue={mvpSaved}
-            showEdit
-            addIcon
-          />
+          <MvpPredictionButton savedPlayerName={mvpSaved} onClick={onOpenMvp} />
         </div>
         <div className="flex justify-center px-1">
           <MatchContextActionButton caption="Alineación" onClick={onOpenAwayLineup} />

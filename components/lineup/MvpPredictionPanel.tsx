@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
+import { formatMvpPointsLabel } from "@/lib/predictions/scoring";
 import { cn } from "@/lib/utils";
 
 type MvpPredictionPanelProps = {
@@ -150,8 +151,8 @@ export function MvpPredictionPanel({
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="space-y-3 px-4 py-4">
         <p className="text-sm text-[var(--tm-muted)]">
-          Elige al MVP de {teamNameEs(homeTeam)} vs {teamNameEs(awayTeam)}. Acierto: +5 pts en la
-          porra.
+          Elige al MVP de {teamNameEs(homeTeam)} vs {teamNameEs(awayTeam)}. Acierto:{" "}
+          {formatMvpPointsLabel()} en la porra.
         </p>
 
         {!serverEditable ? (
