@@ -14,20 +14,22 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <div className="tm-app-shell relative flex flex-col">
-        <ViewportMetricsSync />
-        <Suspense fallback={null}>
-          <ViewportLayoutDebug />
-        </Suspense>
-        <HomeAtmosphere />
-        <AppHeaderGate ctx={ctx} />
-        <main className="tm-app-main relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-          {children}
-        </main>
-      </div>
-      {/* Fuera del shell: overflow:hidden del ancestro rompe fixed bottom en iOS */}
+    <div className="tm-app-shell relative flex flex-col">
+      <div
+        id="tm-safe-probe"
+        className="pointer-events-none fixed bottom-0 left-0 h-0 w-0 pb-[env(safe-area-inset-bottom)]"
+        aria-hidden
+      />
+      <ViewportMetricsSync />
+      <Suspense fallback={null}>
+        <ViewportLayoutDebug />
+      </Suspense>
+      <HomeAtmosphere />
+      <AppHeaderGate ctx={ctx} />
+      <main className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+        {children}
+      </main>
       <TabBar />
-    </>
+    </div>
   );
 }

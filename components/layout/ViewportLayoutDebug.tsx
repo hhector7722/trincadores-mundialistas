@@ -16,7 +16,7 @@ type LayoutMetrics = {
   tabbarHeight: number;
   gapBelowTabbar: number;
   gapBelowShell: number;
-  cssVvhHeight: string;
+  gapBelowVisual: number;
   cssTabbarHeight: string;
 };
 
@@ -32,7 +32,7 @@ function collectMetrics(): LayoutMetrics {
   const tabbar = document.querySelector<HTMLElement>(".tm-tabbar");
   const shellRect = shell?.getBoundingClientRect();
   const tabbarRect = tabbar?.getBoundingClientRect();
-  const viewportBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  const visualBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
 
   return {
     vvHeight: Math.round(vv?.height ?? 0),
@@ -47,7 +47,7 @@ function collectMetrics(): LayoutMetrics {
     tabbarHeight: Math.round(tabbarRect?.height ?? 0),
     gapBelowTabbar: Math.round(window.innerHeight - (tabbarRect?.bottom ?? 0)),
     gapBelowShell: Math.round(window.innerHeight - (shellRect?.bottom ?? 0)),
-    cssVvhHeight: getComputedStyle(document.documentElement).getPropertyValue("--tm-vvh-height").trim(),
+    gapBelowVisual: Math.round(visualBottom - (tabbarRect?.bottom ?? 0)),
     cssTabbarHeight: getComputedStyle(document.documentElement).getPropertyValue("--tm-tabbar-height").trim(),
   };
 }
@@ -77,11 +77,10 @@ export function ViewportLayoutDebug() {
 
   if (!enabled || !metrics) return null;
 
-  const chinGap = metrics.gapBelowTabbar > 0;
+  const chinGap = metrics.gapBelowVisual > 0 || metrics.gapBelowTabbar > 0;
 
   return (
     <>
-      <div id="tm-safe-probe" className="pointer-events-none fixed bottom-0 left-0 h-0 w-0 pb-[env(safe-area-inset-bottom)]" aria-hidden />
       <div
         className="pointer-events-none fixed bottom-0 left-0 right-0 z-[9999] font-mono text-[10px] leading-tight text-lime-300"
         style={{ textShadow: "0 0 4px #000" }}
@@ -90,13 +89,14 @@ export function ViewportLayoutDebug() {
           <p>vv.h={metrics.vvHeight} vv.top={metrics.vvOffsetTop} innerH={metrics.innerHeight}</p>
           <p>safeBottom={metrics.safeBottom}px</p>
           <p>
-            shell {metrics.shellTop}→{metrics.shellBottom} (h={metrics.shellHeight}) css={metrics.cssVvhHeight || "auto"}
+            shell {metrics.shellTop}→{metrics.shellBottom} (h={metrics.shellHeight})
           </p>
           <p>
             tabbar {metrics.tabbarTop}→{metrics.tabbarBottom} (h={metrics.tabbarHeight}) css={metrics.cssTabbarHeight}
           </p>
           <p className={chinGap ? "font-bold text-red-400" : ""}>
-            gapBelowTabbar={metrics.gapBelowTabbar}px gapBelowShell={metrics.gapBelowShell}px
+            gapVisual={metrics.gapBelowVisual}px gapInner={metrics.gapBelowTabbar}px gapShell=
+            {metrics.gapBelowShell}px
           </p>
         </div>
       </div>
