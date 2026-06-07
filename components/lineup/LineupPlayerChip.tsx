@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { LineupSlot } from "@/lib/lineup/types";
 
 type LineupPlayerChipProps = {
@@ -42,11 +43,11 @@ export function LineupPlayerChip({ slot, onClick, variant = "default" }: LineupP
       <div className="w-full rounded-md border border-white/10 bg-black/55 px-1 py-0.5 text-center backdrop-blur-sm">
         <p
           className={cn(
-            "truncate font-semibold leading-tight text-white",
+            "whitespace-normal text-center font-semibold leading-tight text-white",
             isModal ? "text-[8px]" : "text-[9px] sm:text-[10px]"
           )}
         >
-          {slot.name}
+          {shirtPlayerName(slot.name)}
         </p>
         {!isModal ? (
           <p className="text-[8px] font-medium uppercase tracking-wide text-white/55 sm:text-[9px]">

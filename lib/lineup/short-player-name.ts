@@ -23,8 +23,8 @@ const NAME_PARTICLES = new Set([
   "mac",
 ]);
 
-/** Nombre corto para listados compactos (apellido o monónimo). */
-export function shortPlayerName(fullName: string): string {
+/** Nombre tipo camiseta: apellido, compuesto con partícula o monónimo (sin nombre de pila). */
+export function shirtPlayerName(fullName: string): string {
   const trimmed = fullName.trim();
   if (!trimmed) return trimmed;
 
@@ -40,3 +40,6 @@ export function shortPlayerName(fullName: string): string {
 
   return last;
 }
+
+/** Alias histórico de `shirtPlayerName`. */
+export const shortPlayerName = shirtPlayerName;
