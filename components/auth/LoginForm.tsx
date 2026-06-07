@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { signIn } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoadingOverlay } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
@@ -31,7 +32,8 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="relative space-y-4">
+      {pending ? <LoadingOverlay label="Entrando…" /> : null}
       <div>
         <label
           htmlFor="login-username"

@@ -375,6 +375,7 @@ export function QuickPredictionModal({
       }
       onBack={canGoBack && !isPanelSliding ? pop : undefined}
       panelSlide={activePanelSlide}
+      loading={pending && panelView.kind === "prediction"}
     >
       {renderPanelView(panelView, viewMatch)}
     </Modal>

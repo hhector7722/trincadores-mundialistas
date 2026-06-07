@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchPlayerDetailAction } from "@/actions/lineup";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { PlayerDetail } from "@/lib/lineup/player-detail";
+import { LoadingCenter } from "@/components/ui/spinner";
 import { teamNameEs } from "@/lib/teams/display";
 
 type PlayerDetailPanelProps = {
@@ -45,11 +46,7 @@ export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelPro
   }, [teamName, playerName]);
 
   if (loading) {
-    return (
-      <div className="flex min-h-40 items-center justify-center px-4 py-8">
-        <p className="text-sm text-[var(--tm-muted)]">Cargando jugador…</p>
-      </div>
-    );
+    return <LoadingCenter label="Cargando jugador…" />;
   }
 
   if (error || !detail) {

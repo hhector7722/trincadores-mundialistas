@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useTransition, useState, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { cn } from "@/lib/utils";
 
 const TABBAR_HEIGHT_FALLBACK = "calc(var(--tm-tabbar-core) + var(--tm-safe-bottom))";
@@ -36,9 +37,9 @@ function isActive(pathname: string, href: string) {
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { navigate } = useAppNavigation();
   const navRef = useRef<HTMLElement>(null);
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
 
   useLayoutEffect(() => {
     const node = navRef.current;
@@ -79,9 +80,7 @@ export function TabBar() {
 
     event.preventDefault();
     setOptimisticHref(href);
-    startTransition(() => {
-      router.push(href);
-    });
+    navigate(href);
   }
 
   return (

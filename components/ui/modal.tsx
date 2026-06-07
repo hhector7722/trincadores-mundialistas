@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, X } from "lucide-react";
+import { LoadingOverlay } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 export type ModalPanelSlide = {
@@ -26,6 +27,7 @@ type ModalProps = {
   onSwipeRight?: () => void;
   onBack?: () => void;
   panelSlide?: ModalPanelSlide | null;
+  loading?: boolean;
 };
 
 function lockPageScroll() {
@@ -67,6 +69,7 @@ function ModalPanelShell({
   hideHeaderDivider,
   className,
   children,
+  loading = false,
 }: {
   title: string;
   titleId: string;
@@ -75,6 +78,7 @@ function ModalPanelShell({
   hideHeaderDivider?: boolean;
   className?: string;
   children: ReactNode;
+  loading?: boolean;
 }) {
   return (
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
@@ -111,7 +115,10 @@ function ModalPanelShell({
           <X className="h-5 w-5" />
         </button>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">{children}</div>
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+        {children}
+        {loading ? <LoadingOverlay /> : null}
+      </div>
     </div>
   );
 }
@@ -130,6 +137,7 @@ export function Modal({
   onSwipeRight,
   onBack,
   panelSlide = null,
+  loading = false,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -269,6 +277,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
+                      loading={loading}
                     >
                       {children}
                     </ModalPanelShell>
@@ -281,6 +290,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
+                      loading={loading}
                     >
                       {panelSlide.incoming}
                     </ModalPanelShell>
@@ -296,6 +306,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
+                      loading={loading}
                     >
                       {panelSlide.incoming}
                     </ModalPanelShell>
@@ -308,6 +319,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
+                      loading={loading}
                     >
                       {children}
                     </ModalPanelShell>
@@ -323,6 +335,7 @@ export function Modal({
               onBack={onBack}
               hideHeaderDivider={hideHeaderDivider}
               className={className}
+              loading={loading}
             >
               {children}
             </ModalPanelShell>

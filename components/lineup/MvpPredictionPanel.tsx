@@ -9,6 +9,7 @@ import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { formatMvpPointsLabel } from "@/lib/predictions/scoring";
+import { LoadingCenter } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 type MvpPredictionPanelProps = {
@@ -130,11 +131,7 @@ export function MvpPredictionPanel({
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-40 items-center justify-center px-4 py-8">
-        <p className="text-sm text-[var(--tm-muted)]">Cargando jugadores…</p>
-      </div>
-    );
+    return <LoadingCenter label="Cargando jugadores…" />;
   }
 
   if (options.length === 0) {

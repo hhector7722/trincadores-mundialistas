@@ -6,6 +6,7 @@ import { savePrediction } from "@/actions/predictions";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay } from "@/components/ui/spinner";
 import {
   displayGoals,
   resolvePredictionUiState,
@@ -70,7 +71,8 @@ export function PredictionForm({
       : " ";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="relative flex min-h-0 flex-1 flex-col">
+      {pending ? <LoadingOverlay label="Guardando…" /> : null}
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         <div>
           {match.matchday_name && (

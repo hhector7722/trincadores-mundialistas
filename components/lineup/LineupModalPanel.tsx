@@ -8,6 +8,7 @@ import { getBenchPlayers } from "@/lib/lineup/bench-players";
 import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
+import { LoadingCenter } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 type LineupModalPanelProps = {
@@ -44,11 +45,7 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
   const displayName = teamNameEs(teamName);
 
   if (loading) {
-    return (
-      <div className="flex min-h-40 items-center justify-center px-4 py-8">
-        <p className="text-sm text-[var(--tm-muted)]">Cargando plantilla…</p>
-      </div>
-    );
+    return <LoadingCenter label="Cargando plantilla…" />;
   }
 
   if (error) {

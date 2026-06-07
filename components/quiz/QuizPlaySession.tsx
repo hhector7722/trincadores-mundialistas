@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { startQuiz, submitQuiz } from "@/actions/quiz";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { QuizQuestionStage } from "@/components/quiz/QuizQuestionStage";
+import { LoadingCenter } from "@/components/ui/spinner";
 import type { QuestionPhase } from "@/lib/quiz/play-flow";
 import {
   FEEDBACK_DELAY_MS,
@@ -24,6 +26,7 @@ const PLAY_TITLE = "¿QUIEN SABE MÁS DE LOS MUNDIALES?";
 
 export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   const router = useRouter();
+  const { navigate } = useAppNavigation();
   const [session, setSession] = useState<QuizStartSession | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -109,11 +112,11 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
           setSubmitError(result.error);
           return;
         }
-        router.push(`/quiz/result?attempt=${activeSession.attempt_id}`);
+        navigate(`/quiz/result?attempt=${activeSession.attempt_id}`);
         router.refresh();
       });
     },
-    [clearAllTimers, poolId, router]
+    [clearAllTimers, navigate, poolId, router]
   );
 
   const scheduleAdvance = useCallback(
@@ -210,11 +213,7 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   }
 
   if (loading || !session) {
-    return (
-      <div className="tm-quiz-stage rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-6 text-center text-sm text-[var(--tm-muted)]">
-        Preparando preguntas...
-      </div>
-    );
+    return <LoadingCenter label="Preparando preguntas…" minHeightClassName="min-h-[12rem]" />;
   }
 
   if (submitError) {
@@ -229,11 +228,7 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
   }
 
   if (submitting) {
-    return (
-      <div className="tm-quiz-stage rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-6 text-center text-sm text-[var(--tm-muted)]">
-        Calculando resultado...
-      </div>
-    );
+    return <LoadingCenter label="Calculando resultado…" minHeightClassName="min-h-[12rem]" />;
   }
 
   if (!currentQuestion) {

@@ -1,6 +1,7 @@
 ﻿import { Suspense } from "react";
 import { ElasticMainScroll } from "@/components/layout/ElasticMainScroll";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBar } from "@/components/layout/TabBar";
 import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
@@ -16,18 +17,20 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="tm-app-shell">
-      <ViewportMetricsInlineScript />
-      <ViewportMetricsSync />
-      <Suspense fallback={null}>
-        <ViewportLayoutDebug />
-      </Suspense>
-      <HomeAtmosphere />
-      <AppHeaderGate ctx={ctx} />
-      <main className="tm-app-main">
-        <ElasticMainScroll>{children}</ElasticMainScroll>
-      </main>
-      <TabBar />
-    </div>
+    <NavigationLoadingProvider>
+      <div className="tm-app-shell">
+        <ViewportMetricsInlineScript />
+        <ViewportMetricsSync />
+        <Suspense fallback={null}>
+          <ViewportLayoutDebug />
+        </Suspense>
+        <HomeAtmosphere />
+        <AppHeaderGate ctx={ctx} />
+        <main className="tm-app-main">
+          <ElasticMainScroll>{children}</ElasticMainScroll>
+        </main>
+        <TabBar />
+      </div>
+    </NavigationLoadingProvider>
   );
 }
