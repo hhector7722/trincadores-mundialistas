@@ -1,0 +1,3 @@
+#!/bin/sh
+# Cross-platform: delega en Node (funciona en Windows Git, macOS, Linux)
+node scripts/llm-context/post-commit.mjs
