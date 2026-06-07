@@ -15,7 +15,7 @@ export default async function KnockoutPredictionsPage() {
   const matches = await getPoolKnockoutMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   return (
-    <div className="tm-porra-page">
+    <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
       <KnockoutBracket poolId={ctx.activePoolId} matches={matches} />
     </div>
   );

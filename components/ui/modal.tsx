@@ -36,6 +36,8 @@ type ModalProps = {
   loading?: boolean;
   /** Título alineado a la izquierda (sin hueco izquierdo si no hay volver). */
   headerTitleAlign?: "left" | "default";
+  /** Contenido centrado en la barra cuando `hideTitle` (p. ej. fecha del partido). */
+  headerCenter?: ReactNode;
 };
 
 function lockPageScroll() {
@@ -79,6 +81,7 @@ function ModalPanelShell({
   hideHeader = false,
   headerTrailing,
   headerTitleAlign = "default",
+  headerCenter,
   className,
   children,
   loading = false,
@@ -92,6 +95,7 @@ function ModalPanelShell({
   hideHeader?: boolean;
   headerTrailing?: ReactNode;
   headerTitleAlign?: "left" | "default";
+  headerCenter?: ReactNode;
   className?: string;
   children: ReactNode;
   loading?: boolean;
@@ -137,6 +141,13 @@ function ModalPanelShell({
           >
             {title}
           </h2>
+        ) : headerCenter ? (
+          <div
+            id={titleId}
+            className="min-w-0 flex-1 text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm"
+          >
+            {headerCenter}
+          </div>
         ) : (
           <div id={titleId} className="min-w-0 flex-1" />
         )}
@@ -179,6 +190,7 @@ export function Modal({
   loading = false,
   headerTrailing,
   headerTitleAlign = "default",
+  headerCenter,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -322,6 +334,7 @@ export function Modal({
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
+                      headerCenter={headerCenter}
                       className={className}
                       loading={loading}
                     >
@@ -339,6 +352,7 @@ export function Modal({
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
+                      headerCenter={headerCenter}
                       className={className}
                       loading={loading}
                     >
@@ -359,6 +373,7 @@ export function Modal({
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
+                      headerCenter={headerCenter}
                       className={className}
                       loading={loading}
                     >
@@ -376,6 +391,7 @@ export function Modal({
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
+                      headerCenter={headerCenter}
                       className={className}
                       loading={loading}
                     >
@@ -396,6 +412,7 @@ export function Modal({
               hideHeader={hideHeader}
               headerTrailing={headerTrailing}
               headerTitleAlign={headerTitleAlign}
+              headerCenter={headerCenter}
               className={className}
               loading={loading}
             >

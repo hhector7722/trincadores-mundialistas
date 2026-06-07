@@ -14,6 +14,8 @@ export type MatchWithPrediction = {
   status: MatchStatus;
   matchday_name: string;
   matchday_external_key: string | null;
+  external_match_id: string | null;
+  match_number: number | null;
   group_code: string | null;
   officialHome: number | null;
   officialAway: number | null;
@@ -68,7 +70,9 @@ async function fetchPoolMatchesWithPredictions(
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code")
+    .select(
+      "id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code, external_match_id, match_number"
+    )
     .in("matchday_id", filteredDayIds)
     .order("kickoff_at", { ascending: true });
 
@@ -104,6 +108,8 @@ async function fetchPoolMatchesWithPredictions(
       status,
       matchday_name: dayMap.get(m.matchday_id) ?? "",
       matchday_external_key: externalKeyMap.get(m.matchday_id) ?? null,
+      external_match_id: m.external_match_id ?? null,
+      match_number: m.match_number ?? null,
       group_code: m.group_code ?? null,
       officialHome: result?.home_goals ?? null,
       officialAway: result?.away_goals ?? null,
@@ -190,7 +196,9 @@ export async function getMatchPredictionDetail(
 
   const { data: match } = await supabase
     .from("matches")
-    .select("id, matchday_id, home_team, away_team, kickoff_at, status, group_code")
+    .select(
+      "id, matchday_id, home_team, away_team, kickoff_at, status, group_code, external_match_id, match_number"
+    )
     .eq("id", matchId)
     .in("matchday_id", dayIds)
     .maybeSingle();
@@ -224,6 +232,8 @@ export async function getMatchPredictionDetail(
     status: match.status as MatchStatus,
     matchday_name: dayMap.get(match.matchday_id) ?? "",
     matchday_external_key: externalKeyMap.get(match.matchday_id) ?? null,
+    external_match_id: match.external_match_id ?? null,
+    match_number: match.match_number ?? null,
     group_code: match.group_code ?? null,
     prediction: prediction
       ? {

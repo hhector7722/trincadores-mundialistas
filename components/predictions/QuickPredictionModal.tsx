@@ -18,6 +18,7 @@ import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
+import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { cn } from "@/lib/utils";
 
@@ -251,42 +252,39 @@ export function QuickPredictionModal({
           <div className="px-4 pb-3 pt-2">
             <div className="mt-2">
               <MatchTeamsDisplay
+                layout="predictionModal"
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
                 onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team))}
                 onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team))}
-                centerSlot={
-                  <div className="inline-block origin-top scale-[0.88] sm:scale-100">
-                    <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                      Mi pronóstico
-                    </p>
-                    <div className="mt-0.5 flex items-center justify-center gap-0.5">
-                      <ScoreStepper
-                        label={targetMatch.home_team}
-                        value={home}
-                        disabled={controlsDisabled}
-                        onChange={setHome}
-                        variant="floating"
-                        hideLabel
-                      />
-                      <ScoreStepper
-                        label={targetMatch.away_team}
-                        value={away}
-                        disabled={controlsDisabled}
-                        onChange={setAway}
-                        variant="floating"
-                        hideLabel
-                      />
-                    </div>
-                  </div>
+                homeScoreSlot={
+                  <ScoreStepper
+                    label={targetMatch.home_team}
+                    value={home}
+                    disabled={controlsDisabled}
+                    onChange={setHome}
+                    variant="floating"
+                    hideLabel
+                  />
+                }
+                awayScoreSlot={
+                  <ScoreStepper
+                    label={targetMatch.away_team}
+                    value={away}
+                    disabled={controlsDisabled}
+                    onChange={setAway}
+                    variant="floating"
+                    hideLabel
+                  />
                 }
               />
             </div>
 
             <MatchContextActionsRow
               compact
+              layout="teamAnchors"
               className="mt-2 [&>div]:min-h-0"
               match={targetMatch}
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team))}
@@ -301,7 +299,7 @@ export function QuickPredictionModal({
             ) : null}
           </div>
 
-          <div className="mt-auto shrink-0 border-t border-[var(--tm-border)] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
             <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
             <div className="mt-3 flex gap-2">
               <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
@@ -365,7 +363,10 @@ export function QuickPredictionModal({
       open={open}
       onClose={onClose}
       title={quickPanelTitle(panelView)}
+      hideTitle={atPredictionRoot}
       hideHeaderDivider
+      ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
+      headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
       className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}

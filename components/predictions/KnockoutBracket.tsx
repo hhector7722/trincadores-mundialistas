@@ -3,19 +3,19 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
-import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
   formatListScore,
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  KNOCKOUT_ROUND_LABELS,
-  KNOCKOUT_ROUND_ORDER,
-} from "@/lib/predictions/stage-filter";
-import { formatCalendarKickoffHour } from "@/lib/pool/match-calendar";
-import { teamNameEs } from "@/lib/teams/display";
+  BRACKET_MATCH_LAYOUT,
+  BRACKET_THIRD_PLACE,
+  buildKnockoutMatchMap,
+  resolveBracketMatch,
+  type BracketSlot,
+} from "@/lib/predictions/knockout-bracket-layout";
+import { knockoutTeamLabel } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type KnockoutBracketProps = {
@@ -23,46 +23,99 @@ type KnockoutBracketProps = {
   matches: MatchWithPrediction[];
 };
 
-function KnockoutMatchRow({
+function BracketTeamSlot({
+  name,
+  compact,
+}: {
+  name: string;
+  compact?: boolean;
+}) {
+  const label = knockoutTeamLabel(name);
+
+  return (
+    <span
+      className={cn(
+        "tm-ko-slot flex shrink-0 items-center justify-center overflow-hidden rounded-[3px] border border-[var(--tm-ko-slot-border)] bg-[var(--tm-ko-slot-bg)] font-display leading-none text-[var(--tm-accent)]",
+        compact ? "tm-ko-slot--compact" : "tm-ko-slot--regular"
+      )}
+      title={name}
+    >
+      <span className="tm-ko-slot-label">{label}</span>
+    </span>
+  );
+}
+
+function BracketMatchCell({
   match,
+  slot,
   onOpen,
 }: {
-  match: MatchWithPrediction;
-  onOpen: () => void;
+  match: MatchWithPrediction | null;
+  slot: BracketSlot;
+  onOpen: (match: MatchWithPrediction) => void;
 }) {
-  const savedHome = match.prediction?.home_goals ?? null;
-  const savedAway = match.prediction?.away_goals ?? null;
-  const state = resolvePredictionUiState({
-    savedHome,
-    savedAway,
-    draftHome: savedHome ?? 0,
-    draftAway: savedAway ?? 0,
-    draftDirty: false,
-    matchStatus: match.status,
-    serverEditable: match.serverEditable,
-  });
-  const scoreText = formatListScore(savedHome, savedAway);
-  const hour = formatCalendarKickoffHour(match.kickoff_at);
+  const savedHome = match?.prediction?.home_goals ?? null;
+  const savedAway = match?.prediction?.away_goals ?? null;
+  const state = match
+    ? resolvePredictionUiState({
+        savedHome,
+        savedAway,
+        draftHome: savedHome ?? 0,
+        draftAway: savedAway ?? 0,
+        draftDirty: false,
+        matchStatus: match.status,
+        serverEditable: match.serverEditable,
+      })
+    : "empty";
+  const scoreText = match ? formatListScore(savedHome, savedAway) : " ";
+  const isFinal = slot.round === "final";
+  const isThird = slot.round === "third";
+  const isLive = match?.status === "live";
+  const isCompactPair = slot.round === "r32";
+  const homeName = match?.home_team ?? " ";
+  const awayName = match?.away_team ?? " ";
 
   return (
     <button
       type="button"
-      onClick={onOpen}
+      disabled={!match}
+      onClick={() => match && onOpen(match)}
+      style={{
+        gridColumn: slot.column + 1,
+        gridRow: `${slot.rowStart} / span ${slot.rowSpan}`,
+      }}
       className={cn(
-        "flex min-h-14 w-full items-center gap-2 border-b border-[var(--tm-border)] px-3 py-2 text-left transition-colors last:border-0 hover:bg-[rgba(111,43,255,0.12)]",
-        match.status === "live" && "bg-[rgba(212,255,0,0.06)]"
+        "tm-ko-match group relative flex min-h-0 min-w-0 items-center justify-center p-0",
+        slot.side === "left" && "tm-ko-match--left",
+        slot.side === "right" && "tm-ko-match--right",
+        slot.side === "center" && "tm-ko-match--center",
+        isFinal && "tm-ko-match--final",
+        isThird && "tm-ko-match--third",
+        !match && "tm-ko-match--missing",
+        isLive && "tm-ko-match--live",
+        state === "saved" && "tm-ko-match--saved",
+        state === "locked" && "tm-ko-match--locked"
       )}
+      aria-label={
+        match
+          ? `Pronostico ${homeName} contra ${awayName}`
+          : `Partido ${slot.matchNumber} sin datos`
+      }
     >
-      <span className="w-8 shrink-0 text-xs font-medium text-white">{hour}</span>
-      <TeamFlagBadge name={match.home_team} size="xs" />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--tm-fg)]">
-        {teamNameEs(match.home_team)} — {teamNameEs(match.away_team)}
+      <span className="tm-ko-match-inner">
+        <span
+          className={cn(
+            "flex min-h-0 min-w-0 flex-col items-center justify-center gap-[1px]",
+            isCompactPair ? "h-full w-full max-w-[18px]" : "gap-[2px]"
+          )}
+        >
+          <BracketTeamSlot name={homeName} compact={isCompactPair} />
+          {!isCompactPair && scoreText.trim() ? (
+            <span className="tm-ko-score">{scoreText}</span>
+          ) : null}
+          <BracketTeamSlot name={awayName} compact={isCompactPair} />
+        </span>
       </span>
-      <TeamFlagBadge name={match.away_team} size="xs" />
-      <div className="flex shrink-0 flex-col items-end gap-0.5">
-        <PredictionStatusBadge state={state} />
-        <span className="font-display text-sm text-[var(--tm-fg)]">{scoreText}</span>
-      </div>
     </button>
   );
 }
@@ -70,21 +123,7 @@ function KnockoutMatchRow({
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
 
-  const rounds = useMemo(() => {
-    const byKey = new Map<string, MatchWithPrediction[]>();
-    for (const match of matches) {
-      const key = match.matchday_external_key ?? "unknown";
-      const bucket = byKey.get(key);
-      if (bucket) bucket.push(match);
-      else byKey.set(key, [match]);
-    }
-
-    return KNOCKOUT_ROUND_ORDER.filter((key) => byKey.has(key)).map((key) => ({
-      key,
-      label: KNOCKOUT_ROUND_LABELS[key] ?? key,
-      matches: byKey.get(key) ?? [],
-    }));
-  }, [matches]);
+  const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
 
   if (!matches.length) {
     return (
@@ -94,10 +133,12 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
     );
   }
 
+  const thirdPlaceMatch = resolveBracketMatch(matchMap, BRACKET_THIRD_PLACE.matchNumber);
+
   return (
-    <div className="flex flex-col">
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--tm-border)] px-3 py-2">
-        <h1 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)] sm:text-base">
+    <div className="tm-ko-page">
+      <div className="tm-ko-header">
+        <h1 className="font-display text-xs uppercase tracking-wide text-[var(--tm-fg)] sm:text-sm">
           Fase eliminatoria
         </h1>
         <Link href="/predictions" className="tm-cal-ko-link shrink-0">
@@ -105,27 +146,40 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
         </Link>
       </div>
 
-      <div className="pb-2">
-        {rounds.map((round) => (
-          <section
-            key={round.key}
-            className="tm-glass-card mx-0 mb-2 overflow-hidden rounded-none border-x-0"
-          >
-            <h2 className="border-b border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
-              {round.label}
-            </h2>
-            {round.matches.map((match) => (
-              <KnockoutMatchRow
-                key={match.id}
-                match={match}
-                onOpen={() => setActiveMatch(match)}
-              />
-            ))}
-          </section>
-        ))}
+      <div className="tm-ko-stage">
+        <div className="tm-ko-grid" role="img" aria-label="Cuadro de eliminatorias Mundial 2026">
+          {BRACKET_MATCH_LAYOUT.map((slot) => (
+            <BracketMatchCell
+              key={`${slot.side}-${slot.round}-${slot.matchNumber}`}
+              slot={slot}
+              match={resolveBracketMatch(matchMap, slot.matchNumber)}
+              onOpen={setActiveMatch}
+            />
+          ))}
+        </div>
       </div>
 
-      {activeMatch && (
+      {thirdPlaceMatch ? (
+        <div className="tm-ko-third">
+          <span className="tm-ko-third-label">3.er puesto</span>
+          <button
+            type="button"
+            onClick={() => setActiveMatch(thirdPlaceMatch)}
+            className="tm-ko-third-btn"
+          >
+            <BracketTeamSlot name={thirdPlaceMatch.home_team} />
+            <span className="tm-ko-third-score">
+              {formatListScore(
+                thirdPlaceMatch.prediction?.home_goals ?? null,
+                thirdPlaceMatch.prediction?.away_goals ?? null
+              )}
+            </span>
+            <BracketTeamSlot name={thirdPlaceMatch.away_team} />
+          </button>
+        </div>
+      ) : null}
+
+      {activeMatch ? (
         <QuickPredictionModal
           key={`${activeMatch.id}:${activeMatch.prediction?.updated_at ?? "none"}`}
           open
@@ -133,7 +187,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           poolId={poolId}
           match={activeMatch}
         />
-      )}
+      ) : null}
     </div>
   );
 }

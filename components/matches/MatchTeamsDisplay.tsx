@@ -59,6 +59,11 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
+  /** Modal de pronóstico: equipos en 10%/90%, etiqueta arriba y steppers bajo cada bandera. */
+  layout?: "default" | "predictionModal";
+  predictionLabel?: string;
+  homeScoreSlot?: ReactNode;
+  awayScoreSlot?: ReactNode;
   onHomeTeamClick?: () => void;
   onAwayTeamClick?: () => void;
 };
@@ -72,9 +77,37 @@ export function MatchTeamsDisplay({
   showSectionLabel = false,
   centerKickoff = false,
   centerSlot,
+  layout = "default",
+  predictionLabel = "Mi pronóstico",
+  homeScoreSlot,
+  awayScoreSlot,
   onHomeTeamClick,
   onAwayTeamClick,
 }: MatchTeamsDisplayProps) {
+  const isPredictionModal = layout === "predictionModal";
+  const homeAnchor = isPredictionModal ? "10%" : "15%";
+  const awayAnchor = isPredictionModal ? "90%" : "85%";
+
+  if (isPredictionModal) {
+    return (
+      <div className="relative w-full min-h-[6.75rem]">
+        <p className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+          {predictionLabel}
+        </p>
+
+        <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-0.5">
+          <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
+          {homeScoreSlot}
+        </div>
+
+        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-0.5">
+          <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
+          {awayScoreSlot}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {showSectionLabel && (
@@ -84,11 +117,11 @@ export function MatchTeamsDisplay({
       )}
 
       <div className={cn("relative w-full min-h-[4.25rem]", showSectionLabel && "mt-2")}>
-        <div className="absolute left-[15%] top-0 -translate-x-1/2">
+        <div className={cn("absolute top-0 -translate-x-1/2")} style={{ left: homeAnchor }}>
           <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
         </div>
 
-        <div className="absolute left-[85%] top-0 -translate-x-1/2">
+        <div className={cn("absolute top-0 -translate-x-1/2")} style={{ left: awayAnchor }}>
           <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
         </div>
 

@@ -1,4 +1,4 @@
-import { toSlug } from "@/lib/openfootball/slug";
+import { isPlaceholderTeam, toSlug } from "@/lib/openfootball/slug";
 
 type TeamDisplay = {
   nameEs: string;
@@ -78,4 +78,26 @@ export function teamAbbr(teamName: string): string {
 
 export function formatMatchCalendarAbbr(homeTeam: string, awayTeam: string): string {
   return `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
+}
+
+/** Etiqueta compacta para celdas del cuadro KO (WA, 2A, W74…). */
+export function knockoutTeamLabel(teamName: string): string {
+  const trimmed = teamName.trim();
+  if (!trimmed) return " ";
+
+  if (isPlaceholderTeam(trimmed)) {
+    const groupWinner = trimmed.match(/^1([A-L])$/i);
+    if (groupWinner) return `W${groupWinner[1].toUpperCase()}`;
+
+    const groupRunnerUp = trimmed.match(/^2([A-L])$/i);
+    if (groupRunnerUp) return `2${groupRunnerUp[1].toUpperCase()}`;
+
+    if (/^3[A-L](\/[A-L])+$/i.test(trimmed)) {
+      return trimmed.replace(/\//g, "").toUpperCase();
+    }
+
+    return trimmed.toUpperCase();
+  }
+
+  return teamAbbr(trimmed);
 }
