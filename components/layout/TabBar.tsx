@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useTransition, useState, type Mouse
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TABBAR_HEIGHT_FALLBACK = "calc(3rem + env(safe-area-inset-bottom, 0px))";
+const TABBAR_HEIGHT_FALLBACK = "calc(var(--tm-tabbar-core) + var(--tm-safe-bottom))";
 
 function syncTabBarHeight(node: HTMLElement) {
   const height = Math.ceil(node.getBoundingClientRect().height);
@@ -90,7 +90,7 @@ export function TabBar() {
       className="tm-tabbar tm-surface-fade border-t border-[var(--tm-border)] px-1 backdrop-blur-xl"
       aria-label="Navegacion principal"
     >
-      <ul className="flex h-12 items-stretch justify-between">
+      <ul className="tm-tabbar-inner flex h-12 items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(displayPath, href);
           const navigating = optimisticHref === href;

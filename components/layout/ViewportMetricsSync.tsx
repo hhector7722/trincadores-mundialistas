@@ -2,21 +2,30 @@
 
 import { useLayoutEffect } from "react";
 
-function syncViewportOffset() {
-  const offsetTop = Math.round(window.visualViewport?.offsetTop ?? 0);
-  document.documentElement.style.setProperty("--tm-vvh-offset", `${offsetTop}px`);
+function syncViewportMetrics() {
+  const viewport = window.visualViewport;
+
+  if (viewport) {
+    document.documentElement.style.setProperty("--tm-vvh-offset", `${Math.round(viewport.offsetTop)}px`);
+    document.documentElement.style.setProperty("--tm-vvh-height", `${Math.round(viewport.height)}px`);
+    return;
+  }
+
+  document.documentElement.style.setProperty("--tm-vvh-offset", "0px");
+  document.documentElement.style.setProperty("--tm-vvh-height", `${window.innerHeight}px`);
 }
 
-function resetViewportOffset() {
+function resetViewportMetrics() {
   document.documentElement.style.removeProperty("--tm-vvh-offset");
+  document.documentElement.style.removeProperty("--tm-vvh-height");
 }
 
-/** Ajusta solo el top del shell cuando visualViewport se desplaza (teclado / UI del navegador). */
+/** Sincroniza top + alto del shell con visualViewport (iOS PWA / teclado / chrome del navegador). */
 export function ViewportMetricsSync() {
   useLayoutEffect(() => {
-    const onChange = () => syncViewportOffset();
+    const onChange = () => syncViewportMetrics();
 
-    syncViewportOffset();
+    syncViewportMetrics();
 
     window.visualViewport?.addEventListener("resize", onChange);
     window.visualViewport?.addEventListener("scroll", onChange);
@@ -28,7 +37,7 @@ export function ViewportMetricsSync() {
       window.visualViewport?.removeEventListener("scroll", onChange);
       window.removeEventListener("resize", onChange);
       window.removeEventListener("orientationchange", onChange);
-      resetViewportOffset();
+      resetViewportMetrics();
     };
   }, []);
 
