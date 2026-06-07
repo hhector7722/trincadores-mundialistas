@@ -93,7 +93,7 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
-  /** Modal de pronóstico: equipos en 10%/90%, steppers centrados entre banderas. */
+  /** Modal de pronóstico: equipos en 10%/90%, steppers en 30%/70% (entre bandera y centro). */
   layout?: "default" | "predictionModal";
   predictionLabel?: string;
   homeScoreSlot?: ReactNode;
@@ -134,9 +134,14 @@ export function MatchTeamsDisplay({
           <TeamNameLabel name={homeTeam} />
         </div>
 
-        {homeScoreSlot || awayScoreSlot ? (
-          <div className="absolute left-1/2 top-[1.15rem] flex h-10 -translate-x-1/2 items-center justify-center gap-0.5 sm:h-11">
+        {homeScoreSlot ? (
+          <div className="absolute left-[30%] top-[1.15rem] flex h-10 -translate-x-1/2 items-center sm:h-11">
             {homeScoreSlot}
+          </div>
+        ) : null}
+
+        {awayScoreSlot ? (
+          <div className="absolute left-[70%] top-[1.15rem] flex h-10 -translate-x-1/2 items-center sm:h-11">
             {awayScoreSlot}
           </div>
         ) : null}

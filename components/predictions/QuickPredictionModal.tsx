@@ -6,6 +6,7 @@ import { savePrediction } from "@/actions/predictions";
 import { buildLineupView, buildMvpView } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
+import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
@@ -249,7 +250,7 @@ export function QuickPredictionModal({
     if (view.kind === "prediction") {
       return (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="px-4 pb-3 pt-2">
+          <div className="px-4 pb-0 pt-2">
             <div className="mt-2">
               <MatchTeamsDisplay
                 layout="predictionModal"
@@ -282,10 +283,21 @@ export function QuickPredictionModal({
               />
             </div>
 
+            <div className="relative mt-[1.15rem] min-h-[1.375rem] w-full">
+              <div className="absolute left-1/2 top-1/2 w-max max-w-[70%] -translate-x-1/2 -translate-y-1/2">
+                <MvpPredictionButton
+                  savedPlayerName={targetMatch.mvpPrediction?.player_name ?? null}
+                  onClick={() => push(buildMvpView(poolId, targetMatch))}
+                  variant="compact"
+                />
+              </div>
+            </div>
+
             <MatchContextActionsRow
               compact
+              hideMvp
               layout="teamAnchors"
-              className="mt-2 [&>div]:min-h-0"
+              className="mt-[1.15rem] [&>div]:min-h-0"
               match={targetMatch}
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team))}
               onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team))}
@@ -299,7 +311,7 @@ export function QuickPredictionModal({
             ) : null}
           </div>
 
-          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.15rem]">
             <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
             <div className="mt-3 flex gap-2">
               <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
