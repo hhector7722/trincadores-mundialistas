@@ -870,14 +870,14 @@ html[data-modal-open] main {
   right: 0;
 }
 
-/* Semis: centros al 42.5% y 57.5% (medio camino hacia 50% desde 35%/65%) */
+/* Semis: W97/W99 al 45%, W98/W100 al 55% */
 .tm-ko-node--sf .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--sf .tm-ko-node-pair::before {
-  top: 42.5%;
-  height: 15%;
+  top: 45%;
+  height: 10%;
   transform: translateX(-50%);
 }
 
@@ -888,14 +888,14 @@ html[data-modal-open] main {
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 42.5%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 57.5%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
