@@ -908,8 +908,9 @@ html[data-modal-open] main {
 }
 
 /*
- * Cuartos: centros base 12.5/37.5/62.5/87.5% → ajuste ±2% hacia semis (42.5/57.5%).
- * Superior: 25.5% | 2.º sup: 42% | 1.º inf: 58% | 2.º inf: 74.5%
+ * Cuartos superiores (conjunto): borde inferior en el punto medio entre
+ * el inferior actual (~44.75%) y el centro de semis superiores (42.5%) → 43.625%.
+ * Cuartos inferiores: 58% / 74.5% (sin cambio).
  */
 .tm-ko-node--qf-upper .tm-ko-node-pair,
 .tm-ko-node--qf-lower .tm-ko-node-pair {
@@ -922,31 +923,34 @@ html[data-modal-open] main {
   max-height: none;
 }
 
+.tm-ko-node--qf-upper .tm-ko-node-pair {
+  position: absolute;
+  top: 43.625%;
+  left: 50%;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: min(6cqh, 14px);
+  transform: translate(-50%, -100%);
+}
+
 .tm-ko-node--qf-upper .tm-ko-node-pair::before {
-  top: 25.5%;
-  height: 16.5%;
-  transform: translateX(-50%);
+  display: none;
 }
 
-.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:first-of-type {
-  position: absolute;
-  top: 25.5%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:last-of-type {
-  position: absolute;
-  top: 42%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-score {
-  position: absolute;
-  top: 33.75%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair::before {
