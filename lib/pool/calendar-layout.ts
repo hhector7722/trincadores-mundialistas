@@ -21,7 +21,7 @@ const MAX_PREDICTION_FS_RATIO = 0.62;
 const ACCESS_DOCK_GRID_GAP_PX = 8;
 const ACCESS_DOCK_COLS = 2;
 const ACCESS_DOCK_ROWS = 2;
-const ACCESS_DOCK_LONGEST_LABEL = "VER PLANTILLAS";
+const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
 const MIN_ACCESS_BTN_HEIGHT_PX = 18;
 const ACCESS_DOCK_HEIGHT_RATIO = 0.28;
 const MIN_ACCESS_DOCK_HEIGHT_PX = 36;
@@ -166,6 +166,7 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-min-h");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
+    calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
     return;
   }
 
@@ -219,6 +220,27 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
     void slot.offsetHeight;
   }
+}
+
+/** Iguala el hueco card→botones y botones→línea de la semana 1. */
+function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): void {
+  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
+  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+  const dock = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-access-dock");
+
+  if (!slot || !card || !dock) {
+    calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
+    return;
+  }
+
+  void slot.offsetHeight;
+  const slotRect = slot.getBoundingClientRect();
+  const cardRect = card.getBoundingClientRect();
+  const dockH = dock.offsetHeight;
+  const freeSpace = slotRect.bottom - cardRect.bottom;
+  const gap = Math.max(0, Math.floor((freeSpace - dockH) / 2));
+
+  calendar.style.setProperty("--tm-cal-sidebar-access-gap", `${gap}px`);
 }
 
 /** Ajusta la card de grupos a la altura real del contenido (sin relleno inferior). */
@@ -455,6 +477,7 @@ export function fitCalendarLayout(
   syncSidebarAccessDockMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
+  syncSidebarAccessSpacing(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
   for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
@@ -465,6 +488,7 @@ export function fitCalendarLayout(
     syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
+    syncSidebarAccessSpacing(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }
 
@@ -490,6 +514,7 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-min-h");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
+  calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
   calendar.style.removeProperty("--tm-cal-sidebar-card-h");
   calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
   resetPredictionLabelMetrics(calendar);

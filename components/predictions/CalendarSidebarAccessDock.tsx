@@ -29,7 +29,7 @@ export function CalendarSidebarAccessDock({
           Ver stats
         </button>
         <button type="button" onClick={onOpenSquads} className="tm-cal-sidebar-access-btn">
-          Ver plantillas
+          Ver equipos
         </button>
       </div>
     </div>

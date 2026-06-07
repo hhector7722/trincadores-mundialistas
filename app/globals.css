@@ -946,7 +946,7 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   flex: 1 1 auto;
-  gap: var(--tm-cal-sidebar-body-gap, 6px);
+  gap: 0;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card {
@@ -1009,8 +1009,9 @@ html[data-modal-open] main {
 .tm-porra-calendar .tm-cal-sidebar-access-dock {
   flex: 0 0 var(--tm-cal-sidebar-access-dock-h, auto);
   height: var(--tm-cal-sidebar-access-dock-h, auto);
-  margin-top: auto;
-  padding: 0 0 2px;
+  margin-top: var(--tm-cal-sidebar-access-gap, 0px);
+  margin-bottom: var(--tm-cal-sidebar-access-gap, 0px);
+  padding: 0;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {
