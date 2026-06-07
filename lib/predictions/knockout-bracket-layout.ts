@@ -1,70 +1,47 @@
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { KNOCKOUT_ROUND_LABELS, KNOCKOUT_ROUND_ORDER } from "@/lib/predictions/stage-filter";
 
-export type BracketSide = "left" | "right";
+export type StaggeredRoundKey = (typeof KNOCKOUT_ROUND_ORDER)[number];
 
-export type BracketRoundKey = "r32" | "r16" | "qf" | "sf";
-
-export type BracketSlot = {
-  side: BracketSide | "center";
-  round: BracketRoundKey | "final" | "third";
-  matchNumber: number;
-  rowStart: number;
-  rowSpan: number;
-  column: number;
+export type StaggeredRound = {
+  key: StaggeredRoundKey;
+  label: string;
+  matchNumbers: number[];
 };
 
-/** Orden visual del cuadro WC2026 (mitad izq / der) según cup_finals.txt. */
-export const BRACKET_MATCH_LAYOUT: BracketSlot[] = [
-  // Izquierda — dieciseisavos (8 partidos, 2 filas c/u)
-  { side: "left", round: "r32", matchNumber: 73, rowStart: 1, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 75, rowStart: 3, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 74, rowStart: 5, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 77, rowStart: 7, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 83, rowStart: 9, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 84, rowStart: 11, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 81, rowStart: 13, rowSpan: 2, column: 0 },
-  { side: "left", round: "r32", matchNumber: 82, rowStart: 15, rowSpan: 2, column: 0 },
-  // Izquierda — octavos
-  { side: "left", round: "r16", matchNumber: 90, rowStart: 1, rowSpan: 4, column: 1 },
-  { side: "left", round: "r16", matchNumber: 89, rowStart: 5, rowSpan: 4, column: 1 },
-  { side: "left", round: "r16", matchNumber: 93, rowStart: 9, rowSpan: 4, column: 1 },
-  { side: "left", round: "r16", matchNumber: 94, rowStart: 13, rowSpan: 4, column: 1 },
-  // Izquierda — cuartos
-  { side: "left", round: "qf", matchNumber: 97, rowStart: 1, rowSpan: 8, column: 2 },
-  { side: "left", round: "qf", matchNumber: 98, rowStart: 9, rowSpan: 8, column: 2 },
-  // Izquierda — semifinal
-  { side: "left", round: "sf", matchNumber: 101, rowStart: 1, rowSpan: 16, column: 3 },
-  // Final
-  { side: "center", round: "final", matchNumber: 104, rowStart: 1, rowSpan: 16, column: 4 },
-  // Derecha — semifinal
-  { side: "right", round: "sf", matchNumber: 102, rowStart: 1, rowSpan: 16, column: 5 },
-  // Derecha — cuartos
-  { side: "right", round: "qf", matchNumber: 99, rowStart: 1, rowSpan: 8, column: 6 },
-  { side: "right", round: "qf", matchNumber: 100, rowStart: 9, rowSpan: 8, column: 6 },
-  // Derecha — octavos
-  { side: "right", round: "r16", matchNumber: 91, rowStart: 1, rowSpan: 4, column: 7 },
-  { side: "right", round: "r16", matchNumber: 92, rowStart: 5, rowSpan: 4, column: 7 },
-  { side: "right", round: "r16", matchNumber: 95, rowStart: 9, rowSpan: 4, column: 7 },
-  { side: "right", round: "r16", matchNumber: 96, rowStart: 13, rowSpan: 4, column: 7 },
-  // Derecha — dieciseisavos
-  { side: "right", round: "r32", matchNumber: 76, rowStart: 1, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 78, rowStart: 3, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 79, rowStart: 5, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 80, rowStart: 7, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 85, rowStart: 9, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 86, rowStart: 11, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 87, rowStart: 13, rowSpan: 2, column: 8 },
-  { side: "right", round: "r32", matchNumber: 88, rowStart: 15, rowSpan: 2, column: 8 },
+/** Orden de partidos por ronda (M73–M104) según cup_finals.txt. */
+export const KNOCKOUT_STAGGERED_ROUNDS: StaggeredRound[] = [
+  {
+    key: "WC2026:round-of-32",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:round-of-32"],
+    matchNumbers: [73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88],
+  },
+  {
+    key: "WC2026:round-of-16",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:round-of-16"],
+    matchNumbers: [89, 90, 91, 92, 93, 94, 95, 96],
+  },
+  {
+    key: "WC2026:quarter-final",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:quarter-final"],
+    matchNumbers: [97, 98, 99, 100],
+  },
+  {
+    key: "WC2026:semi-final",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:semi-final"],
+    matchNumbers: [101, 102],
+  },
+  {
+    key: "WC2026:third-place",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:third-place"],
+    matchNumbers: [103],
+  },
+  {
+    key: "WC2026:final",
+    label: KNOCKOUT_ROUND_LABELS["WC2026:final"],
+    matchNumbers: [104],
+  },
 ];
-
-export const BRACKET_THIRD_PLACE: BracketSlot = {
-  side: "center",
-  round: "third",
-  matchNumber: 103,
-  rowStart: 1,
-  rowSpan: 1,
-  column: 4,
-};
 
 const MATCH_NUMBER_BY_PAIR: Record<number, { home: string; away: string }> = {
   73: { home: "2A", away: "2B" },
@@ -151,4 +128,11 @@ export function resolveBracketMatch(
   matchNumber: number
 ): MatchWithPrediction | null {
   return matchMap.get(matchNumber) ?? null;
+}
+
+export function placeholderPairForMatchNumber(matchNumber: number): {
+  home: string;
+  away: string;
+} | null {
+  return MATCH_NUMBER_BY_PAIR[matchNumber] ?? null;
 }
