@@ -1,11 +1,6 @@
-﻿import { Suspense } from "react";
-import { ElasticMainScroll } from "@/components/layout/ElasticMainScroll";
-import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+﻿import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBar } from "@/components/layout/TabBar";
-import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
-import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
-import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -18,16 +13,11 @@ export function AppShell({
 }) {
   return (
     <NavigationLoadingProvider>
-      <div className="tm-app-shell">
-        <ViewportMetricsInlineScript />
-        <ViewportMetricsSync />
-        <Suspense fallback={null}>
-          <ViewportLayoutDebug />
-        </Suspense>
+      <div className="relative flex min-h-dvh flex-col">
         <HomeAtmosphere />
         <AppHeaderGate ctx={ctx} />
-        <main className="tm-app-main">
-          <ElasticMainScroll>{children}</ElasticMainScroll>
+        <main className="relative z-10 flex-1 overflow-y-auto pb-[var(--tm-tabbar-height)]">
+          {children}
         </main>
         <TabBar />
       </div>

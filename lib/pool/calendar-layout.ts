@@ -1,17 +1,20 @@
+const MIN_UI_SCALE = 0.15;
+const MAX_UI_SCALE = 2.75;
+const SCALE_SEARCH_ITERATIONS = 14;
 const OVERFLOW_TOLERANCE_PX = 1;
 const MATCH_CARD_GAP_PX = 4;
-const MIN_MATCH_CARD_HEIGHT_PX = 28;
+const MIN_MATCH_CARD_HEIGHT_PX = 22;
 const GROUPS_EDGE_INSET_PX = 2;
 const GROUPS_FLAGS_PER_ROW = 4;
 const GROUPS_LIST_COLUMNS = 2;
 const GROUPS_COL_GAP_PX = 3;
 const GROUPS_FLAG_GAP_PX = 1;
-const GROUPS_CARD_GAP_PX = 2;
+const GROUPS_CARD_GAP_PX = 3;
 const GROUPS_CARD_PAD_Y = 1;
 const GROUPS_LETTER_WIDTH_RATIO = 0.1;
 const GROUPS_SIZE_FIT = 0.98;
 const GROUPS_FLAG_SCALE = 0.96;
-const GROUPS_CARD_HEIGHT_RATIO = 0.92;
+const GROUPS_CARD_HEIGHT_RATIO = 0.88;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
@@ -33,6 +36,43 @@ function elementOverflows(el: HTMLElement): boolean {
     el.scrollHeight > el.clientHeight + OVERFLOW_TOLERANCE_PX ||
     el.scrollWidth > el.clientWidth + OVERFLOW_TOLERANCE_PX
   );
+}
+
+function gridHasOverflow(grid: HTMLElement): boolean {
+  const cells = Array.from(grid.children) as HTMLElement[];
+  for (const cell of cells) {
+    if (elementOverflows(cell)) return true;
+
+    const inner = cell.querySelectorAll(
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction"
+    );
+    for (const node of inner) {
+      if (node instanceof HTMLElement && elementOverflows(node)) return true;
+    }
+  }
+  return false;
+}
+
+function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
+  let lo = MIN_UI_SCALE;
+  let hi = MAX_UI_SCALE;
+  let best = MIN_UI_SCALE;
+
+  for (let i = 0; i < SCALE_SEARCH_ITERATIONS; i++) {
+    const mid = (lo + hi) / 2;
+    calendar.style.setProperty("--tm-cal-ui-scale", mid.toFixed(4));
+    void calendar.offsetHeight;
+
+    if (gridHasOverflow(grid)) {
+      hi = mid;
+    } else {
+      best = mid;
+      lo = mid;
+    }
+  }
+
+  calendar.style.setProperty("--tm-cal-ui-scale", best.toFixed(4));
+  return best;
 }
 
 function findBusiestMatchCell(grid: HTMLElement): HTMLElement | null {
@@ -198,59 +238,13 @@ function syncPredictionLabelMetrics(grid: HTMLElement): void {
   }
 }
 
-function readCssVarPx(host: HTMLElement, varName: string, fallback: number): number {
-  const probe = document.createElement("div");
-  probe.style.position = "absolute";
-  probe.style.visibility = "hidden";
-  probe.style.pointerEvents = "none";
-  probe.style.height = `var(${varName})`;
-  host.appendChild(probe);
-  const height = probe.offsetHeight;
-  host.removeChild(probe);
-  return height > 0 ? height : fallback;
-}
-
-/** Mide la fila más alta del grid y la aplica a todas las semanas. */
-function syncUniformRowHeight(
-  calendar: HTMLElement,
-  grid: HTMLElement,
-  rowCount: number
-): number {
-  const minRow = "var(--tm-cal-row-min-height)";
-  grid.style.gridTemplateRows = `repeat(${rowCount}, minmax(${minRow}, auto))`;
-  void grid.offsetHeight;
-
-  const rowHeightsByTop = new Map<number, number>();
-
-  for (const child of grid.children) {
-    if (!(child instanceof HTMLElement)) continue;
-    rowHeightsByTop.set(
-      child.offsetTop,
-      Math.max(rowHeightsByTop.get(child.offsetTop) ?? 0, child.scrollHeight)
-    );
-  }
-
-  grid.style.removeProperty("gridTemplateRows");
-
-  const measuredMax = rowHeightsByTop.size > 0 ? Math.max(...rowHeightsByTop.values()) : 0;
-  const minRowPx = readCssVarPx(calendar, "--tm-cal-row-min-height", 104);
-  const uniform = Math.max(minRowPx, measuredMax);
-
-  calendar.style.setProperty("--tm-cal-row-height", `${uniform}px`);
-  return uniform;
-}
-
-function runCalendarMetricsPass(calendar: HTMLElement, grid: HTMLElement): number {
-  return syncMatchCardMetrics(calendar, grid);
-}
-
 export type CalendarLayoutResult = {
   rowHeight: number;
   uiScale: number;
   matchCardHeight: number;
 };
 
-/** Filas con altura uniforme (la de la semana más alta); scroll en `.tm-app-main`. */
+/** Filas iguales vía CSS grid 1fr; tarjetas compartidas según el día más cargado. */
 export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
@@ -259,27 +253,35 @@ export function fitCalendarLayout(
   if (rowCount <= 0) return null;
 
   calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
-  calendar.style.setProperty("--tm-cal-ui-scale", "1");
-  calendar.style.removeProperty("--tm-cal-row-height");
   void grid.offsetHeight;
 
-  runCalendarMetricsPass(calendar, grid);
+  let uiScale = searchMaxScale(calendar, grid);
+
+  while (uiScale > MIN_UI_SCALE && gridHasOverflow(grid)) {
+    uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
+    calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
+    void calendar.offsetHeight;
+  }
+
+  let matchCardHeight = syncMatchCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
-  const rowHeight = syncUniformRowHeight(calendar, grid, rowCount);
-  void grid.offsetHeight;
+  for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
+    uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
+    calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
+    void calendar.offsetHeight;
+    matchCardHeight = syncMatchCardMetrics(calendar, grid);
+    syncGroupsPanelMetrics(calendar, grid);
+    syncPredictionLabelMetrics(grid);
+  }
 
-  const matchCardHeight = runCalendarMetricsPass(calendar, grid);
-  syncGroupsPanelMetrics(calendar, grid);
-  syncPredictionLabelMetrics(grid);
-
-  return { rowHeight, uiScale: 1, matchCardHeight };
+  const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
+  return { rowHeight, uiScale, matchCardHeight };
 }
 
 export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-ui-scale");
-  calendar.style.removeProperty("--tm-cal-row-height");
   calendar.style.removeProperty("--tm-cal-match-gap");
   calendar.style.removeProperty("--tm-cal-match-card-h");
   calendar.style.removeProperty("--tm-cal-groups-pad");
