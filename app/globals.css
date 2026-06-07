@@ -112,14 +112,12 @@ html[data-modal-open] main {
   position: fixed;
   top: var(--tm-vvh-offset);
   right: 0;
-  bottom: 0;
   left: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: auto;
-  min-height: var(--tm-vvh);
+  height: var(--tm-vvh);
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -128,19 +126,14 @@ html:has(.tm-app-shell),
 html:has(.tm-app-shell) body {
   overflow: hidden;
   overscroll-behavior: none;
+  height: var(--tm-vvh);
+  min-height: var(--tm-vvh);
+  max-height: var(--tm-vvh);
 }
 
 .tm-tabbar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
   z-index: 50;
   flex-shrink: 0;
-}
-
-.tm-main-with-tabbar {
-  padding-bottom: var(--tm-tabbar-height);
 }
 
 .tm-card-surface {
