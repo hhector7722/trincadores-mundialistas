@@ -25,19 +25,24 @@ export function TeamLineupGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full shrink-0 self-center",
-        isModal ? "max-w-none" : "max-w-[300px] sm:max-w-[360px]",
+        "relative aspect-[3/2] w-full shrink-0 self-center overflow-hidden",
+        isModal
+          ? "max-w-none rounded-xl border border-white/10 shadow-lg"
+          : "max-w-[300px] rounded-2xl border border-white/10 shadow-2xl sm:max-w-[360px]",
         className
       )}
     >
-      <Image
-        src={GOYA_FIELD_SRC}
-        alt=""
-        fill
-        className="object-contain object-center"
-        sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
-        priority
-      />
+      <div className="absolute inset-0 bg-[#3a1218]">
+        <Image
+          src={GOYA_FIELD_SRC}
+          alt=""
+          fill
+          unoptimized
+          className="object-contain object-center"
+          sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
+          priority
+        />
+      </div>
 
       <div className="absolute left-3 top-3 rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80 backdrop-blur-sm">
         {formation}

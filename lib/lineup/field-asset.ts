@@ -1,5 +1,5 @@
 /** Bump al sustituir `public/icons/goya.png` para invalidar caché del navegador/CDN. */
-export const GOYA_FIELD_ASSET_VERSION = "20260607";
+export const GOYA_FIELD_ASSET_VERSION = "20260608";
 
 export const GOYA_FIELD_SRC = `/icons/goya.png?v=${GOYA_FIELD_ASSET_VERSION}`;
 
