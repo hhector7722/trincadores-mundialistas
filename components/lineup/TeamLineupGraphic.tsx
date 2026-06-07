@@ -19,7 +19,7 @@ export function TeamLineupGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full max-w-[220px] shrink-0 self-center sm:max-w-[260px]",
+        "relative aspect-[3/2] w-full max-w-[300px] shrink-0 self-center sm:max-w-[360px]",
         className
       )}
     >
@@ -28,7 +28,7 @@ export function TeamLineupGraphic({
         alt=""
         fill
         className="object-contain object-center"
-        sizes="(max-width: 260px) 100vw, 260px"
+        sizes="(max-width: 360px) 100vw, 360px"
         priority
       />
 
