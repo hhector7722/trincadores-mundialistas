@@ -1,9 +1,7 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
+import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
-
-const RANKING_GRID =
-  "grid grid-cols-[0.75rem_1.75rem_2rem_minmax(0,1fr)_2.75rem_2.75rem] items-center gap-x-2";
 
 export function RankingTable({
   rows,
@@ -25,20 +23,17 @@ export function RankingTable({
       <div
         className={cn(
           RANKING_GRID,
-          "shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-left text-xs font-medium uppercase leading-none tracking-wide text-[var(--tm-muted)]"
+          "tm-ranking-head shrink-0 border-b border-[var(--tm-border)] px-3 text-left font-medium uppercase tracking-wide text-[var(--tm-muted)]"
         )}
       >
         <span aria-hidden="true" />
         <span>Pos</span>
-        <span aria-hidden="true" />
-        <span>Trincador</span>
+        <span className="col-span-2 text-center">Trincador</span>
         <span>Pts</span>
         <span>Fiab</span>
+        <span>Quiz</span>
       </div>
-      <div
-        className="grid min-h-0 flex-1"
-        style={{ gridTemplateRows: `repeat(${rows.length}, minmax(0, 1fr))` }}
-      >
+      <div className="tm-ranking-body min-h-0 flex-1 overflow-y-auto">
         {rows.map((row) => (
           <RankingRow
             key={row.profileId}

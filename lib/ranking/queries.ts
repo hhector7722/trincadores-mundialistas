@@ -20,6 +20,7 @@ export type LeaderboardRow = {
   exactHits: number;
   signHits: number;
   matchPoints: number;
+  quizPoints: number;
   reliabilityPct: number | null;
 };
 
@@ -173,6 +174,35 @@ async function loadResolvedPredictionStats(
   return stats;
 }
 
+async function loadQuizPointsByProfile(poolId: string): Promise<Map<string, number>> {
+  const supabase = await createClient();
+  const { data: quizzes, error: quizError } = await supabase
+    .from("quizzes")
+    .select("id")
+    .eq("pool_id", poolId)
+    .eq("kind", "official")
+    .eq("scoring_mode", "competitive");
+
+  if (quizError) throw new Error(quizError.message);
+  if (!quizzes?.length) return new Map();
+
+  const quizIds = quizzes.map((q) => q.id as string);
+  const { data: scores, error: scoreError } = await supabase
+    .from("quiz_leaderboard")
+    .select("profile_id, best_score")
+    .in("quiz_id", quizIds);
+
+  if (scoreError) throw new Error(scoreError.message);
+
+  const totals = new Map<string, number>();
+  for (const row of scores ?? []) {
+    const profileId = row.profile_id as string;
+    totals.set(profileId, (totals.get(profileId) ?? 0) + ((row.best_score as number) ?? 0));
+  }
+
+  return totals;
+}
+
 async function loadScoresForMatchday(
   poolId: string,
   matchdayId: string
@@ -244,6 +274,7 @@ function buildLeaderboardRows(
   members: MemberRow[],
   scores: Map<string, ScoreRow>,
   reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
+  quizPoints: Map<string, number>,
   previousPositions: Map<string, number> | null
 ): Omit<LeaderboardRow, "position">[] {
   const merged = members.map((m) => {
@@ -258,6 +289,7 @@ function buildLeaderboardRows(
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
       matchPoints: s?.match_points ?? 0,
+      quizPoints: quizPoints.get(m.profileId) ?? 0,
       reliabilityPct: computeReliabilityPct(
         rel?.resolvedCount ?? 0,
         rel?.totalPoints ?? 0
@@ -289,14 +321,15 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     return { matchday, rows: [] };
   }
 
-  const [scores, previousScores, reliability] = await Promise.all([
+  const [scores, previousScores, reliability, quizPoints] = await Promise.all([
     matchday ? loadScoresForMatchday(poolId, matchday.id) : Promise.resolve(new Map<string, ScoreRow>()),
     previous ? loadScoresForMatchday(poolId, previous.id) : Promise.resolve(new Map<string, ScoreRow>()),
     loadResolvedPredictionStats(poolId),
+    loadQuizPointsByProfile(poolId),
   ]);
 
   const previousPositions = previous ? buildPositionMap(members, previousScores) : null;
-  const sorted = buildLeaderboardRows(members, scores, reliability, previousPositions);
+  const sorted = buildLeaderboardRows(members, scores, reliability, quizPoints, previousPositions);
 
   return {
     matchday,

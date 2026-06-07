@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T00:54:41.752Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T01:11:59.736Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -407,7 +407,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/ranking/format.ts` | 4 líneas | formatAggregateStat |
-| `lib/ranking/queries.ts` | 355 líneas | getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
+| `lib/ranking/queries.ts` | 388 líneas | getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
 | `lib/ranking/reliability.ts` | 17 líneas | computeReliabilityPct, formatReliabilityPct, MAX_POINTS_PER_MATCH |
 
 **scoring/** — 1 archivos
@@ -802,7 +802,7 @@ docs/               → AUTH, RLS, SEED
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
 | `components/predictions/PredictionsCalendar.tsx` | 389 | Revisar extracción |
-| `lib/ranking/queries.ts` | 355 | Revisar extracción |
+| `lib/ranking/queries.ts` | 388 | Revisar extracción |
 | `lib/quiz/queries.ts` | 342 | Revisar extracción |
 | `lib/predictions/queries.ts` | 338 | Revisar extracción |
 | `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
