@@ -977,15 +977,32 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
-/* Final: borde inferior arriba al 48%, borde superior abajo al 52% */
+/* Final: W101 al 45%/50%, W102 al 55%/50% del árbol */
+.tm-ko-node--center.tm-ko-node--final {
+  grid-column: 1 / -1;
+  z-index: 1;
+}
+
+.tm-ko-node--center.tm-ko-node--final::before {
+  width: 45%;
+}
+
+.tm-ko-node--center.tm-ko-node--final::after {
+  left: 55%;
+  right: auto;
+  width: 45%;
+}
+
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
-  top: 48%;
-  height: 4%;
-  transform: translateX(-50%);
+  top: 50%;
+  left: 45%;
+  width: 10%;
+  height: 1px;
+  transform: translateY(-50%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-slot {
@@ -995,16 +1012,16 @@ html[data-modal-open] main {
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -100%);
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 52%;
-  left: 50%;
-  transform: translate(-50%, 0);
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-score {
