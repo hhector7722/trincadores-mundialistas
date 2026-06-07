@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchMvpPredictionsForMatches, getMvpPredictionForMatch, type MvpPrediction } from "@/lib/predictions/mvp-queries";
 import {
   isGroupStageMatchdayKey,
   isKnockoutMatchdayKey,
@@ -22,6 +23,7 @@ export type MatchWithPrediction = {
         "id" | "home_goals" | "away_goals" | "points_awarded" | "updated_at"
       >
     | null;
+  mvpPrediction: MvpPrediction | null;
   serverEditable: boolean;
 };
 
@@ -81,6 +83,7 @@ async function fetchPoolMatchesWithPredictions(
     .in("match_id", matchIds);
 
   const predByMatch = new Map((predictions ?? []).map((p) => [p.match_id, p]));
+  const mvpByMatch = await fetchMvpPredictionsForMatches(poolId, profileId, matchIds);
 
   const { data: results } = await supabase
     .from("match_results")
@@ -113,6 +116,7 @@ async function fetchPoolMatchesWithPredictions(
             updated_at: pred.updated_at,
           }
         : null,
+      mvpPrediction: mvpByMatch.get(m.id) ?? null,
       serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
     };
   });
@@ -207,7 +211,10 @@ export async function getMatchPredictionDetail(
     .eq("match_id", matchId)
     .maybeSingle();
 
-  const serverEditable = await fetchMatchEditableFromDb(matchId);
+  const [serverEditable, mvpPrediction] = await Promise.all([
+    fetchMatchEditableFromDb(matchId),
+    getMvpPredictionForMatch(poolId, profileId, matchId),
+  ]);
 
   return {
     id: match.id,
@@ -227,6 +234,7 @@ export async function getMatchPredictionDetail(
           updated_at: prediction.updated_at,
         }
       : null,
+    mvpPrediction,
     serverEditable,
     hasOfficialResult: !!result,
     officialHome: result?.home_goals ?? null,

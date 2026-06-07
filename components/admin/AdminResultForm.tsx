@@ -19,6 +19,8 @@ export function AdminResultForm({
   const router = useRouter();
   const [home, setHome] = useState("0");
   const [away, setAway] = useState("0");
+  const [mvpPlayer, setMvpPlayer] = useState("");
+  const [mvpTeam, setMvpTeam] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -30,7 +32,9 @@ export function AdminResultForm({
         poolId,
         matchId,
         Number(home),
-        Number(away)
+        Number(away),
+        mvpPlayer || null,
+        mvpTeam || null
       );
       if (!result.ok) {
         setError(result.error);
@@ -66,6 +70,24 @@ export function AdminResultForm({
         <Button type="submit" disabled={pending} className={cn(pending && "opacity-60")}>
           {pending ? "..." : "Cerrar"}
         </Button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Input
+          type="text"
+          value={mvpPlayer}
+          onChange={(e) => setMvpPlayer(e.target.value)}
+          placeholder="MVP (jugador)"
+          className="min-w-0 flex-1"
+          aria-label="MVP jugador"
+        />
+        <Input
+          type="text"
+          value={mvpTeam}
+          onChange={(e) => setMvpTeam(e.target.value)}
+          placeholder="Equipo MVP"
+          className="min-w-0 flex-1"
+          aria-label="MVP equipo"
+        />
       </div>
       {error && (
         <p className="text-xs text-[var(--tm-danger)]" role="alert">

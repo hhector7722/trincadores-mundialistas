@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ModalPanelSlide = {
@@ -24,6 +24,7 @@ type ModalProps = {
   belowPanel?: ReactNode;
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
+  onBack?: () => void;
   panelSlide?: ModalPanelSlide | null;
 };
 
@@ -62,6 +63,7 @@ function ModalPanelShell({
   title,
   titleId,
   onClose,
+  onBack,
   hideHeaderDivider,
   className,
   children,
@@ -69,6 +71,7 @@ function ModalPanelShell({
   title: string;
   titleId: string;
   onClose: () => void;
+  onBack?: () => void;
   hideHeaderDivider?: boolean;
   className?: string;
   children: ReactNode;
@@ -77,11 +80,28 @@ function ModalPanelShell({
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
       <div
         className={cn(
-          "flex shrink-0 items-center justify-between gap-3 px-4 py-3",
+          "flex shrink-0 items-center gap-2 px-4 py-3",
           !hideHeaderDivider && "border-b border-[var(--tm-border)]"
         )}
       >
-        <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">{title}</h2>
+        {onBack ? (
+          <button
+            type="button"
+            aria-label="Volver"
+            onClick={onBack}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        ) : (
+          <span className="w-10 shrink-0" aria-hidden="true" />
+        )}
+        <h2
+          id={titleId}
+          className="min-w-0 flex-1 truncate font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]"
+        >
+          {title}
+        </h2>
         <button
           type="button"
           aria-label="Cerrar modal"
@@ -108,6 +128,7 @@ export function Modal({
   belowPanel,
   onSwipeLeft,
   onSwipeRight,
+  onBack,
   panelSlide = null,
 }: ModalProps) {
   const titleId = useId();
@@ -245,6 +266,7 @@ export function Modal({
                       title={title}
                       titleId={titleId}
                       onClose={onClose}
+                      onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
                     >
@@ -256,6 +278,7 @@ export function Modal({
                       title={title}
                       titleId={titleId}
                       onClose={onClose}
+                      onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
                     >
@@ -270,6 +293,7 @@ export function Modal({
                       title={title}
                       titleId={titleId}
                       onClose={onClose}
+                      onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
                     >
@@ -281,6 +305,7 @@ export function Modal({
                       title={title}
                       titleId={titleId}
                       onClose={onClose}
+                      onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       className={className}
                     >
@@ -295,6 +320,7 @@ export function Modal({
               title={title}
               titleId={titleId}
               onClose={onClose}
+              onBack={onBack}
               hideHeaderDivider={hideHeaderDivider}
               className={className}
             >

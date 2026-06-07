@@ -14,7 +14,9 @@ export async function submitMatchResult(
   poolId: string,
   matchId: string,
   homeGoals: number,
-  awayGoals: number
+  awayGoals: number,
+  mvpPlayerName?: string | null,
+  mvpTeamName?: string | null
 ): Promise<AdminActionResult> {
   const validated = validatePredictionGoals(homeGoals, awayGoals);
   if (!validated.ok) {
@@ -45,6 +47,8 @@ export async function submitMatchResult(
       match_id: matchId,
       home_goals: validated.home,
       away_goals: validated.away,
+      mvp_player_name: mvpPlayerName?.trim() || null,
+      mvp_team_name: mvpTeamName?.trim() || null,
       recorded_by: user.id,
       recorded_at: new Date().toISOString(),
     },

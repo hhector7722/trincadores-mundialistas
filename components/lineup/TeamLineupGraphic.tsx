@@ -6,9 +6,15 @@ type TeamLineupGraphicProps = {
   slots: LineupSlot[];
   formation: FormationId;
   className?: string;
+  onPlayerClick?: (playerName: string) => void;
 };
 
-export function TeamLineupGraphic({ slots, formation, className }: TeamLineupGraphicProps) {
+export function TeamLineupGraphic({
+  slots,
+  formation,
+  className,
+  onPlayerClick,
+}: TeamLineupGraphicProps) {
   return (
     <div
       className={cn(
@@ -40,7 +46,12 @@ export function TeamLineupGraphic({ slots, formation, className }: TeamLineupGra
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
         >
-          <LineupPlayerChip slot={slot} />
+          <LineupPlayerChip
+            slot={slot}
+            onClick={
+              onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined
+            }
+          />
         </div>
       ))}
     </div>

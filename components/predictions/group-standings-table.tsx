@@ -24,6 +24,7 @@ type GroupStandingsTableProps = {
   compact?: boolean;
   variant?: "default" | "grid";
   className?: string;
+  onTeamClick?: (teamName: string) => void;
 };
 
 export function GroupStandingsTable({
@@ -31,6 +32,7 @@ export function GroupStandingsTable({
   compact = false,
   variant = "default",
   className,
+  onTeamClick,
 }: GroupStandingsTableProps) {
   const isGrid = variant === "grid";
   const isCompact = compact || isGrid;
@@ -86,23 +88,46 @@ export function GroupStandingsTable({
               )}
             >
               <td className={cn(isGrid ? "py-px pr-0" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
-                <div
-                  className={cn(
-                    "flex min-w-0 items-center",
-                    isGrid ? "justify-center" : "gap-0.5"
-                  )}
-                >
-                  <TeamFlagBadge
-                    name={row.team}
-                    size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
-                    className="shrink-0"
-                  />
-                  {!isGrid ? (
-                    <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
-                      {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
-                    </span>
-                  ) : null}
-                </div>
+                {onTeamClick ? (
+                  <button
+                    type="button"
+                    onClick={() => onTeamClick(row.team)}
+                    className={cn(
+                      "flex min-w-0 items-center rounded-md transition-colors hover:bg-[rgba(111,43,255,0.16)]",
+                      isGrid ? "justify-center p-0.5" : "gap-0.5 p-0.5"
+                    )}
+                    aria-label={`Ver alineación de ${teamNameEs(row.team)}`}
+                  >
+                    <TeamFlagBadge
+                      name={row.team}
+                      size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
+                      className="shrink-0"
+                    />
+                    {!isGrid ? (
+                      <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
+                        {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
+                      </span>
+                    ) : null}
+                  </button>
+                ) : (
+                  <div
+                    className={cn(
+                      "flex min-w-0 items-center",
+                      isGrid ? "justify-center" : "gap-0.5"
+                    )}
+                  >
+                    <TeamFlagBadge
+                      name={row.team}
+                      size={isGrid ? "xxs" : isCompact ? "xxs" : "xs"}
+                      className="shrink-0"
+                    />
+                    {!isGrid ? (
+                      <span className={cn("truncate font-medium", isCompact && "max-w-[3.5rem]")}>
+                        {isCompact ? row.team.slice(0, 3).toUpperCase() : teamNameEs(row.team)}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
               </td>
               <td
                 className={cn(

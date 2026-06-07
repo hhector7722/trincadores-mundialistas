@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
+import {
+  buildLineupView,
+  buildMvpView,
+  EntityModalController,
+} from "@/components/lineup/EntityModalController";
+import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
+import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
@@ -25,13 +32,28 @@ function hasSavedPrediction(match: MatchWithPrediction): boolean {
 }
 
 export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [scoreModalOpen, setScoreModalOpen] = useState(false);
+  const [entityModal, setEntityModal] = useState<{
+    open: boolean;
+    view: EntityModalView;
+  }>({ open: false, view: buildLineupView(match.home_team) });
+
   const isLive = match.status === "live";
   const saved = hasSavedPrediction(match);
   const scoreText = formatListScore(
     match.prediction?.home_goals ?? null,
     match.prediction?.away_goals ?? null
   );
+
+  function openEntityModal(view: EntityModalView) {
+    setScoreModalOpen(false);
+    setEntityModal({ open: true, view });
+  }
+
+  function openScoreModal() {
+    setEntityModal((current) => ({ ...current, open: false }));
+    setScoreModalOpen(true);
+  }
 
   return (
     <>
@@ -49,58 +71,71 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
             </Link>
           </div>
           <div className="mt-2">
-          <MatchTeamsDisplay
-            homeTeam={match.home_team}
-            awayTeam={match.away_team}
-            kickoffAt={match.kickoff_at}
-            isLive={isLive}
-            centerSlot={
-              <div className="inline-block">
-                <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                  Mi pronóstico
-                </p>
-                {saved ? (
-                  <div className="relative w-0 min-w-full">
-                    <button
-                      type="button"
-                      onClick={() => setModalOpen(true)}
+            <MatchTeamsDisplay
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
+              kickoffAt={match.kickoff_at}
+              isLive={isLive}
+              centerSlot={
+                <div className="inline-block">
+                  <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                    Mi pronóstico
+                  </p>
+                  {saved ? (
+                    <div className="relative w-0 min-w-full">
+                      <button
+                        type="button"
+                      onClick={() => openScoreModal()}
                       className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                     >
                       {scoreText}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setModalOpen(true)}
-                      aria-label="Editar pronóstico"
-                      className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      onClick={() => openScoreModal()}
+                        aria-label="Editar pronóstico"
+                        className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      >
+                        <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openScoreModal()}
+                      className="block w-full text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                     >
-                      <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                      <span className="inline-flex items-center gap-1">
+                        <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                        Añadir
+                      </span>
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setModalOpen(true)}
-                    className="block w-full text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                      Añadir
-                    </span>
-                  </button>
-                )}
-              </div>
-            }
-          />
+                  )}
+                </div>
+              }
+            />
           </div>
+          <MatchContextActionsRow
+            className="mt-3 border-t border-[var(--tm-border)] pt-2"
+            match={match}
+            onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
+            onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
+            onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
+          />
         </div>
       </section>
 
       <QuickPredictionModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={scoreModalOpen}
+        onClose={() => setScoreModalOpen(false)}
         poolId={poolId}
         match={match}
+      />
+
+      <EntityModalController
+        open={entityModal.open}
+        onClose={() => setEntityModal((current) => ({ ...current, open: false }))}
+        initialView={entityModal.view}
       />
     </>
   );
