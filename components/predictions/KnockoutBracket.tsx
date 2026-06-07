@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -10,6 +10,8 @@ import {
 } from "@/lib/predictions/edit-state";
 import {
   BRACKET_TREE_LAYOUT,
+  bracketMatchMidPercent,
+  bracketSlotTopPercent,
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
   resolveBracketMatch,
@@ -60,6 +62,19 @@ function BracketTreeMatch({
     : "empty";
   const scoreText = match ? formatListScore(savedHome, savedAway) : " ";
   const isLive = match?.status === "live";
+  const usesPyramidSlots = slot.round !== "r32";
+  const homeY = usesPyramidSlots
+    ? slot.round === "final"
+      ? 50
+      : bracketSlotTopPercent(slot.rowStart, slot.rowSpan, "home")
+    : null;
+  const awayY = usesPyramidSlots
+    ? slot.round === "final"
+      ? 50
+      : bracketSlotTopPercent(slot.rowStart, slot.rowSpan, "away")
+    : null;
+  const midY =
+    homeY != null && awayY != null ? (homeY + awayY) / 2 : bracketMatchMidPercent(slot.rowStart, slot.rowSpan);
 
   return (
     <button
@@ -69,13 +84,18 @@ function BracketTreeMatch({
       style={{
         gridColumn: slot.column + 1,
         gridRow: `${slot.rowStart} / span ${slot.rowSpan}`,
+        ...(usesPyramidSlots
+          ? ({
+              "--tm-ko-home-y": `${homeY}%`,
+              "--tm-ko-away-y": `${awayY}%`,
+              "--tm-ko-mid-y": `${midY}%`,
+            } as CSSProperties)
+          : {}),
       }}
       className={cn(
         "tm-ko-node",
+        usesPyramidSlots && "tm-ko-node--pyramid",
         slot.round === "final" && "tm-ko-node--final",
-        slot.round === "sf" && "tm-ko-node--sf",
-        slot.round === "qf" && slot.rowStart === 1 && "tm-ko-node--qf-upper",
-        slot.round === "qf" && slot.rowStart === 9 && "tm-ko-node--qf-lower",
         slot.side === "left" && "tm-ko-node--left",
         slot.side === "right" && "tm-ko-node--right",
         slot.side === "center" && "tm-ko-node--center",

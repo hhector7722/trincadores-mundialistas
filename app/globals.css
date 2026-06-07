@@ -838,6 +838,10 @@ html[data-modal-open] main {
   pointer-events: none;
 }
 
+.tm-ko-node--left.tm-ko-node--pyramid::after {
+  top: var(--tm-ko-mid-y);
+}
+
 .tm-ko-node--right::before {
   content: "";
   position: absolute;
@@ -850,12 +854,60 @@ html[data-modal-open] main {
   pointer-events: none;
 }
 
+.tm-ko-node--right.tm-ko-node--pyramid::before {
+  top: var(--tm-ko-mid-y);
+}
+
+/* Pirámide: octavos → cuartos → semis (Y desde rejilla); dieciseisavos con space-between nativo */
+.tm-ko-node--pyramid .tm-ko-node-pair {
+  justify-content: flex-start;
+}
+
+.tm-ko-node--pyramid .tm-ko-slot {
+  height: min(5.5cqh, 22px);
+  max-height: none;
+}
+
+.tm-ko-node--pyramid .tm-ko-node-pair::before {
+  top: var(--tm-ko-home-y);
+  height: calc(var(--tm-ko-away-y) - var(--tm-ko-home-y));
+  transform: translateX(-50%);
+}
+
+.tm-ko-node--pyramid .tm-ko-node-pair .tm-ko-slot:first-of-type {
+  position: absolute;
+  top: var(--tm-ko-home-y);
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--pyramid .tm-ko-node-pair .tm-ko-slot:last-of-type {
+  position: absolute;
+  top: var(--tm-ko-away-y);
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--pyramid .tm-ko-node-score {
+  position: absolute;
+  top: var(--tm-ko-mid-y);
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Final: W101/W102 horizontales con hueco central para el marcador */
+.tm-ko-node--center.tm-ko-node--final {
+  --tm-ko-final-home-x: 38%;
+  --tm-ko-final-away-x: 62%;
+  grid-column: 1 / -1;
+  z-index: 1;
+}
+
 .tm-ko-node--center.tm-ko-node--final::before,
 .tm-ko-node--center.tm-ko-node--final::after {
   content: "";
   position: absolute;
   top: 50%;
-  width: 34%;
   height: 1px;
   background: var(--tm-ko-line);
   transform: translateY(-50%);
@@ -864,171 +916,30 @@ html[data-modal-open] main {
 
 .tm-ko-node--center.tm-ko-node--final::before {
   left: 0;
+  width: var(--tm-ko-final-home-x);
 }
 
 .tm-ko-node--center.tm-ko-node--final::after {
-  right: 0;
-}
-
-/* Semis: W97/W99 al 45%, W98/W100 al 55% */
-.tm-ko-node--sf .tm-ko-node-pair {
-  justify-content: flex-start;
-}
-
-.tm-ko-node--sf .tm-ko-node-pair::before {
-  top: 45%;
-  height: 10%;
-  transform: translateX(-50%);
-}
-
-.tm-ko-node--sf .tm-ko-slot {
-  height: min(5.5cqh, 22px);
-  max-height: none;
-}
-
-.tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:first-of-type {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:last-of-type {
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--sf .tm-ko-node-score {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/*
- * Cuartos alineados con dieciseisavos (rejilla 16 filas, slot home/away en filas pares):
- * W89/W91 → 1E (M74 fila 5), W90/W92 → WI (M77 fila 7),
- * W93/W95 → 2L (M83 fila 9), W94/W96 → WH (M84 fila 11).
- */
-.tm-ko-node--qf-upper .tm-ko-node-pair,
-.tm-ko-node--qf-lower .tm-ko-node-pair {
-  justify-content: flex-start;
-}
-
-.tm-ko-node--qf-upper .tm-ko-slot,
-.tm-ko-node--qf-lower .tm-ko-slot {
-  height: min(5.5cqh, 22px);
-  max-height: none;
-}
-
-.tm-ko-node--qf-upper .tm-ko-node-pair::before {
-  top: 28.125%;
-  height: 12.5%;
-  transform: translateX(-50%);
-}
-
-.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:first-of-type {
-  position: absolute;
-  top: 28.125%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:last-of-type {
-  position: absolute;
-  top: 40.625%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-upper .tm-ko-node-score {
-  position: absolute;
-  top: 34.375%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-lower .tm-ko-node-pair::before {
-  top: 59.375%;
-  height: 6.25%;
-  transform: translateX(-50%);
-}
-
-.tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:first-of-type {
-  position: absolute;
-  top: 59.375%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:last-of-type {
-  position: absolute;
-  top: 65.625%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tm-ko-node--qf-lower .tm-ko-node-score {
-  position: absolute;
-  top: 62.5%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Final: W101 al 25%/50%, W102 al 65%/50% del árbol */
-.tm-ko-node--center.tm-ko-node--final {
-  grid-column: 1 / -1;
-  z-index: 1;
-}
-
-.tm-ko-node--center.tm-ko-node--final::before {
-  width: 25%;
-}
-
-.tm-ko-node--center.tm-ko-node--final::after {
-  left: 65%;
+  left: var(--tm-ko-final-away-x);
   right: auto;
-  width: 35%;
-}
-
-.tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
-  justify-content: flex-start;
+  width: calc(100% - var(--tm-ko-final-away-x));
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
-  top: 50%;
-  left: 25%;
-  width: 40%;
-  height: 1px;
-  transform: translateY(-50%);
-}
-
-.tm-ko-node--center.tm-ko-node--final .tm-ko-slot {
-  height: min(5.5cqh, 22px);
-  max-height: none;
+  display: none;
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
-  position: absolute;
-  top: 50%;
-  left: 25%;
-  transform: translate(-50%, -50%);
+  left: var(--tm-ko-final-home-x);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
-  position: absolute;
-  top: 50%;
-  left: 65%;
-  transform: translate(-50%, -50%);
+  left: var(--tm-ko-final-away-x);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-score {
-  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--saved .tm-ko-slot {

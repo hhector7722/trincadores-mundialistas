@@ -11,6 +11,27 @@ export type BracketTreeSlot = {
   rowSpan: number;
 };
 
+const BRACKET_TOTAL_ROWS = 16;
+
+/** Centro vertical del slot local/visitante dentro del bloque del partido (pirámide). */
+export function bracketSlotTopPercent(
+  rowStart: number,
+  rowSpan: number,
+  slot: "home" | "away"
+): number {
+  const quarter = rowSpan / 4;
+  const offset = slot === "home" ? quarter : quarter * 3;
+  return ((rowStart - 1 + offset) / BRACKET_TOTAL_ROWS) * 100;
+}
+
+export function bracketMatchMidPercent(rowStart: number, rowSpan: number): number {
+  return (
+    (bracketSlotTopPercent(rowStart, rowSpan, "home") +
+      bracketSlotTopPercent(rowStart, rowSpan, "away")) /
+    2
+  );
+}
+
 /** Cuadro simétrico WC2026: bordes → centro (16 filas × 9 columnas). */
 export const BRACKET_TREE_LAYOUT: BracketTreeSlot[] = [
   // Izq — dieciseisavos
