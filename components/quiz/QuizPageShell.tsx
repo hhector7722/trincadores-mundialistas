@@ -16,9 +16,7 @@ export function QuizPageShell({
     <div
       className={cn(
         "tm-quiz-page space-y-4",
-        variant === "play"
-          ? "tm-quiz-page--play px-4 pb-4 pt-0"
-          : "px-4 pt-4 pb-[calc(var(--tm-tabbar-height)+1rem)]",
+        variant === "play" ? "tm-quiz-page--play px-4 pb-4 pt-0" : "p-4",
         variant === "viewport" && "tm-quiz-page--viewport",
         className
       )}

@@ -2,21 +2,26 @@
 
 import { useLayoutEffect } from "react";
 
-function syncViewportOffset() {
-  const offsetTop = Math.round(window.visualViewport?.offsetTop ?? 0);
+function syncViewportMetrics() {
+  const vv = window.visualViewport;
+  const offsetTop = Math.round(vv?.offsetTop ?? 0);
+  const height = Math.round(vv?.height ?? window.innerHeight);
+
   document.documentElement.style.setProperty("--tm-vvh-offset", `${offsetTop}px`);
+  document.documentElement.style.setProperty("--tm-vvh-height", `${height}px`);
 }
 
-function resetViewportOffset() {
+function resetViewportMetrics() {
   document.documentElement.style.removeProperty("--tm-vvh-offset");
+  document.documentElement.style.removeProperty("--tm-vvh-height");
 }
 
-/** Solo corrige el top del shell (teclado / UI del navegador). El alto lo fija bottom:0 al layout viewport. */
+/** Alinea top + alto del shell con visualViewport (teclado, barra Safari, chin iOS). */
 export function ViewportMetricsSync() {
   useLayoutEffect(() => {
-    const onChange = () => syncViewportOffset();
+    const onChange = () => syncViewportMetrics();
 
-    syncViewportOffset();
+    syncViewportMetrics();
 
     window.visualViewport?.addEventListener("resize", onChange);
     window.visualViewport?.addEventListener("scroll", onChange);
@@ -28,7 +33,7 @@ export function ViewportMetricsSync() {
       window.visualViewport?.removeEventListener("scroll", onChange);
       window.removeEventListener("resize", onChange);
       window.removeEventListener("orientationchange", onChange);
-      resetViewportOffset();
+      resetViewportMetrics();
     };
   }, []);
 

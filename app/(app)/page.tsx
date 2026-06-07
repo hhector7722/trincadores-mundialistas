@@ -1,4 +1,3 @@
-import { TabBarDebug } from "@/components/debug/TabBarDebug";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
@@ -40,9 +39,7 @@ export default async function HomePage() {
   const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
 
   return (
-    <div className="relative z-10 space-y-3 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
-      {/* TEMPORAL DEBUG - borrar después */}
-      <TabBarDebug />
+    <div className="relative z-10 space-y-3 p-4 pb-4">
       <HomeHero pendingCount={pending} quizSlide={quizSlide} />
       <HomeStandingCard standing={standing} />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}

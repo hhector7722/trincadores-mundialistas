@@ -46,6 +46,7 @@
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
+  --tm-vvh-height: 100dvh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -117,8 +118,8 @@ html[data-modal-open] main {
   position: fixed;
   top: var(--tm-vvh-offset);
   right: 0;
-  bottom: 0;
   left: 0;
+  height: var(--tm-vvh-height);
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -551,7 +552,7 @@ html:has(.tm-app-shell) body {
 
 /* ── Quiz: clearance de TabBar lo reserva el flex del shell (sin padding duplicado en main) ── */
 .tm-quiz-page {
-  scroll-padding-bottom: calc(var(--tm-tabbar-height) + 1rem);
+  scroll-padding-bottom: 1.25rem;
 }
 
 .tm-quiz-page--play,
