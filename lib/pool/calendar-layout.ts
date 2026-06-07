@@ -198,13 +198,59 @@ function syncPredictionLabelMetrics(grid: HTMLElement): void {
   }
 }
 
+function readCssVarPx(host: HTMLElement, varName: string, fallback: number): number {
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.pointerEvents = "none";
+  probe.style.height = `var(${varName})`;
+  host.appendChild(probe);
+  const height = probe.offsetHeight;
+  host.removeChild(probe);
+  return height > 0 ? height : fallback;
+}
+
+/** Mide la fila más alta del grid y la aplica a todas las semanas. */
+function syncUniformRowHeight(
+  calendar: HTMLElement,
+  grid: HTMLElement,
+  rowCount: number
+): number {
+  const minRow = "var(--tm-cal-row-min-height)";
+  grid.style.gridTemplateRows = `repeat(${rowCount}, minmax(${minRow}, auto))`;
+  void grid.offsetHeight;
+
+  const rowHeightsByTop = new Map<number, number>();
+
+  for (const child of grid.children) {
+    if (!(child instanceof HTMLElement)) continue;
+    rowHeightsByTop.set(
+      child.offsetTop,
+      Math.max(rowHeightsByTop.get(child.offsetTop) ?? 0, child.scrollHeight)
+    );
+  }
+
+  grid.style.removeProperty("gridTemplateRows");
+
+  const measuredMax = rowHeightsByTop.size > 0 ? Math.max(...rowHeightsByTop.values()) : 0;
+  const minRowPx = readCssVarPx(calendar, "--tm-cal-row-min-height", 104);
+  const uniform = Math.max(minRowPx, measuredMax);
+
+  calendar.style.setProperty("--tm-cal-row-height", `${uniform}px`);
+  return uniform;
+}
+
+function runCalendarMetricsPass(calendar: HTMLElement, grid: HTMLElement): number {
+  return syncMatchCardMetrics(calendar, grid);
+}
+
 export type CalendarLayoutResult = {
   rowHeight: number;
   uiScale: number;
   matchCardHeight: number;
 };
 
-/** Filas con altura mínima fija; el scroll vertical lo gestiona `.tm-app-main`. */
+/** Filas con altura uniforme (la de la semana más alta); scroll en `.tm-app-main`. */
 export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
@@ -214,18 +260,26 @@ export function fitCalendarLayout(
 
   calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
   calendar.style.setProperty("--tm-cal-ui-scale", "1");
+  calendar.style.removeProperty("--tm-cal-row-height");
   void grid.offsetHeight;
 
-  const matchCardHeight = syncMatchCardMetrics(calendar, grid);
+  runCalendarMetricsPass(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
-  const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
+  const rowHeight = syncUniformRowHeight(calendar, grid, rowCount);
+  void grid.offsetHeight;
+
+  const matchCardHeight = runCalendarMetricsPass(calendar, grid);
+  syncGroupsPanelMetrics(calendar, grid);
+  syncPredictionLabelMetrics(grid);
+
   return { rowHeight, uiScale: 1, matchCardHeight };
 }
 
 export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-ui-scale");
+  calendar.style.removeProperty("--tm-cal-row-height");
   calendar.style.removeProperty("--tm-cal-match-gap");
   calendar.style.removeProperty("--tm-cal-match-card-h");
   calendar.style.removeProperty("--tm-cal-groups-pad");

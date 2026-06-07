@@ -741,6 +741,7 @@ html:has(.tm-app-shell) body {
   --tm-cal-ui-scale: 1;
   --tm-cal-weeks: 1;
   --tm-cal-row-min-height: 6.5rem;
+  --tm-cal-row-height: var(--tm-cal-row-min-height);
   --tm-cal-match-gap: 4px;
   --tm-cal-match-card-h: 2.25rem;
   --tm-cal-grid-line: rgba(130, 70, 220, 0.18);
@@ -809,8 +810,8 @@ html:has(.tm-app-shell) body {
 .tm-porra-calendar .tm-cal-body {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: repeat(var(--tm-cal-weeks, 1), minmax(var(--tm-cal-row-min-height), auto));
-  min-height: calc(var(--tm-cal-weeks, 1) * var(--tm-cal-row-min-height));
+  grid-template-rows: repeat(var(--tm-cal-weeks, 1), var(--tm-cal-row-height));
+  min-height: calc(var(--tm-cal-weeks, 1) * var(--tm-cal-row-height));
   min-width: 0;
   overflow: visible;
   background: var(--tm-cal-cell-bg);
@@ -988,7 +989,7 @@ html:has(.tm-app-shell) body {
 .tm-porra-calendar .tm-cal-sidebar-card {
   display: flex;
   flex-direction: column;
-  align-self: start;
+  align-self: stretch;
   height: calc(100% - var(--tm-cal-sidebar-row-gap, 6px));
   margin: 3px 3px 0;
   overflow: hidden;
