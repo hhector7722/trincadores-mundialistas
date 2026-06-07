@@ -111,7 +111,7 @@ function ModalPanelShell({
       ) : (
       <div
         className={cn(
-          "flex shrink-0 items-center gap-2 px-4",
+          "relative flex shrink-0 items-center gap-2 px-4",
           hideTitle ? "py-2" : "py-3",
           !hideHeaderDivider && "border-b border-[var(--tm-border)]"
         )}
@@ -121,13 +121,16 @@ function ModalPanelShell({
             type="button"
             aria-label="Volver"
             onClick={onBack}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+            className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
         ) : (
           <span
-            className={cn("shrink-0", hideTitle || (titleLeft && !onBack) ? "w-0" : "w-10")}
+            className={cn(
+              "relative z-10 shrink-0",
+              hideTitle && headerCenter ? "w-0" : hideTitle || (titleLeft && !onBack) ? "w-0" : "w-10"
+            )}
             aria-hidden="true"
           />
         )}
@@ -135,31 +138,40 @@ function ModalPanelShell({
           <h2
             id={titleId}
             className={cn(
-              "min-w-0 flex-1 truncate font-display text-sm text-[var(--tm-fg)]",
+              "relative z-10 min-w-0 flex-1 truncate font-display text-sm text-[var(--tm-fg)]",
               titleLeft ? "text-left normal-case tracking-normal" : "uppercase tracking-wide"
             )}
           >
             {title}
           </h2>
         ) : headerCenter ? (
-          <div
-            id={titleId}
-            className="min-w-0 flex-1 text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm"
-          >
+          <div id={titleId} className="sr-only">
             {headerCenter}
           </div>
         ) : (
-          <div id={titleId} className="min-w-0 flex-1" />
+          <div id={titleId} className="relative z-10 min-w-0 flex-1" />
         )}
-        {headerTrailing ? <div className="shrink-0">{headerTrailing}</div> : null}
-        <button
-          type="button"
-          aria-label="Cerrar modal"
-          onClick={onClose}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        {headerCenter ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center px-4"
+          >
+            <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
+              {headerCenter}
+            </p>
+          </div>
+        ) : null}
+        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2">
+          {headerTrailing ? <div className="shrink-0">{headerTrailing}</div> : null}
+          <button
+            type="button"
+            aria-label="Cerrar modal"
+            onClick={onClose}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </div>
       )}
       <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">

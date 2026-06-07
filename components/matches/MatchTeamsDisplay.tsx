@@ -4,35 +4,68 @@ import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
-function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
+function TeamFlagCircle({ name }: { name: string }) {
   const flagCode = teamFlagCode(name);
+
+  return (
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] sm:h-11 sm:w-11">
+      {flagCode ? (
+        <img
+          src={teamFlagUrl(flagCode, 160)}
+          alt=""
+          width={44}
+          height={44}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <span className="font-display text-base text-[var(--tm-accent)]">
+          {name.slice(0, 2).toUpperCase()}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function TeamNameLabel({ name }: { name: string }) {
+  return (
+    <p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-[var(--tm-fg)] sm:text-xs">
+      {teamNameEs(name)}
+    </p>
+  );
+}
+
+function TeamFlagButton({ name, onClick }: { name: string; onClick?: () => void }) {
   const displayName = teamNameEs(name);
 
-  const content = (
-    <>
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] sm:h-11 sm:w-11">
-        {flagCode ? (
-          <img
-            src={teamFlagUrl(flagCode, 160)}
-            alt=""
-            width={44}
-            height={44}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="font-display text-base text-[var(--tm-accent)]">
-            {name.slice(0, 2).toUpperCase()}
-          </span>
-        )}
-      </div>
-      <p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-[var(--tm-fg)] sm:text-xs">
-        {displayName}
-      </p>
-    </>
+  if (!onClick) {
+    return <TeamFlagCircle name={name} />;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
+      aria-label={`Ver alineación de ${displayName}`}
+    >
+      <TeamFlagCircle name={name} />
+    </button>
   );
+}
+
+function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
+  const displayName = teamNameEs(name);
 
   if (!onClick) {
-    return <div className="inline-flex w-max flex-col items-center gap-1">{content}</div>;
+    return (
+      <div className="inline-flex w-max flex-col items-center gap-1">
+        <TeamFlagCircle name={name} />
+        <TeamNameLabel name={name} />
+      </div>
+    );
   }
 
   return (
@@ -45,7 +78,8 @@ function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
       className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver alineación de ${displayName}`}
     >
-      {content}
+      <TeamFlagCircle name={name} />
+      <TeamNameLabel name={name} />
     </button>
   );
 }
@@ -59,7 +93,7 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
-  /** Modal de pronóstico: equipos en 10%/90%, etiqueta arriba y steppers bajo cada bandera. */
+  /** Modal de pronóstico: equipos en 10%/90%, etiqueta arriba y steppers en fila con banderas. */
   layout?: "default" | "predictionModal";
   predictionLabel?: string;
   homeScoreSlot?: ReactNode;
@@ -90,19 +124,25 @@ export function MatchTeamsDisplay({
 
   if (isPredictionModal) {
     return (
-      <div className="relative w-full min-h-[6.75rem]">
+      <div className="relative w-full min-h-[5.5rem]">
         <p className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
           {predictionLabel}
         </p>
 
-        <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-0.5">
-          <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
-          {homeScoreSlot}
+        <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
+          <div className="flex items-center gap-0.5">
+            {homeScoreSlot}
+            <TeamFlagButton name={homeTeam} onClick={onHomeTeamClick} />
+          </div>
+          <TeamNameLabel name={homeTeam} />
         </div>
 
-        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-0.5">
-          <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
-          {awayScoreSlot}
+        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
+          <div className="flex items-center gap-0.5">
+            <TeamFlagButton name={awayTeam} onClick={onAwayTeamClick} />
+            {awayScoreSlot}
+          </div>
+          <TeamNameLabel name={awayTeam} />
         </div>
       </div>
     );
