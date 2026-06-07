@@ -908,8 +908,9 @@ html[data-modal-open] main {
 }
 
 /*
- * Cuartos: conjunto superior (W89–W92, M97/M99) centrado al 40%.
- * Conjunto inferior (W93–W96, M98/M100) centrado al 60%.
+ * Cuartos alineados con dieciseisavos (rejilla 16 filas, slot home/away en filas pares):
+ * W89/W91 → 1E (M74 fila 5), W90/W92 → WI (M77 fila 7),
+ * W93/W95 → 2L (M83 fila 9), W94/W96 → WH (M84 fila 11).
  */
 .tm-ko-node--qf-upper .tm-ko-node-pair,
 .tm-ko-node--qf-lower .tm-ko-node-pair {
@@ -923,55 +924,55 @@ html[data-modal-open] main {
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair::before {
-  top: 35%;
-  height: 10%;
+  top: 28.125%;
+  height: 12.5%;
   transform: translateX(-50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 35%;
+  top: 28.125%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 45%;
+  top: 40.625%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-upper .tm-ko-node-score {
   position: absolute;
-  top: 40%;
+  top: 34.375%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair::before {
-  top: 55%;
-  height: 10%;
+  top: 59.375%;
+  height: 6.25%;
   transform: translateX(-50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 55%;
+  top: 59.375%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 65%;
+  top: 65.625%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--qf-lower .tm-ko-node-score {
   position: absolute;
-  top: 60%;
+  top: 62.5%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
