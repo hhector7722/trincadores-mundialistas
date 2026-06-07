@@ -1,5 +1,6 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+import { TabBar } from "@/components/layout/TabBar";
 import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
@@ -24,6 +25,7 @@ export function AppShell({
       <div className="tm-app-frame">
         <AppHeaderGate ctx={ctx} />
         <main className="tm-app-main">{children}</main>
+        <TabBar />
       </div>
     </div>
   );
