@@ -141,7 +141,6 @@ html[data-modal-open] .tm-app-main {
   overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-  padding-bottom: var(--tm-tabbar-height);
   background-color: var(--tm-shell-bg-hex);
 }
 
@@ -151,6 +150,7 @@ html[data-modal-open] .tm-app-main {
   flex-direction: column;
   flex: 1;
   min-height: 100%;
+  padding-bottom: var(--tm-tabbar-height);
 }
 
 .tm-spinner {
