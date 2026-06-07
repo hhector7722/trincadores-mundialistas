@@ -907,6 +907,75 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
+/*
+ * Cuartos: centros base 12.5/37.5/62.5/87.5% → ajuste ±2% hacia semis (42.5/57.5%).
+ * Superior: 25.5% | 2.º sup: 42% | 1.º inf: 58% | 2.º inf: 74.5%
+ */
+.tm-ko-node--qf-upper .tm-ko-node-pair,
+.tm-ko-node--qf-lower .tm-ko-node-pair {
+  justify-content: flex-start;
+}
+
+.tm-ko-node--qf-upper .tm-ko-slot,
+.tm-ko-node--qf-lower .tm-ko-slot {
+  height: min(5.5cqh, 22px);
+  max-height: none;
+}
+
+.tm-ko-node--qf-upper .tm-ko-node-pair::before {
+  top: 25.5%;
+  height: 16.5%;
+  transform: translateX(-50%);
+}
+
+.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:first-of-type {
+  position: absolute;
+  top: 25.5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--qf-upper .tm-ko-node-pair .tm-ko-slot:last-of-type {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--qf-upper .tm-ko-node-score {
+  position: absolute;
+  top: 33.75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--qf-lower .tm-ko-node-pair::before {
+  top: 58%;
+  height: 16.5%;
+  transform: translateX(-50%);
+}
+
+.tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:first-of-type {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--qf-lower .tm-ko-node-pair .tm-ko-slot:last-of-type {
+  position: absolute;
+  top: 74.5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-node--qf-lower .tm-ko-node-score {
+  position: absolute;
+  top: 66.25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* Final: borde inferior arriba al 48%, borde superior abajo al 52% */
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
   justify-content: flex-start;

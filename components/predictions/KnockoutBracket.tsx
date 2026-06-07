@@ -74,6 +74,8 @@ function BracketTreeMatch({
         "tm-ko-node",
         slot.round === "final" && "tm-ko-node--final",
         slot.round === "sf" && "tm-ko-node--sf",
+        slot.round === "qf" && slot.rowStart === 1 && "tm-ko-node--qf-upper",
+        slot.round === "qf" && slot.rowStart === 9 && "tm-ko-node--qf-lower",
         slot.side === "left" && "tm-ko-node--left",
         slot.side === "right" && "tm-ko-node--right",
         slot.side === "center" && "tm-ko-node--center",
