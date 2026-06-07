@@ -977,20 +977,20 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
-/* Final: W101 al 45%/50%, W102 al 55%/50% del árbol */
+/* Final: W101 al 40%/50%, W102 al 60%/50% del árbol */
 .tm-ko-node--center.tm-ko-node--final {
   grid-column: 1 / -1;
   z-index: 1;
 }
 
 .tm-ko-node--center.tm-ko-node--final::before {
-  width: 45%;
+  width: 40%;
 }
 
 .tm-ko-node--center.tm-ko-node--final::after {
-  left: 55%;
+  left: 60%;
   right: auto;
-  width: 45%;
+  width: 40%;
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
@@ -999,8 +999,8 @@ html[data-modal-open] main {
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
   top: 50%;
-  left: 45%;
-  width: 10%;
+  left: 40%;
+  width: 20%;
   height: 1px;
   transform: translateY(-50%);
 }
@@ -1013,14 +1013,14 @@ html[data-modal-open] main {
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
   top: 50%;
-  left: 45%;
+  left: 40%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
   top: 50%;
-  left: 55%;
+  left: 60%;
   transform: translate(-50%, -50%);
 }
 
