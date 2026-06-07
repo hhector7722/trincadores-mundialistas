@@ -25,14 +25,14 @@ export function TeamLineupGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full shrink-0 self-center overflow-hidden",
+        "relative aspect-[3/2] w-full shrink-0 self-center",
         isModal
-          ? "max-w-none rounded-xl border border-white/10 shadow-lg"
-          : "max-w-[300px] rounded-2xl border border-white/10 shadow-2xl sm:max-w-[360px]",
+          ? "max-w-none overflow-visible"
+          : "max-w-[300px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:max-w-[360px]",
         className
       )}
     >
-      <div className="absolute inset-0 bg-[#3a1218]">
+      <div className={cn("absolute inset-0", !isModal && "bg-[#3a1218]")}>
         <Image
           src={GOYA_FIELD_SRC}
           alt=""
@@ -56,6 +56,7 @@ export function TeamLineupGraphic({
         >
           <LineupPlayerChip
             slot={slot}
+            variant={isModal ? "modal" : "default"}
             onClick={
               onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined
             }
