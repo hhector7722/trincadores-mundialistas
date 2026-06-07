@@ -109,7 +109,7 @@ export function AllGroupsStandingsModal({
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-2 items-stretch gap-2.5 overflow-y-auto px-2.5 pb-2.5 sm:grid-cols-3 sm:gap-3 sm:px-3 sm:pb-3 lg:grid-cols-6">
+        <div className="grid min-h-0 flex-1 auto-rows-auto grid-cols-3 items-stretch gap-2 overflow-y-auto px-2.5 pb-2.5 sm:gap-2.5 sm:px-3 sm:pb-3">
           {groups.map((group) => (
             <button
               key={group.code}
@@ -121,8 +121,8 @@ export function AllGroupsStandingsModal({
                 "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
               )}
             >
-              <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-1 py-1 leading-none">
-                <span className="text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] sm:text-[9px]">
+              <div className="flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-0.5 py-0.5 leading-none">
+                <span className="text-[7px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
                   Grupo {group.code}
                 </span>
               </div>
