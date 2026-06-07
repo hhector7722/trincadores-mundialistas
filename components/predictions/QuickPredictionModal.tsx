@@ -358,6 +358,7 @@ export function QuickPredictionModal({
 
   const activePanelSlide = entityPanelSlide ?? matchPanelSlide;
   const isLineupView = panelView.kind === "lineup";
+  const isMvpView = panelView.kind === "mvp";
 
   return (
     <Modal
@@ -365,6 +366,7 @@ export function QuickPredictionModal({
       onClose={onClose}
       title={quickPanelTitle(panelView)}
       hideHeaderDivider
+      headerTitleAlign={isMvpView ? "left" : "default"}
       className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"

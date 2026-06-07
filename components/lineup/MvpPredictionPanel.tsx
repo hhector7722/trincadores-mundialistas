@@ -5,10 +5,8 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { fetchMatchSquadsAction } from "@/actions/lineup";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { Button } from "@/components/ui/button";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
-import { teamNameEs } from "@/lib/teams/display";
+import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
-import { formatMvpPointsLabel } from "@/lib/predictions/scoring";
 import { LoadingCenter } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +41,51 @@ function flattenSquadPlayers(
     shirtNumber: player.shirt_number,
     position: player.position,
   }));
+}
+
+function sortByShirt(a: SquadPlayerOption, b: SquadPlayerOption): number {
+  const shirtA = a.shirtNumber ?? 999;
+  const shirtB = b.shirtNumber ?? 999;
+  if (shirtA !== shirtB) return shirtA - shirtB;
+  return a.playerName.localeCompare(b.playerName, "es");
+}
+
+function MvpPlayerButton({
+  option,
+  active,
+  disabled,
+  onSelect,
+}: {
+  option: SquadPlayerOption | undefined;
+  active: boolean;
+  disabled: boolean;
+  onSelect: (key: string) => void;
+}) {
+  if (!option) {
+    return <div className="min-h-12 rounded-xl" aria-hidden="true" />;
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onSelect(option.key)}
+      className={cn(
+        "flex min-h-12 w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border px-1.5 py-1.5 text-center transition-colors",
+        active
+          ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
+          : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] hover:bg-[rgba(111,43,255,0.16)]",
+        disabled && "opacity-60"
+      )}
+    >
+      <span className="font-display text-sm font-bold leading-none text-[var(--tm-accent)]">
+        {option.shirtNumber ?? "—"}
+      </span>
+      <span className="w-full truncate text-[10px] font-medium leading-tight text-[var(--tm-fg)]">
+        {shirtPlayerName(option.playerName)}
+      </span>
+    </button>
+  );
 }
 
 export function MvpPredictionPanel({
@@ -86,13 +129,16 @@ export function MvpPredictionPanel({
     };
   }, [homeTeam, awayTeam]);
 
-  const options = useMemo(() => {
-    const merged = [
-      ...flattenSquadPlayers(homeSquad, homeTeam),
-      ...flattenSquadPlayers(awaySquad, awayTeam),
-    ];
-    return merged.sort((a, b) => a.playerName.localeCompare(b.playerName, "es"));
-  }, [homeSquad, awaySquad, homeTeam, awayTeam]);
+  const homeOptions = useMemo(
+    () => flattenSquadPlayers(homeSquad, homeTeam).sort(sortByShirt),
+    [homeSquad, homeTeam]
+  );
+  const awayOptions = useMemo(
+    () => flattenSquadPlayers(awaySquad, awayTeam).sort(sortByShirt),
+    [awaySquad, awayTeam]
+  );
+  const options = useMemo(() => [...homeOptions, ...awayOptions], [homeOptions, awayOptions]);
+  const rowCount = Math.max(homeOptions.length, awayOptions.length);
 
   useEffect(() => {
     if (!savedPlayerName || !savedTeamName) {
@@ -144,52 +190,35 @@ export function MvpPredictionPanel({
     );
   }
 
+  const pickDisabled = !serverEditable || pending;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="space-y-3 px-4 py-4">
-        <p className="text-sm text-[var(--tm-muted)]">
-          Elige al MVP de {teamNameEs(homeTeam)} vs {teamNameEs(awayTeam)}. Acierto:{" "}
-          {formatMvpPointsLabel()} en la porra.
-        </p>
-
         {!serverEditable ? (
           <p className="text-sm text-[var(--tm-muted)]">
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
         ) : null}
 
-        <ul className="max-h-[min(22rem,50dvh)] space-y-1 overflow-y-auto overscroll-contain">
-          {options.map((option) => {
-            const active = selectedKey === option.key;
-            return (
-              <li key={option.key}>
-                <button
-                  type="button"
-                  disabled={!serverEditable || pending}
-                  onClick={() => setSelectedKey(option.key)}
-                  className={cn(
-                    "flex w-full min-h-12 items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors",
-                    active
-                      ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
-                      : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] hover:bg-[rgba(111,43,255,0.16)]",
-                    (!serverEditable || pending) && "opacity-60"
-                  )}
-                >
-                  <TeamFlagBadge name={option.teamName} size="xs" className="shrink-0" />
-                  <span className="font-display w-7 shrink-0 text-center text-sm font-bold text-[var(--tm-accent)]">
-                    {option.shirtNumber ?? "—"}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--tm-fg)]">
-                    {option.playerName}
-                  </span>
-                  <span className="shrink-0 text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">
-                    {option.position ?? " "}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="max-h-[min(22rem,50dvh)] space-y-1 overflow-y-auto overscroll-contain">
+          {Array.from({ length: rowCount }, (_, index) => (
+            <div key={`mvp-row-${index}`} className="grid grid-cols-2 gap-2">
+              <MvpPlayerButton
+                option={homeOptions[index]}
+                active={selectedKey === homeOptions[index]?.key}
+                disabled={pickDisabled}
+                onSelect={setSelectedKey}
+              />
+              <MvpPlayerButton
+                option={awayOptions[index]}
+                active={selectedKey === awayOptions[index]?.key}
+                disabled={pickDisabled}
+                onSelect={setSelectedKey}
+              />
+            </div>
+          ))}
+        </div>
 
         {error ? (
           <p className="text-sm text-[var(--tm-danger)]" role="alert">

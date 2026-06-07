@@ -34,6 +34,8 @@ type ModalProps = {
   onBack?: () => void;
   panelSlide?: ModalPanelSlide | null;
   loading?: boolean;
+  /** Título alineado a la izquierda (sin hueco izquierdo si no hay volver). */
+  headerTitleAlign?: "left" | "default";
 };
 
 function lockPageScroll() {
@@ -76,6 +78,7 @@ function ModalPanelShell({
   hideTitle = false,
   hideHeader = false,
   headerTrailing,
+  headerTitleAlign = "default",
   className,
   children,
   loading = false,
@@ -88,10 +91,13 @@ function ModalPanelShell({
   hideTitle?: boolean;
   hideHeader?: boolean;
   headerTrailing?: ReactNode;
+  headerTitleAlign?: "left" | "default";
   className?: string;
   children: ReactNode;
   loading?: boolean;
 }) {
+  const titleLeft = headerTitleAlign === "left";
+
   return (
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
       {hideHeader ? (
@@ -116,12 +122,18 @@ function ModalPanelShell({
             <ChevronLeft className="h-5 w-5" />
           </button>
         ) : (
-          <span className={cn("shrink-0", hideTitle ? "w-0" : "w-10")} aria-hidden="true" />
+          <span
+            className={cn("shrink-0", hideTitle || (titleLeft && !onBack) ? "w-0" : "w-10")}
+            aria-hidden="true"
+          />
         )}
         {!hideTitle ? (
           <h2
             id={titleId}
-            className="min-w-0 flex-1 truncate font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]"
+            className={cn(
+              "min-w-0 flex-1 truncate font-display text-sm text-[var(--tm-fg)]",
+              titleLeft ? "text-left normal-case tracking-normal" : "uppercase tracking-wide"
+            )}
           >
             {title}
           </h2>
@@ -166,6 +178,7 @@ export function Modal({
   panelSlide = null,
   loading = false,
   headerTrailing,
+  headerTitleAlign = "default",
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -308,6 +321,7 @@ export function Modal({
                       hideTitle={hideTitle}
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
+                      headerTitleAlign={headerTitleAlign}
                       className={className}
                       loading={loading}
                     >
@@ -324,6 +338,7 @@ export function Modal({
                       hideTitle={hideTitle}
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
+                      headerTitleAlign={headerTitleAlign}
                       className={className}
                       loading={loading}
                     >
@@ -343,6 +358,7 @@ export function Modal({
                       hideTitle={hideTitle}
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
+                      headerTitleAlign={headerTitleAlign}
                       className={className}
                       loading={loading}
                     >
@@ -359,6 +375,7 @@ export function Modal({
                       hideTitle={hideTitle}
                       hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
+                      headerTitleAlign={headerTitleAlign}
                       className={className}
                       loading={loading}
                     >
@@ -378,6 +395,7 @@ export function Modal({
               hideTitle={hideTitle}
               hideHeader={hideHeader}
               headerTrailing={headerTrailing}
+              headerTitleAlign={headerTitleAlign}
               className={className}
               loading={loading}
             >
