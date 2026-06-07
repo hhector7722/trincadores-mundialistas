@@ -15,8 +15,8 @@ export function AppShell({
     <NavigationLoadingProvider>
       <div className="relative flex min-h-dvh flex-col">
         <HomeAtmosphere />
-        <AppHeaderGate ctx={ctx} />
         <main className="relative z-10 flex-1 overflow-y-auto pb-[var(--tm-tabbar-height)]">
+          <AppHeaderGate ctx={ctx} />
           {children}
         </main>
         <TabBar />

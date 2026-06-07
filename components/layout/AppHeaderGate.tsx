@@ -20,6 +20,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
       ctx={ctx}
       stackedTitle={isHome}
       title={isRanking ? "LA TABLA" : undefined}
+      homeFade={isHome}
     />
   );
 }
