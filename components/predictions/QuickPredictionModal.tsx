@@ -283,7 +283,7 @@ export function QuickPredictionModal({
               />
             </div>
 
-            <div className="relative mt-[1.15rem] min-h-[1.375rem] w-full">
+            <div className="relative mt-[0.575rem] min-h-[1.375rem] w-full">
               <div className="absolute left-1/2 top-1/2 w-max max-w-[70%] -translate-x-1/2 -translate-y-1/2">
                 <MvpPredictionButton
                   savedPlayerName={targetMatch.mvpPrediction?.player_name ?? null}
@@ -297,7 +297,7 @@ export function QuickPredictionModal({
               compact
               hideMvp
               layout="teamAnchors"
-              className="mt-[1.15rem] [&>div]:min-h-0"
+              className="mt-[0.575rem] [&>div]:min-h-0"
               match={targetMatch}
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team))}
               onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team))}
@@ -311,7 +311,7 @@ export function QuickPredictionModal({
             ) : null}
           </div>
 
-          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.15rem]">
+          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.38rem]">
             <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
             <div className="mt-3 flex gap-2">
               <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
