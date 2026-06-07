@@ -18,7 +18,7 @@ import {
   buildGroupStandingsDetail,
   CALENDAR_SIDEBAR_DAYS,
   isCalendarSidebarDay,
-  type GroupMatchLike,
+  toGroupMatchRows,
   type GroupStandingRow,
 } from "@/lib/pool/group-standings";
 import {
@@ -294,19 +294,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
-  const groupMatchRows = useMemo<GroupMatchLike[]>(
-    () =>
-      matches.map((match) => ({
-        group_code: match.group_code,
-        home_team: match.home_team,
-        away_team: match.away_team,
-        officialHome: match.officialHome,
-        officialAway: match.officialAway,
-        predictedHome: match.prediction?.home_goals ?? null,
-        predictedAway: match.prediction?.away_goals ?? null,
-      })),
-    [matches]
-  );
+  const groupMatchRows = useMemo(() => toGroupMatchRows(matches), [matches]);
 
   const groupStandings = useMemo(
     () => buildGroupStandings(groupMatchRows, "official"),

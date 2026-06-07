@@ -35,6 +35,7 @@ export type GroupStandingDetail = {
 
 export type GroupStandingsSource = "official" | "predictions";
 
+/** Partido normalizado para el motor de clasificación (Real + Mi porra). Sin tabla auxiliar en BD. */
 export type GroupMatchLike = {
   group_code: string | null;
   home_team: string;
@@ -193,7 +194,33 @@ function buildGroupStatsMaps<T extends GroupMatchLike>(
   return statsByGroup;
 }
 
-/** Clasificación detallada por grupo (oficial o según pronósticos del usuario). */
+/** Adapta partidos del calendario/pronósticos al formato del motor de agregación. */
+export function toGroupMatchRows(
+  matches: Array<{
+    group_code: string | null;
+    home_team: string;
+    away_team: string;
+    officialHome: number | null;
+    officialAway: number | null;
+    prediction?: { home_goals: number; away_goals: number } | null;
+  }>
+): GroupMatchLike[] {
+  return matches.map((match) => ({
+    group_code: match.group_code,
+    home_team: match.home_team,
+    away_team: match.away_team,
+    officialHome: match.officialHome,
+    officialAway: match.officialAway,
+    predictedHome: match.prediction?.home_goals ?? null,
+    predictedAway: match.prediction?.away_goals ?? null,
+  }));
+}
+
+/**
+ * Clasificación detallada por grupo.
+ * - `official`: marcador de `match_results` (partidos sin resultado oficial se omiten).
+ * - `predictions`: marcador del usuario en `predictions` (partidos sin pronóstico se omiten).
+ */
 export function buildGroupStandingsDetail<T extends GroupMatchLike>(
   matches: T[],
   source: GroupStandingsSource = "official"
