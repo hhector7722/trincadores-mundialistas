@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useTransition, useState, type MouseEvent } from "react";
-import { Brain, Home, ListOrdered, Target, User } from "lucide-react";
+import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABBAR_HEIGHT_FALLBACK = "calc(3rem + env(safe-area-inset-bottom, 0px))";
@@ -20,10 +20,10 @@ function resetTabBarHeight() {
 }
 
 const TABS = [
-  { href: "/predictions", label: "Porra", icon: Target },
+  { href: "/quiz", label: "Quiz", icon: Brain },
   { href: "/ranking", label: "La tabla", icon: ListOrdered },
   { href: "/", label: "Inicio", icon: Home },
-  { href: "/quiz", label: "Quiz", icon: Brain },
+  { href: "/predictions", label: "Partidos", icon: BarChart3 },
   { href: "/profile", label: "Perfil", icon: User },
 ] as const;
 
