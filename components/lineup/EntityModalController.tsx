@@ -5,10 +5,8 @@ import { Modal } from "@/components/ui/modal";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
-import {
-  entityModalTitle,
-  type EntityModalView,
-} from "@/components/lineup/entity-modal-types";
+import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
+import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 
 type EntityModalControllerProps = {
@@ -84,7 +82,7 @@ export function EntityModalController({
     <Modal
       open={open}
       onClose={onClose}
-      title={entityModalTitle(current)}
+      title={entityModalTitleContent(current)}
       hideHeaderDivider
       className={className}
       wrapperClassName={wrapperClassName}

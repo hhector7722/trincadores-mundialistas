@@ -16,7 +16,7 @@ export type EntityModalView =
 export function entityModalTitle(view: EntityModalView): string {
   switch (view.kind) {
     case "lineup":
-      return "Once probable";
+      return view.teamName;
     case "player":
       return view.playerName;
     case "mvp":

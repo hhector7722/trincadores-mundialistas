@@ -725,6 +725,9 @@ html[data-modal-open] main {
 }
 
 .tm-porra-calendar-wrap {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   width: 100%;
   min-height: 0;
   min-width: 0;

@@ -242,17 +242,48 @@ export type CalendarLayoutResult = {
   rowHeight: number;
   uiScale: number;
   matchCardHeight: number;
+  gridHeight: number;
 };
+
+/** Ancla el cuerpo del calendario al borde inferior del layout (justo encima de la TabBar). */
+export function syncCalendarGridHeight(
+  calendar: HTMLElement,
+  grid: HTMLElement,
+  layoutRoot: HTMLElement
+): number {
+  const layoutRect = layoutRoot.getBoundingClientRect();
+  const calendarRect = calendar.getBoundingClientRect();
+  const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
+  const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
+  const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
+  const available = Math.floor(layoutRect.bottom - calendarRect.top - chromeHeight);
+  const height = Math.max(0, available);
+
+  grid.style.height = `${height}px`;
+  grid.style.flex = "0 0 auto";
+
+  return height;
+}
+
+export function resetCalendarGridHeight(grid: HTMLElement): void {
+  grid.style.removeProperty("height");
+  grid.style.removeProperty("flex");
+}
 
 /** Filas iguales vía CSS grid 1fr; tarjetas compartidas según el día más cargado. */
 export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
-  rowCount: number
+  rowCount: number,
+  layoutRoot?: HTMLElement | null
 ): CalendarLayoutResult | null {
   if (rowCount <= 0) return null;
 
   calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+
+  const gridHeight =
+    layoutRoot != null ? syncCalendarGridHeight(calendar, grid, layoutRoot) : grid.clientHeight;
+
   void grid.offsetHeight;
 
   let uiScale = searchMaxScale(calendar, grid);
@@ -277,10 +308,10 @@ export function fitCalendarLayout(
   }
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
-  return { rowHeight, uiScale, matchCardHeight };
+  return { rowHeight, uiScale, matchCardHeight, gridHeight: grid.clientHeight || gridHeight };
 }
 
-export function resetCalendarLayout(calendar: HTMLElement): void {
+export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | null): void {
   calendar.style.removeProperty("--tm-cal-ui-scale");
   calendar.style.removeProperty("--tm-cal-match-gap");
   calendar.style.removeProperty("--tm-cal-match-card-h");
@@ -293,4 +324,5 @@ export function resetCalendarLayout(calendar: HTMLElement): void {
   calendar.style.removeProperty("--tm-cal-group-card-gap");
   calendar.style.removeProperty("--tm-cal-group-card-py");
   resetPredictionLabelMetrics(calendar);
+  if (grid) resetCalendarGridHeight(grid);
 }

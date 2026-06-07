@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { fetchTeamSquadAction } from "@/actions/lineup";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { getBenchPlayers } from "@/lib/lineup/bench-players";
 import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
@@ -15,6 +14,10 @@ type LineupModalPanelProps = {
   teamName: string;
   onPlayerClick: (playerName: string) => void;
 };
+
+function formatBenchLabel(shirtNumber: number | null, name: string): string {
+  return `${shirtNumber ?? "—"} ${name}`;
+}
 
 export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelProps) {
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
@@ -73,34 +76,6 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="shrink-0 border-b border-[var(--tm-border)] px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <TeamFlagBadge name={teamName} size="md" />
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--tm-accent)]">
-                Once probable
-              </p>
-              <h3 className="truncate font-display text-lg font-bold text-[var(--tm-fg)]">
-                {displayName}
-              </h3>
-              <p className="text-xs text-[var(--tm-muted)]">
-                {squad.team_code ?? teamName.slice(0, 3).toUpperCase()}
-                {squad.year ? ` · Mundial ${squad.year}` : ""}
-              </p>
-            </div>
-          </div>
-          <div className="shrink-0 rounded-lg border border-[var(--tm-border)] bg-black/25 px-2 py-1 text-center">
-            <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--tm-muted)]">
-              Sistema
-            </p>
-            <p className="font-display text-sm font-bold text-[var(--tm-accent)]">
-              {lineup.formation}
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
         <TeamLineupGraphic
           slots={lineup.slots}
@@ -113,31 +88,23 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
             <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
               Reservas ({bench.length})
             </h4>
-            <ul className="space-y-1">
-              {bench.map((player) => (
-                <li key={player.key}>
+            <p className="text-sm leading-relaxed text-[var(--tm-fg)]">
+              {bench.map((player, index) => (
+                <span key={player.key}>
+                  {index > 0 ? ", " : null}
                   <button
                     type="button"
                     onClick={() => onPlayerClick(player.name)}
                     className={cn(
-                      "flex w-full min-h-12 items-center gap-3 rounded-xl border border-[var(--tm-border)]",
-                      "bg-[rgba(111,43,255,0.08)] px-3 py-2 text-left transition-colors",
-                      "hover:bg-[rgba(111,43,255,0.16)] active:bg-[rgba(111,43,255,0.22)]"
+                      "inline text-left transition-colors",
+                      "hover:text-[var(--tm-accent)] active:text-[var(--tm-accent)]"
                     )}
                   >
-                    <span className="font-display w-8 shrink-0 text-center text-sm font-bold text-[var(--tm-accent)]">
-                      {player.shirtNumber ?? "—"}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--tm-fg)]">
-                      {player.name}
-                    </span>
-                    <span className="shrink-0 text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">
-                      {player.position ?? " "}
-                    </span>
+                    {formatBenchLabel(player.shirtNumber, player.name)}
                   </button>
-                </li>
+                </span>
               ))}
-            </ul>
+            </p>
           </section>
         ) : null}
 

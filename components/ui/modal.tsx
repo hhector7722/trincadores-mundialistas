@@ -16,7 +16,7 @@ export type ModalPanelSlide = {
 type ModalProps = {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   className?: string;
   wrapperClassName?: string;
@@ -71,7 +71,7 @@ function ModalPanelShell({
   children,
   loading = false,
 }: {
-  title: string;
+  title: ReactNode;
   titleId: string;
   onClose: () => void;
   onBack?: () => void;

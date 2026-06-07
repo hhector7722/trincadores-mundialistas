@@ -1,17 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { savePrediction } from "@/actions/predictions";
 import { buildLineupView, buildMvpView } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
-import {
-  entityModalTitle,
-  type EntityModalView,
-} from "@/components/lineup/entity-modal-types";
+import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
+import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
@@ -77,9 +75,9 @@ function MatchSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-function quickPanelTitle(view: QuickPanelView): string {
+function quickPanelTitle(view: QuickPanelView): ReactNode {
   if (view.kind === "prediction") return "Pronóstico";
-  return entityModalTitle(view);
+  return entityModalTitleContent(view);
 }
 
 export function QuickPredictionModal({

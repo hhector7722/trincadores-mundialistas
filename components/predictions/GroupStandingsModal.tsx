@@ -1,13 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { buildLineupView } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
-import {
-  entityModalTitle,
-  type EntityModalView,
-} from "@/components/lineup/entity-modal-types";
+import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
+import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
@@ -65,9 +63,9 @@ function GroupSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-function groupPanelTitle(view: GroupPanelView): string {
+function groupPanelTitle(view: GroupPanelView): ReactNode {
   if (view.kind === "standings") return `Grupo ${view.group.code}`;
-  return entityModalTitle(view);
+  return entityModalTitleContent(view);
 }
 
 export function GroupStandingsModal({
