@@ -14,6 +14,18 @@ export const GROUP_STANDINGS_STAT_COLUMNS = [
   { key: "dg", label: "DG" },
 ] as const;
 
+const GRID_STANDINGS_STAT_COLUMNS = GROUP_STANDINGS_STAT_COLUMNS.filter(
+  (col) => col.key === "pts" || col.key === "pj" || col.key === "dg"
+);
+
+type GroupStandingTeamRow = GroupStandingDetail["teams"][number];
+type StatColumnKey = (typeof GROUP_STANDINGS_STAT_COLUMNS)[number]["key"];
+
+function formatStatValue(row: GroupStandingTeamRow, key: StatColumnKey): string | number {
+  if (key === "dg") return formatGroupDg(row.dg);
+  return row[key];
+}
+
 export function formatGroupDg(value: number): string {
   if (value > 0) return `+${value}`;
   return String(value);
@@ -36,8 +48,9 @@ export function GroupStandingsTable({
 }: GroupStandingsTableProps) {
   const isGrid = variant === "grid";
   const isCompact = compact || isGrid;
+  const statColumns = isGrid ? GRID_STANDINGS_STAT_COLUMNS : GROUP_STANDINGS_STAT_COLUMNS;
 
-  function renderTeamCell(row: GroupStandingDetail["teams"][number]) {
+  function renderTeamCell(row: GroupStandingTeamRow) {
     const fullName = teamNameEs(row.team);
     const abbr = teamAbbr(row.team);
     const flagSize = isGrid ? "xxs" : isCompact ? "xxs" : "xs";
@@ -45,16 +58,12 @@ export function GroupStandingsTable({
 
     const inner = (
       <>
-        <TeamFlagBadge
-          name={row.team}
-          size={flagSize}
-          className={cn("shrink-0", isGrid && "mx-auto")}
-        />
+        <TeamFlagBadge name={row.team} size={flagSize} className="shrink-0" />
         <span
           className={cn(
-            "font-medium leading-tight",
+            "min-w-0 font-medium leading-tight",
             isGrid
-              ? "max-w-[3rem] truncate text-center text-[7px] font-semibold uppercase tracking-wide sm:max-w-[3.25rem] sm:text-[8px]"
+              ? "truncate text-left text-[7px] font-semibold uppercase tracking-wide sm:text-[8px]"
               : cn("truncate", isCompact && "max-w-[3.5rem] text-[8px]", !isCompact && "text-[11px] sm:text-xs")
           )}
         >
@@ -65,7 +74,7 @@ export function GroupStandingsTable({
 
     const cellClass = cn(
       "flex min-w-0 items-center",
-      isGrid ? "flex-col gap-0.5 px-0.5" : "gap-0.5"
+      isGrid ? "flex-row gap-1 px-0.5" : "gap-0.5"
     );
 
     if (onTeamClick) {
@@ -112,13 +121,13 @@ export function GroupStandingsTable({
               className={cn(
                 "font-medium",
                 isGrid
-                  ? "min-w-[3.25rem] pb-0.5 text-center sm:min-w-[3.75rem]"
+                  ? "min-w-[3.5rem] pb-0.5 pr-1 text-left sm:min-w-[4rem]"
                   : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
               )}
             >
               {isGrid ? "Sel." : "Equipo"}
             </th>
-            {GROUP_STANDINGS_STAT_COLUMNS.map((col) => (
+            {statColumns.map((col) => (
               <th
                 key={col.key}
                 className={cn(
@@ -140,73 +149,21 @@ export function GroupStandingsTable({
                 index === 0 && "text-[var(--tm-fg)]"
               )}
             >
-              <td className={cn(isGrid ? "py-0.5 pr-0 align-top" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
+              <td className={cn(isGrid ? "py-0.5 pr-1 align-middle" : isCompact ? "py-0.5 pr-1" : "py-2 pr-2")}>
                 {renderTeamCell(row)}
               </td>
-              <td
-                className={cn(
-                  "text-center font-semibold tabular-nums text-[var(--tm-accent)]",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.pts}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.pj}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.pg}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.pe}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.pp}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.gf}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {row.gc}
-              </td>
-              <td
-                className={cn(
-                  "text-center tabular-nums",
-                  isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
-                )}
-              >
-                {formatGroupDg(row.dg)}
-              </td>
+              {statColumns.map((col) => (
+                <td
+                  key={col.key}
+                  className={cn(
+                    "text-center tabular-nums",
+                    col.key === "pts" && "font-semibold text-[var(--tm-accent)]",
+                    isGrid ? "px-px py-0.5" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                  )}
+                >
+                  {formatStatValue(row, col.key)}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
