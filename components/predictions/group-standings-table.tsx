@@ -53,7 +53,7 @@ export function GroupStandingsTable({
   function renderTeamCell(row: GroupStandingTeamRow) {
     const fullName = teamNameEs(row.team);
     const abbr = teamAbbr(row.team);
-    const flagSize = isGrid ? "xxs" : isCompact ? "xxs" : "xs";
+    const flagSize = isGrid ? "xs" : isCompact ? "xxs" : "xs";
     const displayLabel = isGrid || isCompact ? abbr : fullName;
 
     const inner = (
@@ -74,7 +74,7 @@ export function GroupStandingsTable({
 
     const cellClass = cn(
       "flex min-w-0 items-center",
-      isGrid ? "flex-row gap-1 px-0.5" : "gap-0.5"
+      isGrid ? "flex-row items-center gap-1 px-0.5" : "gap-0.5"
     );
 
     if (onTeamClick) {
@@ -100,7 +100,7 @@ export function GroupStandingsTable({
   return (
     <div
       className={cn(
-        isGrid ? "flex min-h-0 flex-1 flex-col overflow-x-auto overflow-y-visible px-1 pb-1" : "overflow-x-auto",
+        isGrid ? "flex min-h-0 flex-1 flex-col overflow-visible px-1 pb-1" : "overflow-x-auto",
         !isGrid && (isCompact ? "px-1 pb-1" : "px-3 pb-4 sm:px-4"),
         className
       )}
@@ -121,7 +121,7 @@ export function GroupStandingsTable({
               className={cn(
                 "font-medium",
                 isGrid
-                  ? "min-w-[3.5rem] pb-0.5 pr-1 text-left sm:min-w-[4rem]"
+                  ? "min-w-[5rem] pb-0.5 pr-1 text-left sm:min-w-[5.5rem]"
                   : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
               )}
             >

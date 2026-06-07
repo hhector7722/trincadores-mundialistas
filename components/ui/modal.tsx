@@ -22,6 +22,8 @@ type ModalProps = {
   wrapperClassName?: string;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
+  /** Sin barra superior (título, trailing ni cerrar). Usar `ariaLabel`. */
+  hideHeader?: boolean;
   /** Controles en la cabecera, a la izquierda del botón cerrar. */
   headerTrailing?: ReactNode;
   ariaLabel?: string;
@@ -72,6 +74,7 @@ function ModalPanelShell({
   onBack,
   hideHeaderDivider,
   hideTitle = false,
+  hideHeader = false,
   headerTrailing,
   className,
   children,
@@ -83,6 +86,7 @@ function ModalPanelShell({
   onBack?: () => void;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
+  hideHeader?: boolean;
   headerTrailing?: ReactNode;
   className?: string;
   children: ReactNode;
@@ -90,6 +94,11 @@ function ModalPanelShell({
 }) {
   return (
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
+      {hideHeader ? (
+        <span id={titleId} className="sr-only">
+          {title}
+        </span>
+      ) : (
       <div
         className={cn(
           "flex shrink-0 items-center gap-2 px-4",
@@ -129,6 +138,7 @@ function ModalPanelShell({
           <X className="h-5 w-5" />
         </button>
       </div>
+      )}
       <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         {children}
         {loading ? <LoadingOverlay /> : null}
@@ -146,6 +156,7 @@ export function Modal({
   wrapperClassName,
   hideHeaderDivider = false,
   hideTitle = false,
+  hideHeader = false,
   ariaLabel,
   backdropClassName,
   belowPanel,
@@ -260,8 +271,8 @@ export function Modal({
           ref={panelRef}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={titleId}
-          aria-label={hideTitle ? ariaLabel : undefined}
+          aria-labelledby={hideHeader ? undefined : titleId}
+          aria-label={hideHeader ? ariaLabel ?? (typeof title === "string" ? title : undefined) : hideTitle ? ariaLabel : undefined}
           tabIndex={-1}
           className="pointer-events-auto w-full overflow-hidden outline-none focus:outline-none focus-visible:outline-none"
         >
@@ -295,6 +306,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
@@ -310,6 +322,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
@@ -328,6 +341,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
@@ -343,6 +357,7 @@ export function Modal({
                       onBack={onBack}
                       hideHeaderDivider={hideHeaderDivider}
                       hideTitle={hideTitle}
+                      hideHeader={hideHeader}
                       headerTrailing={headerTrailing}
                       className={className}
                       loading={loading}
@@ -361,6 +376,7 @@ export function Modal({
               onBack={onBack}
               hideHeaderDivider={hideHeaderDivider}
               hideTitle={hideTitle}
+              hideHeader={hideHeader}
               headerTrailing={headerTrailing}
               className={className}
               loading={loading}
