@@ -870,14 +870,14 @@ html[data-modal-open] main {
   right: 0;
 }
 
-/* Semis: centros al 35% y 65% (medio camino hacia 45%/55% desde 25%/75%) */
+/* Semis: centros al 42.5% y 57.5% (medio camino hacia 50% desde 35%/65%) */
 .tm-ko-node--sf .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--sf .tm-ko-node-pair::before {
-  top: 35%;
-  height: 30%;
+  top: 42.5%;
+  height: 15%;
   transform: translateX(-50%);
 }
 
@@ -888,14 +888,14 @@ html[data-modal-open] main {
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 35%;
+  top: 42.5%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .tm-ko-node--sf .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 65%;
+  top: 57.5%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -907,14 +907,14 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
-/* Final: borde inferior arriba al 45%, borde superior abajo al 55% */
+/* Final: borde inferior arriba al 48%, borde superior abajo al 52% */
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair {
   justify-content: flex-start;
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair::before {
-  top: 45%;
-  height: 10%;
+  top: 48%;
+  height: 4%;
   transform: translateX(-50%);
 }
 
@@ -925,14 +925,14 @@ html[data-modal-open] main {
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:first-of-type {
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -100%);
 }
 
 .tm-ko-node--center.tm-ko-node--final .tm-ko-node-pair .tm-ko-slot:last-of-type {
   position: absolute;
-  top: 55%;
+  top: 52%;
   left: 50%;
   transform: translate(-50%, 0);
 }
