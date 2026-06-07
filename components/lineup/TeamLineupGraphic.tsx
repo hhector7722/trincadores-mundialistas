@@ -18,7 +18,7 @@ export function TeamLineupGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/4] w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 shadow-2xl",
+        "relative aspect-[3/4] w-full max-w-lg shrink-0 self-center overflow-hidden rounded-2xl border border-white/10 shadow-2xl",
         className
       )}
     >
@@ -43,7 +43,7 @@ export function TeamLineupGraphic({
       {slots.map((slot) => (
         <div
           key={slot.key}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
+          className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
           style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
         >
           <LineupPlayerChip
