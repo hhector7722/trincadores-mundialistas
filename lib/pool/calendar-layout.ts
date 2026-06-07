@@ -18,11 +18,13 @@ const GROUPS_CARD_HEIGHT_RATIO = 0.88;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
-const ACCESS_DOCK_GRID_GAP_PX = 3;
-const MIN_ACCESS_BTN_HEIGHT_PX = 14;
-const ACCESS_DOCK_HEIGHT_RATIO = 0.26;
-const MIN_ACCESS_DOCK_HEIGHT_PX = 34;
-const ACCESS_DOCK_ROWS = 4;
+const ACCESS_DOCK_GRID_GAP_PX = 8;
+const ACCESS_DOCK_COLS = 2;
+const ACCESS_DOCK_ROWS = 2;
+const ACCESS_DOCK_LONGEST_LABEL = "VER PLANTILLAS";
+const MIN_ACCESS_BTN_HEIGHT_PX = 18;
+const ACCESS_DOCK_HEIGHT_RATIO = 0.28;
+const MIN_ACCESS_DOCK_HEIGHT_PX = 36;
 const SIDEBAR_BODY_GAP_PX = 6;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
@@ -125,7 +127,36 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
   return cardHeight;
 }
 
-/** Reserva la franja inferior L-M-X para los botones de acceso (4 filas, ancho completo). */
+function measureAccessLabelWidth(text: string, fontSizePx: number): number {
+  if (typeof document === "undefined") {
+    return text.length * fontSizePx * 0.55;
+  }
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return text.length * fontSizePx * 0.55;
+  }
+
+  ctx.font = `700 ${fontSizePx}px system-ui, -apple-system, sans-serif`;
+  return ctx.measureText(text).width;
+}
+
+function fitAccessButtonFontSize(cellW: number, cellH: number, padX: number): number {
+  const minFs = 7;
+  const maxFs = Math.min(11, Math.floor(cellH * 0.46));
+  const availableW = Math.max(0, cellW - padX * 2);
+
+  for (let fs = maxFs; fs >= minFs; fs--) {
+    if (measureAccessLabelWidth(ACCESS_DOCK_LONGEST_LABEL, fs) <= availableW) {
+      return fs;
+    }
+  }
+
+  return minFs;
+}
+
+/** Reserva la franja inferior L-M-X para los botones de acceso (rejilla 2×2). */
 function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
   if (!slot) {
@@ -148,22 +179,46 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     MIN_ACCESS_DOCK_HEIGHT_PX,
     Math.floor(bodyH * ACCESS_DOCK_HEIGHT_RATIO)
   );
-  const rowH = Math.max(
-    12,
+  const slotWidth = slot.clientWidth;
+  const cellW = Math.max(
+    0,
     Math.floor(
-      (dockH - ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1)) / ACCESS_DOCK_ROWS
+      (slotWidth - ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_COLS - 1)) /
+        ACCESS_DOCK_COLS
     )
   );
-  const btnMinH = Math.max(MIN_ACCESS_BTN_HEIGHT_PX, Math.floor(rowH * 0.92));
-  const btnFs = Math.max(8, Math.min(11, Math.floor(btnMinH * 0.52)));
-  const btnPadX = Math.max(8, Math.floor(btnMinH * 0.45));
+  const cellH = Math.max(
+    MIN_ACCESS_BTN_HEIGHT_PX,
+    Math.floor(
+      (dockH - ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1)) /
+        ACCESS_DOCK_ROWS
+    )
+  );
+  const btnPadX = Math.max(4, Math.min(10, Math.floor(cellW * 0.08)));
+  let btnFs = fitAccessButtonFontSize(cellW, cellH, btnPadX);
 
   calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-body-gap", `${SIDEBAR_BODY_GAP_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-gap", `${ACCESS_DOCK_GRID_GAP_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-access-btn-min-h", `${btnMinH}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-btn-min-h", `${cellH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-px", `${btnPadX}px`);
+
+  void slot.offsetHeight;
+  const buttons = slot.querySelectorAll<HTMLElement>(".tm-cal-sidebar-access-btn");
+  while (btnFs > 7 && buttons.length > 0) {
+    let clipped = false;
+    for (const btn of buttons) {
+      if (elementOverflows(btn)) {
+        clipped = true;
+        break;
+      }
+    }
+    if (!clipped) break;
+    btnFs -= 1;
+    calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
+    void slot.offsetHeight;
+  }
 }
 
 /** Ajusta la card de grupos a la altura real del contenido (sin relleno inferior). */
