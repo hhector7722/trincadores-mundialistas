@@ -247,46 +247,45 @@ export function QuickPredictionModal({
   function renderPanelView(view: QuickPanelView, targetMatch: MatchWithPrediction) {
     if (view.kind === "prediction") {
       return (
-        <>
-          <div className="space-y-4 px-4 py-4">
-            <MatchTeamsDisplay
-              homeTeam={targetMatch.home_team}
-              awayTeam={targetMatch.away_team}
-              kickoffAt={targetMatch.kickoff_at}
-              isLive={targetMatch.status === "live"}
-              groupCode={targetMatch.group_code}
-              centerKickoff
-            />
-
-            {uiState === "locked" ? (
-              <p className="text-center text-sm text-[var(--tm-muted)]">
-                Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
-              </p>
-            ) : (
-              <>
-                <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
-                <div className="flex items-center justify-center gap-2 py-1">
-                  <ScoreStepper
-                    label={targetMatch.home_team}
-                    value={home}
-                    disabled={controlsDisabled}
-                    onChange={setHome}
-                    variant="floating"
-                    hideLabel
-                  />
-                  <ScoreStepper
-                    label={targetMatch.away_team}
-                    value={away}
-                    disabled={controlsDisabled}
-                    onChange={setAway}
-                    variant="floating"
-                    hideLabel
-                  />
-                </div>
-              </>
-            )}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="px-4 pb-3 pt-2">
+            <div className="mt-2">
+              <MatchTeamsDisplay
+                homeTeam={targetMatch.home_team}
+                awayTeam={targetMatch.away_team}
+                kickoffAt={targetMatch.kickoff_at}
+                isLive={targetMatch.status === "live"}
+                centerSlot={
+                  <div className="inline-block origin-top scale-[0.88] sm:scale-100">
+                    <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                      Mi pronóstico
+                    </p>
+                    <div className="mt-0.5 flex items-center justify-center gap-0.5">
+                      <ScoreStepper
+                        label={targetMatch.home_team}
+                        value={home}
+                        disabled={controlsDisabled}
+                        onChange={setHome}
+                        variant="floating"
+                        hideLabel
+                      />
+                      <ScoreStepper
+                        label={targetMatch.away_team}
+                        value={away}
+                        disabled={controlsDisabled}
+                        onChange={setAway}
+                        variant="floating"
+                        hideLabel
+                      />
+                    </div>
+                  </div>
+                }
+              />
+            </div>
 
             <MatchContextActionsRow
+              compact
+              className="mt-2 [&>div]:min-h-0"
               match={targetMatch}
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team))}
               onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team))}
@@ -294,23 +293,24 @@ export function QuickPredictionModal({
             />
 
             {error ? (
-              <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
+              <p className="mt-3 text-center text-sm text-[var(--tm-danger)]" role="alert">
                 {error}
               </p>
             ) : null}
           </div>
 
-          <div className="flex shrink-0 gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
-              Cancelar
-            </Button>
-            {uiState !== "locked" ? (
+          <div className="mt-auto shrink-0 border-t border-[var(--tm-border)] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
+            <div className="mt-3 flex gap-2">
+              <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
+                Cancelar
+              </Button>
               <Button className="flex-1" disabled={!canSave || pending} onClick={onSave}>
                 {pending ? "Guardando..." : "Guardar"}
               </Button>
-            ) : null}
+            </div>
           </div>
-        </>
+        </div>
       );
     }
 
