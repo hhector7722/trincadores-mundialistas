@@ -5,6 +5,7 @@ import { fetchTeamSquadAction } from "@/actions/lineup";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { getBenchPlayers } from "@/lib/lineup/bench-players";
 import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
+import { shortPlayerName } from "@/lib/lineup/short-player-name";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -14,10 +15,6 @@ type LineupModalPanelProps = {
   teamName: string;
   onPlayerClick: (playerName: string) => void;
 };
-
-function formatBenchLabel(shirtNumber: number | null, name: string): string {
-  return `${shirtNumber ?? "—"} ${name}`;
-}
 
 export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelProps) {
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
@@ -88,7 +85,7 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
             <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
               Reservas ({bench.length})
             </h4>
-            <p className="text-sm leading-relaxed text-[var(--tm-fg)]">
+            <p className="text-xs leading-snug text-[var(--tm-fg)]">
               {bench.map((player, index) => (
                 <span key={player.key}>
                   {index > 0 ? ", " : null}
@@ -96,11 +93,16 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
                     type="button"
                     onClick={() => onPlayerClick(player.name)}
                     className={cn(
-                      "inline text-left transition-colors",
-                      "hover:text-[var(--tm-accent)] active:text-[var(--tm-accent)]"
+                      "inline text-left whitespace-nowrap transition-colors",
+                      "hover:opacity-90 active:opacity-80"
                     )}
                   >
-                    {formatBenchLabel(player.shirtNumber, player.name)}
+                    <span className="font-display font-bold text-[var(--tm-accent)]">
+                      {player.shirtNumber ?? "—"}
+                    </span>{" "}
+                    <span className="hover:text-[var(--tm-accent)]">
+                      {shortPlayerName(player.name)}
+                    </span>
                   </button>
                 </span>
               ))}
