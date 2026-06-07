@@ -22,8 +22,7 @@
     "quiz:generate-facts": "tsx --env-file=.env.local scripts/generate-quiz-facts.ts",
     "db:seed-quiz-day": "tsx --env-file=.env.local scripts/seed-quiz-day.ts",
     "llm-context": "tsx scripts/generate-llm-context.ts",
-    "llm-context:install-hook": "node scripts/install-llm-hook.mjs",
-    "prepare": "node scripts/install-llm-hook.mjs"
+    "llm-context:install-hook": "node scripts/install-llm-hook.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
