@@ -121,18 +121,19 @@ export function GroupStandingsTable({
               className={cn(
                 "font-medium",
                 isGrid
-                  ? "w-auto pb-0.5 pr-0.5 text-left"
+                  ? "pb-0.5 pr-0.5 text-left"
                   : cn("text-left", isCompact ? "pb-0.5 pr-1" : "pb-2 pr-2")
               )}
+              aria-hidden={isGrid ? true : undefined}
             >
-              {isGrid ? "Sel." : "Equipo"}
+              {isGrid ? null : "Equipo"}
             </th>
             {statColumns.map((col) => (
               <th
                 key={col.key}
                 className={cn(
                   "text-center font-medium tabular-nums",
-                  isGrid ? "w-6 px-0 pb-0.5" : isCompact ? "px-px pb-0.5" : "px-px pb-2"
+                  isGrid ? "w-4 px-0 pb-0.5" : isCompact ? "px-px pb-0.5" : "px-px pb-2"
                 )}
               >
                 {col.label}
@@ -158,7 +159,7 @@ export function GroupStandingsTable({
                   className={cn(
                     "whitespace-nowrap text-center tabular-nums",
                     col.key === "pts" && "font-semibold text-[var(--tm-accent)]",
-                    isGrid ? "w-6 px-0 py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
+                    isGrid ? "w-4 px-0 py-px" : isCompact ? "px-0.5 py-0.5" : "px-0.5 py-2"
                   )}
                 >
                   {formatStatValue(row, col.key)}
