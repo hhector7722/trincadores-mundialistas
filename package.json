@@ -19,6 +19,8 @@
     "db:import-wc2026": "tsx --env-file=.env.local scripts/import-openfootball-wc2026.ts",
     "db:import-wc-historic": "tsx --env-file=.env.local scripts/import-worldcup-historic.ts",
     "db:import-wc2026-feed": "tsx --env-file=.env.local scripts/import-worldcup-2026.ts",
+    "db:fetch-wc2026-squads": "tsx scripts/fetch-worldcup-2026-squads.ts",
+    "db:import-wc2026-squads": "tsx --env-file=.env.local scripts/import-worldcup-2026-squads.ts",
     "quiz:generate-facts": "tsx --env-file=.env.local scripts/generate-quiz-facts.ts",
     "db:seed-quiz-day": "tsx --env-file=.env.local scripts/seed-quiz-day.ts",
     "llm-context": "tsx scripts/generate-llm-context.ts",

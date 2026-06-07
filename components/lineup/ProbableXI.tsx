@@ -100,7 +100,7 @@ export function ProbableXI({
       <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
         <TeamLineupGraphic slots={lineup.slots} formation={lineup.formation} />
         <p className="mt-4 max-w-lg text-center text-[11px] text-[var(--tm-muted)]">
-          Alineación orientativa a partir de la convocatoria histórica. Sin confirmación oficial.
+          Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
           {lineup.benchCount > 0 ? ` ${lineup.benchCount} jugadores en plantilla.` : ""}
         </p>
       </div>

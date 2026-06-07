@@ -33,6 +33,7 @@
 - [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
 - [x] Migracion `match_mvp_predictions` aplicada en remoto (MCP)
 - [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
+- [x] Import plantillas oficiales WC 2026 (48 squads, 1248 jugadores, source worldcup2026/FIFA)
 - [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
 - [ ] Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
 - [ ] Probar flujo E2E con login real (official + bonus)

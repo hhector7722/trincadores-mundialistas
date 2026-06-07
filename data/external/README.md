@@ -27,9 +27,28 @@ Copia manual o clone los CSV del repo
 - `worldcup2026.groups.csv`
 - `worldcup2026.stadia.csv`
 - `worldcup2026.games.csv`
+- `worldcup2026.squads.csv` (convocatorias oficiales FIFA 2026)
 
 ```bash
 ALLOW_IMPORT=1 npm run db:import-wc2026-feed
 ```
 
 Este script **no** reimporta el catálogo OpenFootball; sólo `external_id_map` y `match_live_state`.
+
+### Plantillas oficiales 2026
+
+Descarga convocatorias desde la API FIFA (listas publicadas jun 2026) y versiona el CSV:
+
+```bash
+npm run db:fetch-wc2026-squads
+ALLOW_IMPORT=1 npm run db:import-wc2026-squads -- --truncate-first
+```
+
+Alternativa directa sin CSV intermedio:
+
+```bash
+ALLOW_IMPORT=1 npm run db:import-wc2026-squads -- --from-api --truncate-first
+```
+
+Las plantillas se guardan en `team_squads` con `source_code=worldcup2026` y `year=2026`.
+La app prioriza esta fuente frente al histórico Fjelstul.

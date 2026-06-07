@@ -145,7 +145,7 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
         ) : null}
 
         <p className="mt-4 max-w-lg self-center text-center text-[11px] text-[var(--tm-muted)]">
-          Alineación orientativa a partir de la convocatoria histórica. Sin confirmación oficial.
+          Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
         </p>
       </div>
     </div>

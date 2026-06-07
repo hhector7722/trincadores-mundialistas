@@ -14,11 +14,8 @@ export async function fetchTeamSquadAction(
 ): Promise<LineupActionResult<TeamSquadWithPlayers | null>> {
   try {
     const supabase = await createClient();
-    const squad = await getTeamSquadByName(supabase, teamName, { year: 2026 });
-    if (squad) return { ok: true, data: squad };
-
-    const fallback = await getTeamSquadByName(supabase, teamName);
-    return { ok: true, data: fallback };
+    const squad = await getTeamSquadByName(supabase, teamName);
+    return { ok: true, data: squad };
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar la plantilla.";
     return { ok: false, error: message };
