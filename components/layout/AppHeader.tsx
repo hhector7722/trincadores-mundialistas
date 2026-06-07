@@ -13,7 +13,7 @@ export function AppHeader({
   title?: string;
 }) {
   return (
-    <header className="relative z-20 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
+    <header className="tm-app-header relative z-20 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
       <div className="relative flex items-center justify-center">
         <h1
           className={cn(

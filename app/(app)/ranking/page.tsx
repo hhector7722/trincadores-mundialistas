@@ -16,7 +16,7 @@ export default async function RankingPage() {
   const { rows } = await getPoolLeaderboard(ctx.activePoolId);
 
   return (
-    <div className="tm-ranking-page px-3 pt-2 pb-3">
+    <div className="tm-ranking-page px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <Card className="overflow-hidden p-0">
         <RankingTable rows={rows} currentProfileId={user!.id} />
       </Card>

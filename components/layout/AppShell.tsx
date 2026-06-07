@@ -14,7 +14,7 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="tm-app-shell relative flex flex-col">
+    <div className="tm-app-shell">
       <ViewportMetricsInlineScript />
       <div
         id="tm-safe-probe"
@@ -26,10 +26,10 @@ export function AppShell({
         <ViewportLayoutDebug />
       </Suspense>
       <HomeAtmosphere />
-      <AppHeaderGate ctx={ctx} />
-      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain bg-[var(--tm-shell-bg-hex)]">
-        {children}
-      </main>
+      <div className="tm-app-shell-grid">
+        <AppHeaderGate ctx={ctx} />
+        <main className="tm-app-main">{children}</main>
+      </div>
     </div>
   );
 }
