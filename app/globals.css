@@ -622,13 +622,6 @@ html[data-modal-open] main {
   min-width: 0;
 }
 
-.tm-ranking-head {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  font-size: 0.625rem;
-  line-height: 1;
-}
-
 .tm-ranking-row {
   line-height: 1.2;
 }
