@@ -24,8 +24,10 @@ export function AppShell({
       <HomeAtmosphere />
       <div className="tm-app-frame">
         <AppHeaderGate ctx={ctx} />
-        <main className="tm-app-main">{children}</main>
-        <TabBar />
+        <div className="tm-app-body">
+          <main className="tm-app-main">{children}</main>
+          <TabBar />
+        </div>
       </div>
     </div>
   );
