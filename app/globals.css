@@ -1033,9 +1033,9 @@ html[data-modal-open] main {
 
 .tm-porra-calendar .tm-cal-sidebar-access-btn {
   display: inline-flex;
-  width: var(--tm-cal-sidebar-access-btn-w, auto);
-  height: var(--tm-cal-sidebar-access-btn-h, auto);
-  max-width: calc(100% - 2px);
+  width: fit-content;
+  max-width: calc(100% - 4px);
+  height: auto;
   min-height: 0;
   align-items: center;
   justify-content: center;
@@ -1043,11 +1043,11 @@ html[data-modal-open] main {
   border-radius: 3px;
   background: #ccff00;
   color: #000;
-  padding: 1px 3px;
-  font-size: var(--tm-cal-sidebar-access-btn-fs, clamp(6px, 1.55cqw, 8.5px));
+  padding: 1px 5px;
+  font-size: clamp(7.5px, 1.9cqw, 10px);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: 0.03em;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
