@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
-import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { getQuizSlotStatus } from "@/lib/quiz/slot-status";
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
@@ -77,12 +76,10 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
           Clasificacion del quiz
         </h2>
-        <Card className="overflow-hidden p-0">
-          <QuizLeaderboardTable
-            rows={leaderboardRows}
-            currentProfileId={currentProfileId}
-          />
-        </Card>
+        <QuizLeaderboardTable
+          rows={leaderboardRows}
+          currentProfileId={currentProfileId}
+        />
       </div>
 
       <Modal

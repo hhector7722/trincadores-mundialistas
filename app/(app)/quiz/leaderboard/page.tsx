@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
-import { Card } from "@/components/ui/card";
 import { getQuizLeaderboard } from "@/lib/quiz/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -27,9 +26,7 @@ export default async function QuizLeaderboardPage() {
           Volver al quiz
         </Link>
       </div>
-      <Card className="overflow-hidden p-0">
-        <QuizLeaderboardTable rows={rows} currentProfileId={user!.id} />
-      </Card>
+      <QuizLeaderboardTable rows={rows} currentProfileId={user!.id} />
       <p className="tm-quiz-actions shrink-0 text-center text-[10px] text-[var(--tm-muted)]">
         Solo cuenta el quiz oficial en modo competitivo.
       </p>
