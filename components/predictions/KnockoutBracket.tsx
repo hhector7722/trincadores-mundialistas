@@ -9,10 +9,12 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
+  BRACKET_THIRD_PLACE,
+  BRACKET_TREE_LAYOUT,
   buildKnockoutMatchMap,
-  KNOCKOUT_STAGGERED_ROUNDS,
   placeholderPairForMatchNumber,
   resolveBracketMatch,
+  type BracketTreeSlot,
 } from "@/lib/predictions/knockout-bracket-layout";
 import { knockoutTeamLabel } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -32,18 +34,16 @@ function BracketTeamSlot({ name }: { name: string }) {
   );
 }
 
-function StaggeredMatchPair({
+function BracketTreeMatch({
+  slot,
   match,
-  matchNumber,
-  index,
   onOpen,
 }: {
+  slot: BracketTreeSlot;
   match: MatchWithPrediction | null;
-  matchNumber: number;
-  index: number;
   onOpen: (match: MatchWithPrediction) => void;
 }) {
-  const fallback = placeholderPairForMatchNumber(matchNumber);
+  const fallback = placeholderPairForMatchNumber(slot.matchNumber);
   const homeName = match?.home_team ?? fallback?.home ?? " ";
   const awayName = match?.away_team ?? fallback?.away ?? " ";
   const savedHome = match?.prediction?.home_goals ?? null;
@@ -60,7 +60,6 @@ function StaggeredMatchPair({
       })
     : "empty";
   const scoreText = match ? formatListScore(savedHome, savedAway) : " ";
-  const alignLeft = index % 2 === 0;
   const isLive = match?.status === "live";
 
   return (
@@ -68,23 +67,38 @@ function StaggeredMatchPair({
       type="button"
       disabled={!match}
       onClick={() => match && onOpen(match)}
+      style={{
+        gridColumn: slot.column + 1,
+        gridRow: `${slot.rowStart} / span ${slot.rowSpan}`,
+      }}
       className={cn(
-        "tm-ko-pair",
-        alignLeft ? "tm-ko-pair--left" : "tm-ko-pair--right",
-        !match && "tm-ko-pair--missing",
-        isLive && "tm-ko-pair--live",
-        state === "saved" && "tm-ko-pair--saved",
-        state === "locked" && "tm-ko-pair--locked"
+        "tm-ko-node",
+        slot.round === "final" && "tm-ko-node--final",
+        slot.side === "left" && "tm-ko-node--left",
+        slot.side === "right" && "tm-ko-node--right",
+        slot.side === "center" && "tm-ko-node--center",
+        slot.horizontal && "tm-ko-node--horizontal",
+        !match && "tm-ko-node--missing",
+        isLive && "tm-ko-node--live",
+        state === "saved" && "tm-ko-node--saved",
+        state === "locked" && "tm-ko-node--locked"
       )}
       aria-label={
         match
           ? `Pronostico ${homeName} contra ${awayName}`
-          : `Partido ${matchNumber} sin datos`
+          : `Partido ${slot.matchNumber} sin datos`
       }
     >
-      <BracketTeamSlot name={homeName} />
-      {scoreText.trim() ? <span className="tm-ko-pair-score">{scoreText}</span> : null}
-      <BracketTeamSlot name={awayName} />
+      <span
+        className={cn(
+          "tm-ko-node-pair",
+          slot.horizontal && "tm-ko-node-pair--horizontal"
+        )}
+      >
+        <BracketTeamSlot name={homeName} />
+        {scoreText.trim() ? <span className="tm-ko-node-score">{scoreText}</span> : null}
+        <BracketTeamSlot name={awayName} />
+      </span>
     </button>
   );
 }
@@ -92,20 +106,7 @@ function StaggeredMatchPair({
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
-
-  const rounds = useMemo(
-    () =>
-      KNOCKOUT_STAGGERED_ROUNDS.map((round) => ({
-        ...round,
-        entries: round.matchNumbers
-          .map((matchNumber) => ({
-            matchNumber,
-            match: resolveBracketMatch(matchMap, matchNumber),
-          }))
-          .filter((entry) => entry.match || placeholderPairForMatchNumber(entry.matchNumber)),
-      })).filter((round) => round.entries.length > 0),
-    [matchMap]
-  );
+  const thirdPlaceMatch = resolveBracketMatch(matchMap, BRACKET_THIRD_PLACE.matchNumber);
 
   if (!matches.length) {
     return (
@@ -127,23 +128,37 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
       </div>
 
       <div className="tm-ko-stage">
-        {rounds.map((round) => (
-          <section key={round.key} className="tm-ko-round">
-            <h2 className="tm-ko-round-title">{round.label}</h2>
-            <div className="tm-ko-round-track">
-              {round.entries.map((entry, index) => (
-                <StaggeredMatchPair
-                  key={entry.matchNumber}
-                  match={entry.match}
-                  matchNumber={entry.matchNumber}
-                  index={index}
-                  onOpen={setActiveMatch}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+        <div className="tm-ko-tree" role="img" aria-label="Cuadro de eliminatorias Mundial 2026">
+          {BRACKET_TREE_LAYOUT.map((slot) => (
+            <BracketTreeMatch
+              key={`${slot.side}-${slot.round}-${slot.matchNumber}`}
+              slot={slot}
+              match={resolveBracketMatch(matchMap, slot.matchNumber)}
+              onOpen={setActiveMatch}
+            />
+          ))}
+        </div>
       </div>
+
+      {thirdPlaceMatch ? (
+        <div className="tm-ko-third">
+          <span className="tm-ko-third-label">3.er</span>
+          <button
+            type="button"
+            onClick={() => setActiveMatch(thirdPlaceMatch)}
+            className="tm-ko-third-btn"
+          >
+            <BracketTeamSlot name={thirdPlaceMatch.home_team} />
+            <span className="tm-ko-third-score">
+              {formatListScore(
+                thirdPlaceMatch.prediction?.home_goals ?? null,
+                thirdPlaceMatch.prediction?.away_goals ?? null
+              )}
+            </span>
+            <BracketTeamSlot name={thirdPlaceMatch.away_team} />
+          </button>
+        </div>
+      ) : null}
 
       {activeMatch ? (
         <QuickPredictionModal
