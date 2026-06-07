@@ -87,10 +87,10 @@ export function TabBar() {
   return (
     <nav
       ref={navRef}
-      className="tm-tabbar tm-surface-fade border-t border-[var(--tm-border)] px-1 backdrop-blur-xl"
+      className="tm-tabbar border-t border-[var(--tm-border)] px-1"
       aria-label="Navegacion principal"
     >
-      <ul className="tm-tabbar-inner flex h-12 items-stretch justify-between">
+      <ul className="flex h-12 items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(displayPath, href);
           const navigating = optimisticHref === href;

@@ -45,7 +45,6 @@
   --tm-tabbar-core: 3rem;
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-vvh-offset: 0px;
-  --tm-vvh-height: 100dvh;
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
@@ -113,9 +112,9 @@ html[data-modal-open] main {
 .tm-app-shell {
   position: fixed;
   top: var(--tm-vvh-offset);
-  left: 0;
   right: 0;
-  height: var(--tm-vvh-height);
+  bottom: 0;
+  left: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -555,7 +554,7 @@ html:has(.tm-app-shell) body {
 .tm-quiz-page--viewport {
   display: flex;
   flex-direction: column;
-  min-height: calc(var(--tm-vvh-height) - var(--tm-tabbar-height) - 3.25rem);
+  min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
   padding-top: max(1.25rem, calc(0.875rem + env(safe-area-inset-top, 0px)));
   padding-bottom: 1rem;
 }

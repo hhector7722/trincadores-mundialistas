@@ -1,5 +1,7 @@
-﻿import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+﻿import { Suspense } from "react";
+import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { TabBar } from "@/components/layout/TabBar";
+import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
@@ -12,14 +14,20 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="tm-app-shell relative flex flex-col">
-      <ViewportMetricsSync />
-      <HomeAtmosphere />
-      <AppHeaderGate ctx={ctx} />
-      <main className="tm-app-main relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-        {children}
-      </main>
+    <>
+      <div className="tm-app-shell relative flex flex-col">
+        <ViewportMetricsSync />
+        <Suspense fallback={null}>
+          <ViewportLayoutDebug />
+        </Suspense>
+        <HomeAtmosphere />
+        <AppHeaderGate ctx={ctx} />
+        <main className="tm-app-main relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+          {children}
+        </main>
+      </div>
+      {/* Fuera del shell: overflow:hidden del ancestro rompe fixed bottom en iOS */}
       <TabBar />
-    </div>
+    </>
   );
 }
