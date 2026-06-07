@@ -100,6 +100,18 @@ html[data-modal-open] main {
   -webkit-backdrop-filter: blur(20px);
 }
 
+.tm-app-shell {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+html:has(.tm-app-shell),
+html:has(.tm-app-shell) body {
+  overflow: hidden;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
 .tm-card-surface {
   background: var(--tm-glass);
   backdrop-filter: blur(16px);
@@ -569,6 +581,24 @@ html[data-modal-open] main {
   min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
   height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
   min-width: 0;
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-ranking-head {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.625rem;
+  line-height: 1;
+}
+
+.tm-ranking-row {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  line-height: 1.2;
+}
+
+.tm-ranking-body {
+  -webkit-overflow-scrolling: touch;
 }
 
 @supports (height: 100dvh) {

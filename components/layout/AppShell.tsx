@@ -11,10 +11,12 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-dvh flex-col">
+    <div className="tm-app-shell relative flex h-dvh flex-col overflow-hidden">
       <HomeAtmosphere />
       <AppHeaderGate ctx={ctx} />
-      <main className="relative z-10 flex-1 overflow-y-auto pb-[var(--tm-tabbar-height)]">{children}</main>
+      <main className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-[var(--tm-tabbar-height)]">
+        {children}
+      </main>
       <TabBar />
     </div>
   );
