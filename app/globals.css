@@ -42,14 +42,11 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-content-bottom: var(--tm-tabbar-height);
+  --tm-content-bottom: var(--tm-safe-bottom);
   --tm-vvh-offset: 0px;
   --tm-vvh-height: 100dvh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
-  --tm-tabbar-bg-hex: #2e1260;
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
   --font-ui: var(--font-space), system-ui, sans-serif;
@@ -150,35 +147,7 @@ html:has(.tm-app-shell) body {
 
 html:has(.tm-app-shell) main {
   box-sizing: border-box;
-  padding-bottom: var(--tm-tabbar-height);
-}
-
-.tm-tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  box-sizing: border-box;
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
-  background-color: var(--tm-tabbar-bg-hex);
-  background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-/* Smartphone: TabBar al fondo del visual viewport (sin chin bajo la barra en iOS PWA) */
-@media (max-width: 639px) {
-  .tm-tabbar {
-    position: relative;
-    flex-shrink: 0;
-    width: 100%;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  html:has(.tm-app-shell) main {
-    padding-bottom: 0;
-  }
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .tm-card-surface {
@@ -572,7 +541,7 @@ html:has(.tm-app-shell) main {
   }
 }
 
-/* ── Quiz: clearance de TabBar lo reserva el flex del shell (sin padding duplicado en main) ── */
+/* ── Quiz ── */
 .tm-quiz-page {
   scroll-padding-bottom: 1.25rem;
 }

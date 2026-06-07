@@ -1,6 +1,5 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
-import { TabBar } from "@/components/layout/TabBar";
 import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
@@ -31,7 +30,6 @@ export function AppShell({
       <main className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-[var(--tm-shell-bg-hex)]">
         {children}
       </main>
-      <TabBar />
     </div>
   );
 }
