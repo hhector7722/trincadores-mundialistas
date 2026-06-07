@@ -1,3 +1,4 @@
+import { TabBarDebug } from "@/components/debug/TabBarDebug";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
@@ -41,13 +42,7 @@ export default async function HomePage() {
   return (
     <div className="relative z-10 space-y-3 p-4 pb-[calc(var(--tm-tabbar-height)+1rem)]">
       {/* TEMPORAL DEBUG - borrar después */}
-      <div className="fixed top-0 left-0 z-50 bg-black text-white text-xs p-2">
-        tabbar: <span id="tbh"></span>
-      </div>
-      <script dangerouslySetInnerHTML={{__html: `
-  document.getElementById('tbh').textContent = 
-  getComputedStyle(document.documentElement).getPropertyValue('--tm-tabbar-height')
-`}} />
+      <TabBarDebug />
       <HomeHero pendingCount={pending} quizSlide={quizSlide} />
       <HomeStandingCard standing={standing} />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
