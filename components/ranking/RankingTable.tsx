@@ -33,7 +33,10 @@ export function RankingTable({
         <span>Fiab</span>
         <span>Quiz</span>
       </div>
-      <div className="tm-ranking-body min-h-0 flex-1 overflow-y-auto">
+      <div
+        className="tm-ranking-body grid min-h-0 flex-1 overflow-hidden"
+        style={{ gridTemplateRows: `repeat(${rows.length}, minmax(0, 1fr))` }}
+      >
         {rows.map((row) => (
           <RankingRow
             key={row.profileId}

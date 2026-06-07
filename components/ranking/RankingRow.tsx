@@ -19,14 +19,14 @@ export function RankingRow({
       href={`/profile/${row.profileId}`}
       className={cn(
         RANKING_GRID,
-        "tm-ranking-row min-h-0 border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+        "tm-ranking-row h-full min-h-0 w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatar avatarUrl={row.avatarUrl} label={row.label} className="h-7 w-7 shrink-0" />
+      <ProfileAvatar avatarUrl={row.avatarUrl} label={row.label} className="size-7 shrink-0" />
       <span
         className={cn(
           "min-w-0 truncate text-xs font-medium",

@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T11:32:12.360Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T11:36:47.528Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -116,6 +116,7 @@ flowchart TB
 |---------|-----|
 | `app/(app)/layout.tsx` | Auth/pool guard |
 | `app/(app)/predictions/layout.tsx` | Shell visual |
+| `app/(app)/ranking/layout.tsx` | Shell visual |
 | `app/(auth)/layout.tsx` | Shell visual |
 | `app/layout.tsx` | Shell visual |
 
@@ -163,7 +164,13 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `EntityModalController` | `components/lineup/EntityModalController.tsx` | client | EntityModalController, buildLineupView, buildMvpView |
+| `LineupModalPanel` | `components/lineup/LineupModalPanel.tsx` | client | LineupModalPanel |
 | `LineupPlayerChip` | `components/lineup/LineupPlayerChip.tsx` | server | LineupPlayerChip |
+| `MatchContextActionButton` | `components/lineup/MatchContextActionButton.tsx` | client | MatchContextActionButton |
+| `MatchContextActionsRow` | `components/lineup/MatchContextActionsRow.tsx` | client | MatchContextActionsRow |
+| `MvpPredictionPanel` | `components/lineup/MvpPredictionPanel.tsx` | client | MvpPredictionPanel |
+| `PlayerDetailPanel` | `components/lineup/PlayerDetailPanel.tsx` | client | PlayerDetailPanel |
 | `ProbableXI` | `components/lineup/ProbableXI.tsx` | server | ProbableXI |
 | `TeamLineupGraphic` | `components/lineup/TeamLineupGraphic.tsx` | server | TeamLineupGraphic |
 
@@ -271,6 +278,12 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `signOut` | `actions/auth.ts` | `export async function signOut(): Promise<void> ` |
 | `setActivePool` | `actions/auth.ts` | `export async function setActivePool(poolId: string): Promise<AuthActionResult> ` |
 | `AuthActionResult` | `actions/auth.ts` | `AuthActionResult` |
+| `fetchTeamSquadAction` | `actions/lineup.ts` | `export async function fetchTeamSquadAction( teamName: string ): Promise<LineupAc` |
+| `fetchPlayerDetailAction` | `actions/lineup.ts` | `export async function fetchPlayerDetailAction( teamName: string, playerName: str` |
+| `fetchMatchSquadsAction` | `actions/lineup.ts` | `export async function fetchMatchSquadsAction( homeTeam: string, awayTeam: string` |
+| `LineupActionResult` | `actions/lineup.ts` | `LineupActionResult` |
+| `saveMvpPrediction` | `actions/mvp-predictions.ts` | `export async function saveMvpPrediction( poolId: string, matchId: string, player` |
+| `MvpPredictionActionResult` | `actions/mvp-predictions.ts` | `MvpPredictionActionResult` |
 | `savePrediction` | `actions/predictions.ts` | `export async function savePrediction( poolId: string, matchId: string, homeGoals` |
 | `PredictionActionResult` | `actions/predictions.ts` | `PredictionActionResult` |
 | `startQuiz` | `actions/quiz.ts` | `export async function startQuiz( poolId: string, quizId: string ): Promise<QuizA` |
@@ -322,11 +335,13 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/fjelstul-worldcup/normalize.ts` | 274 líneas | isWomenTournament, isMenTournament, inferGender, onlyMenTournaments, menTournamentExternalIds, filterByMenTournaments, playerDisplayName, normalizeTournaments, normalizeTeams, normalizeStadiums, normalizeMatches, normalizeGoals, normalizeAwardWinners, normalizeStandings, normalizeSquads, assertErrorRate, WOMENS_WC_TOURNAMENT_IDS, NormalizeStats |
 | `lib/fjelstul-worldcup/parse-csv.ts` | 79 líneas | parseCsvContent, readBool, readInt, readOptionalText, CsvRow |
 
-**lineup/** — 4 archivos
+**lineup/** — 6 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/lineup/bench-players.ts` | 30 líneas | getBenchPlayers, BenchPlayer |
 | `lib/lineup/build-probable-xi.ts` | 126 líneas | buildProbableXI |
+| `lib/lineup/player-detail.ts` | 54 líneas | getPlayerDetail, PlayerDetail |
 | `lib/lineup/position-map.ts` | 86 líneas | normalizePositionRole, positionLabelEs, formationRoleCounts, pickFormation, coordinatesForFormation |
 | `lib/lineup/squad-name.ts` | 32 líneas | squadTeamNameFromSlug, squadSlugFromTeamName |
 | `lib/lineup/types.ts` | 30 líneas | PositionRole, FormationId, LineupPlayerInput, LineupPlayer, FieldCoordinate, LineupSlot, ProbableXIResult |
@@ -366,13 +381,14 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 | `lib/pool/tournament-stats.ts` | 70 líneas | tournamentHasGoals, getTournamentTopScorers, getTournamentStatRows, TournamentScorerRow, TournamentStatRow, TournamentStatKind |
 
-**predictions/** — 5 archivos
+**predictions/** — 6 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
-| `lib/predictions/queries.ts` | 338 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/mvp-queries.ts` | 50 líneas | fetchMvpPredictionsForMatches, getMvpPredictionForMatch, MvpPrediction |
+| `lib/predictions/queries.ts` | 346 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
@@ -447,6 +463,12 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/teams/display.ts` | 82 líneas | teamNameEs, teamAbbr, formatMatchCalendarAbbr |
 | `lib/teams/flags.ts` | 62 líneas | teamFlagCode, teamFlagUrl |
 
+**ui/** — 1 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/ui/use-panel-slide-stack.ts` | 132 líneas | usePanelSlideStack |
+
 **utils.ts/** — 1 archivos
 
 | Archivo | Tamaño | Exports |
@@ -486,10 +508,10 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 11 archivos en `supabase/migrations/` |
-| Tablas | 38 |
+| Migraciones | 12 archivos en `supabase/migrations/` |
+| Tablas | 39 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
-| Funciones SQL | 13 |
+| Funciones SQL | 15 |
 | Políticas RLS | 0 |
 | Vistas | quiz_leaderboard, quiz_questions_public |
 
@@ -530,6 +552,7 @@ erDiagram
 | `host_cities` | Ver migraciones SQL | RLS habilitado |
 | `invite_codes` | Códigos de invitación (solo RPC, sin SELECT directo) | RLS habilitado |
 | `match_live_state` | Ver migraciones SQL | RLS habilitado |
+| `match_mvp_predictions` | Ver migraciones SQL | RLS habilitado |
 | `match_results` | Marcador oficial (1:1 con match) | RLS habilitado |
 | `matchdays` | Jornadas de competición dentro de una porra | RLS habilitado |
 | `matches` | Partidos con kickoff, equipos y status | RLS habilitado |
@@ -587,6 +610,7 @@ erDiagram
 |---------|------|
 | `can_view_peer_predictions` | RPC / trigger |
 | `compute_match_points` | RPC / trigger |
+| `compute_mvp_points` | RPC / trigger |
 | `consume_invite_and_join` | RPC / trigger |
 | `expire_stale_quiz_attempts` | RPC / trigger |
 | `generate_news_batch` | RPC / trigger |
@@ -595,6 +619,7 @@ erDiagram
 | `is_pool_owner` | RPC / trigger |
 | `prediction_edit_allowed` | RPC / trigger |
 | `rebuild_pool_member_scores` | RPC / trigger |
+| `recalculate_match_mvp_scores` | RPC / trigger |
 | `recalculate_match_scores` | RPC / trigger |
 | `start_quiz_attempt` | RPC / trigger |
 | `submit_quiz_attempt` | RPC / trigger |
@@ -612,6 +637,7 @@ erDiagram
 - `supabase/migrations/20260607120000_quiz_training_replay.sql` (128 líneas)
 - `supabase/migrations/20260607140000_quiz_play_keys_owner.sql` (129 líneas)
 - `supabase/migrations/20260608000000_worldcup_external_data.sql` (285 líneas)
+- `supabase/migrations/20260608120000_match_mvp_predictions.sql` (177 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -802,13 +828,13 @@ docs/               → AUTH, RLS, SEED
 | Archivo | Líneas | Nota |
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
+| `components/predictions/QuickPredictionModal.tsx` | 529 | Revisar extracción |
 | `components/predictions/PredictionsCalendar.tsx` | 389 | Revisar extracción |
 | `lib/ranking/queries.ts` | 388 | Revisar extracción |
+| `lib/predictions/queries.ts` | 346 | Revisar extracción |
 | `lib/quiz/queries.ts` | 342 | Revisar extracción |
-| `lib/predictions/queries.ts` | 338 | Revisar extracción |
-| `components/predictions/QuickPredictionModal.tsx` | 327 | Revisar extracción |
+| `components/ui/modal.tsx` | 337 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
-| `components/ui/modal.tsx` | 311 | Revisar extracción |
 
 ### Código posiblemente sin uso
 

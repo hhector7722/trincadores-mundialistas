@@ -623,13 +623,11 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-ranking-row {
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
   line-height: 1.2;
 }
 
 .tm-ranking-body {
-  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
 /* ── Porra: calendario a pantalla completa ── */
