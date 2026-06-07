@@ -144,13 +144,20 @@ html[data-modal-open] .tm-app-main {
   background-color: var(--tm-shell-bg-hex);
 }
 
+.tm-app-main::after {
+  content: "";
+  display: block;
+  height: var(--tm-tabbar-height);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
 .tm-app-main-inner {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 100%;
-  padding-bottom: var(--tm-tabbar-height);
 }
 
 .tm-spinner {
