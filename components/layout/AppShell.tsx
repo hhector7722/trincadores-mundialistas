@@ -1,10 +1,18 @@
 ﻿import { Suspense } from "react";
+import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
+import type { AppShellContext } from "@/lib/pool/active-pool";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  ctx,
+  children,
+}: {
+  ctx: AppShellContext;
+  children: React.ReactNode;
+}) {
   return (
     <div className="tm-app-shell">
       <ViewportMetricsInlineScript />
@@ -13,7 +21,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <ViewportLayoutDebug />
       </Suspense>
       <HomeAtmosphere />
-      <main className="tm-app-main">{children}</main>
+      <div className="tm-app-frame">
+        <AppHeaderGate ctx={ctx} />
+        <main className="tm-app-main">{children}</main>
+      </div>
     </div>
   );
 }

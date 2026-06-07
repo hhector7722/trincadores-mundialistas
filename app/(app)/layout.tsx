@@ -32,5 +32,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return <AppShell>{children}</AppShell>;
+  return <AppShell ctx={ctx}>{children}</AppShell>;
 }

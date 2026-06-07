@@ -41,8 +41,8 @@
   --tm-radius-lg: 24px;
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
-  --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tm-content-bottom: var(--tm-safe-bottom);
+  --tm-safe-bottom: 0px;
+  --tm-content-bottom: 0px;
   --tm-vvh-offset: 0px;
   --tm-vvh-height: 100dvh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
@@ -124,16 +124,23 @@ html[data-modal-open] .tm-app-main {
   background-color: var(--tm-shell-bg-hex);
 }
 
-.tm-app-main {
-  box-sizing: border-box;
+.tm-app-frame {
   position: absolute;
   inset: 0;
   z-index: 10;
   display: flex;
   min-height: 0;
   flex-direction: column;
+}
+
+.tm-app-main {
+  box-sizing: border-box;
+  position: relative;
+  min-height: 0;
+  flex: 1 1 0%;
+  overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
   background-color: var(--tm-shell-bg-hex);
 }
@@ -142,10 +149,9 @@ html[data-modal-open] .tm-app-main {
   overflow: hidden;
 }
 
-.tm-app-main > * {
-  flex: 1 1 auto;
+.tm-app-main > .tm-porra-layout {
+  height: 100%;
   min-height: 0;
-  min-width: 0;
 }
 
 html:has(.tm-app-shell) {
