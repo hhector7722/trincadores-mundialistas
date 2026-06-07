@@ -57,7 +57,10 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
 
   return (
     <>
-      <section className="tm-glass-card overflow-visible p-0">
+      <section
+        className="tm-glass-card cursor-pointer overflow-visible p-0"
+        onClick={() => openScoreModal()}
+      >
         <div className="px-4 pb-3 pt-2">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
@@ -65,6 +68,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
             </p>
             <Link
               href="/predictions"
+              onClick={(event) => event.stopPropagation()}
               className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
             >
               Ver todos
@@ -76,6 +80,8 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               awayTeam={match.away_team}
               kickoffAt={match.kickoff_at}
               isLive={isLive}
+              onHomeTeamClick={() => openEntityModal(buildLineupView(match.home_team))}
+              onAwayTeamClick={() => openEntityModal(buildLineupView(match.away_team))}
               centerSlot={
                 <div className="inline-block">
                   <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
@@ -115,14 +121,16 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               }
             />
           </div>
-          <MatchContextActionsRow
-            compact
-            className="mt-2 [&>div]:min-h-0"
-            match={match}
-            onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
-            onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
-            onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
-          />
+          <div onClick={(event) => event.stopPropagation()}>
+            <MatchContextActionsRow
+              compact
+              className="mt-2 [&>div]:min-h-0"
+              match={match}
+              onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
+              onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
+              onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
+            />
+          </div>
         </div>
       </section>
 

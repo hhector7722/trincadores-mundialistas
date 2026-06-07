@@ -1,13 +1,15 @@
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
+import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
-function TeamBlock({ name }: { name: string }) {
+function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
   const flagCode = teamFlagCode(name);
+  const displayName = teamNameEs(name);
 
-  return (
-    <div className="inline-flex w-max flex-col items-center gap-1">
+  const content = (
+    <>
       <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] sm:h-11 sm:w-11">
         {flagCode ? (
           <img
@@ -24,9 +26,27 @@ function TeamBlock({ name }: { name: string }) {
         )}
       </div>
       <p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-[var(--tm-fg)] sm:text-xs">
-        {name}
+        {displayName}
       </p>
-    </div>
+    </>
+  );
+
+  if (!onClick) {
+    return <div className="inline-flex w-max flex-col items-center gap-1">{content}</div>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
+      aria-label={`Ver alineación de ${displayName}`}
+    >
+      {content}
+    </button>
   );
 }
 
@@ -39,6 +59,8 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
+  onHomeTeamClick?: () => void;
+  onAwayTeamClick?: () => void;
 };
 
 export function MatchTeamsDisplay({
@@ -50,6 +72,8 @@ export function MatchTeamsDisplay({
   showSectionLabel = false,
   centerKickoff = false,
   centerSlot,
+  onHomeTeamClick,
+  onAwayTeamClick,
 }: MatchTeamsDisplayProps) {
   return (
     <>
@@ -61,11 +85,11 @@ export function MatchTeamsDisplay({
 
       <div className={cn("relative w-full min-h-[4.25rem]", showSectionLabel && "mt-2")}>
         <div className="absolute left-[15%] top-0 -translate-x-1/2">
-          <TeamBlock name={homeTeam} />
+          <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
         </div>
 
         <div className="absolute left-[85%] top-0 -translate-x-1/2">
-          <TeamBlock name={awayTeam} />
+          <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
         </div>
 
         <div

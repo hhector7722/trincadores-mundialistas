@@ -255,6 +255,8 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
+                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team))}
+                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team))}
                 centerSlot={
                   <div className="inline-block origin-top scale-[0.88] sm:scale-100">
                     <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
