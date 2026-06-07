@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { cn } from "@/lib/utils";
 
 type CalendarSidebarAccessDockProps = {
@@ -16,12 +16,18 @@ export function CalendarSidebarAccessDock({
   onOpenSquads,
   className,
 }: CalendarSidebarAccessDockProps) {
+  const { navigate } = useAppNavigation();
+
   return (
     <div className={cn("tm-cal-sidebar-access-dock shrink-0", className)}>
       <div className="tm-cal-sidebar-access-grid">
-        <Link href="/predictions/knockout" className="tm-cal-sidebar-access-btn">
+        <button
+          type="button"
+          onClick={() => navigate("/predictions/knockout")}
+          className="tm-cal-sidebar-access-btn"
+        >
           Ver cuadro
-        </Link>
+        </button>
         <button type="button" onClick={onOpenAllGroups} className="tm-cal-sidebar-access-btn">
           Ver grupos
         </button>
