@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
-import { useKnockoutFooterAlign } from "@/components/predictions/useKnockoutFooterAlign";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
@@ -13,7 +12,7 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  applyQfFooterAlignment,
+  applyQfOppositeFooterAlignment,
   buildBracketConnectorPaths,
   buildBracketGeometry,
   FINAL_CENTER_X,
@@ -35,8 +34,9 @@ type KnockoutBracketProps = {
   matches: MatchWithPrediction[];
 };
 
-const BASE_BRACKET_GEOMETRY = buildBracketGeometry();
-const FINAL_CENTER_Y = finalCenterYFromGeometry(BASE_BRACKET_GEOMETRY);
+const BRACKET_GEOMETRY = applyQfOppositeFooterAlignment(buildBracketGeometry());
+const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
+const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 
 function BracketTeamRow({
   name,
@@ -131,20 +131,8 @@ function BracketMatchCard({
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const { navigate } = useAppNavigation();
   const pageRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
-  const footerAlign = useKnockoutFooterAlign(canvasRef, footerRef);
-
-  const bracketGeometry = useMemo(
-    () => applyQfFooterAlignment(BASE_BRACKET_GEOMETRY, footerAlign),
-    [footerAlign]
-  );
-  const bracketConnectors = useMemo(
-    () => buildBracketConnectorPaths(bracketGeometry),
-    [bracketGeometry]
-  );
 
   useKnockoutViewportLayout(pageRef);
 
@@ -160,7 +148,6 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
     <div ref={pageRef} className="tm-ko-page">
       <div className="tm-ko-stage">
         <div
-          ref={canvasRef}
           className="tm-ko-canvas"
           role="img"
           aria-label="Cuadro de eliminatorias Mundial 2026"
@@ -173,7 +160,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             preserveAspectRatio="none"
             aria-hidden
           >
-            {bracketConnectors.map((segment, index) => (
+            {BRACKET_CONNECTORS.map((segment, index) => (
               <path
                 key={`wire-${index}`}
                 d={segment.d}
@@ -206,7 +193,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           </div>
 
           <div className="tm-ko-nodes">
-            {bracketGeometry.map((geom) => (
+            {BRACKET_GEOMETRY.map((geom) => (
               <BracketMatchCard
                 key={geom.matchNumber}
                 geom={geom}
@@ -216,7 +203,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             ))}
           </div>
 
-          <div ref={footerRef} className="tm-ko-footer shrink-0">
+          <div className="tm-ko-footer shrink-0">
             <MatchContextActionButton
               caption="Ver fase Prévia"
               emptyLabel="Ver fase Prévia"

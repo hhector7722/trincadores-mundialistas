@@ -154,25 +154,29 @@ export function buildColumnCenters(): readonly number[] {
   return x;
 }
 
-export type FooterButtonAlignX = {
-  leftPct: number;
-  rightPct: number;
-};
+/** Referencia del botón «Ver fase Prévia» (52vw centrado ≈ 24%–76%). */
+export const FOOTER_BUTTON_ALIGN_REF = { leftPct: 24, rightPct: 76 } as const;
 
-/** Alinea cuartos: borde derecho izq. = inicio del botón; borde izq. der. = fin del botón. */
-export function applyQfFooterAlignment(
-  geoms: readonly BracketMatchGeometry[],
-  align: FooterButtonAlignX
+/**
+ * Invierte el desplazamiento del ajuste anterior (borde cuarto ↔ borde botón):
+ * misma magnitud, sentido opuesto respecto a la columna natural.
+ */
+export function applyQfOppositeFooterAlignment(
+  geoms: readonly BracketMatchGeometry[]
 ): BracketMatchGeometry[] {
   return geoms.map((geom) => {
     if (geom.round !== "qf") return geom;
 
     const half = CARD_HALF_WIDTH_BASE * geom.layoutScale;
+    const baseX = mapColumnX(geom.column);
+
     if (geom.side === "left") {
-      return { ...geom, columnX: align.leftPct - half };
+      const footerColX = FOOTER_BUTTON_ALIGN_REF.leftPct - half;
+      return { ...geom, columnX: baseX - (footerColX - baseX) };
     }
     if (geom.side === "right") {
-      return { ...geom, columnX: align.rightPct + half };
+      const footerColX = FOOTER_BUTTON_ALIGN_REF.rightPct + half;
+      return { ...geom, columnX: baseX - (footerColX - baseX) };
     }
     return geom;
   });
