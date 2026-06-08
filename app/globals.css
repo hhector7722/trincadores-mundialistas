@@ -353,14 +353,13 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
-html[data-modal-open] .tm-bottom-chrome,
-html[data-modal-open] .tm-tab-indicators-float {
+html[data-modal-open] .tm-bottom-chrome {
   filter: blur(6px);
   opacity: 0.35;
   pointer-events: none;
 }
 
-/* Chrome inferior: solo TabBar opaca; indicadores flotan en tm-app-frame. */
+/* Chrome inferior: indicadores + TabBar, anclado al borde (patrón marbella). */
 .tm-bottom-chrome {
   position: fixed;
   right: 0;
@@ -370,47 +369,33 @@ html[data-modal-open] .tm-tab-indicators-float {
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  min-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   flex-direction: column;
   justify-content: flex-end;
-  padding-bottom: var(--tm-safe-bottom);
-  background: transparent;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
 
-/* Placeholder SSR: bloque sólido hasta que el portal hidrate encima. */
 .tm-bottom-chrome-placeholder {
+  height: var(--tm-content-bottom);
   pointer-events: none;
+  background-color: var(--tm-tabbar-bg-hex);
 }
 
 html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
   display: none;
 }
 
-/* Home indicator: pintura instantánea bajo el viewport (iOS PWA). */
-html:has(.tm-app-frame)::after {
-  content: "";
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 94;
-  height: var(--tm-safe-bottom);
-  background-color: var(--tm-tabbar-bg-hex);
-  pointer-events: none;
-}
-
-.tm-tab-indicators-float {
-  bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  min-height: var(--tm-tab-indicators-core);
-  background: transparent;
-}
-
 .tm-tab-indicators-slot {
   flex-shrink: 0;
   min-height: var(--tm-tab-indicators-core);
   background: transparent;
+}
+
+.tm-fixed-bottombar {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--tm-tabbar-core);
+  align-items: flex-end;
 }
 
 .tm-tab-swipe-root--dragging {
@@ -435,12 +420,6 @@ html:has(.tm-tab-swipe-root) {
   box-shadow:
     -12px 0 32px rgba(0, 0, 0, 0.22),
     12px 0 32px rgba(0, 0, 0, 0.22);
-}
-
-.tm-fixed-bottombar {
-  box-sizing: border-box;
-  min-height: var(--tm-tabbar-core);
-  align-items: flex-end;
 }
 
 /* Overscroll: arriba tono cabecera, abajo tono TabBar */

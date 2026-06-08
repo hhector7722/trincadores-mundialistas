@@ -1,5 +1,6 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
+import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -76,7 +77,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
-      <body className="antialiased touch-manipulation">{children}</body>
+      <body className="antialiased touch-manipulation">
+        <ViewportMetricsInlineScript />
+        {children}
+      </body>
     </html>
   );
 }
