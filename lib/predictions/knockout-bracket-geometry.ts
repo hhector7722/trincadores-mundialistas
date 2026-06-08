@@ -1,12 +1,16 @@
 import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 
-export const BRACKET_LEAF_SLOTS = 16;
-export const BRACKET_VERTICAL_PAD_TOP = 1;
-export const BRACKET_VERTICAL_PAD_BOTTOM = 0.35;
-export const BRACKET_VERTICAL_COMPACT = 1;
+/** Banda inferior del canvas reservada para el botón «Ver fase Prévia». */
+export const BRACKET_FOOTER_BAND_Y = 10;
 
-/** Empuja octavos hacia el centro para separarlos de los dieciseisavos. */
-const R16_CENTER_NUDGE = 1.85;
+/** Ancla inferior: 1G vs 3º (M82) y 2D vs 2G (M88), alineados con el footer. */
+export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
+
+/** Ancla superior de dieciseisavos (simétrico arriba/abajo). */
+export const R32_TOP_ANCHOR_Y = 3.5;
+
+const R32_SLOT_COUNT = 8;
+const R32_PAIR_HALF = 0.9;
 
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
@@ -155,40 +159,37 @@ const RIGHT_R16 = [91, 92, 95, 96] as const;
 const RIGHT_QF = [99, 100] as const;
 const RIGHT_SF = [102] as const;
 
-export function compactY(y: number): number {
-  return 50 + (y - 50) * BRACKET_VERTICAL_COMPACT;
-}
-
-function scaleY(raw: number): number {
-  const usable = 100 - BRACKET_VERTICAL_PAD_TOP - BRACKET_VERTICAL_PAD_BOTTOM;
-  const linear = BRACKET_VERTICAL_PAD_TOP + (raw / 100) * usable;
-  return compactY(linear);
-}
-
-function nudgeRoundTowardCenter(
-  geoms: BracketMatchGeometry[],
-  round: BracketRoundKey,
-  amount: number
-) {
-  for (const geom of geoms) {
-    if (geom.round !== round) continue;
-    if (Math.abs(geom.midY - 50) < 0.01) continue;
-
-    const delta = geom.midY < 50 ? amount : -amount;
-    geom.homeY += delta;
-    geom.awayY += delta;
-    geom.midY += delta;
-  }
-}
-
-export function leafSpanY(startLeaf: number, leafSpan: number) {
-  const homeRaw = ((startLeaf + leafSpan / 4) / BRACKET_LEAF_SLOTS) * 100;
-  const awayRaw = ((startLeaf + (3 * leafSpan) / 4) / BRACKET_LEAF_SLOTS) * 100;
-  const midRaw = ((startLeaf + leafSpan / 2) / BRACKET_LEAF_SLOTS) * 100;
+function r32YFromSlot(slotIndex: number) {
+  const t = slotIndex / (R32_SLOT_COUNT - 1);
+  const midY = R32_TOP_ANCHOR_Y + t * (R32_BOTTOM_ANCHOR_Y - R32_TOP_ANCHOR_Y);
   return {
-    homeY: scaleY(homeRaw),
-    awayY: scaleY(awayRaw),
-    midY: scaleY(midRaw),
+    midY,
+    homeY: midY - R32_PAIR_HALF,
+    awayY: midY + R32_PAIR_HALF,
+  };
+}
+
+function findMatch(
+  matches: BracketMatchGeometry[],
+  matchNumber: number
+): BracketMatchGeometry {
+  const match = matches.find((entry) => entry.matchNumber === matchNumber);
+  if (!match) {
+    throw new Error(`Missing bracket match ${matchNumber}`);
+  }
+  return match;
+}
+
+function yFromChildPair(
+  childA: BracketMatchGeometry,
+  childB: BracketMatchGeometry
+) {
+  const top = childA.midY <= childB.midY ? childA : childB;
+  const bottom = childA.midY <= childB.midY ? childB : childA;
+  return {
+    midY: (top.midY + bottom.midY) / 2,
+    homeY: top.homeY,
+    awayY: bottom.awayY,
   };
 }
 
@@ -209,19 +210,39 @@ export function cardEdgeX(
   return edge === "left" ? columnX - half : columnX + half;
 }
 
-function pushRound(
+function pushR32Side(
+  out: BracketMatchGeometry[],
+  matchNumbers: readonly number[],
+  side: "left" | "right",
+  column: number
+) {
+  matchNumbers.forEach((matchNumber, slotIndex) => {
+    out.push({
+      matchNumber,
+      round: "r32",
+      side,
+      column,
+      ...r32YFromSlot(slotIndex),
+      columnX: mapColumnX(column),
+      layoutScale: ROUND_LAYOUT_SCALE.r32,
+    });
+  });
+}
+
+function pushRoundFromChildren(
   out: BracketMatchGeometry[],
   matchNumbers: readonly number[],
   round: BracketRoundKey,
   side: "left" | "right",
   column: number,
-  leafSpan: number,
-  childGroups?: readonly number[][]
+  childGroups: readonly [number, number][]
 ) {
   matchNumbers.forEach((matchNumber, index) => {
-    const startLeaf = index * leafSpan;
-    const y = leafSpanY(startLeaf, leafSpan);
-    const childMatches = childGroups?.[index] as [number, number] | undefined;
+    const [childANumber, childBNumber] = childGroups[index];
+    const y = yFromChildPair(
+      findMatch(out, childANumber),
+      findMatch(out, childBNumber)
+    );
     out.push({
       matchNumber,
       round,
@@ -230,7 +251,7 @@ function pushRound(
       ...y,
       columnX: mapColumnX(column),
       layoutScale: ROUND_LAYOUT_SCALE[round],
-      childMatches,
+      childMatches: [childANumber, childBNumber],
     });
   });
 }
@@ -238,31 +259,32 @@ function pushRound(
 export function buildBracketGeometry(): BracketMatchGeometry[] {
   const matches: BracketMatchGeometry[] = [];
 
-  pushRound(matches, LEFT_R32, "r32", "left", 0, 2);
-  pushRound(matches, LEFT_R16, "r16", "left", 1, 4, [
+  pushR32Side(matches, LEFT_R32, "left", 0);
+  pushR32Side(matches, RIGHT_R32, "right", 8);
+
+  pushRoundFromChildren(matches, LEFT_R16, "r16", "left", 1, [
     [LEFT_R32[0], LEFT_R32[1]],
     [LEFT_R32[2], LEFT_R32[3]],
     [LEFT_R32[4], LEFT_R32[5]],
     [LEFT_R32[6], LEFT_R32[7]],
   ]);
-  pushRound(matches, LEFT_QF, "qf", "left", 2, 8, [
+  pushRoundFromChildren(matches, LEFT_QF, "qf", "left", 2, [
     [LEFT_R16[0], LEFT_R16[1]],
     [LEFT_R16[2], LEFT_R16[3]],
   ]);
-  pushRound(matches, LEFT_SF, "sf", "left", 3, 16, [[LEFT_QF[0], LEFT_QF[1]]]);
+  pushRoundFromChildren(matches, LEFT_SF, "sf", "left", 3, [[LEFT_QF[0], LEFT_QF[1]]]);
 
-  pushRound(matches, RIGHT_R32, "r32", "right", 8, 2);
-  pushRound(matches, RIGHT_R16, "r16", "right", 7, 4, [
+  pushRoundFromChildren(matches, RIGHT_R16, "r16", "right", 7, [
     [RIGHT_R32[0], RIGHT_R32[1]],
     [RIGHT_R32[2], RIGHT_R32[3]],
     [RIGHT_R32[4], RIGHT_R32[5]],
     [RIGHT_R32[6], RIGHT_R32[7]],
   ]);
-  pushRound(matches, RIGHT_QF, "qf", "right", 6, 8, [
+  pushRoundFromChildren(matches, RIGHT_QF, "qf", "right", 6, [
     [RIGHT_R16[0], RIGHT_R16[1]],
     [RIGHT_R16[2], RIGHT_R16[3]],
   ]);
-  pushRound(matches, RIGHT_SF, "sf", "right", 5, 16, [[RIGHT_QF[0], RIGHT_QF[1]]]);
+  pushRoundFromChildren(matches, RIGHT_SF, "sf", "right", 5, [[RIGHT_QF[0], RIGHT_QF[1]]]);
 
   matches.push({
     matchNumber: 104,
@@ -276,8 +298,6 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
     layoutScale: ROUND_LAYOUT_SCALE.final,
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],
   });
-
-  nudgeRoundTowardCenter(matches, "r16", R16_CENTER_NUDGE);
 
   return matches;
 }

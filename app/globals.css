@@ -746,6 +746,7 @@ html[data-modal-open] main {
   --tm-ko-card-border: rgba(255, 255, 255, 0.1);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
   --tm-ko-card-width: min(13.5cqw, 68px);
+  --tm-ko-footer-band: 10%;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -834,11 +835,23 @@ html[data-modal-open] main {
 }
 
 .tm-ko-footer {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
-  flex-shrink: 0;
+  height: var(--tm-ko-footer-band);
+  align-items: center;
   justify-content: center;
   border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
-  padding: 0.5rem 1rem 0.65rem;
+  padding-inline: 1rem;
+  pointer-events: none;
+}
+
+.tm-ko-footer > * {
+  pointer-events: auto;
+  max-width: min(52vw, 14rem);
 }
 
 .tm-ko-card {

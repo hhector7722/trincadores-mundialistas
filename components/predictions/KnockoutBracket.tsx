@@ -190,15 +190,15 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
               />
             ))}
           </div>
-        </div>
-      </div>
 
-      <div className="tm-ko-footer shrink-0">
-        <MatchContextActionButton
-          caption="Ver fase Prévia"
-          emptyLabel="Ver fase Prévia"
-          onClick={() => navigate("/predictions")}
-        />
+          <div className="tm-ko-footer shrink-0">
+            <MatchContextActionButton
+              caption="Ver fase Prévia"
+              emptyLabel="Ver fase Prévia"
+              onClick={() => navigate("/predictions")}
+            />
+          </div>
+        </div>
       </div>
 
       {activeMatch ? (
