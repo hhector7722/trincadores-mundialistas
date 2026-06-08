@@ -39,6 +39,12 @@ const GOYA_WIDTH_BOTTOM = 1;
 const GOYA_SCALE_TOP = 0.74;
 const GOYA_SCALE_BOTTOM = 1;
 
+/** Visitante: medios y delanteros hacia su portería (arriba). */
+const AWAY_MF_FW_SHIFT_Y = -2;
+
+/** Local: solo delanteros alejados de su portería (abajo). */
+const HOME_FW_SHIFT_Y = -2;
+
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
 function lineupDepth(y: number): number {
@@ -81,6 +87,16 @@ export function goyaScaleFactor(y: number): number {
   return GOYA_SCALE_TOP + t * (GOYA_SCALE_BOTTOM - GOYA_SCALE_TOP);
 }
 
+function applyAwayAttackLineShift(slot: LineupSlot): LineupSlot {
+  if (slot.role !== "MF" && slot.role !== "FW") return slot;
+  return { ...slot, y: slot.y + AWAY_MF_FW_SHIFT_Y };
+}
+
+function applyHomeForwardShift(slot: LineupSlot): LineupSlot {
+  if (slot.role !== "FW") return slot;
+  return { ...slot, y: slot.y + HOME_FW_SHIFT_Y };
+}
+
 export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
   const width = goyaWidthFactor(slot.y);
   const scale = goyaScaleFactor(slot.y);
@@ -91,10 +107,20 @@ export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
   };
 }
 
+function mapSlotToHomeHalf(slot: LineupSlot): MatchFieldSlot {
+  const positioned = applyHomeForwardShift({ ...slot, ...mapToHomeHalf(slot) });
+  return applyGoyaPerspective(positioned);
+}
+
+function mapSlotToAwayHalf(slot: LineupSlot): MatchFieldSlot {
+  const positioned = applyAwayAttackLineShift({ ...slot, ...mapToAwayHalf(slot) });
+  return applyGoyaPerspective(positioned);
+}
+
 export function mapSlotsToHomeHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return slots.map((slot) => applyGoyaPerspective({ ...slot, ...mapToHomeHalf(slot) }));
+  return slots.map(mapSlotToHomeHalf);
 }
 
 export function mapSlotsToAwayHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return slots.map((slot) => applyGoyaPerspective({ ...slot, ...mapToAwayHalf(slot) }));
+  return slots.map(mapSlotToAwayHalf);
 }
