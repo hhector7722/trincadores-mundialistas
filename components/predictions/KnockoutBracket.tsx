@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
@@ -128,8 +129,11 @@ function BracketMatchCard({
 
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const { navigate } = useAppNavigation();
+  const pageRef = useRef<HTMLDivElement>(null);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
+
+  useKnockoutViewportLayout(pageRef);
 
   if (!matches.length) {
     return (
@@ -140,7 +144,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   }
 
   return (
-    <div className="tm-ko-page">
+    <div ref={pageRef} className="tm-ko-page">
       <div className="tm-ko-stage">
         <div
           className="tm-ko-canvas"

@@ -632,28 +632,23 @@ html[data-modal-open] main {
   position: fixed;
   top: 0;
   right: 0;
+  bottom: var(--tm-tabbar-height);
   left: 0;
   z-index: 20;
   display: flex;
   flex-direction: column;
-  height: calc(100svh - var(--tm-tabbar-height));
-  max-height: calc(100svh - var(--tm-tabbar-height));
+  height: auto;
+  max-height: none;
   min-height: 0;
   overflow: hidden;
   background: var(--tm-glass);
-}
-
-@supports (height: 100dvh) {
-  .tm-porra-layout {
-    height: calc(100dvh - var(--tm-tabbar-height));
-    max-height: calc(100dvh - var(--tm-tabbar-height));
-  }
 }
 
 @media (min-width: 640px) {
   .tm-porra-layout {
     position: static;
     z-index: auto;
+    bottom: auto;
     height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
     max-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
   }
