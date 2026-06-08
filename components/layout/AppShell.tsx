@@ -3,7 +3,6 @@ import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
-import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -16,12 +15,10 @@ export function AppShell({
 }) {
   return (
     <NavigationLoadingProvider>
-      <ViewportMetricsSync />
-      <div className="tm-app-shell">
+      <div className="tm-app-frame">
         <div
           id="tm-safe-probe"
-          className="pointer-events-none fixed left-0 top-0 -z-50 h-0 w-0 overflow-hidden"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          className="pointer-events-none fixed left-0 top-0 -z-50 h-0 w-0 overflow-hidden pb-safe"
           aria-hidden
         />
         <HomeAtmosphere />

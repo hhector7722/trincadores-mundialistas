@@ -43,10 +43,8 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-content-bottom: var(--tm-tabbar-height);
-  --tm-vvh-offset: 0px;
-  --tm-vvh-height: 100svh;
+  --tm-tabbar-height: var(--tm-tabbar-core);
+  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -94,45 +92,49 @@ html[data-modal-open] .tm-app-main {
   touch-action: none;
 }
 
-.tm-app-shell {
-  position: fixed;
-  top: var(--tm-vvh-offset);
-  right: 0;
-  left: 0;
-  z-index: 1;
-  display: flex;
-  width: 100%;
-  height: var(--tm-vvh-height, 100svh);
-  min-height: 0;
-  flex-direction: column;
-  overflow: hidden;
-  overscroll-behavior: none;
-  background-color: var(--tm-shell-bg-hex);
+/* Safe-area (patrón marbella-app/globals.css) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@media (display-mode: standalone) {
-  .tm-app-shell {
-    top: 0;
-  }
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Marco de app: flujo natural, sin shell fixed ni sync de visualViewport */
+.tm-app-frame {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 100svh;
+  min-height: -webkit-fill-available;
+  flex-direction: column;
+  background-color: var(--tm-shell-bg-hex);
 }
 
 .tm-app-main {
   box-sizing: border-box;
   position: relative;
   z-index: 10;
-  min-height: 0;
-  flex: 1 1 0%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  flex: 1 1 auto;
   padding-bottom: var(--tm-content-bottom);
   background-color: var(--tm-shell-bg-hex);
 }
 
-.tm-app-main:has(> .tm-porra-layout) {
+.tm-app-frame:has(.tm-porra-layout) {
+  height: 100svh;
+  min-height: 100svh;
   overflow: hidden;
+}
+
+.tm-app-main:has(> .tm-porra-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
   padding-bottom: 0;
+  overflow: hidden;
 }
 
 .tm-app-main > .tm-porra-layout {
@@ -140,55 +142,18 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
-/* Fila táctil fija de 48px justo encima del home indicator; el inset lo pinta ::after. */
-.tm-tabbar {
-  position: fixed;
-  right: 0;
-  bottom: var(--tm-safe-bottom);
-  left: 0;
-  z-index: 95;
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  height: var(--tm-tabbar-core);
-  background-color: var(--tm-tabbar-bg-hex);
-  background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-html:has(.tm-app-shell)::after {
-  content: "";
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 94;
-  height: var(--tm-safe-bottom);
-  background-color: var(--tm-tabbar-bg-hex);
-  pointer-events: none;
-}
-
-html[data-modal-open] .tm-tabbar {
+html[data-modal-open] .tm-fixed-bottombar {
   filter: blur(6px);
   opacity: 0.35;
   pointer-events: none;
 }
 
-html:has(.tm-app-shell) {
-  height: 100%;
-  min-height: -webkit-fill-available;
-  overflow: hidden;
-  overscroll-behavior: none;
+/* Mismo color sólido que la TabBar bajo el viewport (marbella: body bg = nav bg) */
+html:has(.tm-app-frame) {
   background-color: var(--tm-tabbar-bg-hex);
 }
 
-html:has(.tm-app-shell) body {
-  height: 100%;
-  min-height: -webkit-fill-available;
-  margin: 0;
-  overflow: hidden;
-  overscroll-behavior: none;
+html:has(.tm-app-frame) body {
   background-color: var(--tm-tabbar-bg-hex);
   background-image: none;
 }
@@ -649,16 +614,34 @@ html:has(.tm-app-shell) body {
 
 /* ── Quiz: safe area sobre TabBar fija ── */
 .tm-quiz-page {
-  scroll-padding-bottom: var(--tm-tabbar-height);
+  scroll-padding-bottom: var(--tm-content-bottom);
   padding-bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
 }
 
 .tm-quiz-page--play,
-.tm-quiz-page--viewport {
+.tm-quiz-page--viewport,
+.tm-quiz-page--hub {
   display: flex;
   flex-direction: column;
-  min-height: calc(100svh - var(--tm-tabbar-height) - 3.25rem);
+  min-height: calc(100svh - var(--tm-content-bottom) - 3.25rem);
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-quiz-page--hub > .tm-quiz-hub {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+}
+
+.tm-quiz-hub-spacer {
+  flex: 0 0 40%;
+  min-height: 0;
+}
+
+.tm-quiz-hub-content {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .tm-quiz-page--play > * {
@@ -670,8 +653,9 @@ html:has(.tm-app-shell) body {
 
 @supports (height: 100dvh) {
   .tm-quiz-page--play,
-  .tm-quiz-page--viewport {
-    min-height: calc(100dvh - var(--tm-tabbar-height) - 3.25rem);
+  .tm-quiz-page--viewport,
+  .tm-quiz-page--hub {
+    min-height: calc(100dvh - var(--tm-content-bottom) - 3.25rem);
   }
 }
 

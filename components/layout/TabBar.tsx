@@ -52,35 +52,37 @@ export function TabBar() {
 
   return (
     <nav
-      className="tm-tabbar border-t border-[var(--tm-border)] px-1"
+      className={cn(
+        "tm-fixed-bottombar fixed bottom-0 left-0 right-0 z-[95]",
+        "flex h-12 items-center justify-around border-t border-[var(--tm-border)]",
+        "bg-[var(--tm-tabbar-bg-hex)] px-1 pb-safe",
+        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md"
+      )}
       aria-label="Navegacion principal"
     >
-      <ul className="flex h-12 w-full shrink-0 items-stretch justify-between">
-        {TABS.map(({ href, label, icon: Icon }) => {
-          const active = isActive(displayPath, href);
-          const navigating = optimisticHref === href;
+      {TABS.map(({ href, label, icon: Icon }) => {
+        const active = isActive(displayPath, href);
+        const navigating = optimisticHref === href;
 
-          return (
-            <li key={href} className="flex-1">
-              <Link
-                href={href}
-                prefetch
-                scroll
-                onClick={(event) => handleTabClick(event, href)}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex h-full min-h-12 touch-manipulation flex-col items-center justify-end gap-0.5 px-1 pb-0.5 text-[10px] font-medium leading-none transition-colors duration-150 active:opacity-80",
-                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
-                  navigating && "opacity-90"
-                )}
-              >
-                <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
-                <span>{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+        return (
+          <Link
+            key={href}
+            href={href}
+            prefetch
+            scroll
+            onClick={(event) => handleTabClick(event, href)}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "flex min-h-12 min-w-12 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition-colors duration-150 active:opacity-80",
+              active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
+              navigating && "opacity-90"
+            )}
+          >
+            <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
+            <span>{label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }

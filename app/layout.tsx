@@ -1,6 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
-import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -29,7 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#2A1058",
+  themeColor: "#2E1260",
 };
 
 const siteUrl = getSiteUrl();
@@ -77,10 +76,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
-      <head>
-        <ViewportMetricsInlineScript />
-      </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased touch-manipulation">{children}</body>
     </html>
   );
 }

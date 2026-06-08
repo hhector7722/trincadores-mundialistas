@@ -24,7 +24,7 @@ function readSafeBottom(): number {
 
 function collectMetrics(): LayoutMetrics {
   const vv = window.visualViewport;
-  const shell = document.querySelector<HTMLElement>(".tm-app-shell");
+  const shell = document.querySelector<HTMLElement>(".tm-app-frame");
   const shellRect = shell?.getBoundingClientRect();
   const visualBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
 
