@@ -16,6 +16,7 @@ import { LoadingCenter } from "@/components/ui/spinner";
 
 type NavigationLoadingContextValue = {
   navigate: (href: string) => void;
+  navigateTab: (href: string) => void;
   setNavigating: (active: boolean) => void;
 };
 
@@ -58,6 +59,7 @@ export function useAppNavigation() {
 
   return {
     navigate: context?.navigate ?? ((href: string) => router.push(href)),
+    navigateTab: context?.navigateTab ?? ((href: string) => router.push(href)),
     setNavigating: context?.setNavigating ?? (() => undefined),
   };
 }
@@ -73,6 +75,16 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     (href: string) => {
       if (isSameAppPath(pathnameRef.current, href)) return;
       setNavigating(true);
+      startTransition(() => {
+        router.push(href);
+      });
+    },
+    [router]
+  );
+
+  const navigateTab = useCallback(
+    (href: string) => {
+      if (isSameAppPath(pathnameRef.current, href)) return;
       startTransition(() => {
         router.push(href);
       });
@@ -99,7 +111,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const showOverlay = isPending || navigating;
 
   return (
-    <NavigationLoadingContext.Provider value={{ navigate, setNavigating }}>
+    <NavigationLoadingContext.Provider value={{ navigate, navigateTab, setNavigating }}>
       <div className="contents" onClickCapture={handleCaptureClick}>
         {children}
       </div>

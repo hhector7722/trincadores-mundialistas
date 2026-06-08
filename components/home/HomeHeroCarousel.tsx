@@ -112,7 +112,7 @@ export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselPr
   }
 
   return (
-    <div className="flex min-w-0 flex-col">
+    <div className="flex min-w-0 flex-col" data-block-tab-swipe>
       <div
         ref={scrollRef}
         className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

@@ -43,7 +43,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   /* Marbella usa h-20 (5rem) + pb-safe en un solo nav */
-  --tm-tabbar-core: 5rem;
+  --tm-tabbar-core: 5.25rem;
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
@@ -162,7 +162,7 @@ html[data-modal-open] .tm-app-main {
   background: transparent;
 }
 
-.tm-app-main-inner:has(> .tm-porra-layout) {
+.tm-app-main-inner:has(.tm-porra-layout) {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -171,7 +171,15 @@ html[data-modal-open] .tm-app-main {
   padding-bottom: 0;
 }
 
-.tm-app-main-inner > .tm-porra-layout {
+.tm-app-main-inner:has(.tm-porra-layout) .tm-tab-swipe-root {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tm-app-main-inner .tm-porra-layout {
   height: 100%;
   min-height: 0;
 }
@@ -191,13 +199,22 @@ html[data-modal-open] .tm-app-main {
   overflow: hidden;
 }
 
-.tm-app-main-inner:has(> .tm-home-layout) {
+.tm-app-main-inner:has(.tm-home-layout) {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
   height: 100%;
   padding-bottom: 0;
+  overflow: hidden;
+}
+
+.tm-app-main-inner:has(.tm-home-layout) .tm-tab-swipe-root {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -217,7 +234,7 @@ html[data-modal-open] .tm-app-main {
   background: transparent;
 }
 
-.tm-app-main-inner:has(> .tm-ranking-layout) {
+.tm-app-main-inner:has(.tm-ranking-layout) {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -226,7 +243,15 @@ html[data-modal-open] .tm-app-main {
   padding-bottom: 0;
 }
 
-.tm-app-main-inner > .tm-ranking-layout {
+.tm-app-main-inner:has(.tm-ranking-layout) .tm-tab-swipe-root {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tm-app-main-inner .tm-ranking-layout {
   height: 100%;
   min-height: 0;
 }
