@@ -69,7 +69,7 @@ export function TabBar() {
                 onClick={(event) => handleTabClick(event, href)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-full min-h-12 touch-manipulation flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition-colors duration-150 active:opacity-80",
+                  "flex h-full min-h-12 touch-manipulation flex-col items-center justify-end gap-0.5 px-1 pb-0.5 text-[10px] font-medium leading-none transition-colors duration-150 active:opacity-80",
                   active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
                   navigating && "opacity-90"
                 )}

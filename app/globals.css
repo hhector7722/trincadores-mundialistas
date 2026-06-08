@@ -43,8 +43,8 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: var(--tm-tabbar-core);
-  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
   --tm-vvh-height: 100svh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
@@ -140,23 +140,33 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
-/* Patrón marbella-app: bottom-0, altura total = core + safe-area (border-box + pb-safe). */
+/* Fila táctil fija de 48px justo encima del home indicator; el inset lo pinta ::after. */
 .tm-tabbar {
   position: fixed;
   right: 0;
-  bottom: 0;
+  bottom: var(--tm-safe-bottom);
   left: 0;
   z-index: 95;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
   width: 100%;
-  height: var(--tm-content-bottom);
-  padding-bottom: var(--tm-safe-bottom);
+  height: var(--tm-tabbar-core);
   background-color: var(--tm-tabbar-bg-hex);
   background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+html:has(.tm-app-shell)::after {
+  content: "";
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 94;
+  height: var(--tm-safe-bottom);
+  background-color: var(--tm-tabbar-bg-hex);
+  pointer-events: none;
 }
 
 html[data-modal-open] .tm-tabbar {
