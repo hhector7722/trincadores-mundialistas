@@ -201,6 +201,36 @@ html[data-modal-open] .tm-app-main {
   overflow: hidden;
 }
 
+.tm-app-frame:has(.tm-ranking-layout) {
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.tm-app-main:has(.tm-ranking-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  padding-bottom: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.tm-app-main-inner:has(> .tm-ranking-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.tm-app-main-inner > .tm-ranking-layout {
+  height: 100%;
+  min-height: 0;
+}
+
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;

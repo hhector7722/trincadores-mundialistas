@@ -5,6 +5,25 @@ import { cn } from "@/lib/utils";
 
 const EMPTY_ROW_COUNT = 11;
 
+function RankingTableHeader() {
+  return (
+    <div
+      className={cn(
+        RANKING_GRID,
+        "shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
+      )}
+    >
+      <span aria-hidden="true" />
+      <span>Pos</span>
+      <span aria-hidden="true" />
+      <span>Trincador</span>
+      <span className="text-right">Pts</span>
+      <span className="text-right">Fiab</span>
+      <span className="text-right">Quiz</span>
+    </div>
+  );
+}
+
 function RankingEmptyRow() {
   return (
     <div
@@ -14,13 +33,13 @@ function RankingEmptyRow() {
       )}
       aria-hidden="true"
     >
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="min-w-0 truncate text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
-      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span />
+      <span />
+      <span className="size-7 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
+      <span className="min-w-0 truncate">&nbsp;</span>
+      <span />
+      <span />
+      <span />
     </div>
   );
 }
@@ -34,6 +53,7 @@ export function RankingTable({
 }) {
   return (
     <div className="tm-ranking-table">
+      <RankingTableHeader />
       <div className="tm-ranking-body">
         {rows.length === 0
           ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
