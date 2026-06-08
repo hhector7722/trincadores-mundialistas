@@ -44,15 +44,15 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
         )}
         aria-label="Quiz diario"
       >
-        <div className="flex min-w-0 items-center justify-between gap-2">
-          <p className="min-w-0 truncate text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
+        <div className="grid min-w-0 grid-cols-2 items-center gap-2">
+          <p className="flex min-w-0 items-center justify-center text-center text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
             Quiz diario
           </p>
           <button
             type="button"
             onClick={handlePlay}
             className={cn(
-              "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+              "inline-flex w-full items-center justify-center whitespace-nowrap rounded-full",
               "bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)]",
               "text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-black",
               "transition-opacity hover:opacity-90 active:opacity-80"
