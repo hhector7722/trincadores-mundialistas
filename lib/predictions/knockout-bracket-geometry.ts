@@ -2,13 +2,36 @@ import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout"
 
 export const BRACKET_COLUMN_COUNT = 9;
 export const BRACKET_LEAF_SLOTS = 16;
-export const BRACKET_VERTICAL_PAD = 1.5;
 
-/** Posición X del círculo local en la final (centro del árbol). */
-export const FINAL_HOME_X = 44;
-/** Posición X del círculo visitante en la final. */
-export const FINAL_AWAY_X = 56;
+/** Margen lateral para dieciseisavos (% del ancho del canvas). */
+export const BRACKET_HORIZONTAL_INSET = 4.5;
+/** Acercamiento de semis/final al centro (0.35 ≈ −35 % de hueco). */
+export const BRACKET_CENTER_PULL = 0.35;
+/** Compactación vertical del árbol hacia Y=50 (0.83 ≈ −17 % de altura). */
+export const BRACKET_VERTICAL_COMPACT = 0.83;
+export const BRACKET_VERTICAL_PAD = 2.5;
+
+export const FINAL_HOME_X = 45.5;
+export const FINAL_AWAY_X = 54.5;
 export const FINAL_CENTER_Y = 50;
+
+/** Escalado de layout por ronda (solo transform, sin cambiar estilos base). */
+export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
+  r32: 1,
+  r16: 1.05,
+  qf: 1.1,
+  sf: 1.15,
+  final: 1.4,
+};
+
+export const CHAMPION_LAYOUT_SCALE = 1.7;
+
+export function compactY(y: number): number {
+  return 50 + (y - 50) * BRACKET_VERTICAL_COMPACT;
+}
+
+export const CHAMPION_X = 50;
+export const CHAMPION_Y = compactY(61.5);
 
 export type BracketMatchGeometry = {
   matchNumber: number;
@@ -19,6 +42,7 @@ export type BracketMatchGeometry = {
   awayY: number;
   midY: number;
   columnX: number;
+  layoutScale: number;
   childMatches?: [number, number];
 };
 
@@ -34,7 +58,7 @@ const RIGHT_SF = [102] as const;
 
 function scaleY(raw: number): number {
   const usable = 100 - BRACKET_VERTICAL_PAD * 2;
-  return BRACKET_VERTICAL_PAD + (raw / 100) * usable;
+  return compactY(BRACKET_VERTICAL_PAD + (raw / 100) * usable);
 }
 
 export function leafSpanY(startLeaf: number, leafSpan: number) {
@@ -48,14 +72,34 @@ export function leafSpanY(startLeaf: number, leafSpan: number) {
   };
 }
 
-export function columnCenterX(column: number): number {
-  return ((column + 0.5) / BRACKET_COLUMN_COUNT) * 100;
+function centerPullFactor(column: number): number {
+  if (column === 4) return 0;
+  const dist = Math.abs(column - 4);
+  if (dist === 1) return BRACKET_CENTER_PULL;
+  if (dist === 2) return BRACKET_CENTER_PULL * 0.55;
+  if (dist === 3) return BRACKET_CENTER_PULL * 0.3;
+  return 0;
+}
+
+export function mapColumnX(column: number): number {
+  const rawCenter = ((column + 0.5) / BRACKET_COLUMN_COUNT) * 100;
+  const pull = centerPullFactor(column);
+  let mapped = 50 + (rawCenter - 50) * (1 - pull);
+
+  if (column === 0) {
+    mapped = Math.max(BRACKET_HORIZONTAL_INSET + 2.8, mapped);
+  }
+  if (column === 8) {
+    mapped = Math.min(100 - BRACKET_HORIZONTAL_INSET - 2.8, mapped);
+  }
+
+  return mapped;
 }
 
 export function columnEdgeX(column: number, edge: "left" | "right"): number {
-  return edge === "left"
-    ? (column / BRACKET_COLUMN_COUNT) * 100
-    : ((column + 1) / BRACKET_COLUMN_COUNT) * 100;
+  const center = mapColumnX(column);
+  const halfWidth = (100 / BRACKET_COLUMN_COUNT) * (1 - centerPullFactor(column) * 0.5) * 0.5;
+  return edge === "left" ? center - halfWidth * 0.85 : center + halfWidth * 0.85;
 }
 
 function pushRound(
@@ -77,7 +121,8 @@ function pushRound(
       side,
       column,
       ...y,
-      columnX: columnCenterX(column),
+      columnX: mapColumnX(column),
+      layoutScale: ROUND_LAYOUT_SCALE[round],
       childMatches,
     });
   });
@@ -120,7 +165,8 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
     homeY: FINAL_CENTER_Y,
     awayY: FINAL_CENTER_Y,
     midY: FINAL_CENTER_Y,
-    columnX: columnCenterX(4),
+    columnX: mapColumnX(4),
+    layoutScale: ROUND_LAYOUT_SCALE.final,
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],
   });
 
@@ -141,14 +187,15 @@ function connectChildToParent(
 
 function connectSemiToFinalSlot(
   semi: BracketMatchGeometry,
-  slotX: number
+  slotX: number,
+  slotY: number
 ): string {
   const isLeft = semi.side === "left";
   const xJunction = isLeft
     ? columnEdgeX(semi.column, "right")
     : columnEdgeX(semi.column, "left");
 
-  return `M ${semi.columnX} ${semi.midY} H ${xJunction} V ${FINAL_CENTER_Y} H ${slotX}`;
+  return `M ${semi.columnX} ${semi.midY} H ${xJunction} V ${slotY} H ${slotX}`;
 }
 
 export function buildBracketConnectorPaths(
@@ -174,8 +221,14 @@ export function buildBracketConnectorPaths(
 
   const leftSemi = byNumber.get(LEFT_SF[0]);
   const rightSemi = byNumber.get(RIGHT_SF[0]);
-  if (leftSemi) paths.push(connectSemiToFinalSlot(leftSemi, FINAL_HOME_X));
-  if (rightSemi) paths.push(connectSemiToFinalSlot(rightSemi, FINAL_AWAY_X));
+  if (leftSemi) {
+    paths.push(connectSemiToFinalSlot(leftSemi, FINAL_HOME_X, FINAL_CENTER_Y));
+  }
+  if (rightSemi) {
+    paths.push(connectSemiToFinalSlot(rightSemi, FINAL_AWAY_X, FINAL_CENTER_Y));
+  }
+
+  paths.push(`M 50 ${FINAL_CENTER_Y} V ${CHAMPION_Y}`);
 
   return paths;
 }
@@ -203,4 +256,8 @@ export function scorePosition(geom: BracketMatchGeometry): { x: number; y: numbe
   }
 
   return { x: geom.columnX, y: geom.midY };
+}
+
+export function championPosition(): { x: number; y: number } {
+  return { x: CHAMPION_X, y: CHAMPION_Y };
 }

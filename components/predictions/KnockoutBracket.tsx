@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -11,6 +11,8 @@ import {
 import {
   buildBracketConnectorPaths,
   buildBracketGeometry,
+  CHAMPION_LAYOUT_SCALE,
+  championPosition,
   scorePosition,
   slotPosition,
   type BracketMatchGeometry,
@@ -72,6 +74,7 @@ function BracketMatchNode({
   const awayPos = slotPosition(geom, "away");
   const scorePos = scorePosition(geom);
   const isFinal = geom.round === "final";
+  const layoutScale = geom.layoutScale;
 
   return (
     <button
@@ -92,9 +95,14 @@ function BracketMatchNode({
           : `Partido ${geom.matchNumber} sin datos`
       }
     >
+      {isFinal ? <span className="tm-ko-final-zone" aria-hidden /> : null}
       <span
-        className="tm-ko-match-slot tm-ko-match-slot--home"
-        style={{ left: `${homePos.x}%`, top: `${homePos.y}%` }}
+        className={cn("tm-ko-match-slot", "tm-ko-match-slot--home", `tm-ko-match-slot--${geom.round}`)}
+        style={{
+          left: `${homePos.x}%`,
+          top: `${homePos.y}%`,
+          "--tm-ko-layout-scale": layoutScale,
+        } as CSSProperties}
       >
         <BracketTeamSlot name={homeName} />
       </span>
@@ -107,8 +115,12 @@ function BracketMatchNode({
         </span>
       ) : null}
       <span
-        className="tm-ko-match-slot tm-ko-match-slot--away"
-        style={{ left: `${awayPos.x}%`, top: `${awayPos.y}%` }}
+        className={cn("tm-ko-match-slot", "tm-ko-match-slot--away", `tm-ko-match-slot--${geom.round}`)}
+        style={{
+          left: `${awayPos.x}%`,
+          top: `${awayPos.y}%`,
+          "--tm-ko-layout-scale": layoutScale,
+        } as CSSProperties}
       >
         <BracketTeamSlot name={awayName} />
       </span>
@@ -116,9 +128,41 @@ function BracketMatchNode({
   );
 }
 
+function resolveChampionName(finalMatch: MatchWithPrediction | null): string {
+  if (!finalMatch?.prediction) return "Campeón";
+
+  const home = finalMatch.prediction.home_goals;
+  const away = finalMatch.prediction.away_goals;
+  if (home == null || away == null || home === away) return "Campeón";
+
+  return home > away ? finalMatch.home_team : finalMatch.away_team;
+}
+
+function BracketChampionNode({ name }: { name: string }) {
+  const pos = championPosition();
+
+  return (
+    <div
+      className="tm-ko-champion"
+      style={{
+        left: `${pos.x}%`,
+        top: `${pos.y}%`,
+        "--tm-ko-layout-scale": CHAMPION_LAYOUT_SCALE,
+      } as React.CSSProperties}
+      aria-label={`Campeón: ${name}`}
+    >
+      <span className="tm-ko-match-slot tm-ko-match-slot--champion">
+        <BracketTeamSlot name={name} />
+      </span>
+    </div>
+  );
+}
+
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
+  const finalMatch = useMemo(() => resolveBracketMatch(matchMap, 104), [matchMap]);
+  const championName = useMemo(() => resolveChampionName(finalMatch), [finalMatch]);
 
   if (!matches.length) {
     return (
@@ -176,6 +220,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
                 onOpen={setActiveMatch}
               />
             ))}
+            <BracketChampionNode name={championName} />
           </div>
         </div>
       </div>
