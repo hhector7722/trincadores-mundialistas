@@ -1,5 +1,6 @@
 "use client";
 
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { shortPlayerName } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
@@ -35,8 +36,9 @@ export function MvpBenchStrip({
         position === "top" ? "pb-2" : "pt-2"
       )}
     >
-      <h4 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
-        Reservas {teamNameEs(teamName)} ({players.length})
+      <h4 className="mb-2 flex min-h-7 items-center justify-center gap-2 text-sm font-semibold text-[var(--tm-fg)]">
+        <TeamFlagBadge name={teamName} size="xs" />
+        <span>{teamNameEs(teamName)}</span>
       </h4>
       <p className="text-sm leading-snug text-[var(--tm-fg)]">
         {players.map((player, index) => {

@@ -5,7 +5,6 @@ import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
-import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type MatchMvpFieldGraphicProps = {
@@ -91,13 +90,6 @@ export function MatchMvpFieldGraphic({
           onLoad={handleFieldReady}
           onError={handleFieldReady}
         />
-      </div>
-
-      <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
-        {teamNameEs(awayTeam)}
-      </div>
-      <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
-        {teamNameEs(homeTeam)}
       </div>
 
       {awaySlots.map((slot) => renderSlot(awayTeam, slot, true))}
