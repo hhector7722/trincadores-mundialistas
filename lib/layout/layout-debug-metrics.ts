@@ -34,8 +34,7 @@ export type ExtendedLayoutMetrics = {
   mainOverflowY: string;
   swipeRootOverflow: string;
   swipeTrackHeight: string;
-  vvhHeightVar: string;
-  vvhOffsetVar: string;
+  navPosition: string;
 };
 
 function readSafeBottom(): number {
@@ -48,17 +47,14 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
   const vv = window.visualViewport;
   const frame = document.querySelector<HTMLElement>(".tm-app-frame");
   const main = document.querySelector<HTMLElement>(".tm-app-main");
-  const chrome = document.querySelector<HTMLElement>(".tm-bottom-chrome");
   const nav = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
   const indicators = document.querySelector<HTMLElement>(".tm-tab-indicators-slot");
   const home = document.querySelector<HTMLElement>(".tm-home-layout");
   const swipeRoot = document.querySelector<HTMLElement>(".tm-tab-swipe-root");
   const swipeTrack = swipeRoot?.querySelector<HTMLElement>("[class*='will-change-transform']");
-  const root = document.documentElement;
 
   const frameRect = frame?.getBoundingClientRect();
   const mainRect = main?.getBoundingClientRect();
-  const chromeRect = chrome?.getBoundingClientRect();
   const navRect = nav?.getBoundingClientRect();
   const indicatorRect = indicators?.getBoundingClientRect();
   const visualBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
@@ -83,10 +79,10 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
     gapBelowShell: Math.round(window.innerHeight - (frameRect?.bottom ?? 0)),
     gapBelowVisual: Math.round(visualBottom - (frameRect?.bottom ?? 0)),
     mainBottom: Math.round(mainRect?.bottom ?? 0),
-    chromeTop: Math.round(chromeRect?.top ?? 0),
-    chromeBottom: Math.round(chromeRect?.bottom ?? 0),
+    chromeTop: Math.round(navRect?.top ?? 0),
+    chromeBottom: Math.round(navRect?.bottom ?? 0),
     navBottom: Math.round(navRect?.bottom ?? 0),
-    gapMainToChrome: Math.round((chromeRect?.top ?? 0) - (mainRect?.bottom ?? 0)),
+    gapMainToChrome: Math.round((navRect?.top ?? 0) - (mainRect?.bottom ?? 0)),
     gapBelowNav: Math.round(visualBottom - (navRect?.bottom ?? 0)),
     indicatorTop: Math.round(indicatorRect?.top ?? 0),
     indicatorBottom: Math.round(indicatorRect?.bottom ?? 0),
@@ -103,8 +99,7 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
     mainOverflowY: main ? getComputedStyle(main).overflowY : "n/a",
     swipeRootOverflow: swipeRoot ? getComputedStyle(swipeRoot).overflow : "n/a",
     swipeTrackHeight: swipeTrack ? getComputedStyle(swipeTrack).height : "n/a",
-    vvhHeightVar: root.style.getPropertyValue("--tm-vvh-height") || "unset",
-    vvhOffsetVar: root.style.getPropertyValue("--tm-vvh-offset") || "unset",
+    navPosition: nav ? getComputedStyle(nav).position : "n/a",
   };
 }
 

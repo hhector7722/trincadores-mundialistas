@@ -42,12 +42,10 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  /* Marbella usa h-20 (5rem) + pb-safe en un solo nav */
-  --tm-tabbar-core: 3.25rem;
-  --tm-tab-indicators-core: 1.5rem;
-  --tm-bottom-chrome-core: calc(var(--tm-tab-indicators-core) + var(--tm-tabbar-core));
-  --tm-tabbar-height: calc(var(--tm-bottom-chrome-core) + var(--tm-safe-bottom));
-  --tm-content-bottom: calc(var(--tm-bottom-chrome-core) + var(--tm-safe-bottom));
+  /* Marbella: h-20 (5rem) + pb-safe en el nav; reserva de contenido en main */
+  --tm-tabbar-core: 5rem;
+  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-tab-indicators-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom) + 0.5rem);
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -105,27 +103,28 @@ html[data-modal-open] .tm-app-main {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-html:has(.tm-app-frame),
-html:has(.tm-app-frame) body {
-  height: var(--tm-vvh-height, 100dvh);
-  max-height: var(--tm-vvh-height, 100dvh);
-  overflow: hidden;
+.scroll-end-touch {
+  min-height: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  width: 100%;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
-/* Marco flex: altura real del visualViewport (script inline); TabBar al pie en flujo. */
+.scroll-pb-end {
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+}
+
+/* Shell flex: min-h-dvh, sin cage 100dvh ni overflow global */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  height: var(--tm-vvh-height, 100%);
-  min-height: var(--tm-vvh-height, 100dvh);
-  max-height: var(--tm-vvh-height, 100dvh);
+  min-height: 100dvh;
   flex-direction: column;
-  overflow: hidden;
   isolation: isolate;
 }
 
-/* Degradado fijo: mismo tono en cabecera y contenido, sin corte de color */
+/* Degradado fijo: mismo tono en cabecera y contenido */
 .tm-app-frame::before {
   content: "";
   position: fixed;
@@ -144,116 +143,30 @@ html:has(.tm-app-frame) body {
   box-sizing: border-box;
   position: relative;
   z-index: 10;
-  display: flex;
+  flex: 1 1 auto;
   width: 100%;
-  min-height: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-  overflow: hidden;
-  background: transparent;
+  padding-bottom: var(--tm-content-bottom);
 }
 
-/* Contenido principal: flex-1; scroll interno en layouts hijos */
-.tm-app-main-inner {
-  box-sizing: border-box;
-  display: flex;
-  min-height: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-  padding-bottom: 0;
-  background: transparent;
-}
-
-.tm-app-frame:has(.tm-porra-layout) {
-  overflow: hidden;
-}
-
-.tm-app-main:has(.tm-porra-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  padding-bottom: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.tm-app-main-inner:has(.tm-porra-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: 0;
-}
-
-.tm-app-main-inner:has(.tm-porra-layout) .tm-tab-swipe-root {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-}
-
-.tm-app-main-inner .tm-porra-layout {
-  height: 100%;
-  min-height: 0;
-}
-
-.tm-app-frame:has(.tm-home-layout) {
-  overflow: hidden;
-}
-
+/* Viewports a pantalla completa: scroll interno, sin padding en main */
+.tm-app-main:has(.tm-porra-layout),
+.tm-app-main:has(.tm-ranking-layout),
+.tm-app-main:has(.tm-tab-scroll-layout),
+.tm-app-main:has(.tm-quiz-page),
 .tm-app-main:has(.tm-home-layout) {
   display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
   flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
   padding-bottom: 0;
   overflow: hidden;
 }
 
-.tm-app-main-inner:has(.tm-home-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: 0;
-}
-
-.tm-app-main-inner:has(.tm-home-layout) .tm-tab-swipe-root {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-}
-
-.tm-app-frame:has(.tm-ranking-layout) {
-  overflow: hidden;
-}
-
-.tm-app-main:has(.tm-ranking-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  padding-bottom: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.tm-app-main-inner:has(.tm-ranking-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: 0;
-}
-
-.tm-app-main-inner:has(.tm-ranking-layout) .tm-tab-swipe-root {
+.tm-app-main:has(.tm-porra-layout) .tm-tab-swipe-root,
+.tm-app-main:has(.tm-ranking-layout) .tm-tab-swipe-root,
+.tm-app-main:has(.tm-tab-scroll-layout) .tm-tab-swipe-root,
+.tm-app-main:has(.tm-quiz-page) .tm-tab-swipe-root,
+.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-root {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -261,40 +174,10 @@ html:has(.tm-app-frame) body {
   height: 100%;
 }
 
-.tm-app-main-inner .tm-ranking-layout {
+.tm-app-main .tm-porra-layout,
+.tm-app-main .tm-ranking-layout {
   height: 100%;
   min-height: 0;
-}
-
-.tm-app-frame:has(.tm-tab-scroll-layout) {
-  overflow: hidden;
-}
-
-.tm-app-main:has(.tm-tab-scroll-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  padding-bottom: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.tm-app-main-inner:has(.tm-tab-scroll-layout) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: 0;
-}
-
-.tm-app-main-inner:has(.tm-tab-scroll-layout) .tm-tab-swipe-root {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
 }
 
 .tm-tab-scroll-layout {
@@ -308,39 +191,7 @@ html:has(.tm-app-frame) body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding-bottom: max(0.75rem, var(--tm-safe-bottom));
-}
-
-.tm-app-frame:has(.tm-quiz-page) {
-  overflow: hidden;
-}
-
-.tm-app-main:has(.tm-quiz-page) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  padding-bottom: 0;
-  overflow: hidden;
-}
-
-.tm-app-main-inner:has(.tm-quiz-page) {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: 0;
-  overflow: hidden;
-}
-
-.tm-app-main-inner:has(.tm-quiz-page) .tm-tab-swipe-root {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
 .tm-home-layout {
@@ -353,48 +204,43 @@ html:has(.tm-app-frame) body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding-bottom: 0.75rem;
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
 .tm-home-layout__hero {
   flex: 0 0 auto;
 }
 
-html[data-modal-open] .tm-bottom-chrome {
-  filter: blur(6px);
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-/* Chrome inferior: indicadores en flujo (fondo = degradado) + nav opaca. */
-.tm-bottom-chrome {
-  position: relative;
-  z-index: 20;
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  flex-shrink: 0;
-  flex-direction: column;
-  justify-content: flex-end;
-  background: transparent;
-}
-
+/* Indicadores swipe: fixed sobre la TabBar (portal en body) */
 .tm-tab-indicators-slot {
-  flex-shrink: 0;
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 96;
+  bottom: var(--tm-tab-indicators-bottom);
   display: flex;
-  min-height: var(--tm-tab-indicators-core);
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0;
-  background: transparent;
   pointer-events: none;
+}
+
+.tm-bottom-chrome-placeholder {
+  box-sizing: border-box;
+}
+
+html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
+  display: none;
 }
 
 .tm-fixed-bottombar {
   box-sizing: border-box;
-  width: 100%;
-  min-height: var(--tm-tabbar-core);
-  align-items: flex-end;
+}
+
+html[data-modal-open] .tm-fixed-bottombar,
+html[data-modal-open] .tm-tab-indicators-slot {
+  filter: blur(6px);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .tm-tab-swipe-root--dragging {
@@ -421,14 +267,9 @@ html:has(.tm-tab-swipe-root) {
     12px 0 32px rgba(0, 0, 0, 0.22);
 }
 
-/* Overscroll: arriba tono cabecera, abajo tono TabBar */
+/* Overscroll: arriba tono cabecera */
 html:has(.tm-app-frame) {
   background-color: var(--tm-bg-top);
-}
-
-html:has(.tm-app-frame) body {
-  background-color: var(--tm-tabbar-bg-hex);
-  background-image: none;
 }
 
 .font-display {
@@ -920,10 +761,9 @@ html:has(.tm-app-frame) body {
   }
 }
 
-/* ── Quiz: safe area sobre TabBar fija ── */
+/* ── Quiz: scroll interno con reserva táctil al final ── */
 .tm-quiz-page {
-  scroll-padding-bottom: var(--tm-content-bottom);
-  padding-bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
 .tm-quiz-page--play,
@@ -934,7 +774,7 @@ html:has(.tm-app-frame) body {
   flex-direction: column;
   height: 0;
   min-height: 0;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0;
 }
 
 .tm-quiz-page:not(.tm-quiz-page--play):not(.tm-quiz-page--hub):not(.tm-quiz-page--viewport) {

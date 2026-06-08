@@ -21,7 +21,7 @@ export function ViewportLayoutDebug() {
     const refresh = () => {
       const snapshot = collectExtendedLayoutMetrics(pathname);
       setMetrics(snapshot);
-      emitLayoutDebugLog(snapshot, "H1-H3", "post-fix-v2");
+      emitLayoutDebugLog(snapshot, "marbella-fixed", "marbella-fix");
     };
 
     refresh();
@@ -78,10 +78,8 @@ export function ViewportLayoutDebug() {
             {metrics.homeOverflowY} canScroll={String(metrics.homeCanScroll)}
           </p>
           <p>
-            swipe overflow={metrics.swipeRootOverflow} trackH={metrics.swipeTrackHeight}
-          </p>
-          <p>
-            vvh vars h={metrics.vvhHeightVar} top={metrics.vvhOffsetVar}
+            swipe overflow={metrics.swipeRootOverflow} trackH={metrics.swipeTrackHeight} nav=
+            {metrics.navPosition}
           </p>
         </div>
       </div>
