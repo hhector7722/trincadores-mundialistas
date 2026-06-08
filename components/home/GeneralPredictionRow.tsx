@@ -25,18 +25,16 @@ export function GeneralPredictionRow({
       <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
         {label}
       </span>
-      <div className="flex min-w-0 items-center justify-center">
+      <div className="flex w-full min-w-0 items-center justify-center">
         {hasValue ? (
-          <div className="inline-flex max-w-full min-w-0 items-center justify-center">
-            <span className="truncate text-center text-[10px] font-medium text-[#CCFF00]">
-              {value}
-            </span>
+          <div className="relative inline-flex max-w-full min-w-0">
+            <span className="truncate text-[10px] font-medium text-[#CCFF00]">{value}</span>
             {editable ? (
               <button
                 type="button"
                 onClick={onEdit}
                 aria-label={`Editar ${label}`}
-                className="ml-0.5 shrink-0 text-[#CCFF00] transition-opacity hover:opacity-80"
+                className="absolute left-full top-1/2 ml-0.5 shrink-0 -translate-y-1/2 text-[#CCFF00] transition-opacity hover:opacity-80"
               >
                 <Pencil className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />
               </button>
