@@ -25,3 +25,10 @@ test("teamKitColorsClash detecta camisetas titulares iguales", () => {
   assert.equal(teamKitColorsClash("England", "Germany"), true);
   assert.equal(teamKitColorsClash("Spain", "Brazil"), false);
 });
+
+test("teamKitColorsClash detecta camisetas parecidas aunque no sean idénticas", () => {
+  assert.equal(teamKitColorsClash("Spain", "Morocco"), true);
+  assert.equal(teamKitColorsClash("Belgium", "Austria"), true);
+  assert.equal(teamKitColorsClash("France", "Bosnia & Herzegovina"), true);
+  assert.equal(teamKitColorsClash("Spain", "Netherlands"), false);
+});

@@ -94,8 +94,48 @@ export function getTeamKitHex(teamName: string): string {
   return TEAM_KIT_HEX_BY_SLUG[toSlug(teamName)] ?? DEFAULT_KIT;
 }
 
+/** Delta E por debajo de este umbral = camisetas confundibles en el campo MVP. */
+const KIT_CLASH_DELTA_E_THRESHOLD = 18;
+
+function rgbToXyz(r: number, g: number, b: number): [number, number, number] {
+  const linear = (c: number) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const rs = linear(r);
+  const gs = linear(g);
+  const bs = linear(b);
+  return [
+    (rs * 0.4124564 + gs * 0.3575761 + bs * 0.1804375) * 100,
+    (rs * 0.2126729 + gs * 0.7151522 + bs * 0.072175) * 100,
+    (rs * 0.0193339 + gs * 0.119192 + bs * 0.9503041) * 100,
+  ];
+}
+
+function xyzToLab(x: number, y: number, z: number): [number, number, number] {
+  const f = (t: number) => (t > 0.008856 ? t ** (1 / 3) : 7.787 * t + 16 / 116);
+  const fx = f(x / 95.047);
+  const fy = f(y / 100);
+  const fz = f(z / 108.883);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+}
+
+function hexToLab(hex: string): [number, number, number] {
+  const { r, g, b } = parseHex(hex);
+  return xyzToLab(...rgbToXyz(r, g, b));
+}
+
+function kitColorDeltaE(hex1: string, hex2: string): number {
+  const [l1, a1, b1] = hexToLab(hex1);
+  const [l2, a2, b2] = hexToLab(hex2);
+  return Math.sqrt((l1 - l2) ** 2 + (a1 - a2) ** 2 + (b1 - b2) ** 2);
+}
+
 export function teamKitColorsClash(homeTeam: string, awayTeam: string): boolean {
-  return getTeamKitHex(homeTeam).toUpperCase() === getTeamKitHex(awayTeam).toUpperCase();
+  const home = getTeamKitHex(homeTeam);
+  const away = getTeamKitHex(awayTeam);
+  if (home.toUpperCase() === away.toUpperCase()) return true;
+  return kitColorDeltaE(home, away) < KIT_CLASH_DELTA_E_THRESHOLD;
 }
 
 export function getTeamKitColors(teamName: string): TeamKitColors {
