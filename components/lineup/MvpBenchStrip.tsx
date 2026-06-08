@@ -2,7 +2,7 @@
 
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
-import { teamNameEs } from "@/lib/teams/display";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { cn } from "@/lib/utils";
 
 type MvpBenchStripProps = {
@@ -35,9 +35,12 @@ export function MvpBenchStrip({
         position === "top" ? "pb-1.5" : "pt-1.5"
       )}
     >
-      <p className="mb-1 truncate text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)]">
-        Reservas {teamNameEs(teamName)}
-      </p>
+      <div className="mb-1 flex items-center justify-center gap-1.5">
+        <TeamFlagBadge name={teamName} size="xxs" loading="eager" />
+        <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)]">
+          Reservas
+        </p>
+      </div>
       <div className="flex flex-wrap justify-center gap-1">
         {players.map((player) => {
           const key = benchPlayerKey(teamName, player);
