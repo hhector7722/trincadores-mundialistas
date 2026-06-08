@@ -167,7 +167,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
 
           <div
             className="tm-ko-cup"
-            style={{ left: `${FINAL_CENTER_X}%`, top: `${FINAL_CENTER_Y - 14}%` }}
+            style={{ left: `${FINAL_CENTER_X}%`, top: `${FINAL_CENTER_Y - 5.5}%` }}
             aria-hidden
           >
             <Image

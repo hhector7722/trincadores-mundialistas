@@ -1,8 +1,12 @@
 import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 
 export const BRACKET_LEAF_SLOTS = 16;
-export const BRACKET_VERTICAL_PAD = 2;
-export const BRACKET_VERTICAL_COMPACT = 0.95;
+export const BRACKET_VERTICAL_PAD_TOP = 1;
+export const BRACKET_VERTICAL_PAD_BOTTOM = 0.35;
+export const BRACKET_VERTICAL_COMPACT = 1;
+
+/** Empuja octavos hacia el centro para separarlos de los dieciseisavos. */
+const R16_CENTER_NUDGE = 1.85;
 
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
@@ -156,8 +160,25 @@ export function compactY(y: number): number {
 }
 
 function scaleY(raw: number): number {
-  const usable = 100 - BRACKET_VERTICAL_PAD * 2;
-  return compactY(BRACKET_VERTICAL_PAD + (raw / 100) * usable);
+  const usable = 100 - BRACKET_VERTICAL_PAD_TOP - BRACKET_VERTICAL_PAD_BOTTOM;
+  const linear = BRACKET_VERTICAL_PAD_TOP + (raw / 100) * usable;
+  return compactY(linear);
+}
+
+function nudgeRoundTowardCenter(
+  geoms: BracketMatchGeometry[],
+  round: BracketRoundKey,
+  amount: number
+) {
+  for (const geom of geoms) {
+    if (geom.round !== round) continue;
+    if (Math.abs(geom.midY - 50) < 0.01) continue;
+
+    const delta = geom.midY < 50 ? amount : -amount;
+    geom.homeY += delta;
+    geom.awayY += delta;
+    geom.midY += delta;
+  }
 }
 
 export function leafSpanY(startLeaf: number, leafSpan: number) {
@@ -256,6 +277,8 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],
   });
 
+  nudgeRoundTowardCenter(matches, "r16", R16_CENTER_NUDGE);
+
   return matches;
 }
 
@@ -298,7 +321,11 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    if (Math.abs(geom.homeY - geom.awayY) > 0.01 && geom.round !== "r16") {
+    if (
+      Math.abs(geom.homeY - geom.awayY) > 0.01 &&
+      geom.round !== "r16" &&
+      geom.round !== "qf"
+    ) {
       segments.push({
         d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
         variant: geom.round === "r32" ? "pair" : "default",

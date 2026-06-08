@@ -763,7 +763,7 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  padding: 0.2rem 0.35rem 0.25rem;
+  padding: 0.15rem 0.35rem 0.1rem;
 }
 
 .tm-ko-canvas {
@@ -811,7 +811,7 @@ html[data-modal-open] main {
 
 .tm-ko-cup-img {
   display: block;
-  width: min(14cqw, 3.25rem);
+  width: min(11cqw, 2.6rem);
   height: auto;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
 }
@@ -934,34 +934,36 @@ html[data-modal-open] main {
 
 .tm-ko-card-row {
   display: flex;
-  min-height: min(4.8cqh, 22px);
+  min-height: min(4.4cqh, 20px);
   align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem;
-  padding: 0.3rem 0.4rem;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.28rem 0.32rem;
 }
 
 .tm-ko-card-row-primary {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  overflow: hidden;
   font-family: var(--font-display, inherit);
-  font-size: clamp(6px, 1.85cqw, 9px);
+  font-size: clamp(5.5px, 1.7cqw, 8.5px);
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.15;
-  text-align: left;
-  word-break: break-word;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--tm-accent);
 }
 
 .tm-ko-card-row-score {
   flex-shrink: 0;
-  min-width: 0.7rem;
+  min-width: 0.55rem;
   font-family: var(--font-display, inherit);
-  font-size: clamp(6px, 1.65cqw, 8px);
+  font-size: clamp(5.5px, 1.55cqw, 7.5px);
   font-weight: 800;
   line-height: 1;
-  text-align: right;
+  text-align: center;
   color: var(--tm-fg);
 }
 
