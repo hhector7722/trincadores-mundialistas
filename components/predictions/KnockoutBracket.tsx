@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
-import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
-import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -129,7 +127,6 @@ function BracketMatchCard({
 }
 
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
-  const { navigate } = useAppNavigation();
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
@@ -201,14 +198,6 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
                 onOpen={setActiveMatch}
               />
             ))}
-          </div>
-
-          <div className="tm-ko-footer shrink-0">
-            <MatchContextActionButton
-              caption="Ver fase Prévia"
-              emptyLabel="Ver fase Prévia"
-              onClick={() => navigate("/predictions")}
-            />
           </div>
         </div>
       </div>
