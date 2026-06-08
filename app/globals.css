@@ -46,6 +46,7 @@
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
+  --tm-vvh-height: 100dvh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -79,6 +80,38 @@ body {
 
 html {
   background-color: var(--tm-purple-deep);
+}
+
+/* Shell anclado al visual viewport (iOS PWA / Safari: evita hueco bajo TabBar) */
+.tm-app-shell {
+  position: fixed;
+  top: var(--tm-vvh-offset, 0px);
+  right: 0;
+  left: 0;
+  height: var(--tm-vvh-height, 100dvh);
+  overflow: hidden;
+}
+
+.tm-app-main:has(.tm-porra-layout) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tm-tabbar {
+  background-color: var(--tm-tabbar-bg-hex);
+}
+
+.tm-tabbar::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background-color: var(--tm-tabbar-bg-hex);
+  content: "";
+  pointer-events: none;
 }
 
 html[data-modal-open],
@@ -200,7 +233,7 @@ html[data-modal-open] main {
 
 /* ── Home: atmósfera multicapa ── */
 .tm-home-atmosphere {
-  position: fixed;
+  position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
@@ -667,11 +700,8 @@ html[data-modal-open] main {
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
   box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: var(--tm-tabbar-height);
-  left: 0;
+  position: absolute;
+  inset: 0;
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -778,6 +808,7 @@ html[data-modal-open] main {
   --tm-ko-card-bg: rgba(18, 8, 40, 0.92);
   --tm-ko-card-border: rgba(255, 255, 255, 0.1);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
+  --tm-ko-card-size-scale: 0.92;
   --tm-ko-card-width: min(13.5cqw, 68px);
   --tm-ko-header-band: 10%;
   --tm-ko-footer-band: 10%;
@@ -903,7 +934,7 @@ html[data-modal-open] main {
   z-index: 1;
   display: flex;
   width: var(--tm-ko-card-width);
-  min-width: 42px;
+  min-width: calc(42px * var(--tm-ko-card-size-scale));
   flex-direction: column;
   border: 1px solid var(--tm-ko-card-border);
   border-radius: 0.55rem;
@@ -911,7 +942,8 @@ html[data-modal-open] main {
   padding: 0.1rem 0.08rem;
   cursor: pointer;
   touch-action: manipulation;
-  transform: translate(-50%, -50%) scale(var(--tm-ko-card-scale, 1));
+  transform: translate(-50%, -50%)
+    scale(calc(var(--tm-ko-card-scale, 1) * var(--tm-ko-card-size-scale, 1)));
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -936,7 +968,7 @@ html[data-modal-open] main {
 
 .tm-ko-card--final {
   width: var(--tm-ko-card-width);
-  min-width: 42px;
+  min-width: calc(42px * var(--tm-ko-card-size-scale));
   border-color: rgba(212, 255, 0, 0.42);
   background: linear-gradient(
     165deg,
@@ -1350,9 +1382,10 @@ html[data-modal-open] main {
   display: flex;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  height: var(--tm-cal-sidebar-access-btn-min-h, 18px);
   min-width: 0;
   min-height: var(--tm-cal-sidebar-access-btn-min-h, 18px);
+  align-self: center;
   align-items: center;
   justify-content: center;
   border: none;

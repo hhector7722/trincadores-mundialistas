@@ -19,7 +19,11 @@ export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
 export const R32_TOP_ANCHOR_Y = BRACKET_HEADER_BAND_Y + R32_TOP_CLEARANCE_Y;
 
 const R32_SLOT_COUNT = 8;
-const R32_PAIR_HALF = 1.45;
+
+/** Escala global de tarjetas con equipos (ancho + alto proporcional). */
+export const KO_CARD_SIZE_SCALE = 0.92;
+
+const R32_PAIR_HALF = 1.45 * KO_CARD_SIZE_SCALE;
 
 export const FINAL_CENTER_X = 50;
 
@@ -39,7 +43,7 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 };
 
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
-export const CARD_HALF_WIDTH_BASE = 4.2;
+export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 
 /**
  * Separación mínima horizontal entre tarjetas (en % del canvas 0–100).
