@@ -9,6 +9,7 @@ import {
   setActivePoolCookie,
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
+import { signInTrustedUserByUsername } from "@/lib/auth/trusted-sign-in";
 import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import { normalizePhone, resolveParticipantByPhone } from "@/lib/pwa/onboarding-phones";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
@@ -96,14 +97,25 @@ export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResul
   }
 
   const accessCode = getOnboardingAccessCode(participant.username);
-  if (!accessCode) {
-    return {
-      ok: false,
-      error: "No hay acceso configurado para ese participante. Contacta al administrador.",
-    };
+  if (accessCode) {
+    return signIn(participant.username, accessCode);
   }
 
-  return signIn(participant.username, accessCode);
+  const trusted = await signInTrustedUserByUsername(participant.username);
+  if (!trusted.ok) {
+    return trusted;
+  }
+
+  const supabase = await createClient();
+  try {
+    await applyPoolCookieForUser(trusted.userId);
+  } catch (e) {
+    await supabase.auth.signOut();
+    const msg = e instanceof Error ? e.message : "Error al resolver la porra.";
+    return { ok: false, error: msg };
+  }
+
+  return { ok: true };
 }
 
 export async function signOut(): Promise<void> {
