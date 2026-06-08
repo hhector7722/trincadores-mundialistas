@@ -13,13 +13,24 @@ const CARD_BUTTON_CLASS = cn(
   "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
 );
 
-function ScoringRuleRow({ line }: { line: ScoringRulesCardLine }) {
+function ScoringRuleRow({
+  line,
+  className,
+}: {
+  line: ScoringRulesCardLine;
+  className?: string;
+}) {
   if (line.kind !== "points") return null;
 
   return (
-    <p className="flex items-center justify-between gap-2 text-[10px] font-medium leading-snug">
-      <span className="text-white/75">{line.label}</span>
-      <span className="shrink-0 text-[#CCFF00]">{line.points}</span>
+    <p
+      className={cn(
+        "flex w-full items-center justify-between gap-2 text-[10px] font-medium leading-snug",
+        className
+      )}
+    >
+      <span className="min-w-0 truncate text-white/75">{line.label}</span>
+      <span className="shrink-0 tabular-nums text-right text-[#CCFF00]">{line.points}</span>
     </p>
   );
 }
@@ -46,12 +57,12 @@ function ScoringRulesMiniCard({
       className={cn(
         CARD_BUTTON_CLASS,
         flexClass,
-        useFourRowGrid ? "grid grid-rows-4" : "flex flex-col justify-center"
+        useFourRowGrid ? "grid grid-cols-[1fr_auto] grid-rows-4 gap-x-2" : "flex flex-col justify-center"
       )}
       aria-label="Normas de puntuación. Pulsa para ver el detalle."
     >
       {showHeader ? (
-        <div className="flex min-h-0 items-center justify-between gap-2">
+        <div className="col-span-2 flex min-h-0 items-center justify-between gap-2">
           <p className="text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
             Normas
           </p>
@@ -59,14 +70,24 @@ function ScoringRulesMiniCard({
         </div>
       ) : null}
       {useFourRowGrid ? (
-        lines.map((line) => (
-          <div
-            key={line.kind === "points" ? line.label : line.text}
-            className="flex min-h-0 items-center"
-          >
-            <ScoringRuleRow line={line} />
-          </div>
-        ))
+        lines.flatMap((line) => {
+          if (line.kind !== "points") return [];
+
+          return [
+            <span
+              key={`${line.label}-label`}
+              className="flex min-h-0 items-center truncate text-[10px] font-medium leading-snug text-white/75"
+            >
+              {line.label}
+            </span>,
+            <span
+              key={`${line.label}-points`}
+              className="flex min-h-0 items-center justify-end text-[10px] font-medium tabular-nums leading-snug text-[#CCFF00]"
+            >
+              {line.points}
+            </span>,
+          ];
+        })
       ) : (
         <div className="flex min-h-0 flex-1 flex-col justify-center gap-1">
           {lines.map((line) => (
