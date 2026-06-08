@@ -151,6 +151,10 @@ export function buildColumnCenters(): readonly number[] {
   x[3] += NUDGE_SF_LATERAL;
   x[5] -= NUDGE_SF_LATERAL;
 
+  // Cuartos: borde interior (hacia la final) alineado con el centro de su semifinal.
+  x[2] = x[3] - halfWidthForColumn(2);
+  x[6] = x[5] + halfWidthForColumn(6);
+
   return x;
 }
 
