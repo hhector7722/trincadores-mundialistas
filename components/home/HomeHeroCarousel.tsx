@@ -28,6 +28,17 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
 
   const slides: Slide[] = [
     {
+      id: "mundial",
+      eyebrow: "Mundial 2026",
+      headline: (
+        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
+          104 partidos
+        </p>
+      ),
+      description: "Unos que shanelan de esto, otros que no y muchas bocas que callar",
+      cta: { label: "Ver calendario", href: "/predictions" },
+    },
+    {
       id: "pending",
       eyebrow: "Resultados pendientes",
       headline: (
@@ -58,30 +69,17 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
     });
   }
 
-  slides.push(
-    {
-      id: "ranking",
-      eyebrow: "Clasificación",
-      headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
-          ¿Quién manda?
-        </p>
-      ),
-      description: "Mira tu posición y cuánto te separa del resto",
-      cta: { label: "Ver ranking", href: "/ranking" },
-    },
-    {
-      id: "mundial",
-      eyebrow: "Mundial 2026",
-      headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
-          104 partidos
-        </p>
-      ),
-      description: "Unos que shanelan de esto, otros que no y muchas bocas que callar",
-      cta: { label: "Ver calendario", href: "/predictions" },
-    }
-  );
+  slides.push({
+    id: "ranking",
+    eyebrow: "Clasificación",
+    headline: (
+      <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
+        ¿Quién manda?
+      </p>
+    ),
+    description: "Mira tu posición y cuánto te separa del resto",
+    cta: { label: "Ver ranking", href: "/ranking" },
+  });
 
   return slides;
 }
