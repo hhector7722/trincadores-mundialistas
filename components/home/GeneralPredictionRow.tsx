@@ -21,25 +21,13 @@ export function GeneralPredictionRow({
   const hasValue = Boolean(value);
 
   return (
-    <div className="grid min-h-6 grid-cols-[5rem_1fr] items-center gap-1.5 py-px">
+    <div className="grid min-h-6 grid-cols-[5rem_1fr_auto] items-center gap-1.5 py-px">
       <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
         {label}
       </span>
       <div className="flex w-full min-w-0 items-center justify-center">
         {hasValue ? (
-          <div className="relative inline-flex max-w-full min-w-0">
-            <span className="truncate text-[10px] font-medium text-[#CCFF00]">{value}</span>
-            {editable ? (
-              <button
-                type="button"
-                onClick={onEdit}
-                aria-label={`Editar ${label}`}
-                className="absolute left-full top-1/2 ml-0.5 shrink-0 -translate-y-1/2 text-[#CCFF00] transition-opacity hover:opacity-80"
-              >
-                <Pencil className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />
-              </button>
-            ) : null}
-          </div>
+          <span className="max-w-full truncate text-[10px] font-medium text-[#CCFF00]">{value}</span>
         ) : editable ? (
           <button
             type="button"
@@ -57,6 +45,18 @@ export function GeneralPredictionRow({
         ) : (
           <span className="text-center text-[10px] text-white/30">—</span>
         )}
+      </div>
+      <div className="flex w-3 shrink-0 items-center justify-end">
+        {hasValue && editable ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={`Editar ${label}`}
+            className="shrink-0 text-[#CCFF00] transition-opacity hover:opacity-80"
+          >
+            <Pencil className="h-2 w-2" strokeWidth={2} aria-hidden="true" />
+          </button>
+        ) : null}
       </div>
     </div>
   );
