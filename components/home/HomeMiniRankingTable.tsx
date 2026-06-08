@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
-import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
@@ -42,22 +42,20 @@ function MiniRankingDataRow({
   isCurrentUser: boolean;
 }) {
   return (
-    <Link
-      href={`/profile/${row.profileId}`}
+    <div
       className={cn(
         MINI_RANKING_GRID,
-        "flex min-h-0 flex-1 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] transition-colors last:border-0 hover:bg-white/5"
+        "flex min-h-0 flex-1 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatarButton
+      <ProfileAvatar
         avatarUrl={row.avatarUrl}
         label={row.label}
         className="size-[1.125rem] shrink-0"
-        stopNavigation
       />
       <span
         className={cn(
@@ -76,7 +74,7 @@ function MiniRankingDataRow({
       <span className="shrink-0 text-right font-display tabular-nums text-white/85">
         {formatAggregateStat(row.quizPoints)}
       </span>
-    </Link>
+    </div>
   );
 }
 
@@ -105,7 +103,14 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
   const emptyRowCount = Math.max(0, EMPTY_ROW_COUNT - displayRows.length);
 
   return (
-    <div className="tm-home-top-stat-card @container flex min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card">
+    <Link
+      href="/ranking"
+      aria-label="Ver tabla de clasificación"
+      className={cn(
+        "tm-home-top-stat-card @container flex min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card",
+        "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
+      )}
+    >
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex min-h-full min-w-max flex-1 flex-col">
           <MiniRankingHeader />
@@ -123,6 +128,6 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
