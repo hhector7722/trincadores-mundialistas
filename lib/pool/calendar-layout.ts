@@ -26,10 +26,8 @@ const ACCESS_DOCK_ROWS = 2;
 const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.78;
 const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
 const ACCESS_CARD_INSET_PX = 5;
-const ACCESS_BTN_VERTICAL_INSET_PX = 1;
-const MIN_ACCESS_BTN_HEIGHT_PX = 20;
-const ACCESS_DOCK_HEIGHT_RATIO = 0.36;
-const MIN_ACCESS_DOCK_HEIGHT_PX = 58;
+const ACCESS_BTN_PAD_Y_PX = 1;
+const ACCESS_BTN_LINE_HEIGHT = 1.1;
 const SIDEBAR_BODY_GAP_PX = 6;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
@@ -147,9 +145,9 @@ function measureAccessLabelWidth(text: string, fontSizePx: number): number {
   return ctx.measureText(text).width;
 }
 
-function fitAccessButtonFontSize(cellW: number, cellH: number, padX: number): number {
+function fitAccessButtonFontSize(cellW: number, padX: number): number {
   const minFs = 7;
-  const maxFs = Math.min(11, Math.floor(cellH * 0.46));
+  const maxFs = 11;
   const availableW = Math.max(0, cellW - padX * 2);
 
   for (let fs = maxFs; fs >= minFs; fs--) {
@@ -161,6 +159,10 @@ function fitAccessButtonFontSize(cellW: number, cellH: number, padX: number): nu
   return minFs;
 }
 
+function accessButtonVisualHeight(fontSizePx: number): number {
+  return Math.ceil(fontSizePx * ACCESS_BTN_LINE_HEIGHT + ACCESS_BTN_PAD_Y_PX * 2);
+}
+
 /** Reserva la franja inferior L-M-X para los botones de acceso (rejilla 2×2). */
 function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
@@ -169,7 +171,7 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.removeProperty("--tm-cal-sidebar-body-gap");
     calendar.style.removeProperty("--tm-cal-sidebar-access-pad");
     calendar.style.removeProperty("--tm-cal-sidebar-access-grid-gap");
-    calendar.style.removeProperty("--tm-cal-sidebar-access-btn-min-h");
+    calendar.style.removeProperty("--tm-cal-sidebar-access-btn-py");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
     calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
@@ -177,19 +179,8 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     return;
   }
 
-  const dayNum = slot.querySelector<HTMLElement>(".tm-cal-day-num");
-  const dayNumH = dayNum?.offsetHeight ?? 0;
-  const bodyH = Math.max(
-    0,
-    slot.clientHeight - dayNumH - SIDEBAR_BODY_GAP_PX
-  );
-  const dockH = Math.max(
-    MIN_ACCESS_DOCK_HEIGHT_PX,
-    Math.floor(bodyH * ACCESS_DOCK_HEIGHT_RATIO)
-  );
   const slotWidth = slot.clientWidth;
   const innerW = Math.max(0, slotWidth - ACCESS_CARD_INSET_PX * 2);
-  const innerH = Math.max(0, dockH - ACCESS_CARD_INSET_PX * 2);
   const gridW = Math.max(0, Math.floor(innerW * ACCESS_DOCK_GRID_WIDTH_RATIO));
   const cellW = Math.max(
     0,
@@ -198,25 +189,19 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
         ACCESS_DOCK_COLS
     )
   );
-  const cellH = Math.max(
-    MIN_ACCESS_BTN_HEIGHT_PX,
-    Math.floor(
-      (innerH - ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1)) /
-        ACCESS_DOCK_ROWS
-    )
-  );
-  const btnVisualH = Math.max(
-    MIN_ACCESS_BTN_HEIGHT_PX,
-    cellH - ACCESS_BTN_VERTICAL_INSET_PX * 2
-  );
   const btnPadX = Math.max(3, Math.min(8, Math.floor(cellW * 0.08)));
-  let btnFs = fitAccessButtonFontSize(cellW, btnVisualH, btnPadX);
+  let btnFs = fitAccessButtonFontSize(cellW, btnPadX);
+  let btnVisualH = accessButtonVisualHeight(btnFs);
+  const gridH =
+    btnVisualH * ACCESS_DOCK_ROWS +
+    ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1);
+  const dockH = ACCESS_CARD_INSET_PX * 2 + gridH;
 
   calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-body-gap", `${SIDEBAR_BODY_GAP_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-pad", `${ACCESS_CARD_INSET_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-gap", `${ACCESS_DOCK_GRID_GAP_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-access-btn-min-h", `${btnVisualH}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-btn-py", `${ACCESS_BTN_PAD_Y_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-px", `${btnPadX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-w", `${gridW}px`);
@@ -324,7 +309,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     const dockH = Number.parseFloat(
       calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
     );
-    const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : MIN_ACCESS_DOCK_HEIGHT_PX;
+    const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
     const titleH = title?.offsetHeight ?? 0;
     const topInsetReserve = titleH + GROUPS_EDGE_INSET_PX * 2;
     const maxPanelH = Math.max(
@@ -529,7 +514,7 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-body-gap");
   calendar.style.removeProperty("--tm-cal-sidebar-access-pad");
   calendar.style.removeProperty("--tm-cal-sidebar-access-grid-gap");
-  calendar.style.removeProperty("--tm-cal-sidebar-access-btn-min-h");
+  calendar.style.removeProperty("--tm-cal-sidebar-access-btn-py");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
   calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
