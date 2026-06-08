@@ -24,7 +24,7 @@ export function HomeHero({ pendingCount, quizSlide }: HomeHeroProps) {
         className="pointer-events-none relative z-[1] min-w-0 overflow-hidden"
         aria-hidden="true"
       >
-        <div className="absolute top-3 left-2 origin-top-left translate-x-3 scale-[0.88] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_28%,rgba(0,0,0,0.96)_40%,rgba(0,0,0,0.86)_52%,rgba(0,0,0,0.68)_64%,rgba(0,0,0,0.46)_76%,rgba(0,0,0,0.24)_88%,rgba(0,0,0,0.08)_95%,transparent_100%)] [mask-image:linear-gradient(to_bottom,#000_0%,#000_28%,rgba(0,0,0,0.96)_40%,rgba(0,0,0,0.86)_52%,rgba(0,0,0,0.68)_64%,rgba(0,0,0,0.46)_76%,rgba(0,0,0,0.24)_88%,rgba(0,0,0,0.08)_95%,transparent_100%)] sm:top-4 sm:left-3 sm:translate-x-4 sm:scale-[0.92]">
+        <div className="absolute top-3 left-2 origin-top-left translate-x-3 scale-[0.88] sm:top-4 sm:left-3 sm:translate-x-4 sm:scale-[0.92]">
           <Image
             src="/icons/ronaldo.png"
             alt=""
@@ -35,7 +35,6 @@ export function HomeHero({ pendingCount, quizSlide }: HomeHeroProps) {
             className="block h-[14.5rem] w-[9.75rem] max-w-none object-contain object-left-top mix-blend-lighten sm:h-[15.5rem] sm:w-[10.25rem]"
           />
         </div>
-        <div className="absolute inset-x-0 bottom-0 z-[2] h-12 bg-gradient-to-t from-[rgba(48,21,96,0.92)] via-[rgba(48,21,96,0.45)] to-transparent sm:h-14" />
       </div>
     </section>
   );
