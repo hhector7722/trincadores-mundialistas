@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const CARD_BUTTON_CLASS = cn(
-  "@container flex min-h-0 min-w-0 flex-1 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] text-left tm-stat-card",
+  "@container flex min-h-0 min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] text-left tm-stat-card",
   "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
 );
 
@@ -27,19 +27,21 @@ function ScoringRuleRow({ line }: { line: ScoringRulesCardLine }) {
 type ScoringRulesMiniCardProps = {
   lines: ScoringRulesCardLine[];
   showHeader?: boolean;
+  flexClass?: string;
   onOpen: () => void;
 };
 
 function ScoringRulesMiniCard({
   lines,
   showHeader = false,
+  flexClass = "flex-1",
   onOpen,
 }: ScoringRulesMiniCardProps) {
   return (
     <button
       type="button"
       onClick={onOpen}
-      className={CARD_BUTTON_CLASS}
+      className={cn(CARD_BUTTON_CLASS, flexClass)}
       aria-label="Normas de puntuación. Pulsa para ver el detalle."
     >
       {showHeader ? (
@@ -68,8 +70,13 @@ export function HomeScoringRulesCard() {
   return (
     <>
       <div className="col-start-1 flex h-full min-h-0 min-w-0 flex-col gap-1.5">
-        <ScoringRulesMiniCard lines={topLines} showHeader onOpen={openModal} />
-        <ScoringRulesMiniCard lines={bottomLines} onOpen={openModal} />
+        <ScoringRulesMiniCard
+          lines={topLines}
+          showHeader
+          flexClass="flex-[1.2]"
+          onOpen={openModal}
+        />
+        <ScoringRulesMiniCard lines={bottomLines} flexClass="flex-[0.8]" onOpen={openModal} />
       </div>
 
       <ScoringRulesModal open={open} onClose={() => setOpen(false)} />
