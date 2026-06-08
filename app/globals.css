@@ -49,16 +49,7 @@
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
-  --font-display: var(--font-archivo), system-ui, sans-serif;
-  --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
-  --font-ui: var(--font-space), system-ui, sans-serif;
-}
-
-body {
-  margin: 0;
-  min-height: 100dvh;
-  background-color: var(--tm-purple-deep);
-  background-image:
+  --tm-shell-bg-image:
     radial-gradient(ellipse 110% 65% at 50% -8%, rgba(170, 120, 255, 0.42) 0%, transparent 58%),
     radial-gradient(ellipse 85% 55% at 50% 42%, rgba(140, 90, 240, 0.22) 0%, transparent 68%),
     radial-gradient(ellipse 75% 50% at 8% 8%, rgba(140, 90, 240, 0.28) 0%, transparent 55%),
@@ -72,6 +63,16 @@ body {
       var(--tm-bg) 78%,
       var(--tm-purple-deep) 100%
     );
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
+  --font-ui: var(--font-space), system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--tm-purple-deep);
+  background-image: var(--tm-shell-bg-image);
   color: var(--tm-fg);
   font-family: var(--font-ui);
   color-scheme: dark;
@@ -110,7 +111,22 @@ html[data-modal-open] .tm-app-main {
   min-height: 100svh;
   min-height: -webkit-fill-available;
   flex-direction: column;
-  background-color: var(--tm-shell-bg-hex);
+  isolation: isolate;
+}
+
+/* Degradado fijo: mismo tono en cabecera y contenido, sin corte de color */
+.tm-app-frame::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--tm-purple-deep);
+  background-image: var(--tm-shell-bg-image);
+}
+
+.tm-app-header {
+  background: transparent;
 }
 
 .tm-app-main {
@@ -119,15 +135,15 @@ html[data-modal-open] .tm-app-main {
   z-index: 10;
   width: 100%;
   flex: 1 1 auto;
-  background-color: var(--tm-shell-bg-hex);
+  background: transparent;
 }
 
-/* Reserva scroll sobre la TabBar con fondo shell: el contenido llega visualmente hasta la barra */
+/* Reserva scroll sobre la TabBar: el degradado continúa bajo el contenido */
 .tm-app-main-inner {
   box-sizing: border-box;
   min-height: 100%;
   padding-bottom: var(--tm-content-bottom);
-  background-color: var(--tm-shell-bg-hex);
+  background: transparent;
 }
 
 .tm-app-frame:has(.tm-porra-layout) {
@@ -143,7 +159,7 @@ html[data-modal-open] .tm-app-main {
   flex-direction: column;
   padding-bottom: 0;
   overflow: hidden;
-  background-color: var(--tm-shell-bg-hex);
+  background: transparent;
 }
 
 .tm-app-main-inner:has(> .tm-porra-layout) {
@@ -166,9 +182,9 @@ html[data-modal-open] .tm-fixed-bottombar {
   pointer-events: none;
 }
 
-/* Mismo color sólido que la TabBar bajo el viewport (marbella: body bg = nav bg) */
+/* Overscroll: arriba tono cabecera, abajo tono TabBar */
 html:has(.tm-app-frame) {
-  background-color: var(--tm-tabbar-bg-hex);
+  background-color: var(--tm-bg-top);
 }
 
 html:has(.tm-app-frame) body {
@@ -652,14 +668,47 @@ html:has(.tm-app-frame) body {
   flex-direction: column;
 }
 
-.tm-quiz-hub-spacer {
-  flex: 0 0 40%;
+.tm-quiz-hub-zone {
+  display: flex;
   min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
 }
 
-.tm-quiz-hub-content {
-  flex: 1 1 auto;
+.tm-quiz-hub-zone--cta {
+  align-items: stretch;
+  justify-content: center;
+  padding-block: 0.5rem;
+}
+
+.tm-quiz-hub-cta-inner {
+  width: 100%;
+}
+
+.tm-quiz-hub-zone--leaderboard {
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.tm-quiz-hub-leaderboard-body {
+  display: flex;
   min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tm-quiz-leaderboard-list {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+}
+
+.tm-quiz-leaderboard-row {
+  flex: 1 1 0%;
+  min-height: 2.75rem;
 }
 
 .tm-quiz-page--play > * {
