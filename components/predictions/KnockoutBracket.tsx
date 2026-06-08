@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -9,13 +9,16 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  BRACKET_TREE_LAYOUT,
-  bracketMatchMidPercentForRound,
-  bracketSlotTopPercentForRound,
+  buildBracketConnectorPaths,
+  buildBracketGeometry,
+  scorePosition,
+  slotPosition,
+  type BracketMatchGeometry,
+} from "@/lib/predictions/knockout-bracket-geometry";
+import {
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
   resolveBracketMatch,
-  type BracketTreeSlot,
 } from "@/lib/predictions/knockout-bracket-layout";
 import { knockoutTeamLabel } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -24,6 +27,9 @@ type KnockoutBracketProps = {
   poolId: string;
   matches: MatchWithPrediction[];
 };
+
+const BRACKET_GEOMETRY = buildBracketGeometry();
+const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 
 function BracketTeamSlot({ name }: { name: string }) {
   const label = knockoutTeamLabel(name);
@@ -35,16 +41,16 @@ function BracketTeamSlot({ name }: { name: string }) {
   );
 }
 
-function BracketTreeMatch({
-  slot,
+function BracketMatchNode({
+  geom,
   match,
   onOpen,
 }: {
-  slot: BracketTreeSlot;
+  geom: BracketMatchGeometry;
   match: MatchWithPrediction | null;
   onOpen: (match: MatchWithPrediction) => void;
 }) {
-  const fallback = placeholderPairForMatchNumber(slot.matchNumber);
+  const fallback = placeholderPairForMatchNumber(geom.matchNumber);
   const homeName = match?.home_team ?? fallback?.home ?? " ";
   const awayName = match?.away_team ?? fallback?.away ?? " ";
   const savedHome = match?.prediction?.home_goals ?? null;
@@ -62,55 +68,48 @@ function BracketTreeMatch({
     : "empty";
   const scoreText = match ? formatListScore(savedHome, savedAway) : " ";
   const isLive = match?.status === "live";
-  const usesPyramidSlots = slot.round !== "r32";
-  const homeY = usesPyramidSlots
-    ? bracketSlotTopPercentForRound(slot.round, slot.rowStart, slot.rowSpan, "home")
-    : null;
-  const awayY = usesPyramidSlots
-    ? bracketSlotTopPercentForRound(slot.round, slot.rowStart, slot.rowSpan, "away")
-    : null;
-  const midY = usesPyramidSlots
-    ? bracketMatchMidPercentForRound(slot.round, slot.rowStart, slot.rowSpan)
-    : null;
+  const homePos = slotPosition(geom, "home");
+  const awayPos = slotPosition(geom, "away");
+  const scorePos = scorePosition(geom);
+  const isFinal = geom.round === "final";
 
   return (
     <button
       type="button"
       disabled={!match}
       onClick={() => match && onOpen(match)}
-      style={{
-        gridColumn: slot.column + 1,
-        gridRow: `${slot.rowStart} / span ${slot.rowSpan}`,
-        ...(usesPyramidSlots
-          ? ({
-              "--tm-ko-home-y": `${homeY}%`,
-              "--tm-ko-away-y": `${awayY}%`,
-              "--tm-ko-mid-y": `${midY}%`,
-            } as CSSProperties)
-          : {}),
-      }}
       className={cn(
-        "tm-ko-node",
-        usesPyramidSlots && "tm-ko-node--pyramid",
-        slot.round === "sf" && "tm-ko-node--sf",
-        slot.round === "final" && "tm-ko-node--final",
-        slot.side === "left" && "tm-ko-node--left",
-        slot.side === "right" && "tm-ko-node--right",
-        slot.side === "center" && "tm-ko-node--center",
-        !match && "tm-ko-node--missing",
-        isLive && "tm-ko-node--live",
-        state === "saved" && "tm-ko-node--saved",
-        state === "locked" && "tm-ko-node--locked"
+        "tm-ko-match",
+        isFinal && "tm-ko-match--final",
+        !match && "tm-ko-match--missing",
+        isLive && "tm-ko-match--live",
+        state === "saved" && "tm-ko-match--saved",
+        state === "locked" && "tm-ko-match--locked"
       )}
       aria-label={
         match
           ? `Pronostico ${homeName} contra ${awayName}`
-          : `Partido ${slot.matchNumber} sin datos`
+          : `Partido ${geom.matchNumber} sin datos`
       }
     >
-      <span className="tm-ko-node-pair">
+      <span
+        className="tm-ko-match-slot tm-ko-match-slot--home"
+        style={{ left: `${homePos.x}%`, top: `${homePos.y}%` }}
+      >
         <BracketTeamSlot name={homeName} />
-        {scoreText.trim() ? <span className="tm-ko-node-score">{scoreText}</span> : null}
+      </span>
+      {scoreText.trim() ? (
+        <span
+          className="tm-ko-node-score"
+          style={{ left: `${scorePos.x}%`, top: `${scorePos.y}%` }}
+        >
+          {scoreText}
+        </span>
+      ) : null}
+      <span
+        className="tm-ko-match-slot tm-ko-match-slot--away"
+        style={{ left: `${awayPos.x}%`, top: `${awayPos.y}%` }}
+      >
         <BracketTeamSlot name={awayName} />
       </span>
     </button>
@@ -141,15 +140,43 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
       </div>
 
       <div className="tm-ko-stage">
-        <div className="tm-ko-tree" role="img" aria-label="Cuadro de eliminatorias Mundial 2026">
-          {BRACKET_TREE_LAYOUT.map((slot) => (
-            <BracketTreeMatch
-              key={`${slot.side}-${slot.round}-${slot.matchNumber}`}
-              slot={slot}
-              match={resolveBracketMatch(matchMap, slot.matchNumber)}
-              onOpen={setActiveMatch}
-            />
-          ))}
+        <div
+          className="tm-ko-canvas"
+          role="img"
+          aria-label="Cuadro de eliminatorias Mundial 2026"
+        >
+          <svg
+            className="tm-ko-wires"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            {BRACKET_CONNECTORS.map((path, index) => (
+              <path
+                key={`wire-${index}`}
+                d={path}
+                className="tm-ko-wire"
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+          </svg>
+
+          <div className="tm-ko-columns" aria-hidden>
+            {Array.from({ length: 9 }, (_, column) => (
+              <div key={column} className="tm-ko-col" />
+            ))}
+          </div>
+
+          <div className="tm-ko-nodes">
+            {BRACKET_GEOMETRY.map((geom) => (
+              <BracketMatchNode
+                key={geom.matchNumber}
+                geom={geom}
+                match={resolveBracketMatch(matchMap, geom.matchNumber)}
+                onOpen={setActiveMatch}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
