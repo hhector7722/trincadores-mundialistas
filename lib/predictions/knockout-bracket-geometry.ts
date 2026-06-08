@@ -406,6 +406,16 @@ function connectChildToParent(
       : gutterX(Math.min(child.column, parent.column), Math.max(child.column, parent.column));
   const xStart = cardEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = cardEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
+
+  const childAbove = child.midY < parent.midY;
+  if (
+    parent.round === "r16" &&
+    R16_CLIP_VERTICAL_TO_TOP.has(parent.matchNumber) &&
+    childAbove
+  ) {
+    return `M ${xStart} ${child.midY} H ${xVertical} H ${xEnd}`;
+  }
+
   const yAnchor = verticalAnchorY(child, parent);
 
   return `M ${xStart} ${child.midY} H ${xVertical} V ${yAnchor} H ${xEnd}`;
