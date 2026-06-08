@@ -4,13 +4,13 @@ export const BRACKET_LEAF_SLOTS = 16;
 export const BRACKET_VERTICAL_PAD = 3;
 export const BRACKET_VERTICAL_COMPACT = 0.88;
 
-/** Posiciones X uniformes (9 columnas, márgenes laterales amplios). */
-export const COLUMN_X_BY_INDEX: readonly number[] = [9, 19, 29, 41, 50, 59, 71, 81, 91];
+/** Posiciones X base (9 columnas); se compactan hacia el centro. */
+export const COLUMN_X_RAW: readonly number[] = [9, 19, 29, 41, 50, 59, 71, 81, 91];
+/** Compactación horizontal de columnas (~12.5 %). */
+export const BRACKET_HORIZONTAL_COMPACT = 0.875;
 
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
-export const FINAL_ANCHOR_LEFT_X = 44;
-export const FINAL_ANCHOR_RIGHT_X = 56;
 
 /** Escalado visual por ronda. */
 export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
@@ -18,11 +18,16 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
   r16: 1.1,
   qf: 1.2,
   sf: 1.3,
-  final: 1.5,
+  final: 1.4,
 };
 
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
 export const CARD_HALF_WIDTH_BASE = 4.2;
+
+export const FINAL_ANCHOR_LEFT_X =
+  FINAL_CENTER_X - CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.final;
+export const FINAL_ANCHOR_RIGHT_X =
+  FINAL_CENTER_X + CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.final;
 
 export type BracketMatchGeometry = {
   matchNumber: number;
@@ -68,7 +73,9 @@ export function leafSpanY(startLeaf: number, leafSpan: number) {
 }
 
 export function mapColumnX(column: number): number {
-  return COLUMN_X_BY_INDEX[column] ?? 50;
+  const raw = COLUMN_X_RAW[column] ?? 50;
+  if (raw === 50) return 50;
+  return 50 + (raw - 50) * BRACKET_HORIZONTAL_COMPACT;
 }
 
 export function gutterX(columnA: number, columnB: number): number {

@@ -815,7 +815,7 @@ html[data-modal-open] main {
   border: 1px solid var(--tm-ko-card-border);
   border-radius: 0.55rem;
   background: var(--tm-ko-card-bg);
-  padding: 0;
+  padding: 0.1rem 0.08rem;
   cursor: pointer;
   touch-action: manipulation;
   transform: translate(-50%, -50%) scale(var(--tm-ko-card-scale, 1));
@@ -843,8 +843,8 @@ html[data-modal-open] main {
 
 .tm-ko-card--final {
   z-index: 3;
-  width: min(13.5cqw, 68px);
-  min-width: 54px;
+  width: min(10.2cqw, 51px);
+  min-width: 41px;
   border-color: rgba(212, 255, 0, 0.42);
   background: linear-gradient(
     165deg,
@@ -856,13 +856,32 @@ html[data-modal-open] main {
     0 4px 18px rgba(0, 0, 0, 0.35);
 }
 
+.tm-ko-card--r32 {
+  padding: 0.14rem 0.12rem;
+  gap: 0;
+}
+
+.tm-ko-card--r32::before {
+  content: "";
+  position: absolute;
+  inset: 0.22rem;
+  border: 1px solid var(--tm-ko-card-border);
+  border-radius: 0.4rem;
+  pointer-events: none;
+}
+
+.tm-ko-card--r32 .tm-ko-card-divider {
+  margin-inline: 0.1rem;
+  background: var(--tm-ko-card-border);
+}
+
 .tm-ko-card-row {
   display: flex;
-  min-height: min(3.8cqh, 18px);
+  min-height: min(4.2cqh, 20px);
   align-items: center;
   justify-content: space-between;
   gap: 0.2rem;
-  padding: 0.18rem 0.28rem;
+  padding: 0.28rem 0.38rem;
 }
 
 .tm-ko-card-row-text {
@@ -919,8 +938,8 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--final .tm-ko-card-row {
-  min-height: min(4.4cqh, 21px);
-  padding-inline: 0.34rem;
+  min-height: min(4.8cqh, 22px);
+  padding-inline: 0.44rem;
 }
 
 .tm-ko-card--final .tm-ko-card-row-primary {
