@@ -19,8 +19,9 @@ const MIDFIELD_Y = 50;
 const MIDFIELD_GAP = 6;
 
 /** Local: delanteros cerca del centro, portería abajo. */
-const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP;
-const HOME_DEFENSE_Y = 90;
+const HOME_BLOCK_SHIFT_Y = -2;
+const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP + HOME_BLOCK_SHIFT_Y;
+const HOME_DEFENSE_Y = 90 + HOME_BLOCK_SHIFT_Y;
 
 /** Visitante: delanteros cerca del centro, portería arriba. */
 const AWAY_BLOCK_SHIFT_Y = -6;
