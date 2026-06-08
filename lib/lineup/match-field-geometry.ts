@@ -1,29 +1,49 @@
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
-/** Coordenadas del once individual (y: 16 ataque, y: 90 portería). */
+/**
+ * Geometría del MVP en campo compartido.
+ * Parte de las coordenadas del modal de alineación (campo completo, y: 16 ataque → 90 portería)
+ * y las proyecta a cada mitad con perspectiva Goya (estrecho arriba, ancho abajo).
+ */
+
 const SINGLE_ATTACK_Y = 16;
 const SINGLE_DEFENSE_Y = 90;
 
-/** Mitad inferior: local ataca hacia el centro. */
-const HOME_ATTACK_Y = 56;
-const HOME_DEFENSE_Y = 93;
+/** Mitad inferior (local): portería abajo, ataque hacia el centro. */
+const HOME_ATTACK_Y = 57;
+const HOME_DEFENSE_Y = 91;
 
-/** Mitad superior: visitante ataca hacia el centro. */
-const AWAY_ATTACK_Y = 44;
-const AWAY_DEFENSE_Y = 7;
+/** Mitad superior (visitante): portería arriba, ataque hacia el centro. */
+const AWAY_ATTACK_Y = 43;
+const AWAY_DEFENSE_Y = 9;
 
 /** Límites verticales del plano de juego en la imagen Goya (%). */
 const GOYA_PITCH_TOP_Y = 8;
 const GOYA_PITCH_BOTTOM_Y = 92;
 
-/** Ancho aparente del campo: estrecho arriba, ancho abajo (perspectiva). */
-const GOYA_WIDTH_FACTOR_TOP = 0.66;
+/** Compresión horizontal en el fondo del plano (arriba del campo). */
+const GOYA_WIDTH_FACTOR_TOP = 0.68;
 const GOYA_WIDTH_FACTOR_BOTTOM = 1;
+
+/**
+ * Escala visual mínima en la parte alta: un poco por encima del ancho del plano
+ * para que dorsales y nombres sigan siendo legibles con perspectiva.
+ */
+const GOYA_SCALE_MIN = 0.74;
+const GOYA_SCALE_MAX = 1;
 
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
 function normalizeDepth(y: number): number {
   return (y - SINGLE_ATTACK_Y) / (SINGLE_DEFENSE_Y - SINGLE_ATTACK_Y);
+}
+
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+function pitchDepth(y: number): number {
+  return clamp01((y - GOYA_PITCH_TOP_Y) / (GOYA_PITCH_BOTTOM_Y - GOYA_PITCH_TOP_Y));
 }
 
 function mapToHomeHalf(coord: FieldCoordinate): FieldCoordinate {
@@ -42,23 +62,25 @@ function mapToAwayHalf(coord: FieldCoordinate): FieldCoordinate {
   };
 }
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
-}
-
-/** Factor de ancho/escala según la profundidad del plano Goya (0 = arriba, 1 = abajo). */
-export function goyaPerspectiveFactor(y: number): number {
-  const depth = clamp01((y - GOYA_PITCH_TOP_Y) / (GOYA_PITCH_BOTTOM_Y - GOYA_PITCH_TOP_Y));
+/** Factor de ancho según profundidad del plano Goya. */
+export function goyaWidthFactor(y: number): number {
+  const depth = pitchDepth(y);
   return GOYA_WIDTH_FACTOR_TOP + depth * (GOYA_WIDTH_FACTOR_BOTTOM - GOYA_WIDTH_FACTOR_TOP);
 }
 
-/** Comprime x hacia el centro y devuelve escala proporcional al estrechamiento del campo. */
+/** Escala de chip según profundidad (visitante arriba = más pequeño). */
+export function goyaScaleFactor(y: number): number {
+  const depth = pitchDepth(y);
+  return GOYA_SCALE_MIN + depth * (GOYA_SCALE_MAX - GOYA_SCALE_MIN);
+}
+
 export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
-  const factor = goyaPerspectiveFactor(slot.y);
+  const widthFactor = goyaWidthFactor(slot.y);
+  const scaleFactor = goyaScaleFactor(slot.y);
   return {
     ...slot,
-    x: 50 + (slot.x - 50) * factor,
-    scale: factor,
+    x: 50 + (slot.x - 50) * widthFactor,
+    scale: scaleFactor,
   };
 }
 

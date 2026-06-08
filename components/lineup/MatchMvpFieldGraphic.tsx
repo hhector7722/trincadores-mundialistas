@@ -71,13 +71,13 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "w-full shrink-0 self-center overflow-visible py-1 sm:py-1.5",
+        "w-full shrink-0 self-center overflow-visible py-2 sm:py-3",
         className
       )}
     >
       <div
         className={cn(
-          "relative aspect-[3/2] w-full min-h-[min(40dvh,20rem)] max-w-none overflow-visible"
+          "relative aspect-[3/2] w-full min-h-[min(38dvh,19rem)] max-w-none overflow-visible"
         )}
       >
       <div className="absolute inset-0">
@@ -94,10 +94,10 @@ export function MatchMvpFieldGraphic({
         />
       </div>
 
-      <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+      <div className="pointer-events-none absolute left-4 top-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
         {teamNameEs(awayTeam)}
       </div>
-      <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+      <div className="pointer-events-none absolute bottom-4 left-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
         {teamNameEs(homeTeam)}
       </div>
 
