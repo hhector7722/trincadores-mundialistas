@@ -144,6 +144,7 @@ html[data-modal-open] .tm-app-main {
   flex: 0 0 auto;
   box-sizing: border-box;
   width: 100%;
+  /* Solo pintura: extiende el fondo al home-indicator sin inflar --tm-tabbar-height. */
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background-color: var(--tm-tabbar-bg-hex);
   background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);

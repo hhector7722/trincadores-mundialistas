@@ -7,7 +7,7 @@ import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { cn } from "@/lib/utils";
 
-const TABBAR_HEIGHT_FALLBACK = "calc(var(--tm-tabbar-core) + var(--tm-safe-bottom))";
+const TABBAR_HEIGHT_FALLBACK = "var(--tm-tabbar-core)";
 
 function syncTabBarHeight(node: HTMLElement) {
   const height = Math.ceil(node.getBoundingClientRect().height);

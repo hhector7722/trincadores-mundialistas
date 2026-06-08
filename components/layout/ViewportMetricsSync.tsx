@@ -1,17 +1,9 @@
 "use client";
 
 import { useLayoutEffect } from "react";
+import { resetViewportMetrics, syncViewportMetrics } from "@/lib/layout/viewport-metrics";
 
-function syncViewportMetrics() {
-  const offsetTop = Math.round(window.visualViewport?.offsetTop ?? 0);
-  document.documentElement.style.setProperty("--tm-vvh-offset", `${offsetTop}px`);
-}
-
-function resetViewportMetrics() {
-  document.documentElement.style.removeProperty("--tm-vvh-offset");
-}
-
-/** Ajusta el top del shell al visual viewport (teclado / Safari iOS). El shell usa bottom: 0. */
+/** Mantiene el shell alineado al visual viewport (teclado / recálculo iOS). */
 export function ViewportMetricsSync() {
   useLayoutEffect(() => {
     const onChange = () => syncViewportMetrics();
