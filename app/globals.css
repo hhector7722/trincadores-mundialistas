@@ -43,9 +43,11 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   /* Marbella usa h-20 (5rem) + pb-safe en un solo nav */
-  --tm-tabbar-core: 5.25rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-tabbar-core: 3rem;
+  --tm-tab-indicators-core: 1.5rem;
+  --tm-bottom-chrome-core: calc(var(--tm-tab-indicators-core) + var(--tm-tabbar-core));
+  --tm-tabbar-height: calc(var(--tm-bottom-chrome-core) + var(--tm-safe-bottom));
+  --tm-content-bottom: calc(var(--tm-bottom-chrome-core) + var(--tm-safe-bottom));
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -270,10 +272,14 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
-html[data-modal-open] .tm-fixed-bottombar {
+html[data-modal-open] .tm-bottom-chrome {
   filter: blur(6px);
   opacity: 0.35;
   pointer-events: none;
+}
+
+.tm-tab-indicators-slot {
+  background: transparent;
 }
 
 /* Overscroll: arriba tono cabecera, abajo tono TabBar */

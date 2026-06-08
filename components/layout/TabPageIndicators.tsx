@@ -23,7 +23,7 @@ export function TabPageIndicators() {
 
   return (
     <div
-      className="flex h-5 shrink-0 items-center justify-center"
+      className="flex h-4 shrink-0 items-center justify-center"
       role="tablist"
       aria-label="Secciones principales"
     >
