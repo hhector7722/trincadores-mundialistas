@@ -38,9 +38,9 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[3.25rem] w-[2.625rem] sm:h-[3.5rem] sm:w-[2.875rem]"
+            ? "h-[3rem] w-[2.4375rem] sm:h-[3.25rem] sm:w-[2.625rem]"
             : isModal
-              ? "h-[3.75rem] w-[2.875rem] sm:h-16 sm:w-[3.25rem]"
+              ? "h-[38px] w-[32px]"
               : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
           interactive && "transition-transform active:scale-95"
         )}
@@ -59,7 +59,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isMatch ? "14" : isModal ? "16" : "19"}
+          fontSize={isMatch ? "13" : isModal ? "14" : "19"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
@@ -69,14 +69,14 @@ export function LineupPlayerChip({
       <div
         className={cn(
           "-mt-px w-full rounded-md border bg-black/55 text-center backdrop-blur-sm",
-          isMatch ? "px-1 py-0.5" : "px-0.5 py-px",
+          isMatch ? "px-1 py-0.5" : "px-1 py-0.5",
           selected ? "border-[var(--tm-accent)]" : "border-white/10"
         )}
       >
         <p
           className={cn(
             "whitespace-normal text-center font-semibold leading-tight text-white",
-            isMatch ? "text-[9px] sm:text-[10px]" : isModal ? "text-[9px] sm:text-[10px]" : "text-[9px] sm:text-[10px]"
+            isMatch ? "text-[8px] sm:text-[9px]" : isModal ? "text-[8px]" : "text-[9px] sm:text-[10px]"
           )}
         >
           {shirtPlayerName(slot.name)}
@@ -93,9 +93,9 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "w-[3.75rem] min-h-11 sm:w-[4rem] sm:min-h-12"
+      ? "w-[3.5rem] min-h-10 sm:w-[3.75rem] sm:min-h-11"
       : isModal
-        ? "w-[4rem] min-h-11 sm:w-[4.5rem] sm:min-h-12"
+        ? "w-[3.5rem] min-h-9"
         : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"
