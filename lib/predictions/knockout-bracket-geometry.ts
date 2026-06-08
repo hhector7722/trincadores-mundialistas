@@ -157,6 +157,9 @@ export function buildColumnCenters(): readonly number[] {
 /** Referencia del botón «Ver fase Prévia» (52vw centrado ≈ 24%–76%). */
 export const FOOTER_BUTTON_ALIGN_REF = { leftPct: 24, rightPct: 76 } as const;
 
+/** Empuje ligero de cuartos hacia fuera (alejados de la final). */
+const NUDGE_QF_AWAY_FROM_FINAL = 1.75;
+
 /**
  * Invierte el desplazamiento del ajuste anterior (borde cuarto ↔ borde botón):
  * misma magnitud, sentido opuesto respecto a la columna natural.
@@ -172,11 +175,11 @@ export function applyQfOppositeFooterAlignment(
 
     if (geom.side === "left") {
       const footerColX = FOOTER_BUTTON_ALIGN_REF.leftPct - half;
-      return { ...geom, columnX: baseX - (footerColX - baseX) };
+      return { ...geom, columnX: baseX - (footerColX - baseX) - NUDGE_QF_AWAY_FROM_FINAL };
     }
     if (geom.side === "right") {
       const footerColX = FOOTER_BUTTON_ALIGN_REF.rightPct + half;
-      return { ...geom, columnX: baseX - (footerColX - baseX) };
+      return { ...geom, columnX: baseX - (footerColX - baseX) + NUDGE_QF_AWAY_FROM_FINAL };
     }
     return geom;
   });
