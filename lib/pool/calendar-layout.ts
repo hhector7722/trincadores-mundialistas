@@ -56,7 +56,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-sidebar-access-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -176,7 +176,6 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
     calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
-    calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
     return;
   }
 
@@ -227,57 +226,20 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
   }
 }
 
-/** Iguala el hueco card→botones y botones→línea de la semana 1. */
-function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): void {
-  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-groups-card");
-  const accessCard = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-access-card");
+/** Reservado: la card unificada ya no necesita hueco externo entre grupos y botones. */
+function syncSidebarAccessSpacing(_calendar: HTMLElement, _grid: HTMLElement): void {}
 
-  if (!slot || !card || !accessCard) {
-    calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
-    return;
-  }
-
-  void slot.offsetHeight;
-  const slotRect = slot.getBoundingClientRect();
-  const cardRect = card.getBoundingClientRect();
-  const accessCardH = accessCard.offsetHeight;
-  const freeSpace = slotRect.bottom - cardRect.bottom;
-  const gap = Math.max(0, Math.floor((freeSpace - accessCardH) / 2));
-
-  calendar.style.setProperty("--tm-cal-sidebar-access-gap", `${gap}px`);
-}
-
-/** Ajusta la card de grupos a la altura real del contenido (sin relleno inferior). */
+/** La card unificada ocupa todo el cuerpo lateral; no requiere altura explícita por contenido. */
 function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-groups-card");
-  const section = slot?.querySelector<HTMLElement>(".tm-cal-groups-section");
-  const title = slot?.querySelector<HTMLElement>(".tm-cal-groups-title");
-  const list = slot?.querySelector<HTMLElement>(".tm-cal-groups-list");
-  if (!slot || !card || !section) {
+  if (!slot) {
     calendar.style.removeProperty("--tm-cal-sidebar-card-h");
     calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
     return;
   }
 
-  void section.offsetHeight;
-  const cardRect = card.getBoundingClientRect();
-  const firstGroup = list?.querySelector<HTMLElement>(".tm-cal-group-card");
-  const groupCards = list?.querySelectorAll<HTMLElement>(".tm-cal-group-card");
-  const lastGroup = groupCards?.[groupCards.length - 1];
-
-  const topInset = firstGroup
-    ? Math.max(0, Math.round(firstGroup.getBoundingClientRect().top - cardRect.top))
-    : (title?.offsetHeight ?? 0);
-
-  const contentBottom = lastGroup
-    ? lastGroup.getBoundingClientRect().bottom
-    : cardRect.top + (title?.offsetHeight ?? 0) + (list?.offsetHeight ?? 0);
-
-  const cardH = Math.ceil(contentBottom - cardRect.top + topInset);
-  calendar.style.setProperty("--tm-cal-sidebar-card-edge-pad", `${topInset}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardH}px`);
+  calendar.style.removeProperty("--tm-cal-sidebar-card-h");
+  calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
 }
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
@@ -308,20 +270,22 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
 
   const sidebarSlot = panel.closest<HTMLElement>(".tm-cal-sidebar-slot");
   if (sidebarSlot) {
-    const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
+    const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
     const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
-    const dockH = Number.parseFloat(
-      calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
-    );
-    const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
+    const dock = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-access-dock");
+    const dockH =
+      dock?.offsetHeight ??
+      (() => {
+        const parsed = Number.parseFloat(
+          calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
+        );
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+      })();
     const titleH = title?.offsetHeight ?? 0;
     const topInsetReserve = titleH + GROUPS_EDGE_INSET_PX * 2;
     const maxPanelH = Math.max(
       0,
-      (body?.clientHeight ?? 0) -
-        resolvedDockH -
-        SIDEBAR_BODY_GAP_PX -
-        topInsetReserve
+      (card?.clientHeight ?? 0) - dockH - topInsetReserve
     );
     innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
   } else {
@@ -522,9 +486,6 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
   calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
-  calendar.style.removeProperty("--tm-cal-sidebar-access-gap");
-  calendar.style.removeProperty("--tm-cal-sidebar-card-h");
-  calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
   resetPredictionLabelMetrics(calendar);
   if (grid) resetCalendarGridHeight(grid);
 }

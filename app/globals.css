@@ -1473,7 +1473,7 @@ html:has(.tm-app-frame) body {
 .tm-porra-calendar .tm-cal-sidebar-card {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
   border-radius: 10px;
@@ -1485,16 +1485,8 @@ html:has(.tm-app-frame) body {
   isolation: isolate;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-groups-card {
-  height: var(--tm-cal-sidebar-card-h, auto);
-  max-height: calc(100% - var(--tm-cal-sidebar-access-dock-h, 0px));
-}
-
-.tm-porra-calendar .tm-cal-sidebar-access-card {
-  flex: 0 0 var(--tm-cal-sidebar-access-dock-h, auto);
-  height: var(--tm-cal-sidebar-access-dock-h, auto);
-  margin-top: var(--tm-cal-sidebar-access-gap, 0px);
-  margin-bottom: var(--tm-cal-sidebar-access-gap, 0px);
+.tm-porra-calendar .tm-cal-sidebar-unified-card {
+  height: 100%;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card-inner {
@@ -1502,17 +1494,16 @@ html:has(.tm-app-frame) body {
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  height: auto;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  height: 100%;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-section {
-  flex: 0 0 auto;
-  height: auto;
-  max-height: none;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
   width: 100%;
+  overflow: hidden;
 }
 
 .tm-porra-calendar .tm-cal-groups-title {
@@ -1529,23 +1520,11 @@ html:has(.tm-app-frame) body {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
-  flex: 0 0 auto;
-  height: auto;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
   width: 100%;
   padding-top: 0;
-}
-
-.tm-porra-calendar .tm-cal-sidebar-access-card .tm-cal-sidebar-card-inner {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-dock {
@@ -1558,6 +1537,7 @@ html:has(.tm-app-frame) body {
   justify-content: center;
   padding: var(--tm-cal-sidebar-access-pad, 4px);
   box-sizing: border-box;
+  border-top: 0.5px solid var(--tm-cal-sidebar-border);
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {
