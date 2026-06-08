@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   buildLineupView,
   buildMvpView,
@@ -82,42 +83,55 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               isLive={isLive}
               onHomeTeamClick={() => openEntityModal(buildLineupView(match.home_team))}
               onAwayTeamClick={() => openEntityModal(buildLineupView(match.away_team))}
+              centerSlotAlign={saved ? "default" : "teamNames"}
               centerSlot={
-                <div className="inline-block">
-                  <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                    Mi pronóstico
-                  </p>
-                  {saved ? (
+                saved ? (
+                  <div className="inline-block">
+                    <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                      Mi pronóstico
+                    </p>
                     <div className="relative w-0 min-w-full">
                       <button
                         type="button"
-                        onClick={() => openScoreModal()}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openScoreModal();
+                        }}
                         className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                       >
                         {scoreText}
                       </button>
                       <button
                         type="button"
-                        onClick={() => openScoreModal()}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openScoreModal();
+                        }}
                         aria-label="Editar pronóstico"
                         className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                       >
                         <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => openScoreModal()}
-                      className="block w-full text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                        Añadir
-                      </span>
-                    </button>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openScoreModal();
+                    }}
+                    className={cn(
+                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
+                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+                      "transition-opacity hover:opacity-90 active:opacity-80"
+                    )}
+                  >
+                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                    Añadir
+                  </button>
+                )
               }
             />
             <div

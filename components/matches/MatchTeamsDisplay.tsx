@@ -93,6 +93,8 @@ type MatchTeamsDisplayProps = {
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
   centerSlot?: ReactNode;
+  /** Alinea centerSlot con el eje vertical de los nombres de equipo (debajo de la bandera). */
+  centerSlotAlign?: "default" | "teamNames";
   /** Modal de pronóstico: equipos en 10%/90%, steppers en 34%/66% (entre bandera y centro). */
   layout?: "default" | "predictionModal";
   predictionLabel?: string;
@@ -111,6 +113,7 @@ export function MatchTeamsDisplay({
   showSectionLabel = false,
   centerKickoff = false,
   centerSlot,
+  centerSlotAlign = "default",
   layout = "default",
   predictionLabel = "Mi pronóstico",
   homeScoreSlot,
@@ -190,8 +193,13 @@ export function MatchTeamsDisplay({
               Live
             </span>
           )}
-          {centerSlot}
+          {centerSlotAlign === "default" ? centerSlot : null}
         </div>
+        {centerSlot && centerSlotAlign === "teamNames" ? (
+          <div className="absolute left-1/2 top-[calc(2.5rem+0.25rem+0.375rem)] -translate-x-1/2 -translate-y-1/2 sm:top-[calc(2.75rem+0.25rem+0.375rem)]">
+            {centerSlot}
+          </div>
+        ) : null}
       </div>
     </>
   );
