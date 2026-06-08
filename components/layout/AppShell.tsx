@@ -1,7 +1,9 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
+import { BOTTOM_CHROME_PLACEHOLDER_ID } from "@/lib/layout/bottom-chrome";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
+import { TabIndicatorsFloat } from "@/components/layout/TabIndicatorsFloat";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
@@ -31,7 +33,13 @@ export function AppShell({
               <TabSwipeNavigator>{children}</TabSwipeNavigator>
             </div>
           </main>
+          <TabIndicatorsFloat />
         </div>
+        <div
+          id={BOTTOM_CHROME_PLACEHOLDER_ID}
+          className="tm-bottom-chrome tm-bottom-chrome-placeholder pointer-events-none fixed bottom-0 left-0 right-0 z-[95]"
+          aria-hidden
+        />
         <TabBarWrapper />
         <Suspense fallback={null}>
           <ViewportLayoutDebug />

@@ -38,8 +38,12 @@ export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
     if (header) observer.observe(header);
     observer.observe(root);
 
-    const tabBar = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
+    const tabBar = document.querySelector<HTMLElement>(".tm-bottom-chrome:not(.tm-bottom-chrome-placeholder)");
     if (tabBar) observer.observe(tabBar);
+    const indicators = document.querySelector<HTMLElement>(".tm-tab-indicators-float");
+    if (indicators) observer.observe(indicators);
+    const placeholder = document.getElementById("tm-bottom-chrome-placeholder");
+    if (placeholder) observer.observe(placeholder);
 
     window.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("resize", sync);

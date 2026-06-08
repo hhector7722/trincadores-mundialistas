@@ -353,18 +353,63 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
-html[data-modal-open] .tm-bottom-chrome {
+html[data-modal-open] .tm-bottom-chrome,
+html[data-modal-open] .tm-tab-indicators-float {
   filter: blur(6px);
   opacity: 0.35;
   pointer-events: none;
 }
 
+/* Chrome inferior: solo TabBar opaca; indicadores flotan en tm-app-frame. */
 .tm-bottom-chrome {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 95;
   box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: var(--tm-safe-bottom);
+  background: transparent;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Placeholder SSR: bloque sólido hasta que el portal hidrate encima. */
+.tm-bottom-chrome-placeholder {
+  pointer-events: none;
+}
+
+html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
+  display: none;
+}
+
+/* Home indicator: pintura instantánea bajo el viewport (iOS PWA). */
+html:has(.tm-app-frame)::after {
+  content: "";
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 94;
+  height: var(--tm-safe-bottom);
   background-color: var(--tm-tabbar-bg-hex);
+  pointer-events: none;
+}
+
+.tm-tab-indicators-float {
+  bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  min-height: var(--tm-tab-indicators-core);
+  background: transparent;
 }
 
 .tm-tab-indicators-slot {
+  flex-shrink: 0;
+  min-height: var(--tm-tab-indicators-core);
   background: transparent;
 }
 
