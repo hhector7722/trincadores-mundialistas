@@ -145,6 +145,8 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           role="img"
           aria-label="Cuadro de eliminatorias Mundial 2026"
         >
+          <div className="tm-ko-header-band" aria-hidden />
+
           <svg
             className="tm-ko-wires"
             viewBox="0 0 100 100"

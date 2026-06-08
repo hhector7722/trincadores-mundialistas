@@ -746,6 +746,7 @@ html[data-modal-open] main {
   --tm-ko-card-border: rgba(255, 255, 255, 0.1);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
   --tm-ko-card-width: min(13.5cqw, 68px);
+  --tm-ko-header-band: 10%;
   --tm-ko-footer-band: 10%;
   display: flex;
   flex: 1 1 auto;
@@ -773,6 +774,16 @@ html[data-modal-open] main {
   width: 100%;
   min-height: 0;
   overflow: hidden;
+}
+
+.tm-ko-header-band {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--tm-ko-header-band);
+  pointer-events: none;
 }
 
 .tm-ko-wires {

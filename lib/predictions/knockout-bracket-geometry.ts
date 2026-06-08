@@ -1,13 +1,22 @@
 import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 
+/**
+ * Banda superior equivalente a la cabecera del calendario (mes + días de la semana).
+ * Los dieciseisavos no deben invadir esta zona.
+ */
+export const BRACKET_HEADER_BAND_Y = 10;
+
 /** Banda inferior del canvas reservada para el botón «Ver fase Prévia». */
 export const BRACKET_FOOTER_BAND_Y = 10;
+
+/** Margen extra bajo la cabecera para que la tarjeta no se recorte (translate -50%). */
+const R32_TOP_CLEARANCE_Y = 2;
 
 /** Ancla inferior: 1G vs 3º (M82) y 2D vs 2G (M88), alineados con el footer. */
 export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
 
-/** Ancla superior de dieciseisavos (simétrico arriba/abajo). */
-export const R32_TOP_ANCHOR_Y = 3.5;
+/** Primer dieciseisavos: justo debajo de la zona de cabecera. */
+export const R32_TOP_ANCHOR_Y = BRACKET_HEADER_BAND_Y + R32_TOP_CLEARANCE_Y;
 
 const R32_SLOT_COUNT = 8;
 const R32_PAIR_HALF = 0.9;
