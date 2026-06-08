@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 type QuizPageShellProps = {
   children: React.ReactNode;
-  /** scroll: result; hub: botón al 40% vertical; play: viewport a pantalla completa */
+  /** scroll: result; hub: bloque centrado verticalmente; play: viewport a pantalla completa */
   variant?: "scroll" | "hub" | "play" | "viewport";
   className?: string;
 };

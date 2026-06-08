@@ -50,9 +50,8 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
 
   return (
     <div className="tm-quiz-hub">
-      <div className="tm-quiz-hub-spacer" aria-hidden />
       <div className="tm-quiz-hub-content space-y-6">
-        <div className="space-y-3">
+        <section className="space-y-3" aria-label="Jugar quiz diario">
           <button
             type="button"
             onClick={handlePlay}
@@ -72,9 +71,9 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             Un intento diario. Puntuan a partir del 11 de junio. Los intentos previos son de
             entrenamiento.
           </p>
-        </div>
+        </section>
 
-        <div className="space-y-2">
+        <section className="space-y-2" aria-label="Clasificacion del quiz">
           <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
             Clasificacion del quiz
           </h2>
@@ -82,7 +81,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             rows={leaderboardRows}
             currentProfileId={currentProfileId}
           />
-        </div>
+        </section>
       </div>
 
       <Modal
