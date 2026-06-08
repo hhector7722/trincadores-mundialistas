@@ -1,7 +1,8 @@
+import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
-import { HomeTopThree } from "@/components/home/HomeTopThree";
+import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
@@ -39,6 +40,7 @@ export default async function HomePage() {
     : null;
 
   const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
+  const dailyFact = getDailyFactForToday();
 
   return (
     <div className="relative z-10 space-y-3 p-4 pb-4">
@@ -49,8 +51,8 @@ export default async function HomePage() {
         generalPredictions={generalPredictionsBundle.predictions}
         generalPredictionsEditable={generalPredictionsBundle.editable}
       />
+      <HomeDailyFactCard fact={dailyFact} />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
-      <HomeTopThree rows={leaderboard.rows} />
     </div>
   );
 }

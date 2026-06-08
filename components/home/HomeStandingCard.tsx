@@ -1,14 +1,8 @@
-import Link from "next/link";
-import { BarChart3, ChevronRight, Medal } from "lucide-react";
+import { Medal } from "lucide-react";
 import { HomeGeneralPredictionsCard } from "@/components/home/HomeGeneralPredictionsCard";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import type { MemberStanding } from "@/lib/ranking/queries";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
-
-function ptsLabel(points: number): string {
-  const v = formatAggregateStat(points);
-  return v === " " ? "0 pts" : `${v} pts`;
-}
 
 function PositionStatCard({ standing }: { standing: MemberStanding }) {
   return (
@@ -61,55 +55,6 @@ export function HomeStandingCard({
           editable={generalPredictionsEditable}
         />
       </div>
-
-      {standing && (standing.ahead || standing.behind) && (
-        <Link
-          href="/ranking"
-          className="tm-stat-card flex min-h-12 items-center gap-3 rounded-2xl px-4 py-3 transition-colors hover:border-white/30"
-        >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
-            <BarChart3 className="h-4 w-4 text-purple-200" strokeWidth={2} />
-          </div>
-
-          <div className="flex min-w-0 flex-1 items-center gap-4">
-            {standing.ahead && (
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                  Por delante
-                </p>
-                <p className="mt-0.5 truncate text-sm">
-                  <span className="font-medium text-white">{standing.ahead.label}</span>
-                  <span className="text-white/40"> · </span>
-                  <span className="font-semibold text-[#CCFF00]">
-                    {ptsLabel(standing.ahead.cumulativePoints)}
-                  </span>
-                </p>
-              </div>
-            )}
-
-            {standing.ahead && standing.behind && (
-              <div className="h-8 w-px shrink-0 bg-white/10" aria-hidden="true" />
-            )}
-
-            {standing.behind && (
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                  Por detras
-                </p>
-                <p className="mt-0.5 truncate text-sm">
-                  <span className="font-medium text-white">{standing.behind.label}</span>
-                  <span className="text-white/40"> · </span>
-                  <span className="font-semibold text-[#CCFF00]">
-                    {ptsLabel(standing.behind.cumulativePoints)}
-                  </span>
-                </p>
-              </div>
-            )}
-          </div>
-
-          <ChevronRight className="h-5 w-5 shrink-0 text-white/40" strokeWidth={2} />
-        </Link>
-      )}
     </div>
   );
 }
