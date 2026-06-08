@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState, type CSSProperties } from "react";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
+import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -11,6 +13,8 @@ import {
 import {
   buildBracketConnectorPaths,
   buildBracketGeometry,
+  FINAL_CENTER_X,
+  FINAL_CENTER_Y,
   matchPosition,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
@@ -19,8 +23,7 @@ import {
   placeholderPairForMatchNumber,
   resolveBracketMatch,
 } from "@/lib/predictions/knockout-bracket-layout";
-import { isPlaceholderTeam } from "@/lib/openfootball/slug";
-import { knockoutTeamLabel, teamNameEs } from "@/lib/teams/display";
+import { knockoutBracketDisplayName } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type KnockoutBracketProps = {
@@ -40,22 +43,13 @@ function BracketTeamRow({
   goals: number | null;
   isWinner?: boolean;
 }) {
-  const trimmed = name.trim();
-  const primary = knockoutTeamLabel(name);
-  const secondary =
-    trimmed && !isPlaceholderTeam(trimmed) ? teamNameEs(name) : null;
-  const showSecondary = secondary && secondary.trim() !== primary.trim();
+  const label = knockoutBracketDisplayName(name);
 
   return (
-    <div
-      className={cn("tm-ko-card-row", isWinner && "tm-ko-card-row--winner")}
-    >
-      <div className="tm-ko-card-row-text">
-        <span className="tm-ko-card-row-primary">{primary}</span>
-        {showSecondary ? (
-          <span className="tm-ko-card-row-secondary">{secondary}</span>
-        ) : null}
-      </div>
+    <div className={cn("tm-ko-card-row", isWinner && "tm-ko-card-row--winner")}>
+      <span className="tm-ko-card-row-primary" title={name}>
+        {label}
+      </span>
       <span className="tm-ko-card-row-score">{goals != null ? goals : " "}</span>
     </div>
   );
@@ -131,6 +125,7 @@ function BracketMatchCard({
 }
 
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
+  const { navigate } = useAppNavigation();
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
 
@@ -144,15 +139,6 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
 
   return (
     <div className="tm-ko-page">
-      <div className="tm-ko-header">
-        <h1 className="font-display text-xs uppercase tracking-wide text-[var(--tm-fg)] sm:text-sm">
-          Fase eliminatoria
-        </h1>
-        <Link href="/predictions" className="tm-cal-ko-link shrink-0">
-          VER FASE DE GRUPOS
-        </Link>
-      </div>
-
       <div className="tm-ko-stage">
         <div
           className="tm-ko-canvas"
@@ -179,6 +165,21 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             ))}
           </svg>
 
+          <div
+            className="tm-ko-cup"
+            style={{ left: `${FINAL_CENTER_X}%`, top: `${FINAL_CENTER_Y - 14}%` }}
+            aria-hidden
+          >
+            <Image
+              src="/icons/copa.png"
+              alt=""
+              width={56}
+              height={56}
+              className="tm-ko-cup-img"
+              priority
+            />
+          </div>
+
           <div className="tm-ko-nodes">
             {BRACKET_GEOMETRY.map((geom) => (
               <BracketMatchCard
@@ -190,6 +191,14 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="tm-ko-footer shrink-0">
+        <MatchContextActionButton
+          caption="Ver fase Prévia"
+          emptyLabel="Ver fase Prévia"
+          onClick={() => navigate("/predictions")}
+        />
       </div>
 
       {activeMatch ? (

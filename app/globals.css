@@ -745,7 +745,7 @@ html[data-modal-open] main {
   --tm-ko-card-bg: rgba(18, 8, 40, 0.92);
   --tm-ko-card-border: rgba(255, 255, 255, 0.1);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
-  --tm-ko-card-width: min(10.5cqw, 52px);
+  --tm-ko-card-width: min(13.5cqw, 68px);
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -753,16 +753,6 @@ html[data-modal-open] main {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-}
-
-.tm-ko-header {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  border-bottom: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
-  padding: 0.35rem 0.5rem;
 }
 
 .tm-ko-stage {
@@ -811,10 +801,44 @@ html[data-modal-open] main {
   stroke-width: 1.55px;
 }
 
+.tm-ko-cup {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  animation: tm-ko-cup-float 3.2s ease-in-out infinite;
+}
+
+.tm-ko-cup-img {
+  display: block;
+  width: min(14cqw, 3.25rem);
+  height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes tm-ko-cup-float {
+  0%,
+  100% {
+    transform: translate(-50%, -100%) translateY(0);
+  }
+
+  50% {
+    transform: translate(-50%, -100%) translateY(-0.35rem);
+  }
+}
+
 .tm-ko-nodes {
   position: absolute;
   inset: 0;
   z-index: 1;
+}
+
+.tm-ko-footer {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
+  padding: 0.5rem 1rem 0.65rem;
 }
 
 .tm-ko-card {
@@ -910,49 +934,31 @@ html[data-modal-open] main {
 
 .tm-ko-card-row {
   display: flex;
-  min-height: min(4.2cqh, 20px);
+  min-height: min(4.8cqh, 22px);
   align-items: center;
   justify-content: space-between;
-  gap: 0.2rem;
-  padding: 0.28rem 0.38rem;
-}
-
-.tm-ko-card-row-text {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0.05rem;
-  overflow: hidden;
+  gap: 0.25rem;
+  padding: 0.3rem 0.4rem;
 }
 
 .tm-ko-card-row-primary {
-  overflow: hidden;
+  min-width: 0;
+  flex: 1 1 auto;
   font-family: var(--font-display, inherit);
-  font-size: clamp(5px, 1.55cqw, 8px);
+  font-size: clamp(6px, 1.85cqw, 9px);
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.05;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.15;
+  text-align: left;
+  word-break: break-word;
   color: var(--tm-accent);
-}
-
-.tm-ko-card-row-secondary {
-  overflow: hidden;
-  font-size: clamp(4px, 1.15cqw, 6px);
-  font-weight: 500;
-  line-height: 1.05;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--tm-muted);
 }
 
 .tm-ko-card-row-score {
   flex-shrink: 0;
-  min-width: 0.65rem;
+  min-width: 0.7rem;
   font-family: var(--font-display, inherit);
-  font-size: clamp(5px, 1.45cqw, 7px);
+  font-size: clamp(6px, 1.65cqw, 8px);
   font-weight: 800;
   line-height: 1;
   text-align: right;
@@ -976,7 +982,11 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--final .tm-ko-card-row-primary {
-  font-size: clamp(6px, 1.75cqw, 9px);
+  font-size: clamp(6.5px, 2cqw, 10px);
+}
+
+.tm-ko-card--sf .tm-ko-card-row-primary {
+  font-size: clamp(6px, 1.9cqw, 9px);
 }
 
 .tm-porra-calendar .tm-cal-header,

@@ -80,6 +80,19 @@ export function formatMatchCalendarAbbr(homeTeam: string, awayTeam: string): str
   return `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
 }
 
+/** Nombre legible en tarjetas del cuadro KO (sin abreviar salvo 3º en terceros). */
+export function knockoutBracketDisplayName(teamName: string): string {
+  const trimmed = teamName.trim();
+  if (!trimmed) return " ";
+
+  if (isPlaceholderTeam(trimmed)) {
+    if (/^3[A-L](\/[A-L])+/i.test(trimmed)) return "3º";
+    return trimmed.toUpperCase();
+  }
+
+  return teamNameEs(teamName);
+}
+
 /** Etiqueta compacta para celdas del cuadro KO (WA, 2A, W74…). */
 export function knockoutTeamLabel(teamName: string): string {
   const trimmed = teamName.trim();

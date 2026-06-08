@@ -264,14 +264,14 @@ function connectChildToParent(
   parent: BracketMatchGeometry
 ): string {
   const isLeft = child.side === "left";
-  const xGutter = gutterX(
-    Math.min(child.column, parent.column),
-    Math.max(child.column, parent.column)
-  );
+  const xVertical =
+    parent.round === "sf"
+      ? parent.columnX
+      : gutterX(Math.min(child.column, parent.column), Math.max(child.column, parent.column));
   const xStart = cardEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = cardEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
-  return `M ${xStart} ${child.midY} H ${xGutter} V ${parent.midY} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
 }
 
 function connectSemiToFinal(
@@ -280,9 +280,8 @@ function connectSemiToFinal(
 ): string {
   const isLeft = semi.side === "left";
   const xStart = cardEdgeX(semi.columnX, isLeft ? "right" : "left", semi.layoutScale);
-  const xGutter = gutterX(isLeft ? semi.column : 4, isLeft ? 4 : semi.column);
 
-  return `M ${xStart} ${semi.midY} H ${xGutter} V ${FINAL_CENTER_Y} H ${anchorX}`;
+  return `M ${xStart} ${semi.midY} H ${semi.columnX} V ${FINAL_CENTER_Y} H ${anchorX}`;
 }
 
 export type BracketConnectorSegment = {
@@ -299,7 +298,7 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
+    if (Math.abs(geom.homeY - geom.awayY) > 0.01 && geom.round !== "r16") {
       segments.push({
         d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
         variant: geom.round === "r32" ? "pair" : "default",
