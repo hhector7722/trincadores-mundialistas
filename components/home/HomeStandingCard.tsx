@@ -1,6 +1,7 @@
 import { Medal } from "lucide-react";
 import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeGeneralPredictionsCard } from "@/components/home/HomeGeneralPredictionsCard";
+import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import type { DailyFact } from "@/lib/home/daily-fact";
 import type { MemberStanding } from "@/lib/ranking/queries";
@@ -58,6 +59,7 @@ export function HomeStandingCard({
           predictions={generalPredictions}
           editable={generalPredictionsEditable}
         />
+        <HomeScoringRulesCard />
         <HomeDailyFactCard fact={dailyFact} />
       </div>
     </div>
