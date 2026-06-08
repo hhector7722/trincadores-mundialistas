@@ -1,3 +1,5 @@
+import { bottomAboveTabBar } from "@/lib/layout/tabbar-bounds";
+
 const MIN_UI_SCALE = 0.15;
 const MAX_UI_SCALE = 2.75;
 const SCALE_SEARCH_ITERATIONS = 14;
@@ -22,6 +24,7 @@ const ACCESS_DOCK_GRID_GAP_PX = 8;
 const ACCESS_DOCK_COLS = 2;
 const ACCESS_DOCK_ROWS = 2;
 const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
+const ACCESS_BTN_VERTICAL_INSET_PX = 3;
 const MIN_ACCESS_BTN_HEIGHT_PX = 18;
 const ACCESS_DOCK_HEIGHT_RATIO = 0.28;
 const MIN_ACCESS_DOCK_HEIGHT_PX = 36;
@@ -195,13 +198,17 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
         ACCESS_DOCK_ROWS
     )
   );
+  const btnVisualH = Math.max(
+    MIN_ACCESS_BTN_HEIGHT_PX,
+    cellH - ACCESS_BTN_VERTICAL_INSET_PX * 2
+  );
   const btnPadX = Math.max(4, Math.min(10, Math.floor(cellW * 0.08)));
-  let btnFs = fitAccessButtonFontSize(cellW, cellH, btnPadX);
+  let btnFs = fitAccessButtonFontSize(cellW, btnVisualH, btnPadX);
 
   calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-body-gap", `${SIDEBAR_BODY_GAP_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-gap", `${ACCESS_DOCK_GRID_GAP_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-access-btn-min-h", `${cellH}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-btn-min-h", `${btnVisualH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-px", `${btnPadX}px`);
 
@@ -435,7 +442,8 @@ export function syncCalendarGridHeight(
   const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
   const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
   const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
-  const available = Math.floor(layoutRect.bottom - calendarRect.top - chromeHeight);
+  const contentBottom = bottomAboveTabBar(layoutRect.bottom);
+  const available = Math.floor(contentBottom - calendarRect.top - chromeHeight);
   const height = Math.max(0, available);
 
   grid.style.height = `${height}px`;

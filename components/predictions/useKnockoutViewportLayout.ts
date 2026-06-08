@@ -23,6 +23,7 @@ export function useKnockoutViewportLayout(rootRef: RefObject<HTMLElement | null>
     };
 
     sync();
+    requestAnimationFrame(sync);
 
     const observer = new ResizeObserver(sync);
     observer.observe(layoutRoot);

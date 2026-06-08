@@ -1,3 +1,5 @@
+import { bottomAboveTabBar } from "@/lib/layout/tabbar-bounds";
+
 /** Ancla el cuadro KO al borde inferior real del layout (justo encima de la TabBar). */
 export function syncKnockoutViewportHeight(
   pageRoot: HTMLElement,
@@ -5,7 +7,8 @@ export function syncKnockoutViewportHeight(
 ): number {
   const layoutRect = layoutRoot.getBoundingClientRect();
   const pageRect = pageRoot.getBoundingClientRect();
-  const height = Math.max(0, Math.floor(layoutRect.bottom - pageRect.top));
+  const contentBottom = bottomAboveTabBar(layoutRect.bottom);
+  const height = Math.max(0, Math.floor(contentBottom - pageRect.top));
 
   pageRoot.style.height = `${height}px`;
   pageRoot.style.maxHeight = `${height}px`;
