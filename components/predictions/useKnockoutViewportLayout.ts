@@ -12,8 +12,11 @@ export function useKnockoutViewportLayout(rootRef: RefObject<HTMLElement | null>
     if (!root) return;
 
     const layoutRoot = root.closest(".tm-porra-layout");
-    const pageRoot = root.closest(".tm-porra-page") ?? root;
     if (!(layoutRoot instanceof HTMLElement)) return;
+
+    const pageCandidate = root.closest(".tm-porra-page");
+    const pageRoot: HTMLElement =
+      pageCandidate instanceof HTMLElement ? pageCandidate : root;
 
     const sync = () => {
       syncKnockoutViewportHeight(pageRoot, layoutRoot);
