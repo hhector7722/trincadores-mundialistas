@@ -12,10 +12,10 @@ export function HomeDailyFactCard({ fact }: HomeDailyFactCardProps) {
       className="@container col-start-2 min-w-0 rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card"
       aria-label="Dato shanelador del dia"
     >
-      <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
+      <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
         Dato shanelador del día
       </p>
-      <p className="mt-1.5 text-[10px] font-medium leading-relaxed text-[#CCFF00]">{fact.text}</p>
+      <p className="mt-1.5 text-[10px] font-medium leading-relaxed text-white/50">{fact.text}</p>
     </div>
   );
 }
