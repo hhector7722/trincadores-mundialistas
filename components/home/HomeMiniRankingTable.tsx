@@ -39,7 +39,7 @@ function MiniRankingDataRow({
       href={`/profile/${row.profileId}`}
       className={cn(
         MINI_RANKING_GRID,
-        "min-h-8 border-b border-white/5 px-[clamp(0.5rem,3cqw,0.75rem)] py-1.5 text-[clamp(10px,2.8cqw,12px)] transition-colors last:border-0 hover:bg-white/5"
+        "flex min-h-8 flex-1 border-b border-white/5 px-[clamp(0.5rem,3cqw,0.75rem)] py-1.5 text-[clamp(10px,2.8cqw,12px)] transition-colors last:border-0 hover:bg-white/5"
       )}
     >
       <span
@@ -65,7 +65,7 @@ function MiniRankingEmptyRow() {
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "min-h-8 border-b border-white/5 px-[clamp(0.5rem,3cqw,0.75rem)] py-1.5 text-[clamp(10px,2.8cqw,12px)] last:border-0"
+        "flex min-h-8 flex-1 border-b border-white/5 px-[clamp(0.5rem,3cqw,0.75rem)] py-1.5 text-[clamp(10px,2.8cqw,12px)] last:border-0"
       )}
       aria-hidden="true"
     >
@@ -81,9 +81,9 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
   const emptyRowCount = Math.max(0, EMPTY_ROW_COUNT - displayRows.length);
 
   return (
-    <div className="tm-home-mini-table @container min-w-0 overflow-hidden rounded-2xl tm-stat-card">
+    <div className="tm-home-top-stat-card @container flex min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card">
       <MiniRankingHeader />
-      <div>
+      <div className="flex min-h-0 flex-1 flex-col">
         {displayRows.map((row) => (
           <MiniRankingDataRow
             key={row.profileId}

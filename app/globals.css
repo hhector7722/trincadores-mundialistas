@@ -327,14 +327,14 @@ html:has(.tm-app-frame) body {
   box-shadow: var(--tm-shadow);
 }
 
-/* Altura de referencia: cabecera + 3 filas de la mini tabla de ranking */
+/* Altura de referencia: card de pronósticos globales (padding + 5 filas) */
 :root {
-  --tm-home-mini-table-height: calc(0.75rem + 1rem + 3 * 2rem);
+  --tm-home-top-stat-height: calc(0.75rem * 2 + 5 * 1.5rem);
 }
 
-.tm-home-mini-table,
+.tm-home-top-stat-card,
 .tm-home-secondary-row {
-  height: var(--tm-home-mini-table-height);
+  height: var(--tm-home-top-stat-height);
 }
 
 .tm-accent-link {

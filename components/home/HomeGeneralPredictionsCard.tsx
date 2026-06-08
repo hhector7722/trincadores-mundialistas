@@ -99,7 +99,7 @@ export function HomeGeneralPredictionsCard({
 
   return (
     <>
-      <div className="@container min-w-0 rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
+      <div className="tm-home-top-stat-card @container flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
         <div className="space-y-0">
           <GeneralPredictionRow
             label={labels.champion}

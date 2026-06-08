@@ -14,7 +14,7 @@ import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/
 
 function PositionStatCard({ standing }: { standing: MemberStanding }) {
   return (
-    <div className="@container min-w-0 rounded-2xl p-[clamp(0.75rem,4cqw,1rem)] tm-stat-card">
+    <div className="tm-home-top-stat-card @container flex min-w-0 flex-col justify-center rounded-2xl p-[clamp(0.75rem,4cqw,1rem)] tm-stat-card">
       <div className="mb-3 flex h-[clamp(2rem,10cqw,2.5rem)] w-[clamp(2rem,10cqw,2.5rem)] shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
         <Medal className="h-[clamp(1rem,5cqw,1.25rem)] w-[clamp(1rem,5cqw,1.25rem)] text-purple-200" strokeWidth={2} />
       </div>
