@@ -73,10 +73,10 @@ export function HomeScoringRulesCard() {
         <ScoringRulesMiniCard
           lines={topLines}
           showHeader
-          flexClass="flex-[1.2]"
+          flexClass="flex-[4]"
           onOpen={openModal}
         />
-        <ScoringRulesMiniCard lines={bottomLines} flexClass="flex-[0.8]" onOpen={openModal} />
+        <ScoringRulesMiniCard lines={bottomLines} flexClass="flex-1" onOpen={openModal} />
       </div>
 
       <ScoringRulesModal open={open} onClose={() => setOpen(false)} />
