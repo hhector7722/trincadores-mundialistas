@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef } from "react";
+import { useLayoutAboveTabBar } from "@/components/layout/useLayoutAboveTabBar";
 import { cn } from "@/lib/utils";
 
 type QuizPageShellProps = {
@@ -12,8 +16,14 @@ export function QuizPageShell({
   variant = "scroll",
   className,
 }: QuizPageShellProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const syncViewport =
+    variant === "hub" || variant === "play" || variant === "viewport";
+  useLayoutAboveTabBar(ref, syncViewport);
+
   return (
     <div
+      ref={ref}
       className={cn(
         "tm-quiz-page space-y-4",
         variant === "play" ? "tm-quiz-page--play px-4 pb-4 pt-0" : "",

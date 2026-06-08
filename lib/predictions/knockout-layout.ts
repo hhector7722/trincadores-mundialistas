@@ -1,11 +1,16 @@
+import {
+  readTabBarTop,
+  syncLayoutAboveTabBar,
+} from "@/lib/layout/viewport-chrome";
+
 /** Ancla el cuadro KO al borde inferior del layout (justo encima de la TabBar). */
 export function syncKnockoutViewportHeight(
   pageRoot: HTMLElement,
   layoutRoot: HTMLElement
 ): number {
-  const layoutRect = layoutRoot.getBoundingClientRect();
-  const pageRect = pageRoot.getBoundingClientRect();
-  const height = Math.max(0, Math.floor(layoutRect.bottom - pageRect.top));
+  syncLayoutAboveTabBar(layoutRoot);
+  const top = pageRoot.getBoundingClientRect().top;
+  const height = Math.max(0, Math.floor(readTabBarTop() - top));
 
   pageRoot.style.height = `${height}px`;
   pageRoot.style.maxHeight = `${height}px`;
