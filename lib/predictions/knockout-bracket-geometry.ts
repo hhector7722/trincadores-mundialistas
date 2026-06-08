@@ -151,11 +151,31 @@ export function buildColumnCenters(): readonly number[] {
   x[3] += NUDGE_SF_LATERAL;
   x[5] -= NUDGE_SF_LATERAL;
 
-  // Cuartos: borde interior (hacia la final) alineado con el centro de su semifinal.
-  x[2] = x[3] - halfWidthForColumn(2);
-  x[6] = x[5] + halfWidthForColumn(6);
-
   return x;
+}
+
+export type FooterButtonAlignX = {
+  leftPct: number;
+  rightPct: number;
+};
+
+/** Alinea cuartos: borde derecho izq. = inicio del botón; borde izq. der. = fin del botón. */
+export function applyQfFooterAlignment(
+  geoms: readonly BracketMatchGeometry[],
+  align: FooterButtonAlignX
+): BracketMatchGeometry[] {
+  return geoms.map((geom) => {
+    if (geom.round !== "qf") return geom;
+
+    const half = CARD_HALF_WIDTH_BASE * geom.layoutScale;
+    if (geom.side === "left") {
+      return { ...geom, columnX: align.leftPct - half };
+    }
+    if (geom.side === "right") {
+      return { ...geom, columnX: align.rightPct + half };
+    }
+    return geom;
+  });
 }
 
 const COLUMN_CENTERS = buildColumnCenters();
