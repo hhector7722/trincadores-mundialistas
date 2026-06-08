@@ -16,7 +16,7 @@ const GROUPS_CARD_PAD_Y = 1;
 const GROUPS_LETTER_WIDTH_RATIO = 0.1;
 const GROUPS_SIZE_FIT = 0.98;
 const GROUPS_FLAG_SCALE = 0.96;
-const GROUPS_CARD_HEIGHT_RATIO = 0.88;
+const GROUPS_CARD_HEIGHT_RATIO = 1;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
@@ -25,11 +25,12 @@ const ACCESS_DOCK_COLS = 2;
 const ACCESS_DOCK_ROWS = 2;
 const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.78;
 const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
-const ACCESS_CARD_INSET_PX = 5;
-const ACCESS_CARD_EXTRA_VPAD_PX = 5;
+const ACCESS_CARD_INSET_PX = 4;
+const ACCESS_CARD_EXTRA_VPAD_PX = 2;
 const ACCESS_BTN_PAD_Y_PX = 2;
 const ACCESS_BTN_LINE_HEIGHT = 1.1;
 const SIDEBAR_BODY_GAP_PX = 6;
+const SIDEBAR_CARD_SLOT_INSET_PX = 8;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
   cells: T[]
@@ -226,20 +227,50 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
   }
 }
 
-/** Reservado: la card unificada ya no necesita hueco externo entre grupos y botones. */
-function syncSidebarAccessSpacing(_calendar: HTMLElement, _grid: HTMLElement): void {}
-
-/** La card unificada ocupa todo el cuerpo lateral; no requiere altura explícita por contenido. */
-function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+/** Centra la card en el slot con margen simétrico y sin llegar al borde inferior de la fila. */
+function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  if (!slot) {
-    calendar.style.removeProperty("--tm-cal-sidebar-card-h");
-    calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
+  const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
+  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+
+  if (!slot || !body || !card) {
+    calendar.style.removeProperty("--tm-cal-sidebar-card-offset-top");
+    calendar.style.removeProperty("--tm-cal-sidebar-card-offset-bottom");
     return;
   }
 
-  calendar.style.removeProperty("--tm-cal-sidebar-card-h");
-  calendar.style.removeProperty("--tm-cal-sidebar-card-edge-pad");
+  void body.offsetHeight;
+  const freeSpace = Math.max(0, body.clientHeight - card.offsetHeight);
+  const bottomInset = Math.max(
+    SIDEBAR_CARD_SLOT_INSET_PX,
+    Math.floor(freeSpace / 2)
+  );
+  const topInset = Math.max(SIDEBAR_CARD_SLOT_INSET_PX, freeSpace - bottomInset);
+
+  calendar.style.setProperty("--tm-cal-sidebar-card-offset-top", `${topInset}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", `${bottomInset}px`);
+}
+
+/** Altura compacta de la card: título + grupos + botones, sin relleno elástico. */
+function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
+  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+  const title = slot?.querySelector<HTMLElement>(".tm-cal-groups-title");
+  const list = slot?.querySelector<HTMLElement>(".tm-cal-groups-list");
+  const dock = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-access-dock");
+
+  if (!slot || !card) {
+    calendar.style.removeProperty("--tm-cal-sidebar-card-h");
+    return;
+  }
+
+  void card.offsetHeight;
+  const titleH = title?.offsetHeight ?? 0;
+  const listH = list?.offsetHeight ?? 0;
+  const dockH = dock?.offsetHeight ?? 0;
+  const cardH = Math.ceil(titleH + listH + dockH);
+
+  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardH}px`);
 }
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
@@ -270,22 +301,17 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
 
   const sidebarSlot = panel.closest<HTMLElement>(".tm-cal-sidebar-slot");
   if (sidebarSlot) {
-    const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+    const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
     const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
-    const dock = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-access-dock");
-    const dockH =
-      dock?.offsetHeight ??
-      (() => {
-        const parsed = Number.parseFloat(
-          calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
-        );
-        return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-      })();
+    const dockH = Number.parseFloat(
+      calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
+    );
+    const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
     const titleH = title?.offsetHeight ?? 0;
-    const topInsetReserve = titleH + GROUPS_EDGE_INSET_PX * 2;
+    const slotInset = SIDEBAR_CARD_SLOT_INSET_PX * 2;
     const maxPanelH = Math.max(
       0,
-      (card?.clientHeight ?? 0) - dockH - topInsetReserve
+      (body?.clientHeight ?? 0) - resolvedDockH - titleH - slotInset
     );
     innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
   } else {
@@ -486,6 +512,9 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
   calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
+  calendar.style.removeProperty("--tm-cal-sidebar-card-h");
+  calendar.style.removeProperty("--tm-cal-sidebar-card-offset-top");
+  calendar.style.removeProperty("--tm-cal-sidebar-card-offset-bottom");
   resetPredictionLabelMetrics(calendar);
   if (grid) resetCalendarGridHeight(grid);
 }
