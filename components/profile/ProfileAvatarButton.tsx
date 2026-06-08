@@ -46,6 +46,7 @@ export function ProfileAvatarButton({
         className={cn(
           "shrink-0 outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tm-purple-deep)]",
           variant === "badge" && "rounded-full",
+          variant === "profile" && "rounded-xl",
           className
         )}
       >

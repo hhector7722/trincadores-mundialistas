@@ -29,20 +29,15 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-4 p-4 pb-4">
-      <Card className="flex flex-col items-center gap-4 py-8">
+      <div className="flex flex-col items-center gap-4 py-8 text-center">
         <ProfileAvatarButton
           avatarUrl={profile?.avatar_url ?? null}
           label={label}
           variant="profile"
           className="max-h-72 w-auto max-w-full"
         />
-        <div className="text-center">
-          <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
-          {profile?.username ? (
-            <p className="text-sm text-[var(--tm-muted)]">@{profile.username}</p>
-          ) : null}
-        </div>
-      </Card>
+        <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
+      </div>
       {admin && (
         <Card>
           <Link href="/admin" className="text-sm font-medium text-[var(--tm-primary)]">

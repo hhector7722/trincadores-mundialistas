@@ -31,6 +31,7 @@ export function ProfileAvatar({
         className={cn(
           "shrink-0 object-contain",
           variant === "badge" && "rounded-full",
+          variant === "profile" && "rounded-xl",
           className
         )}
       />
@@ -41,7 +42,7 @@ export function ProfileAvatar({
     <span
       className={cn(
         "flex shrink-0 items-center justify-center bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
-        variant === "badge" ? "rounded-full" : "rounded-lg",
+        variant === "badge" ? "rounded-full" : "rounded-xl",
         className
       )}
       aria-hidden
