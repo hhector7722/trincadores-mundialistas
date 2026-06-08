@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Download, X } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { isShareSaveCancellation, saveImageToGallery, canSaveImageToGallery } from "@/lib/media/save-image-to-gallery";
 
 type Props = {
   open: boolean;
@@ -24,25 +25,8 @@ function avatarDownloadFilename(label: string): string {
   return `${slug}-avatar`;
 }
 
-async function downloadAvatarImage(avatarUrl: string, baseFilename: string): Promise<void> {
-  const response = await fetch(avatarUrl);
-  if (!response.ok) {
-    throw new Error("No se pudo descargar la imagen.");
-  }
-
-  const blob = await response.blob();
-  const extension = blob.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
-  const objectUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = objectUrl;
-  link.download = `${baseFilename}.${extension}`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(objectUrl);
-}
-
 export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
+  const imageRef = useRef<HTMLImageElement>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -50,8 +34,15 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
     setSaving(true);
     setSaveError(null);
     try {
-      await downloadAvatarImage(avatarUrl, avatarDownloadFilename(label));
-    } catch {
+      await saveImageToGallery({
+        url: avatarUrl,
+        baseFilename: avatarDownloadFilename(label),
+        imageElement: imageRef.current,
+      });
+    } catch (error) {
+      if (isShareSaveCancellation(error)) {
+        return;
+      }
       setSaveError("No se pudo guardar la imagen. Intentalo de nuevo.");
     } finally {
       setSaving(false);
@@ -83,6 +74,10 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
             <p className="text-center text-sm text-red-300" role="alert">
               {saveError}
             </p>
+          ) : canSaveImageToGallery() ? (
+            <p className="text-center text-xs text-white/50">
+              Elige «Guardar imagen» o «Fotos» en el menu que se abre.
+            </p>
           ) : null}
         </div>
       }
@@ -100,6 +95,7 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
         <div className="flex max-h-[min(72dvh,calc(100vw-2rem))] max-w-[min(72dvh,calc(100vw-2rem))] items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={imageRef}
             src={avatarUrl}
             alt={`Avatar de ${label}`}
             className="max-h-full max-w-full rounded-full border-2 border-[var(--tm-accent)] object-cover shadow-[0_0_64px_rgba(217,255,0,0.25)]"
