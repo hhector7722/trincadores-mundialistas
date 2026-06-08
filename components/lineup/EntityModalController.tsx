@@ -120,7 +120,7 @@ export function EntityModalController({
       onClose={onClose}
       title={entityModalTitleContent(current)}
       hideHeaderDivider
-      headerTitleAlign={current.kind === "mvp" ? "left" : "default"}
+      headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
       className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]", className)}
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"

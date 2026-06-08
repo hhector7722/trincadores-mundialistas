@@ -74,6 +74,7 @@ export function TeamsPickerModal({
       open={open}
       onClose={onClose}
       title={title}
+      headerTitleAlign="center"
       hideHeaderDivider
       className="max-h-[calc(100dvh-1rem)]"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"

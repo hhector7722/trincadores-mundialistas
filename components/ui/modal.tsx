@@ -35,7 +35,7 @@ type ModalProps = {
   panelSlide?: ModalPanelSlide | null;
   loading?: boolean;
   /** Título alineado a la izquierda (sin hueco izquierdo si no hay volver). */
-  headerTitleAlign?: "left" | "default";
+  headerTitleAlign?: "left" | "default" | "center";
   /** Contenido centrado en la barra cuando `hideTitle` (p. ej. fecha del partido). */
   headerCenter?: ReactNode;
 };
@@ -94,13 +94,14 @@ function ModalPanelShell({
   hideTitle?: boolean;
   hideHeader?: boolean;
   headerTrailing?: ReactNode;
-  headerTitleAlign?: "left" | "default";
+  headerTitleAlign?: "left" | "default" | "center";
   headerCenter?: ReactNode;
   className?: string;
   children: ReactNode;
   loading?: boolean;
 }) {
   const titleLeft = headerTitleAlign === "left";
+  const titleCenter = headerTitleAlign === "center";
 
   return (
     <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
@@ -129,12 +130,18 @@ function ModalPanelShell({
           <span
             className={cn(
               "relative z-10 shrink-0",
-              hideTitle && headerCenter ? "w-0" : hideTitle || (titleLeft && !onBack) ? "w-0" : "w-10"
+              hideTitle && headerCenter
+                ? "w-0"
+                : titleCenter && !onBack
+                  ? "w-0"
+                  : hideTitle || (titleLeft && !onBack)
+                    ? "w-0"
+                    : "w-10"
             )}
             aria-hidden="true"
           />
         )}
-        {!hideTitle ? (
+        {!hideTitle && !titleCenter ? (
           <h2
             id={titleId}
             className={cn(
@@ -144,6 +151,13 @@ function ModalPanelShell({
           >
             {title}
           </h2>
+        ) : !hideTitle && titleCenter ? (
+          <>
+            <h2 id={titleId} className="sr-only">
+              {title}
+            </h2>
+            <div className="relative z-10 min-w-0 flex-1" aria-hidden="true" />
+          </>
         ) : headerCenter ? (
           <div id={titleId} className="sr-only">
             {headerCenter}
@@ -158,6 +172,16 @@ function ModalPanelShell({
           >
             <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
               {headerCenter}
+            </p>
+          </div>
+        ) : null}
+        {titleCenter && !hideTitle ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center px-4"
+          >
+            <p className="max-w-full truncate text-center font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+              {title}
             </p>
           </div>
         ) : null}
