@@ -43,9 +43,10 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-tabbar-height: var(--tm-tabbar-core);
   --tm-content-bottom: var(--tm-tabbar-height);
   --tm-vvh-offset: 0px;
+  --tm-vvh-height: 100svh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -97,16 +98,22 @@ html[data-modal-open] .tm-app-main {
   position: fixed;
   top: var(--tm-vvh-offset);
   right: 0;
-  bottom: 0;
   left: 0;
   z-index: 1;
   display: flex;
   width: 100%;
+  height: var(--tm-vvh-height, 100svh);
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
   overscroll-behavior: none;
   background-color: var(--tm-shell-bg-hex);
+}
+
+@media (display-mode: standalone) {
+  .tm-app-shell {
+    top: 0;
+  }
 }
 
 .tm-app-main {
@@ -146,21 +153,20 @@ html[data-modal-open] .tm-app-main {
 
 html:has(.tm-app-shell) {
   height: 100%;
-  min-height: 100dvh;
   min-height: -webkit-fill-available;
   overflow: hidden;
   overscroll-behavior: none;
-  background-color: var(--tm-shell-bg-hex);
+  background-color: var(--tm-tabbar-bg-hex);
 }
 
 html:has(.tm-app-shell) body {
   height: 100%;
-  min-height: 100dvh;
   min-height: -webkit-fill-available;
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  background-color: var(--tm-shell-bg-hex);
+  background-color: var(--tm-tabbar-bg-hex);
+  background-image: none;
 }
 
 .font-display {
@@ -1470,9 +1476,9 @@ html:has(.tm-app-shell) body {
   min-height: 0;
   align-items: center;
   width: 100%;
-  border: 1px solid var(--tm-cal-match-card-border);
-  border-radius: 3px;
-  background: var(--tm-cal-cell-bg);
+  border: none;
+  border-radius: 0;
+  background: transparent;
   padding: var(--tm-cal-group-card-py, 1px) 2px;
   text-align: left;
   color: inherit;

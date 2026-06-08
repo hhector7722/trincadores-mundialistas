@@ -26,7 +26,7 @@ export function CalendarGroupsPanel({
             key={group.code}
             type="button"
             onClick={() => onGroupClick?.(group.code)}
-            className="tm-cal-group-card flex min-h-0 w-full min-w-0 shrink-0 touch-manipulation items-center transition-colors hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
+            className="tm-cal-group-card flex min-h-0 w-full min-w-0 shrink-0 touch-manipulation items-center transition-opacity hover:opacity-80 active:opacity-70"
             aria-label={`Ver clasificación del grupo ${group.code}`}
           >
             <span className="tm-cal-group-letter shrink-0 font-display font-light text-[var(--tm-fg)]">
