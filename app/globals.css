@@ -1422,10 +1422,12 @@ html:has(.tm-app-frame) body {
 .tm-porra-calendar .tm-cal-sidebar-access-card .tm-cal-sidebar-card-inner {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
-  height: auto;
-  flex: 0 0 auto;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-dock {
