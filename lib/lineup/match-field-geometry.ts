@@ -23,7 +23,7 @@ const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP;
 const HOME_DEFENSE_Y = 90;
 
 /** Visitante: delanteros cerca del centro, portería arriba. */
-const AWAY_BLOCK_SHIFT_Y = -5;
+const AWAY_BLOCK_SHIFT_Y = -6;
 const AWAY_ATTACK_Y = MIDFIELD_Y - MIDFIELD_GAP + AWAY_BLOCK_SHIFT_Y;
 const AWAY_DEFENSE_Y = 10 + AWAY_BLOCK_SHIFT_Y;
 
