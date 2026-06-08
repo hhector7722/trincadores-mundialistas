@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
-import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
+import type { LineupSlot } from "@/lib/lineup/types";
+import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type MatchMvpFieldGraphicProps = {
-  homeSlots: MatchFieldSlot[];
-  awaySlots: MatchFieldSlot[];
+  homeSlots: LineupSlot[];
+  awaySlots: LineupSlot[];
   homeTeam: string;
   awayTeam: string;
   selectedKey: string | null;
@@ -19,7 +19,7 @@ type MatchMvpFieldGraphicProps = {
   className?: string;
 };
 
-function playerKey(teamName: string, slot: MatchFieldSlot): string {
+function playerKey(teamName: string, slot: LineupSlot): string {
   return `${teamName}-${slot.name}-${slot.shirtNumber ?? "x"}`;
 }
 
@@ -38,19 +38,15 @@ export function MatchMvpFieldGraphic({
     onFieldReady?.();
   }
 
-  function renderSlot(teamName: string, slot: MatchFieldSlot) {
+  function renderSlot(teamName: string, slot: LineupSlot) {
     const key = playerKey(teamName, slot);
     const active = selectedKey === key;
 
     return (
       <div
         key={`${teamName}-${slot.key}`}
-        className="absolute z-10"
-        style={{
-          left: `${slot.x}%`,
-          top: `${slot.y}%`,
-          transform: `translate(-50%, -50%) scale(${slot.scale})`,
-        }}
+        className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+        style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
       >
         <LineupPlayerChip
           slot={slot}
@@ -89,11 +85,11 @@ export function MatchMvpFieldGraphic({
         />
       </div>
 
-      <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-full bg-black/50 p-0.5 backdrop-blur-sm">
-        <TeamFlagBadge name={awayTeam} size="xs" loading="eager" />
+      <div className="pointer-events-none absolute left-2 top-2 z-20 max-w-[42%] truncate rounded bg-black/50 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+        {teamNameEs(awayTeam)}
       </div>
-      <div className="pointer-events-none absolute bottom-2 left-2 z-20 rounded-full bg-black/50 p-0.5 backdrop-blur-sm">
-        <TeamFlagBadge name={homeTeam} size="xs" loading="eager" />
+      <div className="pointer-events-none absolute bottom-2 left-2 z-20 max-w-[42%] truncate rounded bg-black/50 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+        {teamNameEs(homeTeam)}
       </div>
 
       {awaySlots.map((slot) => renderSlot(awayTeam, slot))}

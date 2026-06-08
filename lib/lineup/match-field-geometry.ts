@@ -12,16 +12,6 @@ const HOME_DEFENSE_Y = 93;
 const AWAY_ATTACK_Y = 44;
 const AWAY_DEFENSE_Y = 7;
 
-/** Límites verticales del plano de juego en la imagen Goya (%). */
-const GOYA_PITCH_TOP_Y = 8;
-const GOYA_PITCH_BOTTOM_Y = 92;
-
-/** Ancho aparente del campo: estrecho arriba, ancho abajo (perspectiva). */
-const GOYA_WIDTH_FACTOR_TOP = 0.66;
-const GOYA_WIDTH_FACTOR_BOTTOM = 1;
-
-export type MatchFieldSlot = LineupSlot & { scale: number };
-
 function normalizeDepth(y: number): number {
   return (y - SINGLE_ATTACK_Y) / (SINGLE_DEFENSE_Y - SINGLE_ATTACK_Y);
 }
@@ -42,30 +32,10 @@ function mapToAwayHalf(coord: FieldCoordinate): FieldCoordinate {
   };
 }
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
+export function mapSlotsToHomeHalf(slots: LineupSlot[]): LineupSlot[] {
+  return slots.map((slot) => ({ ...slot, ...mapToHomeHalf(slot) }));
 }
 
-/** Factor de ancho/escala según la profundidad del plano Goya (0 = arriba, 1 = abajo). */
-export function goyaPerspectiveFactor(y: number): number {
-  const depth = clamp01((y - GOYA_PITCH_TOP_Y) / (GOYA_PITCH_BOTTOM_Y - GOYA_PITCH_TOP_Y));
-  return GOYA_WIDTH_FACTOR_TOP + depth * (GOYA_WIDTH_FACTOR_BOTTOM - GOYA_WIDTH_FACTOR_TOP);
-}
-
-/** Comprime x hacia el centro y devuelve escala proporcional al estrechamiento del campo. */
-export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
-  const factor = goyaPerspectiveFactor(slot.y);
-  return {
-    ...slot,
-    x: 50 + (slot.x - 50) * factor,
-    scale: factor,
-  };
-}
-
-export function mapSlotsToHomeHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return slots.map((slot) => applyGoyaPerspective({ ...slot, ...mapToHomeHalf(slot) }));
-}
-
-export function mapSlotsToAwayHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return slots.map((slot) => applyGoyaPerspective({ ...slot, ...mapToAwayHalf(slot) }));
+export function mapSlotsToAwayHalf(slots: LineupSlot[]): LineupSlot[] {
+  return slots.map((slot) => ({ ...slot, ...mapToAwayHalf(slot) }));
 }
