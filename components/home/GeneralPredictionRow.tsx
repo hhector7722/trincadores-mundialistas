@@ -36,7 +36,7 @@ export function GeneralPredictionRow({
             onClick={onAdd}
             className={cn(
               "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-              "bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)]",
+              "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
               "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
               "transition-opacity hover:opacity-90 active:opacity-80"
             )}
