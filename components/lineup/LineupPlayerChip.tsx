@@ -40,7 +40,7 @@ export function LineupPlayerChip({
           isMatch
             ? "h-[26px] w-[22px]"
             : isModal
-              ? "h-[38px] w-[32px]"
+              ? "h-[3.75rem] w-[2.875rem] sm:h-16 sm:w-[3.25rem]"
               : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
           interactive && "transition-transform active:scale-95"
         )}
@@ -59,7 +59,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isMatch ? "11" : isModal ? "14" : "19"}
+          fontSize={isMatch ? "11" : isModal ? "16" : "19"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
@@ -75,7 +75,7 @@ export function LineupPlayerChip({
         <p
           className={cn(
             "whitespace-normal text-center font-semibold leading-tight text-white",
-            isMatch ? "text-[7px]" : isModal ? "text-[8px]" : "text-[9px] sm:text-[10px]"
+            isMatch ? "text-[7px]" : isModal ? "text-[9px] sm:text-[10px]" : "text-[9px] sm:text-[10px]"
           )}
         >
           {shirtPlayerName(slot.name)}
@@ -94,7 +94,7 @@ export function LineupPlayerChip({
     isMatch
       ? "w-[2.65rem] min-h-7"
       : isModal
-        ? "w-[3.5rem] min-h-9"
+        ? "w-[4rem] min-h-11 sm:w-[4.5rem] sm:min-h-12"
         : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"
