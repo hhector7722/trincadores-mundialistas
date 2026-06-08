@@ -4,6 +4,7 @@ import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
+import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +101,7 @@ function MiniRankingEmptyRow() {
 }
 
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
-  const displayRows = rows.slice(0, EMPTY_ROW_COUNT);
+  const displayRows = pickContextualLeaderboardRows(rows, currentProfileId);
   const emptyRowCount = Math.max(0, EMPTY_ROW_COUNT - displayRows.length);
 
   return (
