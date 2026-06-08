@@ -2,7 +2,6 @@
 
 import {
   ArrowLeft,
-  CheckCircle2,
   Copy,
   MoreVertical,
   PlusSquare,
@@ -14,17 +13,21 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import {
   completePwaOnboarding,
   confirmStandaloneInstallation,
+  assignParticipantAvatar,
   hasCompletedPwaOnboarding,
   revealParticipantCredentials,
   type OnboardingCredentials,
 } from "@/actions/pwa-onboarding";
 import { LoginHero } from "@/components/auth/LoginHero";
+import { AvatarGenerationStep } from "@/components/pwa/AvatarGenerationStep";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { Button } from "@/components/ui/button";
+import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import type { OnboardingParticipant } from "@/lib/pwa/onboarding-participants";
 import { detectMobileOs, isStandalonePWA, type MobileOs } from "@/lib/pwa/standalone";
 import { cn } from "@/lib/utils";
 
-type OnboardingStep = "os" | "instructions" | "verify" | "identify" | "credentials";
+type OnboardingStep = "os" | "instructions" | "verify" | "identify" | "avatar" | "credentials";
 
 type Props = {
   participants: OnboardingParticipant[];
@@ -170,6 +173,7 @@ export function PwaOnboardingFlow({ participants }: Props) {
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [identifyError, setIdentifyError] = useState<string | null>(null);
   const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState<OnboardingParticipant | null>(null);
   const [credentials, setCredentials] = useState<OnboardingCredentials | null>(null);
   const [bootstrapped, setBootstrapped] = useState(false);
 
@@ -241,6 +245,16 @@ export function PwaOnboardingFlow({ participants }: Props) {
     });
   }
 
+  const handleAvatarReady = useCallback(async () => {
+    if (!selectedParticipant) {
+      throw new Error("Participante no seleccionado.");
+    }
+    const result = await assignParticipantAvatar(selectedParticipant.username);
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+  }, [selectedParticipant]);
+
   function onIdentifyConfirm() {
     setIdentifyError(null);
     if (!selectedUsername) {
@@ -254,10 +268,21 @@ export function PwaOnboardingFlow({ participants }: Props) {
       return;
     }
 
+    setSelectedParticipant(participant);
+    setStep("avatar");
+  }
+
+  function onAvatarContinue() {
+    if (!selectedParticipant) return;
+
     startTransition(async () => {
-      const result = await revealParticipantCredentials(participant.username, participant.displayName);
+      const result = await revealParticipantCredentials(
+        selectedParticipant.username,
+        selectedParticipant.displayName
+      );
       if (!result.ok) {
         setIdentifyError(result.error);
+        setStep("identify");
         return;
       }
       setCredentials(result.data);
@@ -278,7 +303,7 @@ export function PwaOnboardingFlow({ participants }: Props) {
       <LoginHero />
 
       <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
-        {step !== "os" && step !== "credentials" ? (
+        {step !== "os" && step !== "credentials" && step !== "avatar" ? (
           <button
             type="button"
             onClick={onBack}
@@ -367,8 +392,7 @@ export function PwaOnboardingFlow({ participants }: Props) {
             <div>
               <h2 className="text-lg font-bold text-white">Quien eres?</h2>
               <p className="mt-1 text-sm leading-relaxed text-white/60">
-                Selecciona tu nombre en el grupo. Solo entonces te mostraremos tu alias y codigo de
-                acceso.
+                Selecciona tu nombre. Despues generaremos tu avatar para la porra.
               </p>
             </div>
 
@@ -409,22 +433,34 @@ export function PwaOnboardingFlow({ participants }: Props) {
             <Button
               type="button"
               className="w-full"
-              disabled={pending || !selectedUsername}
+              disabled={!selectedUsername}
               onClick={onIdentifyConfirm}
             >
-              {pending ? "Comprobando..." : "Confirmar que soy yo"}
+              Generar mi avatar
             </Button>
           </div>
+        ) : null}
+
+        {step === "avatar" && selectedParticipant ? (
+          <AvatarGenerationStep
+            displayName={selectedParticipant.displayName}
+            avatarUrl={getPresetAvatarUrl(selectedParticipant.username)}
+            onReady={handleAvatarReady}
+            onContinue={onAvatarContinue}
+            pending={pending}
+          />
         ) : null}
 
         {step === "credentials" && credentials ? (
           <div className="space-y-4">
             <div className="flex items-start gap-3 rounded-xl border border-[var(--tm-accent)]/30 bg-[var(--tm-accent-soft)] p-3">
-              <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[var(--tm-accent)]" aria-hidden />
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  Hola, {credentials.displayName}
-                </p>
+              <ProfileAvatar
+                avatarUrl={getPresetAvatarUrl(credentials.username)}
+                label={credentials.displayName}
+                className="size-12 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-white">Hola, {credentials.displayName}</p>
                 <p className="mt-0.5 text-xs leading-relaxed text-white/70">
                   Guarda estos datos. Los necesitaras cada vez que entres.
                 </p>

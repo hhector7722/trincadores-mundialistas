@@ -6,6 +6,19 @@ export type OnboardingParticipant = {
   displayName: string;
 };
 
+type ProfileRow = {
+  username: string;
+  display_name: string | null;
+  is_active: boolean;
+};
+
+function pickJoinedProfile(profiles: unknown): ProfileRow | null {
+  if (!profiles) return null;
+  const row = Array.isArray(profiles) ? profiles[0] : profiles;
+  if (!row || typeof row !== "object" || !("username" in row)) return null;
+  return row as ProfileRow;
+}
+
 function fallbackParticipants(): OnboardingParticipant[] {
   return REAL_PARTICIPANTS.map((participant) => ({
     username: participant.username,
@@ -36,15 +49,8 @@ export async function getOnboardingParticipants(): Promise<OnboardingParticipant
     }
 
     return members
-      .map((row) => {
-        const profile = row.profiles as {
-          username: string;
-          display_name: string | null;
-          is_active: boolean;
-        };
-        return profile;
-      })
-      .filter((profile) => profile.is_active)
+      .map((row) => pickJoinedProfile(row.profiles))
+      .filter((profile): profile is ProfileRow => profile !== null && profile.is_active)
       .map((profile) => ({
         username: profile.username,
         displayName: profile.display_name?.trim() || profile.username,

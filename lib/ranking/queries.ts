@@ -31,6 +31,7 @@ export type MemberStanding = {
   profileId: string;
   label: string;
   username: string;
+  avatarUrl: string | null;
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
@@ -375,6 +376,7 @@ export async function getMemberStanding(
     profileId: row.profileId,
     label: row.label,
     username: row.username,
+    avatarUrl: row.avatarUrl,
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,
@@ -397,6 +399,7 @@ export function memberStandingFromLeaderboard(
     profileId: row.profileId,
     label: row.label,
     username: row.username,
+    avatarUrl: row.avatarUrl,
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,

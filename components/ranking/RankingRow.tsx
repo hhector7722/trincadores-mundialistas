@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -26,7 +26,12 @@ export function RankingRow({
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatar avatarUrl={row.avatarUrl} label={row.label} className="size-7 shrink-0" />
+      <ProfileAvatarButton
+        avatarUrl={row.avatarUrl}
+        label={row.label}
+        className="size-7 shrink-0"
+        stopNavigation
+      />
       <span
         className={cn(
           "min-w-0 truncate text-xs font-medium",

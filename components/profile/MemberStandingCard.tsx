@@ -1,3 +1,4 @@
+import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { Card } from "@/components/ui/card";
 import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
 import { formatAggregateStat } from "@/lib/ranking/format";
@@ -12,10 +13,16 @@ export function MemberStandingCard({
 }) {
   return (
     <Card className="space-y-4">
-      <div>
-        <p className="text-xs text-[var(--tm-muted)]">Nombre</p>
-        <p className="text-base font-medium text-[var(--tm-fg)]">{standing.label}</p>
-        <p className="text-sm text-[var(--tm-muted)]">@{standing.username}</p>
+      <div className="flex flex-col items-center gap-3 text-center">
+        <ProfileAvatarButton
+          avatarUrl={standing.avatarUrl}
+          label={standing.label}
+          className="size-20"
+        />
+        <div>
+          <p className="text-base font-medium text-[var(--tm-fg)]">{standing.label}</p>
+          <p className="text-sm text-[var(--tm-muted)]">@{standing.username}</p>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

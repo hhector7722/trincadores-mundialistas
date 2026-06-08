@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import {
   PWA_ONBOARDING_COOKIE,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/pwa/onboarding-cookie";
 import { isKnownOnboardingParticipant } from "@/lib/pwa/onboarding-participants";
 import { normalizeUsername } from "@/lib/auth/validation";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type OnboardingCredentials = {
   username: string;
@@ -78,6 +80,57 @@ export async function revealParticipantCredentials(
       accessCode,
     },
   };
+}
+
+export async function assignParticipantAvatar(
+  usernameRaw: string
+): Promise<ActionResult<{ avatarUrl: string }>> {
+  const cookieStore = await cookies();
+  if (!hasStandaloneGate(cookieStore)) {
+    return {
+      ok: false,
+      error: "Primero debes completar la comprobacion de instalacion en modo app.",
+    };
+  }
+
+  const username = normalizeUsername(usernameRaw);
+  if (!username) {
+    return { ok: false, error: "Participante no valido." };
+  }
+
+  const known = await isKnownOnboardingParticipant(username);
+  if (!known) {
+    return { ok: false, error: "Ese participante no pertenece al grupo." };
+  }
+
+  const presetUrl = getPresetAvatarUrl(username);
+  const admin = createAdminClient();
+
+  const { data: profile, error: fetchError } = await admin
+    .from("profiles")
+    .select("id, avatar_url")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (fetchError || !profile) {
+    return { ok: false, error: "No se encontro el perfil del participante." };
+  }
+
+  if (profile.avatar_url) {
+    return { ok: true, data: { avatarUrl: profile.avatar_url } };
+  }
+
+  const { error: updateError } = await admin
+    .from("profiles")
+    .update({ avatar_url: presetUrl })
+    .eq("id", profile.id)
+    .is("avatar_url", null);
+
+  if (updateError) {
+    return { ok: false, error: "No se pudo guardar el avatar." };
+  }
+
+  return { ok: true, data: { avatarUrl: presetUrl } };
 }
 
 export async function completePwaOnboarding(): Promise<ActionResult<null>> {
