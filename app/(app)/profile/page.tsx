@@ -33,7 +33,8 @@ export default async function ProfilePage() {
         <ProfileAvatarButton
           avatarUrl={profile?.avatar_url ?? null}
           label={label}
-          className="size-24"
+          variant="profile"
+          className="max-h-72 w-auto max-w-full"
         />
         <div className="text-center">
           <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>

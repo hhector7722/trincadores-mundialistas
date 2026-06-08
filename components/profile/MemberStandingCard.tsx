@@ -17,7 +17,8 @@ export function MemberStandingCard({
         <ProfileAvatarButton
           avatarUrl={standing.avatarUrl}
           label={standing.label}
-          className="size-20"
+          variant="profile"
+          className="max-h-72 w-auto max-w-full"
         />
         <div>
           <p className="text-base font-medium text-[var(--tm-fg)]">{standing.label}</p>

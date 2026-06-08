@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 
+export type ProfileAvatarVariant = "badge" | "profile";
+
 function avatarInitials(label: string): string {
   const trimmed = label.trim();
   if (!trimmed) return "?";
@@ -14,17 +16,23 @@ export function ProfileAvatar({
   avatarUrl,
   label,
   className = "h-8 w-8",
+  variant = "badge",
 }: {
   avatarUrl: string | null;
   label: string;
   className?: string;
+  variant?: ProfileAvatarVariant;
 }) {
   if (avatarUrl) {
     return (
       <img
         src={avatarUrl}
         alt=""
-        className={cn("shrink-0 rounded-full object-cover", className)}
+        className={cn(
+          "shrink-0 object-contain",
+          variant === "badge" && "rounded-full",
+          className
+        )}
       />
     );
   }
@@ -32,7 +40,8 @@ export function ProfileAvatar({
   return (
     <span
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
+        "flex shrink-0 items-center justify-center bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
+        variant === "badge" ? "rounded-full" : "rounded-lg",
         className
       )}
       aria-hidden
