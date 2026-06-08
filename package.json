@@ -13,7 +13,7 @@
     "test:worldcup-data": "tsx --test lib/fjelstul-worldcup/parse.test.ts lib/fjelstul-worldcup/men-filter.test.ts lib/worldcup2026/match-mapper.test.ts",
     "test:lineup": "tsx --test lib/lineup/build-probable-xi.test.ts lib/lineup/team-kit-colors.test.ts",
     "test:quiz": "tsx --test lib/quiz/date.test.ts lib/quiz/options.test.ts lib/quiz/seed-day.test.ts lib/quiz/facts.test.ts lib/quiz/distractors.test.ts lib/quiz/generate-question.test.ts lib/quiz/generate-day.test.ts lib/quiz/worldcup-facts-source.test.ts lib/quiz/quiz-facts-repository.test.ts lib/quiz/slot-status.test.ts lib/quiz/play-flow.test.ts lib/quiz/quality.test.ts",
-    "test:pwa": "tsx --test lib/pwa/standalone.test.ts lib/pwa/onboarding-access-codes.test.ts lib/avatars/presets.test.ts",
+    "test:pwa": "tsx --test lib/pwa/standalone.test.ts lib/pwa/onboarding-access-codes.test.ts lib/pwa/onboarding-phones.test.ts lib/avatars/presets.test.ts lib/text/normalize-alias.test.ts",
     "quiz:generate-day": "tsx --env-file=.env.local scripts/generate-quiz-day.ts",
     "db:purge-demo": "tsx --env-file=.env.local scripts/purge-demo-data.ts",
     "db:bootstrap": "tsx --env-file=.env.local scripts/bootstrap-participants.ts",

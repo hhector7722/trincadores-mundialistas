@@ -27,7 +27,7 @@ export function AvatarGenerationStep({
 }: Props) {
   const [phase, setPhase] = useState<Phase>("generating");
   const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState(`Generando imagen de '${displayName}'`);
+  const [message, setMessage] = useState(`generando imagen de '${displayName}'`);
   const [readyError, setReadyError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const startedRef = useRef(false);
@@ -46,8 +46,8 @@ export function AvatarGenerationStep({
       setProgress(pct);
       setMessage(
         ratio >= MESSAGE_SWITCH_AT
-          ? "Ya casi lo tengo crack"
-          : `Generando imagen de '${displayName}'`
+          ? "ya casi lo tengo crack"
+          : `generando imagen de '${displayName}'`
       );
 
       if (ratio >= 1) {

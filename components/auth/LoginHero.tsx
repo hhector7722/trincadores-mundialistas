@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { AppBrandTitle } from "@/components/layout/AppBrandTitle";
 
-export function LoginHero() {
+type LoginHeroProps = {
+  tagline?: string;
+};
+
+export function LoginHero({ tagline = "Convocatoria 2026" }: LoginHeroProps) {
   return (
     <header className="flex w-full flex-col items-center text-center">
       <Image
@@ -19,7 +23,7 @@ export function LoginHero() {
       </h1>
 
       <p className="mt-2 text-[8px] font-semibold uppercase tracking-[0.14em] text-white/60 sm:text-[9px]">
-        Convocatoria 2026
+        {tagline}
       </p>
     </header>
   );

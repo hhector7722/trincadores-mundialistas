@@ -1,7 +1,9 @@
-﻿export const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
+﻿import { normalizeAlias } from "@/lib/text/normalize-alias";
+
+export const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
 
 export function normalizeUsername(raw: string): string {
-  return raw.trim().toLowerCase();
+  return normalizeAlias(raw);
 }
 
 export function validateUsername(username: string): string | null {

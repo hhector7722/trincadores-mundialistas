@@ -1,5 +1,7 @@
 import { REAL_PARTICIPANTS, REAL_POOL_SLUG } from "@/lib/auth/participants";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isOnboardingEligibleUsername } from "@/lib/pwa/onboarding-phones";
+import { normalizeAlias } from "@/lib/text/normalize-alias";
 
 export type OnboardingParticipant = {
   username: string;
@@ -20,10 +22,14 @@ function pickJoinedProfile(profiles: unknown): ProfileRow | null {
 }
 
 function fallbackParticipants(): OnboardingParticipant[] {
-  return REAL_PARTICIPANTS.map((participant) => ({
-    username: participant.username,
-    displayName: participant.displayName,
-  })).sort((a, b) => a.displayName.localeCompare(b.displayName, "es"));
+  return REAL_PARTICIPANTS.filter((participant) =>
+    isOnboardingEligibleUsername(participant.username)
+  )
+    .map((participant) => ({
+      username: participant.username,
+      displayName: participant.displayName,
+    }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, "es"));
 }
 
 export async function getOnboardingParticipants(): Promise<OnboardingParticipant[]> {
@@ -50,7 +56,10 @@ export async function getOnboardingParticipants(): Promise<OnboardingParticipant
 
     return members
       .map((row) => pickJoinedProfile(row.profiles))
-      .filter((profile): profile is ProfileRow => profile !== null && profile.is_active)
+      .filter(
+        (profile): profile is ProfileRow =>
+          profile !== null && profile.is_active && isOnboardingEligibleUsername(profile.username)
+      )
       .map((profile) => ({
         username: profile.username,
         displayName: profile.display_name?.trim() || profile.username,
@@ -62,7 +71,8 @@ export async function getOnboardingParticipants(): Promise<OnboardingParticipant
 }
 
 export async function isKnownOnboardingParticipant(username: string): Promise<boolean> {
+  if (!isOnboardingEligibleUsername(username)) return false;
   const participants = await getOnboardingParticipants();
-  const normalized = username.trim().toLowerCase();
-  return participants.some((participant) => participant.username === normalized);
+  const normalized = normalizeAlias(username);
+  return participants.some((participant) => normalizeAlias(participant.username) === normalized);
 }

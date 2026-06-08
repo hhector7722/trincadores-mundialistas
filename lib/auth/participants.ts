@@ -21,5 +21,4 @@ export const REAL_PARTICIPANTS: ParticipantSeed[] = [
   { username: "teixeira", displayName: "Teixeira", role: "player" },
   { username: "dani", displayName: "Dani", role: "player" },
   { username: "gabri", displayName: "Gabri", role: "player" },
-  { username: "paco", displayName: "Paco", role: "player" },
 ];

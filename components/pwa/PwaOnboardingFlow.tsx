@@ -3,6 +3,8 @@
 import {
   ArrowLeft,
   Copy,
+  ImageIcon,
+  MoreHorizontal,
   MoreVertical,
   PlusSquare,
   Share,
@@ -15,22 +17,21 @@ import {
   confirmStandaloneInstallation,
   assignParticipantAvatar,
   hasCompletedPwaOnboarding,
+  identifyParticipantByPhone,
   revealParticipantCredentials,
   type OnboardingCredentials,
 } from "@/actions/pwa-onboarding";
 import { LoginHero } from "@/components/auth/LoginHero";
 import { AvatarGenerationStep } from "@/components/pwa/AvatarGenerationStep";
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { getPresetAvatarUrl } from "@/lib/avatars/presets";
-import type { OnboardingParticipant } from "@/lib/pwa/onboarding-participants";
 import { detectMobileOs, isStandalonePWA, type MobileOs } from "@/lib/pwa/standalone";
-import { cn } from "@/lib/utils";
+type OnboardingStep = "os" | "instructions" | "verify" | "phone" | "credentials" | "avatar";
 
-type OnboardingStep = "os" | "instructions" | "verify" | "identify" | "avatar" | "credentials";
-
-type Props = {
-  participants: OnboardingParticipant[];
+type IdentifiedParticipant = {
+  username: string;
+  displayName: string;
 };
 
 function InstructionRow({
@@ -73,6 +74,11 @@ function AndroidInstructions() {
         title="Abre desde el icono"
         detail="Cierra esta pestana del navegador y entra desde el icono nuevo en tu pantalla de inicio."
       />
+      <InstructionRow
+        icon={ImageIcon}
+        title="Espera al logo"
+        detail="Cuando abra la app, espera a que cargue correctamente el logo de Trincadores antes de continuar."
+      />
     </ol>
   );
 }
@@ -80,6 +86,11 @@ function AndroidInstructions() {
 function IosInstructions() {
   return (
     <ol className="space-y-2">
+      <InstructionRow
+        icon={MoreHorizontal}
+        title="Pulsa los tres puntos"
+        detail='Toca el boton "..." de Safari antes de llegar al menu de compartir.'
+      />
       <InstructionRow
         icon={Share}
         title="Pulsa Compartir"
@@ -95,29 +106,21 @@ function IosInstructions() {
         title="Abre desde el icono"
         detail="Cierra Safari y entra desde el icono de Trincadores en tu pantalla de inicio."
       />
+      <InstructionRow
+        icon={ImageIcon}
+        title="Espera al logo"
+        detail="Cuando abra la app, espera a que cargue correctamente el logo de Trincadores antes de continuar."
+      />
     </ol>
   );
 }
 
-function OsChoiceButton({
-  label,
-  selected,
-  onClick,
-}: {
-  label: string;
-  selected: boolean;
-  onClick: () => void;
-}) {
+function OsChoiceButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "flex min-h-12 flex-1 items-center justify-center rounded-2xl border px-4 text-sm font-bold uppercase tracking-wide transition-colors",
-        selected
-          ? "border-[var(--tm-accent)] bg-[var(--tm-accent-soft)] text-[var(--tm-accent)]"
-          : "border-white/15 bg-white/5 text-white/80 hover:border-white/25"
-      )}
+      className="flex min-h-12 flex-1 items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-4 text-sm font-bold uppercase tracking-wide text-white/80 transition-colors hover:border-[var(--tm-accent)] hover:bg-[var(--tm-accent-soft)] hover:text-[var(--tm-accent)]"
     >
       {label}
     </button>
@@ -159,34 +162,30 @@ function CopyField({ label, value }: { label: string; value: string }) {
   );
 }
 
-const STEP_ORDER: OnboardingStep[] = ["os", "instructions", "verify", "identify", "credentials"];
-
-function stepNumber(step: OnboardingStep): number {
-  return STEP_ORDER.indexOf(step) + 1;
-}
-
-export function PwaOnboardingFlow({ participants }: Props) {
+export function PwaOnboardingFlow() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [step, setStep] = useState<OnboardingStep>("os");
   const [os, setOs] = useState<MobileOs | null>(null);
   const [verifyError, setVerifyError] = useState<string | null>(null);
-  const [identifyError, setIdentifyError] = useState<string | null>(null);
-  const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
-  const [selectedParticipant, setSelectedParticipant] = useState<OnboardingParticipant | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [participant, setParticipant] = useState<IdentifiedParticipant | null>(null);
   const [credentials, setCredentials] = useState<OnboardingCredentials | null>(null);
   const [bootstrapped, setBootstrapped] = useState(false);
 
   const goToAccess = useCallback(() => {
     startTransition(async () => {
-      const result = await completePwaOnboarding();
+      const username = participant?.username ?? credentials?.username;
+      if (!username) return;
+
+      const result = await completePwaOnboarding(username);
       if (!result.ok) return;
 
-      const username = credentials?.username;
-      router.push(username ? `/login?u=${encodeURIComponent(username)}` : "/login");
+      router.push(`/login?u=${encodeURIComponent(username)}`);
       router.refresh();
     });
-  }, [credentials?.username, router]);
+  }, [credentials?.username, participant?.username, router]);
 
   useEffect(() => {
     if (bootstrapped) return;
@@ -203,7 +202,7 @@ export function PwaOnboardingFlow({ participants }: Props) {
         } else {
           const gate = await confirmStandaloneInstallation();
           if (gate.ok) {
-            setStep("identify");
+            setStep("phone");
           }
         }
         setBootstrapped(true);
@@ -214,8 +213,8 @@ export function PwaOnboardingFlow({ participants }: Props) {
     setBootstrapped(true);
   }, [bootstrapped, router]);
 
-  function onOsContinue() {
-    if (!os) return;
+  function selectOs(nextOs: MobileOs) {
+    setOs(nextOs);
     setVerifyError(null);
     setStep("instructions");
   }
@@ -241,66 +240,62 @@ export function PwaOnboardingFlow({ participants }: Props) {
         setVerifyError("No se pudo validar la instalacion. Intentalo de nuevo.");
         return;
       }
-      setStep("identify");
+      setStep("phone");
     });
   }
 
-  const handleAvatarReady = useCallback(async () => {
-    if (!selectedParticipant) {
-      throw new Error("Participante no seleccionado.");
-    }
-    const result = await assignParticipantAvatar(selectedParticipant.username);
-    if (!result.ok) {
-      throw new Error(result.error);
-    }
-  }, [selectedParticipant]);
-
-  function onIdentifyConfirm() {
-    setIdentifyError(null);
-    if (!selectedUsername) {
-      setIdentifyError("Selecciona tu nombre en la lista.");
-      return;
-    }
-
-    const participant = participants.find((row) => row.username === selectedUsername);
-    if (!participant) {
-      setIdentifyError("Participante no valido.");
-      return;
-    }
-
-    setSelectedParticipant(participant);
-    setStep("avatar");
-  }
-
-  function onAvatarContinue() {
-    if (!selectedParticipant) return;
+  function onPhoneSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setPhoneError(null);
 
     startTransition(async () => {
-      const result = await revealParticipantCredentials(
-        selectedParticipant.username,
-        selectedParticipant.displayName
-      );
-      if (!result.ok) {
-        setIdentifyError(result.error);
-        setStep("identify");
+      const identity = await identifyParticipantByPhone(phone);
+      if (!identity.ok) {
+        setPhoneError(identity.error);
         return;
       }
-      setCredentials(result.data);
+
+      const creds = await revealParticipantCredentials(
+        identity.data.username,
+        identity.data.displayName
+      );
+      if (!creds.ok) {
+        setPhoneError(creds.error);
+        return;
+      }
+
+      setParticipant(identity.data);
+      setCredentials(creds.data);
       setStep("credentials");
     });
   }
 
+  function onCredentialsContinue() {
+    if (!participant) return;
+    setStep("avatar");
+  }
+
+  const handleAvatarReady = useCallback(async () => {
+    if (!participant) {
+      throw new Error("Participante no identificado.");
+    }
+    const result = await assignParticipantAvatar(participant.username);
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+  }, [participant]);
+
   function onBack() {
     setVerifyError(null);
-    setIdentifyError(null);
+    setPhoneError(null);
     if (step === "instructions") setStep("os");
     if (step === "verify") setStep("instructions");
-    if (step === "identify") setStep("verify");
+    if (step === "phone") setStep("verify");
   }
 
   return (
     <div className="flex w-full flex-col gap-4 sm:gap-5">
-      <LoginHero />
+      <LoginHero tagline="PARA VOSOTROS JUGADORES" />
 
       <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
         {step !== "os" && step !== "credentials" && step !== "avatar" ? (
@@ -325,26 +320,17 @@ export function PwaOnboardingFlow({ participants }: Props) {
             </div>
 
             <div className="flex gap-3">
-              <OsChoiceButton label="Android" selected={os === "android"} onClick={() => setOs("android")} />
-              <OsChoiceButton label="iOS" selected={os === "ios"} onClick={() => setOs("ios")} />
+              <OsChoiceButton label="Android" onClick={() => selectOs("android")} />
+              <OsChoiceButton label="iOS" onClick={() => selectOs("ios")} />
             </div>
-
-            <Button type="button" className="w-full" disabled={!os} onClick={onOsContinue}>
-              Ver instrucciones
-            </Button>
           </div>
         ) : null}
 
         {step === "instructions" && os ? (
           <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-white">
-                {os === "android" ? "Instalar en Android" : "Instalar en iPhone"}
-              </h2>
-              <p className="mt-1 text-sm leading-relaxed text-white/60">
-                Sigue estos pasos y despues confirma que ya la abriste desde el icono.
-              </p>
-            </div>
+            <h2 className="text-lg font-bold text-white">
+              {os === "android" ? "Instalar en Android" : "Instalar en iPhone"}
+            </h2>
 
             {os === "android" ? <AndroidInstructions /> : <IosInstructions />}
 
@@ -364,14 +350,6 @@ export function PwaOnboardingFlow({ participants }: Props) {
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-              <p className="font-semibold text-white">Que comprobamos</p>
-              <p className="mt-1 leading-relaxed">
-                Solo verificamos que la app se ejecuta en modo instalada (standalone). No pedimos
-                capturas ni comprobamos el icono.
-              </p>
-            </div>
-
             {verifyError ? (
               <p
                 className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
@@ -387,84 +365,57 @@ export function PwaOnboardingFlow({ participants }: Props) {
           </div>
         ) : null}
 
-        {step === "identify" ? (
-          <div className="space-y-4">
+        {step === "phone" ? (
+          <form className="space-y-4" onSubmit={onPhoneSubmit}>
+            <h2 className="text-lg font-bold text-white">Tu telefono</h2>
+
             <div>
-              <h2 className="text-lg font-bold text-white">Quien eres?</h2>
-              <p className="mt-1 text-sm leading-relaxed text-white/60">
-                Selecciona tu nombre. Despues generaremos tu avatar para la porra.
-              </p>
+              <label
+                htmlFor="onboarding-phone"
+                className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
+              >
+                Numero de movil
+              </label>
+              <Input
+                id="onboarding-phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                required
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  setPhoneError(null);
+                }}
+                className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-wide"
+                placeholder="647229309"
+                spellCheck={false}
+              />
             </div>
 
-            <ul className="grid grid-cols-2 gap-2">
-              {participants.map((participant) => {
-                const selected = selectedUsername === participant.username;
-                return (
-                  <li key={participant.username}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedUsername(participant.username);
-                        setIdentifyError(null);
-                      }}
-                      className={cn(
-                        "flex min-h-12 w-full items-center justify-center rounded-xl border px-3 text-sm font-semibold transition-colors",
-                        selected
-                          ? "border-[var(--tm-accent)] bg-[var(--tm-accent-soft)] text-[var(--tm-accent)]"
-                          : "border-white/15 bg-white/5 text-white hover:border-white/25"
-                      )}
-                    >
-                      {participant.displayName}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {identifyError ? (
+            {phoneError ? (
               <p
                 className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
-                {identifyError}
+                {phoneError}
               </p>
             ) : null}
 
-            <Button
-              type="button"
-              className="w-full"
-              disabled={!selectedUsername}
-              onClick={onIdentifyConfirm}
-            >
-              Generar mi avatar
+            <Button type="submit" className="w-full" disabled={pending || !phone.trim()}>
+              {pending ? "Comprobando..." : "Siguiente"}
             </Button>
-          </div>
-        ) : null}
-
-        {step === "avatar" && selectedParticipant ? (
-          <AvatarGenerationStep
-            displayName={selectedParticipant.displayName}
-            avatarUrl={getPresetAvatarUrl(selectedParticipant.username)}
-            onReady={handleAvatarReady}
-            onContinue={onAvatarContinue}
-            pending={pending}
-          />
+          </form>
         ) : null}
 
         {step === "credentials" && credentials ? (
           <div className="space-y-4">
-            <div className="flex items-start gap-3 rounded-xl border border-[var(--tm-accent)]/30 bg-[var(--tm-accent-soft)] p-3">
-              <ProfileAvatar
-                avatarUrl={getPresetAvatarUrl(credentials.username)}
-                label={credentials.displayName}
-                className="size-12 shrink-0"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white">Hola, {credentials.displayName}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-white/70">
-                  Guarda estos datos. Los necesitaras cada vez que entres.
-                </p>
-              </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Hola, {credentials.displayName}</h2>
+              <p className="mt-1 text-sm leading-relaxed text-white/70">
+                Guarda estos datos. Los necesitaras cada vez que entres.
+              </p>
             </div>
 
             <div className="space-y-3">
@@ -472,16 +423,22 @@ export function PwaOnboardingFlow({ participants }: Props) {
               <CopyField label="Codigo de acceso" value={credentials.accessCode} />
             </div>
 
-            <Button type="button" className="w-full" disabled={pending} onClick={goToAccess}>
-              {pending ? "Continuando..." : "Continuar al acceso"}
+            <Button type="button" className="w-full" onClick={onCredentialsContinue}>
+              Siguiente
             </Button>
           </div>
         ) : null}
-      </div>
 
-      <p className="text-center text-xs leading-relaxed text-white/50">
-        Paso {stepNumber(step)} de {STEP_ORDER.length}
-      </p>
+        {step === "avatar" && participant ? (
+          <AvatarGenerationStep
+            displayName={participant.displayName}
+            avatarUrl={getPresetAvatarUrl(participant.username)}
+            onReady={handleAvatarReady}
+            onContinue={goToAccess}
+            pending={pending}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }

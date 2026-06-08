@@ -128,8 +128,9 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
   const profileIds = memberships.map((m) => m.profile_id);
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url")
-    .in("id", profileIds);
+    .select("id, username, display_name, avatar_url, onboarding_completed_at")
+    .in("id", profileIds)
+    .not("onboarding_completed_at", "is", null);
 
   const profileMap = new Map(
     (profiles ?? []).map((p) => [
@@ -142,15 +143,18 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
     ])
   );
 
-  return memberships.map((m) => {
-    const p = profileMap.get(m.profile_id);
-    return {
-      profileId: m.profile_id,
-      label: p?.label ?? " ",
-      username: p?.username ?? " ",
-      avatarUrl: p?.avatarUrl ?? null,
-    };
-  });
+  return memberships
+    .map((m) => {
+      const p = profileMap.get(m.profile_id);
+      if (!p) return null;
+      return {
+        profileId: m.profile_id,
+        label: p.label,
+        username: p.username,
+        avatarUrl: p.avatarUrl,
+      };
+    })
+    .filter((row): row is MemberRow => row !== null);
 }
 
 async function loadResolvedPredictionStats(

@@ -10,6 +10,7 @@ export type Profile = {
   avatar_url: string | null;
   is_active: boolean;
   access_code_rotated_at: string | null;
+  onboarding_completed_at: string | null;
   created_at: string;
 };
 export type Pool = { id: string; slug: string; name: string; settings_json: PoolSettings; created_at: string };

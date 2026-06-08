@@ -10,6 +10,11 @@ import {
   PWA_STANDALONE_GATE_MAX_AGE_SECONDS,
 } from "@/lib/pwa/onboarding-cookie";
 import { isKnownOnboardingParticipant } from "@/lib/pwa/onboarding-participants";
+import {
+  isOnboardingEligibleUsername,
+  normalizePhone,
+  resolveParticipantByPhone,
+} from "@/lib/pwa/onboarding-phones";
 import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -40,6 +45,44 @@ export async function confirmStandaloneInstallation(): Promise<ActionResult<null
     maxAge: PWA_STANDALONE_GATE_MAX_AGE_SECONDS,
   });
   return { ok: true, data: null };
+}
+
+export async function identifyParticipantByPhone(
+  phoneRaw: string
+): Promise<ActionResult<{ username: string; displayName: string }>> {
+  const cookieStore = await cookies();
+  if (!hasStandaloneGate(cookieStore)) {
+    return {
+      ok: false,
+      error: "Primero debes completar la comprobacion de instalacion en modo app.",
+    };
+  }
+
+  const phone = normalizePhone(phoneRaw);
+  if (!phone) {
+    return { ok: false, error: "Introduce tu numero de telefono." };
+  }
+
+  const participant = resolveParticipantByPhone(phone);
+  if (!participant) {
+    return {
+      ok: false,
+      error: "Numero no reconocido. Comprueba que es el movil registrado en el grupo.",
+    };
+  }
+
+  const known = await isKnownOnboardingParticipant(participant.username);
+  if (!known) {
+    return { ok: false, error: "Ese participante no pertenece al grupo." };
+  }
+
+  return {
+    ok: true,
+    data: {
+      username: participant.username,
+      displayName: participant.displayName,
+    },
+  };
 }
 
 export async function revealParticipantCredentials(
@@ -133,8 +176,52 @@ export async function assignParticipantAvatar(
   return { ok: true, data: { avatarUrl: presetUrl } };
 }
 
-export async function completePwaOnboarding(): Promise<ActionResult<null>> {
+export async function completePwaOnboarding(
+  usernameRaw: string
+): Promise<ActionResult<null>> {
   const cookieStore = await cookies();
+  if (!hasStandaloneGate(cookieStore)) {
+    return {
+      ok: false,
+      error: "Primero debes completar la comprobacion de instalacion en modo app.",
+    };
+  }
+
+  const username = normalizeUsername(usernameRaw);
+  if (!username || !isOnboardingEligibleUsername(username)) {
+    return { ok: false, error: "Participante no valido para activacion." };
+  }
+
+  const admin = createAdminClient();
+  const { data: profile, error: fetchError } = await admin
+    .from("profiles")
+    .select("id, avatar_url, onboarding_completed_at")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (fetchError || !profile) {
+    return { ok: false, error: "No se encontro el perfil del participante." };
+  }
+
+  if (!profile.avatar_url) {
+    return {
+      ok: false,
+      error: "Debes generar tu avatar antes de activar el acceso.",
+    };
+  }
+
+  if (!profile.onboarding_completed_at) {
+    const { error: activateError } = await admin
+      .from("profiles")
+      .update({ onboarding_completed_at: new Date().toISOString() })
+      .eq("id", profile.id)
+      .is("onboarding_completed_at", null);
+
+    if (activateError) {
+      return { ok: false, error: "No se pudo activar tu perfil." };
+    }
+  }
+
   cookieStore.set(PWA_ONBOARDING_COOKIE, "1", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
