@@ -31,6 +31,11 @@ export const MIN_GAP_Y = 3;
 /** Margen lateral para dieciseisavos (en % del canvas). */
 export const BRACKET_SIDE_INSET = 6.5;
 
+/** Dieciseisavos se alejan de octavos hacia el exterior (~28px en móvil). */
+const NUDGE_R32_AWAY_FROM_R16 = 7;
+/** Semifinales se alejan de la final; la final no se mueve (~24px). */
+const NUDGE_SF_AWAY_FROM_FINAL = 6.5;
+
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
   ROUND_LAYOUT_SCALE.r16, // 1
@@ -105,6 +110,18 @@ export function buildColumnCenters(): readonly number[] {
       x[i] = FINAL_CENTER_X + (x[i] - FINAL_CENTER_X) * factor;
     }
   }
+
+  // Aire extra: solo mueve la ronda exterior (dieciseisavos / semis), no la final.
+  x[0] = Math.max(
+    BRACKET_SIDE_INSET + halfWidthForColumn(0),
+    x[0] - NUDGE_R32_AWAY_FROM_R16
+  );
+  x[8] = Math.min(
+    100 - BRACKET_SIDE_INSET - halfWidthForColumn(8),
+    x[8] + NUDGE_R32_AWAY_FROM_R16
+  );
+  x[3] -= NUDGE_SF_AWAY_FROM_FINAL;
+  x[5] += NUDGE_SF_AWAY_FROM_FINAL;
 
   return x;
 }
