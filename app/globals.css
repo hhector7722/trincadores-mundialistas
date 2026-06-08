@@ -45,8 +45,6 @@
   --tm-tabbar-core: 3rem;
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: var(--tm-tabbar-height);
-  --tm-vvh-offset: 0px;
-  --tm-vvh-height: 100svh;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -79,38 +77,25 @@ body {
 }
 
 html {
+  height: -webkit-fill-available;
   background-color: var(--tm-tabbar-bg-hex);
 }
 
-/* PWA iOS: body fijo al visual viewport (top/height los fija el bootstrap en <head>) */
-html.tm-native-shell {
-  height: 100%;
-  overflow: hidden;
-  background-color: var(--tm-tabbar-bg-hex);
-}
-
-html.tm-native-shell body {
+/* PWA iOS: bloquea scroll del documento; el scroll vive solo en main */
+body:has(.tm-app-shell) {
   position: fixed;
-  left: 0;
-  right: 0;
+  inset: 0;
   width: 100%;
-  min-height: 0;
-  margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  top: var(--tm-vvh-offset, 0px);
-  height: var(--tm-vvh-height, 100svh);
-  background-color: var(--tm-tabbar-bg-hex);
-  background-image: none;
 }
 
-/* Shell ocupa el body fijo; TabBar al fondo del flujo flex */
 .tm-app-shell {
-  position: absolute;
-  inset: 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+  height: -webkit-fill-available;
   overflow: hidden;
 }
 
@@ -126,19 +111,6 @@ html.tm-native-shell body {
 }
 
 .tm-tabbar {
-  background-color: var(--tm-tabbar-bg-hex);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-.tm-tabbar-chin {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 40;
-  height: calc(var(--tm-tabbar-height) + 2rem);
-  pointer-events: none;
   background-color: var(--tm-tabbar-bg-hex);
 }
 

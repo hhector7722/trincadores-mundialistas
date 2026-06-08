@@ -1,6 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
-import { NativeShellBootstrap } from "@/components/layout/NativeShellBootstrap";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -30,7 +29,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: "#2A1058",
-  interactiveWidget: "resizes-content",
 };
 
 const siteUrl = getSiteUrl();
@@ -78,9 +76,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
-      <head>
-        <NativeShellBootstrap />
-      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
