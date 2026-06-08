@@ -4,11 +4,6 @@ export const BRACKET_LEAF_SLOTS = 16;
 export const BRACKET_VERTICAL_PAD = 3;
 export const BRACKET_VERTICAL_COMPACT = 0.88;
 
-/** Posiciones X base (9 columnas); se compactan hacia el centro. */
-export const COLUMN_X_RAW: readonly number[] = [9, 19, 29, 41, 50, 59, 71, 81, 91];
-/** Compactación horizontal de columnas (~12.5 %). */
-export const BRACKET_HORIZONTAL_COMPACT = 0.875;
-
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
 
@@ -24,10 +19,86 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
 export const CARD_HALF_WIDTH_BASE = 4.2;
 
-export const FINAL_ANCHOR_LEFT_X =
-  FINAL_CENTER_X - CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.final;
-export const FINAL_ANCHOR_RIGHT_X =
-  FINAL_CENTER_X + CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.final;
+/**
+ * Separación mínima horizontal entre tarjetas (en % del canvas 0–100).
+ * Ajustable: 24px aprox en móvil suele rondar ~6–7% del ancho.
+ */
+export const MIN_GAP_X = 6.5;
+
+/** Separación mínima vertical (en % del canvas). */
+export const MIN_GAP_Y = 3.5;
+
+/** Margen lateral para que nada “toque” los bordes (en % del canvas). */
+export const BRACKET_SIDE_INSET = 4.5;
+
+const COLUMN_SCALE_BY_INDEX: readonly number[] = [
+  ROUND_LAYOUT_SCALE.r32, // 0
+  ROUND_LAYOUT_SCALE.r16, // 1
+  ROUND_LAYOUT_SCALE.qf, // 2
+  ROUND_LAYOUT_SCALE.sf, // 3
+  ROUND_LAYOUT_SCALE.final, // 4
+  ROUND_LAYOUT_SCALE.sf, // 5
+  ROUND_LAYOUT_SCALE.qf, // 6
+  ROUND_LAYOUT_SCALE.r16, // 7
+  ROUND_LAYOUT_SCALE.r32, // 8
+];
+
+function halfWidthForColumn(column: number): number {
+  const scale = COLUMN_SCALE_BY_INDEX[column] ?? 1;
+  return CARD_HALF_WIDTH_BASE * scale;
+}
+
+function minCenterDistance(colA: number, colB: number): number {
+  return halfWidthForColumn(colA) + halfWidthForColumn(colB) + MIN_GAP_X;
+}
+
+/**
+ * Calcula las X de las 9 columnas garantizando que:
+ * - La final tiene su propia columna física (col 4).
+ * - Hay zona central y distancia mínima entre columnas adyacentes (sin solapes).
+ * - Simetría perfecta izquierda/derecha.
+ */
+export function buildColumnCenters(): readonly number[] {
+  const x: number[] = Array(9).fill(50);
+  x[4] = FINAL_CENTER_X;
+
+  // Construcción desde el centro hacia fuera (garantiza hueco entre rondas).
+  for (let step = 1; step <= 4; step++) {
+    const left = 4 - step;
+    const right = 4 + step;
+    const prevLeft = left + 1;
+    const prevRight = right - 1;
+    x[left] = x[prevLeft] - minCenterDistance(left, prevLeft);
+    x[right] = x[prevRight] + minCenterDistance(right, prevRight);
+  }
+
+  // Clamp a márgenes laterales manteniendo simetría (si fuese necesario).
+  const minX = BRACKET_SIDE_INSET + halfWidthForColumn(0);
+  const maxX = 100 - BRACKET_SIDE_INSET - halfWidthForColumn(8);
+  const overflowLeft = minX - x[0];
+  const overflowRight = x[8] - maxX;
+
+  const shift = Math.max(0, overflowLeft, overflowRight);
+  if (shift > 0) {
+    // Reducimos expansión desde el centro (escala horizontal global).
+    const leftSpan = FINAL_CENTER_X - minX;
+    const rightSpan = maxX - FINAL_CENTER_X;
+    const maxSpan = Math.min(leftSpan, rightSpan);
+    const currentSpan = Math.max(FINAL_CENTER_X - x[0], x[8] - FINAL_CENTER_X);
+    const factor = currentSpan > 0 ? Math.max(0.72, maxSpan / currentSpan) : 1;
+
+    for (let i = 0; i < 9; i++) {
+      x[i] = FINAL_CENTER_X + (x[i] - FINAL_CENTER_X) * factor;
+    }
+  }
+
+  return x;
+}
+
+const COLUMN_CENTERS = buildColumnCenters();
+
+export const FINAL_ANCHOR_LEFT_X = FINAL_CENTER_X - halfWidthForColumn(4);
+export const FINAL_ANCHOR_RIGHT_X = FINAL_CENTER_X + halfWidthForColumn(4);
 
 export type BracketMatchGeometry = {
   matchNumber: number;
@@ -73,9 +144,7 @@ export function leafSpanY(startLeaf: number, leafSpan: number) {
 }
 
 export function mapColumnX(column: number): number {
-  const raw = COLUMN_X_RAW[column] ?? 50;
-  if (raw === 50) return 50;
-  return 50 + (raw - 50) * BRACKET_HORIZONTAL_COMPACT;
+  return COLUMN_CENTERS[column] ?? 50;
 }
 
 export function gutterX(columnA: number, columnB: number): number {

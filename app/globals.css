@@ -842,7 +842,6 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--final {
-  z-index: 3;
   width: min(10.2cqw, 51px);
   min-width: 41px;
   border-color: rgba(212, 255, 0, 0.42);
