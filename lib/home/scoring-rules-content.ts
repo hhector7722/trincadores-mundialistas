@@ -15,14 +15,12 @@ const maxPreTournament =
   champion + finalists + topScorer + tournamentMvp + goldenGlove;
 const maxPerMatch = exact + MVP_PREDICTION_POINTS;
 
-/** Resumen visible en la card de inicio (máx. 6 líneas). */
+/** Resumen visible en la card de inicio (solo partidos). */
 export const SCORING_RULES_CARD_SUMMARY = [
-  "Pronósticos pre-torneo.",
-  "Campeón, finalistas, Pichichi, MVP y Guante de oro.",
-  "Partidos: exacto, signo y MVP.",
-  "El exacto no suma el signo aparte.",
-  "El quiz va aparte.",
-  "Todo queda bloqueado al empezar el Mundial.",
+  `Marcador exacto +${exact} pts`,
+  `Acierto del signo (1x2) +${sign} pts`,
+  `MVP del partido +${MVP_PREDICTION_POINTS} pts`,
+  "Exacto ya incluye signo",
 ] as const;
 
 export type ScoringRulesSection = {
@@ -31,7 +29,7 @@ export type ScoringRulesSection = {
   body: string[];
 };
 
-/** Contenido detallado del modal (escala definitiva v2). */
+/** Secciones del modal (una por pantalla, navegación por deslizamiento). */
 export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
   {
     id: "pre-tournament",

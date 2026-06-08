@@ -22,17 +22,16 @@ export function HomeScoringRulesCard() {
         <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
           Normas de puntuación
         </p>
-        <ul className="mt-1.5 space-y-0.5">
+        <div className="mt-1.5 space-y-0.5">
           {SCORING_RULES_CARD_SUMMARY.map((line) => (
-            <li
+            <p
               key={line}
-              className="flex items-start gap-1.5 text-[10px] font-medium leading-snug text-white/75"
+              className="text-[10px] font-medium leading-snug text-white/75"
             >
-              <span className="mt-[0.35em] h-1 w-1 shrink-0 rounded-full bg-[#CCFF00]/70" aria-hidden="true" />
-              <span>{line}</span>
-            </li>
+              {line}
+            </p>
           ))}
-        </ul>
+        </div>
       </button>
 
       <ScoringRulesModal open={open} onClose={() => setOpen(false)} />
