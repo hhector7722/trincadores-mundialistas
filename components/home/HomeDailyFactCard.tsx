@@ -9,7 +9,7 @@ export function HomeDailyFactCard({ fact }: HomeDailyFactCardProps) {
 
   return (
     <div
-      className="@container flex h-full min-h-0 min-w-0 flex-col justify-start rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card"
+      className="@container flex h-full min-h-0 min-w-0 flex-col justify-start rounded-2xl p-2 tm-stat-card"
       aria-label="Dato shanelador del dia"
     >
       <div className="flex w-full min-w-0 flex-col gap-1.5">

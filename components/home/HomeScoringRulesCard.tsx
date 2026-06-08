@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const CARD_BUTTON_CLASS = cn(
-  "@container min-h-0 min-w-0 rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] text-left tm-stat-card",
+  "@container min-h-0 min-w-0 rounded-2xl p-2 text-left tm-stat-card",
   "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
 );
 
@@ -25,7 +25,7 @@ function ScoringRuleRow({
   return (
     <p
       className={cn(
-        "flex w-full items-center justify-between gap-2 text-[10px] font-medium leading-snug",
+        "flex w-full items-center justify-between gap-2 text-[9px] font-medium leading-none",
         className
       )}
     >
@@ -58,17 +58,17 @@ function ScoringRulesMiniCard({
         CARD_BUTTON_CLASS,
         className,
         useFourRowGrid
-          ? "grid h-full grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_repeat(3,minmax(0,1fr))] gap-x-2 gap-y-0.5"
+          ? "grid h-full grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_repeat(3,auto)] content-start gap-x-2 gap-y-0"
           : "flex h-full flex-col justify-center"
       )}
       aria-label="Normas de puntuación. Pulsa para ver el detalle."
     >
       {showHeader ? (
-        <div className="col-span-2 flex min-h-0 items-center justify-between gap-2">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
+        <div className="col-span-2 flex min-h-0 items-center justify-between gap-2 pb-0.5">
+          <p className="text-[9px] font-semibold uppercase leading-none tracking-wide text-[#CCFF00]">
             Normas
           </p>
-          <span className="text-[9px] font-semibold text-[#CCFF00]">ver más</span>
+          <span className="text-[9px] font-semibold leading-none text-[#CCFF00]">ver más</span>
         </div>
       ) : null}
       {useFourRowGrid ? (
@@ -78,13 +78,13 @@ function ScoringRulesMiniCard({
           return [
             <span
               key={`${line.label}-label`}
-              className="flex min-h-0 items-center text-[10px] font-medium leading-snug text-white/75"
+              className="flex min-h-0 items-center text-[9px] font-medium leading-none text-white/75"
             >
               {line.label}
             </span>,
             <span
               key={`${line.label}-points`}
-              className="flex min-h-0 items-center justify-end text-[10px] font-medium tabular-nums leading-snug text-[#CCFF00]"
+              className="flex min-h-0 items-center justify-end text-[9px] font-medium tabular-nums leading-none text-[#CCFF00]"
             >
               {line.points}
             </span>,

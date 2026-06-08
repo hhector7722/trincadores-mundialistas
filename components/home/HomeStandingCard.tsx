@@ -76,10 +76,10 @@ export function HomeStandingCard({
           <HomeNextMatch poolId={poolId} match={nextMatch} />
         </div>
       ) : null}
-      <div className="grid min-h-0 flex-1 grid-cols-2 items-stretch gap-3">
-        <div className="flex h-full min-h-0 min-w-0 flex-col gap-1.5">
+      <div className="tm-home-secondary-row grid shrink-0 grid-cols-2 items-stretch gap-3">
+        <div className="flex h-full min-h-0 min-w-0 flex-col gap-1">
           <HomeScoringRulesCard className="min-h-0 flex-1" />
-          <HomeDailyQuizCard quizHub={quizHub} />
+          <HomeDailyQuizCard quizHub={quizHub} className="shrink-0" />
         </div>
         <HomeDailyFactCard fact={dailyFact} />
       </div>

@@ -39,7 +39,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
     <>
       <div
         className={cn(
-          "@container shrink-0 rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card",
+          "@container shrink-0 rounded-2xl p-2 tm-stat-card",
           className
         )}
         aria-label="Quiz diario"

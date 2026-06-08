@@ -81,7 +81,7 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
   const emptyRowCount = Math.max(0, EMPTY_ROW_COUNT - displayRows.length);
 
   return (
-    <div className="@container min-w-0 overflow-hidden rounded-2xl tm-stat-card">
+    <div className="tm-home-mini-table @container min-w-0 overflow-hidden rounded-2xl tm-stat-card">
       <MiniRankingHeader />
       <div>
         {displayRows.map((row) => (
