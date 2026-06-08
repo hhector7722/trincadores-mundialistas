@@ -158,7 +158,7 @@ export function buildColumnCenters(): readonly number[] {
 export const FOOTER_BUTTON_ALIGN_REF = { leftPct: 24, rightPct: 76 } as const;
 
 /** Empuje ligero de cuartos hacia fuera (alejados de la final). */
-const NUDGE_QF_AWAY_FROM_FINAL = 1.75;
+const NUDGE_QF_AWAY_FROM_FINAL = 3.25;
 
 /**
  * Invierte el desplazamiento del ajuste anterior (borde cuarto ↔ borde botón):
