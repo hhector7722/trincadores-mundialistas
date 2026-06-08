@@ -19,6 +19,8 @@ type ModalProps = {
   title: ReactNode;
   children: ReactNode;
   className?: string;
+  /** Contenedor raíz del portal (posición, z-index, padding). */
+  containerClassName?: string;
   wrapperClassName?: string;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
@@ -212,6 +214,7 @@ export function Modal({
   title,
   children,
   className,
+  containerClassName,
   wrapperClassName,
   hideHeaderDivider = false,
   hideTitle = false,
@@ -305,8 +308,9 @@ export function Modal({
   return createPortal(
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center p-4",
-        slideActive && "touch-none"
+        "fixed inset-0 z-[100] flex items-center justify-center p-4",
+        slideActive && "touch-none",
+        containerClassName
       )}
       onTouchStart={hasSwipe ? onTouchStart : undefined}
       onTouchEnd={hasSwipe ? onTouchEnd : undefined}
