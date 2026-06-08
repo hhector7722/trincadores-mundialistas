@@ -31,10 +31,6 @@ export const MIN_GAP_Y = 3;
 /** Margen lateral para dieciseisavos (en % del canvas). */
 export const BRACKET_SIDE_INSET = 6.5;
 
-/** Dieciseisavos hacia el borde exterior (~16px en móvil). */
-const NUDGE_R32_OUTWARD = 4;
-/** Octavos hacia el centro / final (~14px en móvil). */
-const NUDGE_R16_TOWARD_CENTER = 3.5;
 /** Semifinales se alejan de la final; la final no se mueve (~24px). */
 const NUDGE_SF_AWAY_FROM_FINAL = 6.5;
 
@@ -116,11 +112,9 @@ export function buildColumnCenters(): readonly number[] {
   const minR32X = BRACKET_SIDE_INSET + halfWidthForColumn(0);
   const maxR32X = 100 - BRACKET_SIDE_INSET - halfWidthForColumn(8);
 
-  // Dieciseisavos ↔ octavos: r32 al borde, r16 hacia el centro (sin tocar límites de pantalla).
-  x[0] = Math.max(minR32X, x[0] - NUDGE_R32_OUTWARD);
-  x[1] += NUDGE_R16_TOWARD_CENTER;
-  x[8] = Math.min(maxR32X, x[8] + NUDGE_R32_OUTWARD);
-  x[7] -= NUDGE_R16_TOWARD_CENTER;
+  // Dieciseisavos al máximo hacia el exterior sin tocar el borde de pantalla.
+  x[0] = minR32X;
+  x[8] = maxR32X;
 
   // Semifinales alejadas de la final; la final no se mueve.
   x[3] -= NUDGE_SF_AWAY_FROM_FINAL;
