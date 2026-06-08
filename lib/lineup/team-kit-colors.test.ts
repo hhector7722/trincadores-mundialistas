@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
+import { getTeamKitColors, teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 
 test("getTeamKitColors usa color de camiseta y dorsal con contraste", () => {
   const spain = getTeamKitColors("Spain");
@@ -19,4 +19,9 @@ test("getTeamKitColors usa color de camiseta y dorsal con contraste", () => {
 test("getTeamKitColors resuelve equipos con slug alternativo", () => {
   const bosnia = getTeamKitColors("Bosnia & Herzegovina");
   assert.equal(bosnia.kit, "#002395");
+});
+
+test("teamKitColorsClash detecta camisetas titulares iguales", () => {
+  assert.equal(teamKitColorsClash("England", "Germany"), true);
+  assert.equal(teamKitColorsClash("Spain", "Brazil"), false);
 });

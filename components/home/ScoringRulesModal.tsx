@@ -166,7 +166,7 @@ export function ScoringRulesModal({ open, onClose }: ScoringRulesModalProps) {
       open={open}
       onClose={onClose}
       title={activeSection.title}
-      headerTitleAlign="left"
+      hideTitle
       hideHeaderDivider
       className="max-h-[min(70dvh,22rem)]"
       wrapperClassName="max-w-[min(100vw-2rem,18rem)]"

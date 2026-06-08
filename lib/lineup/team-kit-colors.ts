@@ -90,8 +90,16 @@ function contrastingBorderColor(bgHex: string): string {
   return relativeLuminance(r, g, b) > 0.45 ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.38)";
 }
 
+export function getTeamKitHex(teamName: string): string {
+  return TEAM_KIT_HEX_BY_SLUG[toSlug(teamName)] ?? DEFAULT_KIT;
+}
+
+export function teamKitColorsClash(homeTeam: string, awayTeam: string): boolean {
+  return getTeamKitHex(homeTeam).toUpperCase() === getTeamKitHex(awayTeam).toUpperCase();
+}
+
 export function getTeamKitColors(teamName: string): TeamKitColors {
-  const kit = TEAM_KIT_HEX_BY_SLUG[toSlug(teamName)] ?? DEFAULT_KIT;
+  const kit = getTeamKitHex(teamName);
   return {
     kit,
     dorsal: contrastingTextColor(kit),

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
+import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -38,7 +39,9 @@ export function MatchMvpFieldGraphic({
     onFieldReady?.();
   }
 
-  function renderSlot(teamName: string, slot: MatchFieldSlot) {
+  const awayKitClash = teamKitColorsClash(homeTeam, awayTeam);
+
+  function renderSlot(teamName: string, slot: MatchFieldSlot, isAway: boolean) {
     const key = playerKey(teamName, slot);
     const active = selectedKey === key;
 
@@ -58,6 +61,7 @@ export function MatchMvpFieldGraphic({
           variant="match"
           selected={active}
           disabled={disabled}
+          awayKitClashBorder={isAway && awayKitClash}
           onClick={
             !slot.isPlaceholder
               ? () => onSelect(key)
@@ -96,8 +100,8 @@ export function MatchMvpFieldGraphic({
         {teamNameEs(homeTeam)}
       </div>
 
-      {awaySlots.map((slot) => renderSlot(awayTeam, slot))}
-      {homeSlots.map((slot) => renderSlot(homeTeam, slot))}
+      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true))}
+      {homeSlots.map((slot) => renderSlot(homeTeam, slot, false))}
     </div>
   );
 }

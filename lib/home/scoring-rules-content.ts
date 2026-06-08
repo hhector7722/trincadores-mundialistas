@@ -15,13 +15,17 @@ const maxPreTournament =
   champion + finalists + topScorer + tournamentMvp + goldenGlove;
 const maxPerMatch = exact + MVP_PREDICTION_POINTS;
 
+export type ScoringRulesCardLine =
+  | { kind: "points"; label: string; points: string }
+  | { kind: "note"; text: string };
+
 /** Resumen visible en la card de inicio (solo partidos). */
-export const SCORING_RULES_CARD_SUMMARY = [
-  `Marcador exacto +${exact} pts`,
-  `Acierto del signo (1x2) +${sign} pts`,
-  `MVP del partido +${MVP_PREDICTION_POINTS} pts`,
-  "Exacto ya incluye signo",
-] as const;
+export const SCORING_RULES_CARD_LINES: ScoringRulesCardLine[] = [
+  { kind: "points", label: "Marcador exacto", points: `+${exact} pts` },
+  { kind: "points", label: "Acierto 1 x 2", points: `+${sign} pts` },
+  { kind: "points", label: "MVP", points: `+${MVP_PREDICTION_POINTS} pts` },
+  { kind: "note", text: "Marcador exacto y signo no se suman" },
+];
 
 export type ScoringRulesSection = {
   id: string;

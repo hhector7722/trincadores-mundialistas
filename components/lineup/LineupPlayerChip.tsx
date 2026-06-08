@@ -10,6 +10,8 @@ type LineupPlayerChipProps = {
   variant?: "default" | "modal" | "match";
   selected?: boolean;
   disabled?: boolean;
+  /** Borde grueso en la camiseta (visitante con color titular coincidente). */
+  awayKitClashBorder?: boolean;
 };
 
 export function LineupPlayerChip({
@@ -19,6 +21,7 @@ export function LineupPlayerChip({
   variant = "default",
   selected = false,
   disabled = false,
+  awayKitClashBorder = false,
 }: LineupPlayerChipProps) {
   const isModal = variant === "modal";
   const isMatch = variant === "match";
@@ -27,7 +30,13 @@ export function LineupPlayerChip({
   const interactive = Boolean(onClick) && !slot.isPlaceholder && !disabled;
   const useKitColors = !slot.isPlaceholder;
   const jerseyFill = useKitColors ? kit.kit : "rgba(0,0,0,0.3)";
-  const jerseyStroke = useKitColors ? kit.border : "rgba(255,255,255,0.25)";
+  const jerseyStroke =
+    awayKitClashBorder && isMatch
+      ? "var(--tm-accent)"
+      : useKitColors
+        ? kit.border
+        : "rgba(255,255,255,0.25)";
+  const jerseyStrokeWidth = awayKitClashBorder && isMatch ? 3.2 : 1.2;
   const dorsalColor = useKitColors ? kit.dorsal : "var(--tm-accent)";
 
   const content = (
@@ -49,7 +58,7 @@ export function LineupPlayerChip({
           d="M24 4.5C18.8 4.5 15 7 13.4 10.6L6.8 13.2 3 21.8 8.4 23.4V47.5H39.6V23.4L45 21.8 41.2 13.2 34.6 10.6C33 7 29.2 4.5 24 4.5Zm0 3.2c2.6 0 4.7 1 5.9 2.7-1.4-.8-3-1.2-5.9-1.2s-4.5.4-5.9 1.2c1.2-1.7 3.3-2.7 5.9-2.7Z"
           fill={jerseyFill}
           stroke={jerseyStroke}
-          strokeWidth="1.2"
+          strokeWidth={jerseyStrokeWidth}
           strokeLinejoin="round"
           strokeDasharray={slot.isPlaceholder ? "2.5 2" : undefined}
         />
