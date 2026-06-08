@@ -86,7 +86,7 @@ export function TabBar() {
   return (
     <nav
       ref={navRef}
-      className="tm-tabbar relative z-50 shrink-0 border-t border-[var(--tm-border)] px-1 pb-[env(safe-area-inset-bottom,0px)]"
+      className="tm-tabbar shrink-0 border-t border-[var(--tm-border)] px-1"
       aria-label="Navegacion principal"
     >
       <ul className="flex h-12 items-stretch justify-between">

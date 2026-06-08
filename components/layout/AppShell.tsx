@@ -1,7 +1,8 @@
 ﻿import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
-import { AppViewportSync } from "@/components/layout/AppViewportSync";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBar } from "@/components/layout/TabBar";
+import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
+import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -14,13 +15,12 @@ export function AppShell({
 }) {
   return (
     <NavigationLoadingProvider>
-      <AppViewportSync />
-      <div className="tm-app-shell relative flex flex-col">
+      <div className="tm-app-shell">
+        <ViewportMetricsInlineScript />
+        <ViewportMetricsSync />
         <HomeAtmosphere />
         <AppHeaderGate ctx={ctx} />
-        <main className="tm-app-main relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-none">
-          {children}
-        </main>
+        <main className="tm-app-main">{children}</main>
         <TabBar />
       </div>
     </NavigationLoadingProvider>
