@@ -107,20 +107,18 @@ html[data-modal-open] .tm-app-main {
 
 html:has(.tm-app-frame),
 html:has(.tm-app-frame) body {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  height: 100%;
+  height: 100dvh;
   overflow: hidden;
 }
 
-/* Marco de app: columna flex a altura real del viewport; TabBar al pie en flujo. */
+/* Marco flex: ocupa exactamente el viewport; TabBar al pie en flujo. */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   min-height: 100dvh;
-  min-height: -webkit-fill-available;
+  max-height: 100dvh;
   flex-direction: column;
   overflow: hidden;
   isolation: isolate;
@@ -211,7 +209,10 @@ html:has(.tm-app-frame) body {
   min-height: 0;
   flex-direction: column;
   padding-bottom: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .tm-app-main-inner:has(.tm-home-layout) {
@@ -347,11 +348,8 @@ html:has(.tm-app-frame) body {
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding-bottom: calc(var(--tm-tab-indicators-core) + 0.5rem);
+  min-height: min-content;
+  padding-bottom: 0.75rem;
 }
 
 .tm-home-layout__hero {
@@ -364,7 +362,7 @@ html[data-modal-open] .tm-bottom-chrome {
   pointer-events: none;
 }
 
-/* Chrome inferior: indicadores flotan sobre el contenido; solo la nav es opaca. */
+/* Chrome inferior: indicadores en flujo (fondo = degradado) + nav opaca. */
 .tm-bottom-chrome {
   position: relative;
   z-index: 20;
@@ -378,16 +376,12 @@ html[data-modal-open] .tm-bottom-chrome {
 }
 
 .tm-tab-indicators-slot {
-  position: absolute;
-  right: 0;
-  bottom: 100%;
-  left: 0;
+  flex-shrink: 0;
   display: flex;
   min-height: var(--tm-tab-indicators-core);
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  padding-bottom: 0.25rem;
+  padding: 0.25rem 0;
   background: transparent;
   pointer-events: none;
 }
