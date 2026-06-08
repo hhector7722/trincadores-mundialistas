@@ -1468,7 +1468,7 @@ html:has(.tm-app-frame) body {
   border-radius: 3px;
   background: #ccff00;
   color: #000;
-  padding: var(--tm-cal-sidebar-access-btn-py, 1px) var(--tm-cal-sidebar-access-btn-px, 6px);
+  padding: var(--tm-cal-sidebar-access-btn-py, 2px) var(--tm-cal-sidebar-access-btn-px, 6px);
   font-size: var(--tm-cal-sidebar-access-btn-fs, clamp(7px, 2cqw, 11px));
   font-weight: 700;
   line-height: 1.1;

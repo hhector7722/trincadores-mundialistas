@@ -26,7 +26,8 @@ const ACCESS_DOCK_ROWS = 2;
 const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.78;
 const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
 const ACCESS_CARD_INSET_PX = 5;
-const ACCESS_BTN_PAD_Y_PX = 1;
+const ACCESS_CARD_EXTRA_VPAD_PX = 5;
+const ACCESS_BTN_PAD_Y_PX = 2;
 const ACCESS_BTN_LINE_HEIGHT = 1.1;
 const SIDEBAR_BODY_GAP_PX = 6;
 
@@ -195,7 +196,10 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
   const gridH =
     btnVisualH * ACCESS_DOCK_ROWS +
     ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1);
-  const dockH = ACCESS_CARD_INSET_PX * 2 + gridH;
+  const dockH =
+    ACCESS_CARD_INSET_PX * 2 +
+    ACCESS_CARD_EXTRA_VPAD_PX * 2 +
+    gridH;
 
   calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-body-gap", `${SIDEBAR_BODY_GAP_PX}px`);
