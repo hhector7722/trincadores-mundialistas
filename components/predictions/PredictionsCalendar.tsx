@@ -259,8 +259,6 @@ function useCalendarViewportLayout(
     if (layout instanceof HTMLElement) observer.observe(layout);
     observer.observe(calendar);
     observer.observe(grid);
-    const tabBar = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
-    if (tabBar) observer.observe(tabBar);
     window.addEventListener("resize", syncLayout);
     window.visualViewport?.addEventListener("resize", syncLayout);
 

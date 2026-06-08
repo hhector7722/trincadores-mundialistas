@@ -29,9 +29,6 @@ export function useKnockoutViewportLayout(rootRef: RefObject<HTMLElement | null>
     observer.observe(layoutRoot);
     observer.observe(pageRoot);
 
-    const tabBar = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
-    if (tabBar) observer.observe(tabBar);
-
     window.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("scroll", sync);

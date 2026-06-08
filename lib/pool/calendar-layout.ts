@@ -1,5 +1,3 @@
-import { bottomAboveTabBar } from "@/lib/layout/tabbar-bounds";
-
 const MIN_UI_SCALE = 0.15;
 const MAX_UI_SCALE = 2.75;
 const SCALE_SEARCH_ITERATIONS = 14;
@@ -29,8 +27,12 @@ const ACCESS_CARD_INSET_PX = 4;
 const ACCESS_CARD_EXTRA_VPAD_PX = 2;
 const ACCESS_BTN_PAD_Y_PX = 2;
 const ACCESS_BTN_LINE_HEIGHT = 1.1;
+const MAX_ACCESS_BTN_FS_PX = 13;
+const ACCESS_BTN_ROW_HEIGHT_RATIO = 0.46;
+const ACCESS_BTN_PAD_Y_RATIO = 0.14;
+const ACCESS_DOCK_GAP_SCALE_RATIO = 0.1;
+const MAX_ACCESS_DOCK_GRID_GAP_PX = 10;
 const SIDEBAR_BODY_GAP_PX = 6;
-const SIDEBAR_CARD_SLOT_INSET_PX = 8;
 const SIDEBAR_CARD_BOTTOM_PAD_PX = 6;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
@@ -162,12 +164,45 @@ function fitAccessButtonFontSize(cellW: number, padX: number): number {
   return minFs;
 }
 
-function accessButtonVisualHeight(fontSizePx: number): number {
-  return Math.ceil(fontSizePx * ACCESS_BTN_LINE_HEIGHT + ACCESS_BTN_PAD_Y_PX * 2);
+function accessButtonVisualHeight(fontSizePx: number, padYPx = ACCESS_BTN_PAD_Y_PX): number {
+  return Math.ceil(fontSizePx * ACCESS_BTN_LINE_HEIGHT + padYPx * 2);
+}
+
+function resolveAccessDockButtonMetrics(
+  cellW: number,
+  rowH: number
+): { btnFs: number; btnPadX: number; btnPy: number; gridGap: number } {
+  const btnPadX = Math.max(3, Math.min(10, Math.floor(cellW * 0.08)));
+  const gridGap = Math.min(
+    MAX_ACCESS_DOCK_GRID_GAP_PX,
+    Math.max(ACCESS_DOCK_GRID_GAP_PX, Math.floor(rowH * ACCESS_DOCK_GAP_SCALE_RATIO))
+  );
+  let btnFs = Math.min(
+    MAX_ACCESS_BTN_FS_PX,
+    Math.max(7, Math.floor(rowH * ACCESS_BTN_ROW_HEIGHT_RATIO))
+  );
+  btnFs = Math.min(btnFs, fitAccessButtonFontSize(cellW, btnPadX));
+  const btnPy = Math.max(ACCESS_BTN_PAD_Y_PX, Math.floor(rowH * ACCESS_BTN_PAD_Y_RATIO));
+  return { btnFs, btnPadX, btnPy, gridGap };
+}
+
+function computeAccessDockHeight(
+  btnFs: number,
+  btnPy: number,
+  gridGap: number
+): number {
+  const btnVisualH = accessButtonVisualHeight(btnFs, btnPy);
+  const gridH =
+    btnVisualH * ACCESS_DOCK_ROWS + gridGap * Math.max(0, ACCESS_DOCK_ROWS - 1);
+  return ACCESS_CARD_INSET_PX * 2 + ACCESS_CARD_EXTRA_VPAD_PX * 2 + gridH;
 }
 
 /** Reserva la franja inferior L-M-X para los botones de acceso (rejilla 2×2). */
-function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+function syncSidebarAccessDockMetrics(
+  calendar: HTMLElement,
+  grid: HTMLElement,
+  targetDockH?: number
+): number {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
   if (!slot) {
     calendar.style.removeProperty("--tm-cal-sidebar-access-dock-h");
@@ -178,7 +213,7 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-fs");
     calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
     calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
-    return;
+    return 0;
   }
 
   const slotWidth = slot.clientWidth;
@@ -191,22 +226,38 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
         ACCESS_DOCK_COLS
     )
   );
-  const btnPadX = Math.max(3, Math.min(8, Math.floor(cellW * 0.08)));
-  let btnFs = fitAccessButtonFontSize(cellW, btnPadX);
-  let btnVisualH = accessButtonVisualHeight(btnFs);
-  const gridH =
-    btnVisualH * ACCESS_DOCK_ROWS +
-    ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1);
-  const dockH =
-    ACCESS_CARD_INSET_PX * 2 +
-    ACCESS_CARD_EXTRA_VPAD_PX * 2 +
-    gridH;
+
+  let btnFs: number;
+  let btnPadX: number;
+  let btnPy: number;
+  let gridGap: number;
+  let dockH: number;
+
+  if (targetDockH != null && targetDockH > 0) {
+    const innerH = Math.max(
+      0,
+      targetDockH - ACCESS_CARD_INSET_PX * 2 - ACCESS_CARD_EXTRA_VPAD_PX * 2
+    );
+    const rowH = Math.max(
+      0,
+      (innerH - ACCESS_DOCK_GRID_GAP_PX * Math.max(0, ACCESS_DOCK_ROWS - 1)) /
+        ACCESS_DOCK_ROWS
+    );
+    ({ btnFs, btnPadX, btnPy, gridGap } = resolveAccessDockButtonMetrics(cellW, rowH));
+    dockH = computeAccessDockHeight(btnFs, btnPy, gridGap);
+  } else {
+    btnPadX = Math.max(3, Math.min(8, Math.floor(cellW * 0.08)));
+    btnFs = fitAccessButtonFontSize(cellW, btnPadX);
+    btnPy = ACCESS_BTN_PAD_Y_PX;
+    gridGap = ACCESS_DOCK_GRID_GAP_PX;
+    dockH = computeAccessDockHeight(btnFs, btnPy, gridGap);
+  }
 
   calendar.style.setProperty("--tm-cal-sidebar-access-dock-h", `${dockH}px`);
   calendar.style.setProperty("--tm-cal-sidebar-body-gap", `${SIDEBAR_BODY_GAP_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-pad", `${ACCESS_CARD_INSET_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-access-grid-gap", `${ACCESS_DOCK_GRID_GAP_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-access-btn-py", `${ACCESS_BTN_PAD_Y_PX}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-grid-gap", `${gridGap}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-access-btn-py", `${btnPy}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-btn-px", `${btnPadX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-w", `${gridW}px`);
@@ -226,54 +277,60 @@ function syncSidebarAccessDockMetrics(calendar: HTMLElement, grid: HTMLElement):
     calendar.style.setProperty("--tm-cal-sidebar-access-btn-fs", `${btnFs}px`);
     void slot.offsetHeight;
   }
+
+  return dockH;
 }
 
-/** Centra la card en el slot con margen simétrico y sin llegar al borde inferior de la fila. */
+/** Alinea la card con el inicio de las tarjetas de partido (sin centrado vertical). */
 function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
-  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
-
-  if (!slot || !body || !card) {
+  if (!slot) {
     calendar.style.removeProperty("--tm-cal-sidebar-card-offset-top");
     calendar.style.removeProperty("--tm-cal-sidebar-card-offset-bottom");
     return;
   }
 
-  void body.offsetHeight;
-  const freeSpace = Math.max(0, body.clientHeight - card.offsetHeight);
-  const bottomInset = Math.max(
-    SIDEBAR_CARD_SLOT_INSET_PX,
-    Math.floor(freeSpace / 2)
-  );
-  const topInset = Math.max(SIDEBAR_CARD_SLOT_INSET_PX, freeSpace - bottomInset);
-
-  calendar.style.setProperty("--tm-cal-sidebar-card-offset-top", `${topInset}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", `${bottomInset}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-card-offset-top", "0px");
+  calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", "0px");
 }
 
-/** Altura compacta de la card: título + grupos + botones, sin relleno elástico. */
-function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+/** Reparte el espacio vertical sobrante en botones más grandes. */
+function syncSidebarDockFromRemainingSpace(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+  const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
   const title = slot?.querySelector<HTMLElement>(".tm-cal-groups-title");
   const list = slot?.querySelector<HTMLElement>(".tm-cal-groups-list");
-  const dock = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-access-dock");
+  if (!slot || !body) return;
 
-  if (!slot || !card) {
+  void list?.offsetHeight;
+
+  const titleH = title?.offsetHeight ?? 0;
+  const listH = list?.offsetHeight ?? 0;
+  const minDockH = Number.parseFloat(
+    calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
+  );
+  const resolvedMinDockH = Number.isFinite(minDockH) && minDockH > 0 ? minDockH : 0;
+  const availableDockH = Math.max(
+    resolvedMinDockH,
+    body.clientHeight - titleH - listH - SIDEBAR_CARD_BOTTOM_PAD_PX
+  );
+
+  syncSidebarAccessDockMetrics(calendar, grid, availableDockH);
+}
+
+/** La card ocupa todo el cuerpo del slot, alineada con la lista de partidos. */
+function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
+  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
+  const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
+
+  if (!slot || !body) {
     calendar.style.removeProperty("--tm-cal-sidebar-card-h");
     calendar.style.removeProperty("--tm-cal-sidebar-card-bottom-pad");
     return;
   }
 
-  void card.offsetHeight;
-  const titleH = title?.offsetHeight ?? 0;
-  const listH = list?.offsetHeight ?? 0;
-  const dockH = dock?.offsetHeight ?? 0;
-  const cardH = Math.ceil(titleH + listH + dockH + SIDEBAR_CARD_BOTTOM_PAD_PX);
-
   calendar.style.setProperty("--tm-cal-sidebar-card-bottom-pad", `${SIDEBAR_CARD_BOTTOM_PAD_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardH}px`);
+  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${body.clientHeight}px`);
 }
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
@@ -311,10 +368,11 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     );
     const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
     const titleH = title?.offsetHeight ?? 0;
-    const slotInset = SIDEBAR_CARD_SLOT_INSET_PX * 2 + SIDEBAR_CARD_BOTTOM_PAD_PX;
+    const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+    const cardH = card?.clientHeight ?? body?.clientHeight ?? 0;
     const maxPanelH = Math.max(
       0,
-      (body?.clientHeight ?? 0) - resolvedDockH - titleH - slotInset
+      cardH - resolvedDockH - titleH - SIDEBAR_CARD_BOTTOM_PAD_PX
     );
     innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
   } else {
@@ -433,7 +491,7 @@ export function syncCalendarGridHeight(
   const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
   const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
   const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
-  const contentBottom = bottomAboveTabBar(layoutRect.bottom);
+  const contentBottom = layoutRect.bottom;
   const available = Math.floor(contentBottom - calendarRect.top - chromeHeight);
   const height = Math.max(0, available);
 
@@ -473,10 +531,12 @@ export function fitCalendarLayout(
   }
 
   let matchCardHeight = syncMatchCardMetrics(calendar, grid);
+  syncSidebarAccessSpacing(calendar, grid);
+  syncSidebarCardMetrics(calendar, grid);
   syncSidebarAccessDockMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
-  syncSidebarCardMetrics(calendar, grid);
-  syncSidebarAccessSpacing(calendar, grid);
+  syncSidebarDockFromRemainingSpace(calendar, grid);
+  syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
   for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
@@ -484,10 +544,12 @@ export function fitCalendarLayout(
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
     matchCardHeight = syncMatchCardMetrics(calendar, grid);
+    syncSidebarAccessSpacing(calendar, grid);
+    syncSidebarCardMetrics(calendar, grid);
     syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
-    syncSidebarCardMetrics(calendar, grid);
-    syncSidebarAccessSpacing(calendar, grid);
+    syncSidebarDockFromRemainingSpace(calendar, grid);
+    syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }
 
