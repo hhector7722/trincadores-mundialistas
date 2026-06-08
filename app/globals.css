@@ -126,11 +126,13 @@ html[data-modal-open] .tm-app-main {
   overflow-y: auto;
   overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--tm-tabbar-height);
   background-color: var(--tm-shell-bg-hex);
 }
 
 .tm-app-main:has(> .tm-porra-layout) {
   overflow: hidden;
+  padding-bottom: 0;
 }
 
 .tm-app-main > .tm-porra-layout {
@@ -139,17 +141,27 @@ html[data-modal-open] .tm-app-main {
 }
 
 .tm-tabbar {
-  position: relative;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 20;
-  flex: 0 0 auto;
   box-sizing: border-box;
+  display: flex;
   width: 100%;
-  /* Solo pintura: extiende el fondo al home-indicator sin inflar --tm-tabbar-height. */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  flex-direction: column;
+  justify-content: flex-end;
   background-color: var(--tm-tabbar-bg-hex);
   background-image: linear-gradient(180deg, rgba(55, 22, 105, 0.72) 0%, rgba(46, 18, 96, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Fila táctil pegada al borde inferior; el safe-area queda debajo de los iconos. */
+.tm-tabbar-inner {
+  box-sizing: border-box;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html:has(.tm-app-shell) {
