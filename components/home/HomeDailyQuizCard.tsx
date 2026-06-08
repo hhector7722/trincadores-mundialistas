@@ -42,6 +42,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
           "@container shrink-0 rounded-2xl p-2 tm-stat-card",
           className
         )}
+        data-tm-indicators-anchor="quiz-daily"
         aria-label="Quiz diario"
       >
         <div className="grid min-w-0 grid-cols-2 items-center gap-2">

@@ -7,7 +7,9 @@ import {
   useTabNavigation,
 } from "@/components/layout/TabNavigationProvider";
 
-const DOT_SIZE = 6;
+import { TAB_INDICATOR_DOT_SIZE } from "@/lib/layout/tab-indicators-position";
+
+const DOT_SIZE = TAB_INDICATOR_DOT_SIZE;
 const ACTIVE_WIDTH = 18;
 const GAP = 6;
 
@@ -23,7 +25,7 @@ export function TabPageIndicators() {
 
   return (
     <div
-      className="flex shrink-0 items-center justify-center pb-1"
+      className="flex shrink-0 items-center justify-center"
       role="tablist"
       aria-label="Secciones principales"
     >
