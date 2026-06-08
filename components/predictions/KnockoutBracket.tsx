@@ -11,10 +11,7 @@ import {
 import {
   buildBracketConnectorPaths,
   buildBracketGeometry,
-  CHAMPION_LAYOUT_SCALE,
-  championPosition,
-  scorePosition,
-  slotPosition,
+  matchPosition,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
 import {
@@ -22,7 +19,8 @@ import {
   placeholderPairForMatchNumber,
   resolveBracketMatch,
 } from "@/lib/predictions/knockout-bracket-layout";
-import { knockoutTeamLabel } from "@/lib/teams/display";
+import { isPlaceholderTeam } from "@/lib/openfootball/slug";
+import { knockoutTeamLabel, teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type KnockoutBracketProps = {
@@ -33,17 +31,37 @@ type KnockoutBracketProps = {
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 
-function BracketTeamSlot({ name }: { name: string }) {
-  const label = knockoutTeamLabel(name);
+function BracketTeamRow({
+  name,
+  goals,
+  isWinner,
+}: {
+  name: string;
+  goals: number | null;
+  isWinner?: boolean;
+}) {
+  const trimmed = name.trim();
+  const primary = knockoutTeamLabel(name);
+  const secondary =
+    trimmed && !isPlaceholderTeam(trimmed) ? teamNameEs(name) : null;
+  const showSecondary = secondary && secondary.trim() !== primary.trim();
 
   return (
-    <span className="tm-ko-slot" title={name}>
-      <span className="tm-ko-slot-label">{label}</span>
-    </span>
+    <div
+      className={cn("tm-ko-card-row", isWinner && "tm-ko-card-row--winner")}
+    >
+      <div className="tm-ko-card-row-text">
+        <span className="tm-ko-card-row-primary">{primary}</span>
+        {showSecondary ? (
+          <span className="tm-ko-card-row-secondary">{secondary}</span>
+        ) : null}
+      </div>
+      <span className="tm-ko-card-row-score">{goals != null ? goals : " "}</span>
+    </div>
   );
 }
 
-function BracketMatchNode({
+function BracketMatchCard({
   geom,
   match,
   onOpen,
@@ -68,101 +86,53 @@ function BracketMatchNode({
         serverEditable: match.serverEditable,
       })
     : "empty";
-  const scoreText = match ? formatListScore(savedHome, savedAway) : " ";
   const isLive = match?.status === "live";
-  const homePos = slotPosition(geom, "home");
-  const awayPos = slotPosition(geom, "away");
-  const scorePos = scorePosition(geom);
-  const isFinal = geom.round === "final";
-  const layoutScale = geom.layoutScale;
+  const pos = matchPosition(geom);
+  const hasScore = savedHome != null && savedAway != null;
+  const homeWins = hasScore && savedHome > savedAway;
+  const awayWins = hasScore && savedAway > savedHome;
+  const scoreSummary = match ? formatListScore(savedHome, savedAway) : " ";
 
   return (
     <button
       type="button"
       disabled={!match}
       onClick={() => match && onOpen(match)}
+      style={
+        {
+          left: `${pos.x}%`,
+          top: `${pos.y}%`,
+          "--tm-ko-card-scale": geom.layoutScale,
+        } as CSSProperties
+      }
       className={cn(
-        "tm-ko-match",
-        isFinal && "tm-ko-match--final",
-        !match && "tm-ko-match--missing",
-        isLive && "tm-ko-match--live",
-        state === "saved" && "tm-ko-match--saved",
-        state === "locked" && "tm-ko-match--locked"
+        "tm-ko-card",
+        `tm-ko-card--${geom.round}`,
+        geom.side === "left" && "tm-ko-card--left",
+        geom.side === "right" && "tm-ko-card--right",
+        !match && "tm-ko-card--missing",
+        isLive && "tm-ko-card--live",
+        state === "saved" && "tm-ko-card--saved",
+        state === "locked" && "tm-ko-card--locked"
       )}
       aria-label={
         match
-          ? `Pronostico ${homeName} contra ${awayName}`
+          ? `Pronostico ${homeName} contra ${awayName}${
+              scoreSummary.trim() ? `, ${scoreSummary}` : ""
+            }`
           : `Partido ${geom.matchNumber} sin datos`
       }
     >
-      {isFinal ? <span className="tm-ko-final-zone" aria-hidden /> : null}
-      <span
-        className={cn("tm-ko-match-slot", "tm-ko-match-slot--home", `tm-ko-match-slot--${geom.round}`)}
-        style={{
-          left: `${homePos.x}%`,
-          top: `${homePos.y}%`,
-          "--tm-ko-layout-scale": layoutScale,
-        } as CSSProperties}
-      >
-        <BracketTeamSlot name={homeName} />
-      </span>
-      {scoreText.trim() ? (
-        <span
-          className="tm-ko-node-score"
-          style={{ left: `${scorePos.x}%`, top: `${scorePos.y}%` }}
-        >
-          {scoreText}
-        </span>
-      ) : null}
-      <span
-        className={cn("tm-ko-match-slot", "tm-ko-match-slot--away", `tm-ko-match-slot--${geom.round}`)}
-        style={{
-          left: `${awayPos.x}%`,
-          top: `${awayPos.y}%`,
-          "--tm-ko-layout-scale": layoutScale,
-        } as CSSProperties}
-      >
-        <BracketTeamSlot name={awayName} />
-      </span>
+      <BracketTeamRow name={homeName} goals={savedHome} isWinner={homeWins} />
+      <div className="tm-ko-card-divider" aria-hidden />
+      <BracketTeamRow name={awayName} goals={savedAway} isWinner={awayWins} />
     </button>
-  );
-}
-
-function resolveChampionName(finalMatch: MatchWithPrediction | null): string {
-  if (!finalMatch?.prediction) return "Campeón";
-
-  const home = finalMatch.prediction.home_goals;
-  const away = finalMatch.prediction.away_goals;
-  if (home == null || away == null || home === away) return "Campeón";
-
-  return home > away ? finalMatch.home_team : finalMatch.away_team;
-}
-
-function BracketChampionNode({ name }: { name: string }) {
-  const pos = championPosition();
-
-  return (
-    <div
-      className="tm-ko-champion"
-      style={{
-        left: `${pos.x}%`,
-        top: `${pos.y}%`,
-        "--tm-ko-layout-scale": CHAMPION_LAYOUT_SCALE,
-      } as React.CSSProperties}
-      aria-label={`Campeón: ${name}`}
-    >
-      <span className="tm-ko-match-slot tm-ko-match-slot--champion">
-        <BracketTeamSlot name={name} />
-      </span>
-    </div>
   );
 }
 
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
-  const finalMatch = useMemo(() => resolveBracketMatch(matchMap, 104), [matchMap]);
-  const championName = useMemo(() => resolveChampionName(finalMatch), [finalMatch]);
 
   if (!matches.length) {
     return (
@@ -205,22 +175,15 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             ))}
           </svg>
 
-          <div className="tm-ko-columns" aria-hidden>
-            {Array.from({ length: 9 }, (_, column) => (
-              <div key={column} className="tm-ko-col" />
-            ))}
-          </div>
-
           <div className="tm-ko-nodes">
             {BRACKET_GEOMETRY.map((geom) => (
-              <BracketMatchNode
+              <BracketMatchCard
                 key={geom.matchNumber}
                 geom={geom}
                 match={resolveBracketMatch(matchMap, geom.matchNumber)}
                 onOpen={setActiveMatch}
               />
             ))}
-            <BracketChampionNode name={championName} />
           </div>
         </div>
       </div>
