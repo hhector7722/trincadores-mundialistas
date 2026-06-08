@@ -16,6 +16,21 @@ export type Pool = { id: string; slug: string; name: string; settings_json: Pool
 export type PoolMember = { pool_id: string; profile_id: string; role: PoolMemberRole; joined_at: string };
 export type Prediction = { id: string; pool_id: string; match_id: string; profile_id: string; home_goals: number; away_goals: number; points_awarded: number | null; created_at: string; updated_at: string };
 export type MatchMvpPrediction = { id: string; pool_id: string; match_id: string; profile_id: string; player_name: string; team_name: string; points_awarded: number | null; created_at: string; updated_at: string };
+export type TournamentGeneralPredictionsRow = {
+  pool_id: string;
+  profile_id: string;
+  champion_team: string | null;
+  finalist_team_a: string | null;
+  finalist_team_b: string | null;
+  top_scorer_player_name: string | null;
+  top_scorer_team_name: string | null;
+  tournament_mvp_player_name: string | null;
+  tournament_mvp_team_name: string | null;
+  golden_glove_player_name: string | null;
+  golden_glove_team_name: string | null;
+  created_at: string;
+  updated_at: string;
+};
 export type PoolMemberScore = { pool_id: string; profile_id: string; matchday_id: string; match_points: number; exact_hits: number; sign_hits: number; cumulative_points: number; rank: number | null; updated_at: string };
 export type { QuizStartSession as QuizStartPayload } from "@/lib/quiz/types";
 

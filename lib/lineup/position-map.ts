@@ -17,6 +17,10 @@ export function normalizePositionRole(position: string | null): PositionRole {
   return "MF";
 }
 
+export function isGoalkeeperPosition(position: string | null): boolean {
+  return normalizePositionRole(position) === "GK";
+}
+
 export function positionLabelEs(role: PositionRole, rawPosition: string | null): string {
   const code = (rawPosition ?? "").trim().toUpperCase();
   if (code.length <= 3 && /^[A-Z]{2,3}$/.test(code)) return code;

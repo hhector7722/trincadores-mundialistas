@@ -14,9 +14,18 @@ import { cn } from "@/lib/utils";
 type LineupModalPanelProps = {
   teamName: string;
   onPlayerClick: (playerName: string) => void;
+  selectionMode?: "navigate" | "pick";
+  playerFilter?: (position: string | null) => boolean;
+  selectionBlockedMessage?: string;
 };
 
-export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelProps) {
+export function LineupModalPanel({
+  teamName,
+  onPlayerClick,
+  selectionMode = "navigate",
+  playerFilter,
+  selectionBlockedMessage,
+}: LineupModalPanelProps) {
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,15 +80,30 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
   const lineup = buildProbableXI(squad.players);
   const bench = getBenchPlayers(squad, lineup);
 
+  function handlePlayerInteraction(playerName: string) {
+    if (selectionMode === "pick" && playerFilter && squad) {
+      const player = squad.players.find((p) => p.player_name === playerName);
+      if (!playerFilter(player?.position ?? null)) {
+        return;
+      }
+    }
+    onPlayerClick(playerName);
+  }
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      {selectionMode === "pick" && selectionBlockedMessage ? (
+        <p className="shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-center text-[10px] text-[var(--tm-muted)]">
+          {selectionBlockedMessage}
+        </p>
+      ) : null}
       <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
         <TeamLineupGraphic
           slots={lineup.slots}
           formation={lineup.formation}
           teamName={teamName}
           size="modal"
-          onPlayerClick={onPlayerClick}
+          onPlayerClick={handlePlayerInteraction}
         />
 
         {bench.length > 0 ? (
@@ -93,7 +117,7 @@ export function LineupModalPanel({ teamName, onPlayerClick }: LineupModalPanelPr
                   {index > 0 ? ", " : null}
                   <button
                     type="button"
-                    onClick={() => onPlayerClick(player.name)}
+                    onClick={() => handlePlayerInteraction(player.name)}
                     className={cn(
                       "inline text-left whitespace-nowrap transition-colors",
                       "hover:opacity-90 active:opacity-80"

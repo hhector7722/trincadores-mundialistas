@@ -7,6 +7,7 @@ import { getQuizDayHub } from "@/lib/quiz/queries";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
 import { getPoolMatches } from "@/lib/pool/queries";
 import { getPoolLeaderboard, memberStandingFromLeaderboard } from "@/lib/ranking/queries";
+import { getTournamentGeneralPredictions } from "@/lib/tournament-predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,11 +20,12 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [matches, pending, leaderboard, quizHub] = await Promise.all([
+  const [matches, pending, leaderboard, quizHub, generalPredictionsBundle] = await Promise.all([
     getPoolMatches(ctx.activePoolId),
     countPendingPredictions(ctx.activePoolId, user!.id),
     getPoolLeaderboard(ctx.activePoolId),
     getQuizDayHub(ctx.activePoolId, user!.id),
+    getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
   ]);
 
   const quizSlide = homeQuizSlideFromHub(quizHub);
@@ -41,7 +43,12 @@ export default async function HomePage() {
   return (
     <div className="relative z-10 space-y-3 p-4 pb-4">
       <HomeHero pendingCount={pending} quizSlide={quizSlide} />
-      <HomeStandingCard standing={standing} />
+      <HomeStandingCard
+        standing={standing}
+        poolId={ctx.activePoolId}
+        generalPredictions={generalPredictionsBundle.predictions}
+        generalPredictionsEditable={generalPredictionsBundle.editable}
+      />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
       <HomeTopThree rows={leaderboard.rows} />
     </div>
