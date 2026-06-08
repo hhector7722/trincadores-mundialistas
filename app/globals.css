@@ -895,10 +895,27 @@ html[data-modal-open] main {
   transform: translate(-50%, -50%);
 }
 
+/* Semis: 4 equipos pegados a la final (48%/52% Y, borde interior hacia el centro) */
+.tm-ko-node--sf.tm-ko-node--left .tm-ko-node-pair .tm-ko-slot {
+  left: 100%;
+}
+
+.tm-ko-node--sf.tm-ko-node--right .tm-ko-node-pair .tm-ko-slot {
+  left: 0;
+}
+
+.tm-ko-node--sf.tm-ko-node--left::after {
+  width: 58%;
+}
+
+.tm-ko-node--sf.tm-ko-node--right::before {
+  width: 58%;
+}
+
 /* Final: W101/W102 horizontales con hueco central para el marcador */
 .tm-ko-node--center.tm-ko-node--final {
-  --tm-ko-final-home-x: 38%;
-  --tm-ko-final-away-x: 62%;
+  --tm-ko-final-home-x: 40%;
+  --tm-ko-final-away-x: 60%;
   grid-column: 1 / -1;
   z-index: 1;
 }

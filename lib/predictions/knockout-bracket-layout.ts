@@ -32,6 +32,31 @@ export function bracketMatchMidPercent(rowStart: number, rowSpan: number): numbe
   );
 }
 
+/** Semis comprimidas junto a la final (misma franja vertical que W101/W102). */
+export const SEMI_SLOT_HOME_Y = 48;
+export const SEMI_SLOT_AWAY_Y = 52;
+export const SEMI_SLOT_MID_Y = 50;
+
+export function bracketSlotTopPercentForRound(
+  round: BracketRoundKey,
+  rowStart: number,
+  rowSpan: number,
+  slot: "home" | "away"
+): number {
+  if (round === "final") return 50;
+  if (round === "sf") return slot === "home" ? SEMI_SLOT_HOME_Y : SEMI_SLOT_AWAY_Y;
+  return bracketSlotTopPercent(rowStart, rowSpan, slot);
+}
+
+export function bracketMatchMidPercentForRound(
+  round: BracketRoundKey,
+  rowStart: number,
+  rowSpan: number
+): number {
+  if (round === "final" || round === "sf") return SEMI_SLOT_MID_Y;
+  return bracketMatchMidPercent(rowStart, rowSpan);
+}
+
 /** Cuadro simétrico WC2026: bordes → centro (16 filas × 9 columnas). */
 export const BRACKET_TREE_LAYOUT: BracketTreeSlot[] = [
   // Izq — dieciseisavos

@@ -10,8 +10,8 @@ import {
 } from "@/lib/predictions/edit-state";
 import {
   BRACKET_TREE_LAYOUT,
-  bracketMatchMidPercent,
-  bracketSlotTopPercent,
+  bracketMatchMidPercentForRound,
+  bracketSlotTopPercentForRound,
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
   resolveBracketMatch,
@@ -64,17 +64,14 @@ function BracketTreeMatch({
   const isLive = match?.status === "live";
   const usesPyramidSlots = slot.round !== "r32";
   const homeY = usesPyramidSlots
-    ? slot.round === "final"
-      ? 50
-      : bracketSlotTopPercent(slot.rowStart, slot.rowSpan, "home")
+    ? bracketSlotTopPercentForRound(slot.round, slot.rowStart, slot.rowSpan, "home")
     : null;
   const awayY = usesPyramidSlots
-    ? slot.round === "final"
-      ? 50
-      : bracketSlotTopPercent(slot.rowStart, slot.rowSpan, "away")
+    ? bracketSlotTopPercentForRound(slot.round, slot.rowStart, slot.rowSpan, "away")
     : null;
-  const midY =
-    homeY != null && awayY != null ? (homeY + awayY) / 2 : bracketMatchMidPercent(slot.rowStart, slot.rowSpan);
+  const midY = usesPyramidSlots
+    ? bracketMatchMidPercentForRound(slot.round, slot.rowStart, slot.rowSpan)
+    : null;
 
   return (
     <button
@@ -95,6 +92,7 @@ function BracketTreeMatch({
       className={cn(
         "tm-ko-node",
         usesPyramidSlots && "tm-ko-node--pyramid",
+        slot.round === "sf" && "tm-ko-node--sf",
         slot.round === "final" && "tm-ko-node--final",
         slot.side === "left" && "tm-ko-node--left",
         slot.side === "right" && "tm-ko-node--right",
