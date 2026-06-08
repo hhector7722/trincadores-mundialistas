@@ -92,7 +92,7 @@ function MiniRankingEmptyRow() {
     >
       <span />
       <span />
-      <span className={cn(MINI_RANKING_AVATAR_CLASS, "bg-white/10 ring-white/15")} />
+      <span className={cn(MINI_RANKING_AVATAR_CLASS, "bg-white/10")} />
       <span className="min-w-0 truncate text-white/20">&nbsp;</span>
       <span />
       <span />
