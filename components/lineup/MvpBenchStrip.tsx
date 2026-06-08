@@ -1,6 +1,6 @@
 "use client";
 
-import { shirtPlayerName } from "@/lib/lineup/short-player-name";
+import { shortPlayerName } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -31,42 +31,43 @@ export function MvpBenchStrip({
   return (
     <section
       className={cn(
-        "w-full shrink-0 px-1",
-        position === "top" ? "pb-1.5" : "pt-1.5"
+        "w-full max-w-lg shrink-0 self-center px-1",
+        position === "top" ? "pb-2" : "pt-2"
       )}
     >
-      <p className="mb-1.5 truncate text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)]">
-        Reservas {teamNameEs(teamName)}
-      </p>
-      <div className="flex flex-wrap justify-center gap-1.5">
-        {players.map((player) => {
+      <h4 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
+        Reservas {teamNameEs(teamName)} ({players.length})
+      </h4>
+      <p className="text-sm leading-snug text-[var(--tm-fg)]">
+        {players.map((player, index) => {
           const key = benchPlayerKey(teamName, player);
           const active = selectedKey === key;
 
           return (
-            <button
-              key={player.key}
-              type="button"
-              disabled={disabled}
-              onClick={() => onSelect(key)}
-              className={cn(
-                "flex min-h-10 min-w-[3.75rem] max-w-[5.25rem] flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1 text-center transition-colors",
-                active
-                  ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
-                  : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] hover:bg-[rgba(111,43,255,0.16)]",
-                disabled && "opacity-60"
-              )}
-            >
-              <span className="font-display text-[13px] font-bold leading-none text-[var(--tm-accent)]">
-                {player.shirtNumber ?? "—"}
-              </span>
-              <span className="w-full truncate text-[9px] font-medium leading-tight text-[var(--tm-fg)]">
-                {shirtPlayerName(player.name)}
-              </span>
-            </button>
+            <span key={player.key}>
+              {index > 0 ? ", " : null}
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onSelect(key)}
+                className={cn(
+                  "inline text-left whitespace-nowrap transition-colors",
+                  "hover:opacity-90 active:opacity-80",
+                  active && "rounded-sm bg-[rgba(212,255,0,0.12)] px-0.5",
+                  disabled && "opacity-60"
+                )}
+              >
+                <span className="font-display font-bold text-[var(--tm-accent)]">
+                  {player.shirtNumber ?? "—"}
+                </span>{" "}
+                <span className={cn("hover:text-[var(--tm-accent)]", active && "text-[var(--tm-accent)]")}>
+                  {shortPlayerName(player.name)}
+                </span>
+              </button>
+            </span>
           );
         })}
-      </div>
+      </p>
     </section>
   );
 }

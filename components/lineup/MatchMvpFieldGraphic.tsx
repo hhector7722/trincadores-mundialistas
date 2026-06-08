@@ -3,13 +3,13 @@
 import Image from "next/image";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
-import type { LineupSlot } from "@/lib/lineup/types";
+import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type MatchMvpFieldGraphicProps = {
-  homeSlots: LineupSlot[];
-  awaySlots: LineupSlot[];
+  homeSlots: MatchFieldSlot[];
+  awaySlots: MatchFieldSlot[];
   homeTeam: string;
   awayTeam: string;
   selectedKey: string | null;
@@ -19,7 +19,7 @@ type MatchMvpFieldGraphicProps = {
   className?: string;
 };
 
-function playerKey(teamName: string, slot: LineupSlot): string {
+function playerKey(teamName: string, slot: MatchFieldSlot): string {
   return `${teamName}-${slot.name}-${slot.shirtNumber ?? "x"}`;
 }
 
@@ -38,15 +38,19 @@ export function MatchMvpFieldGraphic({
     onFieldReady?.();
   }
 
-  function renderSlot(teamName: string, slot: LineupSlot) {
+  function renderSlot(teamName: string, slot: MatchFieldSlot) {
     const key = playerKey(teamName, slot);
     const active = selectedKey === key;
 
     return (
       <div
         key={`${teamName}-${slot.key}`}
-        className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-        style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+        className="absolute z-10"
+        style={{
+          left: `${slot.x}%`,
+          top: `${slot.y}%`,
+          transform: `translate(-50%, -50%) scale(${slot.scale})`,
+        }}
       >
         <LineupPlayerChip
           slot={slot}

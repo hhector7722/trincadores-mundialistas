@@ -38,7 +38,7 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[2.625rem] w-[2.125rem]"
+            ? "h-[1.75rem] w-[1.5rem]"
             : isModal
               ? "h-[3.75rem] w-[2.875rem] sm:h-16 sm:w-[3.25rem]"
               : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
@@ -59,7 +59,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isMatch ? "14" : isModal ? "16" : "19"}
+          fontSize={isMatch ? "11" : isModal ? "16" : "19"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
@@ -69,14 +69,14 @@ export function LineupPlayerChip({
       <div
         className={cn(
           "-mt-px w-full rounded-md border bg-black/55 text-center backdrop-blur-sm",
-          isMatch ? "px-1 py-0.5" : "px-0.5 py-px",
+          isMatch ? "px-0.5 py-px" : "px-0.5 py-px",
           selected ? "border-[var(--tm-accent)]" : "border-white/10"
         )}
       >
         <p
           className={cn(
             "whitespace-normal text-center font-semibold leading-tight text-white",
-            isMatch ? "text-[9px] sm:text-[10px]" : isModal ? "text-[9px] sm:text-[10px]" : "text-[9px] sm:text-[10px]"
+            isMatch ? "text-[7px] sm:text-[8px]" : isModal ? "text-[9px] sm:text-[10px]" : "text-[9px] sm:text-[10px]"
           )}
         >
           {shirtPlayerName(slot.name)}
@@ -93,7 +93,7 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "w-[3.75rem] min-h-10"
+      ? "w-[2.85rem] min-h-8"
       : isModal
         ? "w-[4rem] min-h-11 sm:w-[4.5rem] sm:min-h-12"
         : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
