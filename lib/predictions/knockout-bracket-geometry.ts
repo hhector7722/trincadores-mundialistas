@@ -24,7 +24,7 @@ const R32_PAIR_HALF = 1.45;
 export const FINAL_CENTER_X = 50;
 
 /** Separación mínima entre el centro de semifinales y el de la final (% canvas). */
-const MIN_FINAL_SEMI_GAP_Y = 8.5;
+const MIN_FINAL_SEMI_GAP_Y = 12.5;
 
 /** Copa flotante: distancia sobre el centro de la final (% canvas). */
 export const FINAL_CUP_OFFSET_ABOVE_FINAL = 5.5;
