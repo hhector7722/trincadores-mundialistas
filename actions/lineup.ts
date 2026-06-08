@@ -5,6 +5,7 @@ import {
   getTeamSquadByName,
   type TeamSquadWithPlayers,
 } from "@/lib/worldcup-data/squad-queries";
+import { loadTeamKitHexBySlug } from "@/lib/lineup/team-kit-queries";
 import { createClient } from "@/lib/supabase/server";
 
 export type LineupActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
@@ -34,6 +35,20 @@ export async function fetchPlayerDetailAction(
     return { ok: true, data: detail };
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar el jugador.";
+    return { ok: false, error: message };
+  }
+}
+
+export async function fetchTeamKitHexMapAction(): Promise<
+  LineupActionResult<Record<string, string>>
+> {
+  try {
+    const supabase = await createClient();
+    const map = await loadTeamKitHexBySlug(supabase);
+    return { ok: true, data: map };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudieron cargar los colores de camiseta.";
     return { ok: false, error: message };
   }
 }

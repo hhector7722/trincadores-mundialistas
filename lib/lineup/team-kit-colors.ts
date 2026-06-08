@@ -49,7 +49,7 @@ const TEAM_KIT_HEX_BY_SLUG: Record<string, string> = {
   "saudi-arabia": "#006C35",
   scotland: "#003876",
   senegal: "#00853F",
-  "south-africa": "#008751",
+  "south-africa": "#FECC00",
   "south-korea": "#CD2E3A",
   spain: "#C60B1E",
   sweden: "#FECC00",
@@ -62,6 +62,13 @@ const TEAM_KIT_HEX_BY_SLUG: Record<string, string> = {
 };
 
 const DEFAULT_KIT = "#2A1058";
+
+let dbKitHexBySlug: Record<string, string> | null = null;
+
+/** Sincroniza colores de camiseta cargados desde `teams.primary_kit_hex`. */
+export function setTeamKitHexFromDb(map: Record<string, string>) {
+  dbKitHexBySlug = map;
+}
 
 function parseHex(hex: string): { r: number; g: number; b: number } {
   const normalized = hex.replace("#", "");
@@ -91,7 +98,8 @@ function contrastingBorderColor(bgHex: string): string {
 }
 
 export function getTeamKitHex(teamName: string): string {
-  return TEAM_KIT_HEX_BY_SLUG[toSlug(teamName)] ?? DEFAULT_KIT;
+  const slug = toSlug(teamName);
+  return dbKitHexBySlug?.[slug] ?? TEAM_KIT_HEX_BY_SLUG[slug] ?? DEFAULT_KIT;
 }
 
 /** Delta E por debajo de este umbral = camisetas confundibles en el campo MVP. */

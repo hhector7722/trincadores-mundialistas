@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { fetchMatchSquadsAction } from "@/actions/lineup";
+import { fetchMatchSquadsAction, fetchTeamKitHexMapAction } from "@/actions/lineup";
+import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { MvpBenchStrip } from "@/components/lineup/MvpBenchStrip";
@@ -74,7 +75,20 @@ export function MvpPredictionPanel({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [kitColorsReady, setKitColorsReady] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTeamKitHexMapAction().then((result) => {
+      if (cancelled || !result.ok) return;
+      setTeamKitHexFromDb(result.data);
+      setKitColorsReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -178,7 +192,7 @@ export function MvpPredictionPanel({
     });
   }
 
-  if (loading) {
+  if (loading || !kitColorsReady) {
     return <LoadingCenter label="Cargando jugadores…" />;
   }
 

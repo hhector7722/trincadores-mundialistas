@@ -21,6 +21,12 @@ test("getTeamKitColors resuelve equipos con slug alternativo", () => {
   assert.equal(bosnia.kit, "#002395");
 });
 
+test("South Africa usa camiseta amarilla titular", () => {
+  const rsa = getTeamKitColors("South Africa");
+  assert.equal(rsa.kit, "#FECC00");
+  assert.equal(rsa.dorsal, "#111111");
+});
+
 test("teamKitColorsClash detecta camisetas titulares iguales", () => {
   assert.equal(teamKitColorsClash("England", "Germany"), true);
   assert.equal(teamKitColorsClash("Spain", "Brazil"), false);
