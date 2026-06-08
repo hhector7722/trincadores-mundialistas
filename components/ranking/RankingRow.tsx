@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import { RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { RANKING_AVATAR_CLASS, RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
@@ -29,7 +29,7 @@ export function RankingRow({
       <ProfileAvatarButton
         avatarUrl={row.avatarUrl}
         label={row.label}
-        className="size-7 shrink-0"
+        className={RANKING_AVATAR_CLASS}
         stopNavigation
       />
       <span

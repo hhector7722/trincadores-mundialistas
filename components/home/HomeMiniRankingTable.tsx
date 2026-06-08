@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
+import {
+  MINI_RANKING_AVATAR_CLASS,
+  MINI_RANKING_GRID,
+} from "@/components/ranking/ranking-grid";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
@@ -55,7 +58,7 @@ function MiniRankingDataRow({
       <ProfileAvatar
         avatarUrl={row.avatarUrl}
         label={row.label}
-        className="size-[1.125rem] shrink-0"
+        className={MINI_RANKING_AVATAR_CLASS}
       />
       <span
         className={cn(
@@ -89,7 +92,7 @@ function MiniRankingEmptyRow() {
     >
       <span />
       <span />
-      <span className="size-[1.125rem] shrink-0 rounded-full bg-white/10" />
+      <span className={cn(MINI_RANKING_AVATAR_CLASS, "bg-white/10 ring-white/15")} />
       <span className="min-w-0 truncate text-white/20">&nbsp;</span>
       <span />
       <span />

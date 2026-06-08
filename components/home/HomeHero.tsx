@@ -21,10 +21,10 @@ export function HomeHero({ pendingCount, quizSlide }: HomeHeroProps) {
       </div>
 
       <div
-        className="pointer-events-none relative z-[1] min-w-0 overflow-hidden"
+        className="pointer-events-none relative z-[1] min-w-0 overflow-visible"
         aria-hidden="true"
       >
-        <div className="absolute top-3 left-2 origin-top-left translate-x-3 scale-[0.88] sm:top-4 sm:left-3 sm:translate-x-4 sm:scale-[0.92]">
+        <div className="tm-hero-player-img-wrap absolute top-3 left-2 origin-top-left translate-x-3 scale-[0.88] sm:top-4 sm:left-3 sm:translate-x-4 sm:scale-[0.92]">
           <Image
             src="/icons/ronaldo.png"
             alt=""
