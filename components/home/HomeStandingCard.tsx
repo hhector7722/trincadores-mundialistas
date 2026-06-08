@@ -1,10 +1,11 @@
 import { Medal } from "lucide-react";
 import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeGeneralPredictionsCard } from "@/components/home/HomeGeneralPredictionsCard";
+import { HomeMiniRankingTable } from "@/components/home/HomeMiniRankingTable";
 import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import type { DailyFact } from "@/lib/home/daily-fact";
-import type { MemberStanding } from "@/lib/ranking/queries";
+import type { LeaderboardRow, MemberStanding } from "@/lib/ranking/queries";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
 
 function PositionStatCard({ standing }: { standing: MemberStanding }) {
@@ -31,6 +32,8 @@ function PositionStatCard({ standing }: { standing: MemberStanding }) {
 
 type HomeStandingCardProps = {
   standing: MemberStanding | null;
+  leaderboardRows: LeaderboardRow[];
+  currentProfileId: string;
   poolId: string;
   generalPredictions: TournamentGeneralPredictions;
   generalPredictionsEditable: boolean;
@@ -39,6 +42,8 @@ type HomeStandingCardProps = {
 
 export function HomeStandingCard({
   standing,
+  leaderboardRows,
+  currentProfileId,
   poolId,
   generalPredictions,
   generalPredictionsEditable,
@@ -50,9 +55,7 @@ export function HomeStandingCard({
         {standing ? (
           <PositionStatCard standing={standing} />
         ) : (
-          <div className="@container min-w-0 rounded-2xl p-[clamp(0.75rem,4cqw,1rem)] tm-stat-card">
-            <p className="text-sm text-white/50">Sin datos de clasificacion todavia.</p>
-          </div>
+          <HomeMiniRankingTable rows={leaderboardRows} currentProfileId={currentProfileId} />
         )}
         <HomeGeneralPredictionsCard
           poolId={poolId}

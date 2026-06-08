@@ -46,6 +46,8 @@ export default async function HomePage() {
       <HomeHero pendingCount={pending} quizSlide={quizSlide} />
       <HomeStandingCard
         standing={standing}
+        leaderboardRows={leaderboard.rows}
+        currentProfileId={user!.id}
         poolId={ctx.activePoolId}
         generalPredictions={generalPredictionsBundle.predictions}
         generalPredictionsEditable={generalPredictionsBundle.editable}
