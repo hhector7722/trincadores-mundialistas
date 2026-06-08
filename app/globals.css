@@ -105,15 +105,21 @@ html[data-modal-open] .tm-app-main {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* Marco de app: columna flex 100svh; TabBar al pie en flujo (sin fixed). */
+html:has(.tm-app-frame),
+html:has(.tm-app-frame) body {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Marco de app: columna flex a altura real del viewport; TabBar al pie en flujo. */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  height: 100svh;
-  min-height: 100svh;
-  min-height: -webkit-fill-available;
-  max-height: 100svh;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
   flex-direction: column;
   overflow: hidden;
   isolation: isolate;
@@ -361,6 +367,9 @@ html[data-modal-open] .tm-app-main {
 
 .tm-home-layout__body {
   min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 html[data-modal-open] .tm-bottom-chrome {

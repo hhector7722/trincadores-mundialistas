@@ -32,7 +32,7 @@ export function HomeStandingCard({
   nextMatch,
 }: HomeStandingCardProps) {
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
+    <div className="flex min-h-0 flex-col gap-3 pb-2">
       <div className="grid shrink-0 grid-cols-2 gap-3">
         <HomeMiniRankingTable rows={leaderboardRows} currentProfileId={currentProfileId} />
         <HomeGeneralPredictionsCard
