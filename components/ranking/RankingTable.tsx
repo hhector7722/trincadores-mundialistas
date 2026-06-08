@@ -1,5 +1,29 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
+import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
+import { cn } from "@/lib/utils";
+
+const EMPTY_ROW_COUNT = 11;
+
+function RankingEmptyRow() {
+  return (
+    <div
+      className={cn(
+        RANKING_GRID,
+        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 last:border-0"
+      )}
+      aria-hidden="true"
+    >
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="min-w-0 truncate text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+      <span className="text-[var(--tm-muted)]/20">&nbsp;</span>
+    </div>
+  );
+}
 
 export function RankingTable({
   rows,
@@ -8,26 +32,20 @@ export function RankingTable({
   rows: LeaderboardRow[];
   currentProfileId: string;
 }) {
-  if (rows.length === 0) {
-    return (
-      <div className="tm-ranking-table flex flex-1 flex-col items-center justify-center px-4">
-        <p className="text-center text-sm text-[var(--tm-muted)]">
-          Esperando a todos los participantes
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="tm-ranking-table">
       <div className="tm-ranking-body">
-        {rows.map((row) => (
-          <RankingRow
-            key={row.profileId}
-            row={row}
-            isCurrentUser={row.profileId === currentProfileId}
-          />
-        ))}
+        {rows.length === 0
+          ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
+              <RankingEmptyRow key={`empty-${index}`} />
+            ))
+          : rows.map((row) => (
+              <RankingRow
+                key={row.profileId}
+                row={row}
+                isCurrentUser={row.profileId === currentProfileId}
+              />
+            ))}
       </div>
     </div>
   );

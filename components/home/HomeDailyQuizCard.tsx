@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 
 type HomeDailyQuizCardProps = {
   quizHub: QuizDayHub;
+  className?: string;
 };
 
-export function HomeDailyQuizCard({ quizHub }: HomeDailyQuizCardProps) {
+export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps) {
   const router = useRouter();
   const [alreadyPlayedOpen, setAlreadyPlayedOpen] = useState(false);
 
@@ -37,7 +38,10 @@ export function HomeDailyQuizCard({ quizHub }: HomeDailyQuizCardProps) {
   return (
     <>
       <div
-        className="@container flex h-full min-h-12 min-w-0 flex-col justify-center rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card"
+        className={cn(
+          "@container shrink-0 rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card",
+          className
+        )}
         aria-label="Quiz diario"
       >
         <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">

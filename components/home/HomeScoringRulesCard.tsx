@@ -29,7 +29,7 @@ function ScoringRuleRow({
         className
       )}
     >
-      <span className="min-w-0 truncate text-white/75">{line.label}</span>
+      <span className="min-w-0 text-white/75">{line.label}</span>
       <span className="shrink-0 tabular-nums text-right text-[#CCFF00]">{line.points}</span>
     </p>
   );
@@ -38,14 +38,14 @@ function ScoringRuleRow({
 type ScoringRulesMiniCardProps = {
   lines: ScoringRulesCardLine[];
   showHeader?: boolean;
-  flexClass?: string;
+  className?: string;
   onOpen: () => void;
 };
 
 function ScoringRulesMiniCard({
   lines,
   showHeader = false,
-  flexClass = "flex-1",
+  className,
   onOpen,
 }: ScoringRulesMiniCardProps) {
   const useFourRowGrid = showHeader && lines.length >= 3;
@@ -56,8 +56,10 @@ function ScoringRulesMiniCard({
       onClick={onOpen}
       className={cn(
         CARD_BUTTON_CLASS,
-        flexClass,
-        useFourRowGrid ? "grid grid-cols-[1fr_auto] grid-rows-4 gap-x-2" : "flex flex-col justify-center"
+        className,
+        useFourRowGrid
+          ? "grid h-full grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_repeat(3,minmax(0,1fr))] gap-x-2 gap-y-0.5"
+          : "flex h-full flex-col justify-center"
       )}
       aria-label="Normas de puntuación. Pulsa para ver el detalle."
     >
@@ -76,7 +78,7 @@ function ScoringRulesMiniCard({
           return [
             <span
               key={`${line.label}-label`}
-              className="flex min-h-0 items-center truncate text-[10px] font-medium leading-snug text-white/75"
+              className="flex min-h-0 items-center text-[10px] font-medium leading-snug text-white/75"
             >
               {line.label}
             </span>,
@@ -99,22 +101,23 @@ function ScoringRulesMiniCard({
   );
 }
 
-export function HomeScoringRulesCard() {
+type HomeScoringRulesCardProps = {
+  className?: string;
+};
+
+export function HomeScoringRulesCard({ className }: HomeScoringRulesCardProps) {
   const [open, setOpen] = useState(false);
   const openModal = () => setOpen(true);
-  const topLines = SCORING_RULES_CARD_LINES;
-  const bottomLines: ScoringRulesCardLine[] = [];
 
   return (
     <>
-      <div className="col-start-1 flex h-full min-h-0 min-w-0 flex-col gap-1.5">
+      <div className={cn("min-h-0", className)}>
         <ScoringRulesMiniCard
-          lines={topLines}
+          lines={SCORING_RULES_CARD_LINES}
           showHeader
-          flexClass="flex-[4]"
+          className="h-full w-full"
           onOpen={openModal}
         />
-        <ScoringRulesMiniCard lines={bottomLines} flexClass="flex-1" onOpen={openModal} />
       </div>
 
       <ScoringRulesModal open={open} onClose={() => setOpen(false)} />

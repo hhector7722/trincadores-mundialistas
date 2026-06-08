@@ -1,10 +1,12 @@
 import { Medal } from "lucide-react";
+import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeDailyQuizCard } from "@/components/home/HomeDailyQuizCard";
 import { HomeGeneralPredictionsCard } from "@/components/home/HomeGeneralPredictionsCard";
 import { HomeMiniRankingTable } from "@/components/home/HomeMiniRankingTable";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import { formatAggregateStat } from "@/lib/ranking/format";
+import type { DailyFact } from "@/lib/home/daily-fact";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import type { LeaderboardRow, MemberStanding } from "@/lib/ranking/queries";
@@ -39,6 +41,7 @@ type HomeStandingCardProps = {
   poolId: string;
   generalPredictions: TournamentGeneralPredictions;
   generalPredictionsEditable: boolean;
+  dailyFact: DailyFact | null;
   quizHub: QuizDayHub;
   nextMatch: MatchWithPrediction | null;
 };
@@ -50,6 +53,7 @@ export function HomeStandingCard({
   poolId,
   generalPredictions,
   generalPredictionsEditable,
+  dailyFact,
   quizHub,
   nextMatch,
 }: HomeStandingCardProps) {
@@ -68,9 +72,12 @@ export function HomeStandingCard({
         />
       </div>
       {nextMatch ? <HomeNextMatch poolId={poolId} match={nextMatch} /> : null}
-      <div className="grid grid-cols-2 gap-3">
-        <HomeScoringRulesCard />
-        <HomeDailyQuizCard quizHub={quizHub} />
+      <div className="grid grid-cols-2 items-stretch gap-3">
+        <div className="flex h-full min-h-0 min-w-0 flex-col gap-1.5">
+          <HomeScoringRulesCard className="min-h-0 flex-1" />
+          <HomeDailyQuizCard quizHub={quizHub} />
+        </div>
+        <HomeDailyFactCard fact={dailyFact} />
       </div>
     </div>
   );
