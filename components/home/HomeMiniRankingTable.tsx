@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HomeCardHeader } from "@/components/home/HomeCardHeader";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -83,17 +82,17 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
 
   return (
     <div className="@container min-w-0 overflow-hidden rounded-2xl tm-stat-card">
-      <HomeCardHeader
-        title="Clasificación"
-        action={
-          <Link
-            href="/ranking"
-            className="shrink-0 text-[9px] font-semibold uppercase tracking-wide text-[var(--tm-primary-fg)]/80 hover:text-[var(--tm-primary-fg)]"
-          >
-            Ver todos
-          </Link>
-        }
-      />
+      <div className="flex shrink-0 items-center justify-between gap-2 px-[clamp(0.5rem,3cqw,0.75rem)] py-1">
+        <p className="truncate text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">
+          Clasificación
+        </p>
+        <Link
+          href="/ranking"
+          className="shrink-0 text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]/80 hover:text-[#CCFF00]"
+        >
+          Ver todos
+        </Link>
+      </div>
       <MiniRankingHeader />
       <div>
         {displayRows.map((row) => (
