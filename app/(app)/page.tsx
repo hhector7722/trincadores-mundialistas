@@ -6,7 +6,7 @@ import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
 import { getPoolMatches } from "@/lib/pool/queries";
-import { getPoolLeaderboard, memberStandingFromLeaderboard } from "@/lib/ranking/queries";
+import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import { getTournamentGeneralPredictions } from "@/lib/tournament-predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -38,7 +38,6 @@ export default async function HomePage() {
     ? await getMatchPredictionDetail(ctx.activePoolId, user!.id, focus.id)
     : null;
 
-  const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
   const dailyFact = getDailyFactForToday();
 
   return (
@@ -46,7 +45,6 @@ export default async function HomePage() {
       hero={<HomeHero pendingCount={pending} quizSlide={quizSlide} />}
       body={
         <HomeStandingCard
-          standing={standing}
           leaderboardRows={leaderboard.rows}
           currentProfileId={user!.id}
           poolId={ctx.activePoolId}
