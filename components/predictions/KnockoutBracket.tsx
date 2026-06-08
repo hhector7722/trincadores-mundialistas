@@ -14,7 +14,8 @@ import {
   buildBracketConnectorPaths,
   buildBracketGeometry,
   FINAL_CENTER_X,
-  FINAL_CENTER_Y,
+  FINAL_CUP_OFFSET_ABOVE_FINAL,
+  finalCenterYFromGeometry,
   matchPosition,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
@@ -33,6 +34,7 @@ type KnockoutBracketProps = {
 
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
+const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 
 function BracketTeamRow({
   name,
@@ -169,7 +171,10 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
 
           <div
             className="tm-ko-cup"
-            style={{ left: `${FINAL_CENTER_X}%`, top: `${FINAL_CENTER_Y - 5.5}%` }}
+            style={{
+              left: `${FINAL_CENTER_X}%`,
+              top: `${FINAL_CENTER_Y - FINAL_CUP_OFFSET_ABOVE_FINAL}%`,
+            }}
             aria-hidden
           >
             <Image

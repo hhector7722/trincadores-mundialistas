@@ -22,7 +22,12 @@ const R32_SLOT_COUNT = 8;
 const R32_PAIR_HALF = 1.45;
 
 export const FINAL_CENTER_X = 50;
-export const FINAL_CENTER_Y = 50;
+
+/** Separación mínima entre el centro de semifinales y el de la final (% canvas). */
+const MIN_FINAL_SEMI_GAP_Y = 8.5;
+
+/** Copa flotante: distancia sobre el centro de la final (% canvas). */
+export const FINAL_CUP_OFFSET_ABOVE_FINAL = 5.5;
 
 /** Escalado visual por ronda (progresión suave). */
 export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
@@ -308,20 +313,29 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
   ]);
   pushRoundFromChildren(matches, RIGHT_SF, "sf", "right", 5, [[RIGHT_QF[0], RIGHT_QF[1]]]);
 
+  const semiMidY = findMatch(matches, LEFT_SF[0]).midY;
+  const finalCenterY = semiMidY - MIN_FINAL_SEMI_GAP_Y;
+
   matches.push({
     matchNumber: 104,
     round: "final",
     side: "center",
     column: 4,
-    homeY: FINAL_CENTER_Y,
-    awayY: FINAL_CENTER_Y,
-    midY: FINAL_CENTER_Y,
+    homeY: finalCenterY,
+    awayY: finalCenterY,
+    midY: finalCenterY,
     columnX: FINAL_CENTER_X,
     layoutScale: ROUND_LAYOUT_SCALE.final,
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],
   });
 
   return matches;
+}
+
+export function finalCenterYFromGeometry(
+  geoms: readonly BracketMatchGeometry[]
+): number {
+  return geoms.find((geom) => geom.round === "final")?.midY ?? 50;
 }
 
 function verticalAnchorY(
@@ -361,12 +375,13 @@ function connectChildToParent(
 
 function connectSemiToFinal(
   semi: BracketMatchGeometry,
-  anchorX: number
+  anchorX: number,
+  finalCenterY: number
 ): string {
   const isLeft = semi.side === "left";
   const xStart = cardEdgeX(semi.columnX, isLeft ? "right" : "left", semi.layoutScale);
 
-  return `M ${xStart} ${semi.midY} H ${semi.columnX} V ${FINAL_CENTER_Y} H ${anchorX}`;
+  return `M ${xStart} ${semi.midY} H ${semi.columnX} V ${finalCenterY} H ${anchorX}`;
 }
 
 export type BracketConnectorSegment = {
@@ -407,17 +422,18 @@ export function buildBracketConnectorPaths(
     }
   }
 
+  const finalCenterY = finalCenterYFromGeometry(geoms);
   const leftSemi = byNumber.get(LEFT_SF[0]);
   const rightSemi = byNumber.get(RIGHT_SF[0]);
   if (leftSemi) {
     segments.push({
-      d: connectSemiToFinal(leftSemi, FINAL_ANCHOR_LEFT_X),
+      d: connectSemiToFinal(leftSemi, FINAL_ANCHOR_LEFT_X, finalCenterY),
       variant: "final",
     });
   }
   if (rightSemi) {
     segments.push({
-      d: connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X),
+      d: connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X, finalCenterY),
       variant: "final",
     });
   }
