@@ -125,7 +125,7 @@ function GroupsGrid({
             "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
           )}
         >
-          <div className="flex shrink-0 items-center justify-start px-0.5 py-0.5 leading-none">
+          <div className="flex shrink-0 items-center justify-start px-0.5 pb-0.5 pt-1.5 leading-none">
             <span className="text-[7px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
               Grupo {group.code}
             </span>
