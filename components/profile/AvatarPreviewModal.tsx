@@ -98,7 +98,7 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
             ref={imageRef}
             src={avatarUrl}
             alt={`Avatar de ${label}`}
-            className="max-h-full max-w-full rounded-full border-2 border-[var(--tm-accent)] object-cover shadow-[0_0_64px_rgba(217,255,0,0.25)]"
+            className="max-h-full max-w-full rounded-full object-cover"
           />
         </div>
 

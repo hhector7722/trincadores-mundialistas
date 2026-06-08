@@ -32,7 +32,7 @@ export function ProfileAvatar({
   return (
     <span
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full border border-[var(--tm-border)] bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
+        "flex shrink-0 items-center justify-center rounded-full bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
         className
       )}
       aria-hidden
