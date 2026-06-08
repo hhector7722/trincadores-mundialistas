@@ -107,8 +107,9 @@ html[data-modal-open] .tm-app-main {
 
 html:has(.tm-app-frame),
 html:has(.tm-app-frame) body {
-  height: 100dvh;
-  max-height: 100dvh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -119,7 +120,7 @@ html:has(.tm-app-frame) body {
   width: 100%;
   height: 100dvh;
   min-height: 100dvh;
-  max-height: 100dvh;
+  min-height: -webkit-fill-available;
   flex-direction: column;
   overflow: hidden;
   isolation: isolate;
@@ -165,8 +166,6 @@ html:has(.tm-app-frame) body {
 }
 
 .tm-app-frame:has(.tm-porra-layout) {
-  height: 100svh;
-  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -203,8 +202,6 @@ html:has(.tm-app-frame) body {
 }
 
 .tm-app-frame:has(.tm-home-layout) {
-  height: 100svh;
-  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -224,7 +221,6 @@ html:has(.tm-app-frame) body {
   flex-direction: column;
   height: 100%;
   padding-bottom: 0;
-  overflow: hidden;
 }
 
 .tm-app-main-inner:has(.tm-home-layout) .tm-tab-swipe-root {
@@ -233,12 +229,9 @@ html:has(.tm-app-frame) body {
   min-height: 0;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
 }
 
 .tm-app-frame:has(.tm-ranking-layout) {
-  height: 100svh;
-  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -275,8 +268,6 @@ html:has(.tm-app-frame) body {
 }
 
 .tm-app-frame:has(.tm-tab-scroll-layout) {
-  height: 100svh;
-  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -322,8 +313,6 @@ html:has(.tm-app-frame) body {
 }
 
 .tm-app-frame:has(.tm-quiz-page) {
-  height: 100svh;
-  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -359,17 +348,14 @@ html:has(.tm-app-frame) body {
   box-sizing: border-box;
   width: 100%;
   min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(var(--tm-tab-indicators-core) + 0.5rem);
 }
 
 .tm-home-layout__hero {
   flex: 0 0 auto;
-}
-
-.tm-home-layout__body {
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
 html[data-modal-open] .tm-bottom-chrome {
@@ -378,7 +364,7 @@ html[data-modal-open] .tm-bottom-chrome {
   pointer-events: none;
 }
 
-/* Chrome inferior: indicadores + TabBar, pie del shell flex. */
+/* Chrome inferior: indicadores flotan sobre el contenido; solo la nav es opaca. */
 .tm-bottom-chrome {
   position: relative;
   z-index: 20;
@@ -388,13 +374,22 @@ html[data-modal-open] .tm-bottom-chrome {
   flex-shrink: 0;
   flex-direction: column;
   justify-content: flex-end;
-  background-color: var(--tm-tabbar-bg-hex);
+  background: transparent;
 }
 
 .tm-tab-indicators-slot {
-  flex-shrink: 0;
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  display: flex;
   min-height: var(--tm-tab-indicators-core);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.25rem;
   background: transparent;
+  pointer-events: none;
 }
 
 .tm-fixed-bottombar {
