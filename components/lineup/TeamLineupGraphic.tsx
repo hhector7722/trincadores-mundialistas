@@ -36,19 +36,13 @@ export function TeamLineupGraphic({
   return (
     <div
       className={cn(
-        "w-full shrink-0 self-center",
-        isModal && "overflow-visible py-2 sm:py-3",
+        "relative aspect-[3/2] w-full shrink-0 self-center",
+        isModal
+          ? "max-w-none overflow-visible"
+          : "max-w-[300px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:max-w-[360px]",
         className
       )}
     >
-      <div
-        className={cn(
-          "relative aspect-[3/2] w-full",
-          isModal
-            ? "max-w-none overflow-visible"
-            : "mx-auto max-w-[300px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:max-w-[360px]"
-        )}
-      >
       <div className={cn("absolute inset-0", !isModal && "bg-[#3a1218]")}>
         <Image
           src={GOYA_FIELD_SRC}
@@ -56,19 +50,14 @@ export function TeamLineupGraphic({
           fill
           unoptimized
           className="object-contain object-center"
-          sizes={isModal ? "(max-width: 576px) 100vw, 576px" : "(max-width: 360px) 100vw, 360px"}
+          sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
           priority
           onLoad={handleFieldReady}
           onError={handleFieldReady}
         />
       </div>
 
-      <div
-        className={cn(
-          "absolute rounded bg-black/50 font-bold uppercase tracking-widest text-white/80 backdrop-blur-sm",
-          isModal ? "left-4 top-4 px-2.5 py-1 text-[11px]" : "left-3 top-3 px-2 py-1 text-[10px]"
-        )}
-      >
+      <div className="absolute left-3 top-3 rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80 backdrop-blur-sm">
         {formation}
       </div>
 
@@ -88,7 +77,6 @@ export function TeamLineupGraphic({
           />
         </div>
       ))}
-      </div>
     </div>
   );
 }

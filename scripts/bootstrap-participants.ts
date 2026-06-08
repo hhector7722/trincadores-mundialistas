@@ -58,6 +58,7 @@ async function main() {
   console.log(`Pool creado: ${REAL_POOL_NAME} (${poolId})`);
 
   const delivered: DeliveredCode[] = [];
+  const onboardingCodes: Record<string, string> = {};
 
   for (const participant of REAL_PARTICIPANTS) {
     const code = generateAccessCode();
@@ -103,6 +104,7 @@ async function main() {
       role: participant.role,
       code,
     });
+    onboardingCodes[participant.username] = code;
 
     console.log(`Participante creado: ${participant.username} (${participant.role})`);
   }
@@ -113,7 +115,15 @@ async function main() {
   );
   writeFileSync(outputPath, `${lines.join("\n")}\n`, "utf8");
 
+  const onboardingJsonPath = resolve(process.cwd(), "onboarding-codes.local.json");
+  writeFileSync(onboardingJsonPath, `${JSON.stringify(onboardingCodes)}\n`, "utf8");
+
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "http://localhost:3000";
+
   console.log(`\nCodigos guardados en ${outputPath} (gitignored).`);
+  console.log(`JSON onboarding guardado en ${onboardingJsonPath} (gitignored).`);
+  console.log(`Copia el contenido de onboarding-codes.local.json a ONBOARDING_ACCESS_CODES_JSON en Vercel.`);
+  console.log(`Enlace generico de onboarding: ${siteOrigin}/bienvenida`);
   console.log("Bootstrap completado.");
 }
 

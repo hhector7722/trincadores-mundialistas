@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { isStandalonePWA } from "@/lib/pwa/standalone";
 
 const RUBBER_BAND = 0.42;
 const MAX_PULL_PX = 112;
@@ -11,7 +12,7 @@ function isElasticScrollPlatform() {
   const ios =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  return ios || window.matchMedia("(display-mode: standalone)").matches;
+  return ios || isStandalonePWA();
 }
 
 function isModalOpen() {

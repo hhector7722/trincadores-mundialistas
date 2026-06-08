@@ -101,7 +101,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-0.5 py-2 sm:px-1">
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
             <TeamLineupGraphic
               slots={lineup.slots}
               formation={lineup.formation}
@@ -113,10 +113,10 @@ export function LineupModalPanel({
 
             {bench.length > 0 ? (
               <section className="mt-4 w-full max-w-lg self-center">
-                <h4 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
+                <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-muted)]">
                   Reservas ({bench.length})
                 </h4>
-                <p className="text-sm leading-snug text-[var(--tm-fg)]">
+                <p className="text-xs leading-snug text-[var(--tm-fg)]">
                   {bench.map((player, index) => (
                     <span key={player.key}>
                       {index > 0 ? ", " : null}

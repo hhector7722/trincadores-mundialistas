@@ -36,6 +36,7 @@ yarn-error.log*
 
 # codigos de acceso generados localmente (nunca commitear)
 access-codes.local.txt
+onboarding-codes.local.json
 
 # vercel
 .vercel

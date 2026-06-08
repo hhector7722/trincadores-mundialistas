@@ -1,4 +1,5 @@
-﻿import { LoginForm } from "@/components/auth/LoginForm";
+﻿import { Suspense } from "react";
+import { LoginForm } from "@/components/auth/LoginForm";
 import { LoginHero } from "@/components/auth/LoginHero";
 
 export default function LoginPage() {
@@ -7,7 +8,9 @@ export default function LoginPage() {
       <LoginHero />
 
       <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
 
       <p className="text-center text-xs leading-relaxed text-white/50 sm:text-sm">

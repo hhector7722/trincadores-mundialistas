@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { signIn } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefilledUsername = searchParams.get("u")?.trim() ?? "";
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -47,6 +49,7 @@ export function LoginForm() {
           type="text"
           autoComplete="username"
           required
+          defaultValue={prefilledUsername}
           className="mt-1.5 bg-[var(--tm-surface)] backdrop-blur-sm"
           spellCheck={false}
         />
