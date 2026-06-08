@@ -32,6 +32,8 @@ export type ExtendedLayoutMetrics = {
   mainScrollTop: number;
   mainCanScroll: boolean;
   mainOverflowY: string;
+  swipeRootOverflow: string;
+  swipeTrackHeight: string;
   vvhHeightVar: string;
   vvhOffsetVar: string;
 };
@@ -50,6 +52,8 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
   const nav = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
   const indicators = document.querySelector<HTMLElement>(".tm-tab-indicators-slot");
   const home = document.querySelector<HTMLElement>(".tm-home-layout");
+  const swipeRoot = document.querySelector<HTMLElement>(".tm-tab-swipe-root");
+  const swipeTrack = swipeRoot?.querySelector<HTMLElement>("[class*='will-change-transform']");
   const root = document.documentElement;
 
   const frameRect = frame?.getBoundingClientRect();
@@ -97,6 +101,8 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
     mainScrollTop: main?.scrollTop ?? 0,
     mainCanScroll: (main?.scrollHeight ?? 0) > (main?.clientHeight ?? 0) + 1,
     mainOverflowY: main ? getComputedStyle(main).overflowY : "n/a",
+    swipeRootOverflow: swipeRoot ? getComputedStyle(swipeRoot).overflow : "n/a",
+    swipeTrackHeight: swipeTrack ? getComputedStyle(swipeTrack).height : "n/a",
     vvhHeightVar: root.style.getPropertyValue("--tm-vvh-height") || "unset",
     vvhOffsetVar: root.style.getPropertyValue("--tm-vvh-offset") || "unset",
   };

@@ -21,7 +21,7 @@ export function ViewportLayoutDebug() {
     const refresh = () => {
       const snapshot = collectExtendedLayoutMetrics(pathname);
       setMetrics(snapshot);
-      emitLayoutDebugLog(snapshot, "H1-H4", "post-fix");
+      emitLayoutDebugLog(snapshot, "H1-H3", "post-fix-v2");
     };
 
     refresh();
@@ -31,14 +31,14 @@ export function ViewportLayoutDebug() {
     window.visualViewport?.addEventListener("scroll", refresh);
     window.addEventListener("resize", refresh);
 
-    const main = document.querySelector<HTMLElement>(".tm-app-main");
-    main?.addEventListener("scroll", refresh);
+    const home = document.querySelector<HTMLElement>(".tm-home-layout");
+    home?.addEventListener("scroll", refresh);
 
     return () => {
       window.visualViewport?.removeEventListener("resize", refresh);
       window.visualViewport?.removeEventListener("scroll", refresh);
       window.removeEventListener("resize", refresh);
-      main?.removeEventListener("scroll", refresh);
+      home?.removeEventListener("scroll", refresh);
     };
   }, [enabled, pathname]);
 
@@ -47,8 +47,8 @@ export function ViewportLayoutDebug() {
   const chinGap = metrics.gapBelowVisual > 2 || metrics.gapBelowShell > 2 || metrics.gapBelowNav > 2;
   const scrollIssue =
     metrics.pathname === "/" &&
-    metrics.mainCanScroll &&
-    metrics.mainScrollHeight > metrics.mainClientHeight + 1;
+    metrics.homeCanScroll &&
+    metrics.homeContentOverflow > 0;
 
   return (
     <>
@@ -74,8 +74,11 @@ export function ViewportLayoutDebug() {
             indicators {metrics.indicatorTop}→{metrics.indicatorBottom} nav↓{metrics.navBottom}
           </p>
           <p className={scrollIssue ? "font-bold text-amber-300" : ""}>
-            main scroll {metrics.mainScrollTop}/{metrics.mainScrollHeight - metrics.mainClientHeight}
-            px overflow={metrics.mainOverflowY} canScroll={String(metrics.mainCanScroll)}
+            home scroll {metrics.homeScrollTop}/{metrics.homeContentOverflow}px overflow=
+            {metrics.homeOverflowY} canScroll={String(metrics.homeCanScroll)}
+          </p>
+          <p>
+            swipe overflow={metrics.swipeRootOverflow} trackH={metrics.swipeTrackHeight}
           </p>
           <p>
             vvh vars h={metrics.vvhHeightVar} top={metrics.vvhOffsetVar}
