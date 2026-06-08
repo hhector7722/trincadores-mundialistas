@@ -45,7 +45,7 @@
   /* Marbella: h-20 (5rem) + pb-safe en el nav; reserva de contenido en main */
   --tm-tabbar-core: 5rem;
   --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-tab-indicators-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom) + 0.5rem);
+  --tm-tab-indicators-bottom: var(--tm-content-bottom);
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -219,7 +219,7 @@ html[data-modal-open] .tm-app-main {
   z-index: 96;
   bottom: var(--tm-tab-indicators-bottom);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   pointer-events: none;
 }
