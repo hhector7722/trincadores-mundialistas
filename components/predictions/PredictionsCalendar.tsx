@@ -247,13 +247,14 @@ function useCalendarViewportLayout(
 
     const syncLayout = () => {
       calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
-      resetCalendarLayout(calendar, grid);
-      void calendar.offsetHeight;
       const layoutEl = layout instanceof HTMLElement ? layout : null;
+      resetCalendarLayout(calendar, grid, layoutEl);
+      void calendar.offsetHeight;
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
     };
 
     syncLayout();
+    requestAnimationFrame(syncLayout);
 
     const observer = new ResizeObserver(syncLayout);
     if (layout instanceof HTMLElement) observer.observe(layout);
@@ -261,12 +262,15 @@ function useCalendarViewportLayout(
     observer.observe(grid);
     window.addEventListener("resize", syncLayout);
     window.visualViewport?.addEventListener("resize", syncLayout);
+    window.visualViewport?.addEventListener("scroll", syncLayout);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", syncLayout);
       window.visualViewport?.removeEventListener("resize", syncLayout);
-      resetCalendarLayout(calendar, grid);
+      window.visualViewport?.removeEventListener("scroll", syncLayout);
+      const layoutEl = layout instanceof HTMLElement ? layout : null;
+      resetCalendarLayout(calendar, grid, layoutEl);
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }

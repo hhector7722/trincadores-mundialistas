@@ -1,3 +1,9 @@
+import {
+  readTabBarTop,
+  resetLayoutAboveTabBar,
+  syncLayoutAboveTabBar,
+} from "@/lib/layout/viewport-chrome";
+
 const MIN_UI_SCALE = 0.15;
 const MAX_UI_SCALE = 2.75;
 const SCALE_SEARCH_ITERATIONS = 14;
@@ -461,30 +467,45 @@ export type CalendarLayoutResult = {
   gridHeight: number;
 };
 
-/** Ancla el cuerpo del calendario al borde inferior del layout (justo encima de la TabBar). */
+/** Deja que el grid ocupe el espacio restante del calendario vía flex. */
+function prepareCalendarGridFlex(grid: HTMLElement): void {
+  grid.style.removeProperty("height");
+  grid.style.flex = "1 1 0%";
+  grid.style.minHeight = "0";
+}
+
+/** Ancla el cuerpo del calendario al borde superior de la TabBar. */
 export function syncCalendarGridHeight(
   calendar: HTMLElement,
   grid: HTMLElement,
   layoutRoot: HTMLElement
 ): number {
-  const layoutRect = layoutRoot.getBoundingClientRect();
+  syncLayoutAboveTabBar(layoutRoot);
+  prepareCalendarGridFlex(grid);
+  void calendar.offsetHeight;
+  void grid.offsetHeight;
+
+  const contentBottom = readTabBarTop();
   const calendarRect = calendar.getBoundingClientRect();
   const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
   const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
   const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
-  const contentBottom = layoutRect.bottom;
   const available = Math.floor(contentBottom - calendarRect.top - chromeHeight);
   const height = Math.max(0, available);
 
-  grid.style.height = `${height}px`;
-  grid.style.flex = "0 0 auto";
+  if (height > 0) {
+    grid.style.height = `${height}px`;
+    grid.style.flex = "0 0 auto";
+  }
 
-  return height;
+  return grid.clientHeight || height;
 }
 
-export function resetCalendarGridHeight(grid: HTMLElement): void {
+export function resetCalendarGridHeight(grid: HTMLElement, layoutRoot?: HTMLElement | null): void {
   grid.style.removeProperty("height");
   grid.style.removeProperty("flex");
+  grid.style.removeProperty("min-height");
+  if (layoutRoot) resetLayoutAboveTabBar(layoutRoot);
 }
 
 /** Filas iguales vía CSS grid 1fr; tarjetas compartidas según el día más cargado. */
@@ -534,7 +555,11 @@ export function fitCalendarLayout(
   return { rowHeight, uiScale, matchCardHeight, gridHeight: grid.clientHeight || gridHeight };
 }
 
-export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | null): void {
+export function resetCalendarLayout(
+  calendar: HTMLElement,
+  grid?: HTMLElement | null,
+  layoutRoot?: HTMLElement | null
+): void {
   calendar.style.removeProperty("--tm-cal-ui-scale");
   calendar.style.removeProperty("--tm-cal-match-gap");
   calendar.style.removeProperty("--tm-cal-match-card-h");
@@ -559,5 +584,5 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-card-offset-top");
   calendar.style.removeProperty("--tm-cal-sidebar-card-offset-bottom");
   resetPredictionLabelMetrics(calendar);
-  if (grid) resetCalendarGridHeight(grid);
+  if (grid) resetCalendarGridHeight(grid, layoutRoot);
 }
