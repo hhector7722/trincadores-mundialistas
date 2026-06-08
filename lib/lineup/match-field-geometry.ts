@@ -1,41 +1,46 @@
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
- * Proyección del modal de alineación (campo completo, position-map y: 16→90)
- * a un partido MVP con dos mitades y perspectiva Goya.
+ * Proyección proporcional del modal de alineación (position-map, y: 16→90)
+ * al campo compartido MVP con perspectiva Goya.
  *
- * Ratios respecto al modal de un equipo:
- * - Vertical: cada mitad ≈ 46% del rango táctico original, con hueco en el centro.
- * - Horizontal: compresión hacia el centro según profundidad del plano (arriba más estrecho).
- * - Escala: chips del visitante (arriba) más pequeños; local (abajo) casi tamaño modal.
+ * Cada equipo ocupa su mitad manteniendo la misma distribución relativa de líneas
+ * (FW → MF → DF → GK) que en el modal de un solo equipo.
  */
 
-const SINGLE_ATTACK_Y = 16;
-const SINGLE_DEFENSE_Y = 90;
+/** Rango táctico del modal de alineación (position-map). */
+const LINEUP_ATTACK_Y = 16;
+const LINEUP_DEFENSE_Y = 90;
 
-/** Local: ataque cerca del centro, portería abajo. */
-const HOME_ATTACK_Y = 58;
+/** Línea de medio campo en la imagen Goya (%). */
+const MIDFIELD_Y = 50;
+
+/** Margen entre líneas de ataque y el centro (hueco entre equipos). */
+const MIDFIELD_GAP = 6;
+
+/** Local: delanteros cerca del centro, portería abajo. */
+const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP;
 const HOME_DEFENSE_Y = 90;
 
-/** Visitante: ataque cerca del centro, portería arriba. */
-const AWAY_ATTACK_Y = 42;
+/** Visitante: delanteros cerca del centro, portería arriba. */
+const AWAY_ATTACK_Y = MIDFIELD_Y - MIDFIELD_GAP;
 const AWAY_DEFENSE_Y = 10;
 
 const GOYA_PITCH_TOP_Y = 8;
 const GOYA_PITCH_BOTTOM_Y = 92;
 
-/** Compresión horizontal del plano (trapezoide del PNG Goya). */
+/** Compresión horizontal del trapezoide Goya (arriba más estrecho). */
 const GOYA_WIDTH_TOP = 0.7;
 const GOYA_WIDTH_BOTTOM = 1;
 
-/** Escala visual: en la parte alta no bajar del 78% para mantener lectura. */
-const GOYA_SCALE_TOP = 0.78;
+/** Escala visual según profundidad (visitante arriba = más pequeño). */
+const GOYA_SCALE_TOP = 0.74;
 const GOYA_SCALE_BOTTOM = 1;
 
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
-function normalizeDepth(y: number): number {
-  return (y - SINGLE_ATTACK_Y) / (SINGLE_DEFENSE_Y - SINGLE_ATTACK_Y);
+function lineupDepth(y: number): number {
+  return (y - LINEUP_ATTACK_Y) / (LINEUP_DEFENSE_Y - LINEUP_ATTACK_Y);
 }
 
 function clamp01(value: number): number {
@@ -46,16 +51,18 @@ function pitchDepth(y: number): number {
   return clamp01((y - GOYA_PITCH_TOP_Y) / (GOYA_PITCH_BOTTOM_Y - GOYA_PITCH_TOP_Y));
 }
 
+/** Misma proporción vertical que el modal, comprimida en la mitad inferior. */
 function mapToHomeHalf(coord: FieldCoordinate): FieldCoordinate {
-  const depth = normalizeDepth(coord.y);
+  const depth = lineupDepth(coord.y);
   return {
     x: coord.x,
     y: HOME_ATTACK_Y + depth * (HOME_DEFENSE_Y - HOME_ATTACK_Y),
   };
 }
 
+/** Misma proporción vertical que el modal, comprimida en la mitad superior. */
 function mapToAwayHalf(coord: FieldCoordinate): FieldCoordinate {
-  const depth = normalizeDepth(coord.y);
+  const depth = lineupDepth(coord.y);
   return {
     x: coord.x,
     y: AWAY_ATTACK_Y - depth * (AWAY_ATTACK_Y - AWAY_DEFENSE_Y),
