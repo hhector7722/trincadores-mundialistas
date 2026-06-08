@@ -200,6 +200,7 @@ export function HomeGeneralPredictionsCard({
           open
           onClose={closeAll}
           mode="pickOne"
+          closeOnPick={false}
           title={labels[activeFlow.kind]}
           onPickTeam={setLineupTeam}
         />
