@@ -28,5 +28,5 @@ export const TOURNAMENT_GENERAL_PREDICTION_LABELS: Record<
   finalists: "Finalistas",
   top_scorer: "Pichichi",
   tournament_mvp: "MVP",
-  golden_glove: "Guante de oro",
+  golden_glove: "Guante oro",
 };

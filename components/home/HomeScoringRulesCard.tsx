@@ -58,7 +58,7 @@ function ScoringRulesMiniCard({
         CARD_BUTTON_CLASS,
         className,
         useFourRowGrid
-          ? "grid h-full grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_repeat(3,auto)] content-start gap-x-2 gap-y-0"
+          ? "grid h-full grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_1fr_1fr_1fr] gap-x-2"
           : "flex h-full flex-col justify-center"
       )}
       aria-label="Normas de puntuación. Pulsa para ver el detalle."
