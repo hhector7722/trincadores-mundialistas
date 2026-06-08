@@ -23,7 +23,9 @@ export function AppShell({
         />
         <HomeAtmosphere />
         <AppHeaderGate ctx={ctx} />
-        <main className="tm-app-main">{children}</main>
+        <main className="tm-app-main">
+          <div className="tm-app-main-inner">{children}</div>
+        </main>
       </div>
       <TabBarWrapper />
       <Suspense fallback={null}>

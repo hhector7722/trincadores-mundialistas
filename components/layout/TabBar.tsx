@@ -53,13 +53,13 @@ export function TabBar() {
   return (
     <nav
       className={cn(
-        "tm-fixed-bottombar fixed bottom-0 left-0 right-0 z-[95] box-border",
-        "border-t border-[var(--tm-border)] bg-[var(--tm-tabbar-bg-hex)] pb-safe",
-        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)]"
+        "tm-fixed-bottombar fixed bottom-0 left-0 right-0 z-[95]",
+        "flex h-20 items-center justify-around border-t border-[var(--tm-border)]",
+        "bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe",
+        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md"
       )}
       aria-label="Navegacion principal"
     >
-      <div className="flex h-12 items-center justify-around px-1">
       {TABS.map(({ href, label, icon: Icon }) => {
         const active = isActive(displayPath, href);
         const navigating = optimisticHref === href;
@@ -83,7 +83,6 @@ export function TabBar() {
           </Link>
         );
       })}
-      </div>
     </nav>
   );
 }

@@ -42,10 +42,10 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tm-tabbar-core: 3rem;
-  /* Altura total anclada al viewport: fila táctil + home indicator (marbella: h-20 + pb-safe). */
+  /* Marbella usa h-20 (5rem) + pb-safe en un solo nav */
+  --tm-tabbar-core: 5rem;
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-content-bottom: var(--tm-tabbar-height);
+  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -113,6 +113,7 @@ html[data-modal-open] .tm-app-main {
   background-color: var(--tm-shell-bg-hex);
 }
 
+/* main: padding = color TabBar (marbella MainWrapper pb hereda body = nav) */
 .tm-app-main {
   box-sizing: border-box;
   position: relative;
@@ -120,9 +121,12 @@ html[data-modal-open] .tm-app-main {
   width: 100%;
   flex: 1 1 auto;
   padding-bottom: var(--tm-content-bottom);
+  background-color: var(--tm-tabbar-bg-hex);
+}
+
+.tm-app-main-inner {
+  min-height: 100%;
   background-color: var(--tm-shell-bg-hex);
-  /* Franja sobre la TabBar = mismo color que body/barra (marbella: pb hereda body bg) */
-  box-shadow: inset 0 calc(-1 * var(--tm-content-bottom)) 0 0 var(--tm-tabbar-bg-hex);
 }
 
 .tm-app-frame:has(.tm-porra-layout) {
@@ -131,16 +135,25 @@ html[data-modal-open] .tm-app-main {
   overflow: hidden;
 }
 
-.tm-app-main:has(> .tm-porra-layout) {
+.tm-app-main:has(.tm-porra-layout) {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
   padding-bottom: 0;
   overflow: hidden;
+  background-color: var(--tm-shell-bg-hex);
 }
 
-.tm-app-main > .tm-porra-layout {
+.tm-app-main-inner:has(> .tm-porra-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tm-app-main-inner > .tm-porra-layout {
   height: 100%;
   min-height: 0;
 }
