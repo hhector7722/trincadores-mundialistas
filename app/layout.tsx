@@ -1,5 +1,6 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
+import { AppViewportBootstrap } from "@/components/layout/AppViewportBootstrap";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -76,6 +77,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
+      <head>
+        <AppViewportBootstrap />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );

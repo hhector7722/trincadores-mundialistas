@@ -45,6 +45,8 @@
   --tm-tabbar-core: 3rem;
   --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-content-bottom: var(--tm-tabbar-height);
+  --tm-app-top: 0px;
+  --tm-app-height: 100%;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -77,25 +79,26 @@ body {
 }
 
 html {
-  height: -webkit-fill-available;
   background-color: var(--tm-tabbar-bg-hex);
 }
 
-/* PWA iOS: bloquea scroll del documento; el scroll vive solo en main */
+/* Evita scroll del documento; el shell sigue el visual viewport (no body fijo) */
 body:has(.tm-app-shell) {
-  position: fixed;
-  inset: 0;
-  width: 100%;
   overflow: hidden;
   overscroll-behavior: none;
 }
 
+/* Shell anclado al visual viewport: se actualiza al arrancar y al recalcular iOS */
 .tm-app-shell {
+  position: fixed;
+  top: var(--tm-app-top, 0px);
+  right: 0;
+  left: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  height: -webkit-fill-available;
+  height: var(--tm-app-height, 100%);
   overflow: hidden;
 }
 

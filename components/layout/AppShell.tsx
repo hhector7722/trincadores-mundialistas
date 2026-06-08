@@ -1,4 +1,5 @@
 ﻿import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+import { AppViewportSync } from "@/components/layout/AppViewportSync";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBar } from "@/components/layout/TabBar";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
@@ -13,6 +14,7 @@ export function AppShell({
 }) {
   return (
     <NavigationLoadingProvider>
+      <AppViewportSync />
       <div className="tm-app-shell relative flex flex-col">
         <HomeAtmosphere />
         <AppHeaderGate ctx={ctx} />
