@@ -43,7 +43,7 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   /* Marbella usa h-20 (5rem) + pb-safe en un solo nav */
-  --tm-tabbar-core: 3rem;
+  --tm-tabbar-core: 3.25rem;
   --tm-tab-indicators-core: 1.5rem;
   --tm-bottom-chrome-core: calc(var(--tm-tab-indicators-core) + var(--tm-tabbar-core));
   --tm-tabbar-height: calc(var(--tm-bottom-chrome-core) + var(--tm-safe-bottom));
@@ -280,6 +280,12 @@ html[data-modal-open] .tm-bottom-chrome {
 
 .tm-tab-indicators-slot {
   background: transparent;
+}
+
+.tm-fixed-bottombar {
+  box-sizing: border-box;
+  min-height: var(--tm-tabbar-core);
+  align-items: flex-end;
 }
 
 /* Overscroll: arriba tono cabecera, abajo tono TabBar */

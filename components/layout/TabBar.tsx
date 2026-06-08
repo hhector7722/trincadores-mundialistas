@@ -53,7 +53,7 @@ export function TabBar() {
     <nav
       className={cn(
         "tm-fixed-bottombar shrink-0 border-t border-[var(--tm-border)]",
-        "flex h-12 items-center justify-around px-1 pb-safe",
+        "flex justify-around px-1 pb-safe",
         "bg-[var(--tm-tabbar-bg-hex)]",
         "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md"
       )}
