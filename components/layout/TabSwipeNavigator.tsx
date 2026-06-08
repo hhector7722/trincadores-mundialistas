@@ -12,6 +12,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { getMainTabIndex, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
+import {
+  getTabNeighborForSwipe,
+  getTabSwipeProgress,
+  pointerOffsetToSwipeDirection,
+  resolveTabSwipeCommit,
+  shouldApplyEdgeResistance,
+} from "@/lib/layout/tab-swipe";
 import { cn } from "@/lib/utils";
 
 /** Distancia mínima para confirmar cambio de pestaña (ratio del ancho). */
@@ -56,15 +63,11 @@ function edgeResistance(offset: number, width: number) {
 }
 
 function applyEdgeResistance(activeIndex: number, offset: number, width: number) {
-  let next = offset;
-  const lastIndex = MAIN_TABS.length - 1;
-
-  // Quiz (0): no hay pestaña a la izquierda → bloquear swipe hacia la izquierda.
-  if (activeIndex === 0 && next < 0) next = edgeResistance(next, width);
-  // Perfil (último): no hay pestaña a la derecha → bloquear swipe hacia la derecha.
-  if (activeIndex === lastIndex && next > 0) next = edgeResistance(next, width);
-
-  return next;
+  const direction = pointerOffsetToSwipeDirection(offset);
+  if (!direction || !shouldApplyEdgeResistance(activeIndex, direction)) {
+    return offset;
+  }
+  return edgeResistance(offset, width);
 }
 
 function TabPeek({ label, side }: { label: string; side: "left" | "right" }) {
@@ -109,7 +112,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       dragXRef.current = next;
       setDragX(next);
       if (activeIndex == null || widthRef.current <= 0) return;
-      setSwipeProgress(activeIndex - next / widthRef.current);
+      setSwipeProgress(getTabSwipeProgress(activeIndex, next, widthRef.current));
     },
     [activeIndex, setSwipeProgress]
   );
@@ -275,22 +278,14 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     const offset = dragXRef.current;
     const elapsed = Math.max(performance.now() - startTimeRef.current, 1);
     const velocity = offset / elapsed;
-    const ratio = Math.abs(offset) / Math.max(width, 1);
 
-    let nextIndex = activeIndex;
-    // Orden barra: Quiz ← La tabla ← Inicio ← Partidos ← Perfil
-    // Dedo izquierda (offset < 0) → pestaña anterior (índice menor).
-    // Dedo derecha (offset > 0) → pestaña siguiente (índice mayor).
-    const wantsPrevious =
-      offset < 0 && (ratio >= COMMIT_RATIO || velocity < -VELOCITY_THRESHOLD);
-    const wantsNext =
-      offset > 0 && (ratio >= COMMIT_RATIO || velocity > VELOCITY_THRESHOLD);
+    const targetIndex = resolveTabSwipeCommit(activeIndex, offset, velocity, width, {
+      commitRatio: COMMIT_RATIO,
+      velocityThreshold: VELOCITY_THRESHOLD,
+    });
 
-    if (wantsPrevious && activeIndex > 0) nextIndex = activeIndex - 1;
-    if (wantsNext && activeIndex < MAIN_TABS.length - 1) nextIndex = activeIndex + 1;
-
-    if (nextIndex !== activeIndex) {
-      commitToIndex(nextIndex);
+    if (targetIndex != null && targetIndex !== activeIndex) {
+      commitToIndex(targetIndex);
       return;
     }
 
@@ -366,8 +361,12 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     return <div className="tm-tab-swipe-root min-h-0 min-w-0 flex-1">{children}</div>;
   }
 
-  const prevTab = activeIndex > 0 ? MAIN_TABS[activeIndex - 1] : null;
-  const nextTab = activeIndex < MAIN_TABS.length - 1 ? MAIN_TABS[activeIndex + 1] : null;
+  const leftTab =
+    activeIndex != null ? getTabNeighborForSwipe(activeIndex, "left") : null;
+  const rightTab =
+    activeIndex != null ? getTabNeighborForSwipe(activeIndex, "right") : null;
+  const prevTab = leftTab != null ? MAIN_TABS[leftTab] : null;
+  const nextTab = rightTab != null ? MAIN_TABS[rightTab] : null;
   const showEdgeHints = !isDragging && !animating && dragX === 0;
 
   return (

@@ -6,6 +6,8 @@ export const MAIN_TABS = [
   { href: "/profile", label: "Perfil" },
 ] as const;
 
+/** Orden izq→der en barra; swipe ←/→ entre vecinos vía lib/layout/tab-swipe.ts */
+
 export type MainTabHref = (typeof MAIN_TABS)[number]["href"];
 
 export const MAIN_TAB_HREFS = MAIN_TABS.map((tab) => tab.href);
