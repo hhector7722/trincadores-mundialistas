@@ -58,24 +58,11 @@ function gapMultiplier(colA: number, colB: number): number {
   return 0.92;
 }
 
-/**
- * Aire extra entre pares concretos (% del canvas; ~26–28px en móvil estrecho).
- * Solo dieciseisavos↔octavos y semifinales↔final.
- */
-function extraGapForPair(colA: number, colB: number): number {
-  const minCol = Math.min(colA, colB);
-  const maxCol = Math.max(colA, colB);
-  if (minCol === 0 && maxCol === 1) return 7;
-  if (minCol === 3 && maxCol === 4) return 6.5;
-  return 0;
-}
-
 function minCenterDistance(colA: number, colB: number): number {
   return (
     halfWidthForColumn(colA) +
     halfWidthForColumn(colB) +
-    MIN_GAP_X * gapMultiplier(colA, colB) +
-    extraGapForPair(colA, colB)
+    MIN_GAP_X * gapMultiplier(colA, colB)
   );
 }
 
