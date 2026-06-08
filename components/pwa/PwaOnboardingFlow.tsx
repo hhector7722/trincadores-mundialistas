@@ -2,7 +2,6 @@
 
 import {
   ArrowLeft,
-  Copy,
   ImageIcon,
   MoreHorizontal,
   MoreVertical,
@@ -12,14 +11,13 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { signInWithPhone } from "@/actions/auth";
 import {
   completePwaOnboarding,
   confirmStandaloneInstallation,
   assignParticipantAvatar,
   hasCompletedPwaOnboarding,
   identifyParticipantByPhone,
-  revealParticipantCredentials,
-  type OnboardingCredentials,
 } from "@/actions/pwa-onboarding";
 import { LoginHero } from "@/components/auth/LoginHero";
 import { AvatarGenerationStep } from "@/components/pwa/AvatarGenerationStep";
@@ -27,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import { detectMobileOs, isStandalonePWA, type MobileOs } from "@/lib/pwa/standalone";
-type OnboardingStep = "os" | "instructions" | "verify" | "phone" | "credentials" | "avatar";
+type OnboardingStep = "os" | "instructions" | "verify" | "phone" | "avatar";
 
 type IdentifiedParticipant = {
   username: string;
@@ -127,41 +125,6 @@ function OsChoiceButton({ label, onClick }: { label: string; onClick: () => void
   );
 }
 
-function CopyField({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function onCopy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  }
-
-  return (
-    <div>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">{label}</p>
-      <div className="mt-1.5 flex items-center gap-2">
-        <div className="min-h-12 flex-1 rounded-xl border border-white/10 bg-[var(--tm-surface)] px-3 py-2.5 font-mono text-sm tracking-wide text-white">
-          {value}
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCopy}
-          className="size-12 shrink-0 rounded-xl px-0"
-          aria-label={`Copiar ${label.toLowerCase()}`}
-        >
-          <Copy className="size-4" aria-hidden />
-        </Button>
-      </div>
-      {copied ? <p className="mt-1 text-xs text-[var(--tm-accent)]">Copiado</p> : null}
-    </div>
-  );
-}
-
 export function PwaOnboardingFlow() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -171,21 +134,32 @@ export function PwaOnboardingFlow() {
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [participant, setParticipant] = useState<IdentifiedParticipant | null>(null);
-  const [credentials, setCredentials] = useState<OnboardingCredentials | null>(null);
+  const [accessError, setAccessError] = useState<string | null>(null);
   const [bootstrapped, setBootstrapped] = useState(false);
 
   const goToAccess = useCallback(() => {
     startTransition(async () => {
-      const username = participant?.username ?? credentials?.username;
-      if (!username) return;
+      const username = participant?.username;
+      if (!username || !phone.trim()) return;
+
+      setAccessError(null);
 
       const result = await completePwaOnboarding(username);
-      if (!result.ok) return;
+      if (!result.ok) {
+        setAccessError(result.error);
+        return;
+      }
 
-      router.push(`/login?u=${encodeURIComponent(username)}`);
+      const signInResult = await signInWithPhone(phone);
+      if (!signInResult.ok) {
+        setAccessError(signInResult.error);
+        return;
+      }
+
+      router.push("/");
       router.refresh();
     });
-  }, [credentials?.username, participant?.username, router]);
+  }, [participant?.username, phone, router]);
 
   useEffect(() => {
     if (bootstrapped) return;
@@ -255,24 +229,9 @@ export function PwaOnboardingFlow() {
         return;
       }
 
-      const creds = await revealParticipantCredentials(
-        identity.data.username,
-        identity.data.displayName
-      );
-      if (!creds.ok) {
-        setPhoneError(creds.error);
-        return;
-      }
-
       setParticipant(identity.data);
-      setCredentials(creds.data);
-      setStep("credentials");
+      setStep("avatar");
     });
-  }
-
-  function onCredentialsContinue() {
-    if (!participant) return;
-    setStep("avatar");
   }
 
   const handleAvatarReady = useCallback(async () => {
@@ -298,7 +257,7 @@ export function PwaOnboardingFlow() {
       <LoginHero tagline="PARA VOSOTROS JUGADORES" />
 
       <div className="tm-glass-card rounded-2xl p-5 backdrop-blur-xl">
-        {step !== "os" && step !== "credentials" && step !== "avatar" ? (
+        {step !== "os" && step !== "avatar" ? (
           <button
             type="button"
             onClick={onBack}
@@ -409,34 +368,24 @@ export function PwaOnboardingFlow() {
           </form>
         ) : null}
 
-        {step === "credentials" && credentials ? (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-white">Hola, {credentials.displayName}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-white/70">
-                Guarda estos datos. Los necesitaras cada vez que entres.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <CopyField label="Alias" value={credentials.username} />
-              <CopyField label="Codigo de acceso" value={credentials.accessCode} />
-            </div>
-
-            <Button type="button" className="w-full" onClick={onCredentialsContinue}>
-              Siguiente
-            </Button>
-          </div>
-        ) : null}
-
         {step === "avatar" && participant ? (
-          <AvatarGenerationStep
-            displayName={participant.displayName}
-            avatarUrl={getPresetAvatarUrl(participant.username)}
-            onReady={handleAvatarReady}
-            onContinue={goToAccess}
-            pending={pending}
-          />
+          <>
+            {accessError ? (
+              <p
+                className="mb-4 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
+                role="alert"
+              >
+                {accessError}
+              </p>
+            ) : null}
+            <AvatarGenerationStep
+              displayName={participant.displayName}
+              avatarUrl={getPresetAvatarUrl(participant.username)}
+              onReady={handleAvatarReady}
+              onContinue={goToAccess}
+              pending={pending}
+            />
+          </>
         ) : null}
       </div>
     </div>

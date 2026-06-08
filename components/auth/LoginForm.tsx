@@ -1,8 +1,8 @@
 ﻿"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { signIn } from "@/actions/auth";
+import { signInWithPhone } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingOverlay } from "@/components/ui/spinner";
@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const prefilledUsername = searchParams.get("u")?.trim() ?? "";
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -19,11 +17,10 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     const fd = new FormData(e.currentTarget);
-    const username = String(fd.get("username") ?? "");
-    const accessCode = String(fd.get("accessCode") ?? "");
+    const phone = String(fd.get("phone") ?? "");
 
     startTransition(async () => {
-      const result = await signIn(username, accessCode);
+      const result = await signInWithPhone(phone);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -38,50 +35,32 @@ export function LoginForm() {
       {pending ? <LoadingOverlay label="Entrando…" /> : null}
       <div>
         <label
-          htmlFor="login-username"
+          htmlFor="login-phone"
           className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
         >
-          Alias
+          Numero de movil
         </label>
         <Input
-          id="login-username"
-          name="username"
-          type="text"
-          autoComplete="username"
+          id="login-phone"
+          name="phone"
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel"
           required
-          defaultValue={prefilledUsername}
-          className="mt-1.5 bg-[var(--tm-surface)] backdrop-blur-sm"
+          className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-wide backdrop-blur-sm"
+          placeholder="647229309"
           spellCheck={false}
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="login-access-code"
-          className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
-        >
-          Codigo de acceso
-        </label>
-        <Input
-          id="login-access-code"
-          name="accessCode"
-          type="password"
-          autoComplete="current-password"
-          required
-          minLength={12}
-          className="mt-1.5 bg-[var(--tm-surface)] font-mono uppercase tracking-wider backdrop-blur-sm"
-          spellCheck={false}
-        />
-      </div>
-
-      {error && (
+      {error ? (
         <p
           className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
           role="alert"
         >
           {error}
         </p>
-      )}
+      ) : null}
 
       <Button
         type="submit"

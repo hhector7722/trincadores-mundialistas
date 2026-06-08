@@ -9,6 +9,8 @@ import {
   setActivePoolCookie,
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
+import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
+import { normalizePhone, resolveParticipantByPhone } from "@/lib/pwa/onboarding-phones";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
 
@@ -80,6 +82,28 @@ export async function signIn(
   }
 
   return { ok: true };
+}
+
+export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResult> {
+  const phone = normalizePhone(phoneRaw);
+  if (!phone) {
+    return { ok: false, error: "Introduce tu numero de telefono." };
+  }
+
+  const participant = resolveParticipantByPhone(phone);
+  if (!participant) {
+    return { ok: false, error: "Telefono no reconocido." };
+  }
+
+  const accessCode = getOnboardingAccessCode(participant.username);
+  if (!accessCode) {
+    return {
+      ok: false,
+      error: "No hay acceso configurado para ese participante. Contacta al administrador.",
+    };
+  }
+
+  return signIn(participant.username, accessCode);
 }
 
 export async function signOut(): Promise<void> {
