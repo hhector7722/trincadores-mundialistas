@@ -86,7 +86,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     (href: string) => {
       if (isSameAppPath(pathnameRef.current, href)) return;
       startTransition(() => {
-        router.push(href);
+        router.replace(href);
       });
     },
     [router]

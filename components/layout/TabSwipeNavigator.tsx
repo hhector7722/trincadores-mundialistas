@@ -55,6 +55,18 @@ function edgeResistance(offset: number, width: number) {
   return offset * (1 - ratio * (1 - EDGE_RESISTANCE));
 }
 
+function applyEdgeResistance(activeIndex: number, offset: number, width: number) {
+  let next = offset;
+  const lastIndex = MAIN_TABS.length - 1;
+
+  // Quiz (0): no hay pestaña a la izquierda → bloquear swipe hacia la izquierda.
+  if (activeIndex === 0 && next < 0) next = edgeResistance(next, width);
+  // Perfil (último): no hay pestaña a la derecha → bloquear swipe hacia la derecha.
+  if (activeIndex === lastIndex && next > 0) next = edgeResistance(next, width);
+
+  return next;
+}
+
 function TabPeek({ label, side }: { label: string; side: "left" | "right" }) {
   return (
     <div
@@ -137,6 +149,63 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     };
   }, []);
 
+  /** Evita que el gesto "atrás" del navegador compita con el swipe entre pestañas. */
+  useEffect(() => {
+    if (!enabled) return;
+
+    const root = rootRef.current;
+    if (!root) return;
+
+    const blockNativeHorizontal = (event: TouchEvent) => {
+      if (lockedAxisRef.current !== "x") return;
+      if (event.cancelable) event.preventDefault();
+    };
+
+    root.addEventListener("touchmove", blockNativeHorizontal, { passive: false });
+
+    return () => {
+      root.removeEventListener("touchmove", blockNativeHorizontal);
+    };
+  }, [enabled]);
+
+  /** En raíz de pestaña, el botón/gesto atrás no debe salir de la app ni duplicar navegación. */
+  useEffect(() => {
+    if (!enabled) return;
+
+    const markTabShell = () => {
+      window.history.replaceState(
+        { ...(window.history.state ?? {}), tmTabShell: true },
+        "",
+        window.location.href
+      );
+    };
+
+    markTabShell();
+
+    const onPopState = () => {
+      if (!isMainTabRoot(window.location.pathname)) return;
+      markTabShell();
+      window.history.pushState(
+        { ...(window.history.state ?? {}), tmTabShell: true },
+        "",
+        window.location.href
+      );
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [enabled, pathname]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDragging) {
+      html.setAttribute("data-tab-swipe-dragging", "");
+    } else {
+      html.removeAttribute("data-tab-swipe-dragging");
+    }
+    return () => html.removeAttribute("data-tab-swipe-dragging");
+  }, [isDragging]);
+
   const animateTo = useCallback(
     (target: number, onDone?: () => void) => {
       const track = trackRef.current;
@@ -209,7 +278,9 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     const ratio = Math.abs(offset) / Math.max(width, 1);
 
     let nextIndex = activeIndex;
-    // Deslizar a la izquierda → pestaña anterior (izquierda en la barra). Derecha → siguiente.
+    // Orden barra: Quiz ← La tabla ← Inicio ← Partidos ← Perfil
+    // Dedo izquierda (offset < 0) → pestaña anterior (índice menor).
+    // Dedo derecha (offset > 0) → pestaña siguiente (índice mayor).
     const wantsPrevious =
       offset < 0 && (ratio >= COMMIT_RATIO || velocity < -VELOCITY_THRESHOLD);
     const wantsNext =
@@ -270,12 +341,10 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
     if (lockedAxisRef.current !== "x") return;
 
-    let next = deltaX;
-    const width = widthRef.current;
+    if (event.cancelable) event.preventDefault();
 
-    if (activeIndex === 0 && next > 0) next = edgeResistance(next, width);
-    if (activeIndex === MAIN_TABS.length - 1 && next < 0) next = edgeResistance(next, width);
-
+    const next =
+      activeIndex == null ? deltaX : applyEdgeResistance(activeIndex, deltaX, widthRef.current);
     syncDrag(next);
   };
 

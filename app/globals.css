@@ -359,12 +359,31 @@ html[data-modal-open] .tm-bottom-chrome {
   pointer-events: none;
 }
 
+.tm-bottom-chrome {
+  box-sizing: border-box;
+  background-color: var(--tm-tabbar-bg-hex);
+}
+
 .tm-tab-indicators-slot {
   background: transparent;
 }
 
 .tm-tab-swipe-root--dragging {
   touch-action: none;
+}
+
+.tm-tab-swipe-root {
+  overscroll-behavior-x: none;
+}
+
+html[data-tab-swipe-dragging],
+html[data-tab-swipe-dragging] body {
+  overscroll-behavior-x: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+html:has(.tm-tab-swipe-root) {
+  overscroll-behavior-x: none;
 }
 
 .tm-tab-swipe-track--dragging {
