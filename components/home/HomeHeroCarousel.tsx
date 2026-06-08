@@ -126,7 +126,7 @@ export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselPr
             className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
             aria-hidden={index !== activeIndex}
           >
-            <div className="flex w-full min-w-0 max-w-full flex-col items-start text-left">
+            <div className="flex w-full min-w-0 max-w-full flex-col items-center text-center">
               <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
                 {slide.eyebrow}
               </p>
@@ -148,7 +148,7 @@ export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselPr
       </div>
 
       <div
-        className="mt-2 flex items-center gap-1.5"
+        className="mt-2 flex items-center justify-center gap-1.5"
         role="tablist"
         aria-label="Contenido del hero"
       >
