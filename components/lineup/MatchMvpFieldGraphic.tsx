@@ -75,34 +75,30 @@ export function MatchMvpFieldGraphic({
         className
       )}
     >
-      <div
-        className={cn(
-          "relative aspect-[3/2] w-full min-h-[min(38dvh,19rem)] max-w-none overflow-visible"
-        )}
-      >
-      <div className="absolute inset-0">
-        <Image
-          src={GOYA_FIELD_SRC}
-          alt=""
-          fill
-          unoptimized
-          className="object-contain object-center"
-          sizes="(max-width: 576px) 100vw, 576px"
-          priority
-          onLoad={handleFieldReady}
-          onError={handleFieldReady}
-        />
-      </div>
+      <div className="relative aspect-[3/2] w-full max-w-none overflow-visible">
+        <div className="absolute inset-0">
+          <Image
+            src={GOYA_FIELD_SRC}
+            alt=""
+            fill
+            unoptimized
+            className="object-contain object-center"
+            sizes="(max-width: 576px) 100vw, 576px"
+            priority
+            onLoad={handleFieldReady}
+            onError={handleFieldReady}
+          />
+        </div>
 
-      <div className="pointer-events-none absolute left-4 top-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
-        {teamNameEs(awayTeam)}
-      </div>
-      <div className="pointer-events-none absolute bottom-4 left-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
-        {teamNameEs(homeTeam)}
-      </div>
+        <div className="pointer-events-none absolute left-4 top-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+          {teamNameEs(awayTeam)}
+        </div>
+        <div className="pointer-events-none absolute bottom-4 left-4 z-20 max-w-[46%] truncate rounded bg-black/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+          {teamNameEs(homeTeam)}
+        </div>
 
-      {awaySlots.map((slot) => renderSlot(awayTeam, slot))}
-      {homeSlots.map((slot) => renderSlot(homeTeam, slot))}
+        {awaySlots.map((slot) => renderSlot(awayTeam, slot))}
+        {homeSlots.map((slot) => renderSlot(homeTeam, slot))}
       </div>
     </div>
   );

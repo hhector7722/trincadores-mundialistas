@@ -1,36 +1,36 @@
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
- * Geometría del MVP en campo compartido.
- * Parte de las coordenadas del modal de alineación (campo completo, y: 16 ataque → 90 portería)
- * y las proyecta a cada mitad con perspectiva Goya (estrecho arriba, ancho abajo).
+ * Proyección del modal de alineación (campo completo, position-map y: 16→90)
+ * a un partido MVP con dos mitades y perspectiva Goya.
+ *
+ * Ratios respecto al modal de un equipo:
+ * - Vertical: cada mitad ≈ 46% del rango táctico original, con hueco en el centro.
+ * - Horizontal: compresión hacia el centro según profundidad del plano (arriba más estrecho).
+ * - Escala: chips del visitante (arriba) más pequeños; local (abajo) casi tamaño modal.
  */
 
 const SINGLE_ATTACK_Y = 16;
 const SINGLE_DEFENSE_Y = 90;
 
-/** Mitad inferior (local): portería abajo, ataque hacia el centro. */
-const HOME_ATTACK_Y = 57;
-const HOME_DEFENSE_Y = 91;
+/** Local: ataque cerca del centro, portería abajo. */
+const HOME_ATTACK_Y = 58;
+const HOME_DEFENSE_Y = 90;
 
-/** Mitad superior (visitante): portería arriba, ataque hacia el centro. */
-const AWAY_ATTACK_Y = 43;
-const AWAY_DEFENSE_Y = 9;
+/** Visitante: ataque cerca del centro, portería arriba. */
+const AWAY_ATTACK_Y = 42;
+const AWAY_DEFENSE_Y = 10;
 
-/** Límites verticales del plano de juego en la imagen Goya (%). */
 const GOYA_PITCH_TOP_Y = 8;
 const GOYA_PITCH_BOTTOM_Y = 92;
 
-/** Compresión horizontal en el fondo del plano (arriba del campo). */
-const GOYA_WIDTH_FACTOR_TOP = 0.68;
-const GOYA_WIDTH_FACTOR_BOTTOM = 1;
+/** Compresión horizontal del plano (trapezoide del PNG Goya). */
+const GOYA_WIDTH_TOP = 0.7;
+const GOYA_WIDTH_BOTTOM = 1;
 
-/**
- * Escala visual mínima en la parte alta: un poco por encima del ancho del plano
- * para que dorsales y nombres sigan siendo legibles con perspectiva.
- */
-const GOYA_SCALE_MIN = 0.74;
-const GOYA_SCALE_MAX = 1;
+/** Escala visual: en la parte alta no bajar del 78% para mantener lectura. */
+const GOYA_SCALE_TOP = 0.78;
+const GOYA_SCALE_BOTTOM = 1;
 
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
@@ -62,25 +62,23 @@ function mapToAwayHalf(coord: FieldCoordinate): FieldCoordinate {
   };
 }
 
-/** Factor de ancho según profundidad del plano Goya. */
 export function goyaWidthFactor(y: number): number {
-  const depth = pitchDepth(y);
-  return GOYA_WIDTH_FACTOR_TOP + depth * (GOYA_WIDTH_FACTOR_BOTTOM - GOYA_WIDTH_FACTOR_TOP);
+  const t = pitchDepth(y);
+  return GOYA_WIDTH_TOP + t * (GOYA_WIDTH_BOTTOM - GOYA_WIDTH_TOP);
 }
 
-/** Escala de chip según profundidad (visitante arriba = más pequeño). */
 export function goyaScaleFactor(y: number): number {
-  const depth = pitchDepth(y);
-  return GOYA_SCALE_MIN + depth * (GOYA_SCALE_MAX - GOYA_SCALE_MIN);
+  const t = pitchDepth(y);
+  return GOYA_SCALE_TOP + t * (GOYA_SCALE_BOTTOM - GOYA_SCALE_TOP);
 }
 
 export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
-  const widthFactor = goyaWidthFactor(slot.y);
-  const scaleFactor = goyaScaleFactor(slot.y);
+  const width = goyaWidthFactor(slot.y);
+  const scale = goyaScaleFactor(slot.y);
   return {
     ...slot,
-    x: 50 + (slot.x - 50) * widthFactor,
-    scale: scaleFactor,
+    x: 50 + (slot.x - 50) * width,
+    scale,
   };
 }
 
