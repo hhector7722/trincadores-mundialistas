@@ -739,7 +739,9 @@ html[data-modal-open] main {
 
 /* Cuadro KO premium móvil vertical */
 .tm-ko-page {
-  --tm-ko-wire: rgba(160, 120, 230, 0.22);
+  --tm-ko-wire: rgba(160, 120, 230, 0.34);
+  --tm-ko-wire-pair: rgba(160, 120, 230, 0.28);
+  --tm-ko-wire-final: rgba(160, 120, 230, 0.5);
   --tm-ko-card-bg: rgba(18, 8, 40, 0.92);
   --tm-ko-card-border: rgba(255, 255, 255, 0.1);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
@@ -794,9 +796,19 @@ html[data-modal-open] main {
 .tm-ko-wire {
   fill: none;
   stroke: var(--tm-ko-wire);
-  stroke-width: 1.25px;
+  stroke-width: 1.35px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.tm-ko-wire--pair {
+  stroke: var(--tm-ko-wire-pair);
+  stroke-width: 1.15px;
+}
+
+.tm-ko-wire--final {
+  stroke: var(--tm-ko-wire-final);
+  stroke-width: 1.55px;
 }
 
 .tm-ko-nodes {
@@ -842,8 +854,8 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--final {
-  width: min(10.2cqw, 51px);
-  min-width: 41px;
+  width: var(--tm-ko-card-width);
+  min-width: 42px;
   border-color: rgba(212, 255, 0, 0.42);
   background: linear-gradient(
     165deg,
@@ -855,23 +867,45 @@ html[data-modal-open] main {
     0 4px 18px rgba(0, 0, 0, 0.35);
 }
 
+.tm-ko-card--final::after {
+  content: "";
+  position: absolute;
+  inset: -0.4rem;
+  border: 1px solid rgba(212, 255, 0, 0.1);
+  border-radius: 0.7rem;
+  pointer-events: none;
+}
+
+.tm-ko-card--sf {
+  padding: 0.12rem 0.1rem;
+}
+
+.tm-ko-card--sf .tm-ko-card-row {
+  min-height: min(4.5cqh, 21px);
+  padding: 0.32rem 0.42rem;
+}
+
 .tm-ko-card--r32 {
-  padding: 0.14rem 0.12rem;
+  padding: 0.1rem 0.1rem;
   gap: 0;
 }
 
 .tm-ko-card--r32::before {
   content: "";
   position: absolute;
-  inset: 0.22rem;
+  inset: 0.16rem;
   border: 1px solid var(--tm-ko-card-border);
   border-radius: 0.4rem;
   pointer-events: none;
 }
 
 .tm-ko-card--r32 .tm-ko-card-divider {
-  margin-inline: 0.1rem;
+  margin-inline: 0.14rem;
   background: var(--tm-ko-card-border);
+}
+
+.tm-ko-card--r32 .tm-ko-card-row {
+  padding-block: 0.22rem;
 }
 
 .tm-ko-card-row {
@@ -937,16 +971,12 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--final .tm-ko-card-row {
-  min-height: min(4.8cqh, 22px);
-  padding-inline: 0.44rem;
+  min-height: min(4.4cqh, 20px);
+  padding-inline: 0.4rem;
 }
 
 .tm-ko-card--final .tm-ko-card-row-primary {
   font-size: clamp(6px, 1.75cqw, 9px);
-}
-
-.tm-ko-card--sf .tm-ko-card-row-primary {
-  font-size: clamp(5px, 1.65cqw, 8px);
 }
 
 .tm-porra-calendar .tm-cal-header,

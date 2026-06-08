@@ -1,19 +1,19 @@
 import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 
 export const BRACKET_LEAF_SLOTS = 16;
-export const BRACKET_VERTICAL_PAD = 3;
-export const BRACKET_VERTICAL_COMPACT = 0.88;
+export const BRACKET_VERTICAL_PAD = 2;
+export const BRACKET_VERTICAL_COMPACT = 0.95;
 
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
 
-/** Escalado visual por ronda. */
+/** Escalado visual por ronda (progresión suave). */
 export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
   r32: 1,
-  r16: 1.1,
-  qf: 1.2,
-  sf: 1.3,
-  final: 1.4,
+  r16: 1.08,
+  qf: 1.16,
+  sf: 1.25,
+  final: 1.35,
 };
 
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
@@ -23,13 +23,13 @@ export const CARD_HALF_WIDTH_BASE = 4.2;
  * Separación mínima horizontal entre tarjetas (en % del canvas 0–100).
  * Ajustable: 24px aprox en móvil suele rondar ~6–7% del ancho.
  */
-export const MIN_GAP_X = 6.5;
+export const MIN_GAP_X = 5.5;
 
 /** Separación mínima vertical (en % del canvas). */
-export const MIN_GAP_Y = 3.5;
+export const MIN_GAP_Y = 3;
 
-/** Margen lateral para que nada “toque” los bordes (en % del canvas). */
-export const BRACKET_SIDE_INSET = 4.5;
+/** Margen lateral para dieciseisavos (en % del canvas). */
+export const BRACKET_SIDE_INSET = 6.5;
 
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
@@ -48,8 +48,22 @@ function halfWidthForColumn(column: number): number {
   return CARD_HALF_WIDTH_BASE * scale;
 }
 
+/** Acerca columnas interiores ~15–20 % (octavos→final). */
+function gapMultiplier(colA: number, colB: number): number {
+  const minCol = Math.min(colA, colB);
+  const maxCol = Math.max(colA, colB);
+  const distFromCenter = Math.min(Math.abs(minCol - 4), Math.abs(maxCol - 4));
+  if (distFromCenter <= 1) return 0.8;
+  if (distFromCenter === 2) return 0.86;
+  return 0.92;
+}
+
 function minCenterDistance(colA: number, colB: number): number {
-  return halfWidthForColumn(colA) + halfWidthForColumn(colB) + MIN_GAP_X;
+  return (
+    halfWidthForColumn(colA) +
+    halfWidthForColumn(colB) +
+    MIN_GAP_X * gapMultiplier(colA, colB)
+  );
 }
 
 /**
@@ -257,27 +271,56 @@ function connectSemiToFinal(
   return `M ${xStart} ${semi.midY} H ${xGutter} V ${FINAL_CENTER_Y} H ${anchorX}`;
 }
 
+export type BracketConnectorSegment = {
+  d: string;
+  variant: "default" | "pair" | "final";
+};
+
 export function buildBracketConnectorPaths(
   geoms: BracketMatchGeometry[]
-): string[] {
+): BracketConnectorSegment[] {
   const byNumber = new Map(geoms.map((geom) => [geom.matchNumber, geom]));
-  const paths: string[] = [];
+  const segments: BracketConnectorSegment[] = [];
 
   for (const geom of geoms) {
-    if (geom.round === "final" || !geom.childMatches) continue;
+    if (geom.round === "final") continue;
+
+    if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
+      segments.push({
+        d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
+        variant: geom.round === "r32" ? "pair" : "default",
+      });
+    }
+
+    if (!geom.childMatches) continue;
 
     for (const childNumber of geom.childMatches) {
       const child = byNumber.get(childNumber);
-      if (child) paths.push(connectChildToParent(child, geom));
+      if (child) {
+        segments.push({
+          d: connectChildToParent(child, geom),
+          variant: "default",
+        });
+      }
     }
   }
 
   const leftSemi = byNumber.get(LEFT_SF[0]);
   const rightSemi = byNumber.get(RIGHT_SF[0]);
-  if (leftSemi) paths.push(connectSemiToFinal(leftSemi, FINAL_ANCHOR_LEFT_X));
-  if (rightSemi) paths.push(connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X));
+  if (leftSemi) {
+    segments.push({
+      d: connectSemiToFinal(leftSemi, FINAL_ANCHOR_LEFT_X),
+      variant: "final",
+    });
+  }
+  if (rightSemi) {
+    segments.push({
+      d: connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X),
+      variant: "final",
+    });
+  }
 
-  return paths;
+  return segments;
 }
 
 export function matchPosition(geom: BracketMatchGeometry): { x: number; y: number } {

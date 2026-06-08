@@ -165,11 +165,15 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             preserveAspectRatio="none"
             aria-hidden
           >
-            {BRACKET_CONNECTORS.map((path, index) => (
+            {BRACKET_CONNECTORS.map((segment, index) => (
               <path
                 key={`wire-${index}`}
-                d={path}
-                className="tm-ko-wire"
+                d={segment.d}
+                className={cn(
+                  "tm-ko-wire",
+                  segment.variant === "pair" && "tm-ko-wire--pair",
+                  segment.variant === "final" && "tm-ko-wire--final"
+                )}
                 vectorEffect="non-scaling-stroke"
               />
             ))}
