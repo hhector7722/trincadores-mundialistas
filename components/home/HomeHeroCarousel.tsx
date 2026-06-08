@@ -78,7 +78,7 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
           104 partidos
         </p>
       ),
-      description: "Una porra, un grupo y mucho que demostrar",
+      description: "Unos que shanelan de esto, otros que no y muchas bocas que callar",
       cta: { label: "Ver calendario", href: "/predictions" },
     }
   );
