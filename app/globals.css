@@ -1605,6 +1605,8 @@ html:has(.tm-app-frame) body {
   min-width: 0;
   flex: 0 0 auto;
   height: auto;
+  padding-bottom: var(--tm-cal-sidebar-card-bottom-pad, 6px);
+  box-sizing: border-box;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-section {
@@ -1646,7 +1648,6 @@ html:has(.tm-app-frame) body {
   justify-content: center;
   padding: var(--tm-cal-sidebar-access-pad, 4px);
   box-sizing: border-box;
-  border-top: 0.5px solid var(--tm-cal-sidebar-border);
 }
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {

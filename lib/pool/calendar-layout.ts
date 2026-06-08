@@ -31,6 +31,7 @@ const ACCESS_BTN_PAD_Y_PX = 2;
 const ACCESS_BTN_LINE_HEIGHT = 1.1;
 const SIDEBAR_BODY_GAP_PX = 6;
 const SIDEBAR_CARD_SLOT_INSET_PX = 8;
+const SIDEBAR_CARD_BOTTOM_PAD_PX = 6;
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
   cells: T[]
@@ -261,6 +262,7 @@ function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void 
 
   if (!slot || !card) {
     calendar.style.removeProperty("--tm-cal-sidebar-card-h");
+    calendar.style.removeProperty("--tm-cal-sidebar-card-bottom-pad");
     return;
   }
 
@@ -268,8 +270,9 @@ function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   const titleH = title?.offsetHeight ?? 0;
   const listH = list?.offsetHeight ?? 0;
   const dockH = dock?.offsetHeight ?? 0;
-  const cardH = Math.ceil(titleH + listH + dockH);
+  const cardH = Math.ceil(titleH + listH + dockH + SIDEBAR_CARD_BOTTOM_PAD_PX);
 
+  calendar.style.setProperty("--tm-cal-sidebar-card-bottom-pad", `${SIDEBAR_CARD_BOTTOM_PAD_PX}px`);
   calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardH}px`);
 }
 
@@ -308,7 +311,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     );
     const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
     const titleH = title?.offsetHeight ?? 0;
-    const slotInset = SIDEBAR_CARD_SLOT_INSET_PX * 2;
+    const slotInset = SIDEBAR_CARD_SLOT_INSET_PX * 2 + SIDEBAR_CARD_BOTTOM_PAD_PX;
     const maxPanelH = Math.max(
       0,
       (body?.clientHeight ?? 0) - resolvedDockH - titleH - slotInset
@@ -513,6 +516,7 @@ export function resetCalendarLayout(calendar: HTMLElement, grid?: HTMLElement | 
   calendar.style.removeProperty("--tm-cal-sidebar-access-btn-px");
   calendar.style.removeProperty("--tm-cal-sidebar-access-grid-w");
   calendar.style.removeProperty("--tm-cal-sidebar-card-h");
+  calendar.style.removeProperty("--tm-cal-sidebar-card-bottom-pad");
   calendar.style.removeProperty("--tm-cal-sidebar-card-offset-top");
   calendar.style.removeProperty("--tm-cal-sidebar-card-offset-bottom");
   resetPredictionLabelMetrics(calendar);
