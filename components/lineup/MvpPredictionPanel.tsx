@@ -4,11 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { fetchMatchSquadsAction } from "@/actions/lineup";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
+import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
+import { MvpBenchStrip } from "@/components/lineup/MvpBenchStrip";
+import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
-import { shirtPlayerName } from "@/lib/lineup/short-player-name";
+import { getBenchPlayers } from "@/lib/lineup/bench-players";
+import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
+import { mapSlotsToAwayHalf, mapSlotsToHomeHalf } from "@/lib/lineup/match-field-geometry";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 
 type MvpPredictionPanelProps = {
   poolId: string;
@@ -29,6 +33,17 @@ type SquadPlayerOption = {
   position: string | null;
 };
 
+function sortBenchByShirt<T extends { shirtNumber: number | null; name: string }>(
+  players: T[]
+): T[] {
+  return [...players].sort((a, b) => {
+    const shirtA = a.shirtNumber ?? 999;
+    const shirtB = b.shirtNumber ?? 999;
+    if (shirtA !== shirtB) return shirtA - shirtB;
+    return a.name.localeCompare(b.name, "es");
+  });
+}
+
 function flattenSquadPlayers(
   squad: TeamSquadWithPlayers | null,
   teamName: string
@@ -41,51 +56,6 @@ function flattenSquadPlayers(
     shirtNumber: player.shirt_number,
     position: player.position,
   }));
-}
-
-function sortByShirt(a: SquadPlayerOption, b: SquadPlayerOption): number {
-  const shirtA = a.shirtNumber ?? 999;
-  const shirtB = b.shirtNumber ?? 999;
-  if (shirtA !== shirtB) return shirtA - shirtB;
-  return a.playerName.localeCompare(b.playerName, "es");
-}
-
-function MvpPlayerButton({
-  option,
-  active,
-  disabled,
-  onSelect,
-}: {
-  option: SquadPlayerOption | undefined;
-  active: boolean;
-  disabled: boolean;
-  onSelect: (key: string) => void;
-}) {
-  if (!option) {
-    return <div className="min-h-12 rounded-xl" aria-hidden="true" />;
-  }
-
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => onSelect(option.key)}
-      className={cn(
-        "flex min-h-12 w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border px-1.5 py-1.5 text-center transition-colors",
-        active
-          ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
-          : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] hover:bg-[rgba(111,43,255,0.16)]",
-        disabled && "opacity-60"
-      )}
-    >
-      <span className="font-display text-sm font-bold leading-none text-[var(--tm-accent)]">
-        {option.shirtNumber ?? "—"}
-      </span>
-      <span className="w-full truncate text-[10px] font-medium leading-tight text-[var(--tm-fg)]">
-        {shirtPlayerName(option.playerName)}
-      </span>
-    </button>
-  );
 }
 
 export function MvpPredictionPanel({
@@ -130,15 +100,47 @@ export function MvpPredictionPanel({
   }, [homeTeam, awayTeam]);
 
   const homeOptions = useMemo(
-    () => flattenSquadPlayers(homeSquad, homeTeam).sort(sortByShirt),
+    () => flattenSquadPlayers(homeSquad, homeTeam),
     [homeSquad, homeTeam]
   );
   const awayOptions = useMemo(
-    () => flattenSquadPlayers(awaySquad, awayTeam).sort(sortByShirt),
+    () => flattenSquadPlayers(awaySquad, awayTeam),
     [awaySquad, awayTeam]
   );
   const options = useMemo(() => [...homeOptions, ...awayOptions], [homeOptions, awayOptions]);
-  const rowCount = Math.max(homeOptions.length, awayOptions.length);
+
+  const homeLineup = useMemo(
+    () => (homeSquad ? buildProbableXI(homeSquad.players) : null),
+    [homeSquad]
+  );
+  const awayLineup = useMemo(
+    () => (awaySquad ? buildProbableXI(awaySquad.players) : null),
+    [awaySquad]
+  );
+
+  const homeSlots = useMemo(
+    () => (homeLineup ? mapSlotsToHomeHalf(homeLineup.slots) : []),
+    [homeLineup]
+  );
+  const awaySlots = useMemo(
+    () => (awayLineup ? mapSlotsToAwayHalf(awayLineup.slots) : []),
+    [awayLineup]
+  );
+
+  const homeBench = useMemo(
+    () =>
+      sortBenchByShirt(
+        homeSquad && homeLineup ? getBenchPlayers(homeSquad, homeLineup) : []
+      ),
+    [homeSquad, homeLineup]
+  );
+  const awayBench = useMemo(
+    () =>
+      sortBenchByShirt(
+        awaySquad && awayLineup ? getBenchPlayers(awaySquad, awayLineup) : []
+      ),
+    [awaySquad, awayLineup]
+  );
 
   useEffect(() => {
     if (!savedPlayerName || !savedTeamName) {
@@ -194,34 +196,58 @@ export function MvpPredictionPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="space-y-3 px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col px-1.5 py-3 sm:px-2">
         {!serverEditable ? (
-          <p className="text-sm text-[var(--tm-muted)]">
+          <p className="mb-2 shrink-0 px-2 text-sm text-[var(--tm-muted)]">
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
-        ) : null}
+        ) : (
+          <p className="mb-2 shrink-0 px-2 text-center text-[10px] text-[var(--tm-muted)]">
+            Pulsa un jugador del once probable o de las reservas.
+          </p>
+        )}
 
-        <div className="max-h-[min(22rem,50dvh)] space-y-1 overflow-y-auto overscroll-contain">
-          {Array.from({ length: rowCount }, (_, index) => (
-            <div key={`mvp-row-${index}`} className="grid grid-cols-2 gap-2">
-              <MvpPlayerButton
-                option={homeOptions[index]}
-                active={selectedKey === homeOptions[index]?.key}
+        <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
+          {(markFieldReady) => (
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+              <MvpBenchStrip
+                teamName={awayTeam}
+                players={awayBench}
+                selectedKey={selectedKey}
                 disabled={pickDisabled}
                 onSelect={setSelectedKey}
+                position="top"
               />
-              <MvpPlayerButton
-                option={awayOptions[index]}
-                active={selectedKey === awayOptions[index]?.key}
+
+              <MatchMvpFieldGraphic
+                homeSlots={homeSlots}
+                awaySlots={awaySlots}
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+                selectedKey={selectedKey}
                 disabled={pickDisabled}
                 onSelect={setSelectedKey}
+                onFieldReady={markFieldReady}
               />
+
+              <MvpBenchStrip
+                teamName={homeTeam}
+                players={homeBench}
+                selectedKey={selectedKey}
+                disabled={pickDisabled}
+                onSelect={setSelectedKey}
+                position="bottom"
+              />
+
+              <p className="mt-3 px-2 text-center text-[10px] text-[var(--tm-muted)]">
+                Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
+              </p>
             </div>
-          ))}
-        </div>
+          )}
+        </LineupFieldGate>
 
         {error ? (
-          <p className="text-sm text-[var(--tm-danger)]" role="alert">
+          <p className="mt-2 px-4 text-sm text-[var(--tm-danger)]" role="alert">
             {error}
           </p>
         ) : null}

@@ -1,4 +1,3 @@
-import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
@@ -50,8 +49,8 @@ export default async function HomePage() {
         poolId={ctx.activePoolId}
         generalPredictions={generalPredictionsBundle.predictions}
         generalPredictionsEditable={generalPredictionsBundle.editable}
+        dailyFact={dailyFact}
       />
-      <HomeDailyFactCard fact={dailyFact} />
       {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
     </div>
   );

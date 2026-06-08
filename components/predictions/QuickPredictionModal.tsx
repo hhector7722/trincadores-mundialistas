@@ -355,7 +355,7 @@ export function QuickPredictionModal({
       : null;
 
   const activePanelSlide = entityPanelSlide ?? matchPanelSlide;
-  const isLineupView = panelView.kind === "lineup";
+  const isFieldView = panelView.kind === "lineup" || panelView.kind === "mvp";
   const isMvpView = panelView.kind === "mvp";
 
   return (
@@ -368,8 +368,8 @@ export function QuickPredictionModal({
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
-      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
-      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
+      className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]")}
+      wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeMatches && atPredictionRoot && !activePanelSlide ? () => startMatchSlide(1) : undefined

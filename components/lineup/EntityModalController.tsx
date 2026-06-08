@@ -112,7 +112,7 @@ export function EntityModalController({
     )
   );
 
-  const isLineupView = current.kind === "lineup";
+  const isFieldView = current.kind === "lineup" || current.kind === "mvp";
 
   return (
     <Modal
@@ -121,8 +121,8 @@ export function EntityModalController({
       title={entityModalTitleContent(current)}
       hideHeaderDivider
       headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
-      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]", className)}
-      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
+      className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]", className)}
+      wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onBack={canGoBack && !isSliding ? pop : undefined}
       panelSlide={panelSlide}
