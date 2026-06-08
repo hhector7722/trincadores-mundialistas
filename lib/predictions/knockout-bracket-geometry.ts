@@ -62,6 +62,9 @@ const R32_VISIBLE_EDGE_INSET = 3.5;
 /** Punto medio entre acercar al centro (3.5) y alejar de la final (2.5). */
 const NUDGE_SF_LATERAL = 0.5;
 
+/** Empuje ligero de octavos hacia la final. */
+const NUDGE_R16_TOWARD_FINAL = 1.75;
+
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
   ROUND_LAYOUT_SCALE.r16, // 1
@@ -150,6 +153,10 @@ export function buildColumnCenters(): readonly number[] {
   // Semifinales en posición intermedia; la final no se mueve.
   x[3] += NUDGE_SF_LATERAL;
   x[5] -= NUDGE_SF_LATERAL;
+
+  // Octavos ligeramente más cerca de la final.
+  x[1] += NUDGE_R16_TOWARD_FINAL;
+  x[7] -= NUDGE_R16_TOWARD_FINAL;
 
   return x;
 }
