@@ -113,19 +113,20 @@ html[data-modal-open] .tm-app-main {
   background-color: var(--tm-shell-bg-hex);
 }
 
-/* main: padding = color TabBar (marbella MainWrapper pb hereda body = nav) */
 .tm-app-main {
   box-sizing: border-box;
   position: relative;
   z-index: 10;
   width: 100%;
   flex: 1 1 auto;
-  padding-bottom: var(--tm-content-bottom);
-  background-color: var(--tm-tabbar-bg-hex);
+  background-color: var(--tm-shell-bg-hex);
 }
 
+/* Reserva scroll sobre la TabBar con fondo shell: el contenido llega visualmente hasta la barra */
 .tm-app-main-inner {
+  box-sizing: border-box;
   min-height: 100%;
+  padding-bottom: var(--tm-content-bottom);
   background-color: var(--tm-shell-bg-hex);
 }
 
@@ -151,6 +152,7 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
   flex-direction: column;
   height: 100%;
+  padding-bottom: 0;
 }
 
 .tm-app-main-inner > .tm-porra-layout {
