@@ -2,23 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { cn } from "@/lib/utils";
-
-const TABBAR_HEIGHT_FALLBACK = "var(--tm-tabbar-core)";
-
-function syncTabBarHeight(node: HTMLElement) {
-  const height = Math.ceil(node.getBoundingClientRect().height);
-  if (height > 0) {
-    document.documentElement.style.setProperty("--tm-tabbar-height", `${height}px`);
-  }
-}
-
-function resetTabBarHeight() {
-  document.documentElement.style.setProperty("--tm-tabbar-height", TABBAR_HEIGHT_FALLBACK);
-}
 
 const TABS = [
   { href: "/quiz", label: "Quiz", icon: Brain },
@@ -38,27 +25,7 @@ export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
   const { navigate } = useAppNavigation();
-  const navRef = useRef<HTMLElement>(null);
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
-
-  useLayoutEffect(() => {
-    const node = navRef.current;
-    if (!node) return;
-
-    const onViewportChange = () => syncTabBarHeight(node);
-
-    syncTabBarHeight(node);
-
-    const observer = new ResizeObserver(onViewportChange);
-    observer.observe(node);
-    window.visualViewport?.addEventListener("resize", onViewportChange);
-
-    return () => {
-      observer.disconnect();
-      window.visualViewport?.removeEventListener("resize", onViewportChange);
-      resetTabBarHeight();
-    };
-  }, []);
 
   useEffect(() => {
     for (const href of TAB_HREFS) {
@@ -85,12 +52,10 @@ export function TabBar() {
 
   return (
     <nav
-      ref={navRef}
-      className="tm-tabbar border-t border-[var(--tm-border)]"
+      className="tm-tabbar border-t border-[var(--tm-border)] px-1"
       aria-label="Navegacion principal"
     >
-      <div className="tm-tabbar-inner px-1">
-        <ul className="flex h-12 items-stretch justify-between">
+      <ul className="flex h-full items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(displayPath, href);
           const navigating = optimisticHref === href;
@@ -115,8 +80,7 @@ export function TabBar() {
             </li>
           );
         })}
-        </ul>
-      </div>
+      </ul>
     </nav>
   );
 }
