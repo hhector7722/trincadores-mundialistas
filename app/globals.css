@@ -45,7 +45,8 @@
   /* Marbella: h-20 (5rem) + pb-safe en el nav; reserva de contenido en main */
   --tm-tabbar-core: 5rem;
   --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-tab-indicators-bottom: var(--tm-content-bottom);
+  /* 2px dentro del borde superior de la TabBar: pegados al chrome inferior */
+  --tm-tab-indicators-bottom: calc(var(--tm-content-bottom) - 0.125rem);
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -114,11 +115,12 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell flex: min-h-dvh, sin cage 100dvh ni overflow global */
+/* Shell flex: altura de viewport acotada; sin overflow global en html/body */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
+  height: 100dvh;
   min-height: 100dvh;
   flex-direction: column;
   isolation: isolate;
@@ -143,8 +145,11 @@ html[data-modal-open] .tm-app-main {
   box-sizing: border-box;
   position: relative;
   z-index: 10;
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   width: 100%;
+  min-height: 0;
   padding-bottom: var(--tm-content-bottom);
 }
 
@@ -154,10 +159,6 @@ html[data-modal-open] .tm-app-main {
 .tm-app-main:has(.tm-tab-scroll-layout),
 .tm-app-main:has(.tm-quiz-page),
 .tm-app-main:has(.tm-home-layout) {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1 1 auto;
   padding-bottom: 0;
   overflow: hidden;
 }
@@ -175,7 +176,11 @@ html[data-modal-open] .tm-app-main {
 }
 
 .tm-app-main .tm-porra-layout,
-.tm-app-main .tm-ranking-layout {
+.tm-app-main .tm-ranking-layout,
+.tm-app-main .tm-tab-scroll-layout,
+.tm-app-main .tm-quiz-page--hub,
+.tm-app-main .tm-quiz-page--play,
+.tm-app-main .tm-quiz-page--viewport {
   height: 100%;
   min-height: 0;
 }
@@ -183,9 +188,8 @@ html[data-modal-open] .tm-app-main {
 .tm-tab-scroll-layout {
   box-sizing: border-box;
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
@@ -770,9 +774,8 @@ html:has(.tm-app-frame) {
 .tm-quiz-page--viewport,
 .tm-quiz-page--hub {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   padding-bottom: 0;
 }
@@ -854,9 +857,8 @@ html:has(.tm-app-frame) {
 .tm-ranking-layout {
   box-sizing: border-box;
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -864,9 +866,8 @@ html:has(.tm-app-frame) {
 
 .tm-ranking-page {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   min-width: 0;
   padding: 0.25rem 0.75rem 0;
@@ -874,18 +875,16 @@ html:has(.tm-app-frame) {
 
 .tm-ranking-table {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   min-width: 0;
 }
 
 .tm-ranking-body {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

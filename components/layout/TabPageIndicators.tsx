@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { MAIN_TABS } from "@/lib/layout/main-tabs";
 import { cn } from "@/lib/utils";
 import {
@@ -11,11 +12,16 @@ const DOT_SIZE = 6;
 const ACTIVE_WIDTH = 18;
 const GAP = 6;
 
+function isPredictionsPage(pathname: string) {
+  return pathname === "/predictions" || pathname.startsWith("/predictions/");
+}
+
 export function TabPageIndicators() {
+  const pathname = usePathname();
   const progress = useTabIndicatorProgress();
   const { swipeProgress, activeIndex } = useTabNavigation();
 
-  if (activeIndex == null) return null;
+  if (activeIndex == null || isPredictionsPage(pathname)) return null;
   const trackWidth =
     MAIN_TABS.length * DOT_SIZE + (MAIN_TABS.length - 1) * GAP - DOT_SIZE + ACTIVE_WIDTH;
   const pillLeft = progress * (DOT_SIZE + GAP);
@@ -23,7 +29,7 @@ export function TabPageIndicators() {
 
   return (
     <div
-      className="flex shrink-0 items-center justify-center pb-1"
+      className="flex shrink-0 items-center justify-center"
       role="tablist"
       aria-label="Secciones principales"
     >
