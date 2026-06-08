@@ -10,9 +10,11 @@ export function RankingTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-[var(--tm-muted)]">
-        No hay miembros en esta porra.
-      </p>
+      <div className="tm-ranking-table flex flex-1 flex-col items-center justify-center px-4">
+        <p className="text-center text-sm text-[var(--tm-muted)]">
+          Esperando a todos los participantes
+        </p>
+      </div>
     );
   }
 
