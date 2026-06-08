@@ -15,7 +15,7 @@ export default async function RankingPage() {
   const { rows } = await getPoolLeaderboard(ctx.activePoolId);
 
   return (
-    <div className="tm-ranking-page px-3 py-2">
+    <div className="tm-ranking-page">
       <RankingTable rows={rows} currentProfileId={user!.id} />
     </div>
   );
