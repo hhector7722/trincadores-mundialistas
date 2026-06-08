@@ -59,8 +59,8 @@ const R32_EXTRA_OUTWARD_NUDGE = 1.35;
 /** Margen mínimo al borde visible de pantalla (%). */
 const R32_VISIBLE_EDGE_INSET = 3.5;
 
-/** Semifinales se alejan de la final; la final no se mueve (~24px). */
-const NUDGE_SF_AWAY_FROM_FINAL = 6.5;
+/** Ajuste fino de semifinales hacia el centro (positivo = acercar a la final). */
+const NUDGE_SF_TOWARD_CENTER = 3.5;
 
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
@@ -147,9 +147,9 @@ export function buildColumnCenters(): readonly number[] {
   x[0] = Math.max(minSafeR32X, minR32X - R32_EXTRA_OUTWARD_NUDGE);
   x[8] = Math.min(maxSafeR32X, maxR32X + R32_EXTRA_OUTWARD_NUDGE);
 
-  // Semifinales alejadas de la final; la final no se mueve.
-  x[3] -= NUDGE_SF_AWAY_FROM_FINAL;
-  x[5] += NUDGE_SF_AWAY_FROM_FINAL;
+  // Semifinales más centradas; la final no se mueve.
+  x[3] += NUDGE_SF_TOWARD_CENTER;
+  x[5] -= NUDGE_SF_TOWARD_CENTER;
 
   return x;
 }
