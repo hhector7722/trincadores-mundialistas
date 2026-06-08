@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
@@ -97,17 +98,22 @@ export function ProbableXI({
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
-        <TeamLineupGraphic
-          slots={lineup.slots}
-          formation={lineup.formation}
-          teamName={teamName}
-        />
-        <p className="mt-4 max-w-lg text-center text-[11px] text-[var(--tm-muted)]">
-          Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
-          {lineup.benchCount > 0 ? ` ${lineup.benchCount} jugadores en plantilla.` : ""}
-        </p>
-      </div>
+      <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
+        {(markFieldReady) => (
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
+            <TeamLineupGraphic
+              slots={lineup.slots}
+              formation={lineup.formation}
+              teamName={teamName}
+              onFieldReady={markFieldReady}
+            />
+            <p className="mt-4 max-w-lg text-center text-[11px] text-[var(--tm-muted)]">
+              Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
+              {lineup.benchCount > 0 ? ` ${lineup.benchCount} jugadores en plantilla.` : ""}
+            </p>
+          </div>
+        )}
+      </LineupFieldGate>
     </div>
   );
 }

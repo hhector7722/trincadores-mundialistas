@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
@@ -12,6 +14,8 @@ type TeamLineupGraphicProps = {
   /** `modal`: ocupa el ancho del panel de alineaciones. */
   size?: "default" | "modal";
   onPlayerClick?: (playerName: string) => void;
+  /** Se dispara cuando la imagen del campo terminó de cargar (o falló). */
+  onFieldReady?: () => void;
 };
 
 export function TeamLineupGraphic({
@@ -21,8 +25,13 @@ export function TeamLineupGraphic({
   className,
   size = "default",
   onPlayerClick,
+  onFieldReady,
 }: TeamLineupGraphicProps) {
   const isModal = size === "modal";
+
+  function handleFieldReady() {
+    onFieldReady?.();
+  }
 
   return (
     <div
@@ -43,6 +52,8 @@ export function TeamLineupGraphic({
           className="object-contain object-center"
           sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
           priority
+          onLoad={handleFieldReady}
+          onError={handleFieldReady}
         />
       </div>
 
