@@ -19,7 +19,7 @@ export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
 export const R32_TOP_ANCHOR_Y = BRACKET_HEADER_BAND_Y + R32_TOP_CLEARANCE_Y;
 
 const R32_SLOT_COUNT = 8;
-const R32_PAIR_HALF = 0.9;
+const R32_PAIR_HALF = 1.45;
 
 export const FINAL_CENTER_X = 50;
 export const FINAL_CENTER_Y = 50;
@@ -46,7 +46,13 @@ export const MIN_GAP_X = 5.5;
 export const MIN_GAP_Y = 3;
 
 /** Margen lateral para dieciseisavos (en % del canvas). */
-export const BRACKET_SIDE_INSET = 6.5;
+export const BRACKET_SIDE_INSET = 5.25;
+
+/** Empuje extra de dieciseisavos hacia el exterior (sin salir del viewport). */
+const R32_EXTRA_OUTWARD_NUDGE = 1.35;
+
+/** Margen mínimo al borde visible de pantalla (%). */
+const R32_VISIBLE_EDGE_INSET = 3.5;
 
 /** Semifinales se alejan de la final; la final no se mueve (~24px). */
 const NUDGE_SF_AWAY_FROM_FINAL = 6.5;
@@ -129,9 +135,12 @@ export function buildColumnCenters(): readonly number[] {
   const minR32X = BRACKET_SIDE_INSET + halfWidthForColumn(0);
   const maxR32X = 100 - BRACKET_SIDE_INSET - halfWidthForColumn(8);
 
-  // Dieciseisavos al máximo hacia el exterior sin tocar el borde de pantalla.
-  x[0] = minR32X;
-  x[8] = maxR32X;
+  const minSafeR32X = R32_VISIBLE_EDGE_INSET + halfWidthForColumn(0);
+  const maxSafeR32X = 100 - R32_VISIBLE_EDGE_INSET - halfWidthForColumn(8);
+
+  // Dieciseisavos hacia el exterior, con tope antes del borde no visible.
+  x[0] = Math.max(minSafeR32X, minR32X - R32_EXTRA_OUTWARD_NUDGE);
+  x[8] = Math.min(maxSafeR32X, maxR32X + R32_EXTRA_OUTWARD_NUDGE);
 
   // Semifinales alejadas de la final; la final no se mueve.
   x[3] -= NUDGE_SF_AWAY_FROM_FINAL;
@@ -165,6 +174,10 @@ const LEFT_SF = [101] as const;
 
 const RIGHT_R32 = [76, 78, 79, 80, 85, 86, 87, 88] as const;
 const RIGHT_R16 = [91, 92, 95, 96] as const;
+
+/** Octavos cuyo conector vertical no debe prolongarse hacia el borde de la página. */
+const R16_CLIP_VERTICAL_TO_TOP = new Set([89, 91]);
+const R16_CLIP_VERTICAL_TO_BOTTOM = new Set([94, 96]);
 const RIGHT_QF = [99, 100] as const;
 const RIGHT_SF = [102] as const;
 
@@ -311,6 +324,25 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
   return matches;
 }
 
+function verticalAnchorY(
+  child: BracketMatchGeometry,
+  parent: BracketMatchGeometry
+): number {
+  if (parent.round !== "r16") return parent.midY;
+
+  const childAbove = child.midY < parent.midY;
+
+  if (R16_CLIP_VERTICAL_TO_TOP.has(parent.matchNumber)) {
+    return childAbove ? parent.homeY : parent.midY;
+  }
+
+  if (R16_CLIP_VERTICAL_TO_BOTTOM.has(parent.matchNumber)) {
+    return childAbove ? parent.midY : parent.awayY;
+  }
+
+  return parent.midY;
+}
+
 function connectChildToParent(
   child: BracketMatchGeometry,
   parent: BracketMatchGeometry
@@ -322,8 +354,9 @@ function connectChildToParent(
       : gutterX(Math.min(child.column, parent.column), Math.max(child.column, parent.column));
   const xStart = cardEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = cardEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
+  const yAnchor = verticalAnchorY(child, parent);
 
-  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${yAnchor} H ${xEnd}`;
 }
 
 function connectSemiToFinal(

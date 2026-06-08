@@ -953,7 +953,17 @@ html[data-modal-open] main {
 }
 
 .tm-ko-card--r32 .tm-ko-card-row {
-  padding-block: 0.22rem;
+  padding-block: 0.18rem;
+}
+
+.tm-ko-card--r32 .tm-ko-card-row:first-child {
+  margin-bottom: 0.06rem;
+  transform: translateY(-0.14rem);
+}
+
+.tm-ko-card--r32 .tm-ko-card-row:last-child {
+  margin-top: 0.06rem;
+  transform: translateY(0.14rem);
 }
 
 .tm-ko-card-row {
