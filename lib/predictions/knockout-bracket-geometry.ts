@@ -63,7 +63,7 @@ const R32_VISIBLE_EDGE_INSET = 3.5;
 const NUDGE_SF_LATERAL = 0.5;
 
 /** Empuje ligero de octavos hacia la final. */
-const NUDGE_R16_TOWARD_FINAL = 1.75;
+const NUDGE_R16_TOWARD_FINAL = 3.25;
 
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
