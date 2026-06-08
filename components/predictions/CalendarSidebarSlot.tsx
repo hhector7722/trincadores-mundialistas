@@ -41,7 +41,7 @@ export function CalendarSidebarSlot({
       </span>
       <div className="tm-cal-sidebar-body mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col">
         <div
-          className="tm-cal-sidebar-card flex min-h-0 min-w-0 shrink-0 flex-col"
+          className="tm-cal-sidebar-card tm-cal-sidebar-groups-card flex min-h-0 min-w-0 shrink-0 flex-col"
           aria-label="Panel de grupos del calendario"
         >
           <div className="tm-cal-sidebar-card-inner h-full min-h-0 min-w-0 flex-1">
@@ -52,11 +52,18 @@ export function CalendarSidebarSlot({
           </div>
         </div>
 
-        <CalendarSidebarAccessDock
-          onOpenAllGroups={() => onOpenAllGroups?.()}
-          onOpenStats={() => onOpenStats?.()}
-          onOpenSquads={() => onOpenSquads?.()}
-        />
+        <div
+          className="tm-cal-sidebar-card tm-cal-sidebar-access-card flex min-h-0 min-w-0 shrink-0 flex-col"
+          aria-label="Accesos del calendario"
+        >
+          <div className="tm-cal-sidebar-card-inner h-full min-h-0 min-w-0 flex-1">
+            <CalendarSidebarAccessDock
+              onOpenAllGroups={() => onOpenAllGroups?.()}
+              onOpenStats={() => onOpenStats?.()}
+              onOpenSquads={() => onOpenSquads?.()}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
