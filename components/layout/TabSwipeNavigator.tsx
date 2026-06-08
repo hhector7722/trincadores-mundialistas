@@ -14,12 +14,20 @@ import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider"
 import { getMainTabIndex, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
 import { cn } from "@/lib/utils";
 
-const COMMIT_RATIO = 0.28;
-const VELOCITY_THRESHOLD = 0.45;
-const EDGE_RESISTANCE = 0.34;
-const ANIMATION_MS = 340;
-const IOS_EASING = "cubic-bezier(0.33, 1, 0.68, 1)";
-const LOCK_THRESHOLD_PX = 8;
+/** Distancia mínima para confirmar cambio de pestaña (ratio del ancho). */
+const COMMIT_RATIO = 0.16;
+/** Flick horizontal suficiente para cambiar sin recorrer mucho. */
+const VELOCITY_THRESHOLD = 0.22;
+/** Resistencia en el primer/último tab (0–1, más alto = más suave). */
+const EDGE_RESISTANCE = 0.58;
+const ANIMATION_MS = 420;
+const IOS_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
+const LOCK_THRESHOLD_PX = 5;
+/** Zona lateral donde el swipe horizontal tiene prioridad (px). */
+const EDGE_ZONE_PX = 44;
+/** Desde el centro hace falta un gesto más horizontal para robar el scroll vertical. */
+const AXIS_Y_RATIO_CENTER = 1.65;
+const AXIS_Y_RATIO_EDGE = 1.05;
 
 type TabSwipeNavigatorProps = {
   children: ReactNode;
@@ -38,15 +46,24 @@ function canStartSwipe(target: EventTarget | null) {
   return true;
 }
 
+function isNearHorizontalEdge(clientX: number, width: number) {
+  return clientX <= EDGE_ZONE_PX || clientX >= width - EDGE_ZONE_PX;
+}
+
 function edgeResistance(offset: number, width: number) {
   const ratio = Math.min(1, Math.abs(offset) / width);
   return offset * (1 - ratio * (1 - EDGE_RESISTANCE));
 }
 
-function TabPeek({ label }: { label: string }) {
+function TabPeek({ label, side }: { label: string; side: "left" | "right" }) {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-[var(--tm-shell-bg-hex)]/90">
-      <p className="font-display text-sm uppercase tracking-wide text-white/35">{label}</p>
+    <div
+      className={cn(
+        "flex h-full w-full items-center bg-[var(--tm-shell-bg-hex)]/95",
+        side === "left" ? "justify-start pl-6" : "justify-end pr-6"
+      )}
+    >
+      <p className="font-display text-xs uppercase tracking-[0.2em] text-white/50">{label}</p>
     </div>
   );
 }
@@ -63,6 +80,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
   const [dragX, setDragX] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const dragXRef = useRef(0);
   const widthRef = useRef(0);
@@ -70,6 +88,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const startXRef = useRef(0);
   const startYRef = useRef(0);
   const startTimeRef = useRef(0);
+  const edgeStartRef = useRef(false);
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const navigatingRef = useRef(false);
 
@@ -87,9 +106,11 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     dragXRef.current = 0;
     setDragX(0);
     setAnimating(false);
+    setIsDragging(false);
     setSwipeProgress(null);
     lockedAxisRef.current = "none";
     pointerIdRef.current = null;
+    edgeStartRef.current = false;
     navigatingRef.current = false;
   }, [setSwipeProgress]);
 
@@ -167,6 +188,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         dragXRef.current = 0;
         setDragX(0);
         setAnimating(false);
+        setIsDragging(false);
         setSwipeProgress(null);
         navigatingRef.current = false;
       });
@@ -187,8 +209,11 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     const ratio = Math.abs(offset) / Math.max(width, 1);
 
     let nextIndex = activeIndex;
-    const wantsPrevious = offset > 0 && (ratio >= COMMIT_RATIO || velocity > VELOCITY_THRESHOLD);
-    const wantsNext = offset < 0 && (ratio >= COMMIT_RATIO || velocity < -VELOCITY_THRESHOLD);
+    // Deslizar a la izquierda → pestaña anterior (izquierda en la barra). Derecha → siguiente.
+    const wantsPrevious =
+      offset < 0 && (ratio >= COMMIT_RATIO || velocity < -VELOCITY_THRESHOLD);
+    const wantsNext =
+      offset > 0 && (ratio >= COMMIT_RATIO || velocity > VELOCITY_THRESHOLD);
 
     if (wantsPrevious && activeIndex > 0) nextIndex = activeIndex - 1;
     if (wantsNext && activeIndex < MAIN_TABS.length - 1) nextIndex = activeIndex + 1;
@@ -207,6 +232,10 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     if (!enabled || animating || navigatingRef.current || isModalOpen()) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!canStartSwipe(event.target)) return;
+
+    const root = rootRef.current;
+    const width = root?.clientWidth ?? widthRef.current;
+    edgeStartRef.current = isNearHorizontalEdge(event.clientX, width);
 
     pointerIdRef.current = event.pointerId;
     startXRef.current = event.clientX;
@@ -227,13 +256,16 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
     if (lockedAxisRef.current === "none") {
       if (Math.hypot(deltaX, deltaY) < LOCK_THRESHOLD_PX) return;
-      if (Math.abs(deltaY) > Math.abs(deltaX) * 1.15) {
+
+      const axisYRatio = edgeStartRef.current ? AXIS_Y_RATIO_EDGE : AXIS_Y_RATIO_CENTER;
+      if (Math.abs(deltaY) > Math.abs(deltaX) * axisYRatio) {
         lockedAxisRef.current = "y";
         event.currentTarget.releasePointerCapture(event.pointerId);
         pointerIdRef.current = null;
         return;
       }
       lockedAxisRef.current = "x";
+      setIsDragging(true);
     }
 
     if (lockedAxisRef.current !== "x") return;
@@ -267,26 +299,43 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
   const prevTab = activeIndex > 0 ? MAIN_TABS[activeIndex - 1] : null;
   const nextTab = activeIndex < MAIN_TABS.length - 1 ? MAIN_TABS[activeIndex + 1] : null;
+  const showEdgeHints = !isDragging && !animating && dragX === 0;
 
   return (
     <div
       ref={rootRef}
-      className="tm-tab-swipe-root relative min-h-0 min-w-0 flex-1 touch-pan-y overflow-hidden"
+      className={cn(
+        "tm-tab-swipe-root relative min-h-0 min-w-0 flex-1 touch-pan-y overflow-hidden",
+        isDragging && "tm-tab-swipe-root--dragging"
+      )}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerEnd}
       onPointerCancel={onPointerEnd}
     >
+      {showEdgeHints && prevTab ? (
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-3 bg-gradient-to-r from-[var(--tm-accent)]/10 to-transparent"
+          aria-hidden
+        />
+      ) : null}
+      {showEdgeHints && nextTab ? (
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-3 bg-gradient-to-l from-[var(--tm-accent)]/10 to-transparent"
+          aria-hidden
+        />
+      ) : null}
+
       {prevTab ? (
         <div
           className="pointer-events-none absolute inset-0 z-0 will-change-transform"
           style={{
-            transform: `translate3d(calc(-100% + ${dragX}px), 0, 0)`,
+            transform: `translate3d(calc(-100% - ${dragX}px), 0, 0)`,
             transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
           }}
           aria-hidden
         >
-          <TabPeek label={prevTab.label} />
+          <TabPeek label={prevTab.label} side="left" />
         </div>
       ) : null}
 
@@ -294,12 +343,12 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <div
           className="pointer-events-none absolute inset-0 z-0 will-change-transform"
           style={{
-            transform: `translate3d(calc(100% + ${dragX}px), 0, 0)`,
+            transform: `translate3d(calc(100% - ${dragX}px), 0, 0)`,
             transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
           }}
           aria-hidden
         >
-          <TabPeek label={nextTab.label} />
+          <TabPeek label={nextTab.label} side="right" />
         </div>
       ) : null}
 
@@ -307,6 +356,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         ref={trackRef}
         className={cn(
           "relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
+          isDragging && "tm-tab-swipe-track--dragging",
           !animating && dragX === 0 && "transform-gpu"
         )}
         style={{

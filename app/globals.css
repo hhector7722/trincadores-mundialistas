@@ -363,6 +363,16 @@ html[data-modal-open] .tm-bottom-chrome {
   background: transparent;
 }
 
+.tm-tab-swipe-root--dragging {
+  touch-action: none;
+}
+
+.tm-tab-swipe-track--dragging {
+  box-shadow:
+    -12px 0 32px rgba(0, 0, 0, 0.22),
+    12px 0 32px rgba(0, 0, 0, 0.22);
+}
+
 .tm-fixed-bottombar {
   box-sizing: border-box;
   min-height: var(--tm-tabbar-core);
