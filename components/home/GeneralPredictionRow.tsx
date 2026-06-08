@@ -21,27 +21,15 @@ export function GeneralPredictionRow({
   const hasValue = Boolean(value);
 
   return (
-    <div className="grid min-h-6 grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)] items-center gap-1 py-0.5">
+    <div className="grid min-h-6 grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)_1.25rem] items-center gap-1 py-0.5">
       <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
         {label}
       </span>
-      <div className="flex min-w-0 items-center justify-end gap-1 overflow-visible">
+      <div className="flex min-w-0 items-center justify-center overflow-visible">
         {hasValue ? (
-          <>
-            <span className="min-w-0 truncate text-right text-[10px] font-medium text-[#CCFF00]">
-              {value}
-            </span>
-            {editable ? (
-              <button
-                type="button"
-                onClick={onEdit}
-                aria-label={`Editar ${label}`}
-                className="shrink-0 text-[#CCFF00] transition-opacity hover:opacity-80"
-              >
-                <Pencil className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />
-              </button>
-            ) : null}
-          </>
+          <span className="max-w-full truncate text-center text-[10px] font-medium text-[#CCFF00]">
+            {value}
+          </span>
         ) : editable ? (
           <button
             type="button"
@@ -59,6 +47,18 @@ export function GeneralPredictionRow({
         ) : (
           <span className="text-[10px] text-white/30">—</span>
         )}
+      </div>
+      <div className="flex items-center justify-end">
+        {hasValue && editable ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={`Editar ${label}`}
+            className="shrink-0 text-[#CCFF00] transition-opacity hover:opacity-80"
+          >
+            <Pencil className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />
+          </button>
+        ) : null}
       </div>
     </div>
   );
