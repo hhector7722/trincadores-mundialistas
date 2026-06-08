@@ -294,28 +294,12 @@ function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): voi
   calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", "0px");
 }
 
-/** Reparte el espacio vertical sobrante en botones más grandes. */
-function syncSidebarDockFromRemainingSpace(calendar: HTMLElement, grid: HTMLElement): void {
-  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
-  const title = slot?.querySelector<HTMLElement>(".tm-cal-groups-title");
-  const list = slot?.querySelector<HTMLElement>(".tm-cal-groups-list");
-  if (!slot || !body) return;
-
-  void list?.offsetHeight;
-
-  const titleH = title?.offsetHeight ?? 0;
-  const listH = list?.offsetHeight ?? 0;
-  const minDockH = Number.parseFloat(
-    calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
-  );
-  const resolvedMinDockH = Number.isFinite(minDockH) && minDockH > 0 ? minDockH : 0;
-  const availableDockH = Math.max(
-    resolvedMinDockH,
-    body.clientHeight - titleH - listH - SIDEBAR_CARD_BOTTOM_PAD_PX
-  );
-
-  syncSidebarAccessDockMetrics(calendar, grid, availableDockH);
+/** Reserva mínima para la rejilla 2×2 centrada bajo los grupos. */
+function getMinAccessDockReserve(): number {
+  const cellW = 48;
+  const { btnFs, btnPadX, btnPy, gridGap } = resolveAccessDockButtonMetrics(cellW, 18);
+  void btnPadX;
+  return computeAccessDockHeight(btnFs, btnPy, gridGap);
 }
 
 /** La card ocupa todo el cuerpo del slot, alineada con la lista de partidos. */
@@ -363,16 +347,13 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   if (sidebarSlot) {
     const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
     const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
-    const dockH = Number.parseFloat(
-      calendar.style.getPropertyValue("--tm-cal-sidebar-access-dock-h")
-    );
-    const resolvedDockH = Number.isFinite(dockH) && dockH > 0 ? dockH : 0;
+    const minDockReserve = getMinAccessDockReserve();
     const titleH = title?.offsetHeight ?? 0;
     const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
     const cardH = card?.clientHeight ?? body?.clientHeight ?? 0;
     const maxPanelH = Math.max(
       0,
-      cardH - resolvedDockH - titleH - SIDEBAR_CARD_BOTTOM_PAD_PX
+      cardH - minDockReserve - titleH - SIDEBAR_CARD_BOTTOM_PAD_PX
     );
     innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
   } else {
@@ -535,8 +516,6 @@ export function fitCalendarLayout(
   syncSidebarCardMetrics(calendar, grid);
   syncSidebarAccessDockMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
-  syncSidebarDockFromRemainingSpace(calendar, grid);
-  syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
   for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
@@ -547,8 +526,6 @@ export function fitCalendarLayout(
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
     syncSidebarAccessDockMetrics(calendar, grid);
-    syncGroupsPanelMetrics(calendar, grid);
-    syncSidebarDockFromRemainingSpace(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }
