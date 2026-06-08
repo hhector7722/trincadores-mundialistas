@@ -1,5 +1,4 @@
 import { HomeHero } from "@/components/home/HomeHero";
-import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
@@ -52,8 +51,8 @@ export default async function HomePage() {
         generalPredictions={generalPredictionsBundle.predictions}
         generalPredictionsEditable={generalPredictionsBundle.editable}
         dailyFact={dailyFact}
+        nextMatch={focusMatch}
       />
-      {focusMatch && <HomeNextMatch poolId={ctx.activePoolId} match={focusMatch} />}
     </div>
   );
 }

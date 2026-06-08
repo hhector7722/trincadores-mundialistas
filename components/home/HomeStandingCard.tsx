@@ -2,9 +2,11 @@ import { Medal } from "lucide-react";
 import { HomeDailyFactCard } from "@/components/home/HomeDailyFactCard";
 import { HomeGeneralPredictionsCard } from "@/components/home/HomeGeneralPredictionsCard";
 import { HomeMiniRankingTable } from "@/components/home/HomeMiniRankingTable";
+import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import type { DailyFact } from "@/lib/home/daily-fact";
+import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import type { LeaderboardRow, MemberStanding } from "@/lib/ranking/queries";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
 
@@ -38,6 +40,7 @@ type HomeStandingCardProps = {
   generalPredictions: TournamentGeneralPredictions;
   generalPredictionsEditable: boolean;
   dailyFact: DailyFact | null;
+  nextMatch: MatchWithPrediction | null;
 };
 
 export function HomeStandingCard({
@@ -48,6 +51,7 @@ export function HomeStandingCard({
   generalPredictions,
   generalPredictionsEditable,
   dailyFact,
+  nextMatch,
 }: HomeStandingCardProps) {
   return (
     <div className="space-y-3">
@@ -62,6 +66,9 @@ export function HomeStandingCard({
           predictions={generalPredictions}
           editable={generalPredictionsEditable}
         />
+      </div>
+      {nextMatch ? <HomeNextMatch poolId={poolId} match={nextMatch} /> : null}
+      <div className="grid grid-cols-2 gap-3">
         <HomeScoringRulesCard />
         <HomeDailyFactCard fact={dailyFact} />
       </div>
