@@ -43,8 +43,9 @@
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   --tm-tabbar-core: 3rem;
-  --tm-tabbar-height: var(--tm-tabbar-core);
-  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  /* Altura total anclada al viewport: fila táctil + home indicator (marbella: h-20 + pb-safe). */
+  --tm-tabbar-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
+  --tm-content-bottom: var(--tm-tabbar-height);
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -120,6 +121,8 @@ html[data-modal-open] .tm-app-main {
   flex: 1 1 auto;
   padding-bottom: var(--tm-content-bottom);
   background-color: var(--tm-shell-bg-hex);
+  /* Franja sobre la TabBar = mismo color que body/barra (marbella: pb hereda body bg) */
+  box-shadow: inset 0 calc(-1 * var(--tm-content-bottom)) 0 0 var(--tm-tabbar-bg-hex);
 }
 
 .tm-app-frame:has(.tm-porra-layout) {
