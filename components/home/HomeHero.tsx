@@ -24,7 +24,7 @@ export function HomeHero({ pendingCount, quizSlide }: HomeHeroProps) {
         className="pointer-events-none relative z-[1] min-w-0 overflow-hidden"
         aria-hidden="true"
       >
-        <div className="absolute top-3 left-0 origin-top-left scale-[0.88] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_78%,rgba(0,0,0,0.82)_88%,rgba(0,0,0,0.38)_96%,rgba(0,0,0,0)_100%)] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_78%,rgba(0,0,0,0.82)_88%,rgba(0,0,0,0.38)_96%,rgba(0,0,0,0)_100%)] sm:top-4 sm:scale-[0.92]">
+        <div className="absolute top-3 left-2 origin-top-left translate-x-3 scale-[0.88] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_52%,rgba(0,0,0,0.92)_62%,rgba(0,0,0,0.72)_72%,rgba(0,0,0,0.48)_82%,rgba(0,0,0,0.22)_91%,rgba(0,0,0,0)_100%)] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_0%,rgba(0,0,0,1)_52%,rgba(0,0,0,0.92)_62%,rgba(0,0,0,0.72)_72%,rgba(0,0,0,0.48)_82%,rgba(0,0,0,0.22)_91%,rgba(0,0,0,0)_100%)] sm:top-4 sm:left-3 sm:translate-x-4 sm:scale-[0.92]">
           <Image
             src="/icons/ronaldo.png"
             alt=""
