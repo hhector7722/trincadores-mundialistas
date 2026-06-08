@@ -1,7 +1,7 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
-import { TabBar } from "@/components/layout/TabBar";
+import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { ViewportMetricsSync } from "@/components/layout/ViewportMetricsSync";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
@@ -27,8 +27,8 @@ export function AppShell({
         <HomeAtmosphere />
         <AppHeaderGate ctx={ctx} />
         <main className="tm-app-main">{children}</main>
-        <TabBar />
       </div>
+      <TabBarWrapper />
       <Suspense fallback={null}>
         <ViewportLayoutDebug />
       </Suspense>

@@ -55,7 +55,7 @@ export function TabBar() {
       className="tm-tabbar border-t border-[var(--tm-border)] px-1"
       aria-label="Navegacion principal"
     >
-      <ul className="flex h-full items-stretch justify-between">
+      <ul className="flex h-12 w-full shrink-0 items-stretch justify-between">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(displayPath, href);
           const navigating = optimisticHref === href;
