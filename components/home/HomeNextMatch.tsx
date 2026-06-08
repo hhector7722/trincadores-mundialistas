@@ -10,7 +10,6 @@ import {
 } from "@/components/lineup/EntityModalController";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
-import { HomeCardHeader } from "@/components/home/HomeCardHeader";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
@@ -62,20 +61,20 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
         className="tm-glass-card cursor-pointer overflow-hidden p-0"
         onClick={() => openScoreModal()}
       >
-        <HomeCardHeader
-          title={isLive ? "En juego" : "Proximo partido"}
-          action={
+        <div className="px-4 pb-2 pt-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
+              {isLive ? "En juego" : "Proximo partido"}
+            </p>
             <Link
               href="/predictions"
               onClick={(event) => event.stopPropagation()}
-              className="shrink-0 text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-primary-fg)] transition-opacity hover:opacity-80"
+              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
             >
               Ver todos
             </Link>
-          }
-        />
-        <div className="px-4 pb-2 pt-2">
-          <div className="relative min-h-[6.75rem]">
+          </div>
+          <div className="relative mt-2 min-h-[6.75rem]">
             <MatchTeamsDisplay
               homeTeam={match.home_team}
               awayTeam={match.away_team}
