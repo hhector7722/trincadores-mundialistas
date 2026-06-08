@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signOut } from "@/actions/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { isPoolAdmin } from "@/lib/pool/admin";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
@@ -15,15 +16,32 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const admin = await isPoolAdmin(ctx.activePoolId, user!.id);
+  const [{ data: profile }, admin] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("username, display_name, avatar_url")
+      .eq("id", user!.id)
+      .single(),
+    isPoolAdmin(ctx.activePoolId, user!.id),
+  ]);
+
+  const label = profile?.display_name ?? profile?.username ?? "Jugador";
 
   return (
     <div className="space-y-4 p-4 pb-4">
-      <div>
-        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-          Perfil
-        </h1>
-      </div>
+      <Card className="flex flex-col items-center gap-4 py-8">
+        <ProfileAvatarButton
+          avatarUrl={profile?.avatar_url ?? null}
+          label={label}
+          className="size-24"
+        />
+        <div className="text-center">
+          <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
+          {profile?.username ? (
+            <p className="text-sm text-[var(--tm-muted)]">@{profile.username}</p>
+          ) : null}
+        </div>
+      </Card>
       {admin && (
         <Card>
           <Link href="/admin" className="text-sm font-medium text-[var(--tm-primary)]">
@@ -31,11 +49,6 @@ export default async function ProfilePage() {
           </Link>
         </Card>
       )}
-      <Card>
-        <p className="text-sm text-[var(--tm-muted)]">
-          Perfil publico y logros: fase 1d.
-        </p>
-      </Card>
       <form action={signOut}>
         <Button type="submit" variant="outline" className="w-full">
           Cerrar sesion

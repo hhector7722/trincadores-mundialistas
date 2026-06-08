@@ -11,6 +11,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
   const isHome = pathname === "/";
   const isRanking = pathname === "/ranking";
   const isQuizHub = pathname === "/quiz";
+  const isProfile = pathname === "/profile";
 
   if (hideBrandTitle) {
     return null;
@@ -25,7 +26,9 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
           ? "LA TABLA"
           : isQuizHub
             ? "¿QUIEN SABE MÁS DE LOS MUNDIALES?"
-            : undefined
+            : isProfile
+              ? "Perfil"
+              : undefined
       }
       titleClassName={isQuizHub ? "text-sm sm:text-base" : undefined}
     />
