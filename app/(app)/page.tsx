@@ -1,6 +1,5 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
-import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
@@ -38,7 +37,6 @@ export default async function HomePage() {
     : null;
 
   const standing = memberStandingFromLeaderboard(leaderboard.rows, user!.id);
-  const dailyFact = getDailyFactForToday();
 
   return (
     <div className="relative z-10 space-y-3 p-4 pb-4">
@@ -50,7 +48,7 @@ export default async function HomePage() {
         poolId={ctx.activePoolId}
         generalPredictions={generalPredictionsBundle.predictions}
         generalPredictionsEditable={generalPredictionsBundle.editable}
-        dailyFact={dailyFact}
+        quizHub={quizHub}
         nextMatch={focusMatch}
       />
     </div>
