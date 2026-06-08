@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:scoring": "tsx --test lib/scoring/compute.test.ts",
+    "test:scoring": "tsx --test lib/scoring/compute.test.ts lib/tournament-predictions/scoring.test.ts",
     "test:edit-state": "tsx --test lib/predictions/edit-state.test.ts",
     "test:openfootball": "tsx --test lib/openfootball/parse.test.ts",
     "test:worldcup-data": "tsx --test lib/fjelstul-worldcup/parse.test.ts lib/fjelstul-worldcup/men-filter.test.ts lib/worldcup2026/match-mapper.test.ts",

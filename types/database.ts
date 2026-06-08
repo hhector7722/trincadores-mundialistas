@@ -31,6 +31,32 @@ export type TournamentGeneralPredictionsRow = {
   created_at: string;
   updated_at: string;
 };
+export type TournamentOfficialAwardsRow = {
+  pool_id: string;
+  champion_team: string | null;
+  finalist_team_a: string | null;
+  finalist_team_b: string | null;
+  top_scorer_player_name: string | null;
+  top_scorer_team_name: string | null;
+  tournament_mvp_player_name: string | null;
+  tournament_mvp_team_name: string | null;
+  golden_glove_player_name: string | null;
+  golden_glove_team_name: string | null;
+  recorded_by: string | null;
+  recorded_at: string;
+  updated_at: string;
+};
+export type TournamentGeneralPredictionScoreRow = {
+  pool_id: string;
+  profile_id: string;
+  champion_points: number;
+  finalists_points: number;
+  top_scorer_points: number;
+  tournament_mvp_points: number;
+  golden_glove_points: number;
+  total_points: number;
+  calculated_at: string;
+};
 export type PoolMemberScore = { pool_id: string; profile_id: string; matchday_id: string; match_points: number; exact_hits: number; sign_hits: number; cumulative_points: number; rank: number | null; updated_at: string };
 export type { QuizStartSession as QuizStartPayload } from "@/lib/quiz/types";
 

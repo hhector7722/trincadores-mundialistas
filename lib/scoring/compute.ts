@@ -1,3 +1,5 @@
+import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
+
 export type ScoreInput = {
   predictedHome: number;
   predictedAway: number;
@@ -13,24 +15,16 @@ export function matchOutcome(home: number, away: number): -1 | 0 | 1 {
 }
 
 /**
- * Puntos exclusivos: 8 marcador exacto, 5 diferencia de goles, 3 signo (1X2).
- * Solo aplica la mayor categoría cumplida.
+ * Puntos exclusivos: 5 marcador exacto, 2 signo (1X2).
+ * El exacto ya incluye el signo; no se suman ambos.
  */
-export function computeMatchPoints(input: ScoreInput): 0 | 3 | 5 | 8 {
+export function computeMatchPoints(input: ScoreInput): 0 | 2 | 5 {
   const { predictedHome, predictedAway, resultHome, resultAway } = input;
-  if (
-    predictedHome === resultHome &&
-    predictedAway === resultAway
-  ) {
-    return 8;
-  }
-  const predDiff = predictedHome - predictedAway;
-  const resDiff = resultHome - resultAway;
-  if (predDiff === resDiff) {
-    return 5;
+  if (predictedHome === resultHome && predictedAway === resultAway) {
+    return MATCH_SCORE_POINTS.exact;
   }
   if (matchOutcome(predictedHome, predictedAway) === matchOutcome(resultHome, resultAway)) {
-    return 3;
+    return MATCH_SCORE_POINTS.sign;
   }
-  return 0;
+  return MATCH_SCORE_POINTS.miss;
 }

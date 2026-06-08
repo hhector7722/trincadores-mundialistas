@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminResultForm } from "@/components/admin/AdminResultForm";
+import { AdminTournamentAwardsForm } from "@/components/admin/AdminTournamentAwardsForm";
 import { getAdminOpenMatches } from "@/lib/predictions/queries";
+import { getTournamentOfficialAwards } from "@/lib/tournament-predictions/official-awards-queries";
 import { isPoolAdmin } from "@/lib/pool/admin";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -20,7 +22,10 @@ export default async function AdminPage() {
     redirect("/profile");
   }
 
-  const matches = await getAdminOpenMatches(ctx.activePoolId);
+  const [matches, officialAwards] = await Promise.all([
+    getAdminOpenMatches(ctx.activePoolId),
+    getTournamentOfficialAwards(ctx.activePoolId),
+  ]);
 
   return (
     <div className="space-y-4 p-4 pb-4">
@@ -34,6 +39,20 @@ export default async function AdminPage() {
         <Link href="/profile" className="mt-2 inline-block text-sm text-[var(--tm-primary)]">
           Volver al perfil
         </Link>
+      </div>
+      <div className="rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-4">
+        <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+          Galardones oficiales del torneo
+        </h2>
+        <p className="mt-1 text-xs text-[var(--tm-muted)]">
+          Publica campeón, finalistas y premios individuales. Recalcula pronósticos generales.
+        </p>
+        <div className="mt-3">
+          <AdminTournamentAwardsForm
+            poolId={ctx.activePoolId}
+            initialAwards={officialAwards}
+          />
+        </div>
       </div>
       <div className="rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] px-4">
         {matches.length === 0 ? (

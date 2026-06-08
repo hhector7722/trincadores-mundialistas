@@ -94,6 +94,63 @@ export async function submitMatchResult(
   revalidatePath("/predictions");
   revalidatePath(`/predictions/${matchId}`);
   revalidatePath("/");
+  revalidatePath("/ranking");
+  return { ok: true };
+}
+
+export type TournamentOfficialAwardsPayload = {
+  championTeam?: string | null;
+  finalistTeamA?: string | null;
+  finalistTeamB?: string | null;
+  topScorerPlayerName?: string | null;
+  topScorerTeamName?: string | null;
+  tournamentMvpPlayerName?: string | null;
+  tournamentMvpTeamName?: string | null;
+  goldenGlovePlayerName?: string | null;
+  goldenGloveTeamName?: string | null;
+};
+
+export async function submitTournamentOfficialAwards(
+  poolId: string,
+  awards: TournamentOfficialAwardsPayload
+): Promise<AdminActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesion no valida." };
+  }
+
+  const admin = await isPoolAdmin(poolId, user.id);
+  if (!admin) {
+    return { ok: false, error: "No tienes permisos de administrador en esta porra." };
+  }
+
+  const { error } = await supabase.rpc("upsert_tournament_official_awards", {
+    p_pool_id: poolId,
+    p_champion_team: awards.championTeam ?? null,
+    p_finalist_team_a: awards.finalistTeamA ?? null,
+    p_finalist_team_b: awards.finalistTeamB ?? null,
+    p_top_scorer_player_name: awards.topScorerPlayerName ?? null,
+    p_top_scorer_team_name: awards.topScorerTeamName ?? null,
+    p_tournament_mvp_player_name: awards.tournamentMvpPlayerName ?? null,
+    p_tournament_mvp_team_name: awards.tournamentMvpTeamName ?? null,
+    p_golden_glove_player_name: awards.goldenGlovePlayerName ?? null,
+    p_golden_glove_team_name: awards.goldenGloveTeamName ?? null,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      error: error.message || "No se pudieron guardar los galardones oficiales.",
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/ranking");
+  revalidatePath("/");
   return { ok: true };
 }
 

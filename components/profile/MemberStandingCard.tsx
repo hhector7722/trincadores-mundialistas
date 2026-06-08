@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import type { MemberStanding } from "@/lib/ranking/queries";
 
@@ -30,13 +31,13 @@ export function MemberStandingCard({
           </p>
         </div>
         <div>
-          <p className="text-xs text-[var(--tm-muted)]">Exactos (8 pts)</p>
+          <p className="text-xs text-[var(--tm-muted)]">Exactos ({MATCH_SCORE_POINTS.exact} pts)</p>
           <p className="text-lg font-medium text-[var(--tm-fg)]">
             {formatAggregateStat(standing.exactHits)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-[var(--tm-muted)]">Signo (3 pts)</p>
+          <p className="text-xs text-[var(--tm-muted)]">Signo ({MATCH_SCORE_POINTS.sign} pts)</p>
           <p className="text-lg font-medium text-[var(--tm-fg)]">
             {formatAggregateStat(standing.signHits)}
           </p>
