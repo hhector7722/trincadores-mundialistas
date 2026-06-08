@@ -20,45 +20,45 @@ function label(index: number) {
   return MAIN_TABS[index]?.label ?? "?";
 }
 
-test("Quiz: izquierda=nada, derecha=La tabla", () => {
-  assert.equal(getTabNeighborForSwipe(QUIZ, "left"), null);
-  assert.equal(getTabNeighborForSwipe(QUIZ, "right"), TABLA);
-  assert.equal(label(getTabNeighborForSwipe(QUIZ, "right")!), "La tabla");
-  assert.equal(resolveTabSwipeCommit(QUIZ, -COMMIT_OFFSET, 0, WIDTH), null);
-  assert.equal(resolveTabSwipeCommit(QUIZ, COMMIT_OFFSET, 0, WIDTH), TABLA);
+test("Quiz: deslizar izquierda=La tabla, derecha=nada", () => {
+  assert.equal(getTabNeighborForSwipe(QUIZ, "left"), TABLA);
+  assert.equal(getTabNeighborForSwipe(QUIZ, "right"), null);
+  assert.equal(label(getTabNeighborForSwipe(QUIZ, "left")!), "La tabla");
+  assert.equal(resolveTabSwipeCommit(QUIZ, -COMMIT_OFFSET, 0, WIDTH), TABLA);
+  assert.equal(resolveTabSwipeCommit(QUIZ, COMMIT_OFFSET, 0, WIDTH), null);
 });
 
-test("La tabla: izquierda=Quiz, derecha=Inicio", () => {
-  assert.equal(getTabNeighborForSwipe(TABLA, "left"), QUIZ);
-  assert.equal(getTabNeighborForSwipe(TABLA, "right"), INICIO);
-  assert.equal(resolveTabSwipeCommit(TABLA, -COMMIT_OFFSET, 0, WIDTH), QUIZ);
-  assert.equal(resolveTabSwipeCommit(TABLA, COMMIT_OFFSET, 0, WIDTH), INICIO);
+test("La tabla: deslizar izquierda=Inicio, derecha=Quiz", () => {
+  assert.equal(getTabNeighborForSwipe(TABLA, "left"), INICIO);
+  assert.equal(getTabNeighborForSwipe(TABLA, "right"), QUIZ);
+  assert.equal(resolveTabSwipeCommit(TABLA, -COMMIT_OFFSET, 0, WIDTH), INICIO);
+  assert.equal(resolveTabSwipeCommit(TABLA, COMMIT_OFFSET, 0, WIDTH), QUIZ);
 });
 
-test("Inicio: izquierda=La tabla, derecha=Partidos", () => {
-  assert.equal(getTabNeighborForSwipe(INICIO, "left"), TABLA);
-  assert.equal(getTabNeighborForSwipe(INICIO, "right"), PARTIDOS);
-  assert.equal(resolveTabSwipeCommit(INICIO, -COMMIT_OFFSET, 0, WIDTH), TABLA);
-  assert.equal(resolveTabSwipeCommit(INICIO, COMMIT_OFFSET, 0, WIDTH), PARTIDOS);
+test("Inicio: deslizar izquierda=Partidos, derecha=La tabla", () => {
+  assert.equal(getTabNeighborForSwipe(INICIO, "left"), PARTIDOS);
+  assert.equal(getTabNeighborForSwipe(INICIO, "right"), TABLA);
+  assert.equal(resolveTabSwipeCommit(INICIO, -COMMIT_OFFSET, 0, WIDTH), PARTIDOS);
+  assert.equal(resolveTabSwipeCommit(INICIO, COMMIT_OFFSET, 0, WIDTH), TABLA);
 });
 
-test("Partidos: izquierda=Inicio, derecha=Perfil", () => {
-  assert.equal(getTabNeighborForSwipe(PARTIDOS, "left"), INICIO);
-  assert.equal(getTabNeighborForSwipe(PARTIDOS, "right"), PERFIL);
-  assert.equal(resolveTabSwipeCommit(PARTIDOS, -COMMIT_OFFSET, 0, WIDTH), INICIO);
-  assert.equal(resolveTabSwipeCommit(PARTIDOS, COMMIT_OFFSET, 0, WIDTH), PERFIL);
+test("Partidos: deslizar izquierda=Perfil, derecha=Inicio", () => {
+  assert.equal(getTabNeighborForSwipe(PARTIDOS, "left"), PERFIL);
+  assert.equal(getTabNeighborForSwipe(PARTIDOS, "right"), INICIO);
+  assert.equal(resolveTabSwipeCommit(PARTIDOS, -COMMIT_OFFSET, 0, WIDTH), PERFIL);
+  assert.equal(resolveTabSwipeCommit(PARTIDOS, COMMIT_OFFSET, 0, WIDTH), INICIO);
 });
 
-test("Perfil: izquierda=Partidos, derecha=nada", () => {
-  assert.equal(getTabNeighborForSwipe(PERFIL, "left"), PARTIDOS);
-  assert.equal(getTabNeighborForSwipe(PERFIL, "right"), null);
-  assert.equal(resolveTabSwipeCommit(PERFIL, -COMMIT_OFFSET, 0, WIDTH), PARTIDOS);
-  assert.equal(resolveTabSwipeCommit(PERFIL, COMMIT_OFFSET, 0, WIDTH), null);
+test("Perfil: deslizar izquierda=nada, derecha=Partidos", () => {
+  assert.equal(getTabNeighborForSwipe(PERFIL, "left"), null);
+  assert.equal(getTabNeighborForSwipe(PERFIL, "right"), PARTIDOS);
+  assert.equal(resolveTabSwipeCommit(PERFIL, -COMMIT_OFFSET, 0, WIDTH), null);
+  assert.equal(resolveTabSwipeCommit(PERFIL, COMMIT_OFFSET, 0, WIDTH), PARTIDOS);
 });
 
 test("bordes aplican resistencia", () => {
-  assert.equal(shouldApplyEdgeResistance(QUIZ, "left"), true);
-  assert.equal(shouldApplyEdgeResistance(QUIZ, "right"), false);
-  assert.equal(shouldApplyEdgeResistance(PERFIL, "left"), false);
-  assert.equal(shouldApplyEdgeResistance(PERFIL, "right"), true);
+  assert.equal(shouldApplyEdgeResistance(QUIZ, "left"), false);
+  assert.equal(shouldApplyEdgeResistance(QUIZ, "right"), true);
+  assert.equal(shouldApplyEdgeResistance(PERFIL, "left"), true);
+  assert.equal(shouldApplyEdgeResistance(PERFIL, "right"), false);
 });

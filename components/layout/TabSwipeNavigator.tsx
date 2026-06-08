@@ -13,7 +13,7 @@ import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { getMainTabIndex, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
 import {
-  getTabNeighborForSwipe,
+  getMainTabBarNeighbors,
   getTabSwipeProgress,
   pointerOffsetToSwipeDirection,
   resolveTabSwipeCommit,
@@ -361,12 +361,9 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     return <div className="tm-tab-swipe-root min-h-0 min-w-0 flex-1">{children}</div>;
   }
 
-  const leftTab =
-    activeIndex != null ? getTabNeighborForSwipe(activeIndex, "left") : null;
-  const rightTab =
-    activeIndex != null ? getTabNeighborForSwipe(activeIndex, "right") : null;
-  const prevTab = leftTab != null ? MAIN_TABS[leftTab] : null;
-  const nextTab = rightTab != null ? MAIN_TABS[rightTab] : null;
+  const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(activeIndex);
+  const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
+  const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
   const showEdgeHints = !isDragging && !animating && dragX === 0;
 
   return (
@@ -398,7 +395,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <div
           className="pointer-events-none absolute inset-0 z-0 will-change-transform"
           style={{
-            transform: `translate3d(calc(-100% - ${dragX}px), 0, 0)`,
+            transform: `translate3d(calc(-100% + ${dragX}px), 0, 0)`,
             transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
           }}
           aria-hidden
@@ -411,7 +408,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <div
           className="pointer-events-none absolute inset-0 z-0 will-change-transform"
           style={{
-            transform: `translate3d(calc(100% - ${dragX}px), 0, 0)`,
+            transform: `translate3d(calc(100% + ${dragX}px), 0, 0)`,
             transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
           }}
           aria-hidden
