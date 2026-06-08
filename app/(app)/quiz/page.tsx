@@ -19,7 +19,7 @@ export default async function QuizPage() {
   ]);
 
   return (
-    <QuizPageShell>
+    <QuizPageShell variant="hub">
       <QuizHub
         hub={hub}
         leaderboardRows={leaderboardRows}

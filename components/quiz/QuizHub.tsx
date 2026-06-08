@@ -49,37 +49,40 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <button
-          type="button"
-          onClick={handlePlay}
-          disabled={!quizAvailable}
-          className={playButtonClass}
-        >
-          JUGAR
-        </button>
+    <div className="tm-quiz-hub">
+      <div className="tm-quiz-hub-spacer" aria-hidden />
+      <div className="tm-quiz-hub-content space-y-6">
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={handlePlay}
+            disabled={!quizAvailable}
+            className={playButtonClass}
+          >
+            JUGAR
+          </button>
 
-        {!quizAvailable && (
-          <p className="text-center text-sm text-[var(--tm-muted)]">
-            Todavia no hay quiz publicado para hoy. Vuelve mas tarde.
+          {!quizAvailable && (
+            <p className="text-center text-sm text-[var(--tm-muted)]">
+              Todavia no hay quiz publicado para hoy. Vuelve mas tarde.
+            </p>
+          )}
+
+          <p className="text-center text-xs leading-relaxed text-[var(--tm-muted)]">
+            Un intento diario. Puntuan a partir del 11 de junio. Los intentos previos son de
+            entrenamiento.
           </p>
-        )}
+        </div>
 
-        <p className="text-center text-xs leading-relaxed text-[var(--tm-muted)]">
-          Un intento diario. Puntuan a partir del 11 de junio. Los intentos previos son de
-          entrenamiento.
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
-          Clasificacion del quiz
-        </h2>
-        <QuizLeaderboardTable
-          rows={leaderboardRows}
-          currentProfileId={currentProfileId}
-        />
+        <div className="space-y-2">
+          <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+            Clasificacion del quiz
+          </h2>
+          <QuizLeaderboardTable
+            rows={leaderboardRows}
+            currentProfileId={currentProfileId}
+          />
+        </div>
       </div>
 
       <Modal
