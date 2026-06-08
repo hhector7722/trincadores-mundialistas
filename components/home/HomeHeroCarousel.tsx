@@ -35,7 +35,7 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
           104 partidos
         </p>
       ),
-      description: "Unos que shanelan de esto, otros que no y muchas bocas que callar",
+      description: "Unos que shanelan de esto, otros que no tanto, y muchas caritas que pintar.",
       cta: { label: "Ver calendario", href: "/predictions" },
     },
     {
