@@ -1,5 +1,6 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
+import { HomeViewportShell } from "@/components/home/HomeViewportShell";
 import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
@@ -41,19 +42,21 @@ export default async function HomePage() {
   const dailyFact = getDailyFactForToday();
 
   return (
-    <div className="relative z-10 space-y-3 p-4 pb-4">
-      <HomeHero pendingCount={pending} quizSlide={quizSlide} />
-      <HomeStandingCard
-        standing={standing}
-        leaderboardRows={leaderboard.rows}
-        currentProfileId={user!.id}
-        poolId={ctx.activePoolId}
-        generalPredictions={generalPredictionsBundle.predictions}
-        generalPredictionsEditable={generalPredictionsBundle.editable}
-        dailyFact={dailyFact}
-        quizHub={quizHub}
-        nextMatch={focusMatch}
-      />
-    </div>
+    <HomeViewportShell
+      hero={<HomeHero pendingCount={pending} quizSlide={quizSlide} />}
+      body={
+        <HomeStandingCard
+          standing={standing}
+          leaderboardRows={leaderboard.rows}
+          currentProfileId={user!.id}
+          poolId={ctx.activePoolId}
+          generalPredictions={generalPredictionsBundle.predictions}
+          generalPredictionsEditable={generalPredictionsBundle.editable}
+          dailyFact={dailyFact}
+          quizHub={quizHub}
+          nextMatch={focusMatch}
+        />
+      }
+    />
   );
 }

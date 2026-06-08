@@ -58,8 +58,8 @@ export function HomeStandingCard({
   nextMatch,
 }: HomeStandingCardProps) {
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <div className="grid shrink-0 grid-cols-2 gap-3">
         {standing ? (
           <PositionStatCard standing={standing} />
         ) : (
@@ -71,8 +71,12 @@ export function HomeStandingCard({
           editable={generalPredictionsEditable}
         />
       </div>
-      {nextMatch ? <HomeNextMatch poolId={poolId} match={nextMatch} /> : null}
-      <div className="grid grid-cols-2 items-stretch gap-3">
+      {nextMatch ? (
+        <div className="shrink-0">
+          <HomeNextMatch poolId={poolId} match={nextMatch} />
+        </div>
+      ) : null}
+      <div className="grid min-h-0 flex-1 grid-cols-2 items-stretch gap-3">
         <div className="flex h-full min-h-0 min-w-0 flex-col gap-1.5">
           <HomeScoringRulesCard className="min-h-0 flex-1" />
           <HomeDailyQuizCard quizHub={quizHub} />

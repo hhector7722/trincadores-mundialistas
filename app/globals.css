@@ -176,6 +176,45 @@ html[data-modal-open] .tm-app-main {
   min-height: 0;
 }
 
+.tm-app-frame:has(.tm-home-layout) {
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.tm-app-main:has(.tm-home-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.tm-app-main-inner:has(> .tm-home-layout) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.tm-home-layout {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+}
+
+.tm-home-layout__hero {
+  flex: 0 0 auto;
+}
+
+.tm-home-layout__body {
+  min-height: 0;
+}
+
 html[data-modal-open] .tm-fixed-bottombar {
   filter: blur(6px);
   opacity: 0.35;
