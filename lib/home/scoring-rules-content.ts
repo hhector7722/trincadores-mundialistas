@@ -13,7 +13,7 @@ const {
 } = TOURNAMENT_GENERAL_SCORE_POINTS;
 const maxPreTournament =
   champion + finalists + topScorer + tournamentMvp + goldenGlove;
-const maxPerMatch = exact + sign + MVP_PREDICTION_POINTS;
+const maxPerMatch = exact + MVP_PREDICTION_POINTS;
 
 /** Resumen visible en la card de inicio (máx. 6 líneas). */
 export const SCORING_RULES_CARD_SUMMARY = [
