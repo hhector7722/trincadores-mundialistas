@@ -67,10 +67,15 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full shrink-0 self-center max-w-none overflow-visible",
+        "w-full shrink-0 self-center overflow-visible py-1 sm:py-1.5",
         className
       )}
     >
+      <div
+        className={cn(
+          "relative aspect-[3/2] w-full min-h-[min(40dvh,20rem)] max-w-none overflow-visible"
+        )}
+      >
       <div className="absolute inset-0">
         <Image
           src={GOYA_FIELD_SRC}
@@ -78,22 +83,23 @@ export function MatchMvpFieldGraphic({
           fill
           unoptimized
           className="object-contain object-center"
-          sizes="(max-width: 512px) 100vw, 512px"
+          sizes="(max-width: 576px) 100vw, 576px"
           priority
           onLoad={handleFieldReady}
           onError={handleFieldReady}
         />
       </div>
 
-      <div className="pointer-events-none absolute left-2 top-2 z-20 max-w-[42%] truncate rounded bg-black/50 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+      <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
         {teamNameEs(awayTeam)}
       </div>
-      <div className="pointer-events-none absolute bottom-2 left-2 z-20 max-w-[42%] truncate rounded bg-black/50 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
+      <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-w-[46%] truncate rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/85 backdrop-blur-sm">
         {teamNameEs(homeTeam)}
       </div>
 
       {awaySlots.map((slot) => renderSlot(awayTeam, slot))}
       {homeSlots.map((slot) => renderSlot(homeTeam, slot))}
+      </div>
     </div>
   );
 }

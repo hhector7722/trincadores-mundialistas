@@ -35,10 +35,10 @@ export function MvpBenchStrip({
         position === "top" ? "pb-1.5" : "pt-1.5"
       )}
     >
-      <p className="mb-1 truncate text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)]">
+      <p className="mb-1.5 truncate text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)]">
         Reservas {teamNameEs(teamName)}
       </p>
-      <div className="flex flex-wrap justify-center gap-1">
+      <div className="flex flex-wrap justify-center gap-1.5">
         {players.map((player) => {
           const key = benchPlayerKey(teamName, player);
           const active = selectedKey === key;
@@ -50,17 +50,17 @@ export function MvpBenchStrip({
               disabled={disabled}
               onClick={() => onSelect(key)}
               className={cn(
-                "flex min-h-8 min-w-[3.25rem] max-w-[4.5rem] flex-col items-center justify-center gap-0 rounded-lg border px-1 py-0.5 text-center transition-colors",
+                "flex min-h-10 min-w-[3.75rem] max-w-[5.25rem] flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1 text-center transition-colors",
                 active
                   ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
                   : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] hover:bg-[rgba(111,43,255,0.16)]",
                 disabled && "opacity-60"
               )}
             >
-              <span className="font-display text-[11px] font-bold leading-none text-[var(--tm-accent)]">
+              <span className="font-display text-[13px] font-bold leading-none text-[var(--tm-accent)]">
                 {player.shirtNumber ?? "—"}
               </span>
-              <span className="w-full truncate text-[8px] font-medium leading-tight text-[var(--tm-fg)]">
+              <span className="w-full truncate text-[9px] font-medium leading-tight text-[var(--tm-fg)]">
                 {shirtPlayerName(player.name)}
               </span>
             </button>
