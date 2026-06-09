@@ -211,10 +211,6 @@ export async function resolveTeamLineup(
     return predicted;
   }
 
-  if (cached?.sourceKind === "predicted") {
-    return cached;
-  }
-
   if (cached && cached.sourceKind === "fallback") {
     return cached;
   }
