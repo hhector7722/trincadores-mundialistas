@@ -34,7 +34,7 @@ function RankingEmptyRow() {
     >
       <span />
       <span />
-      <span className={cn(RANKING_AVATAR_CLASS, "rounded-xl bg-[var(--tm-border)]/35")} />
+      <span className={cn(RANKING_AVATAR_CLASS, "min-h-14 rounded-xl bg-[var(--tm-border)]/35")} />
       <span className="min-w-0 truncate">&nbsp;</span>
       <span />
       <span />

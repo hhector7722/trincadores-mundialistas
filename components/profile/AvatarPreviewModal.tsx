@@ -82,7 +82,7 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
         </div>
       }
     >
-      <div className="relative min-h-0 flex-1">
+      <div className="relative flex min-h-[40dvh] flex-1 flex-col pt-[max(1rem,env(safe-area-inset-top))]">
         <button
           type="button"
           aria-label="Cerrar"
@@ -92,13 +92,13 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
           <X className="h-5 w-5" />
         </button>
 
-        <div className="absolute inset-0 flex items-center justify-center px-4 py-6">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imageRef}
             src={avatarUrl}
             alt={`Avatar de ${label}`}
-            className="max-h-full max-w-full rounded-xl object-contain"
+            className="max-h-[min(72dvh,calc(100vw-2rem))] max-w-full rounded-xl object-contain"
           />
         </div>
       </div>

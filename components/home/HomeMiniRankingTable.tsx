@@ -53,14 +53,12 @@ function MiniRankingDataRow({
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <div className={cn("overflow-hidden rounded-xl", MINI_RANKING_AVATAR_CLASS)}>
-        <ProfileAvatar
-          avatarUrl={row.avatarUrl}
-          label={row.label}
-          variant="tile"
-          className="size-full"
-        />
-      </div>
+      <ProfileAvatar
+        avatarUrl={row.avatarUrl}
+        label={row.label}
+        variant="profile"
+        className={MINI_RANKING_AVATAR_CLASS}
+      />
       <span
         className={cn(
           "min-w-0 truncate text-[9px] font-medium",
