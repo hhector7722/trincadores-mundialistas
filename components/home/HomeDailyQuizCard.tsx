@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
 import { canOpenQuizPlay, getQuizSlotStatus } from "@/lib/quiz/slot-status";
 import type { QuizDayHub } from "@/lib/quiz/types";
@@ -16,7 +16,13 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
   const router = useRouter();
   const [alreadyPlayedOpen, setAlreadyPlayedOpen] = useState(false);
 
-  function handlePlay() {
+  function handleCardNavigate() {
+    router.push("/quiz");
+  }
+
+  function handlePlay(event: MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+
     const slot = quizHub.official;
     const canPlay = canOpenQuizPlay(slot, slot?.quiz.scoring_mode, {
       isOwner: quizHub.isOwner,
@@ -38,12 +44,21 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        onClick={handleCardNavigate}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleCardNavigate();
+          }
+        }}
         className={cn(
-          "@container shrink-0 rounded-2xl p-2 tm-stat-card",
+          "@container shrink-0 cursor-pointer rounded-2xl p-2 tm-stat-card",
           className
         )}
         data-tm-indicators-anchor="quiz-daily"
-        aria-label="Quiz diario"
+        aria-label="Ir al quiz diario"
       >
         <div className="grid min-w-0 grid-cols-2 items-center gap-2">
           <p className="flex min-w-0 items-center justify-center text-center text-[9px] font-semibold uppercase tracking-wide text-[#CCFF00]">

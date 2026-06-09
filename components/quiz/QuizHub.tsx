@@ -88,7 +88,8 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         open={waitModalOpen}
         onClose={() => setWaitModalOpen(false)}
         title="Quiz del dia"
-        message="Espera hasta mañana para un nuevo quiz crack"
+        message="Espera hasta mañana para un nuevo intento crack."
+        compact
       />
     </div>
   );
