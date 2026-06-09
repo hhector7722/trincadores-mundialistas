@@ -2,6 +2,8 @@ import { toAuthEmail } from "@/lib/auth/credentials";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
+const OTP_TYPES = ["magiclink", "email"] as const;
+
 /** Inicia sesion server-side tras validar identidad por telefono (sin codigo en env). */
 export async function signInTrustedUserByUsername(
   username: string
@@ -37,14 +39,29 @@ export async function signInTrustedUserByUsername(
   }
 
   const supabase = await createClient();
-  const { data, error: verifyError } = await supabase.auth.verifyOtp({
-    token_hash: hashedToken,
-    type: "email",
-  });
 
-  if (verifyError || !data.user) {
-    return { ok: false, error: "No se pudo iniciar sesion." };
+  for (const type of OTP_TYPES) {
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: hashedToken,
+      type,
+    });
+
+    if (verifyError || !data.user) {
+      continue;
+    }
+
+    if (data.session) {
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      if (sessionError) {
+        continue;
+      }
+    }
+
+    return { ok: true, userId: data.user.id };
   }
 
-  return { ok: true, userId: data.user.id };
+  return { ok: false, error: "No se pudo iniciar sesion." };
 }
