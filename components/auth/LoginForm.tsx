@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { signInWithPhone } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingOverlay } from "@/components/ui/spinner";
@@ -20,11 +19,19 @@ export function LoginForm() {
     const phone = String(fd.get("phone") ?? "");
 
     startTransition(async () => {
-      const result = await signInWithPhone(phone);
-      if (!result.ok) {
-        setError(result.error);
+      const response = await fetch("/api/auth/phone-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+        credentials: "include",
+      });
+
+      const result = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !result.ok) {
+        setError(result.error ?? "No se pudo abrir la sesion.");
         return;
       }
+
       router.push("/");
       router.refresh();
     });

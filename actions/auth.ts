@@ -10,10 +10,7 @@ import {
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
 import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
-import { syncParticipantPassword } from "@/lib/auth/sync-participant-password";
-import { signInTrustedUserByUsername } from "@/lib/auth/trusted-sign-in";
-import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
-import { normalizePhone, resolveParticipantByPhone } from "@/lib/pwa/onboarding-phones";
+import { signInUserByPhone } from "@/lib/auth/phone-sign-in";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
 
@@ -88,57 +85,12 @@ export async function signIn(
   return { ok: true };
 }
 
-async function finishPhoneSignIn(
-  username: string,
-  userId: string
-): Promise<AuthActionResult> {
-  const supabase = await createClient();
-  try {
-    await applyPoolCookieForUser(userId);
-  } catch (e) {
-    await supabase.auth.signOut();
-    const msg = e instanceof Error ? e.message : "Error al resolver la porra.";
-    return { ok: false, error: msg };
-  }
-
-  await setOnboardedDeviceCookie(username);
-  return { ok: true };
-}
-
 export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResult> {
-  const phone = normalizePhone(phoneRaw);
-  if (!phone) {
-    return { ok: false, error: "Introduce tu numero de telefono." };
+  const result = await signInUserByPhone(phoneRaw);
+  if (!result.ok) {
+    return { ok: false, error: result.error };
   }
-
-  const participant = resolveParticipantByPhone(phone);
-  if (!participant) {
-    return { ok: false, error: "Telefono no reconocido." };
-  }
-
-  const accessCode = getOnboardingAccessCode(participant.username);
-  if (accessCode) {
-    let passwordSignIn = await signIn(participant.username, accessCode);
-    if (!passwordSignIn.ok) {
-      const synced = await syncParticipantPassword(participant.username, accessCode);
-      if (synced) {
-        passwordSignIn = await signIn(participant.username, accessCode);
-      }
-    }
-    if (passwordSignIn.ok) {
-      return passwordSignIn;
-    }
-  }
-
-  const trusted = await signInTrustedUserByUsername(participant.username);
-  if (!trusted.ok) {
-    return {
-      ok: false,
-      error: "No se pudo validar el acceso. Contacta al administrador.",
-    };
-  }
-
-  return finishPhoneSignIn(participant.username, trusted.userId);
+  return { ok: true };
 }
 
 export async function signOut(): Promise<void> {

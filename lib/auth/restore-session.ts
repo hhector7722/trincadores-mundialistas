@@ -1,34 +1,14 @@
-import { signInTrustedUserByUsername } from "@/lib/auth/trusted-sign-in";
+import { signInUserByUsername } from "@/lib/auth/phone-sign-in";
 import {
   isProfileOnboardingComplete,
-  setOnboardedDeviceCookie,
   type OnboardingProfileRow,
 } from "@/lib/auth/onboarding-device";
-import { resolvePoolMemberships, setActivePoolCookie } from "@/lib/auth/session";
 import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 export type RestoreSessionResult =
   | { ok: true; username: string }
   | { ok: false; error: string; code: "not_found" | "inactive" | "incomplete" | "auth" };
-
-async function applyPoolCookieForUser(userId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: memberships, error } = await supabase
-    .from("pool_members")
-    .select("pool_id")
-    .eq("profile_id", userId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const resolution = resolvePoolMemberships(memberships);
-  if (resolution.status === "single") {
-    await setActivePoolCookie(resolution.poolId);
-  }
-}
 
 export async function restoreSessionForUsername(
   usernameRaw: string
@@ -58,20 +38,10 @@ export async function restoreSessionForUsername(
     return { ok: false, error: "Onboarding incompleto.", code: "incomplete" };
   }
 
-  const trusted = await signInTrustedUserByUsername(username);
-  if (!trusted.ok) {
-    return { ok: false, error: trusted.error, code: "auth" };
+  const restored = await signInUserByUsername(username);
+  if (!restored.ok) {
+    return { ok: false, error: restored.error, code: "auth" };
   }
 
-  try {
-    await applyPoolCookieForUser(trusted.userId);
-  } catch (e) {
-    const supabase = await createClient();
-    await supabase.auth.signOut();
-    const msg = e instanceof Error ? e.message : "Error al resolver la porra.";
-    return { ok: false, error: msg, code: "auth" };
-  }
-
-  await setOnboardedDeviceCookie(username);
-  return { ok: true, username };
+  return { ok: true, username: restored.username };
 }

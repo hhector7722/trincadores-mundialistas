@@ -9,6 +9,7 @@ import { PWA_ONBOARDING_COOKIE } from "@/lib/pwa/onboarding-cookie";
 const AUTH_PATHS = ["/login"];
 const ONBOARDING_PATHS = ["/bienvenida"];
 const RESTORE_PATH = "/api/auth/restore";
+const PHONE_LOGIN_PATH = "/api/auth/phone-login";
 
 const PUBLIC_PATHS = [
   "/manifest.webmanifest",
@@ -27,6 +28,10 @@ function isOnboardingPath(pathname: string): boolean {
 
 function isRestorePath(pathname: string): boolean {
   return pathname === RESTORE_PATH || pathname.startsWith(`${RESTORE_PATH}/`);
+}
+
+function isPhoneLoginPath(pathname: string): boolean {
+  return pathname === PHONE_LOGIN_PATH || pathname.startsWith(`${PHONE_LOGIN_PATH}/`);
 }
 
 function isPublicPath(pathname: string): boolean {
@@ -84,7 +89,7 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (isPublicPath(pathname) || isRestorePath(pathname)) {
+  if (isPublicPath(pathname) || isRestorePath(pathname) || isPhoneLoginPath(pathname)) {
     return supabaseResponse;
   }
 
