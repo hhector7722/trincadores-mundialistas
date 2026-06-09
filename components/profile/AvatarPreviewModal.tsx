@@ -62,6 +62,9 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
       backdropClassName="bg-[#2a1058]/95 backdrop-blur-lg"
       belowPanel={
         <div className="pointer-events-auto flex w-full shrink-0 flex-col items-center gap-2 border-t border-white/10 bg-[#2a1058]/80 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
+          <p className="text-center font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+            {label}
+          </p>
           <Button
             type="button"
             className="w-full max-w-sm gap-2"
@@ -79,7 +82,7 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
         </div>
       }
     >
-      <div className="relative flex min-h-0 flex-1 flex-col px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      <div className="relative min-h-0 flex-1">
         <button
           type="button"
           aria-label="Cerrar"
@@ -89,7 +92,7 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center px-4 py-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imageRef}
@@ -98,10 +101,6 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
             className="max-h-full max-w-full rounded-xl object-contain"
           />
         </div>
-
-        <p className="shrink-0 pt-3 text-center font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
-          {label}
-        </p>
       </div>
     </Modal>
   );

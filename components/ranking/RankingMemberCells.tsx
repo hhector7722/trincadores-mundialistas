@@ -41,15 +41,16 @@ export function RankingMemberCells({
         aria-label={canPreview ? `Ver avatar de ${label}` : undefined}
         onClick={onActivate}
         className={cn(
-          "shrink-0 rounded-xl outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tm-purple-deep)] disabled:cursor-default disabled:active:scale-100",
-          canPreview && "cursor-pointer"
+          "shrink-0 overflow-hidden rounded-xl outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tm-purple-deep)] disabled:cursor-default disabled:active:scale-100",
+          canPreview && "cursor-pointer",
+          avatarClassName
         )}
       >
         <ProfileAvatar
           avatarUrl={avatarUrl}
           label={label}
-          variant="profile"
-          className={avatarClassName}
+          variant="tile"
+          className="size-full"
         />
       </button>
       <button
