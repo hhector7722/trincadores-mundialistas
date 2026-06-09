@@ -104,6 +104,19 @@ export function usePanelSlideStack<T>(initialView: T) {
     [clearSlideFinishTimer]
   );
 
+  const replaceCurrent = useCallback(
+    (view: T) => {
+      clearSlideFinishTimer();
+      slideLockRef.current = false;
+      setSlide(null);
+      setStack((prev) => {
+        if (prev.length === 0) return [view];
+        return [...prev.slice(0, -1), view];
+      });
+    },
+    [clearSlideFinishTimer]
+  );
+
   const buildPanelSlide = useCallback(
     (renderView: (view: T) => ReactNode): ModalPanelSlide | null => {
       if (!slide) return null;
@@ -125,6 +138,7 @@ export function usePanelSlideStack<T>(initialView: T) {
     push,
     pop,
     reset,
+    replaceCurrent,
     isSliding: slide !== null,
     buildPanelSlide,
   };

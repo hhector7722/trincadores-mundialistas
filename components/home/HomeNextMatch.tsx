@@ -165,6 +165,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
         open={entityModal.open}
         onClose={() => setEntityModal((current) => ({ ...current, open: false }))}
         initialView={entityModal.view}
+        carouselTeams={[match.home_team, match.away_team]}
       />
     </>
   );

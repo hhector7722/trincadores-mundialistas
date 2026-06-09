@@ -20,6 +20,7 @@ import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
+import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { cn } from "@/lib/utils";
 
 type QuickPredictionModalProps = {
@@ -113,11 +114,37 @@ export function QuickPredictionModal({
     push,
     pop,
     reset,
+    replaceCurrent,
     isSliding: isPanelSliding,
     buildPanelSlide,
   } = usePanelSlideStack<QuickPanelView>({ kind: "prediction" });
 
   const atPredictionRoot = panelView.kind === "prediction";
+  const atLineupCarousel = panelView.kind === "lineup";
+
+  const matchTeams = useMemo(
+    () => [viewMatch.home_team, viewMatch.away_team],
+    [viewMatch.home_team, viewMatch.away_team]
+  );
+  const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : viewMatch.home_team;
+
+  const {
+    dotPosition: teamDotPosition,
+    canSwipe: canSwipeTeams,
+    startSlide: startTeamSlide,
+    buildCarouselPanelSlide: buildTeamCarouselSlide,
+    isCarouselSliding,
+  } = useCarouselSlide({
+    items: matchTeams,
+    open,
+    initialItemKey: lineupTeamName,
+    getItemKey: (team) => team,
+    enabled: matchTeams.length > 1,
+    canSlide: atLineupCarousel && !isPanelSliding && !matchSlide,
+    onItemChange: (teamName) => {
+      replaceCurrent(buildLineupView(teamName, viewMatch.id));
+    },
+  });
 
   const savedHome = viewMatch.prediction?.home_goals ?? null;
   const savedAway = viewMatch.prediction?.away_goals ?? null;
@@ -345,6 +372,13 @@ export function QuickPredictionModal({
 
   const entityPanelSlide = buildPanelSlide((view) => renderPanelView(view, viewMatch));
 
+  const teamCarouselSlide =
+    atLineupCarousel && !entityPanelSlide
+      ? buildTeamCarouselSlide((teamName) =>
+          renderPanelView(buildLineupView(teamName, viewMatch.id), viewMatch)
+        )
+      : null;
+
   const matchPanelSlide: ModalPanelSlide | null =
     matchSlide && atPredictionRoot && !entityPanelSlide
       ? {
@@ -355,7 +389,7 @@ export function QuickPredictionModal({
         }
       : null;
 
-  const activePanelSlide = entityPanelSlide ?? matchPanelSlide;
+  const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? matchPanelSlide;
   const isFieldView = panelView.kind === "lineup" || panelView.kind === "mvp";
   const isMvpView = panelView.kind === "mvp";
 
@@ -373,15 +407,27 @@ export function QuickPredictionModal({
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
-        canSwipeMatches && atPredictionRoot && !activePanelSlide ? () => startMatchSlide(1) : undefined
+        canSwipeMatches && atPredictionRoot && !activePanelSlide
+          ? () => startMatchSlide(1)
+          : canSwipeTeams && atLineupCarousel && !activePanelSlide
+            ? () => startTeamSlide(1)
+            : undefined
       }
       onSwipeRight={
-        canSwipeMatches && atPredictionRoot && !activePanelSlide ? () => startMatchSlide(-1) : undefined
+        canSwipeMatches && atPredictionRoot && !activePanelSlide
+          ? () => startMatchSlide(-1)
+          : canSwipeTeams && atLineupCarousel && !activePanelSlide
+            ? () => startTeamSlide(-1)
+            : undefined
       }
       belowPanel={
-        canSwipeMatches && atPredictionRoot ? <MatchSwipeDots position={dotPosition} /> : undefined
+        canSwipeMatches && atPredictionRoot ? (
+          <MatchSwipeDots position={dotPosition} />
+        ) : canSwipeTeams && atLineupCarousel ? (
+          <CarouselSwipeDots position={teamDotPosition} />
+        ) : undefined
       }
-      onBack={canGoBack && !isPanelSliding ? pop : undefined}
+      onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}
       panelSlide={activePanelSlide}
       loading={pending && panelView.kind === "prediction"}
     >

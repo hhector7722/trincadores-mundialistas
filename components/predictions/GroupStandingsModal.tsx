@@ -11,6 +11,7 @@ import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
+import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { cn } from "@/lib/utils";
 
 type GroupStandingsModalProps = {
@@ -96,6 +97,7 @@ export function GroupStandingsModal({
     push,
     pop,
     reset,
+    replaceCurrent,
     isSliding: isPanelSliding,
     buildPanelSlide,
   } = usePanelSlideStack<GroupPanelView>({
@@ -104,6 +106,31 @@ export function GroupStandingsModal({
   });
 
   const atStandingsRoot = panelView.kind === "standings";
+  const atLineupCarousel = panelView.kind === "lineup";
+
+  const groupTeamNames = useMemo(
+    () => viewGroup?.teams.map((row) => row.team) ?? [],
+    [viewGroup]
+  );
+  const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : groupTeamNames[0] ?? "";
+
+  const {
+    dotPosition: teamDotPosition,
+    canSwipe: canSwipeTeams,
+    startSlide: startTeamSlide,
+    buildCarouselPanelSlide: buildTeamCarouselSlide,
+    isCarouselSliding,
+  } = useCarouselSlide({
+    items: groupTeamNames,
+    open,
+    initialItemKey: lineupTeamName,
+    getItemKey: (team) => team,
+    enabled: groupTeamNames.length > 1,
+    canSlide: atLineupCarousel && !isPanelSliding && !groupSlide,
+    onItemChange: (teamName) => {
+      replaceCurrent(buildLineupView(teamName));
+    },
+  });
 
   useEffect(() => {
     if (viewGroup) {
@@ -222,6 +249,13 @@ export function GroupStandingsModal({
 
   const entityPanelSlide = buildPanelSlide(renderPanelView);
 
+  const teamCarouselSlide =
+    atLineupCarousel && !entityPanelSlide
+      ? buildTeamCarouselSlide((teamName) =>
+          renderPanelView(buildLineupView(teamName))
+        )
+      : null;
+
   const groupPanelSlide: ModalPanelSlide | null =
     groupSlide && atStandingsRoot && !entityPanelSlide
       ? {
@@ -237,7 +271,7 @@ export function GroupStandingsModal({
         }
       : null;
 
-  const activePanelSlide = entityPanelSlide ?? groupPanelSlide;
+  const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? groupPanelSlide;
   const isLineupView = panelView.kind === "lineup";
 
   return (
@@ -250,17 +284,27 @@ export function GroupStandingsModal({
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
-        canSwipeGroups && atStandingsRoot && !activePanelSlide ? () => startGroupSlide(1) : undefined
+        canSwipeGroups && atStandingsRoot && !activePanelSlide
+          ? () => startGroupSlide(1)
+          : canSwipeTeams && atLineupCarousel && !activePanelSlide
+            ? () => startTeamSlide(1)
+            : undefined
       }
       onSwipeRight={
         canSwipeGroups && atStandingsRoot && !activePanelSlide
           ? () => startGroupSlide(-1)
-          : undefined
+          : canSwipeTeams && atLineupCarousel && !activePanelSlide
+            ? () => startTeamSlide(-1)
+            : undefined
       }
       belowPanel={
-        canSwipeGroups && atStandingsRoot ? <GroupSwipeDots position={dotPosition} /> : undefined
+        canSwipeGroups && atStandingsRoot ? (
+          <GroupSwipeDots position={dotPosition} />
+        ) : canSwipeTeams && atLineupCarousel ? (
+          <CarouselSwipeDots position={teamDotPosition} />
+        ) : undefined
       }
-      onBack={canGoBack && !isPanelSliding ? pop : undefined}
+      onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}
       panelSlide={activePanelSlide}
     >
       {renderPanelView(panelView)}

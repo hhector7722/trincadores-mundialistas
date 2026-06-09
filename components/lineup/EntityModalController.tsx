@@ -94,8 +94,19 @@ export function EntityModalController({
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
 
-  const atLineupRoot = current.kind === "lineup" && !canGoBack;
-  const carouselTeamName = current.kind === "lineup" ? current.teamName : initialView.kind === "lineup" ? initialView.teamName : "";
+  const atLineupCarousel = current.kind === "lineup";
+  const lineupMatchId =
+    current.kind === "lineup"
+      ? current.matchId
+      : initialView.kind === "lineup"
+        ? initialView.matchId
+        : undefined;
+  const carouselTeamName =
+    current.kind === "lineup"
+      ? current.teamName
+      : initialView.kind === "lineup"
+        ? initialView.teamName
+        : "";
 
   const {
     dotPosition,
@@ -109,9 +120,9 @@ export function EntityModalController({
     initialItemKey: carouselTeamName,
     getItemKey: (team) => team,
     enabled: Boolean(carouselTeams?.length),
-    canSlide: atLineupRoot && !isSliding,
+    canSlide: atLineupCarousel && !isSliding,
     onItemChange: (teamName) => {
-      reset(buildLineupView(teamName));
+      reset(buildLineupView(teamName, lineupMatchId));
       onCarouselTeamChange?.(teamName);
     },
   });
@@ -143,8 +154,10 @@ export function EntityModalController({
   const panelSlide = buildPanelSlide(renderView);
 
   const teamCarouselSlide =
-    atLineupRoot && !panelSlide
-      ? buildCarouselPanelSlide((teamName) => renderView(buildLineupView(teamName)))
+    atLineupCarousel && !panelSlide
+      ? buildCarouselPanelSlide((teamName) =>
+          renderView(buildLineupView(teamName, lineupMatchId))
+        )
       : null;
 
   const activePanelSlide = panelSlide ?? teamCarouselSlide;
@@ -165,12 +178,12 @@ export function EntityModalController({
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
-        canSwipeTeams && atLineupRoot && !activePanelSlide ? () => startTeamSlide(1) : undefined
+        canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined
       }
       onSwipeRight={
-        canSwipeTeams && atLineupRoot && !activePanelSlide ? () => startTeamSlide(-1) : undefined
+        canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(-1) : undefined
       }
-      belowPanel={canSwipeTeams && atLineupRoot ? <CarouselSwipeDots position={dotPosition} /> : undefined}
+      belowPanel={canSwipeTeams && atLineupCarousel ? <CarouselSwipeDots position={dotPosition} /> : undefined}
       onBack={canGoBack && !isSliding && !isCarouselSliding ? pop : undefined}
       panelSlide={activePanelSlide}
     >

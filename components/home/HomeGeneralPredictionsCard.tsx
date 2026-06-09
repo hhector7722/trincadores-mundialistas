@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   saveTournamentChampion,
   saveTournamentFinalists,
@@ -24,6 +24,7 @@ import {
 } from "@/lib/tournament-predictions/display";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
 import { TOURNAMENT_GENERAL_PREDICTION_LABELS } from "@/lib/tournament-predictions/types";
+import { getAllWorldCupTeamsAlphabetically } from "@/lib/predictions/teams-picker-data";
 
 type ActiveFlow =
   | { kind: "champion" }
@@ -57,6 +58,7 @@ export function HomeGeneralPredictionsCard({
   const [playerPickMode, setPlayerPickMode] = useState<PlayerPickMode>("any");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const allTeams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
 
   function closeAll() {
     setActiveFlow(null);
@@ -250,6 +252,8 @@ export function HomeGeneralPredictionsCard({
           open
           onClose={() => setLineupTeam(null)}
           initialView={buildLineupView(lineupTeam)}
+          carouselTeams={allTeams}
+          onCarouselTeamChange={setLineupTeam}
           playerPickMode={playerPickMode}
           onPlayerPicked={(teamName, playerName) => {
             if (activeFlow.kind === "top_scorer") {
