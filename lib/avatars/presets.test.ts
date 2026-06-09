@@ -6,5 +6,6 @@ describe("avatar presets", () => {
   it("resuelve ruta por alias normalizado", () => {
     assert.equal(getPresetAvatarUrl("Hector"), "/icons/avatar/hector.png");
     assert.equal(getPresetAvatarUrl("Solskjær"), "/icons/avatar/solskjaer.png");
+    assert.equal(getPresetAvatarUrl("Solskaer"), "/icons/avatar/solskjaer.png");
   });
 });

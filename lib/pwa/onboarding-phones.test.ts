@@ -33,14 +33,12 @@ describe("onboarding-phones", () => {
   });
 
   it("resuelve alias con acentos y variantes de Solskjær", () => {
-    assert.equal(isOnboardingEligibleUsername("Solskjær"), true);
-    assert.equal(isOnboardingEligibleUsername("SOLSKJAER"), true);
-
-    const fromAccent = resolveParticipantByAlias("Solskjær");
-    const fromAscii = resolveParticipantByAlias("Solskjaer");
-    assert.ok(fromAccent);
-    assert.ok(fromAscii);
-    assert.equal(fromAccent?.username, "solskjaer");
-    assert.equal(fromAscii?.username, "solskjaer");
+    const variants = ["Solskjær", "Solskjaer", "Solskaer", "SOLSKJAER"];
+    for (const variant of variants) {
+      assert.equal(isOnboardingEligibleUsername(variant), true, variant);
+      const match = resolveParticipantByAlias(variant);
+      assert.ok(match, variant);
+      assert.equal(match?.username, "solskjaer", variant);
+    }
   });
 });
