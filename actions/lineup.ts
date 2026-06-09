@@ -5,6 +5,8 @@ import { getPlayerDetail, type PlayerDetail } from "@/lib/lineup/player-detail";
 import { resolveMatchLineups, resolveTeamLineup } from "@/lib/lineup/resolve-lineup";
 import type { FormationId, ResolvedLineup } from "@/lib/lineup/types";
 import { loadTeamKitHexBySlug } from "@/lib/lineup/team-kit-queries";
+import type { SearchablePlayer } from "@/lib/players/search-players";
+import { getAllTournamentPlayers } from "@/lib/worldcup-data/all-squad-players-queries";
 import {
   getTeamSquadByName,
   type TeamSquadWithPlayers,
@@ -12,6 +14,20 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 export type LineupActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
+
+export async function fetchAllTournamentPlayersAction(): Promise<
+  LineupActionResult<SearchablePlayer[]>
+> {
+  try {
+    const supabase = await createClient();
+    const players = await getAllTournamentPlayers(supabase);
+    return { ok: true, data: players };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudieron cargar los jugadores.";
+    return { ok: false, error: message };
+  }
+}
 
 export async function fetchTeamSquadAction(
   teamName: string

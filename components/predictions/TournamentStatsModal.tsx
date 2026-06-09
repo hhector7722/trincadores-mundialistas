@@ -1,8 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { PlayerSearchBar } from "@/components/players/PlayerSearchBar";
 import { Modal } from "@/components/ui/modal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { searchPlayers, type SearchablePlayer } from "@/lib/players/search-players";
+import { normalizeText } from "@/lib/text/normalize-alias";
 import {
   getTournamentStatRows,
   TOURNAMENT_STAT_TABS,
@@ -16,12 +19,44 @@ type TournamentStatsModalProps = {
   matches: MatchWithPrediction[];
 };
 
+const MIN_QUERY_LENGTH = 2;
+
+function filterStatRowsByQuery(
+  rows: ReturnType<typeof getTournamentStatRows>,
+  query: string
+): ReturnType<typeof getTournamentStatRows> {
+  const normalizedQuery = normalizeText(query);
+  if (!normalizedQuery || query.trim().length < MIN_QUERY_LENGTH) return rows;
+
+  const searchable: SearchablePlayer[] = rows.map((row) => ({
+    playerName: row.label,
+    teamName: "",
+    position: null,
+    shirtNumber: null,
+  }));
+
+  const ranked = searchPlayers(searchable, query, { limit: rows.length });
+  const rankedLabels = new Set(ranked.map((player) => player.playerName));
+
+  return rows.filter((row) => rankedLabels.has(row.label));
+}
+
 export function TournamentStatsModal({ open, onClose, matches }: TournamentStatsModalProps) {
   const [activeStat, setActiveStat] = useState<TournamentStatKind>("scorers");
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!open) setQuery("");
+  }, [open]);
 
   const rows = useMemo(
     () => getTournamentStatRows(activeStat, matches),
     [activeStat, matches]
+  );
+
+  const filteredRows = useMemo(
+    () => filterStatRowsByQuery(rows, query),
+    [rows, query]
   );
 
   const emptyLabel = useMemo(() => {
@@ -52,7 +87,16 @@ export function TournamentStatsModal({ open, onClose, matches }: TournamentStats
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="shrink-0 border-b border-[var(--tm-border)] px-3 py-3">
+          <PlayerSearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder="Buscar futbolista…"
+            autoFocus={open}
+          />
+        </div>
+
+        <div className="flex shrink-0 gap-1 overflow-x-auto px-3 pb-2 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TOURNAMENT_STAT_TABS.map((tab) => {
             const active = tab.id === activeStat;
             return (
@@ -76,8 +120,12 @@ export function TournamentStatsModal({ open, onClose, matches }: TournamentStats
         <ul className="min-h-0 flex-1 overflow-y-auto border-t border-[var(--tm-border)] px-3 py-2">
           {rows.length === 0 ? (
             <li className="py-6 text-center text-sm text-[var(--tm-muted)]">{emptyLabel}</li>
+          ) : filteredRows.length === 0 ? (
+            <li className="py-6 text-center text-sm text-[var(--tm-muted)]">
+              No hay resultados para &ldquo;{query.trim()}&rdquo;.
+            </li>
           ) : (
-            rows.map((row, index) => (
+            filteredRows.map((row, index) => (
               <li
                 key={`${row.label}-${index}`}
                 className="flex items-center gap-2 border-b border-[var(--tm-border)] py-2 last:border-0"

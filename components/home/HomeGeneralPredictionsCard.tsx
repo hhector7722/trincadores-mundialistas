@@ -15,6 +15,7 @@ import {
   EntityModalController,
   type PlayerPickMode,
 } from "@/components/lineup/EntityModalController";
+import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamsPickerModal } from "@/components/predictions/TeamsPickerModal";
 import {
   formatChampionDisplay,
@@ -196,12 +197,46 @@ export function HomeGeneralPredictionsCard({
         activeFlow.kind === "tournament_mvp" ||
         activeFlow.kind === "golden_glove") &&
       !lineupTeam ? (
-        <TeamsPickerModal
+        <PlayerAwardPickerModal
           open
           onClose={closeAll}
-          mode="pickOne"
-          closeOnPick={false}
           title={labels[activeFlow.kind]}
+          playerPickMode={playerPickMode}
+          onPickPlayer={(teamName, playerName) => {
+            if (activeFlow.kind === "top_scorer") {
+              runSave(
+                () => saveTournamentTopScorer(poolId, playerName, teamName),
+                () =>
+                  setPredictions((current) => ({
+                    ...current,
+                    topScorerPlayerName: playerName,
+                    topScorerTeamName: teamName,
+                  }))
+              );
+              return;
+            }
+            if (activeFlow.kind === "tournament_mvp") {
+              runSave(
+                () => saveTournamentMvp(poolId, playerName, teamName),
+                () =>
+                  setPredictions((current) => ({
+                    ...current,
+                    tournamentMvpPlayerName: playerName,
+                    tournamentMvpTeamName: teamName,
+                  }))
+              );
+              return;
+            }
+            runSave(
+              () => saveTournamentGoldenGlove(poolId, playerName, teamName),
+              () =>
+                setPredictions((current) => ({
+                  ...current,
+                  goldenGlovePlayerName: playerName,
+                  goldenGloveTeamName: teamName,
+                }))
+            );
+          }}
           onPickTeam={setLineupTeam}
         />
       ) : null}
