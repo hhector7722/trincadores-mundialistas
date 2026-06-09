@@ -87,6 +87,23 @@ export async function signIn(
   return { ok: true };
 }
 
+async function finishPhoneSignIn(
+  username: string,
+  userId: string
+): Promise<AuthActionResult> {
+  const supabase = await createClient();
+  try {
+    await applyPoolCookieForUser(userId);
+  } catch (e) {
+    await supabase.auth.signOut();
+    const msg = e instanceof Error ? e.message : "Error al resolver la porra.";
+    return { ok: false, error: msg };
+  }
+
+  await setOnboardedDeviceCookie(username);
+  return { ok: true };
+}
+
 export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResult> {
   const phone = normalizePhone(phoneRaw);
   if (!phone) {
@@ -100,25 +117,21 @@ export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResul
 
   const accessCode = getOnboardingAccessCode(participant.username);
   if (accessCode) {
-    return signIn(participant.username, accessCode);
+    const passwordSignIn = await signIn(participant.username, accessCode);
+    if (passwordSignIn.ok) {
+      return passwordSignIn;
+    }
   }
 
   const trusted = await signInTrustedUserByUsername(participant.username);
   if (!trusted.ok) {
-    return trusted;
+    return {
+      ok: false,
+      error: "No se pudo validar el acceso. Contacta al administrador.",
+    };
   }
 
-  const supabase = await createClient();
-  try {
-    await applyPoolCookieForUser(trusted.userId);
-  } catch (e) {
-    await supabase.auth.signOut();
-    const msg = e instanceof Error ? e.message : "Error al resolver la porra.";
-    return { ok: false, error: msg };
-  }
-
-  await setOnboardedDeviceCookie(participant.username);
-  return { ok: true };
+  return finishPhoneSignIn(participant.username, trusted.userId);
 }
 
 export async function signOut(): Promise<void> {

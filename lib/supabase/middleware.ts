@@ -35,10 +35,6 @@ function isPublicPath(pathname: string): boolean {
   );
 }
 
-function hasLegacyPwaOnboardingCookie(request: NextRequest): boolean {
-  return request.cookies.get(PWA_ONBOARDING_COOKIE)?.value === "1";
-}
-
 function getOnboardedUsername(request: NextRequest): string | null {
   return readOnboardedUsernameFromCookieValue(
     request.cookies.get(ONBOARDED_USER_COOKIE)?.value,
@@ -105,22 +101,14 @@ export async function updateSession(request: NextRequest) {
     return redirectToRestore(request);
   }
 
-  if (!user && isAuthPath(pathname) && !hasLegacyPwaOnboardingCookie(request)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/bienvenida";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
+  if (!user && isAuthPath(pathname)) {
+    return supabaseResponse;
   }
 
   if (!user && !isAuthPath(pathname) && !isOnboardingPath(pathname)) {
     const redirectUrl = request.nextUrl.clone();
-    if (!hasLegacyPwaOnboardingCookie(request)) {
-      redirectUrl.pathname = "/bienvenida";
-      redirectUrl.search = "";
-    } else {
-      redirectUrl.pathname = "/login";
-      redirectUrl.searchParams.set("next", pathname);
-    }
+    redirectUrl.pathname = "/login";
+    redirectUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
