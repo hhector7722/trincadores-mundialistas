@@ -47,7 +47,7 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[1.875rem] w-[1.5rem]"
+            ? "h-[2.125rem] w-[1.75rem]"
             : isModal
               ? "h-[38px] w-[32px]"
               : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
@@ -89,13 +89,13 @@ export function LineupPlayerChip({
         className={cn(
           "-mt-px w-full rounded-md border bg-black/55 text-center backdrop-blur-sm",
           isMatch ? "px-1 py-0.5" : "px-1 py-0.5",
-          selected ? "border-[var(--tm-accent)]" : "border-white/10"
+          selected ? "border-[var(--tm-accent)]" : isMatch ? "border-white/20" : "border-white/10"
         )}
       >
         <p
           className={cn(
-            "whitespace-normal text-center font-semibold leading-tight text-white",
-            isMatch ? "text-[8px]" : isModal ? "text-[8px]" : "text-[9px] sm:text-[10px]"
+            "whitespace-normal text-center leading-tight text-white",
+            isMatch ? "text-[9px] font-bold" : isModal ? "text-[8px] font-semibold" : "text-[9px] font-semibold sm:text-[10px]"
           )}
         >
           {shirtPlayerName(slot.name)}
@@ -112,7 +112,7 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "w-[3.125rem] min-h-9"
+      ? "w-[3.375rem] min-h-10"
       : isModal
         ? "w-[3.5rem] min-h-9"
         : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",

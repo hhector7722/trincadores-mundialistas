@@ -36,40 +36,48 @@ export function MvpBenchStrip({
         position === "top" ? "pb-2" : "pt-2"
       )}
     >
-      <h4 className="mb-2 flex min-h-7 items-center justify-center gap-2 text-sm font-semibold text-[var(--tm-fg)]">
+      <h4 className="mb-1.5 flex min-h-6 items-center justify-center gap-1.5 text-[10px] font-medium text-[var(--tm-muted)]">
         <TeamFlagBadge name={teamName} size="xs" />
         <span>{teamNameEs(teamName)}</span>
       </h4>
-      <p className="text-sm leading-snug text-[var(--tm-fg)]">
-        {players.map((player, index) => {
+      <div className="grid grid-cols-4 gap-x-0.5 gap-y-1">
+        {players.map((player) => {
           const key = benchPlayerKey(teamName, player);
           const active = selectedKey === key;
 
           return (
-            <span key={player.key}>
-              {index > 0 ? ", " : null}
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => onSelect(key)}
+            <button
+              key={player.key}
+              type="button"
+              disabled={disabled}
+              onClick={() => onSelect(key)}
+              className={cn(
+                "flex w-full min-h-8 flex-col items-center justify-center px-0.5 py-0.5 text-center transition-colors",
+                "hover:opacity-90 active:opacity-80",
+                active && "rounded-sm bg-[rgba(212,255,0,0.1)]",
+                disabled && "opacity-60"
+              )}
+            >
+              <span
                 className={cn(
-                  "inline text-left whitespace-nowrap transition-colors",
-                  "hover:opacity-90 active:opacity-80",
-                  active && "rounded-sm bg-[rgba(212,255,0,0.12)] px-0.5",
-                  disabled && "opacity-60"
+                  "font-display text-[9px] font-medium leading-none text-[var(--tm-subtle)]",
+                  active && "text-[var(--tm-accent)]"
                 )}
               >
-                <span className="font-display font-bold text-[var(--tm-accent)]">
-                  {player.shirtNumber ?? "—"}
-                </span>{" "}
-                <span className={cn("hover:text-[var(--tm-accent)]", active && "text-[var(--tm-accent)]")}>
-                  {shortPlayerName(player.name)}
-                </span>
-              </button>
-            </span>
+                {player.shirtNumber ?? "—"}
+              </span>
+              <span
+                className={cn(
+                  "mt-0.5 text-[8px] leading-tight text-[var(--tm-muted)]",
+                  active && "text-[var(--tm-accent)]"
+                )}
+              >
+                {shortPlayerName(player.name)}
+              </span>
+            </button>
           );
         })}
-      </p>
+      </div>
     </section>
   );
 }
