@@ -62,7 +62,6 @@ export function ProfileAvatarButton({
         onClose={() => setOpen(false)}
         avatarUrl={avatarUrl}
         label={label}
-        layout={variant === "profile" ? "centered" : "footer"}
       />
     </>
   );
