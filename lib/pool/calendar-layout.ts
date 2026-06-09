@@ -38,9 +38,17 @@ const ACCESS_BTN_ROW_HEIGHT_RATIO = 0.46;
 const ACCESS_BTN_PAD_Y_RATIO = 0.14;
 const ACCESS_DOCK_GAP_SCALE_RATIO = 0.1;
 const MAX_ACCESS_DOCK_GRID_GAP_PX = 12;
-const SIDEBAR_REFERENCE_COLUMN = 4;
 const SIDEBAR_BODY_GAP_PX = 6;
 const SIDEBAR_CARD_BOTTOM_PAD_PX = 6;
+
+/** Partido que marca el final inferior de la card lateral del calendario. */
+export const CALENDAR_SIDEBAR_CARD_ANCHOR = {
+  day: 14,
+  kickoffHour: "22:00",
+  groupCode: "F",
+} as const;
+
+export const SIDEBAR_CARD_ANCHOR_ATTR = "data-sidebar-card-anchor";
 
 export function getMaxMatchesInMonthGrid<T extends { inMonth: boolean; matches: unknown[] }>(
   cells: T[]
@@ -309,49 +317,17 @@ function getMinAccessDockReserve(): number {
   return computeAccessDockHeight(btnFs, btnPy, gridGap);
 }
 
-/** La card termina al mismo Y que el primer partido de la columna D (Jue) de su fila. */
-function findSidebarReferenceCell(
-  grid: HTMLElement,
-  slot: HTMLElement
-): HTMLElement | null {
-  const slotRow = slot.style.gridRow;
-  if (!slotRow) return null;
-
-  for (const child of grid.children) {
-    if (!(child instanceof HTMLElement)) continue;
-    if (child.classList.contains("tm-cal-sidebar-slot")) continue;
-    if (child.style.gridRow !== String(slotRow)) continue;
-    if (child.style.gridColumn === String(SIDEBAR_REFERENCE_COLUMN)) {
-      return child;
-    }
-  }
-
-  return null;
+function findSidebarAnchorMatchCard(grid: HTMLElement): HTMLElement | null {
+  return grid.querySelector<HTMLElement>(`.tm-cal-match-card[${SIDEBAR_CARD_ANCHOR_ATTR}]`);
 }
 
-function measureReferenceMatchBottom(
-  cell: HTMLElement,
-  calendar: HTMLElement
-): number | null {
-  const firstMatch = cell.querySelector<HTMLElement>(".tm-cal-match-card");
-  if (firstMatch) {
-    return firstMatch.getBoundingClientRect().bottom;
-  }
-
-  const anchor = cell.querySelector<HTMLElement>(".tm-cal-day-num");
-  const matchList = cell.querySelector<HTMLElement>(".tm-cal-match-list");
-  if (!anchor && !matchList) return null;
-
-  const cardHeightRaw = getComputedStyle(calendar).getPropertyValue("--tm-cal-match-card-h");
-  const cardHeight = cardHeightRaw
-    ? Number.parseFloat(cardHeightRaw)
-    : MIN_MATCH_CARD_HEIGHT_PX;
-
-  const top = (anchor ?? matchList)!.getBoundingClientRect().bottom;
-  return top + 2 + cardHeight;
+function measureSidebarAnchorMatchBottom(grid: HTMLElement): number | null {
+  const anchor = findSidebarAnchorMatchCard(grid);
+  if (!anchor) return null;
+  return anchor.getBoundingClientRect().bottom;
 }
 
-/** Altura de la card alineada con el partido de referencia en columna D. */
+/** Altura de la card alineada con el partido ancla (día 14, 22:00, grupo F). */
 function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
   const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
@@ -365,15 +341,12 @@ function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   calendar.style.setProperty("--tm-cal-sidebar-card-bottom-pad", `${SIDEBAR_CARD_BOTTOM_PAD_PX}px`);
 
   let cardHeight = body.clientHeight;
-  const refCell = findSidebarReferenceCell(grid, slot);
-  if (refCell) {
-    const refBottom = measureReferenceMatchBottom(refCell, calendar);
-    if (refBottom != null) {
-      const bodyTop = body.getBoundingClientRect().top;
-      const alignedHeight = Math.floor(refBottom - bodyTop);
-      if (alignedHeight > 0) {
-        cardHeight = Math.min(body.clientHeight, alignedHeight);
-      }
+  const refBottom = measureSidebarAnchorMatchBottom(grid);
+  if (refBottom != null) {
+    const bodyTop = body.getBoundingClientRect().top;
+    const alignedHeight = Math.floor(refBottom - bodyTop);
+    if (alignedHeight > 0) {
+      cardHeight = Math.min(body.clientHeight, alignedHeight);
     }
   }
 

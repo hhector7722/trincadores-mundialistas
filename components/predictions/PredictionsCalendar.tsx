@@ -11,7 +11,12 @@ import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
-import { fitCalendarLayout, resetCalendarLayout } from "@/lib/pool/calendar-layout";
+import {
+  CALENDAR_SIDEBAR_CARD_ANCHOR,
+  fitCalendarLayout,
+  resetCalendarLayout,
+  SIDEBAR_CARD_ANCHOR_ATTR,
+} from "@/lib/pool/calendar-layout";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
@@ -43,6 +48,16 @@ type PredictionsCalendarProps = {
   matches: MatchWithPrediction[];
 };
 
+function isSidebarCardAnchorMatch(match: MatchWithPrediction): boolean {
+  const dateKey = kickoffDateKey(match.kickoff_at);
+  const day = Number(dateKey.split("-")[2]);
+  return (
+    day === CALENDAR_SIDEBAR_CARD_ANCHOR.day &&
+    match.group_code?.toUpperCase() === CALENDAR_SIDEBAR_CARD_ANCHOR.groupCode &&
+    formatCalendarKickoffHour(match.kickoff_at) === CALENDAR_SIDEBAR_CARD_ANCHOR.kickoffHour
+  );
+}
+
 function formatCalendarPrediction(match: MatchWithPrediction): string {
   const prediction = match.prediction;
   if (
@@ -65,6 +80,7 @@ function CalendarMatchCard({
   const time = formatCalendarKickoffHour(match.kickoff_at);
   const predictionLabel = formatCalendarPrediction(match);
   const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
+  const isSidebarAnchor = isSidebarCardAnchorMatch(match);
 
   return (
     <button
@@ -72,6 +88,7 @@ function CalendarMatchCard({
       title={title}
       aria-label={title}
       onClick={onOpen}
+      {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
       className={cn(
         "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden transition-colors hover:bg-[rgba(111,43,255,0.22)]",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
