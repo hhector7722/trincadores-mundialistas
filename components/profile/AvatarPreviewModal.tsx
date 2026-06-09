@@ -6,6 +6,9 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { isShareSaveCancellation, saveImageToGallery } from "@/lib/media/save-image-to-gallery";
 
+const AVATAR_PREVIEW_IMAGE_CLASS =
+  "max-h-[min(65dvh,calc(100vw-2rem))] max-w-full rounded-xl object-contain";
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -54,24 +57,22 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
       open={open}
       onClose={onClose}
       title={label}
-      hideHeader
+      headerTitleAlign="left"
       ariaLabel={`Avatar ampliado de ${label}`}
-      containerClassName="fixed inset-0 z-[100] flex flex-col p-0"
-      wrapperClassName="relative z-10 flex h-full min-h-0 w-full max-w-none flex-1 flex-col items-center justify-center pointer-events-none"
-      className="flex max-h-none h-full min-h-0 w-full max-w-none flex-1 flex-col rounded-none border-0 bg-transparent shadow-none backdrop-blur-none"
-      backdropClassName="bg-[#2a1058]/95 backdrop-blur-lg"
+      wrapperClassName="w-full max-w-[calc(100vw-2rem)]"
+      className="w-max max-w-full"
     >
-      <div className="pointer-events-auto flex w-full flex-col items-center justify-center gap-4 px-4 py-8">
+      <div className="flex flex-col items-center gap-4 px-4 pb-4 pt-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={imageRef}
           src={avatarUrl}
           alt={`Avatar de ${label}`}
-          className="max-h-[min(65dvh,calc(100vw-2rem))] max-w-full rounded-xl object-contain"
+          className={AVATAR_PREVIEW_IMAGE_CLASS}
         />
         <Button
           type="button"
-          className="w-full max-w-sm gap-2"
+          className="w-full min-w-[12rem] gap-2"
           disabled={saving}
           onClick={handleSave}
         >
