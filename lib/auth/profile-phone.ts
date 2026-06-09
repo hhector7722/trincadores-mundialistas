@@ -1,5 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { normalizePhone } from "@/lib/pwa/onboarding-phones";
+import {
+  normalizePhone,
+  ONBOARDING_PHONE_DIRECTORY,
+  resolveParticipantByPhone,
+} from "@/lib/pwa/onboarding-phones";
 
 export type ProfilePhoneRow = {
   id: string;
@@ -8,39 +12,82 @@ export type ProfilePhoneRow = {
   phone: string;
 };
 
-/** Busca participante por movil en profiles.phone (fuente de verdad en BD). */
+type ProfileSelectRow = {
+  id: string;
+  username: string;
+  display_name: string | null;
+};
+
+function toProfilePhoneRow(row: ProfileSelectRow, phone: string): ProfilePhoneRow {
+  return {
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name?.trim() || row.username,
+    phone,
+  };
+}
+
+async function lookupProfileByUsername(
+  username: string,
+  phone: string
+): Promise<ProfilePhoneRow | null> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("profiles")
+    .select("id, username, display_name")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return toProfilePhoneRow(data, phone);
+}
+
+/** Busca participante por movil (BD + fallback directorio local). */
 export async function lookupProfileByPhone(
   phoneRaw: string
 ): Promise<ProfilePhoneRow | null> {
   const phone = normalizePhone(phoneRaw);
   if (!phone) return null;
 
-  const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id, username, display_name, phone")
-    .eq("phone", phone)
-    .maybeSingle();
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("profiles")
+      .select("id, username, display_name")
+      .eq("phone", phone)
+      .maybeSingle();
 
-  if (error || !data?.phone) return null;
+    if (!error && data) {
+      return toProfilePhoneRow(data, phone);
+    }
+  } catch {
+    // Seguir al fallback por username.
+  }
 
-  return {
-    id: data.id,
-    username: data.username,
-    displayName: data.display_name?.trim() || data.username,
-    phone: data.phone,
-  };
+  const participant = resolveParticipantByPhone(phone);
+  if (!participant) return null;
+
+  try {
+    return await lookupProfileByUsername(participant.username, phone);
+  } catch {
+    return null;
+  }
 }
 
 /** Movil nacional guardado en profiles para un alias. */
 export async function lookupPhoneByUsername(username: string): Promise<string | null> {
-  const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("profiles")
-    .select("phone")
-    .eq("username", username)
-    .maybeSingle();
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("profiles")
+      .select("phone")
+      .eq("username", username)
+      .maybeSingle();
 
-  if (error || !data?.phone) return null;
-  return data.phone;
+    if (!error && data?.phone) return data.phone;
+  } catch {
+    // fallback abajo
+  }
+
+  return ONBOARDING_PHONE_DIRECTORY.find((row) => row.username === username)?.phone ?? null;
 }
