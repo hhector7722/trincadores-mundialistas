@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
-import { Modal } from "@/components/ui/modal";
+import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
 import { getQuizSlotStatus } from "@/lib/quiz/slot-status";
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
 
@@ -84,15 +84,12 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         </section>
       </div>
 
-      <Modal
+      <QuizWaitModal
         open={waitModalOpen}
         onClose={() => setWaitModalOpen(false)}
         title="Quiz del dia"
-      >
-        <p className="text-sm text-[var(--tm-fg)]">
-          Espera hasta mañana para un nuevo quiz crack
-        </p>
-      </Modal>
+        message="Espera hasta mañana para un nuevo quiz crack"
+      />
     </div>
   );
 }

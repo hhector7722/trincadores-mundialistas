@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Modal } from "@/components/ui/modal";
+import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
 import { canOpenQuizPlay, getQuizSlotStatus } from "@/lib/quiz/slot-status";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
@@ -64,15 +64,12 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
         </div>
       </div>
 
-      <Modal
+      <QuizWaitModal
         open={alreadyPlayedOpen}
         onClose={() => setAlreadyPlayedOpen(false)}
         title="Quiz diario"
-      >
-        <p className="text-sm leading-relaxed text-[var(--tm-fg)]">
-          Ya has jugado el quiz diario de hoy. Espera a mañana crack
-        </p>
-      </Modal>
+        message="Ya has jugado el quiz diario de hoy. Espera a mañana crack"
+      />
     </>
   );
 }
