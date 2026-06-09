@@ -1,5 +1,6 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import {
+  findPrimaryMatchIdForTeam,
   isBetterLineupSource,
   loadCachedTeamLineup,
   upsertTeamLineup,
@@ -56,12 +57,22 @@ export async function fetchPredictedLineup(
 }
 
 /** Indica qué fuente se usaría sin persistir ni construir el fallback completo. */
+async function resolveContextMatchId(
+  supabase: SupabaseClient,
+  context: LineupResolveContext
+): Promise<string | undefined> {
+  if (context.matchId) return context.matchId;
+  const primary = await findPrimaryMatchIdForTeam(supabase, context.teamName);
+  return primary ?? undefined;
+}
+
 export async function getLineupSource(
   supabase: SupabaseClient,
   context: LineupResolveContext
 ): Promise<LineupSourceResolution> {
-  if (context.matchId) {
-    const cached = await loadCachedTeamLineup(supabase, context.matchId, context.teamName);
+  const matchId = await resolveContextMatchId(supabase, context);
+  if (matchId) {
+    const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
     if (cached?.sourceKind === "confirmed") {
       return {
         kind: "confirmed",
@@ -72,7 +83,7 @@ export async function getLineupSource(
 
     const confirmed = await fetchConfirmedLineup(supabase, {
       ...context,
-      matchId: context.matchId,
+      matchId,
     });
     if (confirmed) {
       return {
@@ -92,7 +103,7 @@ export async function getLineupSource(
 
     const predicted = await fetchPredictedLineup(supabase, {
       ...context,
-      matchId: context.matchId,
+      matchId,
     });
     if (predicted) {
       return {
@@ -131,23 +142,24 @@ export async function resolveTeamLineup(
   supabase: SupabaseClient,
   context: LineupResolveContext
 ): Promise<ResolvedLineup> {
-  if (!context.matchId) {
+  const matchId = await resolveContextMatchId(supabase, context);
+  if (!matchId) {
     return buildFallbackLineup(context.players, context.formationOverride);
   }
 
-  const cached = await loadCachedTeamLineup(supabase, context.matchId, context.teamName);
+  const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
   if (cached?.sourceKind === "confirmed") {
     return cached;
   }
 
   const confirmed = await fetchConfirmedLineup(supabase, {
     ...context,
-    matchId: context.matchId,
+    matchId,
   });
   if (confirmed) {
     await upsertTeamLineup(
       supabase,
-      context.matchId,
+      matchId,
       context.teamName,
       confirmed,
       confirmed.bench ?? benchFromSquadExcludingStarters(confirmed, context)
@@ -161,12 +173,12 @@ export async function resolveTeamLineup(
 
   const predicted = await fetchPredictedLineup(supabase, {
     ...context,
-    matchId: context.matchId,
+    matchId,
   });
   if (predicted) {
     await upsertTeamLineup(
       supabase,
-      context.matchId,
+      matchId,
       context.teamName,
       predicted,
       benchFromSquadExcludingStarters(predicted, context)
@@ -182,7 +194,7 @@ export async function resolveTeamLineup(
   if (isBetterLineupSource(fallback.sourceKind, cached?.sourceKind ?? null) || !cached) {
     await upsertTeamLineup(
       supabase,
-      context.matchId,
+      matchId,
       context.teamName,
       fallback,
       benchFromSquadExcludingStarters(fallback, context)

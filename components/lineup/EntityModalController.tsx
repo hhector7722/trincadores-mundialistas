@@ -41,6 +41,7 @@ function renderEntityView(
       return (
         <LineupModalPanel
           teamName={view.teamName}
+          matchId={view.matchId}
           onPlayerClick={(playerName) => handlers.onPlayerClick(view.teamName, playerName)}
           selectionMode={playerPickMode === "none" ? "navigate" : "pick"}
           playerFilter={
@@ -174,8 +175,8 @@ export function EntityModalController({
   );
 }
 
-export function buildLineupView(teamName: string): EntityModalView {
-  return { kind: "lineup", teamName };
+export function buildLineupView(teamName: string, matchId?: string): EntityModalView {
+  return { kind: "lineup", teamName, matchId };
 }
 
 export function buildMvpView(

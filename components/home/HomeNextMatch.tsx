@@ -81,8 +81,8 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               awayTeam={match.away_team}
               kickoffAt={match.kickoff_at}
               isLive={isLive}
-              onHomeTeamClick={() => openEntityModal(buildLineupView(match.home_team))}
-              onAwayTeamClick={() => openEntityModal(buildLineupView(match.away_team))}
+              onHomeTeamClick={() => openEntityModal(buildLineupView(match.home_team, match.id))}
+              onAwayTeamClick={() => openEntityModal(buildLineupView(match.away_team, match.id))}
               centerSlotAlign={saved ? "default" : "teamNames"}
               centerSlot={
                 saved ? (
@@ -145,8 +145,8 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 awayAnchor="85%"
                 className="[&>div]:min-h-[2rem]"
                 match={match}
-                onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team))}
-                onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team))}
+                onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team, match.id))}
+                onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team, match.id))}
                 onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
               />
             </div>

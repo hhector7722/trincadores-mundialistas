@@ -4,7 +4,7 @@ import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
-import type { FormationId } from "@/lib/lineup/types";
+import type { FormationId, ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 type ProbableXIProps = {
   squad: TeamSquadWithPlayers | null;
   teamName: string;
+  lineup?: ResolvedLineup | null;
   year?: number | null;
   formation?: FormationId;
   backHref?: string;
@@ -21,6 +22,7 @@ type ProbableXIProps = {
 export function ProbableXI({
   squad,
   teamName,
+  lineup: resolvedLineup,
   year,
   formation,
   backHref = "/predictions",
@@ -61,7 +63,7 @@ export function ProbableXI({
     );
   }
 
-  const lineup = buildFallbackLineup(squad.players, formation);
+  const lineup = resolvedLineup ?? buildFallbackLineup(squad.players, formation);
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>

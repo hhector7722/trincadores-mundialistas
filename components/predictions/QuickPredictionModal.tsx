@@ -257,8 +257,8 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
-                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team))}
-                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team))}
+                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                 homeScoreSlot={
                   <ScoreStepper
                     label={targetMatch.home_team}
@@ -287,8 +287,8 @@ export function QuickPredictionModal({
               layout="teamAnchors"
               className="mt-[0.35rem] [&>div]:min-h-[2rem]"
               match={targetMatch}
-              onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team))}
-              onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team))}
+              onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+              onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
               onOpenMvp={() => push(buildMvpView(poolId, targetMatch))}
             />
 
@@ -318,6 +318,7 @@ export function QuickPredictionModal({
       return (
         <LineupModalPanel
           teamName={view.teamName}
+          matchId={view.matchId}
           onPlayerClick={(playerName) =>
             push({ kind: "player", teamName: view.teamName, playerName })
           }

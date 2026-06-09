@@ -1,5 +1,5 @@
 export type EntityModalView =
-  | { kind: "lineup"; teamName: string }
+  | { kind: "lineup"; teamName: string; matchId?: string }
   | { kind: "player"; teamName: string; playerName: string }
   | {
       kind: "mvp";

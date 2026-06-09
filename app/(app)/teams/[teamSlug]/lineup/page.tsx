@@ -1,4 +1,5 @@
 import { ProbableXI } from "@/components/lineup/ProbableXI";
+import { resolveTeamLineup } from "@/lib/lineup/resolve-lineup";
 import { squadTeamNameFromSlug } from "@/lib/lineup/squad-name";
 import type { FormationId } from "@/lib/lineup/types";
 import { CURRENT_WORLD_CUP_YEAR, getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
@@ -26,11 +27,20 @@ export default async function TeamLineupPage({
 
   const supabase = await createClient();
   const squad = await getTeamSquadByName(supabase, teamName, { year });
+  const lineup =
+    squad && squad.players.length > 0
+      ? await resolveTeamLineup(supabase, {
+          teamName,
+          players: squad.players,
+          formationOverride: formation,
+        })
+      : null;
 
   return (
     <ProbableXI
       squad={squad}
       teamName={teamName}
+      lineup={lineup}
       year={year}
       formation={formation}
       backHref="/predictions"

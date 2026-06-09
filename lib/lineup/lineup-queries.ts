@@ -55,6 +55,40 @@ export function isBetterLineupSource(
   return SOURCE_PRIORITY[candidate] > SOURCE_PRIORITY[current];
 }
 
+type TeamMatchRef = {
+  id: string;
+  kickoff_at: string;
+  status: string | null;
+};
+
+function mergeTeamMatches(rows: TeamMatchRef[]): TeamMatchRef[] {
+  const byId = new Map<string, TeamMatchRef>();
+  for (const row of rows) {
+    byId.set(row.id, row);
+  }
+  return [...byId.values()].sort((a, b) => a.kickoff_at.localeCompare(b.kickoff_at));
+}
+
+/** Próximo partido programado de la selección; si no hay, el primero del calendario. */
+export async function findPrimaryMatchIdForTeam(
+  supabase: SupabaseClient,
+  teamName: string
+): Promise<string | null> {
+  const [homeRes, awayRes] = await Promise.all([
+    supabase.from("matches").select("id, kickoff_at, status").eq("home_team", teamName),
+    supabase.from("matches").select("id, kickoff_at, status").eq("away_team", teamName),
+  ]);
+
+  const matches = mergeTeamMatches([...(homeRes.data ?? []), ...(awayRes.data ?? [])]);
+  if (!matches.length) return null;
+
+  const now = new Date().toISOString();
+  const upcoming = matches.find(
+    (match) => match.status === "scheduled" && match.kickoff_at >= now
+  );
+  return upcoming?.id ?? matches[0].id;
+}
+
 export async function upsertTeamLineup(
   supabase: SupabaseClient,
   matchId: string,
