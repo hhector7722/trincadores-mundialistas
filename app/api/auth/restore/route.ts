@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { clearDeviceCookiesOnResponse } from "@/lib/auth/clear-device-cookies";
 import {
   ONBOARDED_USER_COOKIE,
   readOnboardedUsernameFromCookieValue,
@@ -39,7 +40,9 @@ export async function GET(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/bienvenida";
       redirectUrl.search = "";
-      return NextResponse.redirect(redirectUrl);
+      const response = NextResponse.redirect(redirectUrl);
+      clearDeviceCookiesOnResponse(response);
+      return response;
     }
 
     const redirectUrl = request.nextUrl.clone();

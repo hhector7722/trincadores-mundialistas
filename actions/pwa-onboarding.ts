@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import {
+  clearOnboardedDeviceCookie,
   getOnboardedDeviceUsername,
   isProfileOnboardingComplete,
   setOnboardedDeviceCookie,
@@ -33,7 +34,21 @@ export type PwaEntryRoute = "restore" | "login" | "onboard";
 export async function resolvePwaEntryRoute(): Promise<PwaEntryRoute> {
   const deviceUsername = await getOnboardedDeviceUsername();
   if (deviceUsername) {
-    return "restore";
+    try {
+      const admin = createAdminClient();
+      const { data: profile, error } = await admin
+        .from("profiles")
+        .select("username, is_active, onboarding_completed_at, avatar_url")
+        .eq("username", deviceUsername)
+        .maybeSingle();
+
+      if (!error && profile?.is_active && isProfileOnboardingComplete(profile)) {
+        return "restore";
+      }
+    } catch {
+      // Cookie de dispositivo obsoleta: seguir al onboarding.
+    }
+    await clearOnboardedDeviceCookie();
   }
 
   const supabase = await createClient();
@@ -52,11 +67,6 @@ export async function resolvePwaEntryRoute(): Promise<PwaEntryRoute> {
       await setOnboardedDeviceCookie(profile.username);
       return "restore";
     }
-  }
-
-  const cookieStore = await cookies();
-  if (cookieStore.get(PWA_ONBOARDING_COOKIE)?.value === "1") {
-    return "login";
   }
 
   return "onboard";

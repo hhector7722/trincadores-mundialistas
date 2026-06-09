@@ -126,6 +126,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!user && onboardedUsername) {
+    if (isOnboardingPath(pathname)) {
+      return supabaseResponse;
+    }
     return redirectToRestore(request);
   }
 
