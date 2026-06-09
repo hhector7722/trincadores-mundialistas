@@ -1,4 +1,5 @@
 import { getLatestSubmittedAttemptId } from "@/lib/quiz/queries";
+import { QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF } from "@/lib/quiz/play-routes";
 import {
   canReplayQuiz,
   formatQuizSlotStatusLabel,
@@ -24,18 +25,18 @@ function ctaForStatus(
   replayable: boolean
 ): { label: string; href: string } {
   if (replayable) {
-    return { label: "Jugar de nuevo", href: "/quiz/play" };
+    return { label: "Jugar de nuevo", href: QUIZ_PLAY_HREF };
   }
   if (status === "completed" && resultHref) {
     return { label: "Ver resultado", href: resultHref };
   }
   if (status === "in_progress") {
-    return { label: "Continuar", href: "/quiz/play" };
+    return { label: "Continuar", href: QUIZ_PLAY_RESUME_HREF };
   }
   if (status === "expired") {
-    return { label: "Nuevo intento", href: "/quiz/play" };
+    return { label: "Nuevo intento", href: QUIZ_PLAY_HREF };
   }
-  return { label: "Jugar", href: "/quiz/play" };
+  return { label: "Jugar", href: QUIZ_PLAY_HREF };
 }
 
 function headlineForSlide(

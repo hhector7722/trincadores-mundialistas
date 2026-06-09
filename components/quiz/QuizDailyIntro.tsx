@@ -24,6 +24,7 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
   const [splashMinElapsed, setSplashMinElapsed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
+  const [needsTapToPlay, setNeedsTapToPlay] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const completedRef = useRef(false);
 
@@ -58,15 +59,28 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
     setStage("video");
   }, [splashMinElapsed, stage, videoReady]);
 
+  const tryPlayVideo = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video) return false;
+
+    video.muted = true;
+    try {
+      await video.play();
+      setNeedsTapToPlay(false);
+      return true;
+    } catch {
+      setNeedsTapToPlay(true);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     if (stage !== "video") return;
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = 0;
-    void video.play().catch(() => {
-      beginOutro();
-    });
-  }, [beginOutro, stage]);
+    void tryPlayVideo();
+  }, [stage, tryPlayVideo]);
 
   useEffect(() => {
     if (stage !== "outro") return;
@@ -158,11 +172,13 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
                 src={QUIZ_INTRO_VIDEO_SRC}
                 className="tm-quiz-intro-video"
                 playsInline
+                muted
                 preload="auto"
                 onCanPlayThrough={handleCanPlayThrough}
                 onLoadedMetadata={handleLoadedMetadata}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={handleEnded}
+                onError={() => setNeedsTapToPlay(true)}
               />
               <div className="tm-quiz-intro-video-scanlines" aria-hidden="true" />
             </div>
@@ -180,7 +196,15 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
             }
             aria-live="polite"
           >
-            {countdown ? (
+            {needsTapToPlay ? (
+              <button
+                type="button"
+                onClick={() => void tryPlayVideo()}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)]"
+              >
+                Toca para continuar
+              </button>
+            ) : countdown ? (
               <>
                 {countdown.eyebrow ? (
                   <p

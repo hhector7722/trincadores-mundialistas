@@ -57,7 +57,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
 
   const playReady = Boolean(session) && !loading && !loadError;
   const contentVisible =
-    (playReady && (skipIntro || quizRevealed)) ||
+    (playReady && (skipIntro || (quizRevealed && introDone))) ||
     (Boolean(loadError) && (skipIntro || introDone));
 
   useEffect(() => {
