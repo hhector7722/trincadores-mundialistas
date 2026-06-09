@@ -35,7 +35,7 @@ type MvpPredictionPanelProps = {
 
 type SquadPlayerOption = {
   key: string;
-  playerName: string;
+  name: string;
   teamName: string;
   shirtNumber: number | null;
   position: string | null;
@@ -73,7 +73,7 @@ function flattenSquadPlayers(
         name: player.player_name,
         shirtNumber: player.shirt_number,
       }),
-      playerName: player.player_name,
+      name: player.player_name,
       teamName,
       shirtNumber: player.shirt_number,
       position: player.position,
@@ -209,7 +209,7 @@ export function MvpPredictionPanel({
       const result = await saveMvpPrediction(
         poolId,
         matchId,
-        selected.playerName,
+        selected.name,
         selected.teamName
       );
       if (!result.ok) {
@@ -247,7 +247,7 @@ export function MvpPredictionPanel({
         ) : (
           <p className="mb-0.5 shrink-0 px-1 text-center text-[9px] text-[var(--tm-muted)]">
             {selectedOption
-              ? `MVP: ${selectedOption.playerName} (${selectedOption.teamName})`
+              ? `MVP: ${selectedOption.name} (${selectedOption.teamName})`
               : "Pulsa un jugador del once probable o de las reservas."}
           </p>
         )}

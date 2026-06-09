@@ -1,6 +1,9 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
-import { getSiteUrl } from "@/lib/site-url";import "./globals.css";
+import { AppUpdateNotifier } from "@/components/pwa/AppUpdateNotifier";
+import { getSiteUrl } from "@/lib/site-url";
+import { getDeploymentVersion } from "@/lib/pwa/deployment-version";
+import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -73,9 +76,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const deploymentVersion = getDeploymentVersion();
+
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
-      <body className="antialiased touch-manipulation">{children}</body>
+      <body className="antialiased touch-manipulation">
+        <AppUpdateNotifier deploymentVersion={deploymentVersion} />
+        {children}
+      </body>
     </html>
   );
 }
