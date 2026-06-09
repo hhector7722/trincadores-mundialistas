@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import { Download } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
-import { Button } from "@/components/ui/button";
 import { isShareSaveCancellation, saveImageToGallery } from "@/lib/media/save-image-to-gallery";
+import { cn } from "@/lib/utils";
 
 const AVATAR_PREVIEW_IMAGE_CLASS =
   "max-h-[min(65dvh,calc(100vw-2rem))] max-w-full rounded-xl object-contain";
@@ -59,8 +59,9 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
       title={label}
       headerTitleAlign="left"
       ariaLabel={`Avatar ampliado de ${label}`}
-      wrapperClassName="w-full max-w-[calc(100vw-2rem)]"
-      className="w-max max-w-full"
+      wrapperClassName="w-max max-w-[calc(100vw-2rem)]"
+      panelHostClassName="w-max"
+      className="w-max max-w-[calc(100vw-2rem)]"
     >
       <div className="flex flex-col items-center gap-4 px-4 pb-4 pt-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -70,15 +71,20 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
           alt={`Avatar de ${label}`}
           className={AVATAR_PREVIEW_IMAGE_CLASS}
         />
-        <Button
+        <button
           type="button"
-          className="w-full min-w-[12rem] gap-2"
           disabled={saving}
           onClick={handleSave}
+          className={cn(
+            "inline-flex w-fit shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full",
+            "min-h-12 bg-[#CCFF00] px-4 py-2",
+            "text-xs font-bold uppercase tracking-wide text-black",
+            "transition-opacity hover:opacity-90 active:opacity-80 disabled:cursor-wait disabled:opacity-70"
+          )}
         >
           <Download className="h-4 w-4 shrink-0" aria-hidden />
           {saving ? "Guardando..." : "Guardar imagen"}
-        </Button>
+        </button>
         {saveError ? (
           <p className="text-center text-sm text-red-300" role="alert">
             {saveError}

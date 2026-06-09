@@ -22,6 +22,8 @@ type ModalProps = {
   /** Contenedor raíz del portal (posición, z-index, padding). */
   containerClassName?: string;
   wrapperClassName?: string;
+  /** Contenedor del panel (por defecto `w-full`). */
+  panelHostClassName?: string;
   hideHeaderDivider?: boolean;
   hideTitle?: boolean;
   /** Sin barra superior (título, trailing ni cerrar). Usar `ariaLabel`. */
@@ -216,6 +218,7 @@ export function Modal({
   className,
   containerClassName,
   wrapperClassName,
+  panelHostClassName,
   hideHeaderDivider = false,
   hideTitle = false,
   hideHeader = false,
@@ -339,7 +342,10 @@ export function Modal({
           aria-labelledby={hideHeader ? undefined : titleId}
           aria-label={hideHeader ? ariaLabel ?? (typeof title === "string" ? title : undefined) : hideTitle ? ariaLabel : undefined}
           tabIndex={-1}
-          className="pointer-events-auto w-full overflow-hidden outline-none focus:outline-none focus-visible:outline-none"
+          className={cn(
+            "pointer-events-auto w-full overflow-hidden outline-none focus:outline-none focus-visible:outline-none",
+            panelHostClassName
+          )}
         >
           {slideActive && panelSlide ? (
             <div
