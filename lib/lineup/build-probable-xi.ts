@@ -1,10 +1,14 @@
 import {
-  coordinatesForFormation,
+  fallbackSlotKeyForRole,
+  normalizeFormationTemplate,
+} from "@/lib/lineup/formation-templates";
+import {
   formationRoleCounts,
   normalizePositionRole,
   pickFormation,
   positionLabelEs,
 } from "@/lib/lineup/position-map";
+import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import type {
   FormationId,
   LineupPlayer,
@@ -73,17 +77,6 @@ function pickPlayersForRole(
   return picked;
 }
 
-function assignCoordinates(
-  players: LineupPlayer[],
-  coords: { x: number; y: number }[]
-): LineupSlot[] {
-  return players.map((player, index) => ({
-    ...player,
-    x: coords[index]?.x ?? 50,
-    y: coords[index]?.y ?? 50,
-  }));
-}
-
 /** Construye un once probable desde plantilla/convocatoria. */
 export function buildProbableXI(
   players: LineupPlayerInput[],
@@ -100,19 +93,33 @@ export function buildProbableXI(
     });
 
   const counts = formationRoleCounts(formation);
-  const coords = coordinatesForFormation(formation);
+  const templateId = normalizeFormationTemplate(formation);
 
   const gk = pickPlayersForRole(groups.GK, counts.GK, "GK");
   const df = pickPlayersForRole(groups.DF, counts.DF, "DF");
   const mf = pickPlayersForRole(groups.MF, counts.MF, "MF");
   const fw = pickPlayersForRole(groups.FW, counts.FW, "FW");
 
-  const slots: LineupSlot[] = [
-    ...assignCoordinates(gk, coords.GK),
-    ...assignCoordinates(df, coords.DF),
-    ...assignCoordinates(mf, coords.MF),
-    ...assignCoordinates(fw, coords.FW),
+  const layoutInputs = [
+    ...gk.map((player, index) => ({
+      ...player,
+      slotKey: fallbackSlotKeyForRole(templateId, "GK", index),
+    })),
+    ...df.map((player, index) => ({
+      ...player,
+      slotKey: fallbackSlotKeyForRole(templateId, "DF", index),
+    })),
+    ...mf.map((player, index) => ({
+      ...player,
+      slotKey: fallbackSlotKeyForRole(templateId, "MF", index),
+    })),
+    ...fw.map((player, index) => ({
+      ...player,
+      slotKey: fallbackSlotKeyForRole(templateId, "FW", index),
+    })),
   ];
+
+  const slots: LineupSlot[] = layoutPredictedStarters(layoutInputs, formation);
 
   const starters = slots.filter((s) => !s.isPlaceholder).length;
 

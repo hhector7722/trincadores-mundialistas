@@ -28,45 +28,11 @@ export function positionLabelEs(role: PositionRole, rawPosition: string | null):
 }
 
 /** Coordenadas % del campo vertical (x: ancho, y: arriba=ataque, abajo=portería). */
+import { getRoleCoordinatesFromTemplate } from "@/lib/lineup/formation-templates";
+
 const FORMATION_COORDS: Record<FormationId, Record<PositionRole, FieldCoordinate[]>> = {
-  "4-3-3": {
-    GK: [{ x: 50, y: 84 }],
-    DF: [
-      { x: 14, y: 70 },
-      { x: 38, y: 70 },
-      { x: 62, y: 70 },
-      { x: 86, y: 70 },
-    ],
-    MF: [
-      { x: 26, y: 46 },
-      { x: 50, y: 46 },
-      { x: 74, y: 46 },
-    ],
-    FW: [
-      { x: 22, y: 16 },
-      { x: 50, y: 16 },
-      { x: 78, y: 16 },
-    ],
-  },
-  "4-4-2": {
-    GK: [{ x: 50, y: 84 }],
-    DF: [
-      { x: 14, y: 70 },
-      { x: 38, y: 70 },
-      { x: 62, y: 70 },
-      { x: 86, y: 70 },
-    ],
-    MF: [
-      { x: 12, y: 46 },
-      { x: 38, y: 46 },
-      { x: 62, y: 46 },
-      { x: 88, y: 46 },
-    ],
-    FW: [
-      { x: 36, y: 16 },
-      { x: 64, y: 16 },
-    ],
-  },
+  "4-3-3": getRoleCoordinatesFromTemplate("4-3-3"),
+  "4-4-2": getRoleCoordinatesFromTemplate("4-4-2"),
 };
 
 export function formationRoleCounts(formation: FormationId): Record<PositionRole, number> {

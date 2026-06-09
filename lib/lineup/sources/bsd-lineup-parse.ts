@@ -1,4 +1,8 @@
 import { dedupeBenchAgainstStarters } from "@/lib/lineup/bench-dedupe";
+import {
+  fallbackSlotKeyForRole,
+  normalizeFormationTemplate,
+} from "@/lib/lineup/formation-templates";
 import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import {
   refinePredictedSlotKey,
@@ -6,7 +10,6 @@ import {
   swapMirroredForwardSlots,
   tacticalSlotLabelEs,
 } from "@/lib/lineup/tactical-profile";
-import { coordinateForConfirmedIndex } from "@/lib/lineup/sources/bsd-slot-coords";
 import {
   findSquadPlayer,
   reserveSquadPlayerIdentity,
@@ -157,18 +160,10 @@ export function parseBsdConfirmedTeamLineup(
   const formationLabel = normalizeFormationLabel(payload.formation);
   const formation = toFormationId(formationLabel);
 
-  const roleGroups: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
-  const roleTotals: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
-
-  for (const starter of starters.slice(0, 11)) {
-    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players);
-    const role = roleFromPosition(squadPlayer?.position ?? starter.position);
-    roleTotals[role] += 1;
-  }
-
   const usedSquadIdentities = new Set<string>();
+  const roleGroups: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
 
-  const slots: LineupSlot[] = starters.slice(0, 11).map((starter, index) => {
+  const starterInputs = starters.slice(0, 11).map((starter, index) => {
     const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players, {
       excludeIdentities: usedSquadIdentities,
     });
@@ -176,20 +171,22 @@ export function parseBsdConfirmedTeamLineup(
     const role = roleFromPosition(squadPlayer?.position ?? starter.position);
     const roleIndex = roleGroups[role];
     roleGroups[role] += 1;
-    const coords = coordinateForConfirmedIndex(role, roleIndex, roleTotals[role]);
+    const templateId = normalizeFormationTemplate(formationLabel);
+    const slotKey = fallbackSlotKeyForRole(templateId, role, roleIndex);
     const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
 
     return {
+      slotKey,
+      role,
       key: `${name}-${starter.jersey_number ?? index}`,
       name,
       shirtNumber: squadPlayer?.shirt_number ?? starter.jersey_number ?? null,
       positionLabel: positionLabelEs(role, squadPlayer?.position ?? starter.position ?? null),
-      role,
       isPlaceholder: !name,
-      x: coords.x,
-      y: coords.y,
     };
   });
+
+  const slots: LineupSlot[] = layoutPredictedStarters(starterInputs, formationLabel);
 
   const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {
