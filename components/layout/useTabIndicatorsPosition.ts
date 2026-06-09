@@ -10,10 +10,14 @@ import {
 const QUIZ_ANCHOR_SELECTOR = '[data-tm-indicators-anchor="quiz-daily"]';
 
 /** Sincroniza --tm-tab-indicators-bottom al eje Y entre Quiz diario y la TabBar. */
-export function useTabIndicatorsPosition() {
+export function useTabIndicatorsPosition(enabled = true) {
   const pathname = usePathname();
 
   useLayoutEffect(() => {
+    if (!enabled) {
+      resetTabIndicatorsBottom();
+      return;
+    }
     let frame = 0;
 
     const sync = () => {
@@ -52,5 +56,5 @@ export function useTabIndicatorsPosition() {
       window.visualViewport?.removeEventListener("scroll", sync);
       resetTabIndicatorsBottom();
     };
-  }, [pathname]);
+  }, [enabled, pathname]);
 }

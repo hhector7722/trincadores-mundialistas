@@ -1,6 +1,7 @@
 "use client";
 
-import { MAIN_TABS } from "@/lib/layout/main-tabs";
+import { usePathname } from "next/navigation";
+import { MAIN_TABS, shouldShowTabPageIndicators } from "@/lib/layout/main-tabs";
 import { cn } from "@/lib/utils";
 import {
   useTabIndicatorProgress,
@@ -14,10 +15,11 @@ const ACTIVE_WIDTH = 18;
 const GAP = 6;
 
 export function TabPageIndicators() {
+  const pathname = usePathname();
   const progress = useTabIndicatorProgress();
   const { swipeProgress, activeIndex } = useTabNavigation();
 
-  if (activeIndex == null) return null;
+  if (!shouldShowTabPageIndicators(pathname) || activeIndex == null) return null;
   const trackWidth =
     MAIN_TABS.length * DOT_SIZE + (MAIN_TABS.length - 1) * GAP - DOT_SIZE + ACTIVE_WIDTH;
   const pillLeft = progress * (DOT_SIZE + GAP);

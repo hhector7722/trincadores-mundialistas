@@ -40,3 +40,14 @@ export function getMainTabIndex(pathname: string): number | null {
 export function isMainTabRoot(pathname: string): boolean {
   return getMainTabIndex(pathname) !== null;
 }
+
+/** Rutas de la pestaña Partidos (calendario / KO / detalle). */
+export function isPredictionsTabPath(pathname: string): boolean {
+  return pathname === "/predictions" || pathname.startsWith("/predictions/");
+}
+
+/** Indicadores swipe: visibles en pestañas principales salvo Partidos (layout full-bleed). */
+export function shouldShowTabPageIndicators(pathname: string): boolean {
+  if (isPredictionsTabPath(pathname)) return false;
+  return getMainTabSectionIndex(pathname) !== null;
+}
