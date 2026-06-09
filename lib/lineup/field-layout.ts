@@ -21,7 +21,8 @@ export function clampToPlayable(coord: FieldCoordinate): FieldCoordinate {
 
 /** Separación mínima aproximada entre centros de ficha (%). */
 const MIN_GAP_X = 13;
-const MIN_GAP_Y = 11;
+/** Solo empujar en vertical si comparten línea (evita desplazar el 9 al carril). */
+const MIN_GAP_Y = 7;
 const MAX_NUDGE_PASSES = 12;
 
 function distanceX(a: LineupSlot, b: LineupSlot): number {

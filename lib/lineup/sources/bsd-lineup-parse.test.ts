@@ -78,3 +78,51 @@ test("parseBsdPredictedTeamLineup corrige Laporte/Porro mal ubicados por BSD", (
   assert.equal(porro.positionLabel, "LD");
   assert.ok(laporte.x < porro.x, "Laporte debe quedar más centrado que Porro a la derecha");
 });
+
+test("parseBsdPredictedTeamLineup coloca Iglesias de 9 y Pino en banda", () => {
+  const squad = [
+    { player_name: "Unai Simon", position: "GK", shirt_number: 23 },
+    { player_name: "Marc Cucurella", position: "DF", shirt_number: 24 },
+    { player_name: "Aymeric Laporte", position: "DF", shirt_number: 14 },
+    { player_name: "Pau Cubarsi", position: "DF", shirt_number: 22 },
+    { player_name: "Pedro Porro", position: "DF", shirt_number: 12 },
+    { player_name: "Pedri", position: "MF", shirt_number: 20 },
+    { player_name: "Mikel Merino", position: "MF", shirt_number: 6 },
+    { player_name: "Mikel Oyarzabal", position: "FW", shirt_number: 21 },
+    { player_name: "Alex Baena", position: "MF", shirt_number: 15 },
+    { player_name: "Yeremy Pino", position: "FW", shirt_number: 11 },
+    { player_name: "Borja Iglesias", position: "FW", shirt_number: 26 },
+  ];
+
+  const payload = {
+    team: "Spain",
+    predicted_formation: "4-2-3-1",
+    starters: [
+      { name: "Unai Simon", jersey_number: 23, predicted_slot: "GK", position: "G" },
+      { name: "Marc Cucurella", jersey_number: 24, predicted_slot: "LB", position: "D" },
+      { name: "Aymeric Laporte", jersey_number: 14, predicted_slot: "CB", position: "D" },
+      { name: "Pau Cubarsi", jersey_number: 22, predicted_slot: "CB", position: "D" },
+      { name: "Pedro Porro", jersey_number: 12, predicted_slot: "RB", position: "D" },
+      { name: "Pedri", jersey_number: 20, predicted_slot: "DM", position: "M" },
+      { name: "Mikel Merino", jersey_number: 6, predicted_slot: "DM", position: "M" },
+      { name: "Mikel Oyarzabal", jersey_number: 21, predicted_slot: "LW", position: "F" },
+      { name: "Alex Baena", jersey_number: 15, predicted_slot: "AM", position: "M" },
+      { name: "Yeremy Pino", jersey_number: 11, predicted_slot: "RW", position: "F" },
+      { name: "Borja Iglesias", jersey_number: 26, predicted_slot: "ST", position: "F" },
+    ],
+    substitutes: [],
+    updated_at: "2026-06-09T20:00:00+00:00",
+  };
+
+  const lineup = parseBsdPredictedTeamLineup(payload, squad, payload.updated_at);
+  assert.ok(lineup);
+
+  const iglesias = lineup.slots.find((slot) => slot.name === "Borja Iglesias");
+  const pino = lineup.slots.find((slot) => slot.name === "Yeremy Pino");
+
+  assert.ok(iglesias && pino);
+  assert.equal(iglesias.positionLabel, "DC");
+  assert.equal(pino.positionLabel, "ED");
+  assert.equal(iglesias.x, 50);
+  assert.ok(iglesias.y < pino.y, "El 9 debe quedar más arriba que el extremo");
+});

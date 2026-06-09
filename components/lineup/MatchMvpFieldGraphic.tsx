@@ -44,14 +44,13 @@ export function MatchMvpFieldGraphic({
 }: MatchMvpFieldGraphicProps) {
   const awayKitClash = teamKitColorsClash(homeTeam, awayTeam);
 
-  const { separatedAway, separatedHome } = useMemo(() => {
-    const merged = [...awaySlots, ...homeSlots];
-    const separated = separateOverlappingSlots(merged);
-    return {
-      separatedAway: separated.slice(0, awaySlots.length) as MatchFieldSlot[],
-      separatedHome: separated.slice(awaySlots.length) as MatchFieldSlot[],
-    };
-  }, [awaySlots, homeSlots]);
+  const { separatedAway, separatedHome } = useMemo(
+    () => ({
+      separatedAway: separateOverlappingSlots(awaySlots) as MatchFieldSlot[],
+      separatedHome: separateOverlappingSlots(homeSlots) as MatchFieldSlot[],
+    }),
+    [awaySlots, homeSlots]
+  );
 
   function renderSlot(
     teamName: string,

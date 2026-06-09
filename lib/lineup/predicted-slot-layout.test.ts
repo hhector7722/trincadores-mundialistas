@@ -18,6 +18,34 @@ test("layoutPredictedStarters coloca portería abajo y delantero arriba", () => 
   assert.ok(gk.y > st.y);
 });
 
+test("layoutPredictedStarters usa carril táctico en 4-2-3-1", () => {
+  const starters = [
+    { slotKey: "GK", role: "GK" as const },
+    { slotKey: "LB", role: "DF" as const },
+    { slotKey: "CB", role: "DF" as const },
+    { slotKey: "CB", role: "DF" as const },
+    { slotKey: "RB", role: "DF" as const },
+    { slotKey: "DM", role: "MF" as const },
+    { slotKey: "DM", role: "MF" as const },
+    { slotKey: "LW", role: "MF" as const },
+    { slotKey: "AM", role: "MF" as const },
+    { slotKey: "RW", role: "MF" as const },
+    { slotKey: "ST", role: "FW" as const },
+  ];
+
+  const positioned = layoutPredictedStarters(starters, "4-2-3-1");
+  const st = positioned.find((slot) => slot.slotKey === "ST");
+  const rw = positioned.find((slot) => slot.slotKey === "RW");
+  const dm = positioned.filter((slot) => slot.slotKey === "DM");
+
+  assert.ok(st && rw);
+  assert.equal(st.x, 50);
+  assert.equal(rw.x, 80);
+  assert.equal(dm[0]!.x, 36);
+  assert.equal(dm[1]!.x, 64);
+  assert.ok(st.y < rw.y);
+});
+
 test("layoutPredictedStarters separa líneas en 4-2-3-1 por slot, no por índice", () => {
   const starters = [
     { slotKey: "ST", role: "FW" as const },

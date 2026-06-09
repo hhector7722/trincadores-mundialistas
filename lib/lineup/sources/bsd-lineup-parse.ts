@@ -3,10 +3,14 @@ import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import {
   refinePredictedSlotKey,
   swapMirroredDefenderSlots,
+  swapMirroredForwardSlots,
   tacticalSlotLabelEs,
 } from "@/lib/lineup/tactical-profile";
 import { coordinateForConfirmedIndex } from "@/lib/lineup/sources/bsd-slot-coords";
-import { findSquadPlayer } from "@/lib/lineup/sources/bsd-squad-match";
+import {
+  findSquadPlayer,
+  reserveSquadPlayerIdentity,
+} from "@/lib/lineup/sources/bsd-squad-match";
 import type {
   BsdConfirmedPlayer,
   BsdConfirmedTeamLineup,
@@ -70,8 +74,13 @@ export function parseBsdPredictedTeamLineup(
   const formationLabel = normalizeFormationLabel(payload.predicted_formation);
   const formation = toFormationId(formationLabel);
 
+  const usedSquadIdentities = new Set<string>();
+
   const rawStarterInputs = starters.slice(0, 11).map((starter, index) => {
-    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players);
+    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players, {
+      excludeIdentities: usedSquadIdentities,
+    });
+    reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
     const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
     const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
 
@@ -85,12 +94,14 @@ export function parseBsdPredictedTeamLineup(
     };
   });
 
-  const refinedSlots = swapMirroredDefenderSlots(
-    rawStarterInputs.map((row) => ({
-      name: row.name,
-      slotKey: refinePredictedSlotKey(row.name, row.slotKey, row.squadPosition),
-      squadPosition: row.squadPosition,
-    }))
+  const refinedSlots = swapMirroredForwardSlots(
+    swapMirroredDefenderSlots(
+      rawStarterInputs.map((row) => ({
+        name: row.name,
+        slotKey: refinePredictedSlotKey(row.name, row.slotKey, row.squadPosition),
+        squadPosition: row.squadPosition,
+      }))
+    )
   );
 
   const starterInputs = rawStarterInputs.map((row, index) => {
@@ -155,8 +166,13 @@ export function parseBsdConfirmedTeamLineup(
     roleTotals[role] += 1;
   }
 
+  const usedSquadIdentities = new Set<string>();
+
   const slots: LineupSlot[] = starters.slice(0, 11).map((starter, index) => {
-    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players);
+    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players, {
+      excludeIdentities: usedSquadIdentities,
+    });
+    reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
     const role = roleFromPosition(squadPlayer?.position ?? starter.position);
     const roleIndex = roleGroups[role];
     roleGroups[role] += 1;
