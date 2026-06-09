@@ -1,4 +1,5 @@
-import { signInUserByUsername } from "@/lib/auth/phone-sign-in";
+import { signInUserByUsername, signInUserByUsernameWithClient } from "@/lib/auth/phone-sign-in";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   isProfileOnboardingComplete,
   type OnboardingProfileRow,
@@ -11,7 +12,8 @@ export type RestoreSessionResult =
   | { ok: false; error: string; code: "not_found" | "inactive" | "incomplete" | "auth" };
 
 export async function restoreSessionForUsername(
-  usernameRaw: string
+  usernameRaw: string,
+  supabase?: SupabaseClient
 ): Promise<RestoreSessionResult> {
   const username = normalizeUsername(usernameRaw);
   if (!username) {
@@ -38,7 +40,9 @@ export async function restoreSessionForUsername(
     return { ok: false, error: "Onboarding incompleto.", code: "incomplete" };
   }
 
-  const restored = await signInUserByUsername(username);
+  const restored = supabase
+    ? await signInUserByUsernameWithClient(username, supabase)
+    : await signInUserByUsername(username);
   if (!restored.ok) {
     return { ok: false, error: restored.error, code: "auth" };
   }

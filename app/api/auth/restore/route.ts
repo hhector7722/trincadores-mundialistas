@@ -6,6 +6,7 @@ import {
 } from "@/lib/auth/onboarding-device";
 import { restoreSessionForUsername } from "@/lib/auth/restore-session";
 import { PWA_ONBOARDING_COOKIE } from "@/lib/pwa/onboarding-cookie";
+import { createClientFromRoute } from "@/lib/supabase/route";
 
 export const dynamic = "force-dynamic";
 
@@ -32,27 +33,32 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  const result = await restoreSessionForUsername(username);
   const next = safeNextPath(request.nextUrl.searchParams.get("next"));
+  const successUrl = request.nextUrl.clone();
+  successUrl.pathname = next;
+  successUrl.search = "";
+
+  const response = NextResponse.redirect(successUrl);
+  const supabase = createClientFromRoute(request, response);
+  const result = await restoreSessionForUsername(username, supabase);
 
   if (!result.ok) {
     if (result.code === "incomplete") {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/bienvenida";
       redirectUrl.search = "";
-      const response = NextResponse.redirect(redirectUrl);
-      clearDeviceCookiesOnResponse(response);
-      return response;
+      const failResponse = NextResponse.redirect(redirectUrl);
+      clearDeviceCookiesOnResponse(failResponse);
+      return failResponse;
     }
 
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("error", "restore_failed");
-    return NextResponse.redirect(redirectUrl);
+    const failResponse = NextResponse.redirect(redirectUrl);
+    clearDeviceCookiesOnResponse(failResponse);
+    return failResponse;
   }
 
-  const redirectUrl = request.nextUrl.clone();
-  redirectUrl.pathname = next;
-  redirectUrl.search = "";
-  return NextResponse.redirect(redirectUrl);
+  return response;
 }

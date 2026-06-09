@@ -137,7 +137,10 @@ export async function signInUserByPhone(phoneRaw: string): Promise<PhoneSignInRe
   return signInUserByPhoneWithClient(phoneRaw, supabase);
 }
 
-export async function signInUserByUsername(usernameRaw: string): Promise<PhoneSignInResult> {
+export async function signInUserByUsernameWithClient(
+  usernameRaw: string,
+  supabase: SupabaseClient
+): Promise<PhoneSignInResult> {
   const username = normalizeUsername(usernameRaw);
   if (!username) {
     return { ok: false, error: "Participante no reconocido." };
@@ -148,6 +151,10 @@ export async function signInUserByUsername(usernameRaw: string): Promise<PhoneSi
     return { ok: false, error: "Participante no reconocido." };
   }
 
-  const supabase = await createClient();
   return signInUserByPhoneWithClient(phone, supabase);
+}
+
+export async function signInUserByUsername(usernameRaw: string): Promise<PhoneSignInResult> {
+  const supabase = await createClient();
+  return signInUserByUsernameWithClient(usernameRaw, supabase);
 }
