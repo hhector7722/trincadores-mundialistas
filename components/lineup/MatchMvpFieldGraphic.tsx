@@ -1,7 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
+import {
+  MVP_PITCH_ASPECT_CLASS,
+  separateOverlappingSlots,
+} from "@/lib/lineup/field-layout";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { cn } from "@/lib/utils";
@@ -39,6 +44,15 @@ export function MatchMvpFieldGraphic({
 }: MatchMvpFieldGraphicProps) {
   const awayKitClash = teamKitColorsClash(homeTeam, awayTeam);
 
+  const { separatedAway, separatedHome } = useMemo(() => {
+    const merged = [...awaySlots, ...homeSlots];
+    const separated = separateOverlappingSlots(merged);
+    return {
+      separatedAway: separated.slice(0, awaySlots.length) as MatchFieldSlot[],
+      separatedHome: separated.slice(awaySlots.length) as MatchFieldSlot[],
+    };
+  }, [awaySlots, homeSlots]);
+
   function renderSlot(
     teamName: string,
     slot: MatchFieldSlot,
@@ -75,16 +89,17 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "relative aspect-[3/2] w-full shrink-0 self-center max-w-none overflow-visible",
+        "relative w-full shrink-0 self-center max-w-[15rem] overflow-visible",
+        MVP_PITCH_ASPECT_CLASS,
         className
       )}
     >
-      <div className="absolute inset-0 bg-[#143d24]">
+      <div className="absolute inset-0 rounded-lg bg-[#143d24]">
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 
-      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
-      {homeSlots.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
+      {separatedAway.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
+      {separatedHome.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
     </div>
   );
 }

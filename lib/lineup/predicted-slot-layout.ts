@@ -1,18 +1,16 @@
+import { clampToPlayable, PLAYABLE_X_MAX, PLAYABLE_X_MIN } from "@/lib/lineup/field-layout";
 import type { FieldCoordinate } from "@/lib/lineup/types";
 
 type LineKey = "GK" | "DF" | "DM" | "MF" | "AM" | "FW";
 
-/**
- * Profundidad táctica (% del contenedor).
- * Arriba = ataque rival · Abajo = portería propia (alineado con campo vertical).
- */
+/** Profundidad táctica dentro de la zona jugable (arriba=ataque, abajo=portería). */
 const LINE_DEPTH: Record<LineKey, number> = {
-  GK: 84,
-  DF: 70,
-  DM: 56,
-  MF: 46,
-  AM: 30,
-  FW: 16,
+  GK: 78,
+  DF: 66,
+  DM: 54,
+  MF: 44,
+  AM: 32,
+  FW: 22,
 };
 
 const SLOT_HORIZONTAL_ORDER: Record<string, number> = {
@@ -30,7 +28,6 @@ const SLOT_HORIZONTAL_ORDER: Record<string, number> = {
   RM: 82,
   RB: 88,
   RWB: 92,
-  RW: 78,
   GK: 50,
 };
 
@@ -63,12 +60,10 @@ function horizontalOrder(slotKey: string): number {
 function spreadX(index: number, total: number): number {
   if (total <= 1) return 50;
   const spread = Math.max(total - 1, 1);
-  return Math.round((14 + (index / spread) * 72) * 10) / 10;
+  const x = PLAYABLE_X_MIN + (index / spread) * (PLAYABLE_X_MAX - PLAYABLE_X_MIN);
+  return Math.round(x * 10) / 10;
 }
 
-/**
- * Reparte titulares por línea táctica según slot/rol (no por índice en el array BSD).
- */
 export function layoutPredictedStarters<T extends LayoutInput>(
   starters: T[],
   formationLabel?: string
@@ -93,8 +88,10 @@ export function layoutPredictedStarters<T extends LayoutInput>(
     sorted.forEach(({ starter }, index) => {
       positioned.push({
         ...starter,
-        x: spreadX(index, sorted.length),
-        y: LINE_DEPTH[line],
+        ...clampToPlayable({
+          x: spreadX(index, sorted.length),
+          y: LINE_DEPTH[line],
+        }),
       });
     });
   }

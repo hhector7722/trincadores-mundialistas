@@ -119,7 +119,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-2 sm:px-2">
             <TeamLineupGraphic
               slots={resolvedLineup.slots}
               formationLabel={resolvedLineup.formationLabel}
@@ -136,12 +136,12 @@ export function LineupModalPanel({
                 players={bench}
                 showTeamHeader={false}
                 position="none"
-                className="mt-4"
+                className="mt-3"
                 onPlayerClick={(player) => handlePlayerInteraction(player.name)}
               />
             ) : null}
 
-            <div className="mt-4 max-w-lg self-center px-2">
+            <div className="mt-3 max-w-lg self-center px-2">
               <LineupSourceBadge
                 sourceKind={resolvedLineup.sourceKind}
                 formationLabel={resolvedLineup.formationLabel}

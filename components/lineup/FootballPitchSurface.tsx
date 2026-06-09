@@ -19,7 +19,7 @@ export function FootballPitchSurface({ className, onReady }: FootballPitchSurfac
 
   return (
     <svg
-      viewBox="0 0 300 200"
+      viewBox="0 0 68 105"
       aria-hidden
       className={cn("h-full w-full", className)}
       preserveAspectRatio="xMidYMid meet"
@@ -36,30 +36,30 @@ export function FootballPitchSurface({ className, onReady }: FootballPitchSurfac
         </linearGradient>
       </defs>
 
-      <rect x="8" y="8" width="284" height="184" rx="6" fill="url(#pitch-grass)" />
-      <rect x="8" y="8" width="284" height="92" fill="url(#pitch-stripe-a)" />
-      <rect x="8" y="100" width="284" height="92" fill="url(#pitch-stripe-a)" opacity="0.55" />
+      <rect x="2" y="2" width="64" height="101" rx="3" fill="url(#pitch-grass)" />
+      <rect x="2" y="2" width="64" height="50.5" fill="url(#pitch-stripe-a)" />
+      <rect x="2" y="52.5" width="64" height="50.5" fill="url(#pitch-stripe-a)" opacity="0.55" />
 
       <g
         fill="none"
         stroke="rgba(255,255,255,0.55)"
-        strokeWidth="1.5"
+        strokeWidth="0.6"
         strokeLinejoin="round"
       >
-        <rect x="22" y="16" width="256" height="168" rx="2" />
-        <line x1="22" y1="100" x2="278" y2="100" />
-        <circle cx="150" cy="100" r="22" />
-        <circle cx="150" cy="100" r="2" fill="rgba(255,255,255,0.55)" />
+        <rect x="6" y="6" width="56" height="93" rx="1" />
+        <line x1="6" y1="52.5" x2="62" y2="52.5" />
+        <circle cx="34" cy="52.5" r="8" />
+        <circle cx="34" cy="52.5" r="0.8" fill="rgba(255,255,255,0.55)" />
 
-        <rect x="88" y="16" width="124" height="44" />
-        <rect x="112" y="16" width="76" height="18" />
-        <circle cx="150" cy="38" r="2" fill="rgba(255,255,255,0.55)" />
-        <path d="M 134 60 A 14 14 0 0 0 166 60" />
+        <rect x="18" y="6" width="32" height="14" />
+        <rect x="24" y="6" width="20" height="6" />
+        <circle cx="34" cy="14" r="0.8" fill="rgba(255,255,255,0.55)" />
+        <path d="M 30 20 A 4 4 0 0 0 38 20" />
 
-        <rect x="88" y="140" width="124" height="44" />
-        <rect x="112" y="166" width="76" height="18" />
-        <circle cx="150" cy="162" r="2" fill="rgba(255,255,255,0.55)" />
-        <path d="M 134 140 A 14 14 0 0 1 166 140" />
+        <rect x="18" y="85" width="32" height="14" />
+        <rect x="24" y="93" width="20" height="6" />
+        <circle cx="34" cy="91" r="0.8" fill="rgba(255,255,255,0.55)" />
+        <path d="M 30 85 A 4 4 0 0 1 38 85" />
       </g>
     </svg>
   );

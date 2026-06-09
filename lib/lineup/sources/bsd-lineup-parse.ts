@@ -1,5 +1,10 @@
 import { dedupeBenchAgainstStarters } from "@/lib/lineup/bench-dedupe";
 import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
+import {
+  refinePredictedSlotKey,
+  swapMirroredDefenderSlots,
+  tacticalSlotLabelEs,
+} from "@/lib/lineup/tactical-profile";
 import { coordinateForConfirmedIndex } from "@/lib/lineup/sources/bsd-slot-coords";
 import { findSquadPlayer } from "@/lib/lineup/sources/bsd-squad-match";
 import type {
@@ -65,20 +70,44 @@ export function parseBsdPredictedTeamLineup(
   const formationLabel = normalizeFormationLabel(payload.predicted_formation);
   const formation = toFormationId(formationLabel);
 
-  const starterInputs = starters.slice(0, 11).map((starter, index) => {
-    const slotKey = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
+  const rawStarterInputs = starters.slice(0, 11).map((starter, index) => {
     const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players);
-    const role = roleFromPosition(squadPlayer?.position ?? starter.position);
     const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
+    const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
+
+    return {
+      name,
+      slotKey: rawSlot,
+      squadPosition: squadPlayer?.position ?? starter.position ?? null,
+      index,
+      starter,
+      squadPlayer,
+    };
+  });
+
+  const refinedSlots = swapMirroredDefenderSlots(
+    rawStarterInputs.map((row) => ({
+      name: row.name,
+      slotKey: refinePredictedSlotKey(row.name, row.slotKey, row.squadPosition),
+      squadPosition: row.squadPosition,
+    }))
+  );
+
+  const starterInputs = rawStarterInputs.map((row, index) => {
+    const slotKey = refinedSlots[index]!.slotKey;
+    const role = roleFromPosition(row.squadPlayer?.position ?? row.starter.position);
+    const tacticalLabel = tacticalSlotLabelEs(slotKey);
 
     return {
       slotKey,
       role,
-      key: `${name}-${starter.jersey_number ?? index}`,
-      name,
-      shirtNumber: squadPlayer?.shirt_number ?? starter.jersey_number ?? null,
-      positionLabel: positionLabelEs(role, squadPlayer?.position ?? starter.position ?? null),
-      isPlaceholder: !name,
+      key: `${row.name}-${row.starter.jersey_number ?? row.index}`,
+      name: row.name,
+      shirtNumber: row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? null,
+      positionLabel:
+        tacticalLabel ??
+        positionLabelEs(role, row.squadPlayer?.position ?? row.starter.position ?? null),
+      isPlaceholder: !row.name,
     };
   });
 

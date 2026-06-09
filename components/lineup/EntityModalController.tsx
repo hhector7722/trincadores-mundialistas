@@ -157,7 +157,11 @@ export function EntityModalController({
       title={entityModalTitleContent(current)}
       hideHeaderDivider
       headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
-      className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]", className)}
+      className={cn(
+        current.kind === "mvp" && "max-h-[min(100dvh-0.5rem,34rem)]",
+        current.kind === "lineup" && "max-h-[calc(100dvh-1rem)]",
+        className
+      )}
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={

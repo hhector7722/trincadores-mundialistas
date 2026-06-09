@@ -6,19 +6,19 @@ import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
  */
 
 /** Rango táctico del modal (y alto = ataque, y bajo = portería). */
-const LINEUP_ATTACK_Y = 16;
-const LINEUP_DEFENSE_Y = 84;
+const LINEUP_ATTACK_Y = 22;
+const LINEUP_DEFENSE_Y = 78;
 
 const MIDFIELD_Y = 50;
-const MIDFIELD_GAP = 12;
+const MIDFIELD_GAP = 20;
 
 /** Visitante: portería arriba (y bajo en su sistema → arriba en pantalla). */
 const AWAY_ATTACK_Y = MIDFIELD_Y - MIDFIELD_GAP;
-const AWAY_DEFENSE_Y = 12;
+const AWAY_DEFENSE_Y = 8;
 
 /** Local: portería abajo. */
 const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP;
-const HOME_DEFENSE_Y = 88;
+const HOME_DEFENSE_Y = 92;
 
 const GOYA_PITCH_TOP_Y = 8;
 const GOYA_PITCH_BOTTOM_Y = 92;

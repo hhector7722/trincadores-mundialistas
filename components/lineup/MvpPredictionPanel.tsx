@@ -264,19 +264,20 @@ export function MvpPredictionPanel({
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
         ) : (
-          <p className="mb-1 shrink-0 px-1 text-center text-[10px] text-[var(--tm-muted)]">
+          <p className="mb-0.5 shrink-0 px-1 text-center text-[9px] text-[var(--tm-muted)]">
             Pulsa un jugador del once probable o de las reservas.
           </p>
         )}
 
         <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
           {(markFieldReady) => (
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+            <div className="flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto overscroll-contain">
               <BenchPlayersStrip
                 teamName={awayTeam}
                 players={awayBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
+                compact
                 onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
                 position="top"
               />
@@ -299,23 +300,26 @@ export function MvpPredictionPanel({
                 players={homeBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
+                compact
                 onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
                 position="bottom"
               />
 
-              <div className="mt-2 space-y-2 px-2">
+              <div className="mt-1 flex w-full shrink-0 gap-1.5 px-1">
                 {resolvedAwayLineup ? (
                   <LineupSourceBadge
+                    compact
                     sourceKind={resolvedAwayLineup.sourceKind}
                     formationLabel={`${resolvedAwayLineup.formationLabel} · visitante`}
-                    fetchedAt={resolvedAwayLineup.fetchedAt}
+                    className="min-w-0 flex-1 [&_p:last-child]:text-[11px]"
                   />
                 ) : null}
                 {resolvedHomeLineup ? (
                   <LineupSourceBadge
+                    compact
                     sourceKind={resolvedHomeLineup.sourceKind}
                     formationLabel={`${resolvedHomeLineup.formationLabel} · local`}
-                    fetchedAt={resolvedHomeLineup.fetchedAt}
+                    className="min-w-0 flex-1 [&_p:last-child]:text-[11px]"
                   />
                 ) : null}
               </div>
@@ -331,8 +335,8 @@ export function MvpPredictionPanel({
       </div>
 
       {serverEditable ? (
-        <div className="flex shrink-0 gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Button className="flex-1" disabled={!selectedKey || pending} onClick={onSave}>
+        <div className="flex shrink-0 gap-2 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <Button className="min-h-11 flex-1" disabled={!selectedKey || pending} onClick={onSave}>
             {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
           </Button>
         </div>
