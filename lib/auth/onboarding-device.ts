@@ -65,6 +65,8 @@ export type OnboardingProfileRow = {
   avatar_url: string | null;
 };
 
-export function isProfileOnboardingComplete(profile: OnboardingProfileRow): boolean {
+export function isProfileOnboardingComplete(
+  profile: Pick<OnboardingProfileRow, "onboarding_completed_at" | "avatar_url">
+): boolean {
   return Boolean(profile.onboarding_completed_at?.trim() || profile.avatar_url?.trim());
 }
