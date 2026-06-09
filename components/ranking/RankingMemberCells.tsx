@@ -2,13 +2,12 @@
 
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { cn } from "@/lib/utils";
 
 type Props = {
   avatarUrl: string | null;
   label: string;
-  avatarClassName: string;
   nameClassName?: string;
   /** Evita navegacion del contenedor padre (p. ej. Link del home). */
   stopNavigation?: boolean;
@@ -17,7 +16,6 @@ type Props = {
 export function RankingMemberCells({
   avatarUrl,
   label,
-  avatarClassName,
   nameClassName,
   stopNavigation = false,
 }: Props) {
@@ -45,12 +43,7 @@ export function RankingMemberCells({
           canPreview && "cursor-pointer"
         )}
       >
-        <ProfileAvatar
-          avatarUrl={avatarUrl}
-          label={label}
-          variant="profile"
-          className={avatarClassName}
-        />
+        <AvatarDisplay avatarUrl={avatarUrl} label={label} size="ranking" />
       </button>
       <button
         type="button"

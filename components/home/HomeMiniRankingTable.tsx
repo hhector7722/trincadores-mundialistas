@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import {
-  MINI_RANKING_AVATAR_CLASS,
-  MINI_RANKING_GRID,
-} from "@/components/ranking/ranking-grid";
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
@@ -53,12 +50,7 @@ function MiniRankingDataRow({
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatar
-        avatarUrl={row.avatarUrl}
-        label={row.label}
-        variant="profile"
-        className={MINI_RANKING_AVATAR_CLASS}
-      />
+      <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       <span
         className={cn(
           "min-w-0 truncate text-[9px] font-medium",
@@ -88,7 +80,7 @@ function MiniRankingEmptyRow() {
     >
       <span />
       <span />
-      <span className={cn(MINI_RANKING_AVATAR_CLASS, "rounded-xl bg-white/10")} />
+      <span className="h-8 min-w-[2rem] shrink-0 rounded-xl bg-white/10" />
       <span className="min-w-0 truncate text-white/20">&nbsp;</span>
       <span />
       <span />

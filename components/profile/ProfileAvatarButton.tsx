@@ -2,6 +2,7 @@
 
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
+import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { ProfileAvatar, type ProfileAvatarVariant } from "@/components/profile/ProfileAvatar";
 import { cn } from "@/lib/utils";
 
@@ -50,12 +51,16 @@ export function ProfileAvatarButton({
           className
         )}
       >
-        <ProfileAvatar
-          avatarUrl={avatarUrl}
-          label={label}
-          className={className}
-          variant={variant}
-        />
+        {variant === "profile" ? (
+          <AvatarDisplay avatarUrl={avatarUrl} label={label} size="profile" />
+        ) : (
+          <ProfileAvatar
+            avatarUrl={avatarUrl}
+            label={label}
+            className={className}
+            variant={variant}
+          />
+        )}
       </button>
       <AvatarPreviewModal
         open={open}

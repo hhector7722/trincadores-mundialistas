@@ -3,7 +3,6 @@ import { signOut } from "@/actions/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
-import { AVATAR_DISPLAY_PROFILE } from "@/lib/avatars/display-classes";
 import { isPoolAdmin } from "@/lib/pool/admin";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
@@ -35,7 +34,6 @@ export default async function ProfilePage() {
           avatarUrl={profile?.avatar_url ?? null}
           label={label}
           variant="profile"
-          className={AVATAR_DISPLAY_PROFILE}
         />
         <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
       </div>

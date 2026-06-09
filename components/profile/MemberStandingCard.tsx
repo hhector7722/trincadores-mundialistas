@@ -1,5 +1,4 @@
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
-import { AVATAR_DISPLAY_PROFILE } from "@/lib/avatars/display-classes";
 import { Card } from "@/components/ui/card";
 import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
 import { formatAggregateStat } from "@/lib/ranking/format";
@@ -19,7 +18,6 @@ export function MemberStandingCard({
           avatarUrl={standing.avatarUrl}
           label={standing.label}
           variant="profile"
-          className={AVATAR_DISPLAY_PROFILE}
         />
         <p className="text-base font-medium text-[var(--tm-fg)]">{standing.label}</p>
       </div>

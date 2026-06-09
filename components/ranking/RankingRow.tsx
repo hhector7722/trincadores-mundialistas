@@ -1,6 +1,6 @@
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
-import { RANKING_AVATAR_CLASS, RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -27,7 +27,6 @@ export function RankingRow({
       <RankingMemberCells
         avatarUrl={row.avatarUrl}
         label={row.label}
-        avatarClassName={RANKING_AVATAR_CLASS}
         nameClassName={cn(
           "text-xs font-medium",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"

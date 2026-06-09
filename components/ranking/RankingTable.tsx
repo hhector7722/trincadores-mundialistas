@@ -1,5 +1,5 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
-import { RANKING_AVATAR_CLASS, RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +34,7 @@ function RankingEmptyRow() {
     >
       <span />
       <span />
-      <span className={cn(RANKING_AVATAR_CLASS, "min-h-14 rounded-xl bg-[var(--tm-border)]/35")} />
+      <span className="h-14 min-w-[3rem] shrink-0 rounded-xl bg-[var(--tm-border)]/35" />
       <span className="min-w-0 truncate">&nbsp;</span>
       <span />
       <span />
