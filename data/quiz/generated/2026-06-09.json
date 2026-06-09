@@ -1,0 +1,128 @@
+{
+  "quiz_date": "2026-06-09",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿En qué país se disputó el Mundial 2022?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Catar"
+          },
+          {
+            "id": "b",
+            "label": "Italia"
+          },
+          {
+            "id": "c",
+            "label": "Inglaterra"
+          },
+          {
+            "id": "d",
+            "label": "Uruguay"
+          }
+        ],
+        "correct_option_id": "a",
+        "fact_id": "wc2022-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2022qatar",
+        "source_label": "FIFA — Mundial 2022",
+        "template_id": "host_country",
+        "category": "hosts"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Cuántas veces ha ganado el Mundial Italia?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "5 títulos"
+          },
+          {
+            "id": "b",
+            "label": "2 títulos"
+          },
+          {
+            "id": "c",
+            "label": "4 títulos"
+          },
+          {
+            "id": "d",
+            "label": "3 títulos"
+          }
+        ],
+        "correct_option_id": "c",
+        "fact_id": "italy-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/italy-world-cup-history",
+        "source_label": "FIFA — Italia",
+        "template_id": "titles_count",
+        "category": "teams"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿Quién es el máximo goleador histórico en la historia de los Mundiales?",
+        "image_url": null,
+        "options": [
+          {
+            "id": "a",
+            "label": "Miroslav Klose"
+          },
+          {
+            "id": "b",
+            "label": "Roger Milla"
+          },
+          {
+            "id": "c",
+            "label": "La mano de Dios"
+          },
+          {
+            "id": "d",
+            "label": "Cafu"
+          }
+        ],
+        "correct_option_id": "a",
+        "fact_id": "top-scorer-klose",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/miroslav-klose-top-scorer",
+        "source_label": "FIFA — Miroslav Klose",
+        "template_id": "top_scorer",
+        "category": "records"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-09T07:50:42.759Z",
+    "fact_ids": [
+      "wc2022-host",
+      "italy-titles",
+      "top-scorer-klose"
+    ],
+    "templates": [
+      "host_country",
+      "titles_count",
+      "top_scorer"
+    ],
+    "sources": [
+      {
+        "fact_id": "wc2022-host",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/2022qatar",
+        "source_label": "FIFA — Mundial 2022"
+      },
+      {
+        "fact_id": "italy-titles",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/italy-world-cup-history",
+        "source_label": "FIFA — Italia"
+      },
+      {
+        "fact_id": "top-scorer-klose",
+        "source_url": "https://www.fifa.com/en/tournaments/mens/worldcup/articles/miroslav-klose-top-scorer",
+        "source_label": "FIFA — Miroslav Klose"
+      }
+    ],
+    "facts_source": "world-cup-facts.json",
+    "facts_pool_size": 32
+  }
+}
