@@ -1,6 +1,5 @@
 import { MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS } from "@/lib/predictions/scoring";
 import { PREDICTION_LOCK_MINUTES } from "@/lib/predictions/deadline";
-import { QUIZ_MODULE_CONTRACT } from "@/lib/quiz/module.contract";
 import { TOURNAMENT_GENERAL_SCORE_POINTS } from "@/lib/tournament-predictions/scoring";
 
 const { exact, sign } = MATCH_SCORE_POINTS;
@@ -37,62 +36,30 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
     title: "Pronósticos pre-torneo",
     body: [
       `Campeón: +${champion} pts.`,
-      `Finalistas: +${finalists} pts si aciertas los dos equipos de la final (orden indiferente).`,
-      `Máximo goleador (Pichichi): +${topScorer} pts.`,
-      `MVP del torneo: +${tournamentMvp} pts.`,
-      `Mejor portero (Guante de Oro): +${goldenGlove} pts.`,
-      "Los rellenas una vez antes de que empiece el Mundial.",
-      "Cada categoría puntúa de forma independiente al publicarse el galardón oficial.",
+      `Finalistas: +${finalists} pts si aciertas los dos equipos de la final.`,
+      `Máximo goleador: +${topScorer} pts.`,
+      `MVP: +${tournamentMvp} pts.`,
+      `Mejor portero: +${goldenGlove} pts.`,
     ],
   },
   {
     id: "matches",
-    title: "Pronósticos de partido",
+    title: "Puntuación",
     body: [
       `Acierto exacto del marcador: +${exact} pts.`,
-      `Acierto del signo (1X2), sin marcador exacto: +${sign} pts.`,
-      `MVP del partido acertado: +${MVP_PREDICTION_POINTS} pt, independiente del marcador.`,
-      "El exacto y el signo no se suman en el mismo partido.",
+      `Acierto del signo 1 x 2: +${sign} pts.`,
+      `MVP: +${MVP_PREDICTION_POINTS} pt.`,
+      "marcador exacto y el signo no se suman en el mismo partido.",
       `Máximo teórico por partido: +${maxPerMatch} pts (exacto + MVP).`,
-      "Cada partido se evalúa cuando el admin publica el resultado oficial.",
-    ],
-  },
-  {
-    id: "main-ranking",
-    title: "Clasificación principal",
-    body: [
-      "Suma pronósticos pre-torneo, marcadores de partido y MVPs de partido acertados.",
-      "Tu posición en inicio y el ranking usan solo esta suma.",
-      "El quiz, el entrenamiento y las estadísticas del torneo no modifican tu puesto.",
-    ],
-  },
-  {
-    id: "quiz",
-    title: "Quiz (competición paralela)",
-    body: [
-      `Hasta ${QUIZ_MODULE_CONTRACT.maxPointsPerAttempt} pts por intento competitivo del día.`,
-      "Un intento enviado bloquea repetir ese día en modo competitivo.",
-      "El entrenamiento permite rejugar sin sumar.",
-      "Los puntos del quiz no modifican tu posición en la porra principal.",
     ],
   },
   {
     id: "locks",
-    title: "Cuándo se bloquean las ediciones",
+    title: "Límite para pronosticar",
     body: [
       `Partidos y MVP de partido: ${PREDICTION_LOCK_MINUTES} minutos antes del pitido.`,
       "Pronósticos pre-torneo: al arrancar el primer partido del Mundial.",
       "Partidos en juego, finalizados o ya cerrados no admiten cambios.",
-    ],
-  },
-  {
-    id: "no-score",
-    title: "Qué no puntúa",
-    body: [
-      "Fallar marcador, signo o MVP de partido.",
-      "Dejar vacío un pronóstico antes del bloqueo.",
-      "Quiz en entrenamiento o intentos no competitivos.",
-      "Explorar calendario, grupos o plantillas.",
     ],
   },
 ];
