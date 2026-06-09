@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Download, X } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { isShareSaveCancellation, saveImageToGallery, canSaveImageToGallery } from "@/lib/media/save-image-to-gallery";
+import { isShareSaveCancellation, saveImageToGallery } from "@/lib/media/save-image-to-gallery";
 
 type Props = {
   open: boolean;
@@ -74,10 +74,6 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
           {saveError ? (
             <p className="text-center text-sm text-red-300" role="alert">
               {saveError}
-            </p>
-          ) : canSaveImageToGallery() ? (
-            <p className="text-center text-xs text-white/50">
-              Elige «Guardar imagen» o «Fotos» en el menu que se abre.
             </p>
           ) : null}
         </div>

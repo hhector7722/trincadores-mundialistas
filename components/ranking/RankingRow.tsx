@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
+import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { RANKING_AVATAR_CLASS, RANKING_GRID } from "@/components/ranking/ranking-grid";
-import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -15,8 +14,7 @@ export function RankingRow({
   isCurrentUser: boolean;
 }) {
   return (
-    <Link
-      href={`/profile/${row.profileId}`}
+    <div
       className={cn(
         RANKING_GRID,
         "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
@@ -26,20 +24,15 @@ export function RankingRow({
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.position)}
       </span>
-      <ProfileAvatarButton
+      <RankingMemberCells
         avatarUrl={row.avatarUrl}
         label={row.label}
-        className={RANKING_AVATAR_CLASS}
-        stopNavigation
-      />
-      <span
-        className={cn(
-          "min-w-0 truncate text-xs font-medium",
+        avatarClassName={RANKING_AVATAR_CLASS}
+        nameClassName={cn(
+          "text-xs font-medium",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
-      >
-        {row.label}
-      </span>
+      />
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
@@ -49,6 +42,6 @@ export function RankingRow({
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.quizPoints)}
       </span>
-    </Link>
+    </div>
   );
 }
