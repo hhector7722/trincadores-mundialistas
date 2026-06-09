@@ -1,3 +1,4 @@
+import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
 import type {
   LineupBenchPlayer,
   LineupSourceKind,
@@ -16,7 +17,7 @@ const SOURCE_PRIORITY: Record<LineupSourceKind, number> = {
 function rowToResolved(row: StoredLineupRow): ResolvedLineup {
   const formation = row.formation === "4-4-2" ? "4-4-2" : "4-3-3";
   const bench = row.bench as LineupBenchPlayer[];
-  return {
+  return relayoutLineupSlots({
     formation,
     formationLabel: row.formation,
     slots: row.slots as LineupSlot[],
@@ -26,7 +27,7 @@ function rowToResolved(row: StoredLineupRow): ResolvedLineup {
     sourceKind: row.source_kind,
     dataSourceCode: row.data_source_code,
     fetchedAt: row.fetched_at,
-  };
+  });
 }
 
 export async function loadCachedTeamLineup(
@@ -101,15 +102,17 @@ export async function upsertTeamLineup(
     return;
   }
 
+  const normalized = relayoutLineupSlots({ ...lineup, bench, benchCount: bench.length });
+
   const payload = {
     match_id: matchId,
     team_name: teamName,
-    source_kind: lineup.sourceKind,
-    data_source_code: lineup.dataSourceCode,
-    formation: lineup.formationLabel,
-    slots: lineup.slots,
+    source_kind: normalized.sourceKind,
+    data_source_code: normalized.dataSourceCode,
+    formation: normalized.formationLabel,
+    slots: normalized.slots,
     bench,
-    fetched_at: lineup.fetchedAt,
+    fetched_at: normalized.fetchedAt,
     updated_at: new Date().toISOString(),
   };
 

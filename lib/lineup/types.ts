@@ -15,6 +15,8 @@ export type LineupPlayer = {
   positionLabel: string;
   role: PositionRole;
   isPlaceholder: boolean;
+  /** Clave táctica de plantilla (GK, LB, CM…) para relayout consistente entre equipos. */
+  slotKey?: string;
 };
 
 export type FieldCoordinate = { x: number; y: number };

@@ -36,9 +36,12 @@ export function measureTabIndicatorsBottom(): number {
   return Math.round(visualBottom - midpointFromTop - TAB_INDICATOR_DOT_SIZE / 2);
 }
 
+export const TAB_INDICATORS_SYNC_EVENT = "tm-tab-indicators-sync";
+
 export function applyTabIndicatorsBottom(): void {
   const bottom = measureTabIndicatorsBottom();
   document.documentElement.style.setProperty("--tm-tab-indicators-bottom", `${bottom}px`);
+  window.dispatchEvent(new Event(TAB_INDICATORS_SYNC_EVENT));
 }
 
 export function resetTabIndicatorsBottom(): void {

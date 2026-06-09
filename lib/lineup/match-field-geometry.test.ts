@@ -1,12 +1,27 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { separateOverlappingSlots, SINGLE_TEAM_BOUNDS } from "./field-layout";
+import { getFormationTemplateCoordinates } from "./formation-templates";
+import { layoutPredictedStarters } from "./predicted-slot-layout";
 import {
   mapSlotsToAwayHalf,
   mapSlotsToHomeHalf,
   MVP_AWAY_BOUNDS,
   MVP_HOME_BOUNDS,
 } from "./match-field-geometry";
+
+const SPAIN_4231 = [
+  { slotKey: "GK", role: "GK" as const },
+  { slotKey: "LB", role: "DF" as const },
+  { slotKey: "LCB", role: "DF" as const },
+  { slotKey: "RCB", role: "DF" as const },
+  { slotKey: "RB", role: "DF" as const },
+  { slotKey: "LDM", role: "MF" as const },
+  { slotKey: "RDM", role: "MF" as const },
+  { slotKey: "LW", role: "MF" as const },
+  { slotKey: "AM", role: "MF" as const },
+  { slotKey: "RW", role: "MF" as const },
+  { slotKey: "ST", role: "FW" as const },
+];
 
 test("mapSlotsToAwayHalf coloca portero arriba del campo MVP", () => {
   const mapped = mapSlotsToAwayHalf([
@@ -22,38 +37,21 @@ test("mapSlotsToAwayHalf coloca portero arriba del campo MVP", () => {
     },
   ]);
 
-  assert.equal(mapped[0]!.y, 8);
+  assert.equal(mapped[0]!.y, 7);
 });
 
-test("separateOverlappingSlots MVP no saca al portero del arco visitante", () => {
-  const away = mapSlotsToAwayHalf([
-    {
-      key: "gk",
-      name: "GK",
-      shirtNumber: 1,
-      positionLabel: "POR",
-      role: "GK",
-      isPlaceholder: false,
-      x: 50,
-      y: 78,
-    },
-    {
-      key: "cb",
-      name: "CB",
-      shirtNumber: 4,
-      positionLabel: "DFC",
-      role: "DF",
-      isPlaceholder: false,
-      x: 50,
-      y: 66,
-    },
-  ]);
+test("mapSlotsToAwayHalf separa portero y defensa en bandas distintas", () => {
+  const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const mapped = mapSlotsToAwayHalf(template);
+  const gk = mapped.find((slot) => slot.role === "GK");
+  const defenders = mapped.filter((slot) => slot.role === "DF");
 
-  const separated = separateOverlappingSlots(away, MVP_AWAY_BOUNDS);
-  const gk = separated.find((slot) => slot.role === "GK");
   assert.ok(gk);
-  assert.ok(gk.y <= MVP_AWAY_BOUNDS.yMax);
-  assert.ok(gk.y >= MVP_AWAY_BOUNDS.yMin);
+  for (const defender of defenders) {
+    assert.ok(defender.y - gk!.y >= 5, `defensa demasiado cerca del portero (${defender.y})`);
+    assert.ok(defender.y <= MVP_AWAY_BOUNDS.yMax);
+    assert.ok(defender.y >= MVP_AWAY_BOUNDS.yMin);
+  }
 });
 
 test("mapSlotsToHomeHalf mantiene delantero en mitad inferior", () => {
@@ -70,38 +68,28 @@ test("mapSlotsToHomeHalf mantiene delantero en mitad inferior", () => {
     },
   ]);
 
-  assert.ok(mapped[0]!.y >= 70 && mapped[0]!.y <= 72);
+  assert.equal(mapped[0]!.y, 71);
 });
 
-test("separateOverlappingSlots respeta bounds de equipo individual", () => {
-  const separated = separateOverlappingSlots(
-    [
-      {
-        key: "a",
-        name: "A",
-        shirtNumber: 1,
-        positionLabel: "POR",
-        role: "GK",
-        isPlaceholder: false,
-        x: 50,
-        y: 78,
-      },
-      {
-        key: "b",
-        name: "B",
-        shirtNumber: 2,
-        positionLabel: "DFC",
-        role: "DF",
-        isPlaceholder: false,
-        x: 50,
-        y: 78,
-      },
-    ],
-    SINGLE_TEAM_BOUNDS
-  );
+test("proyeccion MVP mantiene coords horizontales de plantilla", () => {
+  const template = getFormationTemplateCoordinates("4-2-3-1");
+  const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const home = mapSlotsToHomeHalf(slots);
 
-  for (const slot of separated) {
-    assert.ok(slot.y >= SINGLE_TEAM_BOUNDS.yMin);
-    assert.ok(slot.y <= SINGLE_TEAM_BOUNDS.yMax);
+  assert.deepEqual(
+    home.map((slot) => slot.x).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
+});
+
+test("mapSlotsToHomeHalf respeta bounds del local", () => {
+  const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const mapped = mapSlotsToHomeHalf(template);
+
+  for (const slot of mapped) {
+    assert.ok(slot.y >= MVP_HOME_BOUNDS.yMin);
+    assert.ok(slot.y <= MVP_HOME_BOUNDS.yMax);
+    assert.ok(slot.x >= MVP_HOME_BOUNDS.xMin);
+    assert.ok(slot.x <= MVP_HOME_BOUNDS.xMax);
   }
 });

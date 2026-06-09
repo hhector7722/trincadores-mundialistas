@@ -2,13 +2,9 @@
 
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import {
-  PITCH_ASPECT_CLASS,
-  separateOverlappingSlots,
-} from "@/lib/lineup/field-layout";
+import { PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
 
 type TeamLineupGraphicProps = {
   slots: LineupSlot[];
@@ -33,7 +29,6 @@ export function TeamLineupGraphic({
   squadPlayerNames,
 }: TeamLineupGraphicProps) {
   const isModal = size === "modal";
-  const positionedSlots = useMemo(() => separateOverlappingSlots(slots), [slots]);
 
   return (
     <div className={cn("flex w-full flex-col items-center gap-1.5", className)}>
@@ -57,7 +52,7 @@ export function TeamLineupGraphic({
           <FootballPitchSurface className="object-contain object-center" onReady={onFieldReady} />
         </div>
 
-        {positionedSlots.map((slot) => (
+        {slots.map((slot) => (
           <div
             key={slot.key}
             className="absolute z-10 -translate-x-1/2 -translate-y-1/2"

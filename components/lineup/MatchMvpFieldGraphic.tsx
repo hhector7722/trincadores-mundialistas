@@ -1,17 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
+import { MVP_PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import {
-  MVP_PITCH_ASPECT_CLASS,
-  separateOverlappingSlots,
-} from "@/lib/lineup/field-layout";
-import {
-  MVP_AWAY_BOUNDS,
-  MVP_HOME_BOUNDS,
   type MatchFieldSlot,
 } from "@/lib/lineup/match-field-geometry";
+import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import { cn } from "@/lib/utils";
 
@@ -29,10 +24,6 @@ type MatchMvpFieldGraphicProps = {
   className?: string;
 };
 
-function playerKey(teamName: string, slot: MatchFieldSlot): string {
-  return `${teamName}-${slot.name}-${slot.shirtNumber ?? "x"}`;
-}
-
 export function MatchMvpFieldGraphic({
   homeSlots,
   awaySlots,
@@ -48,21 +39,13 @@ export function MatchMvpFieldGraphic({
 }: MatchMvpFieldGraphicProps) {
   const awayKitClash = teamKitColorsClash(homeTeam, awayTeam);
 
-  const { separatedAway, separatedHome } = useMemo(
-    () => ({
-      separatedAway: separateOverlappingSlots(awaySlots, MVP_AWAY_BOUNDS) as MatchFieldSlot[],
-      separatedHome: separateOverlappingSlots(homeSlots, MVP_HOME_BOUNDS) as MatchFieldSlot[],
-    }),
-    [awaySlots, homeSlots]
-  );
-
   function renderSlot(
     teamName: string,
     slot: MatchFieldSlot,
     isAway: boolean,
     squadPlayerNames?: string[]
   ) {
-    const key = playerKey(teamName, slot);
+    const key = mvpSelectionKey(teamName, slot);
     const active = selectedKey === key;
 
     return (
@@ -92,7 +75,7 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "relative w-full shrink-0 self-center max-w-[15rem] overflow-hidden",
+        "relative w-full shrink-0 self-center max-w-[16.5rem] overflow-visible",
         MVP_PITCH_ASPECT_CLASS,
         className
       )}
@@ -101,8 +84,8 @@ export function MatchMvpFieldGraphic({
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 
-      {separatedAway.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
-      {separatedHome.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
+      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
+      {homeSlots.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
     </div>
   );
 }

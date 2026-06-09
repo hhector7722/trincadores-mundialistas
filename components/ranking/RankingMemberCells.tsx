@@ -35,7 +35,7 @@ export function RankingMemberCells({
 
   return (
     <>
-      <div className="flex min-w-0 items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-2.5">
         <button
           type="button"
           disabled={!canPreview}

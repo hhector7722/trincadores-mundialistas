@@ -3,83 +3,57 @@ import type { PlayableBounds } from "@/lib/lineup/field-layout";
 
 /**
  * Proyección al campo MVP compartido (visitante arriba, local abajo).
- * El campo SVG tiene porterías arriba/abajo; cada equipo ocupa su mitad vertical.
+ * Usa bandas tácticas discretas para evitar solapes GK–defensa tras comprimir la mitad.
  */
 
-/** Ataque/portería en vista de once individual (y bajo = ataque, y alto = portería). */
-const LINEUP_ATTACK_Y = 16;
-const LINEUP_DEFENSE_Y = 78;
-
-const MIDFIELD_Y = 50;
-const MIDFIELD_GAP = 20;
-
-/** Visitante: portería arriba (y bajo en su sistema → arriba en pantalla). */
-const AWAY_ATTACK_Y = MIDFIELD_Y - MIDFIELD_GAP;
-const AWAY_DEFENSE_Y = 8;
-
-/** Local: portería abajo. */
-const HOME_ATTACK_Y = MIDFIELD_Y + MIDFIELD_GAP;
-const HOME_DEFENSE_Y = 92;
+const AWAY_LINE_Y = [7, 13, 19, 25, 29] as const;
+const HOME_LINE_Y = [71, 77, 83, 89, 93] as const;
 
 export const MVP_AWAY_BOUNDS: PlayableBounds = {
-  xMin: 22,
-  xMax: 78,
-  yMin: 6,
-  yMax: 32,
+  xMin: 18,
+  xMax: 82,
+  yMin: 5,
+  yMax: 31,
 };
 
 export const MVP_HOME_BOUNDS: PlayableBounds = {
-  xMin: 22,
-  xMax: 78,
-  yMin: 68,
-  yMax: 94,
+  xMin: 18,
+  xMax: 82,
+  yMin: 69,
+  yMax: 95,
 };
-
-const GOYA_PITCH_TOP_Y = 8;
-const GOYA_PITCH_BOTTOM_Y = 92;
-
-const GOYA_SCALE_TOP = 0.86;
-const GOYA_SCALE_BOTTOM = 1;
 
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
-}
-
-function lineupDepth(y: number): number {
-  return clamp01((y - LINEUP_ATTACK_Y) / (LINEUP_DEFENSE_Y - LINEUP_ATTACK_Y));
-}
-
-function pitchDepth(y: number): number {
-  return clamp01((y - GOYA_PITCH_TOP_Y) / (GOYA_PITCH_BOTTOM_Y - GOYA_PITCH_TOP_Y));
+function lineupLineIndex(y: number): number {
+  if (y >= 72) return 0;
+  if (y >= 60) return 1;
+  if (y >= 48) return 2;
+  if (y >= 28) return 3;
+  return 4;
 }
 
 function mapToHomeHalf(coord: FieldCoordinate): FieldCoordinate {
-  const depth = lineupDepth(coord.y);
+  const line = lineupLineIndex(coord.y);
+  const inverted = AWAY_LINE_Y.length - 1 - line;
   return {
     x: coord.x,
-    y: HOME_ATTACK_Y + depth * (HOME_DEFENSE_Y - HOME_ATTACK_Y),
+    y: HOME_LINE_Y[inverted] ?? HOME_LINE_Y[HOME_LINE_Y.length - 1]!,
   };
 }
 
 function mapToAwayHalf(coord: FieldCoordinate): FieldCoordinate {
-  const depth = lineupDepth(coord.y);
+  const line = lineupLineIndex(coord.y);
   return {
     x: coord.x,
-    y: AWAY_ATTACK_Y - depth * (AWAY_ATTACK_Y - AWAY_DEFENSE_Y),
+    y: AWAY_LINE_Y[line] ?? AWAY_LINE_Y[AWAY_LINE_Y.length - 1]!,
   };
-}
-
-export function goyaScaleFactor(y: number): number {
-  const t = pitchDepth(y);
-  return GOYA_SCALE_TOP + t * (GOYA_SCALE_BOTTOM - GOYA_SCALE_TOP);
 }
 
 export function applyGoyaPerspective(slot: LineupSlot): MatchFieldSlot {
   return {
     ...slot,
-    scale: goyaScaleFactor(slot.y),
+    scale: 1,
   };
 }
 
@@ -97,6 +71,11 @@ export function mapSlotsToHomeHalf(slots: LineupSlot[]): MatchFieldSlot[] {
 
 export function mapSlotsToAwayHalf(slots: LineupSlot[]): MatchFieldSlot[] {
   return slots.map(mapSlotToAwayHalf);
+}
+
+/** Reservado por compatibilidad con tests/UI; el MVP usa escala uniforme. */
+export function goyaScaleFactor(_y: number): number {
+  return 1;
 }
 
 export function goyaWidthFactor(_y: number): number {

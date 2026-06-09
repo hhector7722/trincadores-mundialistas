@@ -82,3 +82,25 @@ test("assignFormationTemplateCoordinates coloca porteria abajo y delantero arrib
   assert.ok(gk && st);
   assert.ok(gk.y > st.y);
 });
+
+test("4-3-3 acepta pivotes DM en la linea de tres medios", () => {
+  const template = getFormationTemplateCoordinates("4-3-3");
+  const withDm = layoutPredictedStarters(
+    [
+      { slotKey: "GK", role: "GK" },
+      { slotKey: "LB", role: "DF" },
+      { slotKey: "CB", role: "DF" },
+      { slotKey: "CB", role: "DF" },
+      { slotKey: "RB", role: "DF" },
+      { slotKey: "DM", role: "MF" },
+      { slotKey: "CM", role: "MF" },
+      { slotKey: "DM", role: "MF" },
+      { slotKey: "LW", role: "MF" },
+      { slotKey: "ST", role: "FW" },
+      { slotKey: "RW", role: "MF" },
+    ],
+    "4-3-3"
+  ).map((slot) => ({ x: slot.x, y: slot.y }));
+
+  assert.deepEqual(withDm, template);
+});

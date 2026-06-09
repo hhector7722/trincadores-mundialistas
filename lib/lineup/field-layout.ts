@@ -3,8 +3,8 @@ import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 /** Proporción ancho:alto de un campo en vista vertical (~68×105 m). */
 export const PITCH_ASPECT_CLASS = "aspect-[68/105]";
 
-/** Campo MVP (dos equipos): un poco más alto que un solo equipo. */
-export const MVP_PITCH_ASPECT_CLASS = "aspect-[68/130]";
+/** Campo MVP (dos equipos): más alto para 22 fichas en dos mitades. */
+export const MVP_PITCH_ASPECT_CLASS = "aspect-[68/148]";
 
 /** Zona jugable dentro del SVG (%): evita esquinas y líneas de banda. */
 export const PLAYABLE_X_MIN = 20;

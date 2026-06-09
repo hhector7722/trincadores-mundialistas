@@ -50,7 +50,7 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[1.625rem] w-[1.375rem]"
+            ? "h-8 w-7"
             : isModal
               ? "h-[1.75rem] w-[1.5rem]"
               : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
@@ -98,7 +98,7 @@ export function LineupPlayerChip({
         <p
           className={cn(
             "whitespace-normal text-center leading-tight text-white",
-            isMatch ? "text-[7px] font-bold" : isModal ? "text-[7px] font-semibold" : "text-[9px] font-semibold sm:text-[10px]"
+            isMatch ? "text-[8px] font-bold" : isModal ? "text-[7px] font-semibold" : "text-[9px] font-semibold sm:text-[10px]"
           )}
         >
           {squadPlayerNames?.length
@@ -117,7 +117,7 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "w-[2.625rem] min-h-8"
+      ? "min-h-12 w-12 touch-manipulation"
       : isModal
         ? "w-[2.75rem] min-h-8"
         : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",

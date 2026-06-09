@@ -1,9 +1,12 @@
 import {
-  coordinatesForFormation,
+  fallbackSlotKeyForRole,
+  normalizeFormationTemplate,
+} from "@/lib/lineup/formation-templates";
+import {
   normalizePositionRole,
   positionLabelEs,
 } from "@/lib/lineup/position-map";
-import { apiFootballGridToCoordinate } from "@/lib/lineup/sources/api-football-grid";
+import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import { API_FOOTBALL_BASE_URL, API_FOOTBALL_SOURCE_CODE } from "@/lib/lineup/sources/api-football-constants";
 import { teamNamesMatch } from "@/lib/lineup/sources/api-football-names";
 import type { ConfirmedLineupProvider } from "@/lib/lineup/sources/types";
@@ -99,31 +102,41 @@ function roleFromEntry(
   return normalizePositionRole(raw);
 }
 
-function buildStarterSlot(
-  entry: ApiFootballLineupEntry,
-  squadPlayer: LineupPlayerInput | null,
-  role: PositionRole,
-  index: number,
-  formation: FormationId
-): LineupSlot {
-  const coords =
-    entry.grid != null
-      ? apiFootballGridToCoordinate(entry.grid)
-      : coordinatesForFormation(formation)[role][index] ?? { x: 50, y: 50 };
+function buildStarterInputs(
+  starters: ApiFootballLineupEntry[],
+  squadIndexMap: Map<string, LineupPlayerInput>,
+  formationLabel: string
+): Array<{
+  key: string;
+  name: string;
+  shirtNumber: number | null;
+  positionLabel: string;
+  role: PositionRole;
+  isPlaceholder: boolean;
+  slotKey: string;
+}> {
+  const templateId = normalizeFormationTemplate(formationLabel);
+  const roleCounters: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
 
-  const name = squadPlayer?.player_name ?? entry.player?.name ?? "Por confirmar";
-  const shirtNumber = squadPlayer?.shirt_number ?? entry.player?.number ?? null;
+  return starters.slice(0, 11).map((entry, index) => {
+    const squadPlayer = resolveSquadPlayer(entry, squadIndexMap);
+    const role = roleFromEntry(entry, squadPlayer);
+    const roleIndex = roleCounters[role];
+    roleCounters[role] += 1;
+    const slotKey = fallbackSlotKeyForRole(templateId, role, roleIndex);
+    const name = squadPlayer?.player_name ?? entry.player?.name ?? "Por confirmar";
+    const shirtNumber = squadPlayer?.shirt_number ?? entry.player?.number ?? null;
 
-  return {
-    key: `${name}-${shirtNumber ?? index}`,
-    name,
-    shirtNumber,
-    positionLabel: positionLabelEs(role, squadPlayer?.position ?? entry.player?.pos ?? null),
-    role,
-    isPlaceholder: !name || name === "Por confirmar",
-    x: coords.x,
-    y: coords.y,
-  };
+    return {
+      key: `${name}-${shirtNumber ?? index}`,
+      name,
+      shirtNumber,
+      positionLabel: positionLabelEs(role, squadPlayer?.position ?? entry.player?.pos ?? null),
+      role,
+      isPlaceholder: !name || name === "Por confirmar",
+      slotKey,
+    };
+  });
 }
 
 function buildBench(entries: ApiFootballLineupEntry[], squadIndexMap: Map<string, LineupPlayerInput>): LineupBenchPlayer[] {
@@ -153,11 +166,8 @@ export function parseApiFootballTeamLineup(
   const formation = toFormationId(formationLabel);
   const squadIndexMap = squadIndex(players);
 
-  const slots: LineupSlot[] = starters.slice(0, 11).map((entry, index) => {
-    const squadPlayer = resolveSquadPlayer(entry, squadIndexMap);
-    const role = roleFromEntry(entry, squadPlayer);
-    return buildStarterSlot(entry, squadPlayer, role, index, formation);
-  });
+  const starterInputs = buildStarterInputs(starters, squadIndexMap, formationLabel);
+  const slots: LineupSlot[] = layoutPredictedStarters(starterInputs, formationLabel);
 
   const bench = buildBench(payload.substitutes ?? [], squadIndexMap);
   const fetchedAt = new Date().toISOString();

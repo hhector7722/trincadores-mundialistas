@@ -10,7 +10,7 @@ function RankingTableHeader() {
     <div
       className={cn(
         RANKING_GRID,
-        "shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
+        "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
       <span aria-hidden="true" />
@@ -34,8 +34,8 @@ function RankingEmptyRow() {
     >
       <span />
       <span />
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="size-10 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="size-9 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
         <span className="min-w-0 flex-1 truncate">&nbsp;</span>
       </div>
       <span />

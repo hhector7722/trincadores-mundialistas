@@ -3,13 +3,18 @@
 import { useLayoutEffect, type RefObject } from "react";
 import {
   resetLayoutAboveTabBar,
+  syncLayoutAboveIndicators,
   syncLayoutAboveTabBar,
 } from "@/lib/layout/viewport-chrome";
+import { TAB_INDICATORS_SYNC_EVENT } from "@/lib/layout/tab-indicators-position";
 
-/** Fija la altura del contenedor desde su top hasta la TabBar (portal fixed). */
+export type LayoutBottomAnchor = "tabbar" | "indicators";
+
+/** Fija la altura del contenedor hasta la TabBar o los indicadores swipe. */
 export function useLayoutAboveTabBar(
   rootRef: RefObject<HTMLElement | null>,
-  enabled = true
+  enabled = true,
+  bottomAnchor: LayoutBottomAnchor = "tabbar"
 ) {
   useLayoutEffect(() => {
     if (!enabled) return;
@@ -18,7 +23,11 @@ export function useLayoutAboveTabBar(
     if (!root) return;
 
     const sync = () => {
-      syncLayoutAboveTabBar(root);
+      if (bottomAnchor === "indicators") {
+        syncLayoutAboveIndicators(root);
+      } else {
+        syncLayoutAboveTabBar(root);
+      }
     };
 
     sync();
@@ -31,16 +40,27 @@ export function useLayoutAboveTabBar(
     const nav = document.querySelector('nav[aria-label="Navegacion principal"]');
     if (nav) observer.observe(nav);
 
+    if (bottomAnchor === "indicators") {
+      const indicators = document.querySelector(".tm-tab-indicators-slot");
+      if (indicators) observer.observe(indicators);
+    }
+
     window.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("scroll", sync);
+    if (bottomAnchor === "indicators") {
+      window.addEventListener(TAB_INDICATORS_SYNC_EVENT, sync);
+    }
 
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", sync);
       window.visualViewport?.removeEventListener("resize", sync);
       window.visualViewport?.removeEventListener("scroll", sync);
+      if (bottomAnchor === "indicators") {
+        window.removeEventListener(TAB_INDICATORS_SYNC_EVENT, sync);
+      }
       resetLayoutAboveTabBar(root);
     };
-  }, [rootRef, enabled]);
+  }, [rootRef, enabled, bottomAnchor]);
 }

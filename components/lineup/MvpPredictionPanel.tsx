@@ -12,6 +12,10 @@ import { Button } from "@/components/ui/button";
 import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
+import {
+  findMvpOptionBySaved,
+  mvpSelectionKey,
+} from "@/lib/lineup/mvp-selection-key";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { mapSlotsToAwayHalf, mapSlotsToHomeHalf } from "@/lib/lineup/match-field-geometry";
@@ -65,7 +69,10 @@ function flattenSquadPlayers(
       return true;
     })
     .map((player) => ({
-      key: `${teamName}-${player.player_name}-${player.shirt_number ?? "x"}`,
+      key: mvpSelectionKey(teamName, {
+        name: player.player_name,
+        shirtNumber: player.shirt_number,
+      }),
       playerName: player.player_name,
       teamName,
       shirtNumber: player.shirt_number,
@@ -181,12 +188,14 @@ export function MvpPredictionPanel({
       setSelectedKey(null);
       return;
     }
-    const match = options.find(
-      (option) =>
-        option.playerName === savedPlayerName && option.teamName === savedTeamName
-    );
+    const match = findMvpOptionBySaved(options, savedPlayerName, savedTeamName);
     setSelectedKey(match?.key ?? null);
   }, [options, savedPlayerName, savedTeamName]);
+
+  const selectedOption = useMemo(
+    () => options.find((option) => option.key === selectedKey) ?? null,
+    [options, selectedKey]
+  );
 
   function onSave() {
     const selected = options.find((option) => option.key === selectedKey);
@@ -237,7 +246,9 @@ export function MvpPredictionPanel({
           </p>
         ) : (
           <p className="mb-0.5 shrink-0 px-1 text-center text-[9px] text-[var(--tm-muted)]">
-            Pulsa un jugador del once probable o de las reservas.
+            {selectedOption
+              ? `MVP: ${selectedOption.playerName} (${selectedOption.teamName})`
+              : "Pulsa un jugador del once probable o de las reservas."}
           </p>
         )}
 

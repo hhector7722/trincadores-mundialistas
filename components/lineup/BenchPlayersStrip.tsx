@@ -1,13 +1,14 @@
 "use client";
 
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { squadDisplayNames } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 export function benchPlayerKey(teamName: string, player: BenchPlayer): string {
-  return `${teamName}-${player.name}-${player.shirtNumber ?? "x"}`;
+  return mvpSelectionKey(teamName, player);
 }
 
 type BenchPlayersStripProps = {
@@ -70,7 +71,7 @@ export function BenchPlayersStrip({
       <div
         className={cn(
           "grid gap-x-0.5 gap-y-0.5",
-          compact ? "max-h-[3.75rem] grid-cols-8 overflow-y-auto overscroll-contain" : "grid-cols-6 sm:grid-cols-8"
+          compact ? "max-h-[4.75rem] grid-cols-6 overflow-y-auto overscroll-contain sm:grid-cols-8" : "grid-cols-6 sm:grid-cols-8"
         )}
       >
         {players.map((player, index) => {
@@ -85,7 +86,7 @@ export function BenchPlayersStrip({
               onClick={() => onPlayerClick(player)}
               className={cn(
                 "flex w-full flex-col items-center justify-center px-0.5 text-center transition-colors",
-                compact ? "min-h-5 py-0" : "min-h-6 py-0.5",
+                compact ? "min-h-12 py-0.5" : "min-h-6 py-0.5",
                 "hover:opacity-90 active:opacity-80",
                 active && "rounded-sm bg-[rgba(212,255,0,0.1)]",
                 disabled && "opacity-60"

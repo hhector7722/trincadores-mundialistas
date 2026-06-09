@@ -57,4 +57,6 @@
 - [x] Quiz cron diario 5:00 Madrid (`/api/cron/quiz-daily` + `publishQuizDay`)
 - [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play
 - [x] Alineaciones: optimización carga (bundle actions, ventana confirmada, BSD lookup acotado)
+- [x] Alineaciones: plantilla visual fija por formación + relayout al leer caché (coords consistentes entre equipos)
+- [x] MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px
 - [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, horizonte 48h, TTL 6h)
