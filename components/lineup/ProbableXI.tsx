@@ -2,7 +2,8 @@ import Link from "next/link";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
-import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
+import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
+import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { FormationId } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { teamNameEs } from "@/lib/teams/display";
@@ -60,7 +61,7 @@ export function ProbableXI({
     );
   }
 
-  const lineup = buildProbableXI(squad.players, formation);
+  const lineup = buildFallbackLineup(squad.players, formation);
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
@@ -83,18 +84,15 @@ export function ProbableXI({
               <p className="text-xs text-[var(--tm-muted)]">
                 {abbr}
                 {labelYear ? ` · Mundial ${labelYear}` : ""}
-                {lineup.isProbable ? " · generado desde plantilla" : ""}
               </p>
             </div>
           </div>
-          <div className="shrink-0 rounded-lg border border-[var(--tm-border)] bg-black/25 px-2 py-1 text-center">
-            <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--tm-muted)]">
-              Sistema
-            </p>
-            <p className="font-display text-sm font-bold text-[var(--tm-accent)]">
-              {lineup.formation}
-            </p>
-          </div>
+          <LineupSourceBadge
+            sourceKind={lineup.sourceKind}
+            formationLabel={lineup.formationLabel}
+            fetchedAt={lineup.fetchedAt}
+            compact
+          />
         </div>
       </header>
 
@@ -107,10 +105,18 @@ export function ProbableXI({
               teamName={teamName}
               onFieldReady={markFieldReady}
             />
-            <p className="mt-4 max-w-lg text-center text-[11px] text-[var(--tm-muted)]">
-              Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
-              {lineup.benchCount > 0 ? ` ${lineup.benchCount} jugadores en plantilla.` : ""}
-            </p>
+            <div className="mt-4 max-w-lg px-2">
+              <LineupSourceBadge
+                sourceKind={lineup.sourceKind}
+                formationLabel={lineup.formationLabel}
+                fetchedAt={lineup.fetchedAt}
+              />
+              {lineup.benchCount > 0 ? (
+                <p className="mt-2 text-center text-[11px] text-[var(--tm-muted)]">
+                  {lineup.benchCount} jugadores en plantilla.
+                </p>
+              ) : null}
+            </div>
           </div>
         )}
       </LineupFieldGate>

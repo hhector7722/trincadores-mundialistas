@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchTeamSquadAction } from "@/actions/lineup";
+import { fetchResolvedTeamLineupAction, fetchTeamSquadAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
-import { getBenchPlayers } from "@/lib/lineup/bench-players";
-import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
+import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
+import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
+import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import type { ResolvedLineup } from "@/lib/lineup/types";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
@@ -13,6 +15,7 @@ import { LoadingCenter } from "@/components/ui/spinner";
 
 type LineupModalPanelProps = {
   teamName: string;
+  matchId?: string;
   onPlayerClick: (playerName: string) => void;
   selectionMode?: "navigate" | "pick";
   playerFilter?: (position: string | null) => boolean;
@@ -21,12 +24,14 @@ type LineupModalPanelProps = {
 
 export function LineupModalPanel({
   teamName,
+  matchId,
   onPlayerClick,
   selectionMode = "navigate",
   playerFilter,
   selectionBlockedMessage,
 }: LineupModalPanelProps) {
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
+  const [lineup, setLineup] = useState<ResolvedLineup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,14 +40,28 @@ export function LineupModalPanel({
     setLoading(true);
     setError(null);
     setSquad(null);
+    setLineup(null);
 
-    fetchTeamSquadAction(teamName).then((result) => {
+    Promise.all([
+      fetchTeamSquadAction(teamName),
+      fetchResolvedTeamLineupAction(teamName, { matchId }),
+    ]).then(([squadResult, lineupResult]) => {
       if (cancelled) return;
-      if (!result.ok) {
-        setError(result.error);
+      if (!squadResult.ok) {
+        setError(squadResult.error);
         setSquad(null);
+        setLineup(null);
       } else {
-        setSquad(result.data);
+        setSquad(squadResult.data);
+        if (lineupResult.ok) {
+          setLineup(lineupResult.data);
+        } else {
+          setLineup(
+            squadResult.data
+              ? buildFallbackLineup(squadResult.data.players)
+              : buildFallbackLineup([])
+          );
+        }
       }
       setLoading(false);
     });
@@ -50,7 +69,7 @@ export function LineupModalPanel({
     return () => {
       cancelled = true;
     };
-  }, [teamName]);
+  }, [teamName, matchId]);
 
   const displayName = teamNameEs(teamName);
 
@@ -78,8 +97,8 @@ export function LineupModalPanel({
     );
   }
 
-  const lineup = buildProbableXI(squad.players);
-  const bench = getBenchPlayers(squad, lineup);
+  const resolvedLineup = lineup ?? buildFallbackLineup(squad.players);
+  const bench = resolveBenchPlayers(squad, resolvedLineup);
 
   function handlePlayerInteraction(playerName: string) {
     if (selectionMode === "pick" && playerFilter && squad) {
@@ -102,8 +121,8 @@ export function LineupModalPanel({
         {(markFieldReady) => (
           <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
             <TeamLineupGraphic
-              slots={lineup.slots}
-              formation={lineup.formation}
+              slots={resolvedLineup.slots}
+              formation={resolvedLineup.formation}
               teamName={teamName}
               size="modal"
               onPlayerClick={handlePlayerInteraction}
@@ -121,9 +140,13 @@ export function LineupModalPanel({
               />
             ) : null}
 
-            <p className="mt-4 max-w-lg self-center text-center text-[9px] leading-snug text-[var(--tm-muted)]">
-              Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
-            </p>
+            <div className="mt-4 max-w-lg self-center px-2">
+              <LineupSourceBadge
+                sourceKind={resolvedLineup.sourceKind}
+                formationLabel={resolvedLineup.formationLabel}
+                fetchedAt={resolvedLineup.fetchedAt}
+              />
+            </div>
           </div>
         )}
       </LineupFieldGate>

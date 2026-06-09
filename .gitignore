@@ -38,6 +38,9 @@ yarn-error.log*
 access-codes.local.txt
 onboarding-codes.local.json
 
+# artefactos temporales de scripts de mapeo
+scripts/.cache/
+
 # vercel
 .vercel
 

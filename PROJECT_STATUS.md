@@ -28,6 +28,8 @@
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 - [x] MVP partido: prediccion por partido, scoring +5 pts, modal reutilizable (home/calendario/pronostico)
+- [x] Alineaciones con capa de fuentes: confirmed (BSD/API-Football) > predicted (BSD) > fallback dorsal; BD `match_team_lineups` + badge UI
+- [x] Integración BSD (Bzzoiro): predicted lineups WC 2026 + confirmed ~1h antes del pitido
 
 ## Siguiente
 - [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
@@ -35,6 +37,11 @@
 - [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
 - [x] Import plantillas oficiales WC 2026 (48 squads, 1248 jugadores, source worldcup2026/FIFA)
 - [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
+- [x] Migracion `match_team_lineups` aplicada en remoto (MCP)
+- [x] Script `db:map-api-football-fixtures` (matches → fixture IDs API-Football)
+- [x] Mapeo BSD remoto: 93/104 partidos en `external_id_map` (72 grupos + 21 eliminatorias; 11 sin match por placeholders `3A/B/C/D/F` vs BSD)
+- [ ] API-Football free tier: temporada 2026 no disponible; lineups confirmadas vía BSD o plan de pago API-Football
+- [ ] Enchufar proveedor predicted lineups gratuito cuando exista fuente fiable
 - [ ] Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real

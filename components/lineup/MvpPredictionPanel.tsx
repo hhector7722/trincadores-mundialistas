@@ -2,15 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { fetchMatchSquadsAction, fetchTeamKitHexMapAction } from "@/actions/lineup";
+import {
+  fetchMatchSquadsAction,
+  fetchResolvedMatchLineupsAction,
+  fetchTeamKitHexMapAction,
+} from "@/actions/lineup";
 import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
-import { getBenchPlayers } from "@/lib/lineup/bench-players";
-import { buildProbableXI } from "@/lib/lineup/build-probable-xi";
+import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
+import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
+import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import type { ResolvedLineup } from "@/lib/lineup/types";
 import { mapSlotsToAwayHalf, mapSlotsToHomeHalf } from "@/lib/lineup/match-field-geometry";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -72,6 +78,8 @@ export function MvpPredictionPanel({
   const router = useRouter();
   const [homeSquad, setHomeSquad] = useState<TeamSquadWithPlayers | null>(null);
   const [awaySquad, setAwaySquad] = useState<TeamSquadWithPlayers | null>(null);
+  const [homeLineup, setHomeLineup] = useState<ResolvedLineup | null>(null);
+  const [awayLineup, setAwayLineup] = useState<ResolvedLineup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -95,15 +103,35 @@ export function MvpPredictionPanel({
     setLoading(true);
     setError(null);
 
-    fetchMatchSquadsAction(homeTeam, awayTeam).then((result) => {
+    Promise.all([
+      fetchMatchSquadsAction(homeTeam, awayTeam),
+      fetchResolvedMatchLineupsAction(matchId, homeTeam, awayTeam),
+    ]).then(([squadsResult, lineupsResult]) => {
       if (cancelled) return;
-      if (!result.ok) {
-        setError(result.error);
+      if (!squadsResult.ok) {
+        setError(squadsResult.error);
         setHomeSquad(null);
         setAwaySquad(null);
+        setHomeLineup(null);
+        setAwayLineup(null);
       } else {
-        setHomeSquad(result.data.home);
-        setAwaySquad(result.data.away);
+        setHomeSquad(squadsResult.data.home);
+        setAwaySquad(squadsResult.data.away);
+        if (lineupsResult.ok) {
+          setHomeLineup(lineupsResult.data.home);
+          setAwayLineup(lineupsResult.data.away);
+        } else {
+          setHomeLineup(
+            squadsResult.data.home
+              ? buildFallbackLineup(squadsResult.data.home.players)
+              : buildFallbackLineup([])
+          );
+          setAwayLineup(
+            squadsResult.data.away
+              ? buildFallbackLineup(squadsResult.data.away.players)
+              : buildFallbackLineup([])
+          );
+        }
       }
       setLoading(false);
     });
@@ -111,7 +139,7 @@ export function MvpPredictionPanel({
     return () => {
       cancelled = true;
     };
-  }, [homeTeam, awayTeam]);
+  }, [homeTeam, awayTeam, matchId]);
 
   const homeOptions = useMemo(
     () => flattenSquadPlayers(homeSquad, homeTeam),
@@ -123,37 +151,45 @@ export function MvpPredictionPanel({
   );
   const options = useMemo(() => [...homeOptions, ...awayOptions], [homeOptions, awayOptions]);
 
-  const homeLineup = useMemo(
-    () => (homeSquad ? buildProbableXI(homeSquad.players) : null),
-    [homeSquad]
+  const resolvedHomeLineup = useMemo(
+    () =>
+      homeLineup ??
+      (homeSquad ? buildFallbackLineup(homeSquad.players) : null),
+    [homeLineup, homeSquad]
   );
-  const awayLineup = useMemo(
-    () => (awaySquad ? buildProbableXI(awaySquad.players) : null),
-    [awaySquad]
+  const resolvedAwayLineup = useMemo(
+    () =>
+      awayLineup ??
+      (awaySquad ? buildFallbackLineup(awaySquad.players) : null),
+    [awayLineup, awaySquad]
   );
 
   const homeSlots = useMemo(
-    () => (homeLineup ? mapSlotsToHomeHalf(homeLineup.slots) : []),
-    [homeLineup]
+    () => (resolvedHomeLineup ? mapSlotsToHomeHalf(resolvedHomeLineup.slots) : []),
+    [resolvedHomeLineup]
   );
   const awaySlots = useMemo(
-    () => (awayLineup ? mapSlotsToAwayHalf(awayLineup.slots) : []),
-    [awayLineup]
+    () => (resolvedAwayLineup ? mapSlotsToAwayHalf(resolvedAwayLineup.slots) : []),
+    [resolvedAwayLineup]
   );
 
   const homeBench = useMemo(
     () =>
       sortBenchByShirt(
-        homeSquad && homeLineup ? getBenchPlayers(homeSquad, homeLineup) : []
+        homeSquad && resolvedHomeLineup
+          ? resolveBenchPlayers(homeSquad, resolvedHomeLineup)
+          : []
       ),
-    [homeSquad, homeLineup]
+    [homeSquad, resolvedHomeLineup]
   );
   const awayBench = useMemo(
     () =>
       sortBenchByShirt(
-        awaySquad && awayLineup ? getBenchPlayers(awaySquad, awayLineup) : []
+        awaySquad && resolvedAwayLineup
+          ? resolveBenchPlayers(awaySquad, resolvedAwayLineup)
+          : []
       ),
-    [awaySquad, awayLineup]
+    [awaySquad, resolvedAwayLineup]
   );
 
   useEffect(() => {
@@ -253,9 +289,22 @@ export function MvpPredictionPanel({
                 position="bottom"
               />
 
-              <p className="mt-1 px-1 text-center text-[9px] leading-snug text-[var(--tm-muted)]">
-                Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
-              </p>
+              <div className="mt-2 space-y-2 px-2">
+                {resolvedAwayLineup ? (
+                  <LineupSourceBadge
+                    sourceKind={resolvedAwayLineup.sourceKind}
+                    formationLabel={`${resolvedAwayLineup.formationLabel} · visitante`}
+                    fetchedAt={resolvedAwayLineup.fetchedAt}
+                  />
+                ) : null}
+                {resolvedHomeLineup ? (
+                  <LineupSourceBadge
+                    sourceKind={resolvedHomeLineup.sourceKind}
+                    formationLabel={`${resolvedHomeLineup.formationLabel} · local`}
+                    fetchedAt={resolvedHomeLineup.fetchedAt}
+                  />
+                ) : null}
+              </div>
             </div>
           )}
         </LineupFieldGate>
