@@ -989,8 +989,8 @@ html:has(.tm-app-frame) {
   --tm-ko-wire: rgba(160, 120, 230, 0.34);
   --tm-ko-wire-pair: rgba(160, 120, 230, 0.28);
   --tm-ko-wire-final: rgba(160, 120, 230, 0.5);
-  --tm-ko-card-bg: rgba(18, 8, 40, 0.92);
-  --tm-ko-card-border: rgba(255, 255, 255, 0.1);
+  --tm-ko-card-bg: #ffffff;
+  --tm-ko-card-border: rgba(0, 0, 0, 0.12);
   --tm-ko-card-highlight: rgba(212, 255, 0, 0.14);
   --tm-ko-card-size-scale: 0.92;
   --tm-ko-card-width: min(13.5cqw, 68px);
@@ -1137,6 +1137,10 @@ html:has(.tm-app-frame) {
   cursor: default;
 }
 
+.tm-ko-card:not(.tm-ko-card--r32) {
+  min-height: min(5.5cqh, 26px);
+}
+
 .tm-ko-card--missing {
   opacity: 0.45;
 }
@@ -1154,11 +1158,7 @@ html:has(.tm-app-frame) {
   width: var(--tm-ko-card-width);
   min-width: calc(42px * var(--tm-ko-card-size-scale));
   border-color: rgba(212, 255, 0, 0.42);
-  background: linear-gradient(
-    165deg,
-    rgba(28, 12, 58, 0.98) 0%,
-    rgba(14, 6, 34, 0.98) 100%
-  );
+  background: var(--tm-ko-card-bg);
   box-shadow:
     0 0 0 1px rgba(212, 255, 0, 0.12),
     0 4px 18px rgba(0, 0, 0, 0.35);
@@ -1213,6 +1213,10 @@ html:has(.tm-app-frame) {
 .tm-ko-card--r32 .tm-ko-card-row:last-child {
   margin-top: 0.06rem;
   transform: translateY(0.14rem);
+}
+
+.tm-ko-card--r32 .tm-ko-card-row-score {
+  color: rgba(18, 8, 40, 0.85);
 }
 
 .tm-ko-card-row {

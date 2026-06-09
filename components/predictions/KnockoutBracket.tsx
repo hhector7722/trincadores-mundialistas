@@ -11,7 +11,6 @@ import {
 } from "@/lib/predictions/edit-state";
 import {
   applyQfOppositeFooterAlignment,
-  buildBracketConnectorPaths,
   buildBracketGeometry,
   FINAL_CENTER_X,
   FINAL_CUP_OFFSET_ABOVE_FINAL,
@@ -33,7 +32,6 @@ type KnockoutBracketProps = {
 };
 
 const BRACKET_GEOMETRY = applyQfOppositeFooterAlignment(buildBracketGeometry());
-const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 
 function BracketTeamRow({
@@ -119,9 +117,13 @@ function BracketMatchCard({
           : `Partido ${geom.matchNumber} sin datos`
       }
     >
-      <BracketTeamRow name={homeName} goals={savedHome} isWinner={homeWins} />
-      <div className="tm-ko-card-divider" aria-hidden />
-      <BracketTeamRow name={awayName} goals={savedAway} isWinner={awayWins} />
+      {geom.round === "r32" ? (
+        <>
+          <BracketTeamRow name={homeName} goals={savedHome} isWinner={homeWins} />
+          <div className="tm-ko-card-divider" aria-hidden />
+          <BracketTeamRow name={awayName} goals={savedAway} isWinner={awayWins} />
+        </>
+      ) : null}
     </button>
   );
 }
@@ -150,26 +152,6 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           aria-label="Cuadro de eliminatorias Mundial 2026"
         >
           <div className="tm-ko-header-band" aria-hidden />
-
-          <svg
-            className="tm-ko-wires"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            {BRACKET_CONNECTORS.map((segment, index) => (
-              <path
-                key={`wire-${index}`}
-                d={segment.d}
-                className={cn(
-                  "tm-ko-wire",
-                  segment.variant === "pair" && "tm-ko-wire--pair",
-                  segment.variant === "final" && "tm-ko-wire--final"
-                )}
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-          </svg>
 
           <div
             className="tm-ko-cup"
