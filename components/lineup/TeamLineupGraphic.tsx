@@ -15,6 +15,7 @@ type TeamLineupGraphicProps = {
   onPlayerClick?: (playerName: string) => void;
   /** Se dispara cuando el campo terminó de cargar (o falló). */
   onFieldReady?: () => void;
+  squadPlayerNames?: string[];
 };
 
 export function TeamLineupGraphic({
@@ -25,6 +26,7 @@ export function TeamLineupGraphic({
   size = "default",
   onPlayerClick,
   onFieldReady,
+  squadPlayerNames,
 }: TeamLineupGraphicProps) {
   const isModal = size === "modal";
 
@@ -55,6 +57,7 @@ export function TeamLineupGraphic({
           <LineupPlayerChip
             slot={slot}
             teamName={teamName}
+            squadPlayerNames={squadPlayerNames}
             variant={isModal ? "modal" : "default"}
             onClick={
               onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined

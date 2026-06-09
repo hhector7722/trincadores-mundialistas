@@ -54,10 +54,10 @@ export function coordinateForConfirmedIndex(
   const spread = Math.max(totalInRole - 1, 1);
   const x = 12 + (index / spread) * 76;
   const yByRole: Record<typeof role, number> = {
-    GK: 90,
-    DF: 74,
-    MF: 50,
-    FW: 20,
+    GK: 84,
+    DF: 70,
+    MF: 46,
+    FW: 16,
   };
   return { x: Math.round(x * 10) / 10, y: yByRole[role] };
 }

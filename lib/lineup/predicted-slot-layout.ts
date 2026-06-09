@@ -2,23 +2,17 @@ import type { FieldCoordinate } from "@/lib/lineup/types";
 
 type LineKey = "GK" | "DF" | "DM" | "MF" | "AM" | "FW";
 
-/** Profundidad táctica (%): arriba = ataque, abajo = portería. */
+/**
+ * Profundidad táctica (% del contenedor).
+ * Arriba = ataque rival · Abajo = portería propia (alineado con campo vertical).
+ */
 const LINE_DEPTH: Record<LineKey, number> = {
-  GK: 90,
-  DF: 74,
-  DM: 60,
-  MF: 50,
-  AM: 34,
-  FW: 18,
-};
-
-/** Línea táctica por índice de titular (orden BSD: POR → DEF → MED → DEL). */
-const FORMATION_LINE_BY_INDEX: Record<string, LineKey[]> = {
-  "4-2-3-1": ["GK", "DF", "DF", "DF", "DF", "DM", "DM", "AM", "AM", "AM", "FW"],
-  "4-3-3": ["GK", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "FW", "FW", "FW"],
-  "4-4-2": ["GK", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "MF", "FW", "FW"],
-  "3-5-2": ["GK", "DF", "DF", "DF", "MF", "MF", "MF", "MF", "MF", "FW", "FW"],
-  "5-3-2": ["GK", "DF", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "FW", "FW"],
+  GK: 84,
+  DF: 70,
+  DM: 56,
+  MF: 46,
+  AM: 30,
+  FW: 16,
 };
 
 const SLOT_HORIZONTAL_ORDER: Record<string, number> = {
@@ -45,13 +39,20 @@ type LayoutInput = {
   role: "GK" | "DF" | "MF" | "FW";
 };
 
-function tacticalLine({ slotKey, role }: LayoutInput): LineKey {
+function tacticalLine({ slotKey, role }: LayoutInput, formationLabel?: string): LineKey {
   const key = slotKey.trim().toUpperCase();
-  if (role === "GK") return "GK";
-  if (role === "DF") return "DF";
-  if (role === "FW") return "FW";
+  const formation = (formationLabel ?? "").trim();
+
+  if (role === "GK" || key === "GK") return "GK";
+  if (role === "DF" || ["LB", "RB", "CB", "LWB", "RWB"].includes(key)) return "DF";
+  if (role === "FW" || ["ST", "CF", "SS"].includes(key)) return "FW";
   if (key === "DM") return "DM";
-  if (["AM", "LW", "RW", "SS", "CF"].includes(key)) return "AM";
+  if (["AM", "LW", "RW"].includes(key)) return "AM";
+
+  if (formation === "4-2-3-1" && ["CM", "LM", "RM"].includes(key)) {
+    return "DM";
+  }
+
   return "MF";
 }
 
@@ -62,17 +63,20 @@ function horizontalOrder(slotKey: string): number {
 function spreadX(index: number, total: number): number {
   if (total <= 1) return 50;
   const spread = Math.max(total - 1, 1);
-  return Math.round((12 + (index / spread) * 76) * 10) / 10;
+  return Math.round((14 + (index / spread) * 72) * 10) / 10;
 }
 
-function layoutByLineGroups<T extends LayoutInput>(
+/**
+ * Reparte titulares por línea táctica según slot/rol (no por índice en el array BSD).
+ */
+export function layoutPredictedStarters<T extends LayoutInput>(
   starters: T[],
-  lineForIndex: (index: number, starter: T) => LineKey
+  formationLabel?: string
 ): Array<T & FieldCoordinate> {
   const lineBuckets = new Map<LineKey, Array<{ starter: T; index: number }>>();
 
   starters.forEach((starter, index) => {
-    const line = lineForIndex(index, starter);
+    const line = tacticalLine(starter, formationLabel);
     const bucket = lineBuckets.get(line) ?? [];
     bucket.push({ starter, index });
     lineBuckets.set(line, bucket);
@@ -96,21 +100,4 @@ function layoutByLineGroups<T extends LayoutInput>(
   }
 
   return positioned;
-}
-
-/**
- * Coloca titulares predichos usando la formación declarada por BSD (p. ej. 4-2-3-1)
- * o, en su defecto, heurística por slot/rol.
- */
-export function layoutPredictedStarters<T extends LayoutInput>(
-  starters: T[],
-  formationLabel?: string
-): Array<T & FieldCoordinate> {
-  const template = formationLabel ? FORMATION_LINE_BY_INDEX[formationLabel] : undefined;
-
-  if (template && starters.length === 11) {
-    return layoutByLineGroups(starters, (index) => template[index] ?? tacticalLine(starters[index]!));
-  }
-
-  return layoutByLineGroups(starters, (_index, starter) => tacticalLine(starter));
 }

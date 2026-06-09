@@ -1,7 +1,7 @@
 "use client";
 
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
-import { shortPlayerName } from "@/lib/lineup/short-player-name";
+import { squadDisplayNames } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,8 @@ export function BenchPlayersStrip({
 }: BenchPlayersStripProps) {
   if (players.length === 0) return null;
 
+  const labels = squadDisplayNames(players.map((player) => player.name));
+
   return (
     <section
       className={cn(
@@ -53,7 +55,7 @@ export function BenchPlayersStrip({
         </h4>
       )}
       <div className="grid grid-cols-6 gap-x-0.5 gap-y-0.5 sm:grid-cols-8">
-        {players.map((player) => {
+        {players.map((player, index) => {
           const key = benchPlayerKey(teamName, player);
           const active = selectedKey === key;
 
@@ -84,7 +86,7 @@ export function BenchPlayersStrip({
                   active && "text-[var(--tm-accent)]"
                 )}
               >
-                {shortPlayerName(player.name)}
+                {labels[index]}
               </span>
             </button>
           );

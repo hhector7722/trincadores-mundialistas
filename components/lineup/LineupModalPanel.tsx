@@ -124,6 +124,7 @@ export function LineupModalPanel({
               slots={resolvedLineup.slots}
               formationLabel={resolvedLineup.formationLabel}
               teamName={teamName}
+              squadPlayerNames={squad.players.map((player) => player.player_name)}
               size="modal"
               onPlayerClick={handlePlayerInteraction}
               onFieldReady={markFieldReady}

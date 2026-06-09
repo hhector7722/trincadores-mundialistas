@@ -27,44 +27,44 @@ export function positionLabelEs(role: PositionRole, rawPosition: string | null):
   return ROLE_LABEL_ES[role];
 }
 
-/** Coordenadas % del campo (x: izq→der, y: arriba=punta ataque, abajo=portería). */
+/** Coordenadas % del campo vertical (x: ancho, y: arriba=ataque, abajo=portería). */
 const FORMATION_COORDS: Record<FormationId, Record<PositionRole, FieldCoordinate[]>> = {
   "4-3-3": {
-    GK: [{ x: 50, y: 90 }],
+    GK: [{ x: 50, y: 84 }],
     DF: [
-      { x: 14, y: 72 },
-      { x: 38, y: 75 },
-      { x: 62, y: 75 },
-      { x: 86, y: 72 },
+      { x: 14, y: 70 },
+      { x: 38, y: 70 },
+      { x: 62, y: 70 },
+      { x: 86, y: 70 },
     ],
     MF: [
-      { x: 26, y: 52 },
-      { x: 50, y: 48 },
-      { x: 74, y: 52 },
+      { x: 26, y: 46 },
+      { x: 50, y: 46 },
+      { x: 74, y: 46 },
     ],
     FW: [
-      { x: 22, y: 22 },
+      { x: 22, y: 16 },
       { x: 50, y: 16 },
-      { x: 78, y: 22 },
+      { x: 78, y: 16 },
     ],
   },
   "4-4-2": {
-    GK: [{ x: 50, y: 90 }],
+    GK: [{ x: 50, y: 84 }],
     DF: [
-      { x: 14, y: 72 },
-      { x: 38, y: 75 },
-      { x: 62, y: 75 },
-      { x: 86, y: 72 },
+      { x: 14, y: 70 },
+      { x: 38, y: 70 },
+      { x: 62, y: 70 },
+      { x: 86, y: 70 },
     ],
     MF: [
-      { x: 12, y: 52 },
-      { x: 38, y: 55 },
-      { x: 62, y: 55 },
-      { x: 88, y: 52 },
+      { x: 12, y: 46 },
+      { x: 38, y: 46 },
+      { x: 62, y: 46 },
+      { x: 88, y: 46 },
     ],
     FW: [
-      { x: 36, y: 24 },
-      { x: 64, y: 24 },
+      { x: 36, y: 16 },
+      { x: 64, y: 16 },
     ],
   },
 };

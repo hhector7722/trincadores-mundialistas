@@ -286,6 +286,8 @@ export function MvpPredictionPanel({
                 awaySlots={awaySlots}
                 homeTeam={homeTeam}
                 awayTeam={awayTeam}
+                homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
+                awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
                 onSelect={setSelectedKey}

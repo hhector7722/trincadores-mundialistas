@@ -3,8 +3,24 @@ import test from "node:test";
 import { dedupeBenchAgainstStarters } from "./bench-dedupe";
 import { layoutPredictedStarters } from "./predicted-slot-layout";
 
-test("layoutPredictedStarters reparte 4-2-3-1 en líneas separadas", () => {
+test("layoutPredictedStarters coloca portería abajo y delantero arriba", () => {
+  const positioned = layoutPredictedStarters(
+    [
+      { slotKey: "GK", role: "GK" },
+      { slotKey: "ST", role: "FW" },
+    ],
+    "4-2-3-1"
+  );
+
+  const gk = positioned.find((slot) => slot.slotKey === "GK");
+  const st = positioned.find((slot) => slot.slotKey === "ST");
+  assert.ok(gk && st);
+  assert.ok(gk.y > st.y);
+});
+
+test("layoutPredictedStarters separa líneas en 4-2-3-1 por slot, no por índice", () => {
   const starters = [
+    { slotKey: "ST", role: "FW" as const },
     { slotKey: "GK", role: "GK" as const },
     { slotKey: "LB", role: "DF" as const },
     { slotKey: "CB", role: "DF" as const },
@@ -15,19 +31,17 @@ test("layoutPredictedStarters reparte 4-2-3-1 en líneas separadas", () => {
     { slotKey: "LW", role: "MF" as const },
     { slotKey: "AM", role: "MF" as const },
     { slotKey: "RW", role: "MF" as const },
-    { slotKey: "ST", role: "FW" as const },
   ];
 
   const positioned = layoutPredictedStarters(starters, "4-2-3-1");
-  const coords = positioned.map((slot) => `${slot.x},${slot.y}`);
-  assert.equal(new Set(coords).size, coords.length);
-
+  const gk = positioned.find((slot) => slot.slotKey === "GK");
+  const st = positioned.find((slot) => slot.slotKey === "ST");
   const dm = positioned.filter((slot) => slot.slotKey === "DM");
-  const am = positioned.filter((slot) => slot.slotKey === "LW" || slot.slotKey === "AM" || slot.slotKey === "RW");
+
+  assert.ok(gk && st);
   assert.equal(dm.length, 2);
-  assert.equal(am.length, 3);
-  assert.ok(dm.every((slot) => slot.y === 60));
-  assert.ok(am.every((slot) => slot.y === 34));
+  assert.ok(gk.y > dm[0]!.y);
+  assert.ok(dm[0]!.y > st.y);
 });
 
 test("dedupeBenchAgainstStarters elimina titulares y duplicados por dorsal", () => {

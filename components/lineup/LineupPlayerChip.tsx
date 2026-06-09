@@ -1,5 +1,5 @@
 import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
-import { shirtPlayerName } from "@/lib/lineup/short-player-name";
+import { displayNameInSquad, shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,8 @@ type LineupPlayerChipProps = {
   disabled?: boolean;
   /** Borde grueso en la camiseta (visitante con color titular coincidente). */
   awayKitClashBorder?: boolean;
+  /** Nombres completos de la plantilla para desambiguar apellidos repetidos. */
+  squadPlayerNames?: string[];
 };
 
 export function LineupPlayerChip({
@@ -22,6 +24,7 @@ export function LineupPlayerChip({
   selected = false,
   disabled = false,
   awayKitClashBorder = false,
+  squadPlayerNames,
 }: LineupPlayerChipProps) {
   const isModal = variant === "modal";
   const isMatch = variant === "match";
@@ -98,7 +101,9 @@ export function LineupPlayerChip({
             isMatch ? "text-[9px] font-bold" : isModal ? "text-[8px] font-semibold" : "text-[9px] font-semibold sm:text-[10px]"
           )}
         >
-          {shirtPlayerName(slot.name)}
+          {squadPlayerNames?.length
+            ? displayNameInSquad(slot.name, squadPlayerNames)
+            : shirtPlayerName(slot.name)}
         </p>
         {!isModal && !isMatch ? (
           <p className="text-[8px] font-medium uppercase tracking-wide text-white/55 sm:text-[9px]">
