@@ -42,16 +42,19 @@ export function PlayerSearchBar({
         aria-label={placeholder}
         className="min-h-10 w-full flex-1 border-0 bg-transparent text-base text-zinc-900 outline-none placeholder:text-zinc-400"
       />
-      {value ? (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          aria-label="Borrar búsqueda"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      ) : null}
+      <button
+        type="button"
+        onClick={() => onChange("")}
+        aria-label="Borrar búsqueda"
+        disabled={!value}
+        tabIndex={value ? 0 : -1}
+        className={cn(
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800",
+          !value && "pointer-events-none invisible"
+        )}
+      >
+        <X className="h-4 w-4" />
+      </button>
     </div>
   );
 }

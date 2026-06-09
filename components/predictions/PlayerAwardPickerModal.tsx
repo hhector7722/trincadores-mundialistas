@@ -96,11 +96,11 @@ export function PlayerAwardPickerModal({
       title={title}
       headerTitleAlign="center"
       hideHeaderDivider
-      className="max-h-[calc(100dvh-1rem)]"
+      className="h-[min(calc(100dvh-2rem),44rem)] max-h-[calc(100dvh-2rem)]"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <div className="shrink-0 space-y-2 border-b border-[var(--tm-border)] px-3 py-3">
           <PlayerSearchBar
             value={query}
@@ -111,65 +111,77 @@ export function PlayerAwardPickerModal({
           <p className="text-center text-[10px] text-[var(--tm-muted)]">{pickHint}</p>
         </div>
 
-        {loading ? (
-          <LoadingCenter label="Cargando jugadores…" />
-        ) : error ? (
-          <div className="px-4 py-6">
-            <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
-              {error}
-            </p>
-          </div>
-        ) : showSearchResults ? (
-          <ul className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
-            {searchResults.length === 0 ? (
-              <li className="py-8 text-center text-sm text-[var(--tm-muted)]">
-                No hay jugadores que coincidan con &ldquo;{query.trim()}&rdquo;.
-              </li>
-            ) : (
-              searchResults.map((player) => (
-                <li key={`${player.teamName}-${player.playerName}`}>
-                  <button
-                    type="button"
-                    onClick={() => onPickPlayer(player.teamName, player.playerName)}
-                    className="flex min-h-12 w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[rgba(111,43,255,0.18)] active:bg-[rgba(111,43,255,0.28)]"
-                  >
-                    <TeamFlagBadge name={player.teamName} size="sm" className="shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[var(--tm-fg)]">
-                        {player.playerName}
-                      </p>
-                      <p className="truncate text-xs text-[var(--tm-muted)]">
-                        {teamNameEs(player.teamName)}
-                        {player.shirtNumber != null ? ` · #${player.shirtNumber}` : ""}
-                      </p>
-                    </div>
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-        ) : (
-          <ul className="grid min-h-0 flex-1 grid-cols-6 items-stretch gap-2 overflow-y-auto p-2.5 sm:gap-2.5 sm:p-3">
-            {teams.map((team) => (
-              <li key={team} className="flex min-w-0">
-                <button
-                  type="button"
-                  onClick={() => onPickTeam(team)}
-                  aria-label={`Ver plantilla de ${teamNameEs(team)}`}
-                  className={cn(
-                    "flex h-[3.75rem] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] px-1 text-center transition-colors",
-                    "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
+        <div className="relative min-h-0 flex-1 overflow-hidden">
+          {loading ? (
+            <LoadingCenter label="Cargando jugadores…" />
+          ) : error ? (
+            <div className="flex h-full items-center justify-center px-4 py-6">
+              <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
+                {error}
+              </p>
+            </div>
+          ) : (
+            <>
+              <ul
+                aria-hidden={showSearchResults}
+                className={cn(
+                  "absolute inset-0 grid grid-cols-6 items-stretch gap-2 overflow-y-auto p-2.5 sm:gap-2.5 sm:p-3",
+                  showSearchResults && "pointer-events-none invisible"
+                )}
+              >
+                {teams.map((team) => (
+                  <li key={team} className="flex min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => onPickTeam(team)}
+                      aria-label={`Ver plantilla de ${teamNameEs(team)}`}
+                      className={cn(
+                        "flex h-[3.75rem] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] px-1 text-center transition-colors",
+                        "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
+                      )}
+                    >
+                      <TeamFlagBadge name={team} size="sm" className="shrink-0" />
+                      <span className="w-full min-w-0 truncate text-center text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-[10px]">
+                        {teamAbbr(team)}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {showSearchResults ? (
+                <ul className="absolute inset-0 overflow-y-auto px-2 py-2">
+                  {searchResults.length === 0 ? (
+                    <li className="py-8 text-center text-sm text-[var(--tm-muted)]">
+                      No hay jugadores que coincidan con &ldquo;{query.trim()}&rdquo;.
+                    </li>
+                  ) : (
+                    searchResults.map((player) => (
+                      <li key={`${player.teamName}-${player.playerName}`}>
+                        <button
+                          type="button"
+                          onClick={() => onPickPlayer(player.teamName, player.playerName)}
+                          className="flex min-h-12 w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[rgba(111,43,255,0.18)] active:bg-[rgba(111,43,255,0.28)]"
+                        >
+                          <TeamFlagBadge name={player.teamName} size="sm" className="shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-[var(--tm-fg)]">
+                              {player.playerName}
+                            </p>
+                            <p className="truncate text-xs text-[var(--tm-muted)]">
+                              {teamNameEs(player.teamName)}
+                              {player.shirtNumber != null ? ` · #${player.shirtNumber}` : ""}
+                            </p>
+                          </div>
+                        </button>
+                      </li>
+                    ))
                   )}
-                >
-                  <TeamFlagBadge name={team} size="sm" className="shrink-0" />
-                  <span className="w-full min-w-0 truncate text-center text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-[10px]">
-                    {teamAbbr(team)}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+                </ul>
+              ) : null}
+            </>
+          )}
+        </div>
       </div>
     </Modal>
   );
