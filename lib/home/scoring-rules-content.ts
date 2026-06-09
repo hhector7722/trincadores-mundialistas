@@ -11,8 +11,6 @@ const {
   tournamentMvp,
   goldenGlove,
 } = TOURNAMENT_GENERAL_SCORE_POINTS;
-const maxPreTournament =
-  champion + finalists + topScorer + tournamentMvp + goldenGlove;
 const maxPerMatch = exact + MVP_PREDICTION_POINTS;
 
 export type ScoringRulesCardLine =
@@ -54,7 +52,8 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
       `Acierto exacto del marcador: +${exact} pts.`,
       `Acierto del signo (1X2), sin marcador exacto: +${sign} pts.`,
       `MVP del partido acertado: +${MVP_PREDICTION_POINTS} pt, independiente del marcador.`,
-      "El exacto ya incluye el signo: si aciertas el marcador, no se suma el signo aparte.",
+      "El exacto y el signo no se suman en el mismo partido.",
+      `Máximo teórico por partido: +${maxPerMatch} pts (exacto + MVP).`,
       "Cada partido se evalúa cuando el admin publica el resultado oficial.",
     ],
   },
@@ -62,19 +61,9 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
     id: "main-ranking",
     title: "Clasificación principal",
     body: [
-      `Pronósticos pre-torneo (hasta +${maxPreTournament} pts).`,
-      `Pronósticos de partido (hasta +${exact} o +${sign} por partido).`,
-      `MVP de partido (+${MVP_PREDICTION_POINTS} pt por acierto, suma aparte).`,
+      "Suma pronósticos pre-torneo, marcadores de partido y MVPs de partido acertados.",
       "Tu posición en inicio y el ranking usan solo esta suma.",
-    ],
-  },
-  {
-    id: "outside-ranking",
-    title: "Fuera de la clasificación principal",
-    body: [
-      "El quiz diario: competición paralela con su propia tabla.",
-      "Entrenamiento del quiz: practica sin puntuar.",
-      "Actividad, logros y estadísticas del torneo: informativos.",
+      "El quiz, el entrenamiento y las estadísticas del torneo no modifican tu puesto.",
     ],
   },
   {
@@ -104,15 +93,6 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
       "Dejar vacío un pronóstico antes del bloqueo.",
       "Quiz en entrenamiento o intentos no competitivos.",
       "Explorar calendario, grupos o plantillas.",
-    ],
-  },
-  {
-    id: "nuances",
-    title: "Exacto, signo y MVP",
-    body: [
-      `Exacto (+${exact}) y signo (+${sign}) son excluyentes: nunca se suman los dos en el mismo partido.`,
-      `El MVP (+${MVP_PREDICTION_POINTS} pt) sí suma aparte, incluso si el marcador da 0 pts.`,
-      `Máximo teórico por partido: +${maxPerMatch} pts (exacto + MVP).`,
     ],
   },
 ];

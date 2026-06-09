@@ -53,11 +53,13 @@ function SectionSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
+const MODAL_PANEL_CLASS =
+  "flex h-[min(70dvh,22rem)] min-h-[min(70dvh,22rem)] max-h-[min(70dvh,22rem)] flex-col";
+
 function SectionPanel({ section }: { section: ScoringRulesSection }) {
   return (
-    <div className="px-4 py-3">
-      <h3 className="font-display text-sm font-semibold text-[var(--tm-fg)]">{section.title}</h3>
-      <ul className="mt-2 space-y-1.5">
+    <div className="flex min-h-0 flex-1 flex-col px-4 py-3">
+      <ul className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain">
         {section.body.map((line) => (
           <li key={line} className="flex gap-2 text-xs leading-relaxed text-[var(--tm-muted)]">
             <span
@@ -80,6 +82,8 @@ export function ScoringRulesModal({ open, onClose }: ScoringRulesModalProps) {
   const wasOpenRef = useRef(false);
 
   const activeSection = SECTIONS[activeIndex] ?? SECTIONS[0];
+  const displaySection =
+    sectionSlide != null ? (SECTIONS[sectionSlide.targetIndex] ?? activeSection) : activeSection;
   const canSwipe = SECTIONS.length > 1;
   const dotPosition = resolveDotPosition(activeIndex, SECTIONS.length);
 
@@ -165,10 +169,10 @@ export function ScoringRulesModal({ open, onClose }: ScoringRulesModalProps) {
     <Modal
       open={open}
       onClose={onClose}
-      title={activeSection.title}
-      hideTitle
+      title={displaySection.title}
+      headerTitleAlign="left"
       hideHeaderDivider
-      className="max-h-[min(70dvh,22rem)]"
+      className={MODAL_PANEL_CLASS}
       wrapperClassName="max-w-[min(100vw-2rem,18rem)]"
       onSwipeLeft={canSwipe && !panelSlide ? () => startSectionSlide(1) : undefined}
       onSwipeRight={canSwipe && !panelSlide ? () => startSectionSlide(-1) : undefined}

@@ -70,16 +70,15 @@ function applyEdgeResistance(activeIndex: number, offset: number, width: number)
   return edgeResistance(offset, width);
 }
 
-function TabPeek({ label, side }: { label: string; side: "left" | "right" }) {
+function TabPeek({ side }: { side: "left" | "right" }) {
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center bg-[var(--tm-shell-bg-hex)]/95",
-        side === "left" ? "justify-start pl-6" : "justify-end pr-6"
+        "h-full w-full bg-[var(--tm-shell-bg-hex)]/95",
+        side === "left" ? "bg-gradient-to-r from-[var(--tm-accent)]/5 to-transparent" : "bg-gradient-to-l from-[var(--tm-accent)]/5 to-transparent"
       )}
-    >
-      <p className="font-display text-xs uppercase tracking-[0.2em] text-white/50">{label}</p>
-    </div>
+      aria-hidden="true"
+    />
   );
 }
 
@@ -400,7 +399,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
           }}
           aria-hidden
         >
-          <TabPeek label={prevTab.label} side="left" />
+          <TabPeek side="left" />
         </div>
       ) : null}
 
@@ -413,7 +412,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
           }}
           aria-hidden
         >
-          <TabPeek label={nextTab.label} side="right" />
+          <TabPeek side="right" />
         </div>
       ) : null}
 

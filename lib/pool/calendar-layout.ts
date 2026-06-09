@@ -24,7 +24,7 @@ const GROUPS_CARD_HEIGHT_RATIO = 1;
 const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
-const ACCESS_DOCK_GRID_GAP_PX = 6;
+const ACCESS_DOCK_GRID_GAP_PX = 9;
 const ACCESS_DOCK_COLS = 2;
 const ACCESS_DOCK_ROWS = 2;
 const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.78;
@@ -37,7 +37,8 @@ const MAX_ACCESS_BTN_FS_PX = 13;
 const ACCESS_BTN_ROW_HEIGHT_RATIO = 0.46;
 const ACCESS_BTN_PAD_Y_RATIO = 0.14;
 const ACCESS_DOCK_GAP_SCALE_RATIO = 0.1;
-const MAX_ACCESS_DOCK_GRID_GAP_PX = 10;
+const MAX_ACCESS_DOCK_GRID_GAP_PX = 12;
+const SIDEBAR_REFERENCE_COLUMN = 4;
 const SIDEBAR_BODY_GAP_PX = 6;
 const SIDEBAR_CARD_BOTTOM_PAD_PX = 6;
 
@@ -308,7 +309,49 @@ function getMinAccessDockReserve(): number {
   return computeAccessDockHeight(btnFs, btnPy, gridGap);
 }
 
-/** La card ocupa todo el cuerpo del slot, alineada con la lista de partidos. */
+/** La card termina al mismo Y que el primer partido de la columna D (Jue) de su fila. */
+function findSidebarReferenceCell(
+  grid: HTMLElement,
+  slot: HTMLElement
+): HTMLElement | null {
+  const slotRow = slot.style.gridRow;
+  if (!slotRow) return null;
+
+  for (const child of grid.children) {
+    if (!(child instanceof HTMLElement)) continue;
+    if (child.classList.contains("tm-cal-sidebar-slot")) continue;
+    if (child.style.gridRow !== String(slotRow)) continue;
+    if (child.style.gridColumn === String(SIDEBAR_REFERENCE_COLUMN)) {
+      return child;
+    }
+  }
+
+  return null;
+}
+
+function measureReferenceMatchBottom(
+  cell: HTMLElement,
+  calendar: HTMLElement
+): number | null {
+  const firstMatch = cell.querySelector<HTMLElement>(".tm-cal-match-card");
+  if (firstMatch) {
+    return firstMatch.getBoundingClientRect().bottom;
+  }
+
+  const anchor = cell.querySelector<HTMLElement>(".tm-cal-day-num");
+  const matchList = cell.querySelector<HTMLElement>(".tm-cal-match-list");
+  if (!anchor && !matchList) return null;
+
+  const cardHeightRaw = getComputedStyle(calendar).getPropertyValue("--tm-cal-match-card-h");
+  const cardHeight = cardHeightRaw
+    ? Number.parseFloat(cardHeightRaw)
+    : MIN_MATCH_CARD_HEIGHT_PX;
+
+  const top = (anchor ?? matchList)!.getBoundingClientRect().bottom;
+  return top + 2 + cardHeight;
+}
+
+/** Altura de la card alineada con el partido de referencia en columna D. */
 function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void {
   const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
   const body = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-body");
@@ -320,7 +363,38 @@ function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   }
 
   calendar.style.setProperty("--tm-cal-sidebar-card-bottom-pad", `${SIDEBAR_CARD_BOTTOM_PAD_PX}px`);
-  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${body.clientHeight}px`);
+
+  let cardHeight = body.clientHeight;
+  const refCell = findSidebarReferenceCell(grid, slot);
+  if (refCell) {
+    const refBottom = measureReferenceMatchBottom(refCell, calendar);
+    if (refBottom != null) {
+      const bodyTop = body.getBoundingClientRect().top;
+      const alignedHeight = Math.floor(refBottom - bodyTop);
+      if (alignedHeight > 0) {
+        cardHeight = Math.min(body.clientHeight, alignedHeight);
+      }
+    }
+  }
+
+  calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardHeight}px`);
+}
+
+function measureSidebarAccessDockTargetHeight(grid: HTMLElement): number | undefined {
+  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
+  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+  const groupsSection = slot?.querySelector<HTMLElement>(".tm-cal-groups-section");
+  if (!card || !groupsSection) return undefined;
+
+  const cardBottom =
+    card.getBoundingClientRect().bottom -
+    SIDEBAR_CARD_BOTTOM_PAD_PX -
+    ACCESS_CARD_INSET_PX;
+  const groupsBottom = groupsSection.getBoundingClientRect().bottom;
+  const target = Math.floor(cardBottom - groupsBottom);
+
+  if (target <= 0) return undefined;
+  return Math.max(getMinAccessDockReserve(), target);
 }
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
@@ -535,7 +609,12 @@ export function fitCalendarLayout(
   let matchCardHeight = syncMatchCardMetrics(calendar, grid);
   syncSidebarAccessSpacing(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
-  syncSidebarAccessDockMetrics(calendar, grid);
+  syncGroupsPanelMetrics(calendar, grid);
+  syncSidebarAccessDockMetrics(
+    calendar,
+    grid,
+    measureSidebarAccessDockTargetHeight(grid)
+  );
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
@@ -546,7 +625,12 @@ export function fitCalendarLayout(
     matchCardHeight = syncMatchCardMetrics(calendar, grid);
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
-    syncSidebarAccessDockMetrics(calendar, grid);
+    syncGroupsPanelMetrics(calendar, grid);
+    syncSidebarAccessDockMetrics(
+      calendar,
+      grid,
+      measureSidebarAccessDockTargetHeight(grid)
+    );
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }
