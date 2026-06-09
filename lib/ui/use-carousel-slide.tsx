@@ -20,14 +20,29 @@ export function resolveCarouselDotPosition(index: number, total: number): Carous
   return "middle";
 }
 
-export function CarouselSwipeDots({ position }: { position: CarouselDotPosition }) {
+export function CarouselSwipeDots({
+  activeIndex,
+  total,
+}: {
+  activeIndex: number;
+  total: number;
+}) {
+  if (total <= 1) return null;
+
+  const dotCount = total <= 3 ? total : 3;
+  const activeDot =
+    total <= 3
+      ? activeIndex
+      : resolveCarouselDotPosition(activeIndex, total) === "start"
+        ? 0
+        : resolveCarouselDotPosition(activeIndex, total) === "end"
+          ? 2
+          : 1;
+
   return (
     <div className="flex items-center justify-center gap-1.5" aria-hidden="true">
-      {[0, 1, 2].map((dot) => {
-        const active =
-          (position === "start" && dot === 0) ||
-          (position === "middle" && dot === 1) ||
-          (position === "end" && dot === 2);
+      {Array.from({ length: dotCount }, (_, dot) => {
+        const active = dot === activeDot;
 
         return (
           <span

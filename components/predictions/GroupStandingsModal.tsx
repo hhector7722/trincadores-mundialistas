@@ -115,7 +115,7 @@ export function GroupStandingsModal({
   const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : groupTeamNames[0] ?? "";
 
   const {
-    dotPosition: teamDotPosition,
+    activeIndex: teamCarouselIndex,
     canSwipe: canSwipeTeams,
     startSlide: startTeamSlide,
     buildCarouselPanelSlide: buildTeamCarouselSlide,
@@ -301,7 +301,7 @@ export function GroupStandingsModal({
         canSwipeGroups && atStandingsRoot ? (
           <GroupSwipeDots position={dotPosition} />
         ) : canSwipeTeams && atLineupCarousel ? (
-          <CarouselSwipeDots position={teamDotPosition} />
+          <CarouselSwipeDots activeIndex={teamCarouselIndex} total={groupTeamNames.length} />
         ) : undefined
       }
       onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}

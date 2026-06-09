@@ -109,7 +109,7 @@ export function EntityModalController({
         : "";
 
   const {
-    dotPosition,
+    activeIndex: teamCarouselIndex,
     canSwipe: canSwipeTeams,
     startSlide: startTeamSlide,
     buildCarouselPanelSlide,
@@ -183,7 +183,11 @@ export function EntityModalController({
       onSwipeRight={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(-1) : undefined
       }
-      belowPanel={canSwipeTeams && atLineupCarousel ? <CarouselSwipeDots position={dotPosition} /> : undefined}
+      belowPanel={
+        canSwipeTeams && atLineupCarousel ? (
+          <CarouselSwipeDots activeIndex={teamCarouselIndex} total={carouselTeams?.length ?? 0} />
+        ) : undefined
+      }
       onBack={canGoBack && !isSliding && !isCarouselSliding ? pop : undefined}
       panelSlide={activePanelSlide}
     >

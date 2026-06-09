@@ -129,7 +129,7 @@ export function QuickPredictionModal({
   const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : viewMatch.home_team;
 
   const {
-    dotPosition: teamDotPosition,
+    activeIndex: teamCarouselIndex,
     canSwipe: canSwipeTeams,
     startSlide: startTeamSlide,
     buildCarouselPanelSlide: buildTeamCarouselSlide,
@@ -424,7 +424,7 @@ export function QuickPredictionModal({
         canSwipeMatches && atPredictionRoot ? (
           <MatchSwipeDots position={dotPosition} />
         ) : canSwipeTeams && atLineupCarousel ? (
-          <CarouselSwipeDots position={teamDotPosition} />
+          <CarouselSwipeDots activeIndex={teamCarouselIndex} total={matchTeams.length} />
         ) : undefined
       }
       onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}
