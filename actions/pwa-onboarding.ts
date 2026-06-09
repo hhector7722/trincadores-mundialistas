@@ -14,11 +14,8 @@ import {
   PWA_STANDALONE_GATE_MAX_AGE_SECONDS,
 } from "@/lib/pwa/onboarding-cookie";
 import { isKnownOnboardingParticipant } from "@/lib/pwa/onboarding-participants";
-import {
-  isOnboardingEligibleUsername,
-  normalizePhone,
-  resolveParticipantByPhone,
-} from "@/lib/pwa/onboarding-phones";
+import { lookupProfileByPhone } from "@/lib/auth/profile-phone";
+import { isOnboardingEligibleUsername, normalizePhone } from "@/lib/pwa/onboarding-phones";
 import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -96,15 +93,15 @@ export async function identifyParticipantByPhone(
     return { ok: false, error: "Introduce tu numero de telefono." };
   }
 
-  const participant = resolveParticipantByPhone(phone);
-  if (!participant) {
+  const profile = await lookupProfileByPhone(phone);
+  if (!profile) {
     return {
       ok: false,
       error: "Numero no reconocido. Comprueba que es el movil registrado en el grupo.",
     };
   }
 
-  const known = await isKnownOnboardingParticipant(participant.username);
+  const known = await isKnownOnboardingParticipant(profile.username);
   if (!known) {
     return { ok: false, error: "Ese participante no pertenece al grupo." };
   }
@@ -112,8 +109,8 @@ export async function identifyParticipantByPhone(
   return {
     ok: true,
     data: {
-      username: participant.username,
-      displayName: participant.displayName,
+      username: profile.username,
+      displayName: profile.displayName,
     },
   };
 }

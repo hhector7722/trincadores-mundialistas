@@ -1,15 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toAuthEmail } from "@/lib/auth/credentials";
 import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
+import { lookupPhoneByUsername, lookupProfileByPhone } from "@/lib/auth/profile-phone";
 import { resolvePoolMemberships, setActivePoolCookie } from "@/lib/auth/session";
+import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import {
-  normalizePhone,
-  resolveParticipantByPhone,
-  resolveParticipantByAlias,
-} from "@/lib/pwa/onboarding-phones";
-import { normalizeUsername } from "@/lib/auth/validation";
+import { normalizePhone } from "@/lib/pwa/onboarding-phones";
 
 export type PhoneSignInResult = { ok: true; username: string } | { ok: false; error: string };
 
@@ -52,26 +49,18 @@ export async function signInUserByPhoneWithClient(
     return { ok: false, error: "Introduce tu numero de telefono." };
   }
 
-  const participant = resolveParticipantByPhone(phone);
-  if (!participant) {
+  const profile = await lookupProfileByPhone(phone);
+  if (!profile) {
     return { ok: false, error: "Telefono no reconocido." };
   }
 
   const admin = createAdminClient();
-  const email = toAuthEmail(participant.username);
-
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("id")
-    .eq("username", participant.username)
-    .maybeSingle();
-
-  if (profileError || !profile) {
-    return { ok: false, error: "No se encontro el perfil del participante." };
-  }
+  const email = toAuthEmail(profile.username);
 
   const { error: passwordError } = await admin.auth.admin.updateUserById(profile.id, {
     password: phone,
+    phone: `+34${phone}`,
+    phone_confirm: true,
   });
 
   if (passwordError) {
@@ -87,7 +76,7 @@ export async function signInUserByPhoneWithClient(
     return { ok: false, error: "No se pudo abrir la sesion." };
   }
 
-  return finishSession(supabase, data.user.id, participant.username);
+  return finishSession(supabase, data.user.id, profile.username);
 }
 
 export async function signInUserByPhone(phoneRaw: string): Promise<PhoneSignInResult> {
@@ -97,11 +86,15 @@ export async function signInUserByPhone(phoneRaw: string): Promise<PhoneSignInRe
 
 export async function signInUserByUsername(usernameRaw: string): Promise<PhoneSignInResult> {
   const username = normalizeUsername(usernameRaw);
-  const participant = resolveParticipantByAlias(username);
-  if (!participant) {
+  if (!username) {
+    return { ok: false, error: "Participante no reconocido." };
+  }
+
+  const phone = await lookupPhoneByUsername(username);
+  if (!phone) {
     return { ok: false, error: "Participante no reconocido." };
   }
 
   const supabase = await createClient();
-  return signInUserByPhoneWithClient(participant.phone, supabase);
+  return signInUserByPhoneWithClient(phone, supabase);
 }
