@@ -33,11 +33,11 @@ test("mapSlotsToAwayHalf coloca portero arriba del campo MVP", () => {
       role: "GK",
       isPlaceholder: false,
       x: 50,
-      y: 78,
+      y: 92,
     },
   ]);
 
-  assert.equal(mapped[0]!.y, 7);
+  assert.equal(mapped[0]!.y, 6);
 });
 
 test("mapSlotsToAwayHalf separa portero y defensa en bandas distintas", () => {

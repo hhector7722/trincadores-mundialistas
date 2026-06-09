@@ -68,6 +68,18 @@ test("4-3-3 y 4-4-2 tienen geometrias distintas", () => {
   assert.notDeepEqual(f433, f442);
 });
 
+test("plantilla ancla portero en porteria y defensa en borde del area", () => {
+  const positioned = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const gk = positioned.find((slot) => slot.slotKey === "GK");
+  const defenders = positioned.filter((slot) => slot.role === "DF");
+
+  assert.ok(gk);
+  assert.ok(gk.y >= 90, `portero demasiado adelantado (y=${gk.y})`);
+  for (const defender of defenders) {
+    assert.ok(defender.y >= 79 && defender.y <= 83, `defensa fuera del borde del area (y=${defender.y})`);
+  }
+});
+
 test("assignFormationTemplateCoordinates coloca porteria abajo y delantero arriba", () => {
   const positioned = assignFormationTemplateCoordinates(
     [

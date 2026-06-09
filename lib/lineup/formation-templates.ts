@@ -1,4 +1,4 @@
-import { clampToPlayable } from "@/lib/lineup/field-layout";
+import { clampToPlayable, TACTICAL_LINE_Y } from "@/lib/lineup/field-layout";
 import type { FieldCoordinate, FormationId, PositionRole } from "@/lib/lineup/types";
 
 /** Formaciones con plantilla visual fija (misma disposición siempre). */
@@ -10,45 +10,47 @@ type TemplateAnchor = {
   coord: FieldCoordinate;
 };
 
+const { GOALKEEPER, DEFENSE, HOLDING, MIDFIELD, ATTACK, FORWARD } = TACTICAL_LINE_Y;
+
 const TEMPLATES: Record<FormationTemplateId, TemplateAnchor[]> = {
   "4-3-3": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: 78 } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: 66 } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: 66 } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: 66 } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: 66 } },
-    { key: "LM", accept: ["LM", "LCM", "CM"], coord: { x: 26, y: 44 } },
-    { key: "CM", accept: ["CM"], coord: { x: 50, y: 44 } },
-    { key: "RM", accept: ["RM", "RCM", "CM"], coord: { x: 74, y: 44 } },
-    { key: "LW", accept: ["LW"], coord: { x: 22, y: 18 } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: 18 } },
-    { key: "RW", accept: ["RW"], coord: { x: 80, y: 18 } },
+    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
+    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
+    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
+    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
+    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
+    { key: "LM", accept: ["LM", "LCM", "CM"], coord: { x: 26, y: MIDFIELD } },
+    { key: "CM", accept: ["CM"], coord: { x: 50, y: MIDFIELD } },
+    { key: "RM", accept: ["RM", "RCM", "CM"], coord: { x: 74, y: MIDFIELD } },
+    { key: "LW", accept: ["LW"], coord: { x: 22, y: FORWARD } },
+    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: FORWARD } },
+    { key: "RW", accept: ["RW"], coord: { x: 80, y: FORWARD } },
   ],
   "4-4-2": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: 78 } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: 66 } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: 66 } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: 66 } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: 66 } },
-    { key: "LM", accept: ["LM", "LW"], coord: { x: 20, y: 44 } },
-    { key: "LCM", accept: ["CM", "DM", "LCM"], coord: { x: 40, y: 44 } },
-    { key: "RCM", accept: ["CM", "DM", "RCM"], coord: { x: 60, y: 44 } },
-    { key: "RM", accept: ["RM", "RW"], coord: { x: 80, y: 44 } },
-    { key: "LST", accept: ["ST", "CF", "LST", "DC"], coord: { x: 38, y: 18 } },
-    { key: "RST", accept: ["ST", "CF", "SS", "RST", "DC"], coord: { x: 62, y: 18 } },
+    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
+    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
+    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
+    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
+    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
+    { key: "LM", accept: ["LM", "LW"], coord: { x: 20, y: MIDFIELD } },
+    { key: "LCM", accept: ["CM", "DM", "LCM"], coord: { x: 40, y: MIDFIELD } },
+    { key: "RCM", accept: ["CM", "DM", "RCM"], coord: { x: 60, y: MIDFIELD } },
+    { key: "RM", accept: ["RM", "RW"], coord: { x: 80, y: MIDFIELD } },
+    { key: "LST", accept: ["ST", "CF", "LST", "DC"], coord: { x: 38, y: FORWARD } },
+    { key: "RST", accept: ["ST", "CF", "SS", "RST", "DC"], coord: { x: 62, y: FORWARD } },
   ],
   "4-2-3-1": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: 78 } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: 66 } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: 66 } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: 66 } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: 66 } },
-    { key: "LDM", accept: ["DM", "CDM", "LDM", "MCD"], coord: { x: 36, y: 54 } },
-    { key: "RDM", accept: ["DM", "CDM", "RDM", "MCD"], coord: { x: 64, y: 54 } },
-    { key: "LW", accept: ["LW"], coord: { x: 22, y: 34 } },
-    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: 50, y: 34 } },
-    { key: "RW", accept: ["RW"], coord: { x: 80, y: 34 } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: 18 } },
+    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
+    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
+    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
+    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
+    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
+    { key: "LDM", accept: ["DM", "CDM", "LDM", "MCD"], coord: { x: 36, y: HOLDING } },
+    { key: "RDM", accept: ["DM", "CDM", "RDM", "MCD"], coord: { x: 64, y: HOLDING } },
+    { key: "LW", accept: ["LW"], coord: { x: 22, y: ATTACK } },
+    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: 50, y: ATTACK } },
+    { key: "RW", accept: ["RW"], coord: { x: 80, y: ATTACK } },
+    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: FORWARD } },
   ],
 };
 

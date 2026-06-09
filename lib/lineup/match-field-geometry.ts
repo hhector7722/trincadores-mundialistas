@@ -6,8 +6,8 @@ import type { PlayableBounds } from "@/lib/lineup/field-layout";
  * Usa bandas tácticas discretas para evitar solapes GK–defensa tras comprimir la mitad.
  */
 
-const AWAY_LINE_Y = [7, 13, 19, 25, 29] as const;
-const HOME_LINE_Y = [71, 77, 83, 89, 93] as const;
+const AWAY_LINE_Y = [6, 13, 20, 25, 29] as const;
+const HOME_LINE_Y = [71, 76, 82, 88, 93] as const;
 
 export const MVP_AWAY_BOUNDS: PlayableBounds = {
   xMin: 18,
@@ -26,10 +26,10 @@ export const MVP_HOME_BOUNDS: PlayableBounds = {
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
 function lineupLineIndex(y: number): number {
-  if (y >= 72) return 0;
-  if (y >= 60) return 1;
-  if (y >= 48) return 2;
-  if (y >= 28) return 3;
+  if (y >= 86) return 0;
+  if (y >= 74) return 1;
+  if (y >= 58) return 2;
+  if (y >= 30) return 3;
   return 4;
 }
 

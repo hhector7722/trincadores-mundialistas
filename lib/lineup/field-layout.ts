@@ -9,8 +9,22 @@ export const MVP_PITCH_ASPECT_CLASS = "aspect-[68/148]";
 /** Zona jugable dentro del SVG (%): evita esquinas y líneas de banda. */
 export const PLAYABLE_X_MIN = 20;
 export const PLAYABLE_X_MAX = 80;
-export const PLAYABLE_Y_MIN = 18;
-export const PLAYABLE_Y_MAX = 82;
+export const PLAYABLE_Y_MIN = 16;
+/** Permite anclar al portero en la portería inferior (≈ y 93 del SVG). */
+export const PLAYABLE_Y_MAX = 94;
+
+/**
+ * Bandas verticales tácticas en vista de once (y alto = portería propia).
+ * DEFENSE coincide con el borde exterior del área grande del SVG (~81%).
+ */
+export const TACTICAL_LINE_Y = {
+  GOALKEEPER: 92,
+  DEFENSE: 81,
+  HOLDING: 68,
+  MIDFIELD: 52,
+  ATTACK: 38,
+  FORWARD: 22,
+} as const;
 
 export type PlayableBounds = {
   xMin: number;
