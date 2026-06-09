@@ -9,6 +9,7 @@ import {
   setActivePoolCookie,
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
+import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
 import { signInTrustedUserByUsername } from "@/lib/auth/trusted-sign-in";
 import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import { normalizePhone, resolveParticipantByPhone } from "@/lib/pwa/onboarding-phones";
@@ -82,6 +83,7 @@ export async function signIn(
     return { ok: false, error: msg };
   }
 
+  await setOnboardedDeviceCookie(username);
   return { ok: true };
 }
 
@@ -115,6 +117,7 @@ export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResul
     return { ok: false, error: msg };
   }
 
+  await setOnboardedDeviceCookie(participant.username);
   return { ok: true };
 }
 

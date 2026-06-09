@@ -3,8 +3,13 @@
 import { cookies } from "next/headers";
 import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import {
+  getOnboardedDeviceUsername,
+  isProfileOnboardingComplete,
+  setOnboardedDeviceCookie,
+} from "@/lib/auth/onboarding-device";
+import { createClient } from "@/lib/supabase/server";
+import {
   PWA_ONBOARDING_COOKIE,
-  PWA_ONBOARDING_MAX_AGE_SECONDS,
   PWA_STANDALONE_GATE_COOKIE,
   PWA_STANDALONE_GATE_MAX_AGE_SECONDS,
 } from "@/lib/pwa/onboarding-cookie";
@@ -23,9 +28,44 @@ function hasStandaloneGate(cookieStore: Awaited<ReturnType<typeof cookies>>): bo
   return cookieStore.get(PWA_STANDALONE_GATE_COOKIE)?.value === "1";
 }
 
-export async function hasCompletedPwaOnboarding(): Promise<boolean> {
+export type PwaEntryRoute = "restore" | "login" | "onboard";
+
+/** Decide cómo entrar en PWA: restaurar sesión, re-vincular teléfono o onboarding completo. */
+export async function resolvePwaEntryRoute(): Promise<PwaEntryRoute> {
+  const deviceUsername = await getOnboardedDeviceUsername();
+  if (deviceUsername) {
+    return "restore";
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("username, is_active, onboarding_completed_at, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!error && profile?.is_active && isProfileOnboardingComplete(profile)) {
+      await setOnboardedDeviceCookie(profile.username);
+      return "restore";
+    }
+  }
+
   const cookieStore = await cookies();
-  return cookieStore.get(PWA_ONBOARDING_COOKIE)?.value === "1";
+  if (cookieStore.get(PWA_ONBOARDING_COOKIE)?.value === "1") {
+    return "login";
+  }
+
+  return "onboard";
+}
+
+export async function hasCompletedPwaOnboarding(): Promise<boolean> {
+  const route = await resolvePwaEntryRoute();
+  return route !== "onboard";
 }
 
 export async function confirmStandaloneInstallation(): Promise<ActionResult<null>> {
@@ -175,13 +215,7 @@ export async function completePwaOnboarding(
     }
   }
 
-  cookieStore.set(PWA_ONBOARDING_COOKIE, "1", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: PWA_ONBOARDING_MAX_AGE_SECONDS,
-  });
+  await setOnboardedDeviceCookie(username);
   cookieStore.delete(PWA_STANDALONE_GATE_COOKIE);
   return { ok: true, data: null };
 }

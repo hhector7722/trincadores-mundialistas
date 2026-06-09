@@ -22,7 +22,7 @@ export const getCachedAppShellContext = cache(
 export async function requireActivePoolContext(): Promise<AppShellContext> {
   const ctx = await getCachedAppShellContext();
   if (!ctx) {
-    redirect("/login");
+    redirect("/api/auth/restore");
   }
   return ctx;
 }

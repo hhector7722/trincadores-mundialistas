@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/api/auth/restore");
   }
 
   const ctx = await getCachedAppShellContext();

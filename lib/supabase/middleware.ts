@@ -1,9 +1,14 @@
 ﻿import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  ONBOARDED_USER_COOKIE,
+  readOnboardedUsernameFromCookieValue,
+} from "@/lib/auth/onboarding-device";
 import { PWA_ONBOARDING_COOKIE } from "@/lib/pwa/onboarding-cookie";
 
 const AUTH_PATHS = ["/login"];
 const ONBOARDING_PATHS = ["/bienvenida"];
+const RESTORE_PATH = "/api/auth/restore";
 
 const PUBLIC_PATHS = [
   "/manifest.webmanifest",
@@ -20,14 +25,37 @@ function isOnboardingPath(pathname: string): boolean {
   return ONBOARDING_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
+function isRestorePath(pathname: string): boolean {
+  return pathname === RESTORE_PATH || pathname.startsWith(`${RESTORE_PATH}/`);
+}
+
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
     (p) => pathname === p || pathname.startsWith(`${p}?`) || pathname.startsWith(`${p}/`),
   );
 }
 
-function hasPwaOnboardingCookie(request: NextRequest): boolean {
+function hasLegacyPwaOnboardingCookie(request: NextRequest): boolean {
   return request.cookies.get(PWA_ONBOARDING_COOKIE)?.value === "1";
+}
+
+function getOnboardedUsername(request: NextRequest): string | null {
+  return readOnboardedUsernameFromCookieValue(
+    request.cookies.get(ONBOARDED_USER_COOKIE)?.value,
+    request.cookies.get(PWA_ONBOARDING_COOKIE)?.value
+  );
+}
+
+function redirectToRestore(request: NextRequest): NextResponse {
+  const redirectUrl = request.nextUrl.clone();
+  redirectUrl.pathname = RESTORE_PATH;
+  const pathname = request.nextUrl.pathname;
+  if (pathname && pathname !== "/" && !isAuthPath(pathname) && !isOnboardingPath(pathname)) {
+    redirectUrl.searchParams.set("next", pathname);
+  } else {
+    redirectUrl.search = "";
+  }
+  return NextResponse.redirect(redirectUrl);
 }
 
 export async function updateSession(request: NextRequest) {
@@ -60,26 +88,35 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (isPublicPath(pathname)) {
+  if (isPublicPath(pathname) || isRestorePath(pathname)) {
     return supabaseResponse;
   }
+
+  const onboardedUsername = getOnboardedUsername(request);
 
   if (user && (isAuthPath(pathname) || isOnboardingPath(pathname))) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";
+    redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (!user && isAuthPath(pathname) && !hasPwaOnboardingCookie(request)) {
+  if (!user && onboardedUsername) {
+    return redirectToRestore(request);
+  }
+
+  if (!user && isAuthPath(pathname) && !hasLegacyPwaOnboardingCookie(request)) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/bienvenida";
+    redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 
   if (!user && !isAuthPath(pathname) && !isOnboardingPath(pathname)) {
     const redirectUrl = request.nextUrl.clone();
-    if (!hasPwaOnboardingCookie(request)) {
+    if (!hasLegacyPwaOnboardingCookie(request)) {
       redirectUrl.pathname = "/bienvenida";
+      redirectUrl.search = "";
     } else {
       redirectUrl.pathname = "/login";
       redirectUrl.searchParams.set("next", pathname);

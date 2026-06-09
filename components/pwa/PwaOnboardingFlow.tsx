@@ -16,8 +16,8 @@ import {
   completePwaOnboarding,
   confirmStandaloneInstallation,
   assignParticipantAvatar,
-  hasCompletedPwaOnboarding,
   identifyParticipantByPhone,
+  resolvePwaEntryRoute,
 } from "@/actions/pwa-onboarding";
 import { LoginHero } from "@/components/auth/LoginHero";
 import { AvatarGenerationStep } from "@/components/pwa/AvatarGenerationStep";
@@ -169,15 +169,19 @@ export function PwaOnboardingFlow() {
 
     if (isStandalonePWA()) {
       void (async () => {
-        const completed = await hasCompletedPwaOnboarding();
-        if (completed) {
-          router.replace("/login");
-          router.refresh();
-        } else {
-          const gate = await confirmStandaloneInstallation();
-          if (gate.ok) {
-            setStep("phone");
-          }
+        const entry = await resolvePwaEntryRoute();
+        if (entry === "restore") {
+          window.location.assign("/api/auth/restore");
+          return;
+        }
+        if (entry === "login") {
+          window.location.assign("/login");
+          return;
+        }
+
+        const gate = await confirmStandaloneInstallation();
+        if (gate.ok) {
+          setStep("phone");
         }
         setBootstrapped(true);
       })();
