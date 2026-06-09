@@ -270,6 +270,24 @@ export function gutterX(columnA: number, columnB: number): number {
   return (mapColumnX(columnA) + mapColumnX(columnB)) / 2;
 }
 
+/** Ancho útil de la columna de dieciseisavos (% del canvas), centrado en `columnX`. */
+export function r32ColumnSlotWidthPct(column: number): number {
+  const center = mapColumnX(column);
+
+  if (column === 0) {
+    return 2 * Math.min(center - R32_VISIBLE_EDGE_INSET, gutterX(0, 1) - center);
+  }
+
+  if (column === 8) {
+    return (
+      2 *
+      Math.min(center - gutterX(7, 8), 100 - R32_VISIBLE_EDGE_INSET - center)
+    );
+  }
+
+  return CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.r32 * 2;
+}
+
 export function cardEdgeX(
   columnX: number,
   edge: "left" | "right",

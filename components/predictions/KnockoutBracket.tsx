@@ -16,6 +16,7 @@ import {
   FINAL_CUP_OFFSET_ABOVE_FINAL,
   finalCenterYFromGeometry,
   matchPosition,
+  r32ColumnSlotWidthPct,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
 import {
@@ -97,6 +98,11 @@ function BracketMatchCard({
           left: `${pos.x}%`,
           top: `${pos.y}%`,
           "--tm-ko-card-scale": geom.layoutScale,
+          ...(geom.round === "r32"
+            ? {
+                "--tm-ko-r32-col-width": `${r32ColumnSlotWidthPct(geom.column)}%`,
+              }
+            : {}),
         } as CSSProperties
       }
       className={cn(
