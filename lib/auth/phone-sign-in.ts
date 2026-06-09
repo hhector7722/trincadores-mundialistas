@@ -1,12 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toAuthEmail } from "@/lib/auth/credentials";
 import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
-import { lookupPhoneByUsername, lookupProfileByPhone } from "@/lib/auth/profile-phone";
+import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import { resolvePoolMemberships, setActivePoolCookie } from "@/lib/auth/session";
 import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { normalizePhone } from "@/lib/pwa/onboarding-phones";
+import {
+  normalizePhone,
+  ONBOARDING_PHONE_DIRECTORY,
+  resolveParticipantByPhone,
+} from "@/lib/pwa/onboarding-phones";
 
 export type PhoneSignInResult = { ok: true; username: string } | { ok: false; error: string };
 
@@ -15,7 +19,11 @@ async function finishSession(
   userId: string,
   username: string
 ): Promise<PhoneSignInResult> {
-  await supabase.auth.signOut({ scope: "others" });
+  try {
+    await supabase.auth.signOut({ scope: "others" });
+  } catch {
+    // No bloquear login si falla cerrar otras sesiones.
+  }
 
   const { data: memberships, error: membershipsError } = await supabase
     .from("pool_members")
@@ -36,9 +44,47 @@ async function finishSession(
   return { ok: true, username };
 }
 
+async function lookupProfileIdByUsername(username: string): Promise<string | null> {
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("username", username)
+      .maybeSingle();
+    if (error || !data?.id) return null;
+    return data.id;
+  } catch {
+    return null;
+  }
+}
+
+async function syncAuthPassword(profileId: string, password: string, phone: string): Promise<boolean> {
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin.auth.admin.updateUserById(profileId, {
+      password,
+      phone: `+34${phone}`,
+      phone_confirm: true,
+    });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+async function tryPasswordSignIn(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+): Promise<string | null> {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error || !data.user) return null;
+  return data.user.id;
+}
+
 /**
- * Abre sesion solo con telefono: sincroniza password en Auth y entra.
- * Cierra el resto de sesiones activas del mismo usuario.
+ * Login solo con telefono: directorio local -> codigo integrado -> sync admin si hace falta.
  */
 export async function signInUserByPhoneWithClient(
   phoneRaw: string,
@@ -49,34 +95,41 @@ export async function signInUserByPhoneWithClient(
     return { ok: false, error: "Introduce tu numero de telefono." };
   }
 
-  const profile = await lookupProfileByPhone(phone);
-  if (!profile) {
+  const participant = resolveParticipantByPhone(phone);
+  if (!participant) {
     return { ok: false, error: "Telefono no reconocido." };
   }
 
-  const admin = createAdminClient();
-  const email = toAuthEmail(profile.username);
+  const username = participant.username;
+  const email = toAuthEmail(username);
+  const accessCode = getOnboardingAccessCode(username);
+  const passwordsToTry = [accessCode, phone].filter(
+    (value, index, list): value is string => Boolean(value) && list.indexOf(value) === index
+  );
 
-  const { error: passwordError } = await admin.auth.admin.updateUserById(profile.id, {
-    password: phone,
-    phone: `+34${phone}`,
-    phone_confirm: true,
-  });
+  for (const password of passwordsToTry) {
+    const userId = await tryPasswordSignIn(supabase, email, password);
+    if (userId) {
+      return finishSession(supabase, userId, username);
+    }
+  }
 
-  if (passwordError) {
+  const profileId = await lookupProfileIdByUsername(username);
+  if (!profileId) {
     return { ok: false, error: "No se pudo abrir la sesion." };
   }
 
-  const { data, error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password: phone,
-  });
+  for (const password of passwordsToTry) {
+    const synced = await syncAuthPassword(profileId, password, phone);
+    if (!synced) continue;
 
-  if (signInError || !data.user) {
-    return { ok: false, error: "No se pudo abrir la sesion." };
+    const userId = await tryPasswordSignIn(supabase, email, password);
+    if (userId) {
+      return finishSession(supabase, userId, username);
+    }
   }
 
-  return finishSession(supabase, data.user.id, profile.username);
+  return { ok: false, error: "No se pudo abrir la sesion." };
 }
 
 export async function signInUserByPhone(phoneRaw: string): Promise<PhoneSignInResult> {
@@ -90,7 +143,7 @@ export async function signInUserByUsername(usernameRaw: string): Promise<PhoneSi
     return { ok: false, error: "Participante no reconocido." };
   }
 
-  const phone = await lookupPhoneByUsername(username);
+  const phone = ONBOARDING_PHONE_DIRECTORY.find((row) => row.username === username)?.phone;
   if (!phone) {
     return { ok: false, error: "Participante no reconocido." };
   }
