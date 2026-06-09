@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
 import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
+import { syncParticipantPassword } from "@/lib/auth/sync-participant-password";
 import { signInTrustedUserByUsername } from "@/lib/auth/trusted-sign-in";
 import { getOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import { normalizePhone, resolveParticipantByPhone } from "@/lib/pwa/onboarding-phones";
@@ -117,7 +118,13 @@ export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResul
 
   const accessCode = getOnboardingAccessCode(participant.username);
   if (accessCode) {
-    const passwordSignIn = await signIn(participant.username, accessCode);
+    let passwordSignIn = await signIn(participant.username, accessCode);
+    if (!passwordSignIn.ok) {
+      const synced = await syncParticipantPassword(participant.username, accessCode);
+      if (synced) {
+        passwordSignIn = await signIn(participant.username, accessCode);
+      }
+    }
     if (passwordSignIn.ok) {
       return passwordSignIn;
     }

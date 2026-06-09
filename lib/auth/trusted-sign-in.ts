@@ -25,22 +25,19 @@ export async function signInTrustedUserByUsername(
     return { ok: false, error: "Cuenta desactivada. Contacta al administrador." };
   }
 
-  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
-
-  const hashedToken = linkData?.properties?.hashed_token;
-  if (linkError || !hashedToken) {
-    return {
-      ok: false,
-      error: "No hay acceso configurado para ese participante. Contacta al administrador.",
-    };
-  }
-
   const supabase = await createClient();
 
   for (const type of OTP_TYPES) {
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+
+    const hashedToken = linkData?.properties?.hashed_token;
+    if (linkError || !hashedToken) {
+      continue;
+    }
+
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: hashedToken,
       type,

@@ -1,4 +1,5 @@
 import { normalizeUsername } from "@/lib/auth/validation";
+import { BUILT_IN_ONBOARDING_ACCESS_CODES } from "@/lib/pwa/onboarding-access-codes-built-in";
 
 function parseAccessCodesJson(raw: string): Record<string, string> {
   const parsed = JSON.parse(raw) as unknown;
@@ -14,10 +15,23 @@ function parseAccessCodesJson(raw: string): Record<string, string> {
   return map;
 }
 
-export function getOnboardingAccessCodeMap(): Record<string, string> {
+function readEnvAccessCodes(): Record<string, string> {
   const raw = process.env.ONBOARDING_ACCESS_CODES_JSON?.trim();
-  if (!raw) return {};
-  return parseAccessCodesJson(raw);
+  if (!raw || raw === '""' || raw === "''") return {};
+
+  try {
+    const parsed = parseAccessCodesJson(raw);
+    return Object.keys(parsed).length > 0 ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function getOnboardingAccessCodeMap(): Record<string, string> {
+  return {
+    ...BUILT_IN_ONBOARDING_ACCESS_CODES,
+    ...readEnvAccessCodes(),
+  };
 }
 
 export function getOnboardingAccessCode(username: string): string | null {
