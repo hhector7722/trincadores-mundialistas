@@ -7,8 +7,12 @@ import {
   MVP_PITCH_ASPECT_CLASS,
   separateOverlappingSlots,
 } from "@/lib/lineup/field-layout";
+import {
+  MVP_AWAY_BOUNDS,
+  MVP_HOME_BOUNDS,
+  type MatchFieldSlot,
+} from "@/lib/lineup/match-field-geometry";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
-import type { MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { cn } from "@/lib/utils";
 
 type MatchMvpFieldGraphicProps = {
@@ -46,8 +50,8 @@ export function MatchMvpFieldGraphic({
 
   const { separatedAway, separatedHome } = useMemo(
     () => ({
-      separatedAway: separateOverlappingSlots(awaySlots) as MatchFieldSlot[],
-      separatedHome: separateOverlappingSlots(homeSlots) as MatchFieldSlot[],
+      separatedAway: separateOverlappingSlots(awaySlots, MVP_AWAY_BOUNDS) as MatchFieldSlot[],
+      separatedHome: separateOverlappingSlots(homeSlots, MVP_HOME_BOUNDS) as MatchFieldSlot[],
     }),
     [awaySlots, homeSlots]
   );
@@ -88,7 +92,7 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "relative w-full shrink-0 self-center max-w-[15rem] overflow-visible",
+        "relative w-full shrink-0 self-center max-w-[15rem] overflow-hidden",
         MVP_PITCH_ASPECT_CLASS,
         className
       )}

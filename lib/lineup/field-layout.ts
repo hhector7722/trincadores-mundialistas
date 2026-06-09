@@ -12,10 +12,28 @@ export const PLAYABLE_X_MAX = 80;
 export const PLAYABLE_Y_MIN = 18;
 export const PLAYABLE_Y_MAX = 82;
 
+export type PlayableBounds = {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+};
+
+export const SINGLE_TEAM_BOUNDS: PlayableBounds = {
+  xMin: PLAYABLE_X_MIN,
+  xMax: PLAYABLE_X_MAX,
+  yMin: PLAYABLE_Y_MIN,
+  yMax: PLAYABLE_Y_MAX,
+};
+
 export function clampToPlayable(coord: FieldCoordinate): FieldCoordinate {
+  return clampToBounds(coord, SINGLE_TEAM_BOUNDS);
+}
+
+export function clampToBounds(coord: FieldCoordinate, bounds: PlayableBounds): FieldCoordinate {
   return {
-    x: Math.min(PLAYABLE_X_MAX, Math.max(PLAYABLE_X_MIN, coord.x)),
-    y: Math.min(PLAYABLE_Y_MAX, Math.max(PLAYABLE_Y_MIN, coord.y)),
+    x: Math.min(bounds.xMax, Math.max(bounds.xMin, coord.x)),
+    y: Math.min(bounds.yMax, Math.max(bounds.yMin, coord.y)),
   };
 }
 
@@ -40,7 +58,10 @@ function slotsOverlap(a: LineupSlot, b: LineupSlot): boolean {
 /**
  * Empuja ligeramente fichas que se solapan (camiseta + nombre).
  */
-export function separateOverlappingSlots(slots: LineupSlot[]): LineupSlot[] {
+export function separateOverlappingSlots(
+  slots: LineupSlot[],
+  bounds: PlayableBounds = SINGLE_TEAM_BOUNDS
+): LineupSlot[] {
   const positioned = slots.map((slot) => ({ ...slot }));
 
   for (let pass = 0; pass < MAX_NUDGE_PASSES; pass += 1) {
@@ -57,8 +78,8 @@ export function separateOverlappingSlots(slots: LineupSlot[]): LineupSlot[] {
         const pushX = dx === 0 ? MIN_GAP_X / 2 : (Math.sign(dx) * MIN_GAP_X) / 2;
         const pushY = dy === 0 ? MIN_GAP_Y / 2 : (Math.sign(dy) * MIN_GAP_Y) / 2;
 
-        const nextA = clampToPlayable({ x: a.x + pushX, y: a.y + pushY });
-        const nextB = clampToPlayable({ x: b.x - pushX, y: b.y - pushY });
+        const nextA = clampToBounds({ x: a.x + pushX, y: a.y + pushY }, bounds);
+        const nextB = clampToBounds({ x: b.x - pushX, y: b.y - pushY }, bounds);
 
         positioned[i] = { ...a, ...nextA };
         positioned[j] = { ...b, ...nextB };
