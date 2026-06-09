@@ -1,8 +1,10 @@
 ﻿import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import {
+  isProfileOnboardingComplete,
   ONBOARDED_USER_COOKIE,
   readOnboardedUsernameFromCookieValue,
+  type OnboardingProfileRow,
 } from "@/lib/auth/onboarding-device";
 import { PWA_ONBOARDING_COOKIE } from "@/lib/pwa/onboarding-cookie";
 
@@ -95,11 +97,32 @@ export async function updateSession(request: NextRequest) {
 
   const onboardedUsername = getOnboardedUsername(request);
 
-  if (user && (isAuthPath(pathname) || isOnboardingPath(pathname))) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_active, onboarding_completed_at, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const onboardingComplete =
+      profile?.is_active && isProfileOnboardingComplete(profile as OnboardingProfileRow);
+
+    if (!onboardingComplete) {
+      if (!isOnboardingPath(pathname)) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = "/bienvenida";
+        redirectUrl.search = "";
+        return NextResponse.redirect(redirectUrl);
+      }
+      return supabaseResponse;
+    }
+
+    if (isAuthPath(pathname) || isOnboardingPath(pathname)) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
   if (!user && onboardedUsername) {

@@ -9,12 +9,18 @@ import {
   setActivePoolCookie,
 } from "@/lib/auth/session";
 import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
-import { setOnboardedDeviceCookie } from "@/lib/auth/onboarding-device";
+import {
+  clearOnboardedDeviceCookie,
+  isProfileOnboardingComplete,
+  setOnboardedDeviceCookie,
+} from "@/lib/auth/onboarding-device";
 import { signInUserByPhone } from "@/lib/auth/phone-sign-in";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
 
-export type AuthActionResult = { ok: true } | { ok: false; error: string };
+export type AuthActionResult =
+  | { ok: true; needsOnboarding?: boolean }
+  | { ok: false; error: string };
 
 const LOGIN_ERROR = "Alias o codigo incorrectos.";
 
@@ -59,7 +65,7 @@ export async function signIn(
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("is_active")
+    .select("is_active, onboarding_completed_at, avatar_url")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -81,6 +87,11 @@ export async function signIn(
     return { ok: false, error: msg };
   }
 
+  if (!isProfileOnboardingComplete(profile)) {
+    await clearOnboardedDeviceCookie();
+    return { ok: true, needsOnboarding: true };
+  }
+
   await setOnboardedDeviceCookie(username);
   return { ok: true };
 }
@@ -97,6 +108,7 @@ export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   await clearActivePoolCookie();
+  await clearOnboardedDeviceCookie();
   redirect("/login");
 }
 

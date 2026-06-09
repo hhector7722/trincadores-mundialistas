@@ -31,6 +31,12 @@ export async function getOnboardedDeviceUsername(): Promise<string | null> {
   );
 }
 
+export async function clearOnboardedDeviceCookie(): Promise<void> {
+  const store = await cookies();
+  store.delete(ONBOARDED_USER_COOKIE);
+  store.delete(PWA_ONBOARDING_COOKIE);
+}
+
 export async function setOnboardedDeviceCookie(username: string): Promise<void> {
   const normalized = normalizeUsername(username);
   if (!normalized) return;

@@ -27,7 +27,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/");
+      router.push(result.needsOnboarding ? "/bienvenida" : "/");
       router.refresh();
     });
   }
