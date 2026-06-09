@@ -27,6 +27,7 @@ export function RankingRow({
       <RankingMemberCells
         avatarUrl={row.avatarUrl}
         label={row.label}
+        size="ranking"
         nameClassName={cn(
           "text-xs font-medium",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"

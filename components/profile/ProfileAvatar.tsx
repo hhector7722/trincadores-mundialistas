@@ -29,7 +29,7 @@ export function ProfileAvatar({
         src={avatarUrl}
         alt=""
         className={cn(
-          "shrink-0 object-contain",
+          "block shrink-0 object-contain",
           variant === "badge" && "rounded-full",
           variant === "profile" && "rounded-xl",
           className

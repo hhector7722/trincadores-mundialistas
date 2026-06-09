@@ -1,16 +1,7 @@
-import {
-  AVATAR_DISPLAY_HOME_MINI,
-  AVATAR_DISPLAY_RANKING,
-} from "@/lib/avatars/display-classes";
-
-/** Grid: tendencia | pos | avatar | nombre | pts | fiab | quiz */
+/** Grid: tendencia | pos | trincador (avatar+nombre) | pts | fiab | quiz */
 export const RANKING_GRID =
-  "grid grid-cols-[0.625rem_1.5rem_minmax(3rem,4.5rem)_minmax(0,1fr)_2.25rem_2.25rem_2.25rem] items-center gap-x-2";
+  "grid grid-cols-[0.625rem_1.5rem_minmax(0,1fr)_2.25rem_2.25rem_2.25rem] items-center gap-x-2";
 
-/** Compacto para la card de inicio (sin columna quiz). Columna avatar ancha para proporción natural. */
+/** Card inicio: tendencia | pos | trincador | pts | fiab */
 export const MINI_RANKING_GRID =
-  "grid grid-cols-[0.5rem_1.125rem_minmax(2rem,3rem)_minmax(0,1fr)_1.5rem_1.5rem] items-center gap-x-1.5";
-
-export const RANKING_AVATAR_CLASS = AVATAR_DISPLAY_RANKING;
-
-export const MINI_RANKING_AVATAR_CLASS = AVATAR_DISPLAY_HOME_MINI;
+  "grid grid-cols-[0.5rem_1.125rem_minmax(0,1fr)_1.5rem_1.5rem] items-center gap-x-1.5";

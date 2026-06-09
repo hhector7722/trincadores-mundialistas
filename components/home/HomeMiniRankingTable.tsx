@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
+import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
@@ -25,7 +25,7 @@ function MiniRankingHeader() {
     >
       <span aria-hidden="true" />
       <span>Pos</span>
-      <span className="col-span-2 text-center">Trincador</span>
+      <span className="text-center">Trincador</span>
       <span className="text-right">Pts</span>
       <span className="text-right">Fiab</span>
     </div>
@@ -43,22 +43,24 @@ function MiniRankingDataRow({
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "flex min-h-0 flex-1 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
+        "min-h-10 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
-      <span
-        className={cn(
-          "min-w-0 truncate text-[9px] font-medium",
-          isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
-        )}
-      >
-        {row.label}
-      </span>
+      <div className="flex min-w-0 items-center gap-1.5">
+        <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
+        <span
+          className={cn(
+            "min-w-0 flex-1 truncate text-[9px] font-medium",
+            isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
+          )}
+        >
+          {row.label}
+        </span>
+      </div>
       <span className="shrink-0 text-right font-display tabular-nums text-white/85">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
@@ -74,14 +76,16 @@ function MiniRankingEmptyRow() {
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "flex min-h-0 flex-1 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
+        "min-h-10 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
       )}
       aria-hidden="true"
     >
       <span />
       <span />
-      <span className="h-8 min-w-[2rem] shrink-0 rounded-xl bg-white/10" />
-      <span className="min-w-0 truncate text-white/20">&nbsp;</span>
+      <div className="flex min-w-0 items-center gap-1.5">
+        <span className="h-8 w-6 shrink-0 rounded-xl bg-white/10" />
+        <span className="min-w-0 flex-1 truncate text-white/20">&nbsp;</span>
+      </div>
       <span />
       <span />
     </div>
