@@ -15,6 +15,7 @@ import {
   setOnboardedDeviceCookie,
 } from "@/lib/auth/onboarding-device";
 import { signInUserByPhone } from "@/lib/auth/phone-sign-in";
+import { stampOnboardingCompletedIfNeeded } from "@/lib/auth/stamp-onboarding-completed";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
 
@@ -90,6 +91,12 @@ export async function signIn(
   if (!isProfileOnboardingComplete(profile)) {
     await clearOnboardedDeviceCookie();
     return { ok: true, needsOnboarding: true };
+  }
+
+  try {
+    await stampOnboardingCompletedIfNeeded(data.user.id, profile);
+  } catch {
+    // No bloquear login si falla el backfill de activacion.
   }
 
   await setOnboardedDeviceCookie(username);
