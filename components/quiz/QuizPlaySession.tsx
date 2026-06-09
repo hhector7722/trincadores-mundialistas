@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { startQuiz, submitQuiz } from "@/actions/quiz";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
+import { QuizDailyIntro } from "@/components/quiz/QuizDailyIntro";
 import { QuizQuestionStage } from "@/components/quiz/QuizQuestionStage";
 import { LoadingCenter } from "@/components/ui/spinner";
 import type { QuestionPhase } from "@/lib/quiz/play-flow";
@@ -15,18 +16,24 @@ import {
   QUESTION_TIME_SEC,
   shouldAutoSubmit,
 } from "@/lib/quiz/play-flow";
+import { QUIZ_PLAY_ENTER_MS } from "@/lib/quiz/intro";
 import type { QuizStartSession } from "@/lib/quiz/types";
+import { cn } from "@/lib/utils";
 
 type QuizPlaySessionProps = {
   poolId: string;
   quizId: string;
+  /** Sin entradilla al reanudar un intento en curso. */
+  skipIntro?: boolean;
 };
 
 const PLAY_TITLE = "¿QUIEN SABE MÁS DE LOS MUNDIALES?";
 
-export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
+export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlaySessionProps) {
   const router = useRouter();
   const { navigate } = useAppNavigation();
+  const [introDone, setIntroDone] = useState(skipIntro);
+  const [quizRevealed, setQuizRevealed] = useState(skipIntro);
   const [session, setSession] = useState<QuizStartSession | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -201,8 +208,18 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
 
   useEffect(() => () => clearAllTimers(), [clearAllTimers]);
 
+  const handleOutroStart = useCallback(() => {
+    setQuizRevealed(true);
+  }, []);
+
+  const handleIntroComplete = useCallback(() => {
+    setIntroDone(true);
+  }, []);
+
+  let body: ReactNode;
+
   if (loadError) {
-    return (
+    body = (
       <CardMessage
         title="No se pudo iniciar"
         body={loadError}
@@ -210,14 +227,10 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
         actionLabel="Volver al quiz"
       />
     );
-  }
-
-  if (loading || !session) {
-    return <LoadingCenter label="Preparando preguntas…" minHeightClassName="min-h-[12rem]" />;
-  }
-
-  if (submitError) {
-    return (
+  } else if (loading || !session) {
+    body = <LoadingCenter label="Preparando preguntas…" minHeightClassName="min-h-[12rem]" />;
+  } else if (submitError) {
+    body = (
       <CardMessage
         title="Error al enviar"
         body={submitError}
@@ -225,14 +238,10 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
         actionLabel="Volver al quiz"
       />
     );
-  }
-
-  if (submitting) {
-    return <LoadingCenter label="Calculando resultado…" minHeightClassName="min-h-[12rem]" />;
-  }
-
-  if (!currentQuestion) {
-    return (
+  } else if (submitting) {
+    body = <LoadingCenter label="Calculando resultado…" minHeightClassName="min-h-[12rem]" />;
+  } else if (!currentQuestion) {
+    body = (
       <CardMessage
         title="Sin preguntas"
         body="Este quiz no tiene preguntas publicadas."
@@ -240,23 +249,43 @@ export function QuizPlaySession({ poolId, quizId }: QuizPlaySessionProps) {
         actionLabel="Volver"
       />
     );
+  } else {
+    body = (
+      <div className="tm-quiz-play-session flex min-h-0 flex-1 flex-col">
+        <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
+          {PLAY_TITLE}
+        </h1>
+
+        <div className="tm-quiz-stage-scroll flex min-h-0 flex-1 flex-col gap-4">
+          <QuizQuestionStage
+            question={currentQuestion}
+            selectedOptionId={answers[currentQuestion.id] ?? null}
+            phase={phase}
+            secondsLeft={secondsLeft}
+            locked={phase === "feedback"}
+            onSelect={resolveAnswer}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="tm-quiz-play-session flex min-h-0 flex-1 flex-col">
-      <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
-        {PLAY_TITLE}
-      </h1>
+    <div className="tm-quiz-play-root flex min-h-0 flex-1 flex-col">
+      {!introDone && (
+        <QuizDailyIntro onOutroStart={handleOutroStart} onComplete={handleIntroComplete} />
+      )}
 
-      <div className="tm-quiz-stage-scroll flex min-h-0 flex-1 flex-col gap-4">
-        <QuizQuestionStage
-          question={currentQuestion}
-          selectedOptionId={answers[currentQuestion.id] ?? null}
-          phase={phase}
-          secondsLeft={secondsLeft}
-          locked={phase === "feedback"}
-          onSelect={resolveAnswer}
-        />
+      <div
+        className={cn(
+          "tm-quiz-play-content flex min-h-0 flex-1 flex-col",
+          quizRevealed && "tm-quiz-play-content--visible",
+          !introDone && "pointer-events-none"
+        )}
+        style={{ transitionDuration: `${QUIZ_PLAY_ENTER_MS}ms` }}
+        aria-hidden={!quizRevealed}
+      >
+        {body}
       </div>
     </div>
   );

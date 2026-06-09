@@ -36,7 +36,11 @@ export default async function QuizPlayPage() {
 
   return (
     <QuizPageShell variant="play">
-      <QuizPlaySession poolId={ctx.activePoolId} quizId={slot.quiz.id} />
+      <QuizPlaySession
+        poolId={ctx.activePoolId}
+        quizId={slot.quiz.id}
+        skipIntro={status === "in_progress"}
+      />
     </QuizPageShell>
   );
 }
