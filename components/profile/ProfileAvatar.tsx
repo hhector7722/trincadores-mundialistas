@@ -1,3 +1,4 @@
+import { getAvatarBadgeObjectPosition } from "@/lib/avatars/presets";
 import { cn } from "@/lib/utils";
 
 export type ProfileAvatarVariant = "badge" | "profile";
@@ -30,11 +31,15 @@ export function ProfileAvatar({
         alt=""
         className={cn(
           "block shrink-0",
-          variant === "badge" &&
-            "rounded-full object-cover object-[center_22%]",
+          variant === "badge" && "rounded-full object-cover",
           variant === "profile" && "rounded-xl object-contain",
           className
         )}
+        style={
+          variant === "badge"
+            ? { objectPosition: getAvatarBadgeObjectPosition(avatarUrl) }
+            : undefined
+        }
       />
     );
   }
