@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { introCountdownFromRemaining } from "@/lib/quiz/intro-countdown";
 import {
   QUIZ_INTRO_CROSSFADE_MS,
   QUIZ_INTRO_OUTRO_LEAD_S,
@@ -22,7 +23,7 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
   const [stage, setStage] = useState<IntroStage>("splash");
   const [splashMinElapsed, setSplashMinElapsed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const completedRef = useRef(false);
 
@@ -77,17 +78,21 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
     setVideoReady(true);
   };
 
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video && Number.isFinite(video.duration)) {
+      setRemainingSec(video.duration);
+    }
+  };
+
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
 
-    const ratio = Math.min(1, video.currentTime / video.duration);
-    setProgress(ratio);
+    const remaining = Math.max(0, video.duration - video.currentTime);
+    setRemainingSec(remaining);
 
-    if (
-      stage === "video" &&
-      video.duration - video.currentTime <= QUIZ_INTRO_OUTRO_LEAD_S
-    ) {
+    if (stage === "video" && remaining <= QUIZ_INTRO_OUTRO_LEAD_S) {
       beginOutro();
     }
   };
@@ -99,6 +104,9 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
   const showSplash = stage === "splash";
   const showVideo = stage === "video" || stage === "outro";
   const isOutro = stage === "outro";
+
+  const countdown =
+    remainingSec !== null ? introCountdownFromRemaining(remainingSec) : null;
 
   return (
     <div
@@ -114,7 +122,7 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
           : undefined
       }
     >
-      <div className="tm-quiz-intro-stage relative flex w-full max-w-sm flex-1 flex-col items-center justify-center">
+      <div className="tm-quiz-intro-stage relative flex w-full max-w-md flex-1 flex-col items-center justify-center">
         <div
           className={cn(
             "tm-quiz-intro-splash-layer absolute inset-0 flex flex-col items-center justify-center gap-1",
@@ -137,13 +145,13 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
 
         <div
           className={cn(
-            "tm-quiz-intro-video-layer flex w-full flex-col items-center gap-6",
+            "tm-quiz-intro-video-layer flex w-full flex-col items-center gap-5",
             showVideo ? "tm-quiz-intro-layer--visible" : "tm-quiz-intro-layer--hidden"
           )}
           style={{ transitionDuration: `${QUIZ_INTRO_CROSSFADE_MS}ms` }}
           aria-hidden={!showVideo}
         >
-          <div className="tm-quiz-intro-video-portrait shrink-0">
+          <div className="tm-quiz-intro-video-stage shrink-0">
             <div className="tm-quiz-intro-video-wrap">
               <video
                 ref={videoRef}
@@ -152,44 +160,51 @@ export function QuizDailyIntro({ onComplete, onOutroStart }: QuizDailyIntroProps
                 playsInline
                 preload="auto"
                 onCanPlayThrough={handleCanPlayThrough}
+                onLoadedMetadata={handleLoadedMetadata}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={handleEnded}
               />
-              <div className="tm-quiz-intro-video-vignette" aria-hidden="true" />
               <div className="tm-quiz-intro-video-scanlines" aria-hidden="true" />
             </div>
           </div>
 
           <div
             className={cn(
-              "w-full max-w-xs shrink-0 space-y-2",
-              isOutro && "tm-quiz-intro-progress--outro"
+              "tm-quiz-intro-countdown shrink-0 text-center",
+              isOutro && "tm-quiz-intro-countdown--outro"
             )}
             style={
               isOutro
                 ? { transition: `opacity ${QUIZ_INTRO_OUTRO_MS}ms ease-in-out` }
                 : undefined
             }
+            aria-live="polite"
           >
-            <div
-              className="h-2 overflow-hidden rounded-full border border-[var(--tm-border)] bg-[var(--tm-surface)]"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(progress * 100)}
-              aria-label="Cargando quiz"
-            >
-              <div
-                className="h-full rounded-full bg-[var(--tm-accent)] ease-linear"
-                style={{
-                  width: `${progress * 100}%`,
-                  transition: "width 120ms linear",
-                }}
-              />
-            </div>
-            <p className="text-center text-[10px] uppercase tracking-widest text-[var(--tm-muted)]">
-              Preparando preguntas…
-            </p>
+            {countdown ? (
+              <>
+                {countdown.eyebrow ? (
+                  <p
+                    className={cn(
+                      "font-display uppercase tracking-[0.35em] text-[var(--tm-muted)]",
+                      countdown.emphasis ? "text-[11px]" : "text-[10px]"
+                    )}
+                  >
+                    {countdown.eyebrow}
+                  </p>
+                ) : null}
+                <p
+                  className={cn(
+                    "tm-quiz-intro-countdown-main font-display uppercase tracking-wide text-[var(--tm-accent)]",
+                    countdown.emphasis ? "text-5xl tabular-nums" : "text-sm text-[var(--tm-fg)]"
+                  )}
+                  key={countdown.main}
+                >
+                  {countdown.main}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-[var(--tm-muted)]">Cargando vídeo…</p>
+            )}
           </div>
         </div>
       </div>
