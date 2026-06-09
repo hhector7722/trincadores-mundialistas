@@ -210,13 +210,13 @@ export function MvpPredictionPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col px-1 py-2 sm:px-1.5">
+      <div className="flex min-h-0 flex-1 flex-col px-1 py-1 sm:px-1.5">
         {!serverEditable ? (
-          <p className="mb-1.5 shrink-0 px-1 text-sm text-[var(--tm-muted)]">
+          <p className="mb-1 shrink-0 px-1 text-sm text-[var(--tm-muted)]">
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
         ) : (
-          <p className="mb-1.5 shrink-0 px-1 text-center text-[10px] text-[var(--tm-muted)]">
+          <p className="mb-1 shrink-0 px-1 text-center text-[10px] text-[var(--tm-muted)]">
             Pulsa un jugador del once probable o de las reservas.
           </p>
         )}
@@ -253,7 +253,7 @@ export function MvpPredictionPanel({
                 position="bottom"
               />
 
-              <p className="mt-2 px-1 text-center text-[9px] leading-snug text-[var(--tm-muted)]">
+              <p className="mt-1 px-1 text-center text-[9px] leading-snug text-[var(--tm-muted)]">
                 Once probable a partir de la convocatoria oficial FIFA 2026. Formación orientativa.
               </p>
             </div>

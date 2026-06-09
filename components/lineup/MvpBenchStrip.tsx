@@ -32,15 +32,15 @@ export function MvpBenchStrip({
   return (
     <section
       className={cn(
-        "w-full max-w-lg shrink-0 self-center px-1",
-        position === "top" ? "pb-2" : "pt-2"
+        "w-full max-w-lg shrink-0 self-center px-0.5",
+        position === "top" ? "pb-1" : "pt-1"
       )}
     >
-      <h4 className="mb-1.5 flex min-h-6 items-center justify-center gap-1.5 text-[10px] font-medium text-[var(--tm-muted)]">
+      <h4 className="mb-1 flex min-h-5 items-center justify-center gap-1 text-[10px] font-medium text-[var(--tm-muted)]">
         <TeamFlagBadge name={teamName} size="xs" />
         <span>{teamNameEs(teamName)}</span>
       </h4>
-      <div className="grid grid-cols-4 gap-x-0.5 gap-y-1">
+      <div className="grid grid-cols-6 gap-x-0.5 gap-y-0.5 sm:grid-cols-8">
         {players.map((player) => {
           const key = benchPlayerKey(teamName, player);
           const active = selectedKey === key;
@@ -52,7 +52,7 @@ export function MvpBenchStrip({
               disabled={disabled}
               onClick={() => onSelect(key)}
               className={cn(
-                "flex w-full min-h-8 flex-col items-center justify-center px-0.5 py-0.5 text-center transition-colors",
+                "flex w-full min-h-6 flex-col items-center justify-center px-0.5 py-0.5 text-center transition-colors",
                 "hover:opacity-90 active:opacity-80",
                 active && "rounded-sm bg-[rgba(212,255,0,0.1)]",
                 disabled && "opacity-60"
