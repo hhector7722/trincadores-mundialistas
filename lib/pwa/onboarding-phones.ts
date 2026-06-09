@@ -18,6 +18,7 @@ export const ONBOARDING_PHONE_DIRECTORY: PhoneParticipant[] = [
   { username: "gonza", displayName: "Gonza", phone: "606021566" },
   { username: "dani", displayName: "Dani", phone: "697989788" },
   { username: "hector", displayName: "Hector", phone: "647229309" },
+  { username: "paco", displayName: "Paco", phone: "663135650" },
 ];
 
 export function normalizePhone(raw: string): string {

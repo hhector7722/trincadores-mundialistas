@@ -24,9 +24,12 @@ describe("onboarding-phones", () => {
     assert.equal(resolveParticipantByPhone("600000000"), null);
   });
 
-  it("excluye a Paco del onboarding", () => {
-    assert.equal(isOnboardingEligibleUsername("paco"), false);
-    assert.equal(resolveParticipantByPhone(""), null);
+  it("incluye a Paco con su movil registrado", () => {
+    assert.equal(isOnboardingEligibleUsername("paco"), true);
+    const match = resolveParticipantByPhone("663135650");
+    assert.ok(match);
+    assert.equal(match?.username, "paco");
+    assert.equal(match?.displayName, "Paco");
   });
 
   it("resuelve alias con acentos y variantes de Solskjær", () => {

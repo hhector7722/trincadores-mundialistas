@@ -92,7 +92,6 @@ export async function confirmStandaloneInstallation(): Promise<ActionResult<null
 function resolveParticipantDisplayName(username: string): string {
   const fromSeed = REAL_PARTICIPANTS.find((row) => row.username === username);
   if (fromSeed) return fromSeed.displayName;
-  if (username === "paco") return "Paco";
   return username;
 }
 
