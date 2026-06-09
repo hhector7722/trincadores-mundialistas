@@ -61,12 +61,13 @@ function parseEventRows(payload: BsdEventsResponse): BsdEventRef[] {
     }));
 }
 
+/** Solo scripts de mapeo masivo (`emit-bsd-map-sql`, `preview-bsd-fixtures`). */
 export async function fetchWorldCupEventsFromBsd(): Promise<{
   events: BsdEventRef[];
   requests: number;
 }> {
   const payload = await bsdFetch<BsdEventsResponse>(
-    `/api/v2/events/?league_id=${BSD_WC_LEAGUE_ID}&limit=250`
+    `/api/v2/events/?league_id=${BSD_WC_LEAGUE_ID}&season_id=${BSD_WC_SEASON_ID}&limit=200`
   );
   if (!payload) {
     return { events: [], requests: 1 };
@@ -76,6 +77,68 @@ export async function fetchWorldCupEventsFromBsd(): Promise<{
     (event) => event.seasonId === BSD_WC_SEASON_ID
   );
   return { events, requests: 1 };
+}
+
+/** Consulta acotada por equipo/fecha — ver docs BSD `/api/v2/events/` query params. */
+export function buildBsdEventsLookupPath(params: {
+  teamName: string;
+  kickoffAt?: string;
+}): string {
+  const searchParams = new URLSearchParams({
+    league_id: String(BSD_WC_LEAGUE_ID),
+    season_id: String(BSD_WC_SEASON_ID),
+    team_name: params.teamName,
+    limit: "20",
+  });
+
+  if (params.kickoffAt) {
+    const day = params.kickoffAt.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day)) {
+      searchParams.set("date_from", day);
+      searchParams.set("date_to", day);
+    }
+  }
+
+  return `/api/v2/events/?${searchParams.toString()}`;
+}
+
+/**
+ * Resuelve candidatos BSD para un partido concreto (pocos resultados).
+ * Usar `external_id_map` en runtime cuando exista; esto es fallback de mapeo.
+ */
+export async function fetchBsdEventsForMatchLookup(params: {
+  homeTeam: string;
+  awayTeam: string;
+  kickoffAt?: string;
+}): Promise<{ events: BsdEventRef[]; requests: number }> {
+  if (!isBsdConfigured()) {
+    return { events: [], requests: 0 };
+  }
+
+  const filterTeams = [params.homeTeam, params.awayTeam].filter(
+    (name, index, list) => list.indexOf(name) === index
+  );
+
+  let requests = 0;
+  const merged: BsdEventRef[] = [];
+
+  for (const teamName of filterTeams) {
+    const payload = await bsdFetch<BsdEventsResponse>(
+      buildBsdEventsLookupPath({ teamName, kickoffAt: params.kickoffAt })
+    );
+    requests += 1;
+    if (payload) {
+      merged.push(...parseEventRows(payload));
+    }
+    if (merged.length > 0) break;
+  }
+
+  const unique = new Map<number, BsdEventRef>();
+  for (const event of merged) {
+    unique.set(event.fixtureId, event);
+  }
+
+  return { events: [...unique.values()], requests };
 }
 
 export type BsdConfirmedLineupsPayload = {

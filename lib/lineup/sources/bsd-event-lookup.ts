@@ -1,5 +1,5 @@
 import { teamNamesMatch } from "@/lib/lineup/sources/api-football-names";
-import { fetchWorldCupEventsFromBsd } from "@/lib/lineup/sources/bsd-client";
+import { fetchBsdEventsForMatchLookup } from "@/lib/lineup/sources/bsd-client";
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -34,7 +34,11 @@ export async function resolveBsdEventId(
     return Number.isFinite(parsed) ? parsed : null;
   }
 
-  const { events } = await fetchWorldCupEventsFromBsd();
+  const { events } = await fetchBsdEventsForMatchLookup({
+    homeTeam,
+    awayTeam,
+    kickoffAt,
+  });
 
   for (const event of events) {
     const teamsOk =

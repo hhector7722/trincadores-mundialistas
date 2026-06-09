@@ -72,6 +72,91 @@ export async function fetchTeamKitHexMapAction(): Promise<
   }
 }
 
+async function loadTeamLineupBundle(
+  teamName: string,
+  options?: { matchId?: string; formation?: FormationId }
+): Promise<{ squad: TeamSquadWithPlayers | null; lineup: ResolvedLineup }> {
+  const supabase = await createClient();
+  const squad = await getTeamSquadByName(supabase, teamName);
+
+  if (!squad || squad.players.length === 0) {
+    return {
+      squad,
+      lineup: buildFallbackLineup([], options?.formation),
+    };
+  }
+
+  const lineup = await resolveTeamLineup(supabase, {
+    matchId: options?.matchId,
+    teamName,
+    players: squad.players,
+    formationOverride: options?.formation,
+  });
+
+  return { squad, lineup };
+}
+
+/** Una sola ida al servidor: plantilla + alineación resuelta. */
+export async function fetchTeamLineupBundleAction(
+  teamName: string,
+  options?: { matchId?: string; formation?: FormationId }
+): Promise<
+  LineupActionResult<{ squad: TeamSquadWithPlayers | null; lineup: ResolvedLineup }>
+> {
+  try {
+    const data = await loadTeamLineupBundle(teamName, options);
+    return { ok: true, data };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudo cargar la alineación.";
+    return { ok: false, error: message };
+  }
+}
+
+/** Partido completo: plantillas, alineaciones y colores de camiseta en un request. */
+export async function fetchMatchLineupBundleAction(
+  matchId: string,
+  homeTeam: string,
+  awayTeam: string
+): Promise<
+  LineupActionResult<{
+    home: { squad: TeamSquadWithPlayers | null; lineup: ResolvedLineup };
+    away: { squad: TeamSquadWithPlayers | null; lineup: ResolvedLineup };
+    kitHexMap: Record<string, string>;
+  }>
+> {
+  try {
+    const supabase = await createClient();
+    const [homeSquad, awaySquad, kitHexMap] = await Promise.all([
+      getTeamSquadByName(supabase, homeTeam),
+      getTeamSquadByName(supabase, awayTeam),
+      loadTeamKitHexBySlug(supabase),
+    ]);
+
+    const lineups = await resolveMatchLineups(
+      supabase,
+      matchId,
+      homeTeam,
+      awayTeam,
+      homeSquad?.players ?? [],
+      awaySquad?.players ?? []
+    );
+
+    return {
+      ok: true,
+      data: {
+        home: { squad: homeSquad, lineup: lineups.home },
+        away: { squad: awaySquad, lineup: lineups.away },
+        kitHexMap,
+      },
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudieron cargar las alineaciones.";
+    return { ok: false, error: message };
+  }
+}
+
 export async function fetchMatchSquadsAction(
   homeTeam: string,
   awayTeam: string
@@ -96,27 +181,9 @@ export async function fetchResolvedTeamLineupAction(
   teamName: string,
   options?: { matchId?: string; formation?: FormationId }
 ): Promise<LineupActionResult<ResolvedLineup>> {
-  try {
-    const supabase = await createClient();
-    const squad = await getTeamSquadByName(supabase, teamName);
-
-    if (!squad || squad.players.length === 0) {
-      return { ok: true, data: buildFallbackLineup([], options?.formation) };
-    }
-
-    const lineup = await resolveTeamLineup(supabase, {
-      matchId: options?.matchId,
-      teamName,
-      players: squad.players,
-      formationOverride: options?.formation,
-    });
-
-    return { ok: true, data: lineup };
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "No se pudo resolver la alineación.";
-    return { ok: false, error: message };
-  }
+  const result = await fetchTeamLineupBundleAction(teamName, options);
+  if (!result.ok) return result;
+  return { ok: true, data: result.data.lineup };
 }
 
 export async function fetchResolvedMatchLineupsAction(
@@ -124,26 +191,13 @@ export async function fetchResolvedMatchLineupsAction(
   homeTeam: string,
   awayTeam: string
 ): Promise<LineupActionResult<{ home: ResolvedLineup; away: ResolvedLineup }>> {
-  try {
-    const supabase = await createClient();
-    const [homeSquad, awaySquad] = await Promise.all([
-      getTeamSquadByName(supabase, homeTeam),
-      getTeamSquadByName(supabase, awayTeam),
-    ]);
-
-    const lineups = await resolveMatchLineups(
-      supabase,
-      matchId,
-      homeTeam,
-      awayTeam,
-      homeSquad?.players ?? [],
-      awaySquad?.players ?? []
-    );
-
-    return { ok: true, data: lineups };
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "No se pudieron resolver las alineaciones.";
-    return { ok: false, error: message };
-  }
+  const result = await fetchMatchLineupBundleAction(matchId, homeTeam, awayTeam);
+  if (!result.ok) return result;
+  return {
+    ok: true,
+    data: {
+      home: result.data.home.lineup,
+      away: result.data.away.lineup,
+    },
+  };
 }

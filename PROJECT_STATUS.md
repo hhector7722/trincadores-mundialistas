@@ -56,3 +56,5 @@
 - [x] Quiz generador: distractores semanticos + owner replay ilimitado
 - [x] Quiz cron diario 5:00 Madrid (`/api/cron/quiz-daily` + `publishQuizDay`)
 - [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play
+- [x] Alineaciones: optimización carga (bundle actions, ventana confirmada, BSD lookup acotado)
+- [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, horizonte 48h, TTL 6h)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchResolvedTeamLineupAction, fetchTeamSquadAction } from "@/actions/lineup";
+import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
@@ -42,26 +42,15 @@ export function LineupModalPanel({
     setSquad(null);
     setLineup(null);
 
-    Promise.all([
-      fetchTeamSquadAction(teamName),
-      fetchResolvedTeamLineupAction(teamName, { matchId }),
-    ]).then(([squadResult, lineupResult]) => {
+    fetchTeamLineupBundleAction(teamName, { matchId }).then((result) => {
       if (cancelled) return;
-      if (!squadResult.ok) {
-        setError(squadResult.error);
+      if (!result.ok) {
+        setError(result.error);
         setSquad(null);
         setLineup(null);
       } else {
-        setSquad(squadResult.data);
-        if (lineupResult.ok) {
-          setLineup(lineupResult.data);
-        } else {
-          setLineup(
-            squadResult.data
-              ? buildFallbackLineup(squadResult.data.players)
-              : buildFallbackLineup([])
-          );
-        }
+        setSquad(result.data.squad);
+        setLineup(result.data.lineup);
       }
       setLoading(false);
     });

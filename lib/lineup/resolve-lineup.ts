@@ -1,4 +1,5 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
 import {
   findPrimaryMatchIdForTeam,
   isBetterLineupSource,
@@ -64,6 +65,18 @@ async function resolveContextMatchId(
   if (context.matchId) return context.matchId;
   const primary = await findPrimaryMatchIdForTeam(supabase, context.teamName);
   return primary ?? undefined;
+}
+
+async function loadMatchMeta(
+  supabase: SupabaseClient,
+  matchId: string
+): Promise<{ kickoff_at: string; status: string | null } | null> {
+  const { data } = await supabase
+    .from("matches")
+    .select("kickoff_at, status")
+    .eq("id", matchId)
+    .maybeSingle();
+  return data;
 }
 
 export async function getLineupSource(
@@ -152,19 +165,35 @@ export async function resolveTeamLineup(
     return cached;
   }
 
-  const confirmed = await fetchConfirmedLineup(supabase, {
-    ...context,
-    matchId,
-  });
-  if (confirmed) {
-    await upsertTeamLineup(
-      supabase,
+  const matchMeta = await loadMatchMeta(supabase, matchId);
+  const tryConfirmed = shouldFetchConfirmedLineup(
+    matchMeta?.kickoff_at,
+    matchMeta?.status
+  );
+
+  if (cached?.sourceKind === "predicted" && !tryConfirmed) {
+    return cached;
+  }
+
+  if (tryConfirmed) {
+    const confirmed = await fetchConfirmedLineup(supabase, {
+      ...context,
       matchId,
-      context.teamName,
-      confirmed,
-      confirmed.bench ?? benchFromSquadExcludingStarters(confirmed, context)
-    );
-    return confirmed;
+    });
+    if (confirmed) {
+      await upsertTeamLineup(
+        supabase,
+        matchId,
+        context.teamName,
+        confirmed,
+        confirmed.bench ?? benchFromSquadExcludingStarters(confirmed, context)
+      );
+      return confirmed;
+    }
+  }
+
+  if (cached?.sourceKind === "predicted") {
+    return cached;
   }
 
   const predicted = await fetchPredictedLineup(supabase, {
@@ -209,6 +238,14 @@ function benchFromSquadExcludingStarters(
   context: LineupResolveContext
 ): LineupBenchPlayer[] {
   return benchFromResolved(lineup, context);
+}
+
+/** Suplentes derivados de plantilla excluyendo titulares (cron/scripts). */
+export function benchPlayersExcludingStarters(
+  lineup: ResolvedLineup,
+  players: LineupResolveContext["players"]
+): LineupBenchPlayer[] {
+  return benchFromResolved(lineup, { teamName: "", players });
 }
 
 export async function resolveMatchLineups(

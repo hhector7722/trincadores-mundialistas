@@ -2,11 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import {
-  fetchMatchSquadsAction,
-  fetchResolvedMatchLineupsAction,
-  fetchTeamKitHexMapAction,
-} from "@/actions/lineup";
+import { fetchMatchLineupBundleAction } from "@/actions/lineup";
 import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
@@ -100,50 +96,26 @@ export function MvpPredictionPanel({
 
   useEffect(() => {
     let cancelled = false;
-    fetchTeamKitHexMapAction().then((result) => {
-      if (cancelled || !result.ok) return;
-      setTeamKitHexFromDb(result.data);
-      setKitColorsReady(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
     setLoading(true);
     setError(null);
+    setKitColorsReady(false);
 
-    Promise.all([
-      fetchMatchSquadsAction(homeTeam, awayTeam),
-      fetchResolvedMatchLineupsAction(matchId, homeTeam, awayTeam),
-    ]).then(([squadsResult, lineupsResult]) => {
+    fetchMatchLineupBundleAction(matchId, homeTeam, awayTeam).then((result) => {
       if (cancelled) return;
-      if (!squadsResult.ok) {
-        setError(squadsResult.error);
+      if (!result.ok) {
+        setError(result.error);
         setHomeSquad(null);
         setAwaySquad(null);
         setHomeLineup(null);
         setAwayLineup(null);
+        setKitColorsReady(false);
       } else {
-        setHomeSquad(squadsResult.data.home);
-        setAwaySquad(squadsResult.data.away);
-        if (lineupsResult.ok) {
-          setHomeLineup(lineupsResult.data.home);
-          setAwayLineup(lineupsResult.data.away);
-        } else {
-          setHomeLineup(
-            squadsResult.data.home
-              ? buildFallbackLineup(squadsResult.data.home.players)
-              : buildFallbackLineup([])
-          );
-          setAwayLineup(
-            squadsResult.data.away
-              ? buildFallbackLineup(squadsResult.data.away.players)
-              : buildFallbackLineup([])
-          );
-        }
+        setTeamKitHexFromDb(result.data.kitHexMap);
+        setHomeSquad(result.data.home.squad);
+        setAwaySquad(result.data.away.squad);
+        setHomeLineup(result.data.home.lineup);
+        setAwayLineup(result.data.away.lineup);
+        setKitColorsReady(true);
       }
       setLoading(false);
     });
