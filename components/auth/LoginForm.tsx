@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { signIn } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingOverlay } from "@/components/ui/spinner";
@@ -16,19 +17,13 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     const fd = new FormData(e.currentTarget);
-    const phone = String(fd.get("phone") ?? "");
+    const username = String(fd.get("username") ?? "");
+    const accessCode = String(fd.get("accessCode") ?? "");
 
     startTransition(async () => {
-      const response = await fetch("/api/auth/phone-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-        credentials: "include",
-      });
-
-      const result = (await response.json()) as { ok: boolean; error?: string };
-      if (!response.ok || !result.ok) {
-        setError(result.error ?? "No se pudo abrir la sesion.");
+      const result = await signIn(username, accessCode);
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
 
@@ -42,20 +37,40 @@ export function LoginForm() {
       {pending ? <LoadingOverlay label="Entrando…" /> : null}
       <div>
         <label
-          htmlFor="login-phone"
+          htmlFor="login-username"
           className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
         >
-          Numero de movil
+          Alias
         </label>
         <Input
-          id="login-phone"
-          name="phone"
-          type="tel"
-          inputMode="numeric"
-          autoComplete="tel"
+          id="login-username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
           required
-          className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-wide backdrop-blur-sm"
-          placeholder="647229309"
+          className="mt-1.5 bg-[var(--tm-surface)] lowercase tracking-wide backdrop-blur-sm"
+          placeholder="hector"
+          spellCheck={false}
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="login-access-code"
+          className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
+        >
+          Codigo de acceso
+        </label>
+        <Input
+          id="login-access-code"
+          name="accessCode"
+          type="password"
+          autoComplete="current-password"
+          required
+          className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-widest backdrop-blur-sm"
+          placeholder="••••••••••••"
           spellCheck={false}
         />
       </div>

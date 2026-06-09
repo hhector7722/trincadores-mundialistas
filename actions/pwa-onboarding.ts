@@ -14,9 +14,11 @@ import {
   PWA_STANDALONE_GATE_MAX_AGE_SECONDS,
 } from "@/lib/pwa/onboarding-cookie";
 import { isKnownOnboardingParticipant } from "@/lib/pwa/onboarding-participants";
+import { REAL_PARTICIPANTS } from "@/lib/auth/participants";
+import { hasOnboardingAccessCode } from "@/lib/pwa/onboarding-access-codes";
 import { lookupProfileByPhone } from "@/lib/auth/profile-phone";
 import { isOnboardingEligibleUsername, normalizePhone } from "@/lib/pwa/onboarding-phones";
-import { normalizeUsername } from "@/lib/auth/validation";
+import { normalizeUsername, validateUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
@@ -77,6 +79,43 @@ export async function confirmStandaloneInstallation(): Promise<ActionResult<null
   return { ok: true, data: null };
 }
 
+function resolveParticipantDisplayName(username: string): string {
+  const fromSeed = REAL_PARTICIPANTS.find((row) => row.username === username);
+  if (fromSeed) return fromSeed.displayName;
+  if (username === "paco") return "Paco";
+  return username;
+}
+
+export async function identifyParticipantByUsername(
+  usernameRaw: string
+): Promise<ActionResult<{ username: string; displayName: string }>> {
+  const cookieStore = await cookies();
+  if (!hasStandaloneGate(cookieStore)) {
+    return {
+      ok: false,
+      error: "Primero debes completar la comprobacion de instalacion en modo app.",
+    };
+  }
+
+  const username = normalizeUsername(usernameRaw);
+  const userError = validateUsername(username);
+  if (userError) {
+    return { ok: false, error: userError };
+  }
+
+  if (!hasOnboardingAccessCode(username)) {
+    return { ok: false, error: "Alias no reconocido. Comprueba que es tu alias del grupo." };
+  }
+
+  return {
+    ok: true,
+    data: {
+      username,
+      displayName: resolveParticipantDisplayName(username),
+    },
+  };
+}
+
 export async function identifyParticipantByPhone(
   phoneRaw: string
 ): Promise<ActionResult<{ username: string; displayName: string }>> {
@@ -131,8 +170,7 @@ export async function assignParticipantAvatar(
     return { ok: false, error: "Participante no valido." };
   }
 
-  const known = await isKnownOnboardingParticipant(username);
-  if (!known) {
+  if (!hasOnboardingAccessCode(username)) {
     return { ok: false, error: "Ese participante no pertenece al grupo." };
   }
 
@@ -178,7 +216,7 @@ export async function completePwaOnboarding(
   }
 
   const username = normalizeUsername(usernameRaw);
-  if (!username || !isOnboardingEligibleUsername(username)) {
+  if (!username || !hasOnboardingAccessCode(username)) {
     return { ok: false, error: "Participante no valido para activacion." };
   }
 

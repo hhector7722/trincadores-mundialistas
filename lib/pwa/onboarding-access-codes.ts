@@ -38,3 +38,7 @@ export function getOnboardingAccessCode(username: string): string | null {
   const map = getOnboardingAccessCodeMap();
   return map[normalizeUsername(username)] ?? null;
 }
+
+export function hasOnboardingAccessCode(username: string): boolean {
+  return Boolean(getOnboardingAccessCode(username));
+}

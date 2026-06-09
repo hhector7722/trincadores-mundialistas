@@ -11,12 +11,12 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { signInWithPhone } from "@/actions/auth";
+import { signIn } from "@/actions/auth";
 import {
   completePwaOnboarding,
   confirmStandaloneInstallation,
   assignParticipantAvatar,
-  identifyParticipantByPhone,
+  identifyParticipantByUsername,
   resolvePwaEntryRoute,
 } from "@/actions/pwa-onboarding";
 import { LoginHero } from "@/components/auth/LoginHero";
@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPresetAvatarUrl } from "@/lib/avatars/presets";
 import { detectMobileOs, isStandalonePWA, type MobileOs } from "@/lib/pwa/standalone";
-type OnboardingStep = "os" | "instructions" | "verify" | "phone" | "avatar";
+type OnboardingStep = "os" | "instructions" | "verify" | "access" | "avatar";
 
 type IdentifiedParticipant = {
   username: string;
@@ -131,35 +131,36 @@ export function PwaOnboardingFlow() {
   const [step, setStep] = useState<OnboardingStep>("os");
   const [os, setOs] = useState<MobileOs | null>(null);
   const [verifyError, setVerifyError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [phone, setPhone] = useState("");
-  const [participant, setParticipant] = useState<IdentifiedParticipant | null>(null);
   const [accessError, setAccessError] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [accessCode, setAccessCode] = useState("");
+  const [participant, setParticipant] = useState<IdentifiedParticipant | null>(null);
+  const [finishError, setFinishError] = useState<string | null>(null);
   const [bootstrapped, setBootstrapped] = useState(false);
 
   const goToAccess = useCallback(() => {
     startTransition(async () => {
-      const username = participant?.username;
-      if (!username || !phone.trim()) return;
+      const alias = participant?.username;
+      if (!alias || !accessCode.trim()) return;
 
-      setAccessError(null);
+      setFinishError(null);
 
-      const result = await completePwaOnboarding(username);
+      const result = await completePwaOnboarding(alias);
       if (!result.ok) {
-        setAccessError(result.error);
+        setFinishError(result.error);
         return;
       }
 
-      const signInResult = await signInWithPhone(phone);
+      const signInResult = await signIn(alias, accessCode);
       if (!signInResult.ok) {
-        setAccessError(signInResult.error);
+        setFinishError(signInResult.error);
         return;
       }
 
       router.push("/");
       router.refresh();
     });
-  }, [participant?.username, phone, router]);
+  }, [accessCode, participant?.username, router]);
 
   useEffect(() => {
     if (bootstrapped) return;
@@ -181,7 +182,7 @@ export function PwaOnboardingFlow() {
 
         const gate = await confirmStandaloneInstallation();
         if (gate.ok) {
-          setStep("phone");
+          setStep("access");
         }
         setBootstrapped(true);
       })();
@@ -218,18 +219,18 @@ export function PwaOnboardingFlow() {
         setVerifyError("No se pudo validar la instalacion. Intentalo de nuevo.");
         return;
       }
-      setStep("phone");
+      setStep("access");
     });
   }
 
-  function onPhoneSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onAccessSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setPhoneError(null);
+    setAccessError(null);
 
     startTransition(async () => {
-      const identity = await identifyParticipantByPhone(phone);
+      const identity = await identifyParticipantByUsername(username);
       if (!identity.ok) {
-        setPhoneError(identity.error);
+        setAccessError(identity.error);
         return;
       }
 
@@ -250,10 +251,10 @@ export function PwaOnboardingFlow() {
 
   function onBack() {
     setVerifyError(null);
-    setPhoneError(null);
+    setAccessError(null);
     if (step === "instructions") setStep("os");
     if (step === "verify") setStep("instructions");
-    if (step === "phone") setStep("verify");
+    if (step === "access") setStep("verify");
   }
 
   return (
@@ -328,45 +329,74 @@ export function PwaOnboardingFlow() {
           </div>
         ) : null}
 
-        {step === "phone" ? (
-          <form className="space-y-4" onSubmit={onPhoneSubmit}>
-            <h2 className="text-lg font-bold text-white">Tu telefono</h2>
+        {step === "access" ? (
+          <form className="space-y-4" onSubmit={onAccessSubmit}>
+            <h2 className="text-lg font-bold text-white">Tu acceso</h2>
 
             <div>
               <label
-                htmlFor="onboarding-phone"
+                htmlFor="onboarding-username"
                 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
               >
-                Numero de movil
+                Alias
               </label>
               <Input
-                id="onboarding-phone"
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
+                id="onboarding-username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
                 required
-                value={phone}
+                value={username}
                 onChange={(event) => {
-                  setPhone(event.target.value);
-                  setPhoneError(null);
+                  setUsername(event.target.value);
+                  setAccessError(null);
                 }}
-                className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-wide"
-                placeholder="647229309"
+                className="mt-1.5 bg-[var(--tm-surface)] lowercase tracking-wide"
+                placeholder="hector"
                 spellCheck={false}
               />
             </div>
 
-            {phoneError ? (
+            <div>
+              <label
+                htmlFor="onboarding-access-code"
+                className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50"
+              >
+                Codigo de acceso
+              </label>
+              <Input
+                id="onboarding-access-code"
+                name="accessCode"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={accessCode}
+                onChange={(event) => {
+                  setAccessCode(event.target.value);
+                  setAccessError(null);
+                }}
+                className="mt-1.5 bg-[var(--tm-surface)] font-mono tracking-widest"
+                placeholder="••••••••••••"
+                spellCheck={false}
+              />
+            </div>
+
+            {accessError ? (
               <p
                 className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
-                {phoneError}
+                {accessError}
               </p>
             ) : null}
 
-            <Button type="submit" className="w-full" disabled={pending || !phone.trim()}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={pending || !username.trim() || !accessCode.trim()}
+            >
               {pending ? "Comprobando..." : "Siguiente"}
             </Button>
           </form>
@@ -374,12 +404,12 @@ export function PwaOnboardingFlow() {
 
         {step === "avatar" && participant ? (
           <>
-            {accessError ? (
+            {finishError ? (
               <p
                 className="mb-4 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400"
                 role="alert"
               >
-                {accessError}
+                {finishError}
               </p>
             ) : null}
             <AvatarGenerationStep
