@@ -6,40 +6,52 @@ import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
-type MvpBenchStripProps = {
-  teamName: string;
-  players: BenchPlayer[];
-  selectedKey: string | null;
-  disabled?: boolean;
-  onSelect: (key: string) => void;
-  position: "top" | "bottom";
-};
-
-function benchPlayerKey(teamName: string, player: BenchPlayer): string {
+export function benchPlayerKey(teamName: string, player: BenchPlayer): string {
   return `${teamName}-${player.name}-${player.shirtNumber ?? "x"}`;
 }
 
-export function MvpBenchStrip({
+type BenchPlayersStripProps = {
+  teamName: string;
+  players: BenchPlayer[];
+  onPlayerClick: (player: BenchPlayer) => void;
+  selectedKey?: string | null;
+  disabled?: boolean;
+  showTeamHeader?: boolean;
+  position?: "top" | "bottom" | "none";
+  className?: string;
+};
+
+export function BenchPlayersStrip({
   teamName,
   players,
-  selectedKey,
+  onPlayerClick,
+  selectedKey = null,
   disabled,
-  onSelect,
-  position,
-}: MvpBenchStripProps) {
+  showTeamHeader = true,
+  position = "bottom",
+  className,
+}: BenchPlayersStripProps) {
   if (players.length === 0) return null;
 
   return (
     <section
       className={cn(
         "w-full max-w-lg shrink-0 self-center px-0.5",
-        position === "top" ? "pb-1" : "pt-1"
+        position === "top" && "pb-1",
+        position === "bottom" && "pt-1",
+        className
       )}
     >
-      <h4 className="mb-1 flex min-h-5 items-center justify-center gap-1 text-[10px] font-medium text-[var(--tm-muted)]">
-        <TeamFlagBadge name={teamName} size="xs" />
-        <span>{teamNameEs(teamName)}</span>
-      </h4>
+      {showTeamHeader ? (
+        <h4 className="mb-1 flex min-h-5 items-center justify-center gap-1 text-[10px] font-medium text-[var(--tm-muted)]">
+          <TeamFlagBadge name={teamName} size="xs" />
+          <span>{teamNameEs(teamName)}</span>
+        </h4>
+      ) : (
+        <h4 className="mb-1 text-center text-[10px] font-medium text-[var(--tm-muted)]">
+          Reservas ({players.length})
+        </h4>
+      )}
       <div className="grid grid-cols-6 gap-x-0.5 gap-y-0.5 sm:grid-cols-8">
         {players.map((player) => {
           const key = benchPlayerKey(teamName, player);
@@ -50,7 +62,7 @@ export function MvpBenchStrip({
               key={player.key}
               type="button"
               disabled={disabled}
-              onClick={() => onSelect(key)}
+              onClick={() => onPlayerClick(player)}
               className={cn(
                 "flex w-full min-h-6 flex-col items-center justify-center px-0.5 py-0.5 text-center transition-colors",
                 "hover:opacity-90 active:opacity-80",

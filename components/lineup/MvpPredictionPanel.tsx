@@ -6,7 +6,7 @@ import { fetchMatchSquadsAction, fetchTeamKitHexMapAction } from "@/actions/line
 import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
-import { MvpBenchStrip } from "@/components/lineup/MvpBenchStrip";
+import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
 import { getBenchPlayers } from "@/lib/lineup/bench-players";
@@ -224,12 +224,12 @@ export function MvpPredictionPanel({
         <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
           {(markFieldReady) => (
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
-              <MvpBenchStrip
+              <BenchPlayersStrip
                 teamName={awayTeam}
                 players={awayBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
-                onSelect={setSelectedKey}
+                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
                 position="top"
               />
 
@@ -244,12 +244,12 @@ export function MvpPredictionPanel({
                 onFieldReady={markFieldReady}
               />
 
-              <MvpBenchStrip
+              <BenchPlayersStrip
                 teamName={homeTeam}
                 players={homeBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
-                onSelect={setSelectedKey}
+                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
                 position="bottom"
               />
 
