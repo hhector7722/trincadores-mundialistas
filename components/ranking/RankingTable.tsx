@@ -35,7 +35,7 @@ function RankingEmptyRow() {
       <span />
       <span />
       <div className="flex min-w-0 items-center gap-2">
-        <span className="h-14 w-10 shrink-0 rounded-xl bg-[var(--tm-border)]/35" />
+        <span className="size-14 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
         <span className="min-w-0 flex-1 truncate">&nbsp;</span>
       </div>
       <span />

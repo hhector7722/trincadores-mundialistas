@@ -1,4 +1,4 @@
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { ProfileAvatar, type ProfileAvatarVariant } from "@/components/profile/ProfileAvatar";
 import {
   AVATAR_DISPLAY_HOME_MINI,
   AVATAR_DISPLAY_PROFILE,
@@ -7,10 +7,13 @@ import {
 
 export type AvatarDisplaySize = "profile" | "ranking" | "mini";
 
-const SIZE_CLASS: Record<AvatarDisplaySize, string> = {
-  profile: AVATAR_DISPLAY_PROFILE,
-  ranking: AVATAR_DISPLAY_RANKING,
-  mini: AVATAR_DISPLAY_HOME_MINI,
+const DISPLAY_CONFIG: Record<
+  AvatarDisplaySize,
+  { variant: ProfileAvatarVariant; className: string }
+> = {
+  profile: { variant: "profile", className: AVATAR_DISPLAY_PROFILE },
+  ranking: { variant: "badge", className: AVATAR_DISPLAY_RANKING },
+  mini: { variant: "badge", className: AVATAR_DISPLAY_HOME_MINI },
 };
 
 export function AvatarDisplay({
@@ -22,12 +25,9 @@ export function AvatarDisplay({
   label: string;
   size: AvatarDisplaySize;
 }) {
+  const { variant, className } = DISPLAY_CONFIG[size];
+
   return (
-    <ProfileAvatar
-      avatarUrl={avatarUrl}
-      label={label}
-      variant="profile"
-      className={SIZE_CLASS[size]}
-    />
+    <ProfileAvatar avatarUrl={avatarUrl} label={label} variant={variant} className={className} />
   );
 }

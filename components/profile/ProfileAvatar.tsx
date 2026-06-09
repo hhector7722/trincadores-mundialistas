@@ -29,9 +29,10 @@ export function ProfileAvatar({
         src={avatarUrl}
         alt=""
         className={cn(
-          "block shrink-0 object-contain",
-          variant === "badge" && "rounded-full",
-          variant === "profile" && "rounded-xl",
+          "block shrink-0",
+          variant === "badge" &&
+            "rounded-full object-cover object-[center_22%]",
+          variant === "profile" && "rounded-xl object-contain",
           className
         )}
       />
