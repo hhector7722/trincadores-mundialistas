@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { isShareSaveCancellation, saveImageToGallery } from "@/lib/media/save-image-to-gallery";
@@ -61,15 +61,6 @@ export function AvatarPreviewModal({ open, onClose, avatarUrl, label }: Props) {
       className="flex max-h-none h-full min-h-0 w-full max-w-none flex-1 flex-col rounded-none border-0 bg-transparent shadow-none backdrop-blur-none"
       backdropClassName="bg-[#2a1058]/95 backdrop-blur-lg"
     >
-      <button
-        type="button"
-        aria-label="Cerrar"
-        onClick={onClose}
-        className="pointer-events-auto fixed right-0 top-0 z-[110] flex h-12 w-12 shrink-0 items-center justify-center bg-black/30 text-white transition-colors hover:bg-black/50 pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)]"
-      >
-        <X className="h-5 w-5" />
-      </button>
-
       <div className="pointer-events-auto flex w-full flex-col items-center justify-center gap-4 px-4 py-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
