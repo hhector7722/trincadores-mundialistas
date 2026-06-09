@@ -1,8 +1,5 @@
 import { teamNamesMatch } from "@/lib/lineup/sources/api-football-names";
-import {
-  fetchWorldCupEventsFromBsd,
-  type BsdConfirmedLineupsPayload,
-} from "@/lib/lineup/sources/bsd-client";
+import { fetchWorldCupEventsFromBsd } from "@/lib/lineup/sources/bsd-client";
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -56,12 +53,18 @@ export async function resolveBsdEventId(
   return null;
 }
 
+type BsdLineupTeamRef = { team_name?: string; team?: string };
+
+function getBsdLineupTeamName(lineup: BsdLineupTeamRef | undefined): string {
+  return lineup?.team_name ?? lineup?.team ?? "";
+}
+
 export function pickBsdTeamSide(
-  payload: BsdConfirmedLineupsPayload | { lineups?: { home?: { team_name?: string; team?: string }; away?: { team_name?: string; team?: string } } | null },
+  payload: { lineups?: { home?: BsdLineupTeamRef; away?: BsdLineupTeamRef } | null },
   teamName: string
 ): "home" | "away" | null {
-  const homeName = payload.lineups?.home?.team_name ?? payload.lineups?.home?.team ?? "";
-  const awayName = payload.lineups?.away?.team_name ?? payload.lineups?.away?.team ?? "";
+  const homeName = getBsdLineupTeamName(payload.lineups?.home);
+  const awayName = getBsdLineupTeamName(payload.lineups?.away);
   if (teamNamesMatch(homeName, teamName)) return "home";
   if (teamNamesMatch(awayName, teamName)) return "away";
   return null;
