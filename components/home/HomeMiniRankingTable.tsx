@@ -28,11 +28,9 @@ function MiniRankingHeader() {
     >
       <span aria-hidden="true" />
       <span>Pos</span>
-      <span aria-hidden="true" />
-      <span>Trincador</span>
+      <span className="col-span-2 text-center">Trincador</span>
       <span className="text-right">Pts</span>
       <span className="text-right">Fiab</span>
-      <span className="text-right">Quiz</span>
     </div>
   );
 }
@@ -71,9 +69,6 @@ function MiniRankingDataRow({
       <span className="shrink-0 text-right tabular-nums text-white/45">
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
-      <span className="shrink-0 text-right font-display tabular-nums text-white/85">
-        {formatAggregateStat(row.quizPoints)}
-      </span>
     </div>
   );
 }
@@ -91,7 +86,6 @@ function MiniRankingEmptyRow() {
       <span />
       <span className={cn(MINI_RANKING_AVATAR_CLASS, "rounded-xl bg-white/10")} />
       <span className="min-w-0 truncate text-white/20">&nbsp;</span>
-      <span />
       <span />
       <span />
     </div>

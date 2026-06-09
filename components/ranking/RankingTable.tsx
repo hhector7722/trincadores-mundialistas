@@ -15,8 +15,7 @@ function RankingTableHeader() {
     >
       <span aria-hidden="true" />
       <span>Pos</span>
-      <span aria-hidden="true" />
-      <span>Trincador</span>
+      <span className="col-span-2 text-center">Trincador</span>
       <span className="text-right">Pts</span>
       <span className="text-right">Fiab</span>
       <span className="text-right">Quiz</span>
@@ -35,7 +34,7 @@ function RankingEmptyRow() {
     >
       <span />
       <span />
-      <span className={cn(RANKING_AVATAR_CLASS, "bg-[var(--tm-border)]/35")} />
+      <span className={cn(RANKING_AVATAR_CLASS, "rounded-xl bg-[var(--tm-border)]/35")} />
       <span className="min-w-0 truncate">&nbsp;</span>
       <span />
       <span />
