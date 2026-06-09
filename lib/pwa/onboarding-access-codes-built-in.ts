@@ -17,6 +17,7 @@ const RAW_CODES: Record<string, string> = {
   dani: "4T33UE48AAVC",
   gabri: "A6YJ4TJZWXYA",
   paco: "AHN3EL6KVB68",
+  aitor: "GMXZ8AY2E9XB",
 };
 
 export const BUILT_IN_ONBOARDING_ACCESS_CODES: Record<string, string> = Object.fromEntries(
