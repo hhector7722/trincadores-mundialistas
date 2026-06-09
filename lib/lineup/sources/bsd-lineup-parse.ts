@@ -1,7 +1,6 @@
-import {
-  coordinateForConfirmedIndex,
-  coordinateForPredictedSlot,
-} from "@/lib/lineup/sources/bsd-slot-coords";
+import { dedupeBenchAgainstStarters } from "@/lib/lineup/bench-dedupe";
+import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
+import { coordinateForConfirmedIndex } from "@/lib/lineup/sources/bsd-slot-coords";
 import { findSquadPlayer } from "@/lib/lineup/sources/bsd-squad-match";
 import type {
   BsdConfirmedPlayer,
@@ -65,36 +64,34 @@ export function parseBsdPredictedTeamLineup(
 
   const formationLabel = normalizeFormationLabel(payload.predicted_formation);
   const formation = toFormationId(formationLabel);
-  const slotCounts = new Map<string, number>();
 
-  const slots: LineupSlot[] = starters.slice(0, 11).map((starter, index) => {
+  const starterInputs = starters.slice(0, 11).map((starter, index) => {
     const slotKey = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
-    const slotIndex = slotCounts.get(slotKey) ?? 0;
-    slotCounts.set(slotKey, slotIndex + 1);
-
     const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players);
     const role = roleFromPosition(squadPlayer?.position ?? starter.position);
-    const coords = coordinateForPredictedSlot(slotKey, slotIndex);
     const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
 
     return {
+      slotKey,
+      role,
       key: `${name}-${starter.jersey_number ?? index}`,
       name,
       shirtNumber: squadPlayer?.shirt_number ?? starter.jersey_number ?? null,
       positionLabel: positionLabelEs(role, squadPlayer?.position ?? starter.position ?? null),
-      role,
       isPlaceholder: !name,
-      x: coords.x,
-      y: coords.y,
     };
   });
 
-  const bench = (payload.substitutes ?? [])
+  const slots: LineupSlot[] = layoutPredictedStarters(starterInputs, formationLabel);
+
+  const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {
       const squadPlayer = findSquadPlayer(player.name ?? "", player.jersey_number, players);
       return toBenchPlayer(player, squadPlayer, index);
     })
     .filter((player): player is LineupBenchPlayer => player != null);
+
+  const bench = dedupeBenchAgainstStarters(rawBench, slots);
 
   return {
     formation,
@@ -149,12 +146,14 @@ export function parseBsdConfirmedTeamLineup(
     };
   });
 
-  const bench = (payload.substitutes ?? [])
+  const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {
       const squadPlayer = findSquadPlayer(player.name ?? "", player.jersey_number, players);
       return toBenchPlayer(player, squadPlayer, index);
     })
     .filter((player): player is LineupBenchPlayer => player != null);
+
+  const bench = dedupeBenchAgainstStarters(rawBench, slots);
 
   return {
     formation,

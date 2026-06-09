@@ -15,6 +15,7 @@ import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
 import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
+import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { mapSlotsToAwayHalf, mapSlotsToHomeHalf } from "@/lib/lineup/match-field-geometry";
@@ -56,13 +57,24 @@ function flattenSquadPlayers(
   teamName: string
 ): SquadPlayerOption[] {
   if (!squad) return [];
-  return squad.players.map((player) => ({
-    key: `${teamName}-${player.player_name}-${player.shirt_number ?? "x"}`,
-    playerName: player.player_name,
-    teamName,
-    shirtNumber: player.shirt_number,
-    position: player.position,
-  }));
+  const seen = new Set<string>();
+  return squad.players
+    .filter((player) => {
+      const key = playerIdentityKey({
+        name: player.player_name,
+        shirtNumber: player.shirt_number,
+      });
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((player) => ({
+      key: `${teamName}-${player.player_name}-${player.shirt_number ?? "x"}`,
+      playerName: player.player_name,
+      teamName,
+      shirtNumber: player.shirt_number,
+      position: player.position,
+    }));
 }
 
 export function MvpPredictionPanel({

@@ -1,26 +1,25 @@
 "use client";
 
-import Image from "next/image";
+import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { GOYA_FIELD_SRC } from "@/lib/lineup/field-asset";
-import type { FormationId, LineupSlot } from "@/lib/lineup/types";
+import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
 type TeamLineupGraphicProps = {
   slots: LineupSlot[];
-  formation: FormationId;
+  formationLabel: string;
   teamName: string;
   className?: string;
   /** `modal`: ocupa el ancho del panel de alineaciones. */
   size?: "default" | "modal";
   onPlayerClick?: (playerName: string) => void;
-  /** Se dispara cuando la imagen del campo terminó de cargar (o falló). */
+  /** Se dispara cuando el campo terminó de cargar (o falló). */
   onFieldReady?: () => void;
 };
 
 export function TeamLineupGraphic({
   slots,
-  formation,
+  formationLabel,
   teamName,
   className,
   size = "default",
@@ -28,10 +27,6 @@ export function TeamLineupGraphic({
   onFieldReady,
 }: TeamLineupGraphicProps) {
   const isModal = size === "modal";
-
-  function handleFieldReady() {
-    onFieldReady?.();
-  }
 
   return (
     <div
@@ -43,22 +38,12 @@ export function TeamLineupGraphic({
         className
       )}
     >
-      <div className={cn("absolute inset-0", !isModal && "bg-[#3a1218]")}>
-        <Image
-          src={GOYA_FIELD_SRC}
-          alt=""
-          fill
-          unoptimized
-          className="object-contain object-center"
-          sizes={isModal ? "(max-width: 512px) 100vw, 512px" : "(max-width: 360px) 100vw, 360px"}
-          priority
-          onLoad={handleFieldReady}
-          onError={handleFieldReady}
-        />
+      <div className={cn("absolute inset-0", !isModal && "rounded-2xl bg-[#143d24]")}>
+        <FootballPitchSurface className="object-contain object-center" onReady={onFieldReady} />
       </div>
 
       <div className="absolute left-3 top-3 rounded bg-black/50 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80 backdrop-blur-sm">
-        {formation}
+        {formationLabel}
       </div>
 
       {slots.map((slot) => (

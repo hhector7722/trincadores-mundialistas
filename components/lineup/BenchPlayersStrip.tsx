@@ -49,7 +49,7 @@ export function BenchPlayersStrip({
         </h4>
       ) : (
         <h4 className="mb-1 text-center text-[10px] font-medium text-[var(--tm-muted)]">
-          Reservas ({players.length})
+          Resto de convocatoria ({players.length})
         </h4>
       )}
       <div className="grid grid-cols-6 gap-x-0.5 gap-y-0.5 sm:grid-cols-8">
@@ -59,7 +59,7 @@ export function BenchPlayersStrip({
 
           return (
             <button
-              key={player.key}
+              key={key}
               type="button"
               disabled={disabled}
               onClick={() => onPlayerClick(player)}

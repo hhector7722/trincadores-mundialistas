@@ -122,7 +122,7 @@ export function LineupModalPanel({
           <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-1.5 py-3 sm:px-2">
             <TeamLineupGraphic
               slots={resolvedLineup.slots}
-              formation={resolvedLineup.formation}
+              formationLabel={resolvedLineup.formationLabel}
               teamName={teamName}
               size="modal"
               onPlayerClick={handlePlayerInteraction}

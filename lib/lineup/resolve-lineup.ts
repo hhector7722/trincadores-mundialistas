@@ -167,10 +167,6 @@ export async function resolveTeamLineup(
     return confirmed;
   }
 
-  if (cached?.sourceKind === "predicted") {
-    return cached;
-  }
-
   const predicted = await fetchPredictedLineup(supabase, {
     ...context,
     matchId,
@@ -181,9 +177,13 @@ export async function resolveTeamLineup(
       matchId,
       context.teamName,
       predicted,
-      benchFromSquadExcludingStarters(predicted, context)
+      predicted.bench ?? []
     );
     return predicted;
+  }
+
+  if (cached?.sourceKind === "predicted") {
+    return cached;
   }
 
   if (cached && cached.sourceKind === "fallback") {

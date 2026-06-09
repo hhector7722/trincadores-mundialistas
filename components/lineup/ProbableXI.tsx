@@ -103,7 +103,7 @@ export function ProbableXI({
           <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-3 py-4">
             <TeamLineupGraphic
               slots={lineup.slots}
-              formation={lineup.formation}
+              formationLabel={lineup.formationLabel}
               teamName={teamName}
               onFieldReady={markFieldReady}
             />
