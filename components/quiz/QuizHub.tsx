@@ -67,10 +67,10 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             </p>
           )}
 
-          <p className="text-center text-xs leading-relaxed text-[var(--tm-muted)]">
-            Un intento diario. Puntuan a partir del 11 de junio. Los intentos previos son de
-            entrenamiento.
-          </p>
+          <div className="space-y-1 text-center text-xs leading-relaxed text-[var(--tm-muted)]">
+            <p>Un intento por dia. Puntuan a partir del 11 de junio.</p>
+            <p>Los intentos previos son de entrenamiento.</p>
+          </div>
         </section>
 
         <section className="space-y-2" aria-label="Clasificacion del quiz">
