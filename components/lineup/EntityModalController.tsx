@@ -9,6 +9,7 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import { isGoalkeeperPosition } from "@/lib/lineup/position-map";
+import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,9 @@ type EntityModalControllerProps = {
   wrapperClassName?: string;
   playerPickMode?: PlayerPickMode;
   onPlayerPicked?: (teamName: string, playerName: string) => void;
+  /** Lista ordenada para deslizar entre alineaciones (solo en vista lineup raíz). */
+  carouselTeams?: string[];
+  onCarouselTeamChange?: (teamName: string) => void;
 };
 
 function renderEntityView(
@@ -83,9 +87,33 @@ export function EntityModalController({
   wrapperClassName,
   playerPickMode = "none",
   onPlayerPicked,
+  carouselTeams,
+  onCarouselTeamChange,
 }: EntityModalControllerProps) {
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
+
+  const atLineupRoot = current.kind === "lineup" && !canGoBack;
+  const carouselTeamName = current.kind === "lineup" ? current.teamName : initialView.kind === "lineup" ? initialView.teamName : "";
+
+  const {
+    dotPosition,
+    canSwipe: canSwipeTeams,
+    startSlide: startTeamSlide,
+    buildCarouselPanelSlide,
+    isCarouselSliding,
+  } = useCarouselSlide({
+    items: carouselTeams ?? [],
+    open,
+    initialItemKey: carouselTeamName,
+    getItemKey: (team) => team,
+    enabled: Boolean(carouselTeams?.length),
+    canSlide: atLineupRoot && !isSliding,
+    onItemChange: (teamName) => {
+      reset(buildLineupView(teamName));
+      onCarouselTeamChange?.(teamName);
+    },
+  });
 
   useEffect(() => {
     if (open) {
@@ -102,16 +130,23 @@ export function EntityModalController({
     push({ kind: "player", teamName, playerName });
   }
 
-  const panelSlide = buildPanelSlide((view) =>
+  const renderView = (view: EntityModalView) =>
     renderEntityView(
       view,
       {
         onPlayerClick: handlePlayerClick,
       },
       playerPickMode
-    )
-  );
+    );
 
+  const panelSlide = buildPanelSlide(renderView);
+
+  const teamCarouselSlide =
+    atLineupRoot && !panelSlide
+      ? buildCarouselPanelSlide((teamName) => renderView(buildLineupView(teamName)))
+      : null;
+
+  const activePanelSlide = panelSlide ?? teamCarouselSlide;
   const isFieldView = current.kind === "lineup" || current.kind === "mvp";
 
   return (
@@ -124,16 +159,17 @@ export function EntityModalController({
       className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]", className)}
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
-      onBack={canGoBack && !isSliding ? pop : undefined}
-      panelSlide={panelSlide}
+      onSwipeLeft={
+        canSwipeTeams && atLineupRoot && !activePanelSlide ? () => startTeamSlide(1) : undefined
+      }
+      onSwipeRight={
+        canSwipeTeams && atLineupRoot && !activePanelSlide ? () => startTeamSlide(-1) : undefined
+      }
+      belowPanel={canSwipeTeams && atLineupRoot ? <CarouselSwipeDots position={dotPosition} /> : undefined}
+      onBack={canGoBack && !isSliding && !isCarouselSliding ? pop : undefined}
+      panelSlide={activePanelSlide}
     >
-      {renderEntityView(
-        current,
-        {
-          onPlayerClick: handlePlayerClick,
-        },
-        playerPickMode
-      )}
+      {renderView(current)}
     </Modal>
   );
 }
