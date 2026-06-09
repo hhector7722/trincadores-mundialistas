@@ -48,10 +48,17 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   const advancingRef = useRef(false);
   const feedbackTimerRef = useRef<number | null>(null);
   const questionTimerRef = useRef<number | null>(null);
+  const playScrollRef = useRef<HTMLDivElement>(null);
+  const pendingRevealRef = useRef(skipIntro);
   const stepRef = useRef(step);
   const phaseRef = useRef(phase);
   const sessionRef = useRef(session);
   const answersRef = useRef(answers);
+
+  const playReady = Boolean(session) && !loading && !loadError;
+  const contentVisible =
+    (playReady && (skipIntro || quizRevealed)) ||
+    (Boolean(loadError) && (skipIntro || introDone));
 
   useEffect(() => {
     stepRef.current = step;
@@ -208,8 +215,23 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
 
   useEffect(() => () => clearAllTimers(), [clearAllTimers]);
 
-  const handleOutroStart = useCallback(() => {
+  useEffect(() => {
+    if (!pendingRevealRef.current || !playReady) return;
     setQuizRevealed(true);
+  }, [playReady]);
+
+  useEffect(() => {
+    if (!contentVisible || !currentQuestion) return;
+    const scrollEl = playScrollRef.current;
+    if (!scrollEl) return;
+    scrollEl.scrollTop = 0;
+  }, [contentVisible, currentQuestion?.id, step]);
+
+  const handleOutroStart = useCallback(() => {
+    pendingRevealRef.current = true;
+    if (sessionRef.current) {
+      setQuizRevealed(true);
+    }
   }, []);
 
   const handleIntroComplete = useCallback(() => {
@@ -227,8 +249,8 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
         actionLabel="Volver al quiz"
       />
     );
-  } else if (loading || !session) {
-    body = <LoadingCenter label="Preparando preguntas…" minHeightClassName="min-h-[12rem]" />;
+  } else if (!playReady) {
+    body = null;
   } else if (submitError) {
     body = (
       <CardMessage
@@ -252,11 +274,14 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   } else {
     body = (
       <div className="tm-quiz-play-session flex min-h-0 flex-1 flex-col">
-        <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
-          {PLAY_TITLE}
-        </h1>
+        <div
+          ref={playScrollRef}
+          className="tm-quiz-play-scroll flex min-h-0 flex-1 flex-col gap-4"
+        >
+          <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
+            {PLAY_TITLE}
+          </h1>
 
-        <div className="tm-quiz-stage-scroll flex min-h-0 flex-1 flex-col gap-4">
           <QuizQuestionStage
             question={currentQuestion}
             selectedOptionId={answers[currentQuestion.id] ?? null}
@@ -270,20 +295,29 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
     );
   }
 
+  const showIntro = !skipIntro && !introDone;
+  const showPreparing = !playReady && !loadError && (skipIntro || introDone);
+
   return (
     <div className="tm-quiz-play-root flex min-h-0 flex-1 flex-col">
-      {!introDone && (
+      {showIntro && (
         <QuizDailyIntro onOutroStart={handleOutroStart} onComplete={handleIntroComplete} />
+      )}
+
+      {showPreparing && (
+        <div className="absolute inset-0 z-[5] flex items-center justify-center">
+          <LoadingCenter label="Preparando preguntas…" minHeightClassName="min-h-[12rem]" />
+        </div>
       )}
 
       <div
         className={cn(
           "tm-quiz-play-content flex min-h-0 flex-1 flex-col",
-          quizRevealed && "tm-quiz-play-content--visible",
-          !introDone && "pointer-events-none"
+          contentVisible && "tm-quiz-play-content--visible",
+          (showIntro || showPreparing) && "pointer-events-none"
         )}
         style={{ transitionDuration: `${QUIZ_PLAY_ENTER_MS}ms` }}
-        aria-hidden={!quizRevealed}
+        aria-hidden={!contentVisible}
       >
         {body}
       </div>

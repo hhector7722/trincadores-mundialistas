@@ -26,7 +26,7 @@ export function QuizPageShell({
       ref={ref}
       className={cn(
         "tm-quiz-page space-y-4",
-        variant === "play" ? "tm-quiz-page--play px-4 pb-4 pt-0" : "",
+        variant === "play" ? "tm-quiz-page--play px-4 pb-4" : "",
         variant === "hub" && "tm-quiz-page--hub px-4 pb-4 pt-0",
         variant === "viewport" && "tm-quiz-page--viewport",
         variant === "scroll" && "p-4",

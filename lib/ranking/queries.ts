@@ -1,3 +1,4 @@
+import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { computeReliabilityPct } from "@/lib/ranking/reliability";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
 import { createClient } from "@/lib/supabase/server";
@@ -129,11 +130,12 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
   const { data: profiles } = await supabase
     .from("profiles")
     .select("id, username, display_name, avatar_url, onboarding_completed_at")
-    .in("id", profileIds)
-    .not("onboarding_completed_at", "is", null);
+    .in("id", profileIds);
 
   const profileMap = new Map(
-    (profiles ?? []).map((p) => [
+    (profiles ?? [])
+      .filter((p) => isProfileOnboardingComplete(p))
+      .map((p) => [
       p.id,
       {
         label: p.display_name ?? p.username,

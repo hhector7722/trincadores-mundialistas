@@ -777,6 +777,10 @@ html:has(.tm-app-frame) {
   padding-bottom: 0;
 }
 
+.tm-quiz-page--play {
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+}
+
 .tm-quiz-page:not(.tm-quiz-page--play):not(.tm-quiz-page--hub):not(.tm-quiz-page--viewport) {
   flex: 1 1 0%;
   height: 0;
@@ -808,16 +812,21 @@ html:has(.tm-app-frame) {
 }
 
 
-.tm-quiz-stage-scroll {
+.tm-quiz-play-scroll {
   min-height: 0;
   flex: 1 1 0%;
+  overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-padding-top: 0.5rem;
+  scroll-padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 .tm-quiz-play-title {
   margin-bottom: 1rem;
+  padding-top: 0.25rem;
 }
 
 .tm-quiz-timer {
@@ -1000,15 +1009,12 @@ html:has(.tm-app-frame) {
 
 .tm-quiz-play-content {
   opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity 600ms ease-out,
-    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 500ms ease-out;
+  will-change: opacity;
 }
 
 .tm-quiz-play-content--visible {
   opacity: 1;
-  transform: translateY(0);
 }
 
 @keyframes tm-quiz-intro-fade-in {
