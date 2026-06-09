@@ -4,7 +4,7 @@ import {
   MINI_RANKING_AVATAR_CLASS,
   MINI_RANKING_GRID,
 } from "@/components/ranking/ranking-grid";
-import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
@@ -53,16 +53,22 @@ function MiniRankingDataRow({
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <RankingMemberCells
-        avatarUrl={row.avatarUrl}
-        label={row.label}
-        avatarClassName={MINI_RANKING_AVATAR_CLASS}
-        nameClassName={cn(
-          "text-[9px] font-medium",
+      <div className={cn("overflow-hidden rounded-xl", MINI_RANKING_AVATAR_CLASS)}>
+        <ProfileAvatar
+          avatarUrl={row.avatarUrl}
+          label={row.label}
+          variant="tile"
+          className="size-full"
+        />
+      </div>
+      <span
+        className={cn(
+          "min-w-0 truncate text-[9px] font-medium",
           isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
         )}
-        stopNavigation
-      />
+      >
+        {row.label}
+      </span>
       <span className="shrink-0 text-right font-display tabular-nums text-white/85">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
