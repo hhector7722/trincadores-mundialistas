@@ -2,7 +2,7 @@
 
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
+import { MODAL_PITCH_DECOR_SCALE, PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ export function TeamLineupGraphic({
           "relative shrink-0 self-center overflow-visible",
           !sized && PITCH_ASPECT_CLASS,
           !sized &&
-            (isModal ? "w-full max-w-[min(98vw,14.8rem)]" : "w-full max-w-[min(92vw,16.5rem)] sm:max-w-[17rem]")
+            (isModal ? "w-full max-w-[min(98vw,18.5rem)]" : "w-full max-w-[min(92vw,16.5rem)] sm:max-w-[17rem]")
         )}
         style={
           sized
@@ -54,7 +54,17 @@ export function TeamLineupGraphic({
             : undefined
         }
       >
-        <div className="absolute inset-0 overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          style={
+            isModal
+              ? {
+                  transform: `scale(${MODAL_PITCH_DECOR_SCALE})`,
+                  transformOrigin: "center center",
+                }
+              : undefined
+          }
+        >
           <FootballPitchSurface onReady={onFieldReady} />
         </div>
 

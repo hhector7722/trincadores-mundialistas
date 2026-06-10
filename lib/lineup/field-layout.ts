@@ -3,7 +3,7 @@ import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 /** Proporción ancho:alto del terreno reglamentario (~68×105 m). */
 export const PITCH_ASPECT_CLASS = "aspect-[68/105]";
 
-export { MODAL_FIELD_CONTAINER_SCALE, scaleModalFieldContainer } from "./modal-field-scale";
+export { MODAL_PITCH_DECOR_SCALE } from "./modal-field-scale";
 
 /** Campo MVP: misma superficie táctica; el rival se refleja verticalmente. */
 export const MVP_PITCH_ASPECT_CLASS = PITCH_ASPECT_CLASS;

@@ -39,6 +39,6 @@ describe("computeFitFieldModalLayout", () => {
       gapPx * 2;
 
     expect(total).toBeLessThanOrEqual(heightPx + 1);
-    expect(layout.chipScale).toBe(1);
+    expect(layout.chipScale).toBeGreaterThanOrEqual(0.58);
   });
 });

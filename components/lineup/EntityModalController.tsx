@@ -199,7 +199,7 @@ export function EntityModalController({
       headerTitleAlign={isMvpView ? "left" : "center"}
       headerCompact={isMvpView}
       scrollContent={!isMvpView}
-      containerClassName={isMvpView ? "p-1" : undefined}
+      containerClassName={isMvpView ? "p-1" : isLineupView ? "p-1.5" : undefined}
       className={cn(
         isMvpView && "max-h-[calc(100dvh-0.5rem)]",
         isLineupView && "max-h-[calc(100dvh-1rem)]",

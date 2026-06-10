@@ -2,7 +2,7 @@
 
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { MVP_PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
+import { MODAL_PITCH_DECOR_SCALE, MVP_PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import { type MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
@@ -101,7 +101,13 @@ export function MatchMvpFieldGraphic({
           : undefined
       }
     >
-      <div className="absolute inset-0 overflow-hidden">
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        style={{
+          transform: `scale(${MODAL_PITCH_DECOR_SCALE})`,
+          transformOrigin: "center center",
+        }}
+      >
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 

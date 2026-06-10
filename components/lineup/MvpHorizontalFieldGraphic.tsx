@@ -3,6 +3,7 @@
 import { HorizontalPitchSurface } from "@/components/lineup/HorizontalPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { HORIZONTAL_PITCH_ASPECT } from "@/lib/lineup/fit-mvp-horizontal-layout";
+import { MODAL_PITCH_DECOR_SCALE } from "@/lib/lineup/field-layout";
 import type { MvpHorizontalSlot } from "@/lib/lineup/mvp-horizontal-geometry";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
@@ -100,7 +101,13 @@ export function MvpHorizontalFieldGraphic({
           : undefined
       }
     >
-      <div className="absolute inset-0 overflow-hidden">
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        style={{
+          transform: `scale(${MODAL_PITCH_DECOR_SCALE})`,
+          transformOrigin: "center center",
+        }}
+      >
         <HorizontalPitchSurface onReady={onFieldReady} />
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
@@ -8,7 +8,6 @@ import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
-import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -34,7 +33,6 @@ export function LineupModalPanel({
 }: LineupModalPanelProps) {
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
   const [lineup, setLineup] = useState<ResolvedLineup | null>(null);
-  const layoutRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,20 +63,6 @@ export function LineupModalPanel({
 
   const displayName = teamNameEs(teamName);
 
-  const benchCount = useMemo(() => {
-    if (!squad?.players.length) return 0;
-    const resolved = lineup ?? buildFallbackLineup(squad.players);
-    return resolveBenchPlayers(squad, resolved).length;
-  }, [squad, lineup]);
-
-  const fitLayout = useFitFieldModalLayout(layoutRef, {
-    awayBenchCount: 0,
-    homeBenchCount: benchCount,
-    footerPx: 0,
-    gapPx: 2,
-    enabled: !loading && benchCount >= 0,
-  });
-
   useEffect(() => {
     if (loading || !squad?.players.length) return;
     const resolved = lineup ?? buildFallbackLineup(squad.players);
@@ -91,7 +75,7 @@ export function LineupModalPanel({
 
   if (error) {
     return (
-      <div className="px-4 py-6">
+      <div className="px-4 py-4">
         <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
           {error}
         </p>
@@ -101,7 +85,7 @@ export function LineupModalPanel({
 
   if (!squad || squad.players.length === 0) {
     return (
-      <div className="px-4 py-8 text-center">
+      <div className="px-4 py-6 text-center">
         <p className="text-sm text-[var(--tm-muted)]">
           No hay plantilla disponible para {displayName}.
         </p>
@@ -123,15 +107,15 @@ export function LineupModalPanel({
   }
 
   return (
-    <div ref={layoutRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col">
       {selectionMode === "pick" && selectionBlockedMessage ? (
-        <p className="shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-center text-[10px] text-[var(--tm-muted)]">
+        <p className="shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-center text-[10px] text-[var(--tm-muted)]">
           {selectionBlockedMessage}
         </p>
       ) : null}
-      <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-1.5 py-2 sm:px-2">
+          <div className="flex min-h-0 flex-1 flex-col items-center px-1 py-1 sm:px-1.5">
             <TeamLineupGraphic
               slots={resolvedLineup.slots}
               teamName={teamName}
@@ -139,20 +123,16 @@ export function LineupModalPanel({
               size="modal"
               onPlayerClick={handlePlayerInteraction}
               onFieldReady={markFieldReady}
-              widthPx={fitLayout?.fieldWidthPx}
-              heightPx={fitLayout?.fieldHeightPx}
-              chipScale={fitLayout?.chipScale ?? 1}
             />
 
             {bench.length > 0 ? (
               <BenchPlayersStrip
                 teamName={teamName}
                 players={bench}
-                density="compact"
+                density="inline"
                 showTeamHeader={false}
                 position="none"
-                gridLayout={fitLayout?.homeBench}
-                className="mt-2"
+                className="mt-1.5"
                 onPlayerClick={(player) => handlePlayerInteraction(player.name)}
               />
             ) : null}

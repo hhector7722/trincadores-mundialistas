@@ -1,5 +1,3 @@
-import { scaleModalFieldContainer } from "./modal-field-scale";
-
 /** Proporción ancho:alto del terreno horizontal (~105×68 m). */
 export const HORIZONTAL_PITCH_ASPECT = 105 / 68;
 
@@ -13,9 +11,6 @@ import { EMPTY_BENCH } from "./bench-grid-layout";
 export type FitMvpHorizontalLayout = {
   fieldWidthPx: number;
   fieldHeightPx: number;
-  /** Dimensiones de referencia (sin escala de contenedor) para calcular tamaño de fichas. */
-  chipReferenceWidthPx: number;
-  chipReferenceHeightPx: number;
   chipScale: number;
   awayBench: import("./bench-grid-layout").BenchLayoutConfig;
   homeBench: import("./bench-grid-layout").BenchLayoutConfig;
@@ -101,28 +96,16 @@ export function computeFitMvpHorizontalLayout(
 
   const fieldByHeight = Math.max(0, usableHeight - benchStackHeight);
   const fieldByWidth = usableWidth / HORIZONTAL_PITCH_ASPECT;
-  const naturalFieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
-  const naturalFieldWidthPx = naturalFieldHeightPx * HORIZONTAL_PITCH_ASPECT;
-  const scaledField = scaleModalFieldContainer(naturalFieldWidthPx, naturalFieldHeightPx);
+  const fieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
+  const fieldWidthPx = fieldHeightPx * HORIZONTAL_PITCH_ASPECT;
 
-  const awayBenchFinal = estimateMvpInlineBenchLayout(
-    opts.awayBenchCount,
-    scaledField.widthPx
-  );
-  const homeBenchFinal = estimateMvpInlineBenchLayout(
-    opts.homeBenchCount,
-    scaledField.widthPx
-  );
+  const awayBenchFinal = estimateMvpInlineBenchLayout(opts.awayBenchCount, fieldWidthPx);
+  const homeBenchFinal = estimateMvpInlineBenchLayout(opts.homeBenchCount, fieldWidthPx);
 
   return {
-    fieldWidthPx: scaledField.widthPx,
-    fieldHeightPx: scaledField.heightPx,
-    chipReferenceWidthPx: scaledField.referenceWidthPx,
-    chipReferenceHeightPx: scaledField.referenceHeightPx,
-    chipScale: computeMvpFieldChipScale(
-      scaledField.referenceWidthPx,
-      scaledField.referenceHeightPx
-    ),
+    fieldWidthPx,
+    fieldHeightPx,
+    chipScale: computeMvpFieldChipScale(fieldWidthPx, fieldHeightPx),
     awayBench: awayBenchFinal,
     homeBench: homeBenchFinal,
   };

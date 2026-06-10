@@ -228,14 +228,14 @@ export function MvpPredictionPanel({
     footerPx,
     formationRowPx: MVP_FORMATION_ROW_PX,
     enabled: !loading && kitColorsReady,
-    gapPx: 4,
+    gapPx: 2,
   });
 
   const chipScale = useMemo(() => {
     if (!fitLayout) return 1;
     return computeMvpFieldChipScale(
-      fitLayout.chipReferenceWidthPx,
-      fitLayout.chipReferenceHeightPx,
+      fitLayout.fieldWidthPx,
+      fitLayout.fieldHeightPx,
       [...awaySlots, ...homeSlots]
     );
   }, [fitLayout, awaySlots, homeSlots]);

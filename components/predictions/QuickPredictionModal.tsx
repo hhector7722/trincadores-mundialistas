@@ -414,6 +414,7 @@ export function QuickPredictionModal({
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
       className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]")}
+      containerClassName={isFieldView ? "p-1.5" : undefined}
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
