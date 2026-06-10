@@ -18,6 +18,8 @@ const SCALE_MAX = 0.78;
 
 /** Multiplicador visual del 11 inicial respecto al cálculo base anti-solapamiento. */
 export const MVP_STARTER_CHIP_SCALE_MULTIPLIER = 2;
+/** Reducción fina de camiseta (solo render; coordenadas tácticas intactas). */
+export const MVP_CHIP_VISUAL_SIZE_FACTOR = 0.9;
 const SLOT_SCALE_PADDING = 0.96;
 
 function maxScaleForSlotPair(
@@ -72,6 +74,8 @@ export function computeMvpFieldChipScale(
   const rawScale = Math.max(SCALE_MIN, Math.round(scale * 1000) / 1000);
   return Math.min(
     SCALE_MAX * MVP_STARTER_CHIP_SCALE_MULTIPLIER,
-    Math.round(rawScale * MVP_STARTER_CHIP_SCALE_MULTIPLIER * 1000) / 1000
+    Math.round(
+      rawScale * MVP_STARTER_CHIP_SCALE_MULTIPLIER * MVP_CHIP_VISUAL_SIZE_FACTOR * 1000
+    ) / 1000
   );
 }

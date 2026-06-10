@@ -32,8 +32,8 @@ describe("computeFitMvpHorizontalLayout", () => {
       gapPx: 4,
     });
 
-    expect(layout.chipScale).toBeLessThanOrEqual(1.56);
-    expect(layout.chipScale).toBeGreaterThanOrEqual(0.76);
+    expect(layout.chipScale).toBeLessThanOrEqual(1.41);
+    expect(layout.chipScale).toBeGreaterThanOrEqual(0.68);
   });
 
   it("encaja todo en viewports bajos sin scroll", () => {

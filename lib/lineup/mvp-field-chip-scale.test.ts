@@ -4,8 +4,8 @@ import { computeMvpFieldChipScale } from "./mvp-field-chip-scale";
 describe("computeMvpFieldChipScale", () => {
   it("aplica escala máxima segura según tamaño del campo", () => {
     const scale = computeMvpFieldChipScale(360, 200);
-    expect(scale).toBeGreaterThanOrEqual(0.76);
-    expect(scale).toBeLessThanOrEqual(1.56);
+    expect(scale).toBeGreaterThanOrEqual(0.68);
+    expect(scale).toBeLessThanOrEqual(1.41);
   });
 
   it("reduce escala en campos estrechos para evitar solapamientos", () => {
