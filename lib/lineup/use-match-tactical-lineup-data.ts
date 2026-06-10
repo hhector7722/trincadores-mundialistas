@@ -7,8 +7,8 @@ import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import {
-  mapSlotsToAwayLeft,
-  mapSlotsToHomeRight,
+  mapSlotsToAwayRight,
+  mapSlotsToHomeLeft,
 } from "@/lib/lineup/mvp-horizontal-geometry";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
@@ -89,14 +89,14 @@ export function useMatchTacticalLineupData(
   const awaySlots = useMemo(
     () =>
       resolvedAwayLineup
-        ? mapSlotsToAwayLeft(resolveFormationSlotsFromLineup(resolvedAwayLineup))
+        ? mapSlotsToAwayRight(resolveFormationSlotsFromLineup(resolvedAwayLineup))
         : [],
     [resolvedAwayLineup]
   );
   const homeSlots = useMemo(
     () =>
       resolvedHomeLineup
-        ? mapSlotsToHomeRight(resolveFormationSlotsFromLineup(resolvedHomeLineup))
+        ? mapSlotsToHomeLeft(resolveFormationSlotsFromLineup(resolvedHomeLineup))
         : [],
     [resolvedHomeLineup]
   );

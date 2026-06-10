@@ -58,10 +58,10 @@ export function MvpTacticalFieldBody({
   const chipScale = useMemo(
     () =>
       computeMvpFieldChipScale(layout.fieldWidthPx, layout.fieldHeightPx, [
-        ...awaySlots,
         ...homeSlots,
+        ...awaySlots,
       ]),
-    [layout, awaySlots, homeSlots]
+    [layout, homeSlots, awaySlots]
   );
 
   const pickDisabled = interactive && disabled;
@@ -73,26 +73,26 @@ export function MvpTacticalFieldBody({
         className
       )}
     >
-      {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
+      {homeBench.length > 0 || resolvedHomeLineup?.formationLabel ? (
         <div className="w-full shrink-0 pb-0.5">
           <LineupFormationInfo
-            teamName={awayTeam}
-            formationLabel={resolvedAwayLineup?.formationLabel}
+            teamName={homeTeam}
+            formationLabel={resolvedHomeLineup?.formationLabel}
             align="left"
           />
-          {awayBench.length > 0 ? (
+          {homeBench.length > 0 ? (
             <MvpBenchColumn
-              teamName={awayTeam}
-              players={awayBench}
+              teamName={homeTeam}
+              players={homeBench}
               selectedKey={selectedKey}
               selectedPlayer={selectedPlayer}
               disabled={pickDisabled}
               align="left"
-              gridLayout={layout.awayBench}
+              gridLayout={layout.homeBench}
               readOnly={!interactive}
               onPlayerClick={
                 interactive && onSelect
-                  ? (player) => onSelect(mvpSelectionKey(awayTeam, player))
+                  ? (player) => onSelect(mvpSelectionKey(homeTeam, player))
                   : () => {}
               }
             />
@@ -102,12 +102,12 @@ export function MvpTacticalFieldBody({
 
       <div className="flex shrink-0 items-center justify-center pb-1">
         <MvpHorizontalFieldGraphic
-          awaySlots={awaySlots}
           homeSlots={homeSlots}
-          awayTeam={awayTeam}
+          awaySlots={awaySlots}
           homeTeam={homeTeam}
-          awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
+          awayTeam={awayTeam}
           homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
+          awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
           selectedKey={interactive ? selectedKey : null}
           selectedPlayer={interactive ? selectedPlayer : null}
           disabled={pickDisabled}
@@ -119,26 +119,26 @@ export function MvpTacticalFieldBody({
         />
       </div>
 
-      {homeBench.length > 0 || resolvedHomeLineup?.formationLabel ? (
+      {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
         <div className="w-full shrink-0 pt-0.5 pb-1">
           <LineupFormationInfo
-            teamName={homeTeam}
-            formationLabel={resolvedHomeLineup?.formationLabel}
+            teamName={awayTeam}
+            formationLabel={resolvedAwayLineup?.formationLabel}
             align="right"
           />
-          {homeBench.length > 0 ? (
+          {awayBench.length > 0 ? (
             <MvpBenchColumn
-              teamName={homeTeam}
-              players={homeBench}
+              teamName={awayTeam}
+              players={awayBench}
               selectedKey={selectedKey}
               selectedPlayer={selectedPlayer}
               disabled={pickDisabled}
               align="right"
-              gridLayout={layout.homeBench}
+              gridLayout={layout.awayBench}
               readOnly={!interactive}
               onPlayerClick={
                 interactive && onSelect
-                  ? (player) => onSelect(mvpSelectionKey(homeTeam, player))
+                  ? (player) => onSelect(mvpSelectionKey(awayTeam, player))
                   : () => {}
               }
             />

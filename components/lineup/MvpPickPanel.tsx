@@ -97,8 +97,8 @@ export function MvpPickPanel({
   } = useMatchTacticalLineupData(matchId, homeTeam, awayTeam);
 
   const layout = useMemo(
-    () => buildTacticalModalLayout(awayBench.length, homeBench.length),
-    [awayBench.length, homeBench.length]
+    () => buildTacticalModalLayout(homeBench.length, awayBench.length),
+    [homeBench.length, awayBench.length]
   );
 
   const homeOptions = useMemo(

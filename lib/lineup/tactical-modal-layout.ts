@@ -35,32 +35,32 @@ export const TACTICAL_FIELD_CHIP_SCALE = computeMvpFieldChipScale(
   TACTICAL_FIELD_HEIGHT_PX
 );
 
-/** Layout táctico: campo idéntico; bancos según convocatoria real. */
+/** Layout táctico: campo idéntico; banco local arriba, visitante abajo. */
 export function buildTacticalModalLayout(
-  awayBenchCount: number,
-  homeBenchCount: number
+  homeBenchCount: number,
+  awayBenchCount: number
 ): FitMvpHorizontalLayout {
-  const away = awayBenchCount > 0 ? awayBenchCount : TACTICAL_SHELL_BENCH_PLACEHOLDER;
   const home = homeBenchCount > 0 ? homeBenchCount : TACTICAL_SHELL_BENCH_PLACEHOLDER;
+  const away = awayBenchCount > 0 ? awayBenchCount : TACTICAL_SHELL_BENCH_PLACEHOLDER;
 
   return {
     fieldWidthPx: TACTICAL_FIELD_WIDTH_PX,
     fieldHeightPx: TACTICAL_FIELD_HEIGHT_PX,
     chipScale: TACTICAL_FIELD_CHIP_SCALE,
-    awayBench: estimateMvpInlineBenchLayout(away, TACTICAL_FIELD_WIDTH_PX),
     homeBench: estimateMvpInlineBenchLayout(home, TACTICAL_FIELD_WIDTH_PX),
+    awayBench: estimateMvpInlineBenchLayout(away, TACTICAL_FIELD_WIDTH_PX),
   };
 }
 
 export function computeTacticalBodyMinHeightPx(layout: FitMvpHorizontalLayout): number {
   return (
     MVP_FORMATION_ROW_PX +
-    layout.awayBench.heightPx +
+    layout.homeBench.heightPx +
     MVP_LAYOUT_GAP_PX +
     layout.fieldHeightPx +
     MVP_LAYOUT_GAP_PX +
     MVP_FORMATION_ROW_PX +
-    layout.homeBench.heightPx +
+    layout.awayBench.heightPx +
     MVP_CHIP_BLEED_PX +
     TACTICAL_BODY_PAD_PX
   );

@@ -108,7 +108,7 @@ export function MvpHorizontalFieldGraphic({
   return (
     <div
       role="img"
-      aria-label={`Campo táctico MVP horizontal: ${starterCount} titulares, ${teamNameEs(awayTeam)} a la izquierda y ${teamNameEs(homeTeam)} a la derecha`}
+      aria-label={`Campo táctico MVP horizontal: ${starterCount} titulares, ${teamNameEs(homeTeam)} a la izquierda y ${teamNameEs(awayTeam)} a la derecha`}
       className={cn("relative shrink-0 overflow-visible", className)}
       style={{
         width: widthPx,
@@ -121,8 +121,8 @@ export function MvpHorizontalFieldGraphic({
         <HorizontalPitchSurface onReady={onFieldReady} />
       </div>
 
-      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
       {homeSlots.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
+      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
     </div>
   );
 }
