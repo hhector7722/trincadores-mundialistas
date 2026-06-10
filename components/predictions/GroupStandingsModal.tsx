@@ -317,7 +317,7 @@ export function GroupStandingsModal({
         isPlayerView && PLAYER_MODAL_WRAPPER_CLASS
       )}
       containerClassName={isCompactModal ? "p-1.5" : undefined}
-      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      backdropClassName="bg-[#2a1058]/40"
       onSwipeLeft={
         canSwipeGroups && atStandingsRoot && !activePanelSlide
           ? () => startGroupSlide(1)

@@ -231,7 +231,7 @@ export function EntityModalController({
         isMvpView && MVP_MODAL_WRAPPER_CLASS,
         wrapperClassName
       )}
-      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      backdropClassName="bg-[#2a1058]/40"
       onSwipeLeft={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined
       }

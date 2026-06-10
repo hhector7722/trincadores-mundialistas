@@ -15,7 +15,7 @@ Todo modal (nuevo o existente) **debe** usar `Modal` de `@/components/ui/modal`.
 | Centro en pantalla | Contenedor `fixed inset-0 flex items-center justify-center` |
 | Ancho < pantalla | `w-full max-w-sm` + padding `p-4` (márgenes mínimos 1rem) |
 | Altura < pantalla | `max-h-[calc(100dvh-2rem)]` en el panel |
-| Fondo difuminado | Backdrop `bg-black/60 backdrop-blur-md` |
+| Fondo difuminado | Backdrop `bg-[#2a1058]/40 backdrop-blur-sm` |
 | Clic fuera cierra | Botón backdrop `absolute inset-0` con `onClick={onClose}` |
 
 ## Bloqueo de interacción con el fondo
@@ -48,6 +48,6 @@ Props opcionales: `className` para ancho custom (`max-w-md`, etc.), siempre resp
 ## Prohibiciones
 
 - ❌ `items-end` (bottom sheet) — el modal va centrado en todos los breakpoints.
-- ❌ `backdrop-blur-[2px]` u overlay sin blur perceptible.
+- ❌ `backdrop-blur-md`/`backdrop-blur-xl` en backdrop u overlay sin blur perceptible.
 - ❌ Modales sin cierre por backdrop o sin bloqueo de scroll del `main`.
 - ❌ Duplicar lógica de portal/scroll-lock en componentes hijos.

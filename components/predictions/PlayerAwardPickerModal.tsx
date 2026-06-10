@@ -98,7 +98,7 @@ export function PlayerAwardPickerModal({
       hideHeaderDivider
       className="h-[min(calc(100dvh-2rem),44rem)] max-h-[calc(100dvh-2rem)]"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
-      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      backdropClassName="bg-[#2a1058]/40"
     >
       <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <div className="shrink-0 space-y-2 border-b border-[var(--tm-border)] px-3 py-3">

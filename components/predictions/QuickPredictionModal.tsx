@@ -498,7 +498,7 @@ export function QuickPredictionModal({
         isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
         isMvpView && MVP_MODAL_WRAPPER_CLASS
       )}
-      backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
+      backdropClassName="bg-[#2a1058]/40"
       onSwipeLeft={
         canSwipeMatches && atPredictionRoot && !activePanelSlide
           ? () => startMatchSlide(1)

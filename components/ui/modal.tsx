@@ -347,7 +347,7 @@ export function Modal({
         type="button"
         aria-label="Cerrar"
         className={cn(
-          "absolute inset-0 overscroll-none bg-[#2a1058]/45 backdrop-blur-md",
+          "absolute inset-0 overscroll-none bg-[#2a1058]/40 backdrop-blur-sm",
           hasSwipe ? "touch-manipulation" : "touch-none",
           backdropClassName
         )}
