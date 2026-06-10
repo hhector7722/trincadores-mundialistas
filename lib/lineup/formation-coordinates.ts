@@ -40,8 +40,8 @@ export const TACTICAL_Y = {
   HOLDING: 60,
   /** Defensas (70–80 %) */
   DEFENSE: 75,
-  /** Portero (90–95 %) */
-  GOALKEEPER: 92,
+  /** Portero anclado a la línea de gol (94 %). */
+  GOALKEEPER: 94,
 } as const;
 
 /** Alias usado por field-layout y proyección MVP. */
@@ -105,16 +105,16 @@ export const FORMATION_SLOT_ANCHORS: Record<FormationId, FormationSlotAnchor[]> 
   ],
   "4-2-3-1": [
     { key: "GK", accept: ["GK"], coord: { x: X.C, y: Y.GOALKEEPER } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: X.L, y: Y.DEFENSE } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: X.IL, y: Y.DEFENSE } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: X.IR, y: Y.DEFENSE } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: X.R, y: Y.DEFENSE } },
+    { key: "LB", accept: ["LB", "LWB"], coord: { x: X.UL, y: Y.DEFENSE } },
+    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: X.DL, y: Y.DEFENSE } },
+    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: X.DR, y: Y.DEFENSE } },
+    { key: "RB", accept: ["RB", "RWB"], coord: { x: X.UR, y: Y.DEFENSE } },
     { key: "LDM", accept: ["DM", "CDM", "LDM", "MCD"], coord: { x: X.IL, y: Y.HOLDING } },
     { key: "RDM", accept: ["DM", "CDM", "RDM", "MCD"], coord: { x: X.IR, y: Y.HOLDING } },
     { key: "LW", accept: ["LW"], coord: { x: X.L, y: Y.ATTACK } },
-    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.C, y: Y.ATTACK } },
+    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.IL, y: Y.ATTACK } },
     { key: "RW", accept: ["RW"], coord: { x: X.R, y: Y.ATTACK } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: Y.FORWARD } },
+    { key: "ST", accept: ["ST", "CF"], coord: { x: X.IR, y: Y.FORWARD } },
   ],
   "4-1-4-1": [
     { key: "GK", accept: ["GK"], coord: { x: X.C, y: Y.GOALKEEPER } },

@@ -1,4 +1,10 @@
 import { TACTICAL_Y } from "@/lib/lineup/formation-coordinates";
+import {
+  MVP_FIELD_EFFECTIVE_CHIP_SCALE,
+  resolveTacticalSlotCollisions,
+  type TacticalCollisionMode,
+} from "@/lib/lineup/tactical-collision-resolve";
+import type { PlayableBounds } from "@/lib/lineup/field-layout";
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
@@ -24,6 +30,20 @@ const HOME_X_SPAN = HOME_HALF_X.MAX - HOME_HALF_X.MIN;
 /** Rango vertical jugable (posición lateral de la plantilla maestra). */
 export const PLAYABLE_Y_MIN = 12;
 export const PLAYABLE_Y_MAX = 88;
+
+export const AWAY_HORIZONTAL_BOUNDS: PlayableBounds = {
+  xMin: AWAY_HALF_X.MIN,
+  xMax: AWAY_HALF_X.MAX,
+  yMin: PLAYABLE_Y_MIN,
+  yMax: PLAYABLE_Y_MAX,
+};
+
+export const HOME_HORIZONTAL_BOUNDS: PlayableBounds = {
+  xMin: HOME_HALF_X.MIN,
+  xMax: HOME_HALF_X.MAX,
+  yMin: PLAYABLE_Y_MIN,
+  yMax: PLAYABLE_Y_MAX,
+};
 
 function sourceDepth(y: number): number {
   return (SOURCE_Y_GK - y) / SOURCE_Y_SPAN;
@@ -59,12 +79,40 @@ function mapSlotToHomeRight(slot: LineupSlot): MvpHorizontalSlot {
   return { ...slot, ...compressCoordToHomeRight(slot), scale: 1 };
 }
 
+function resolveHorizontalHalf(
+  slots: LineupSlot[],
+  mapFn: (slot: LineupSlot) => MvpHorizontalSlot,
+  bounds: PlayableBounds,
+  mode: TacticalCollisionMode
+): MvpHorizontalSlot[] {
+  const mapped = slots.map(mapFn);
+  return resolveTacticalSlotCollisions(mapped, {
+    bounds,
+    mode,
+    chipScale: MVP_FIELD_EFFECTIVE_CHIP_SCALE,
+    maxNudge: 16,
+  }).map((slot) => ({
+    ...slot,
+    scale: 1,
+  }));
+}
+
 /** Visitante en mitad izquierda del campo horizontal. */
 export function mapSlotsToAwayLeft(slots: LineupSlot[]): MvpHorizontalSlot[] {
-  return slots.map(mapSlotToAwayLeft);
+  return resolveHorizontalHalf(
+    slots,
+    mapSlotToAwayLeft,
+    AWAY_HORIZONTAL_BOUNDS,
+    "horizontal-away"
+  );
 }
 
 /** Local en mitad derecha del campo horizontal. */
 export function mapSlotsToHomeRight(slots: LineupSlot[]): MvpHorizontalSlot[] {
-  return slots.map(mapSlotToHomeRight);
+  return resolveHorizontalHalf(
+    slots,
+    mapSlotToHomeRight,
+    HOME_HORIZONTAL_BOUNDS,
+    "horizontal-home"
+  );
 }
