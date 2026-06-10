@@ -8,7 +8,6 @@ import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
-import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { ensureElevenStarterSlots } from "@/lib/lineup/ensure-eleven-starter-slots";
@@ -253,45 +252,28 @@ export function MvpPredictionPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="shrink-0 px-1 py-0.5">
-        {!serverEditable ? (
-          <p className="text-center text-[9px] text-[var(--tm-muted)]">
-            Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
-          </p>
-        ) : selectedOption ? (
-          <p className="truncate text-center text-[9px] font-medium text-[var(--tm-accent)]">
-            MVP: {selectedOption.name}
-          </p>
-        ) : null}
-      </div>
+      {serverEditable && selectedOption ? (
+        <p className="shrink-0 truncate px-1 py-0.5 text-center text-[9px] font-medium text-[var(--tm-accent)]">
+          MVP: {selectedOption.name}
+        </p>
+      ) : null}
 
       <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="shrink-0 space-y-0">
-              <BenchPlayersStrip
-                teamName={awayTeam}
-                players={awayBench}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                density="minimal"
-                showTeamHeader={false}
-                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
-                position="top"
-              />
-              <BenchPlayersStrip
-                teamName={homeTeam}
-                players={homeBench}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                density="minimal"
-                showTeamHeader={false}
-                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
-                position="none"
-              />
-            </div>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-0.5">
+            <BenchPlayersStrip
+              teamName={awayTeam}
+              players={awayBench}
+              formationLabel={resolvedAwayLineup?.formationLabel}
+              selectedKey={selectedKey}
+              disabled={pickDisabled}
+              density="mvp"
+              showTeamHeader
+              onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
+              position="top"
+            />
 
-            <div className="flex min-h-[14.5rem] flex-1 items-center justify-center px-0.5 py-0.5">
+            <div className="flex min-h-[15rem] flex-1 items-center justify-center py-0.5">
               <MatchMvpFieldGraphic
                 homeSlots={homeSlots}
                 awaySlots={awaySlots}
@@ -306,36 +288,35 @@ export function MvpPredictionPanel({
               />
             </div>
 
-            <div className="shrink-0 space-y-0.5 px-1 py-0.5">
-              {resolvedAwayLineup ? (
-                <LineupMetaLine
-                  teamName={awayTeam}
-                  sourceKind={resolvedAwayLineup.sourceKind}
-                  formationLabel={resolvedAwayLineup.formationLabel}
-                  fetchedAt={resolvedAwayLineup.fetchedAt}
-                />
-              ) : null}
-              {resolvedHomeLineup ? (
-                <LineupMetaLine
-                  teamName={homeTeam}
-                  sourceKind={resolvedHomeLineup.sourceKind}
-                  formationLabel={resolvedHomeLineup.formationLabel}
-                  fetchedAt={resolvedHomeLineup.fetchedAt}
-                />
-              ) : null}
-            </div>
+            <BenchPlayersStrip
+              teamName={homeTeam}
+              players={homeBench}
+              formationLabel={resolvedHomeLineup?.formationLabel}
+              selectedKey={selectedKey}
+              disabled={pickDisabled}
+              density="mvp"
+              showTeamHeader
+              onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
+              position="bottom"
+            />
           </div>
         )}
       </LineupFieldGate>
 
+      {!serverEditable ? (
+        <p className="shrink-0 px-1 py-0.5 text-center text-[9px] text-[var(--tm-muted)]">
+          Predicción cerrada.
+        </p>
+      ) : null}
+
       {error ? (
-        <p className="mt-0.5 shrink-0 px-4 text-sm text-[var(--tm-danger)]" role="alert">
+        <p className="shrink-0 px-3 text-sm text-[var(--tm-danger)]" role="alert">
           {error}
         </p>
       ) : null}
 
       {serverEditable ? (
-        <div className="flex shrink-0 gap-2 px-3 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 gap-2 px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
           <Button className="min-h-11 flex-1" disabled={!selectedKey || pending} onClick={onSave}>
             {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
           </Button>

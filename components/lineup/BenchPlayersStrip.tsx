@@ -11,7 +11,7 @@ export function benchPlayerKey(teamName: string, player: BenchPlayer): string {
   return mvpSelectionKey(teamName, player);
 }
 
-type BenchDensity = "default" | "compact" | "minimal";
+type BenchDensity = "default" | "compact" | "minimal" | "mvp";
 
 type BenchPlayersStripProps = {
   teamName: string;
@@ -20,8 +20,9 @@ type BenchPlayersStripProps = {
   selectedKey?: string | null;
   disabled?: boolean;
   showTeamHeader?: boolean;
+  formationLabel?: string;
   position?: "top" | "bottom" | "none";
-  /** `compact`: grid reducido. `minimal`: fila única para modal MVP. */
+  /** `mvp`: legible en modal; 2 filas compactas con cabecera de equipo. */
   density?: BenchDensity;
   /** @deprecated Usar density="compact" */
   compact?: boolean;
@@ -35,6 +36,7 @@ export function BenchPlayersStrip({
   selectedKey = null,
   disabled,
   showTeamHeader = true,
+  formationLabel,
   position = "bottom",
   density,
   compact = false,
@@ -44,6 +46,7 @@ export function BenchPlayersStrip({
 
   const resolvedDensity: BenchDensity = density ?? (compact ? "compact" : "default");
   const labels = squadDisplayNames(players.map((player) => player.name));
+  const isMvp = resolvedDensity === "mvp";
   const isMinimal = resolvedDensity === "minimal";
   const isCompact = resolvedDensity === "compact" || isMinimal;
 
@@ -51,25 +54,31 @@ export function BenchPlayersStrip({
     <section
       className={cn(
         "w-full shrink-0 self-center",
-        isMinimal ? "max-w-full px-0 opacity-75" : "max-w-lg px-0.5",
-        position === "top" && (isMinimal ? "pb-0" : isCompact ? "pb-0.5" : "pb-1"),
-        position === "bottom" && (isMinimal ? "pt-0" : isCompact ? "pt-0.5" : "pt-1"),
+        isMvp ? "max-w-full px-0.5" : isMinimal ? "max-w-full px-0 opacity-75" : "max-w-lg px-0.5",
+        position === "top" && (isMvp || isMinimal ? "pb-0.5" : isCompact ? "pb-0.5" : "pb-1"),
+        position === "bottom" && (isMvp || isMinimal ? "pt-0.5" : isCompact ? "pt-0.5" : "pt-1"),
         className
       )}
     >
-      {showTeamHeader && !isMinimal ? (
+      {showTeamHeader && (isMvp || !isMinimal) ? (
         <h4
           className={cn(
             "flex items-center justify-center gap-1 font-medium text-[var(--tm-muted)]",
-            isCompact ? "mb-0.5 min-h-4 text-[9px]" : "mb-1 min-h-5 text-[10px]"
+            isMvp ? "mb-0.5 min-h-4 text-[9px]" : isCompact ? "mb-0.5 min-h-4 text-[9px]" : "mb-1 min-h-5 text-[10px]"
           )}
         >
           <TeamFlagBadge name={teamName} size="xs" />
-          <span>{teamNameEs(teamName)}</span>
+          <span className="truncate">{teamNameEs(teamName)}</span>
+          {formationLabel ? (
+            <>
+              <span aria-hidden>·</span>
+              <span className="font-semibold text-[var(--tm-fg)]">{formationLabel}</span>
+            </>
+          ) : null}
         </h4>
       ) : showTeamHeader && isMinimal ? (
         <h4 className="sr-only">{teamNameEs(teamName)} — suplentes</h4>
-      ) : !showTeamHeader && !isMinimal ? (
+      ) : !showTeamHeader && !isMinimal && !isMvp ? (
         <h4
           className={cn(
             "text-center font-medium text-[var(--tm-muted)]",
@@ -82,14 +91,16 @@ export function BenchPlayersStrip({
 
       <div
         className={cn(
-          isMinimal
-            ? "flex gap-px overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            : cn(
-                "grid gap-x-0.5 gap-y-0.5",
-                isCompact
-                  ? "max-h-[3rem] grid-cols-8 overflow-y-auto overscroll-contain sm:grid-cols-10"
-                  : "grid-cols-6 sm:grid-cols-8"
-              )
+          isMvp
+            ? "grid max-h-[3.5rem] grid-cols-6 gap-x-1 gap-y-0.5 overflow-y-auto overscroll-contain sm:grid-cols-7"
+            : isMinimal
+              ? "flex gap-px overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              : cn(
+                  "grid gap-x-0.5 gap-y-0.5",
+                  isCompact
+                    ? "max-h-[3rem] grid-cols-8 overflow-y-auto overscroll-contain sm:grid-cols-10"
+                    : "grid-cols-6 sm:grid-cols-8"
+                )
         )}
       >
         {players.map((player, index) => {
@@ -103,31 +114,33 @@ export function BenchPlayersStrip({
               disabled={disabled}
               onClick={() => onPlayerClick(player)}
               className={cn(
-                "flex shrink-0 flex-col items-center justify-center text-center transition-colors",
-                isMinimal
-                  ? "min-h-9 min-w-[2.35rem] px-0.5 py-0"
-                  : isCompact
-                    ? "min-h-10 w-full px-0.5 py-0.5"
-                    : "min-h-6 w-full px-0.5 py-0.5",
+                "flex flex-col items-center justify-center text-center transition-colors",
+                isMvp
+                  ? "min-h-10 w-full rounded-sm px-0.5 py-0.5"
+                  : isMinimal
+                    ? "min-h-9 min-w-[2.35rem] shrink-0 px-0.5 py-0"
+                    : isCompact
+                      ? "min-h-10 w-full px-0.5 py-0.5"
+                      : "min-h-6 w-full px-0.5 py-0.5",
                 "hover:opacity-90 active:opacity-80",
-                active && "rounded-sm bg-[rgba(212,255,0,0.1)]",
+                active && "bg-[rgba(212,255,0,0.14)] ring-1 ring-[var(--tm-accent)]/40",
                 disabled && "opacity-60"
               )}
             >
               <span
                 className={cn(
-                  isMinimal ? "text-[7px]" : isCompact ? "text-[8px]" : "text-[9px]",
-                  "font-display font-medium leading-none text-[var(--tm-subtle)]",
-                  active && "text-[var(--tm-accent)]"
+                  isMvp ? "text-[10px]" : isMinimal ? "text-[7px]" : isCompact ? "text-[8px]" : "text-[9px]",
+                  "font-display font-bold leading-none",
+                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
                 )}
               >
                 {player.shirtNumber ?? "—"}
               </span>
               <span
                 className={cn(
-                  isMinimal ? "mt-0 text-[6px] leading-none" : isCompact ? "mt-0 text-[7px]" : "mt-0.5 text-[8px]",
-                  "leading-tight text-[var(--tm-muted)]",
-                  active && "text-[var(--tm-accent)]"
+                  isMvp ? "mt-0.5 text-[8px] leading-tight" : isMinimal ? "mt-0 text-[6px] leading-none" : isCompact ? "mt-0 text-[7px]" : "mt-0.5 text-[8px]",
+                  "leading-tight",
+                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
                 )}
               >
                 {labels[index]}

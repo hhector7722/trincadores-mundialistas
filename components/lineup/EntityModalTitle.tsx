@@ -18,15 +18,14 @@ export function entityModalTitleContent(view: EntityModalView): ReactNode {
       return view.playerName;
     case "mvp":
       return (
-        <span className="flex min-w-0 flex-1 items-center gap-2 text-sm">
-          <span className="shrink-0 font-semibold">MVP</span>
-          <span className="flex min-w-0 items-center gap-1.5 truncate text-[var(--tm-muted)]">
-            <TeamFlagBadge name={view.awayTeam} size="xs" />
-            <span className="truncate">{teamNameEs(view.awayTeam)}</span>
-            <span aria-hidden>·</span>
-            <TeamFlagBadge name={view.homeTeam} size="xs" />
-            <span className="truncate">{teamNameEs(view.homeTeam)}</span>
+        <span className="flex min-w-0 flex-1 items-center gap-1 truncate text-xs">
+          <TeamFlagBadge name={view.awayTeam} size="xs" />
+          <span className="truncate">{teamNameEs(view.awayTeam)}</span>
+          <span aria-hidden className="text-[var(--tm-muted)]">
+            ·
           </span>
+          <TeamFlagBadge name={view.homeTeam} size="xs" />
+          <span className="truncate">{teamNameEs(view.homeTeam)}</span>
         </span>
       );
     default:
