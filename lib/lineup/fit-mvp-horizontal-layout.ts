@@ -5,6 +5,7 @@ export type { BenchLayoutConfig } from "./bench-grid-layout";
 export { EMPTY_BENCH, pickBenchGrid } from "./bench-grid-layout";
 
 import { pickBenchGrid } from "./bench-grid-layout";
+import { computeMvpFieldChipScale } from "./mvp-field-chip-scale";
 
 export type FitMvpHorizontalLayout = {
   fieldWidthPx: number;
@@ -32,13 +33,6 @@ const MVP_BENCH = {
   minNameFont: 8,
   minNumberFont: 9,
 };
-
-/** Escala visual de fichas MVP (solo tamaño, no coordenadas). */
-function mvpChipScale(fieldHeightPx: number, fieldWidthPx: number): number {
-  const byHeight = fieldHeightPx / 420;
-  const byWidth = fieldWidthPx / 680;
-  return Math.min(0.62, Math.max(0.38, Math.min(byHeight, byWidth)));
-}
 
 /**
  * MVP horizontal: convocatorias en 2–3 filas + campo + botón, sin scroll.
@@ -77,7 +71,7 @@ export function computeFitMvpHorizontalLayout(
   return {
     fieldWidthPx,
     fieldHeightPx,
-    chipScale: mvpChipScale(fieldHeightPx, fieldWidthPx),
+    chipScale: computeMvpFieldChipScale(fieldWidthPx, fieldHeightPx),
     awayBench,
     homeBench,
   };

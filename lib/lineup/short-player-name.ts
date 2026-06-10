@@ -83,3 +83,36 @@ export function displayNameInSquad(fullName: string, squadFullNames: string[]): 
   if (index < 0) return shirtPlayerName(fullName);
   return squadDisplayNames(squadFullNames)[index] ?? shirtPlayerName(fullName);
 }
+
+const MVP_FIELD_NAME_MAX = 8;
+const MVP_FIELD_STEM_MIN = 6;
+const MVP_FIELD_STEM_MAX = 8;
+
+function mvpFieldStemLength(labelLength: number): number {
+  return Math.min(
+    MVP_FIELD_STEM_MAX,
+    Math.max(MVP_FIELD_STEM_MIN, labelLength - 4)
+  );
+}
+
+/** Abrevia etiquetas largas en el campo MVP sin mover coordenadas. */
+export function abbreviateMvpFieldLabel(label: string): string {
+  const trimmed = label.trim();
+  if (trimmed.length <= MVP_FIELD_NAME_MAX) return trimmed;
+
+  const stem = trimmed.slice(0, mvpFieldStemLength(trimmed.length));
+  return stem.endsWith(".") ? stem : `${stem}.`;
+}
+
+/** Nombre compacto para etiqueta MVP: desambiguación de plantilla + abreviatura si hace falta. */
+export function mvpFieldDisplayName(
+  fullName: string,
+  squadFullNames?: string[]
+): string {
+  const base =
+    squadFullNames && squadFullNames.length > 0
+      ? displayNameInSquad(fullName, squadFullNames)
+      : shirtPlayerName(fullName);
+
+  return abbreviateMvpFieldLabel(base);
+}

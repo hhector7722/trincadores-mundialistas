@@ -1,5 +1,9 @@
 import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
-import { displayNameInSquad, shirtPlayerName } from "@/lib/lineup/short-player-name";
+import {
+  displayNameInSquad,
+  mvpFieldDisplayName,
+  shirtPlayerName,
+} from "@/lib/lineup/short-player-name";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +46,12 @@ export function LineupPlayerChip({
   const jerseyStrokeWidth = clashOutline ? 3.5 : 1.2;
   const dorsalColor = useKitColors ? kit.dorsal : "var(--tm-accent)";
 
+  const displayName = isMatch
+    ? mvpFieldDisplayName(slot.name, squadPlayerNames)
+    : squadPlayerNames?.length
+      ? displayNameInSquad(slot.name, squadPlayerNames)
+      : shirtPlayerName(slot.name);
+
   const content = (
     <>
       <svg
@@ -50,7 +60,7 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[2.5rem] w-[2.15rem] sm:h-[2.65rem] sm:w-[2.3rem]"
+            ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
             : isModal
               ? "h-[2.2rem] w-[1.9rem]"
               : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
@@ -81,7 +91,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isMatch ? "14" : isModal ? "12" : "20"}
+          fontSize={isMatch ? "15.5" : isModal ? "12" : "20"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
@@ -90,20 +100,22 @@ export function LineupPlayerChip({
       </svg>
       <div
         className={cn(
-          "-mt-px w-full rounded-md border bg-black/55 text-center backdrop-blur-sm",
-          isMatch ? "px-0.5 py-px" : "px-1 py-0.5",
-          selected ? "border-[var(--tm-accent)]" : isMatch ? "border-white/20" : "border-white/10"
+          "w-full rounded border bg-black/60 text-center backdrop-blur-sm",
+          isMatch ? "max-w-[2.85rem] px-0 py-0 leading-none" : "px-1 py-0.5",
+          selected ? "border-[var(--tm-accent)]" : isMatch ? "border-white/25" : "border-white/10"
         )}
       >
         <p
           className={cn(
-            "whitespace-normal text-center leading-tight text-white",
-            isMatch ? "text-[9px] font-bold leading-none" : isModal ? "text-[8px] font-semibold leading-none" : "text-[9px] font-semibold sm:text-[10px]"
+            "whitespace-normal text-center text-white",
+            isMatch
+              ? "text-[9.5px] font-bold leading-none tracking-tight"
+              : isModal
+                ? "text-[8px] font-semibold leading-none"
+                : "text-[9px] font-semibold leading-tight sm:text-[10px]"
           )}
         >
-          {squadPlayerNames?.length
-            ? displayNameInSquad(slot.name, squadPlayerNames)
-            : shirtPlayerName(slot.name)}
+          {displayName}
         </p>
         {!isModal && !isMatch ? (
           <p className="text-[8px] font-medium uppercase tracking-wide text-white/55 sm:text-[9px]">
@@ -117,7 +129,7 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "min-h-12 w-[3.4rem] touch-manipulation"
+      ? "min-h-[2.65rem] w-[3.05rem] touch-manipulation"
       : isModal
         ? "w-[3rem] min-h-10"
         : "w-[4.75rem] min-h-12 sm:w-[5.5rem]",

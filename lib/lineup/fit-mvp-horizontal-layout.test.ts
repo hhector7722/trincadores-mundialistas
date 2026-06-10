@@ -33,7 +33,7 @@ describe("computeFitMvpHorizontalLayout", () => {
       gapPx: 4,
     });
 
-    expect(layout.chipScale).toBeLessThanOrEqual(0.62);
+    expect(layout.chipScale).toBeLessThanOrEqual(0.64);
     expect(layout.chipScale).toBeGreaterThanOrEqual(0.38);
   });
 
