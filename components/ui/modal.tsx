@@ -48,7 +48,7 @@ type ModalProps = {
   backButtonPlain?: boolean;
   /** Si false, el contenido no hace scroll interno (layout adaptativo sin recortes). */
   scrollContent?: boolean;
-  /** Fondo y panel totalmente opacos (sin glass ni blur). */
+  /** Panel opaco; el fondo exterior (backdrop) se difumina con blur. */
   opaque?: boolean;
 };
 
@@ -378,7 +378,7 @@ export function Modal({
         aria-label="Cerrar"
         className={cn(
           "absolute inset-0 overscroll-none",
-          opaque ? "bg-[#2a1058]" : "bg-[#2a1058]/40 backdrop-blur-sm",
+          opaque ? "bg-[#2a1058]/40 backdrop-blur-md" : "bg-[#2a1058]/40 backdrop-blur-sm",
           hasSwipe ? "touch-manipulation" : "touch-none",
           !opaque && backdropClassName
         )}
