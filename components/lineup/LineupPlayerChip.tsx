@@ -100,19 +100,29 @@ export function LineupPlayerChip({
       </svg>
       <div
         className={cn(
-          "w-full rounded border bg-black/60 text-center backdrop-blur-sm",
-          isMatch ? "max-w-[2.85rem] px-0 py-0 leading-none" : "px-1 py-0.5",
-          selected ? "border-[var(--tm-accent)]" : isMatch ? "border-white/25" : "border-white/10"
+          "w-full rounded border text-center",
+          isMatch && selected
+            ? "border-[var(--tm-accent)] bg-[var(--tm-accent)] px-0 py-0 leading-none"
+            : cn(
+                "backdrop-blur-sm",
+                isMatch ? "max-w-[2.85rem] bg-black/60 px-0 py-0 leading-none" : "bg-black/60 px-1 py-0.5",
+                selected ? "border-[var(--tm-accent)]" : isMatch ? "border-white/25" : "border-white/10"
+              )
         )}
       >
         <p
           className={cn(
-            "whitespace-normal text-center text-white",
-            isMatch
-              ? "text-[9.5px] font-bold leading-none tracking-tight"
-              : isModal
-                ? "text-[8px] font-semibold leading-none"
-                : "text-[9px] font-semibold leading-tight sm:text-[10px]"
+            "whitespace-normal text-center",
+            isMatch && selected
+              ? "text-[9.5px] font-bold leading-none tracking-tight text-[var(--tm-primary-fg)]"
+              : cn(
+                  "text-white",
+                  isMatch
+                    ? "text-[9.5px] font-bold leading-none tracking-tight"
+                    : isModal
+                      ? "text-[8px] font-semibold leading-none"
+                      : "text-[9px] font-semibold leading-tight sm:text-[10px]"
+                )
           )}
         >
           {displayName}
