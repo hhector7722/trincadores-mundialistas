@@ -9,7 +9,6 @@ const RAW_CODES: Record<string, string> = {
   hector: "8W3D38T4NKKS",
   damo: "P77VPZHBXX6E",
   sanfe: "VV2ZMCWUWHB8",
-  solskjaer: "TQPYHRC7QWVH",
   gonza: "TP4AE88DGGLT",
   nacho: "BRUSREQRP9HE",
   oro: "WKF48HVZ2L65",

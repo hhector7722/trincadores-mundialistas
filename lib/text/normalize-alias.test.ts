@@ -14,21 +14,6 @@ describe("normalizeText", () => {
 });
 
 describe("normalizeAlias", () => {
-  it("trata Solskjær, Solskjaer y Solskaer como equivalentes", () => {
-    const variants = [
-      "Solskjær",
-      "Solskjaer",
-      "Solskaer",
-      "SOLSKJÆR",
-      "solskjaer",
-      "solskaer",
-      "  SolskJÆR  ",
-    ];
-    for (const variant of variants) {
-      assert.equal(normalizeAlias(variant), "solskjaer", variant);
-    }
-  });
-
   it("normaliza alias con acentos y mayusculas", () => {
     assert.equal(normalizeAlias("Héctor"), "hector");
     assert.equal(normalizeAlias("DAMO"), "damo");

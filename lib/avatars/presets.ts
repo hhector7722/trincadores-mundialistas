@@ -7,7 +7,6 @@ const DEFAULT_BADGE_OBJECT_POSITION = "center 22%";
 /** Recorte vertical del círculo en ranking/home por alias (posters con cara más baja). */
 const BADGE_OBJECT_POSITION: Record<string, string> = {
   nacho: "center 40%",
-  solskjaer: "center 58%",
 };
 
 /** Ruta pública del avatar preasignado por alias (p. ej. `/icons/avatar/hector.png`). */

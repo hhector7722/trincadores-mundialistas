@@ -1,8 +1,5 @@
 /** Variantes de alias que deben resolver al mismo identificador canonico. */
-const ALIAS_CANONICAL: Record<string, string> = {
-  solskjaer: "solskjaer",
-  solskaer: "solskjaer",
-};
+const ALIAS_CANONICAL: Record<string, string> = {};
 
 /**
  * Normaliza texto para comparacion flexible:
@@ -20,7 +17,7 @@ export function normalizeText(value: string): string {
 
 /**
  * Normaliza un alias de usuario para comparacion y resolucion de assets.
- * Tras normalizeText aplica equivalencias explicitas (p. ej. Solskjær / Solskjaer / Solskaer → solskjaer).
+ * Tras normalizeText aplica equivalencias explicitas cuando existan en ALIAS_CANONICAL.
  */
 export function normalizeAlias(value: string): string {
   const base = normalizeText(value);

@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 import {
   isOnboardingEligibleUsername,
   normalizePhone,
-  resolveParticipantByAlias,
   resolveParticipantByPhone,
 } from "./onboarding-phones";
 
@@ -32,13 +31,4 @@ describe("onboarding-phones", () => {
     assert.equal(match?.displayName, "Paco");
   });
 
-  it("resuelve alias con acentos y variantes de Solskjær", () => {
-    const variants = ["Solskjær", "Solskjaer", "Solskaer", "SOLSKJAER"];
-    for (const variant of variants) {
-      assert.equal(isOnboardingEligibleUsername(variant), true, variant);
-      const match = resolveParticipantByAlias(variant);
-      assert.ok(match, variant);
-      assert.equal(match?.username, "solskjaer", variant);
-    }
-  });
 });

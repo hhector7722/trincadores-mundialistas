@@ -11,7 +11,6 @@ export const ONBOARDING_PHONE_DIRECTORY: PhoneParticipant[] = [
   { username: "teixeira", displayName: "Teixeira", phone: "605187355" },
   { username: "nacho", displayName: "Nacho", phone: "639485610" },
   { username: "damo", displayName: "Damo", phone: "649224147" },
-  { username: "solskjaer", displayName: "Solskjær", phone: "601353725" },
   { username: "gabri", displayName: "Gabri", phone: "605442296" },
   { username: "oro", displayName: "Oro", phone: "626155719" },
   { username: "sanfe", displayName: "Sanfe", phone: "670658044" },
