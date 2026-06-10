@@ -24,8 +24,14 @@ export const PLAYER_MODAL_PANEL_HOST_CLASS = LINEUP_MODAL_PANEL_HOST_CLASS;
 /** Modal MVP: dos equipos en campo horizontal. */
 export const MVP_MODAL_WRAPPER_CLASS = "max-w-[min(100vw-1rem,32rem)]";
 
-/** Altura fija del panel de posibles alineaciones (sin pie de guardado). */
-export const MVP_MODAL_PANEL_CLASS = "h-[min(calc(100dvh-4rem),27rem)]";
+/** Altura del viewport táctico (preview / posibles alineaciones). */
+export const MVP_MODAL_FIELD_HEIGHT_REM = 27;
 
-/** Panel MVP con botón guardar: más alto para no recortar campo ni suplentes. */
-export const MVP_MODAL_PICK_PANEL_CLASS = "h-[min(calc(100dvh-3.5rem),29rem)]";
+/** Pie fijo del modal MVP (botón guardar); se suma sin reducir el campo. */
+export const MVP_MODAL_SAVE_FOOTER_REM = 2.25;
+
+/** Panel posibles alineaciones: solo viewport táctico. */
+export const MVP_MODAL_PANEL_CLASS = `h-[min(calc(100dvh-4rem),${MVP_MODAL_FIELD_HEIGHT_REM}rem)]`;
+
+/** Panel elección MVP: mismo viewport + pie de guardado. */
+export const MVP_MODAL_PICK_PANEL_CLASS = `h-[min(calc(100dvh-3.5rem),calc(${MVP_MODAL_FIELD_HEIGHT_REM}rem+${MVP_MODAL_SAVE_FOOTER_REM}rem))]`;

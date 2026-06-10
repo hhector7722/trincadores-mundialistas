@@ -25,6 +25,7 @@ import {
   mapSlotsToHomeRight,
 } from "@/lib/lineup/mvp-horizontal-geometry";
 import type { ResolvedLineup } from "@/lib/lineup/types";
+import { cn } from "@/lib/utils";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
 
@@ -51,11 +52,10 @@ type SquadPlayerOption = {
 };
 
 const MVP_FORMATION_ROW_PX = 22;
-const MVP_FOOTER_PX = 44;
-const MVP_FOOTER_CLOSED_PX = 28;
-const MVP_ERROR_PX = 18;
 /** Margen bajo el campo: fichas centradas en y% desbordan la línea inferior. */
 const MVP_CHIP_BLEED_PX = 14;
+/** Pie visual del modal MVP (debe coincidir con MVP_MODAL_SAVE_FOOTER_REM). */
+const MVP_SAVE_FOOTER_CLASS = "h-9 shrink-0";
 
 function sortBenchByShirt<T extends { shirtNumber: number | null; name: string }>(
   players: T[]
@@ -255,14 +255,8 @@ export function MvpPredictionPanel({
     return players;
   }, [awaySlots, homeSlots, awayBench, homeBench, awayTeam, homeTeam]);
 
-  const footerPx =
-    MVP_CHIP_BLEED_PX +
-    (preview
-      ? 0
-      : serverEditable
-        ? MVP_FOOTER_PX
-        : MVP_FOOTER_CLOSED_PX) +
-    (error ? MVP_ERROR_PX : 0);
+  /** Misma reserva en preview y MVP: el pie de guardar va fuera del área medida. */
+  const footerPx = MVP_CHIP_BLEED_PX;
 
   const fitLayout = useFitMvpLayout(layoutRef, {
     awayBenchCount: awayBench.length,
@@ -426,28 +420,30 @@ export function MvpPredictionPanel({
         )}
       </div>
 
-      {!preview && !serverEditable ? (
-        <p className="shrink-0 px-1 py-1 text-center text-[9px] text-[var(--tm-muted)]">
-          Predicción cerrada.
-        </p>
-      ) : null}
-
-      {error ? (
-        <p className="shrink-0 px-2 py-0.5 text-[10px] text-[var(--tm-danger)]" role="alert">
-          {error}
-        </p>
-      ) : null}
-
-      {!preview && serverEditable ? (
-        <div className="flex shrink-0 justify-center px-2 py-0.5 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
-          <Button
-            className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
-            disabled={!selectedOption || pending}
-            onClick={onSave}
-            title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
-          >
-            {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
-          </Button>
+      {!preview ? (
+        <div
+          className={cn(
+            MVP_SAVE_FOOTER_CLASS,
+            "flex flex-col items-center justify-center gap-0.5 px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-0.5"
+          )}
+        >
+          {error ? (
+            <p className="text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {!serverEditable ? (
+            <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
+          ) : (
+            <Button
+              className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
+              disabled={!selectedOption || pending}
+              onClick={onSave}
+              title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
+            >
+              {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
+            </Button>
+          )}
         </div>
       ) : null}
     </div>
