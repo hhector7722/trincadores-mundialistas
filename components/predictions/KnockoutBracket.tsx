@@ -15,7 +15,7 @@ import {
   FINAL_CENTER_X,
   FINAL_CUP_OFFSET_ABOVE_FINAL,
   finalCenterYFromGeometry,
-  matchPosition,
+  finalHitSpanPercent,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
 import {
@@ -44,13 +44,13 @@ type TeamSlotLayout = {
   y: number;
 };
 
-function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
+function teamSlotLayouts(geom: BracketMatchGeometry): {
   home: TeamSlotLayout;
   away: TeamSlotLayout;
 } {
   return {
-    home: { x: columnX, y: geom.homeY },
-    away: { x: columnX, y: geom.awayY },
+    home: { x: geom.homeX ?? geom.columnX, y: geom.homeY },
+    away: { x: geom.awayX ?? geom.columnX, y: geom.awayY },
   };
 }
 
@@ -115,15 +115,23 @@ function BracketMatchNode({
       })
     : "empty";
   const isLive = match?.status === "live";
-  const columnX = matchPosition(geom).x;
-  const slots = teamSlotLayouts(geom, columnX);
+  const slots = teamSlotLayouts(geom);
   const hasScore = savedHome != null && savedAway != null;
   const homeWins = hasScore && savedHome > savedAway;
   const awayWins = hasScore && savedAway > savedHome;
   const scoreSummary = match ? formatListScore(savedHome, savedAway) : " ";
   const isSaved = state === "saved";
+  const isFinal = geom.round === "final";
 
-  const scoreY = (slots.home.y + slots.away.y) / 2;
+  const scoreY = geom.midY;
+  const hitStyle: CSSProperties = isFinal
+    ? {
+        left: `${geom.columnX}%`,
+        top: `${geom.midY}%`,
+        width: `${finalHitSpanPercent()}%`,
+        minHeight: "max(48px, var(--tm-ko-orb-size))",
+      }
+    : { left: `${geom.columnX}%`, top: `${geom.midY}%` };
 
   return (
     <>
@@ -138,7 +146,7 @@ function BracketMatchNode({
           isSaved && "tm-ko-match-hit--saved",
           state === "locked" && "tm-ko-match-hit--locked"
         )}
-        style={{ left: `${columnX}%`, top: `${geom.midY}%` }}
+        style={hitStyle}
         onClick={() => match && onOpen(match)}
         aria-label={
           match
@@ -165,7 +173,7 @@ function BracketMatchNode({
       {hasScore ? (
         <span
           className="tm-ko-match-score"
-          style={{ left: `${columnX}%`, top: `${scoreY}%` }}
+          style={{ left: `${geom.columnX}%`, top: `${scoreY}%` }}
           aria-hidden
         >
           {scoreSummary}

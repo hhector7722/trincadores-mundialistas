@@ -1,6 +1,29 @@
 import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 
 /**
+ * Rejilla guía (no visible en UI): 10 columnas A–J × 15 filas.
+ * Las posiciones del cuadro se derivan de esta malla; no se dibujan líneas.
+ *
+ * Columnas: A(r32) B(r16) C(qf) D(sf) E(finalista) | F(finalista) G(sf) H(qf) I(r16) J(r32)
+ * Filas por ronda (centro del enfrentamiento): r32 → 1,3,…,15 · r16 → 2,6,10,14 · qf → 4,12 · sf/final → 8
+ */
+
+/** Columnas de la rejilla guía (A=0 … J=9). */
+export const BRACKET_GRID_COLS = 10;
+
+/** Filas de la rejilla guía (1 … 15). */
+export const BRACKET_GRID_ROWS = 15;
+
+/** Columna A — dieciseisavos izquierda. */
+export const COL_R32_LEFT = 0;
+/** Columna E — local de la final / finalista izquierda. */
+export const COL_FINAL_HOME = 4;
+/** Columna F — visitante de la final / finalista derecha. */
+export const COL_FINAL_AWAY = 5;
+/** Columna J — dieciseisavos derecha. */
+export const COL_R32_RIGHT = 9;
+
+/**
  * Banda superior equivalente a la cabecera del calendario (mes + días de la semana).
  * Los dieciseisavos no deben invadir esta zona.
  */
@@ -12,13 +35,11 @@ export const BRACKET_FOOTER_BAND_Y = 10;
 /** Margen extra bajo la cabecera para que la tarjeta no se recorte (translate -50%). */
 const R32_TOP_CLEARANCE_Y = 2;
 
-/** Ancla inferior: 1G vs 3º (M82) y 2D vs 2G (M88), alineados con el footer. */
+/** Ancla inferior: fila 15 de la rejilla guía. */
 export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
 
-/** Primer dieciseisavos: justo debajo de la zona de cabecera. */
+/** Ancla superior: fila 1 de la rejilla guía. */
 export const R32_TOP_ANCHOR_Y = BRACKET_HEADER_BAND_Y + R32_TOP_CLEARANCE_Y;
-
-const R32_SLOT_COUNT = 8;
 
 /** Escala global de tarjetas con equipos (ancho + alto proporcional). */
 export const KO_CARD_SIZE_SCALE = 0.92;
@@ -35,31 +56,34 @@ export const ORB_PAIR_INNER_HALF_Y = ORB_HALF_Y + ORB_INNER_EDGE_GAP_Y / 2;
 /** @deprecated Usar ORB_PAIR_INNER_HALF_Y */
 export const R32_PAIR_INNER_HALF_Y = ORB_PAIR_INNER_HALF_Y;
 
-/** Centros verticales de emparejamientos r32 (8 por lado). */
-function buildR32PairCenters(): readonly number[] {
-  return buildPairCentersInBand(R32_SLOT_COUNT);
+/** Índice de ronda en la rejilla guía: 0=r32, 1=r16, 2=qf, 3=sf. */
+export type BracketGridRoundIndex = 0 | 1 | 2 | 3;
+
+const ROUND_TO_GRID_INDEX: Record<Exclude<BracketRoundKey, "final">, BracketGridRoundIndex> =
+  {
+    r32: 0,
+    r16: 1,
+    qf: 2,
+    sf: 3,
+  };
+
+/** Fila 1-indexed del centro de un slot en la rejilla guía. */
+export function bracketGridRowCenter(
+  roundIndex: BracketGridRoundIndex,
+  slotIndex: number
+): number {
+  return 2 ** roundIndex + slotIndex * 2 ** (roundIndex + 1);
 }
 
-const R32_PAIR_CENTERS = buildR32PairCenters();
+/** Convierte fila de rejilla (1…15) a coordenada Y del canvas (%). */
+export function gridRowToPercentY(row1Based: number): number {
+  const t = (row1Based - 1) / (BRACKET_GRID_ROWS - 1);
+  return R32_TOP_ANCHOR_Y + t * (R32_BOTTOM_ANCHOR_Y - R32_TOP_ANCHOR_Y);
+}
 
-/** Reparte centros de emparejamientos homogéneamente en la banda visible del canvas. */
-export function buildPairCentersInBand(matchCount: number): readonly number[] {
-  if (matchCount <= 0) return [];
-
-  const innerHalf = ORB_PAIR_INNER_HALF_Y;
-  const topBound = R32_TOP_ANCHOR_Y + innerHalf + ORB_HALF_Y;
-  const bottomBound = R32_BOTTOM_ANCHOR_Y - innerHalf - ORB_HALF_Y;
-
-  if (matchCount === 1) {
-    return [(topBound + bottomBound) / 2];
-  }
-
-  const centerSpan = bottomBound - topBound;
-  const pairPitch = centerSpan / (matchCount - 1);
-  return Array.from(
-    { length: matchCount },
-    (_, index) => topBound + index * pairPitch
-  );
+function yFromGridRow(row1Based: number) {
+  const midY = gridRowToPercentY(row1Based);
+  return yFromPairCenter(midY);
 }
 
 function yFromPairCenter(midY: number) {
@@ -69,8 +93,6 @@ function yFromPairCenter(midY: number) {
     awayY: midY + ORB_PAIR_INNER_HALF_Y,
   };
 }
-
-export const FINAL_CENTER_X = 50;
 
 /** Copa flotante: distancia sobre el centro de la final (% canvas). */
 export const FINAL_CUP_OFFSET_ABOVE_FINAL = 5.5;
@@ -87,22 +109,20 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
 export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 
-/** Margen lateral homogéneo para las 9 columnas del cuadro (% canvas). */
+/** Margen lateral homogéneo para las columnas del cuadro (% canvas). */
 export const BRACKET_COLUMN_INSET = 3.5;
 
-/** Semifinales ligeramente más cerca de cuartos de su lado (% canvas). */
-export const SF_COLUMN_NUDGE_TOWARD_QF = 1.5;
-
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
-  ROUND_LAYOUT_SCALE.r32, // 0
-  ROUND_LAYOUT_SCALE.r16, // 1
-  ROUND_LAYOUT_SCALE.qf, // 2
-  ROUND_LAYOUT_SCALE.sf, // 3
-  ROUND_LAYOUT_SCALE.final, // 4
-  ROUND_LAYOUT_SCALE.sf, // 5
-  ROUND_LAYOUT_SCALE.qf, // 6
-  ROUND_LAYOUT_SCALE.r16, // 7
-  ROUND_LAYOUT_SCALE.r32, // 8
+  ROUND_LAYOUT_SCALE.r32, // A — 0
+  ROUND_LAYOUT_SCALE.r16, // B — 1
+  ROUND_LAYOUT_SCALE.qf, // C — 2
+  ROUND_LAYOUT_SCALE.sf, // D — 3
+  ROUND_LAYOUT_SCALE.final, // E — 4
+  ROUND_LAYOUT_SCALE.final, // F — 5
+  ROUND_LAYOUT_SCALE.sf, // G — 6
+  ROUND_LAYOUT_SCALE.qf, // H — 7
+  ROUND_LAYOUT_SCALE.r16, // I — 8
+  ROUND_LAYOUT_SCALE.r32, // J — 9
 ];
 
 function halfWidthForColumn(column: number): number {
@@ -110,36 +130,41 @@ function halfWidthForColumn(column: number): number {
   return CARD_HALF_WIDTH_BASE * scale;
 }
 
-/**
- * Nueve columnas de izquierda a derecha:
- * r32 → r16 → qf → sf → final → sf → qf → r16 → r32.
- * Las semifinales se acercan ligeramente a los cuartos de su lado.
- */
+/** Centros X de las 10 columnas guía A…J (% canvas). */
 export function buildColumnCenters(): readonly number[] {
   const span = 100 - 2 * BRACKET_COLUMN_INSET;
-  const x = Array.from(
-    { length: 9 },
-    (_, index) => BRACKET_COLUMN_INSET + (span * index) / 8
+  return Array.from(
+    { length: BRACKET_GRID_COLS },
+    (_, index) => BRACKET_COLUMN_INSET + (span * (index + 0.5)) / BRACKET_GRID_COLS
   );
-  x[3] -= SF_COLUMN_NUDGE_TOWARD_QF;
-  x[5] += SF_COLUMN_NUDGE_TOWARD_QF;
-  return x;
 }
 
 const COLUMN_CENTERS = buildColumnCenters();
 
-export const FINAL_ANCHOR_LEFT_X = FINAL_CENTER_X - halfWidthForColumn(4);
-export const FINAL_ANCHOR_RIGHT_X = FINAL_CENTER_X + halfWidthForColumn(4);
+export function mapColumnX(column: number): number {
+  return COLUMN_CENTERS[column] ?? 50;
+}
+
+/** Centro horizontal entre columnas E y F (copa + eje de la final). */
+export const FINAL_CENTER_X =
+  (mapColumnX(COL_FINAL_HOME) + mapColumnX(COL_FINAL_AWAY)) / 2;
+
+export const FINAL_ANCHOR_LEFT_X = mapColumnX(COL_FINAL_HOME);
+export const FINAL_ANCHOR_RIGHT_X = mapColumnX(COL_FINAL_AWAY);
 
 export type BracketMatchGeometry = {
   matchNumber: number;
   round: BracketRoundKey;
   side: "left" | "right" | "center";
+  /** Columna guía principal (0…9). */
   column: number;
   homeY: number;
   awayY: number;
   midY: number;
   columnX: number;
+  /** Si difiere de columnX (p. ej. final en E vs F). */
+  homeX?: number;
+  awayX?: number;
   layoutScale: number;
   childMatches?: [number, number];
 };
@@ -158,14 +183,7 @@ const R16_CLIP_VERTICAL_TO_BOTTOM = new Set([94, 96]);
 const RIGHT_QF = [99, 100] as const;
 const RIGHT_SF = [102] as const;
 
-function r32YFromSlot(slotIndex: number) {
-  const midY = R32_PAIR_CENTERS[slotIndex] ?? R32_TOP_ANCHOR_Y;
-  return yFromPairCenter(midY);
-}
-
-export function mapColumnX(column: number): number {
-  return COLUMN_CENTERS[column] ?? 50;
-}
+const FINAL_GRID_ROW = bracketGridRowCenter(3, 0);
 
 export function gutterX(columnA: number, columnB: number): number {
   return (mapColumnX(columnA) + mapColumnX(columnB)) / 2;
@@ -187,12 +205,13 @@ function pushR32Side(
   column: number
 ) {
   matchNumbers.forEach((matchNumber, slotIndex) => {
+    const row = bracketGridRowCenter(0, slotIndex);
     out.push({
       matchNumber,
       round: "r32",
       side,
       column,
-      ...r32YFromSlot(slotIndex),
+      ...yFromGridRow(row),
       columnX: mapColumnX(column),
       layoutScale: ROUND_LAYOUT_SCALE.r32,
     });
@@ -202,21 +221,22 @@ function pushR32Side(
 function pushRoundFromChildren(
   out: BracketMatchGeometry[],
   matchNumbers: readonly number[],
-  round: BracketRoundKey,
+  round: Exclude<BracketRoundKey, "final">,
   side: "left" | "right",
   column: number,
   childGroups: readonly [number, number][]
 ) {
-  const pairCenters = buildPairCentersInBand(matchNumbers.length);
+  const roundIndex = ROUND_TO_GRID_INDEX[round];
 
   matchNumbers.forEach((matchNumber, index) => {
     const [childANumber, childBNumber] = childGroups[index];
+    const row = bracketGridRowCenter(roundIndex, index);
     out.push({
       matchNumber,
       round,
       side,
       column,
-      ...yFromPairCenter(pairCenters[index] ?? R32_TOP_ANCHOR_Y),
+      ...yFromGridRow(row),
       columnX: mapColumnX(column),
       layoutScale: ROUND_LAYOUT_SCALE[round],
       childMatches: [childANumber, childBNumber],
@@ -227,8 +247,8 @@ function pushRoundFromChildren(
 export function buildBracketGeometry(): BracketMatchGeometry[] {
   const matches: BracketMatchGeometry[] = [];
 
-  pushR32Side(matches, LEFT_R32, "left", 0);
-  pushR32Side(matches, RIGHT_R32, "right", 8);
+  pushR32Side(matches, LEFT_R32, "left", COL_R32_LEFT);
+  pushR32Side(matches, RIGHT_R32, "right", COL_R32_RIGHT);
 
   pushRoundFromChildren(matches, LEFT_R16, "r16", "left", 1, [
     [LEFT_R32[0], LEFT_R32[1]],
@@ -242,26 +262,32 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
   ]);
   pushRoundFromChildren(matches, LEFT_SF, "sf", "left", 3, [[LEFT_QF[0], LEFT_QF[1]]]);
 
-  pushRoundFromChildren(matches, RIGHT_R16, "r16", "right", 7, [
+  pushRoundFromChildren(matches, RIGHT_R16, "r16", "right", 8, [
     [RIGHT_R32[0], RIGHT_R32[1]],
     [RIGHT_R32[2], RIGHT_R32[3]],
     [RIGHT_R32[4], RIGHT_R32[5]],
     [RIGHT_R32[6], RIGHT_R32[7]],
   ]);
-  pushRoundFromChildren(matches, RIGHT_QF, "qf", "right", 6, [
+  pushRoundFromChildren(matches, RIGHT_QF, "qf", "right", 7, [
     [RIGHT_R16[0], RIGHT_R16[1]],
     [RIGHT_R16[2], RIGHT_R16[3]],
   ]);
-  pushRoundFromChildren(matches, RIGHT_SF, "sf", "right", 5, [[RIGHT_QF[0], RIGHT_QF[1]]]);
+  pushRoundFromChildren(matches, RIGHT_SF, "sf", "right", 6, [[RIGHT_QF[0], RIGHT_QF[1]]]);
 
-  const finalCenterY = buildPairCentersInBand(1)[0] ?? 50;
+  const homeX = mapColumnX(COL_FINAL_HOME);
+  const awayX = mapColumnX(COL_FINAL_AWAY);
+  const finalMidY = gridRowToPercentY(FINAL_GRID_ROW);
 
   matches.push({
     matchNumber: 104,
     round: "final",
     side: "center",
-    column: 4,
-    ...yFromPairCenter(finalCenterY),
+    column: COL_FINAL_HOME,
+    midY: finalMidY,
+    homeY: finalMidY,
+    awayY: finalMidY,
+    homeX,
+    awayX,
     columnX: FINAL_CENTER_X,
     layoutScale: ROUND_LAYOUT_SCALE.final,
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],
@@ -274,6 +300,17 @@ export function finalCenterYFromGeometry(
   geoms: readonly BracketMatchGeometry[]
 ): number {
   return geoms.find((geom) => geom.round === "final")?.midY ?? 50;
+}
+
+/** @deprecated La rejilla guía fija las filas; conservado por compatibilidad de tests. */
+export function buildPairCentersInBand(matchCount: number): readonly number[] {
+  if (matchCount <= 0) return [];
+  if (matchCount === 1) return [gridRowToPercentY(FINAL_GRID_ROW)];
+
+  const roundIndex = Math.round(Math.log2(8 / matchCount)) as BracketGridRoundIndex;
+  return Array.from({ length: matchCount }, (_, index) =>
+    gridRowToPercentY(bracketGridRowCenter(roundIndex, index))
+  );
 }
 
 function verticalAnchorY(
@@ -391,4 +428,9 @@ export function buildBracketConnectorPaths(
 
 export function matchPosition(geom: BracketMatchGeometry): { x: number; y: number } {
   return { x: geom.columnX, y: geom.midY };
+}
+
+/** Ancho del área táctil de la final entre columnas E y F (% canvas). */
+export function finalHitSpanPercent(): number {
+  return Math.abs(mapColumnX(COL_FINAL_AWAY) - mapColumnX(COL_FINAL_HOME)) + 4;
 }
