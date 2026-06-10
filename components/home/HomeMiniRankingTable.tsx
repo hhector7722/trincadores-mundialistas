@@ -50,7 +50,7 @@ function MiniRankingDataRow({
       <span className="shrink-0 font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <div className="flex min-w-0 items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-2">
         <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
         <span
           className={cn(
@@ -82,8 +82,8 @@ function MiniRankingEmptyRow() {
     >
       <span />
       <span />
-      <div className="flex min-w-0 items-center gap-1.5">
-        <span className="size-8 shrink-0 rounded-full bg-white/10" />
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="size-5 shrink-0 rounded-full bg-white/10" />
         <span className="min-w-0 flex-1 truncate text-white/20">&nbsp;</span>
       </div>
       <span />
