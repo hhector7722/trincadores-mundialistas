@@ -2,11 +2,9 @@
 
 import { useMemo } from "react";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
-import { POSSIBLE_LINEUPS_FIELD_BODY_CLASS } from "@/lib/lineup/field-asset";
+import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
-import { cn } from "@/lib/utils";
-import { LoadingCenter } from "@/components/ui/spinner";
 
 type PossibleLineupsPanelProps = {
   matchId: string;
@@ -35,7 +33,7 @@ export function PossibleLineupsPanel({
   } = useMatchTacticalLineupData(matchId, homeTeam, awayTeam);
 
   const layout = useMemo(
-    () => buildTacticalModalLayout("possible-lineups", awayBench.length, homeBench.length),
+    () => buildTacticalModalLayout(awayBench.length, homeBench.length),
     [awayBench.length, homeBench.length]
   );
 
@@ -50,36 +48,21 @@ export function PossibleLineupsPanel({
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-      <div
-        className={cn(
-          POSSIBLE_LINEUPS_FIELD_BODY_CLASS,
-          "relative flex flex-col overflow-hidden px-1 pt-0.5"
-        )}
-      >
-        {!ready ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]">
-            <LoadingCenter label="Cargando alineaciones…" minHeightClassName="min-h-0" />
-          </div>
-        ) : null}
-
-        {ready ? (
-          <MvpTacticalFieldBody
-            awayTeam={awayTeam}
-            homeTeam={homeTeam}
-            awaySlots={awaySlots}
-            homeSlots={homeSlots}
-            awayBench={awayBench}
-            homeBench={homeBench}
-            resolvedAwayLineup={resolvedAwayLineup}
-            resolvedHomeLineup={resolvedHomeLineup}
-            awaySquad={awaySquad}
-            homeSquad={homeSquad}
-            layout={layout}
-            interactive={false}
-          />
-        ) : null}
-      </div>
-    </div>
+    <TacticalLineupsPanelShell loading={!ready} className="h-full min-h-0">
+      <MvpTacticalFieldBody
+        awayTeam={awayTeam}
+        homeTeam={homeTeam}
+        awaySlots={awaySlots}
+        homeSlots={homeSlots}
+        awayBench={awayBench}
+        homeBench={homeBench}
+        resolvedAwayLineup={resolvedAwayLineup}
+        resolvedHomeLineup={resolvedHomeLineup}
+        awaySquad={awaySquad}
+        homeSquad={homeSquad}
+        layout={layout}
+        interactive={false}
+      />
+    </TacticalLineupsPanelShell>
   );
 }

@@ -4,17 +4,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
+import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
 import { Button } from "@/components/ui/button";
 import {
   findMvpOptionBySaved,
   mvpSelectionKey,
   resolveMvpSelection,
 } from "@/lib/lineup/mvp-selection-key";
-import { MVP_MODAL_FIELD_BODY_CLASS } from "@/lib/lineup/field-asset";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
 import { cn } from "@/lib/utils";
-import { LoadingCenter } from "@/components/ui/spinner";
 
 type MvpPickPanelProps = {
   poolId: string;
@@ -35,8 +34,6 @@ type SquadPlayerOption = {
   shirtNumber: number | null;
   position: string | null;
 };
-
-const MVP_SAVE_FOOTER_CLASS = "h-9 shrink-0";
 
 function flattenSquadPlayers(
   squad: { players: Array<{ player_name: string; shirt_number: number | null; position: string | null }> } | null,
@@ -98,7 +95,7 @@ export function MvpPickPanel({
   } = useMatchTacticalLineupData(matchId, homeTeam, awayTeam);
 
   const layout = useMemo(
-    () => buildTacticalModalLayout("mvp-pick", awayBench.length, homeBench.length),
+    () => buildTacticalModalLayout(awayBench.length, homeBench.length),
     [awayBench.length, homeBench.length]
   );
 
@@ -202,65 +199,54 @@ export function MvpPickPanel({
   const pickDisabled = !serverEditable || pending;
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-      <div
-        className={cn(
-          MVP_MODAL_FIELD_BODY_CLASS,
-          "relative flex shrink-0 flex-col overflow-hidden px-1 pt-0.5"
-        )}
-      >
-        {!ready ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]">
-            <LoadingCenter label="Cargando alineaciones…" minHeightClassName="min-h-0" />
-          </div>
-        ) : null}
-
-        {ready ? (
-          <MvpTacticalFieldBody
-            awayTeam={awayTeam}
-            homeTeam={homeTeam}
-            awaySlots={awaySlots}
-            homeSlots={homeSlots}
-            awayBench={awayBench}
-            homeBench={homeBench}
-            resolvedAwayLineup={resolvedAwayLineup}
-            resolvedHomeLineup={resolvedHomeLineup}
-            awaySquad={awaySquad}
-            homeSquad={homeSquad}
-            layout={layout}
-            interactive
-            selectedKey={selectedKey}
-            selectedPlayer={selectedOption}
-            disabled={pickDisabled}
-            onSelect={setSelectedKey}
-          />
-        ) : null}
-      </div>
-
-      <div
-        className={cn(
-          MVP_SAVE_FOOTER_CLASS,
-          "flex flex-col items-center justify-center gap-0.5 px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-0.5"
-        )}
-      >
-        {error ? (
-          <p className="text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
-            {error}
-          </p>
-        ) : null}
-        {!serverEditable ? (
-          <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
-        ) : (
-          <Button
-            className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
-            disabled={!selectedOption || pending}
-            onClick={onSave}
-            title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
-          >
-            {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
-          </Button>
-        )}
-      </div>
-    </div>
+    <TacticalLineupsPanelShell
+      loading={!ready}
+      className="h-full min-h-0"
+      footer={
+        <div
+          className={cn(
+            "shrink-0 bg-[var(--tm-accent)]",
+            "px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+          )}
+        >
+          {error ? (
+            <p className="mb-1 text-center text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {!serverEditable ? (
+            <p className="py-1 text-center text-[9px] text-black/70">Predicción cerrada.</p>
+          ) : (
+            <Button
+              className="h-10 min-h-10 w-full rounded-full bg-black/10 text-sm font-semibold text-black hover:bg-black/15"
+              disabled={!selectedOption || pending}
+              onClick={onSave}
+              title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
+            >
+              {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <MvpTacticalFieldBody
+        awayTeam={awayTeam}
+        homeTeam={homeTeam}
+        awaySlots={awaySlots}
+        homeSlots={homeSlots}
+        awayBench={awayBench}
+        homeBench={homeBench}
+        resolvedAwayLineup={resolvedAwayLineup}
+        resolvedHomeLineup={resolvedHomeLineup}
+        awaySquad={awaySquad}
+        homeSquad={homeSquad}
+        layout={layout}
+        interactive
+        selectedKey={selectedKey}
+        selectedPlayer={selectedOption}
+        disabled={pickDisabled}
+        onSelect={setSelectedKey}
+      />
+    </TacticalLineupsPanelShell>
   );
 }

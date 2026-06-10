@@ -69,7 +69,7 @@ export function MvpTacticalFieldBody({
   return (
     <div
       className={cn(
-        "mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden",
+        "mx-auto flex w-full min-w-0 shrink-0 flex-col",
         className
       )}
     >
@@ -99,7 +99,7 @@ export function MvpTacticalFieldBody({
         </div>
       ) : null}
 
-      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden pb-1">
+      <div className="flex shrink-0 items-center justify-center pb-1">
         <MvpHorizontalFieldGraphic
           awaySlots={awaySlots}
           homeSlots={homeSlots}

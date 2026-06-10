@@ -30,19 +30,17 @@ export const MVP_MODAL_FIELD_HEIGHT_REM = 27;
 /** Pie fijo del modal MVP (botón guardar); se suma sin reducir el campo. */
 export const MVP_MODAL_SAVE_FOOTER_REM = 2.25;
 
-/** Panel elección MVP: viewport táctico + pie de guardado. */
-export const MVP_MODAL_PICK_PANEL_CLASS = `h-[min(calc(100dvh-3.5rem),calc(${MVP_MODAL_FIELD_HEIGHT_REM}rem+${MVP_MODAL_SAVE_FOOTER_REM}rem))]`;
+/** Pie del modal MVP (botón guardar). */
+export const MVP_MODAL_FOOTER_HEIGHT_REM = MVP_MODAL_SAVE_FOOTER_REM;
 
-/** Panel posibles alineaciones: mismo tamaño exterior que MVP (sin pie de guardar). */
-export const POSSIBLE_LINEUPS_MODAL_PANEL_CLASS = MVP_MODAL_PICK_PANEL_CLASS;
+/** Panel elección MVP: altura fija (cuerpo táctico + pie). */
+export const MVP_MODAL_PICK_PANEL_CLASS = `h-[min(calc(100dvh-3.5rem),calc(${MVP_MODAL_FIELD_HEIGHT_REM}rem+${MVP_MODAL_SAVE_FOOTER_REM}rem))] min-h-[min(calc(100dvh-3.5rem),calc(${MVP_MODAL_FIELD_HEIGHT_REM}rem+${MVP_MODAL_SAVE_FOOTER_REM}rem))]`;
+
+/** Panel posibles alineaciones: mismo cuerpo táctico que MVP (sin pie). */
+export const POSSIBLE_LINEUPS_MODAL_PANEL_CLASS = `h-[min(calc(100dvh-3.5rem),${MVP_MODAL_FIELD_HEIGHT_REM}rem)] min-h-[min(calc(100dvh-3.5rem),${MVP_MODAL_FIELD_HEIGHT_REM}rem)]`;
 
 /** @deprecated Usar POSSIBLE_LINEUPS_MODAL_PANEL_CLASS */
 export const MVP_MODAL_PANEL_CLASS = POSSIBLE_LINEUPS_MODAL_PANEL_CLASS;
 
-/** Cuerpo táctico MVP (panel menos cabecera y pie). */
+/** Cuerpo táctico compartido (MVP y posibles alineaciones). */
 export const MVP_MODAL_FIELD_BODY_HEIGHT_REM = 25;
-export const MVP_MODAL_FIELD_BODY_CLASS = `h-[min(calc(100dvh-6.5rem),${MVP_MODAL_FIELD_BODY_HEIGHT_REM}rem)] w-full shrink-0`;
-
-/** Cuerpo posibles alineaciones: ocupa el hueco del campo + pie del modal MVP. */
-export const POSSIBLE_LINEUPS_FIELD_BODY_CLASS =
-  "min-h-0 flex-1 w-full";
