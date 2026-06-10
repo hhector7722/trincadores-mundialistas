@@ -134,29 +134,29 @@ export function ProbableXI({
       ) : null}
 
       <div ref={layoutRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          {(markFieldReady) => (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 pt-1">
-              {bench.length > 0 ? (
-                <BenchPlayersStrip
-                  teamName={teamName}
-                  players={bench}
-                  density="secondary"
-                  showTeamHeader={false}
-                  gridLayout={fitLayout?.bench}
-                  position="top"
-                  onPlayerClick={() => {}}
-                />
-              ) : null}
+        {bench.length > 0 ? (
+          <BenchPlayersStrip
+            teamName={teamName}
+            players={bench}
+            density="secondary"
+            showTeamHeader={false}
+            gridLayout={fitLayout?.bench}
+            position="top"
+            className="shrink-0 px-2 pt-1"
+            onPlayerClick={() => {}}
+          />
+        ) : null}
 
-              <div className="flex min-h-[14rem] flex-1 items-center justify-center py-1">
-                <TeamLineupGraphic
-                  slots={lineupResolved.slots}
-                  teamName={teamName}
-                  onFieldReady={markFieldReady}
-                />
-              </div>
-            </div>
+        <LineupFieldGate className="flex shrink-0 flex-col items-center justify-center overflow-visible px-2">
+          {(markFieldReady) => (
+            <TeamLineupGraphic
+              slots={lineupResolved.slots}
+              teamName={teamName}
+              onFieldReady={markFieldReady}
+              widthPx={fitLayout?.fieldWidthPx}
+              heightPx={fitLayout?.fieldHeightPx}
+              chipScale={1}
+            />
           )}
         </LineupFieldGate>
 
@@ -165,6 +165,7 @@ export function ProbableXI({
           sourceKind={lineupResolved.sourceKind}
           formationLabel={lineupResolved.formationLabel}
           fetchedAt={lineupResolved.fetchedAt}
+          className="mt-auto"
         />
       </div>
     </div>

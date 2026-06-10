@@ -25,21 +25,7 @@ export function entityModalTitleContent(
     case "player":
       return view.playerName;
     case "mvp":
-      return (
-        <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-xs normal-case tracking-normal">
-          <span className="font-semibold text-[var(--tm-fg)]">MVP</span>
-          <span aria-hidden className="text-[var(--tm-muted)]">
-            ·
-          </span>
-          <TeamFlagBadge name={view.awayTeam} size="xs" />
-          <span className="truncate">{teamNameEs(view.awayTeam)}</span>
-          <span aria-hidden className="shrink-0 text-[var(--tm-muted)]">
-            vs
-          </span>
-          <TeamFlagBadge name={view.homeTeam} size="xs" />
-          <span className="truncate">{teamNameEs(view.homeTeam)}</span>
-        </span>
-      );
+      return "MVP";
     default:
       return "Detalle";
   }

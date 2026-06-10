@@ -1,5 +1,27 @@
 import { describe, expect, it } from "vitest";
+import { pickBenchGrid } from "./bench-grid-layout";
 import { computeFitLineupLayout, VERTICAL_PITCH_ASPECT } from "./fit-lineup-layout";
+
+describe("pickBenchGrid", () => {
+  it("prefiere varias filas frente a una sola fila larga", () => {
+    const grid = pickBenchGrid(
+      12,
+      80,
+      {
+        rowHeight: 28,
+        nameFont: 10,
+        numberFont: 12,
+        minRowHeight: 24,
+        minNameFont: 9,
+        minNumberFont: 11,
+      },
+      { minRows: 2, maxRows: 4, maxColumns: 10 }
+    );
+
+    expect(grid.rows).toBeGreaterThanOrEqual(2);
+    expect(grid.columns).toBeLessThan(12);
+  });
+});
 
 describe("computeFitLineupLayout", () => {
   it("reserva espacio para meta y calcula banquillo legible", () => {
@@ -12,12 +34,13 @@ describe("computeFitLineupLayout", () => {
     });
 
     expect(layout.bench.columns).toBeGreaterThan(0);
+    expect(layout.bench.rows).toBeGreaterThanOrEqual(2);
     expect(layout.bench.nameFontPx).toBeGreaterThanOrEqual(9);
-    expect(layout.bench.numberFontPx).toBeGreaterThanOrEqual(11);
-    expect(layout.metaPx).toBe(56);
+    expect(layout.fieldHeightPx).toBeGreaterThan(0);
+    expect(layout.fieldWidthPx).toBeCloseTo(layout.fieldHeightPx * VERTICAL_PITCH_ASPECT, 1);
   });
 
-  it("encaja banquillo en viewports bajos sin scroll", () => {
+  it("encaja banquillo, campo y meta sin scroll", () => {
     const heightPx = 520;
     const metaPx = 56;
     const gapPx = 4;
@@ -29,22 +52,10 @@ describe("computeFitLineupLayout", () => {
       gapPx,
     });
 
-    const total = layout.bench.heightPx + metaPx + gapPx;
-    expect(total).toBeLessThanOrEqual(heightPx + 1);
-  });
+    const usableHeight = heightPx - metaPx - gapPx;
+    const total = layout.bench.heightPx + layout.fieldHeightPx + metaPx + gapPx * 2;
 
-  it("prioriza altura de campo vertical", () => {
-    const layout = computeFitLineupLayout({
-      widthPx: 320,
-      heightPx: 600,
-      benchCount: 12,
-      metaPx: 56,
-      gapPx: 4,
-    });
-
-    const usableHeight = 600 - 56 - 4;
-    const fieldEstimate = usableHeight - layout.bench.heightPx - 4;
-    expect(fieldEstimate / usableHeight).toBeGreaterThanOrEqual(0.55);
-    expect(VERTICAL_PITCH_ASPECT).toBeCloseTo(68 / 105, 4);
+    expect(total).toBeLessThanOrEqual(heightPx + 2);
+    expect(layout.fieldHeightPx / usableHeight).toBeGreaterThanOrEqual(0.65);
   });
 });

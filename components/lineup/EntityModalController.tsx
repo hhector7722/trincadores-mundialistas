@@ -201,7 +201,7 @@ export function EntityModalController({
       }
       belowPanel={
         canSwipeTeams && atLineupCarousel ? (
-          <div className="mt-1 shrink-0 pb-1">
+          <div className="mt-2 shrink-0 pb-2 pt-1">
             <CarouselSwipeDots activeIndex={teamCarouselIndex} total={carouselTeams?.length ?? 0} />
           </div>
         ) : undefined

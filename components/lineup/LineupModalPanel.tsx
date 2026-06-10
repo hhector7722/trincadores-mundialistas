@@ -128,32 +128,32 @@ export function LineupModalPanel({
         </p>
       ) : null}
 
-      <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-1 pt-0.5">
-            {bench.length > 0 ? (
-              <BenchPlayersStrip
-                teamName={teamName}
-                players={bench}
-                density="secondary"
-                showTeamHeader={false}
-                gridLayout={fitLayout?.bench}
-                position="top"
-                onPlayerClick={(player) => handlePlayerInteraction(player.name)}
-              />
-            ) : null}
+      {bench.length > 0 ? (
+        <BenchPlayersStrip
+          teamName={teamName}
+          players={bench}
+          density="secondary"
+          showTeamHeader={false}
+          gridLayout={fitLayout?.bench}
+          position="top"
+          className="shrink-0 px-1 pt-0.5"
+          onPlayerClick={(player) => handlePlayerInteraction(player.name)}
+        />
+      ) : null}
 
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-0.5">
-              <TeamLineupGraphic
-                slots={lineupResolved.slots}
-                teamName={teamName}
-                squadPlayerNames={squad.players.map((player) => player.player_name)}
-                size="modal"
-                onPlayerClick={handlePlayerInteraction}
-                onFieldReady={markFieldReady}
-              />
-            </div>
-          </div>
+      <LineupFieldGate className="flex shrink-0 flex-col items-center justify-center overflow-visible px-1">
+        {(markFieldReady) => (
+          <TeamLineupGraphic
+            slots={lineupResolved.slots}
+            teamName={teamName}
+            squadPlayerNames={squad.players.map((player) => player.player_name)}
+            size="modal"
+            onPlayerClick={handlePlayerInteraction}
+            onFieldReady={markFieldReady}
+            widthPx={fitLayout?.fieldWidthPx}
+            heightPx={fitLayout?.fieldHeightPx}
+            chipScale={1}
+          />
         )}
       </LineupFieldGate>
 
@@ -162,6 +162,7 @@ export function LineupModalPanel({
         sourceKind={lineupResolved.sourceKind}
         formationLabel={lineupResolved.formationLabel}
         fetchedAt={lineupResolved.fetchedAt}
+        className="mt-auto"
       />
     </div>
   );

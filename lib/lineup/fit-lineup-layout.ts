@@ -1,18 +1,15 @@
 /** Proporción ancho:alto del terreno vertical (~68×105 m). */
 export const VERTICAL_PITCH_ASPECT = 68 / 105;
 
-export type BenchLayoutConfig = {
-  columns: number;
-  rows: number;
-  heightPx: number;
-  rowHeightPx: number;
-  nameFontPx: number;
-  numberFontPx: number;
-};
+export type { BenchLayoutConfig } from "./bench-grid-layout";
+export { EMPTY_BENCH, pickBenchGrid } from "./bench-grid-layout";
+
+import { pickBenchGrid } from "./bench-grid-layout";
 
 export type FitLineupLayout = {
-  bench: BenchLayoutConfig;
-  /** Reservado para meta inferior (px). */
+  bench: import("./bench-grid-layout").BenchLayoutConfig;
+  fieldWidthPx: number;
+  fieldHeightPx: number;
   metaPx: number;
 };
 
@@ -24,86 +21,22 @@ export type ComputeFitLineupLayoutOptions = {
   gapPx?: number;
 };
 
-const BENCH_ROW_GAP = 2;
-const EMPTY_BENCH: BenchLayoutConfig = {
-  columns: 0,
-  rows: 0,
-  heightPx: 0,
-  rowHeightPx: 0,
-  nameFontPx: 0,
-  numberFontPx: 0,
-};
-
-type BenchSizePrefs = {
-  rowHeight: number;
-  nameFont: number;
-  numberFont: number;
-  minRowHeight: number;
-  minNameFont: number;
-  minNumberFont: number;
-};
-
-/** Tipografía legible para suplentes en alineación individual. */
-const LINEUP_BENCH: BenchSizePrefs = {
-  rowHeight: 30,
-  nameFont: 11,
-  numberFont: 13,
+const LINEUP_BENCH = {
+  rowHeight: 28,
+  nameFont: 10,
+  numberFont: 12,
   minRowHeight: 24,
   minNameFont: 9,
   minNumberFont: 11,
 };
 
-/** Campo vertical ocupa al menos ~58 % del área útil. */
-const MIN_FIELD_HEIGHT_RATIO = 0.58;
-
-function benchConfig(
-  count: number,
-  rowHeightPx: number,
-  nameFontPx: number,
-  numberFontPx: number
-): BenchLayoutConfig {
-  if (count <= 0) return EMPTY_BENCH;
-
-  let best: BenchLayoutConfig | null = null;
-
-  for (let rows = 1; rows <= Math.min(count, 4); rows += 1) {
-    const columns = Math.ceil(count / rows);
-    const heightPx = rows * rowHeightPx + Math.max(0, rows - 1) * BENCH_ROW_GAP;
-    const candidate = { columns, rows, heightPx, rowHeightPx, nameFontPx, numberFontPx };
-    if (!best || heightPx < best.heightPx) {
-      best = candidate;
-    }
-  }
-
-  return best ?? EMPTY_BENCH;
-}
-
-function fitBenchInHeight(
-  count: number,
-  maxHeight: number,
-  prefs: BenchSizePrefs
-): BenchLayoutConfig {
-  if (count <= 0) return EMPTY_BENCH;
-
-  let rowHeight = prefs.rowHeight;
-  let nameFont = prefs.nameFont;
-  let numberFont = prefs.numberFont;
-
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    const config = benchConfig(count, rowHeight, nameFont, numberFont);
-    if (config.heightPx <= maxHeight + 0.5 || attempt === 9) {
-      return config;
-    }
-    rowHeight = Math.max(prefs.minRowHeight, rowHeight - 2);
-    nameFont = Math.max(prefs.minNameFont, nameFont - 0.5);
-    numberFont = Math.max(prefs.minNumberFont, numberFont - 0.5);
-  }
-
-  return benchConfig(count, prefs.minRowHeight, prefs.minNameFont, prefs.minNumberFont);
-}
+/** Campo vertical: 65–75 % del área útil. */
+const FIELD_HEIGHT_MIN_RATIO = 0.65;
+const FIELD_HEIGHT_TARGET_RATIO = 0.68;
+const FIELD_HEIGHT_MAX_RATIO = 0.75;
 
 /**
- * Alineación vertical: el campo manda; suplentes legibles en el espacio superior restante.
+ * Alineación vertical: el campo manda (~68 %); convocatoria en 2–3 filas arriba.
  */
 export function computeFitLineupLayout(opts: ComputeFitLineupLayoutOptions): FitLineupLayout {
   const gap = opts.gapPx ?? 4;
@@ -111,17 +44,46 @@ export function computeFitLineupLayout(opts: ComputeFitLineupLayoutOptions): Fit
   const usableHeight = Math.max(0, opts.heightPx - opts.metaPx - gap);
 
   const naturalFieldHeight = usableWidth / VERTICAL_PITCH_ASPECT;
-  const minFieldHeight = usableHeight * MIN_FIELD_HEIGHT_RATIO;
-  const fieldHeightPx = Math.max(
-    minFieldHeight,
-    Math.min(naturalFieldHeight, usableHeight * 0.74)
+  let fieldHeightPx = Math.min(
+    naturalFieldHeight,
+    usableHeight * FIELD_HEIGHT_TARGET_RATIO
+  );
+  fieldHeightPx = Math.max(
+    usableHeight * FIELD_HEIGHT_MIN_RATIO,
+    Math.min(fieldHeightPx, usableHeight * FIELD_HEIGHT_MAX_RATIO)
   );
 
-  const benchSpace = Math.max(0, usableHeight - fieldHeightPx - gap);
-  const bench = fitBenchInHeight(opts.benchCount, benchSpace, LINEUP_BENCH);
+  let benchSpace = Math.max(0, usableHeight - fieldHeightPx - gap);
+  let bench = pickBenchGrid(opts.benchCount, benchSpace, LINEUP_BENCH, {
+    minRows: opts.benchCount >= 8 ? 2 : 1,
+    maxRows: 4,
+    maxColumns: 10,
+  });
+
+  if (bench.heightPx > benchSpace + 0.5 && opts.benchCount > 0) {
+    fieldHeightPx = Math.max(
+      usableHeight * FIELD_HEIGHT_MIN_RATIO,
+      usableHeight - bench.heightPx - gap
+    );
+    benchSpace = Math.max(0, usableHeight - fieldHeightPx - gap);
+    bench = pickBenchGrid(opts.benchCount, benchSpace, LINEUP_BENCH, {
+      minRows: opts.benchCount >= 8 ? 2 : 1,
+      maxRows: 4,
+      maxColumns: 10,
+    });
+  }
+
+  const fieldWidthPx = Math.min(usableWidth, fieldHeightPx * VERTICAL_PITCH_ASPECT);
+
+  const totalUsed = bench.heightPx + fieldHeightPx + gap;
+  if (totalUsed > usableHeight + 0.5 && opts.benchCount > 0) {
+    fieldHeightPx = Math.max(120, usableHeight - bench.heightPx - gap);
+  }
 
   return {
     bench,
+    fieldWidthPx: Math.min(usableWidth, fieldHeightPx * VERTICAL_PITCH_ASPECT),
+    fieldHeightPx,
     metaPx: opts.metaPx,
   };
 }
