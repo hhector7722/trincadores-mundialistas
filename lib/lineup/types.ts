@@ -1,6 +1,6 @@
 export type PositionRole = "GK" | "DF" | "MF" | "FW";
 
-export type FormationId = "4-3-3" | "4-4-2" | "4-2-3-1" | "3-5-2" | "5-3-2";
+export type FormationId = "4-3-3" | "4-4-2" | "4-2-3-1" | "4-1-4-1" | "3-5-2" | "5-3-2";
 
 export type LineupPlayerInput = {
   player_name: string;

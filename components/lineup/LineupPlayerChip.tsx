@@ -50,10 +50,10 @@ export function LineupPlayerChip({
         className={cn(
           "block shrink-0",
           isMatch
-            ? "h-[2.4rem] w-[2.1rem] sm:h-[2.55rem] sm:w-[2.2rem]"
+            ? "h-[2.5rem] w-[2.15rem] sm:h-[2.65rem] sm:w-[2.3rem]"
             : isModal
-              ? "h-[1.75rem] w-[1.5rem]"
-              : "h-[4.25rem] w-[3.25rem] sm:h-[4.75rem] sm:w-14",
+              ? "h-[2.2rem] w-[1.9rem]"
+              : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
           interactive && "transition-transform active:scale-95"
         )}
       >
@@ -81,7 +81,7 @@ export function LineupPlayerChip({
           textAnchor="middle"
           dominantBaseline="middle"
           fill={dorsalColor}
-          fontSize={isMatch ? "13" : isModal ? "11" : "19"}
+          fontSize={isMatch ? "14" : isModal ? "12" : "20"}
           fontWeight="700"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
@@ -98,7 +98,7 @@ export function LineupPlayerChip({
         <p
           className={cn(
             "whitespace-normal text-center leading-tight text-white",
-            isMatch ? "text-[9px] font-bold leading-none" : isModal ? "text-[7px] font-semibold" : "text-[9px] font-semibold sm:text-[10px]"
+            isMatch ? "text-[9px] font-bold leading-none" : isModal ? "text-[8px] font-semibold leading-none" : "text-[9px] font-semibold sm:text-[10px]"
           )}
         >
           {squadPlayerNames?.length
@@ -117,10 +117,10 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "min-h-12 w-[3.35rem] touch-manipulation"
+      ? "min-h-12 w-[3.4rem] touch-manipulation"
       : isModal
-        ? "w-[2.75rem] min-h-8"
-        : "w-[4.5rem] min-h-12 sm:w-[5.25rem]",
+        ? "w-[3rem] min-h-10"
+        : "w-[4.75rem] min-h-12 sm:w-[5.5rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"
   );

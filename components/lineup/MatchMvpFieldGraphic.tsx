@@ -14,8 +14,6 @@ type MatchMvpFieldGraphicProps = {
   awaySlots: MatchFieldSlot[];
   homeTeam: string;
   awayTeam: string;
-  homeFormation?: string;
-  awayFormation?: string;
   homeSquadPlayerNames?: string[];
   awaySquadPlayerNames?: string[];
   selectedKey: string | null;
@@ -30,8 +28,6 @@ export function MatchMvpFieldGraphic({
   awaySlots,
   homeTeam,
   awayTeam,
-  homeFormation,
-  awayFormation,
   homeSquadPlayerNames,
   awaySquadPlayerNames,
   selectedKey,
@@ -81,7 +77,7 @@ export function MatchMvpFieldGraphic({
       role="img"
       aria-label={`Campo táctico MVP: ${starterCount} titulares, ${teamNameEs(awayTeam)} arriba y ${teamNameEs(homeTeam)} abajo`}
       className={cn(
-        "relative w-full max-w-[min(98vw,22rem)] shrink-0 overflow-visible",
+        "relative w-full max-w-[min(98vw,23rem)] shrink-0 overflow-visible",
         MVP_PITCH_ASPECT_CLASS,
         className
       )}
@@ -89,18 +85,6 @@ export function MatchMvpFieldGraphic({
       <div className="absolute inset-0">
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
-
-      {awayFormation ? (
-        <div className="pointer-events-none absolute left-1/2 top-[3%] z-30 -translate-x-1/2 rounded bg-black/55 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest text-white/85 backdrop-blur-sm">
-          {awayFormation}
-        </div>
-      ) : null}
-
-      {homeFormation ? (
-        <div className="pointer-events-none absolute bottom-[3%] left-1/2 z-30 -translate-x-1/2 rounded bg-black/55 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest text-white/85 backdrop-blur-sm">
-          {homeFormation}
-        </div>
-      ) : null}
 
       {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
       {homeSlots.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}

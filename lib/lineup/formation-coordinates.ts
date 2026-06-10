@@ -65,6 +65,7 @@ export const FORMATION_IDS: readonly FormationId[] = [
   "4-4-2",
   "4-3-3",
   "4-2-3-1",
+  "4-1-4-1",
   "3-5-2",
   "5-3-2",
 ];
@@ -113,6 +114,19 @@ export const FORMATION_SLOT_ANCHORS: Record<FormationId, FormationSlotAnchor[]> 
     { key: "LW", accept: ["LW"], coord: { x: X.L, y: Y.ATTACK } },
     { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.C, y: Y.ATTACK } },
     { key: "RW", accept: ["RW"], coord: { x: X.R, y: Y.ATTACK } },
+    { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: Y.FORWARD } },
+  ],
+  "4-1-4-1": [
+    { key: "GK", accept: ["GK"], coord: { x: X.C, y: Y.GOALKEEPER } },
+    { key: "LB", accept: ["LB", "LWB"], coord: { x: X.L, y: Y.DEFENSE } },
+    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: X.IL, y: Y.DEFENSE } },
+    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: X.IR, y: Y.DEFENSE } },
+    { key: "RB", accept: ["RB", "RWB"], coord: { x: X.R, y: Y.DEFENSE } },
+    { key: "DM", accept: ["DM", "CDM", "MCD"], coord: { x: X.C, y: Y.HOLDING } },
+    { key: "LM", accept: ["LM", "LW"], coord: { x: X.L, y: Y.MIDFIELD } },
+    { key: "LCM", accept: ["LCM", "CM"], coord: { x: X.IL, y: Y.MIDFIELD } },
+    { key: "RCM", accept: ["RCM", "CM"], coord: { x: X.IR, y: Y.MIDFIELD } },
+    { key: "RM", accept: ["RM", "RW"], coord: { x: X.R, y: Y.MIDFIELD } },
     { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: Y.FORWARD } },
   ],
   "3-5-2": [

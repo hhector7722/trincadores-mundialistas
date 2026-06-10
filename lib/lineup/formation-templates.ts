@@ -124,6 +124,12 @@ export function fallbackSlotKeyForRole(
     return "CM";
   }
 
+  if (formation === "4-1-4-1") {
+    if (role === "MF") return (["DM", "LM", "LCM", "RCM", "RM"] as const)[index] ?? "CM";
+    if (role === "FW") return "ST";
+    return "CM";
+  }
+
   // 4-3-3
   if (role === "MF") return (["DM", "LCM", "RCM"] as const)[index] ?? "CM";
   if (role === "FW") return (["LW", "ST", "RW"] as const)[index] ?? "ST";
@@ -160,6 +166,12 @@ function expandedAccept(
       keys.add("LM");
       keys.add("RM");
     }
+  }
+
+  if (formation === "4-1-4-1") {
+    if (keys.has("LM")) keys.add("LW");
+    if (keys.has("RM")) keys.add("RW");
+    if (keys.has("DM")) keys.add("CM");
   }
 
   if (formation === "3-5-2") {
