@@ -5,6 +5,7 @@ import { TOURNAMENT_GENERAL_SCORE_POINTS } from "@/lib/tournament-predictions/sc
 const { exact, sign } = MATCH_SCORE_POINTS;
 const {
   champion,
+  finalistSingle,
   finalists,
   topScorer,
   tournamentMvp,
@@ -36,7 +37,8 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
     title: "Pronósticos pre-torneo",
     body: [
       `Campeón: +${champion} pts.`,
-      `Finalistas: +${finalists} pts si aciertas los dos equipos de la final.`,
+      `Finalistas — un equipo acertado: +${finalistSingle} pts.`,
+      `Finalistas — los dos equipos acertados: +${finalists} pts (el orden no importa).`,
       `Máximo goleador: +${topScorer} pts.`,
       `MVP: +${tournamentMvp} pts.`,
       `Mejor portero: +${goldenGlove} pts.`,

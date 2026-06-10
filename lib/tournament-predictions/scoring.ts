@@ -1,6 +1,7 @@
 /** Debe coincidir con las funciones `tournament_*_points()` en SQL. */
 export const TOURNAMENT_GENERAL_SCORE_POINTS = {
   champion: 10,
+  finalistSingle: 2,
   finalists: 5,
   topScorer: 7,
   tournamentMvp: 10,
@@ -40,19 +41,35 @@ export function computeTournamentChampionPoints(
     : 0;
 }
 
-/** 5 pts si aciertas los dos finalistas (orden indiferente). */
+function countFinalistHits(
+  predictedA: string | null,
+  predictedB: string | null,
+  officialA: string | null,
+  officialB: string | null
+): number {
+  if (!officialA || !officialB) return 0;
+  const officials = new Set([norm(officialA), norm(officialB)]);
+  const predicted = new Set(
+    [predictedA, predictedB].filter((team): team is string => Boolean(team?.trim())).map(norm)
+  );
+  let hits = 0;
+  for (const team of predicted) {
+    if (officials.has(team)) hits++;
+  }
+  return hits;
+}
+
+/** +2 pts por un finalista acertado; +5 pts si aciertas los dos (orden indiferente). */
 export function computeTournamentFinalistsPoints(
   predictedA: string | null,
   predictedB: string | null,
   officialA: string | null,
   officialB: string | null
 ): number {
-  if (!predictedA || !predictedB || !officialA || !officialB) return 0;
-  const direct =
-    norm(predictedA) === norm(officialA) && norm(predictedB) === norm(officialB);
-  const swapped =
-    norm(predictedA) === norm(officialB) && norm(predictedB) === norm(officialA);
-  return direct || swapped ? TOURNAMENT_GENERAL_SCORE_POINTS.finalists : 0;
+  const hits = countFinalistHits(predictedA, predictedB, officialA, officialB);
+  if (hits >= 2) return TOURNAMENT_GENERAL_SCORE_POINTS.finalists;
+  if (hits === 1) return TOURNAMENT_GENERAL_SCORE_POINTS.finalistSingle;
+  return 0;
 }
 
 export function computeTournamentPlayerAwardPoints(

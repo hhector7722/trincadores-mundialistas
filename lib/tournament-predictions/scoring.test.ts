@@ -32,10 +32,14 @@ describe("computeTournamentFinalistsPoints", () => {
     );
   });
 
-  it("0 pts si solo aciertas uno", () => {
+  it("2 pts si aciertas solo un finalista", () => {
     assert.equal(
       computeTournamentFinalistsPoints("Argentina", "España", "Argentina", "Francia"),
-      0
+      2
+    );
+    assert.equal(
+      computeTournamentFinalistsPoints("Argentina", null, "Argentina", "Francia"),
+      2
     );
   });
 });
