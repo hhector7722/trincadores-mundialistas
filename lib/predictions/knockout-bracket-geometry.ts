@@ -109,6 +109,9 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
 export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 
+/** Mitad del orbe en X (% canvas) para anclar líneas conectoras. */
+export const ORB_HALF_WIDTH_X = 2.65 * KO_CARD_SIZE_SCALE;
+
 /** Margen lateral homogéneo para las columnas del cuadro (% canvas). */
 export const BRACKET_COLUMN_INSET = 3.5;
 
@@ -195,6 +198,15 @@ export function cardEdgeX(
   layoutScale: number
 ): number {
   const half = CARD_HALF_WIDTH_BASE * layoutScale;
+  return edge === "left" ? columnX - half : columnX + half;
+}
+
+export function connectorEdgeX(
+  columnX: number,
+  edge: "left" | "right",
+  layoutScale: number
+): number {
+  const half = ORB_HALF_WIDTH_X * Math.min(layoutScale, 1.12);
   return edge === "left" ? columnX - half : columnX + half;
 }
 
@@ -341,8 +353,8 @@ function connectChildToParent(
     parent.round === "sf"
       ? parent.columnX
       : gutterX(Math.min(child.column, parent.column), Math.max(child.column, parent.column));
-  const xStart = cardEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
-  const xEnd = cardEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
+  const xStart = connectorEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
+  const xEnd = connectorEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
   const childAbove = child.midY < parent.midY;
   if (
@@ -364,7 +376,7 @@ function connectSemiToFinal(
   finalCenterY: number
 ): string {
   const isLeft = semi.side === "left";
-  const xStart = cardEdgeX(semi.columnX, isLeft ? "right" : "left", semi.layoutScale);
+  const xStart = connectorEdgeX(semi.columnX, isLeft ? "right" : "left", semi.layoutScale);
 
   return `M ${xStart} ${semi.midY} H ${semi.columnX} V ${finalCenterY} H ${anchorX}`;
 }
@@ -383,14 +395,10 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    if (
-      Math.abs(geom.homeY - geom.awayY) > 0.01 &&
-      geom.round !== "r16" &&
-      geom.round !== "qf"
-    ) {
+    if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
       segments.push({
         d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
-        variant: geom.round === "r32" ? "pair" : "default",
+        variant: "pair",
       });
     }
 
@@ -421,6 +429,18 @@ export function buildBracketConnectorPaths(
       d: connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X, finalCenterY),
       variant: "final",
     });
+  }
+
+  const final = byNumber.get(104);
+  if (final?.homeX != null && final.awayX != null) {
+    const homeEdge = connectorEdgeX(final.homeX, "right", final.layoutScale);
+    const awayEdge = connectorEdgeX(final.awayX, "left", final.layoutScale);
+    if (Math.abs(homeEdge - awayEdge) > 0.05) {
+      segments.push({
+        d: `M ${homeEdge} ${final.midY} H ${awayEdge}`,
+        variant: "final",
+      });
+    }
   }
 
   return segments;

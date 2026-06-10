@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   bracketGridRowCenter,
+  buildBracketConnectorPaths,
   buildBracketGeometry,
   COL_FINAL_AWAY,
   COL_FINAL_HOME,
@@ -61,5 +62,15 @@ describe("bracket grid guide (invisible layout)", () => {
     expect(final?.homeX).toBeLessThan(final?.awayX ?? 0);
     expect(final?.homeX).toBeGreaterThan(leftSf?.columnX ?? 0);
     expect(final?.awayX).toBeLessThan(rightSf?.columnX ?? 100);
+  });
+
+  it("generates inter-round connector segments for the full bracket", () => {
+    const geoms = buildBracketGeometry();
+    const segments = buildBracketConnectorPaths(geoms);
+
+    expect(segments.length).toBeGreaterThan(60);
+    expect(segments.some((segment) => segment.variant === "pair")).toBe(true);
+    expect(segments.some((segment) => segment.variant === "final")).toBe(true);
+    expect(segments.every((segment) => segment.d.startsWith("M"))).toBe(true);
   });
 });
