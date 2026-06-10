@@ -54,14 +54,13 @@ export function MatchContextActionsRow({
             />
           </div>
           {!hideMvp ? (
-            <div className="absolute left-1/2 top-0 z-[2] -translate-x-1/2">
-              <div className="inline-block min-w-[4.5rem] max-w-[min(42vw,9.5rem)]">
-                <MvpPredictionButton
-                  savedPlayerName={mvpSaved}
-                  onClick={onOpenMvp}
-                  variant={compact ? "compact" : "default"}
-                />
-              </div>
+            <div className="absolute inset-x-0 top-0 z-[2] px-1">
+              <MvpPredictionButton
+                savedPlayerName={mvpSaved}
+                onClick={onOpenMvp}
+                variant={compact ? "compact" : "default"}
+                className="w-full"
+              />
             </div>
           ) : null}
           <div
