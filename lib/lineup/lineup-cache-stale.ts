@@ -31,6 +31,12 @@ export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
     return true;
   }
 
+  if (
+    lineup.slots.some((slot) => !slot.isPlaceholder && slot.shirtNumber == null)
+  ) {
+    return true;
+  }
+
   if (shirts.length === 0) return false;
 
   return shirts.some((shirt) => shirt < 1 || shirt > FIFA_SQUAD_SHIRT_MAX);

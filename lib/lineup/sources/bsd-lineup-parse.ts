@@ -17,6 +17,8 @@ import {
   tacticalSlotLabelEs,
 } from "@/lib/lineup/tactical-profile";
 import {
+  assignStarterShirtNumbers,
+  findOfficialSquadMatch,
   findSquadPlayer,
   reserveSquadPlayerIdentity,
 } from "@/lib/lineup/sources/bsd-squad-match";
@@ -71,27 +73,25 @@ function toBenchPlayer(
   };
 }
 
-function resolvePredictedStarter(
+function resolvePredictedStarterIdentity(
   starter: BsdPredictedPlayer,
   index: number,
   players: LineupPlayerInput[],
   officialSquad: OfficialSquadPlayer[],
-  usedShirtNumbers: Set<number>,
   usedSquadIdentities: Set<string>
 ) {
-  const squadPlayer = findSquadPlayer(
+  const bsdJersey = starter.jersey_number ?? 0;
+  const squadPlayer = findOfficialSquadMatch(
     {
       name: starter.name ?? "",
-      shirtNumber: starter.jersey_number ?? 0,
+      shirtNumber: bsdJersey,
     },
     players,
     officialSquad,
-    usedShirtNumbers,
     { excludeIdentities: usedSquadIdentities }
   );
 
-  if (squadPlayer?.shirt_number) {
-    usedShirtNumbers.add(squadPlayer.shirt_number);
+  if (squadPlayer) {
     reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
   }
 
@@ -108,6 +108,7 @@ function resolvePredictedStarter(
     starter,
     squadPlayer,
     isPlaceholder,
+    bsdJersey,
   };
 }
 
@@ -131,15 +132,25 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
   const rawStarterInputs = starters
     .slice(0, 11)
     .map((starter, index) =>
-      resolvePredictedStarter(
+      resolvePredictedStarterIdentity(
         starter,
         index,
         players,
         officialSquad,
-        usedShirtNumbers,
         usedSquadIdentities
       )
     );
+
+  const starterShirts = assignStarterShirtNumbers(
+    rawStarterInputs.map((row) => ({
+      official: row.squadPlayer,
+      bsdJersey: row.bsdJersey,
+    })),
+    useOfficial
+  );
+  for (const shirt of starterShirts) {
+    if (shirt > 0) usedShirtNumbers.add(shirt);
+  }
 
   const refinedSlots = swapMirroredForwardSlots(
     swapMirroredDefenderSlots(
@@ -162,7 +173,7 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
       key: `${slotKey}-${row.index}`,
       name: row.name,
       shirtNumber: useOfficial
-        ? (row.squadPlayer?.shirt_number ?? null)
+        ? starterShirts[row.index]!
         : (row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? null),
       positionLabel:
         tacticalLabel ??

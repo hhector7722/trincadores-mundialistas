@@ -39,6 +39,12 @@ test("hasDuplicateStarterShirts detecta dorsales repetidos", () => {
   assert.equal(hasDuplicateStarterShirts(predictedLineup([1, 5, 10, 14])), false);
 });
 
+test("isPredictedLineupCacheStale detecta titulares sin dorsal", () => {
+  const lineup = predictedLineup([1, 5, 4, 10]);
+  lineup.slots[2] = { ...lineup.slots[2]!, shirtNumber: null };
+  assert.equal(isPredictedLineupCacheStale(lineup), true);
+});
+
 test("isPredictedLineupCacheStale detecta placeholders Por confirmar", () => {
   const lineup = predictedLineup([1, 5, 4, 10]);
   lineup.slots[3] = {
