@@ -54,7 +54,7 @@ export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }
   return (
     <div
       className={cn(
-        "tm-flag-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        "tm-circle-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
         dim,
         className
       )}

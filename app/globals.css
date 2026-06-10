@@ -292,7 +292,7 @@ html:has(.tm-app-frame) {
   -webkit-backdrop-filter: blur(20px);
 }
 
-.tm-flag-depth {
+.tm-circle-depth {
   border: 0.5px solid rgba(255, 255, 255, 0.42);
   background: #ffffff;
   box-shadow:

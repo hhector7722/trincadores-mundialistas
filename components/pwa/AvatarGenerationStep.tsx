@@ -134,7 +134,7 @@ export function AvatarGenerationStep({
 
       <div className="relative mx-auto flex size-44 items-center justify-center">
         <div className="absolute inset-0 rounded-full bg-[var(--tm-accent-soft)] blur-2xl" aria-hidden />
-        <div className="relative size-40 overflow-hidden rounded-full">
+        <div className="tm-circle-depth relative size-40 overflow-hidden rounded-full">
           <Image
             src={avatarUrl}
             alt={`Avatar de ${displayName}`}

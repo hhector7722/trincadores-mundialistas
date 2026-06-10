@@ -24,31 +24,52 @@ export function ProfileAvatar({
   className?: string;
   variant?: ProfileAvatarVariant;
 }) {
-  if (avatarUrl) {
+  if (variant === "profile") {
+    if (avatarUrl) {
+      return (
+        <img
+          src={avatarUrl}
+          alt=""
+          className={cn("block shrink-0 rounded-xl object-contain", className)}
+        />
+      );
+    }
+
     return (
-      <img
-        src={avatarUrl}
-        alt=""
+      <span
         className={cn(
-          "block shrink-0",
-          variant === "badge" && "rounded-full object-cover",
-          variant === "profile" && "rounded-xl object-contain",
+          "flex shrink-0 items-center justify-center rounded-xl bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
           className
         )}
-        style={
-          variant === "badge"
-            ? { objectPosition: getAvatarBadgeObjectPosition(avatarUrl) }
-            : undefined
-        }
-      />
+        aria-hidden
+      >
+        {avatarInitials(label)}
+      </span>
+    );
+  }
+
+  if (avatarUrl) {
+    return (
+      <div
+        className={cn(
+          "tm-circle-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+          className
+        )}
+      >
+        <img
+          src={avatarUrl}
+          alt=""
+          className="h-full w-full object-cover"
+          style={{ objectPosition: getAvatarBadgeObjectPosition(avatarUrl) }}
+        />
+      </div>
     );
   }
 
   return (
     <span
       className={cn(
-        "flex shrink-0 items-center justify-center bg-[var(--tm-surface-elevated)] text-xs font-semibold text-[var(--tm-muted)]",
-        variant === "badge" ? "rounded-full" : "rounded-xl",
+        "tm-circle-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full text-xs font-semibold text-[var(--tm-muted)]",
         className
       )}
       aria-hidden
