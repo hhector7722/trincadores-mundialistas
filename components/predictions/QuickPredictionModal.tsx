@@ -285,10 +285,11 @@ export function QuickPredictionModal({
       return;
     }
 
+    const idx = orderedMatches.findIndex((item) => item.id === match.id);
+    if (idx >= 0) setActiveIndex(idx);
+
     if (!wasOpenRef.current) {
       wasOpenRef.current = true;
-      const idx = orderedMatches.findIndex((item) => item.id === match.id);
-      setActiveIndex(idx >= 0 ? idx : 0);
       setMatchSlide(null);
       matchSlideLockRef.current = false;
       setMvpOverrides(mvpOverridesFromMatchListAndActive(orderedMatches, match));
@@ -298,19 +299,16 @@ export function QuickPredictionModal({
   useEffect(() => {
     if (!open) return;
 
-    const fromProps =
-      mvpPlayerNameFromMatch(viewMatch) ||
-      mvpPlayerNameFromMatch(match) ||
-      null;
-    if (fromProps) setMvpPlayerName(fromProps);
+    const fromView = mvpPlayerNameFromMatch(viewMatch);
+    setMvpPlayerName(fromView);
 
     let cancelled = false;
     void fetchSavedMvpPlayerName(poolId, viewMatch.id)
       .then((name) => {
-        if (!cancelled && name) setMvpPlayerName(name);
+        if (!cancelled) setMvpPlayerName(name);
       })
       .catch(() => {
-        if (!cancelled && fromProps) setMvpPlayerName(fromProps);
+        if (!cancelled) setMvpPlayerName(fromView);
       });
 
     return () => {
@@ -322,8 +320,6 @@ export function QuickPredictionModal({
     viewMatch.id,
     viewMatch.mvpPrediction?.player_name,
     viewMatch.mvpPrediction?.updated_at,
-    match.mvpPrediction?.player_name,
-    match.mvpPrediction?.updated_at,
   ]);
 
   useEffect(() => () => clearMatchSlideTimer(), [clearMatchSlideTimer]);
