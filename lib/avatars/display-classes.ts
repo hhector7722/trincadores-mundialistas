@@ -5,4 +5,4 @@ export const AVATAR_DISPLAY_PROFILE = "max-h-72 w-auto max-w-full shrink-0";
 export const AVATAR_DISPLAY_RANKING = "size-9 shrink-0";
 
 /** Mini-tabla inicio: círculo, rostro predominante (proporcional a ranking size-9 vs antiguo size-14). */
-export const AVATAR_DISPLAY_HOME_MINI = "size-5 shrink-0";
+export const AVATAR_DISPLAY_HOME_MINI = "size-6 shrink-0";

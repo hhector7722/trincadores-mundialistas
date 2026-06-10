@@ -83,7 +83,7 @@ function MiniRankingEmptyRow() {
       <span />
       <span />
       <div className="flex min-w-0 items-center gap-2">
-        <span className="size-5 shrink-0 rounded-full bg-white/10" />
+        <span className="size-6 shrink-0 rounded-full bg-white/10" />
         <span className="min-w-0 flex-1 truncate text-white/20">&nbsp;</span>
       </div>
       <span />
