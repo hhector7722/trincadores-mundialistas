@@ -77,6 +77,9 @@ export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 /** Margen lateral homogéneo para las 9 columnas del cuadro (% canvas). */
 export const BRACKET_COLUMN_INSET = 3.5;
 
+/** Semifinales ligeramente más cerca de cuartos de su lado (% canvas). */
+export const SF_COLUMN_NUDGE_TOWARD_QF = 1.5;
+
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
   ROUND_LAYOUT_SCALE.r16, // 1
@@ -95,15 +98,19 @@ function halfWidthForColumn(column: number): number {
 }
 
 /**
- * Nueve columnas equiespaciadas de izquierda a derecha:
+ * Nueve columnas de izquierda a derecha:
  * r32 → r16 → qf → sf → final → sf → qf → r16 → r32.
+ * Las semifinales se acercan ligeramente a los cuartos de su lado.
  */
 export function buildColumnCenters(): readonly number[] {
   const span = 100 - 2 * BRACKET_COLUMN_INSET;
-  return Array.from(
+  const x = Array.from(
     { length: 9 },
     (_, index) => BRACKET_COLUMN_INSET + (span * index) / 8
   );
+  x[3] -= SF_COLUMN_NUDGE_TOWARD_QF;
+  x[5] += SF_COLUMN_NUDGE_TOWARD_QF;
+  return x;
 }
 
 const COLUMN_CENTERS = buildColumnCenters();
