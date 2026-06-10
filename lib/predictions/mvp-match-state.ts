@@ -5,8 +5,13 @@ export type MvpSnapshot = {
   team_name: string;
 };
 
-export function mvpSnapshotFromMatch(match: MatchWithPrediction): MvpSnapshot | null {
+export function mvpPlayerNameFromMatch(match: MatchWithPrediction): string | null {
   const player_name = match.mvpPrediction?.player_name?.trim();
+  return player_name || null;
+}
+
+export function mvpSnapshotFromMatch(match: MatchWithPrediction): MvpSnapshot | null {
+  const player_name = mvpPlayerNameFromMatch(match);
   const team_name = match.mvpPrediction?.team_name?.trim();
   if (!player_name || !team_name) return null;
   return { player_name, team_name };

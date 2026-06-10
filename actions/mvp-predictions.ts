@@ -38,6 +38,16 @@ export async function fetchSavedMvpPrediction(poolId: string, matchId: string) {
   return getMvpPredictionForMatch(poolId, user.id, matchId);
 }
 
+/** Nombre guardado en `match_mvp_predictions.player_name` para el usuario actual. */
+export async function fetchSavedMvpPlayerName(
+  poolId: string,
+  matchId: string
+): Promise<string | null> {
+  const saved = await fetchSavedMvpPrediction(poolId, matchId);
+  const name = saved?.player_name?.trim();
+  return name || null;
+}
+
 export async function saveMvpPrediction(
   poolId: string,
   matchId: string,

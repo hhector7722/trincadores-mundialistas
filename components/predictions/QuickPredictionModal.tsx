@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
-import { fetchSavedMvpPrediction } from "@/actions/mvp-predictions";
+import { fetchSavedMvpPlayerName } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
 import { buildLineupView, buildMvpView } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
@@ -20,7 +20,7 @@ import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
   mvpOverridesFromMatchListAndActive,
-  mvpSnapshotFromMatch,
+  mvpPlayerNameFromMatch,
   preferMatchMvpData,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
@@ -120,6 +120,7 @@ export function QuickPredictionModal({
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
+  const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -241,10 +242,14 @@ export function QuickPredictionModal({
 
   const handleMvpSaved = useCallback(
     (matchId: string, playerName: string, teamName: string) => {
+      const trimmedName = playerName.trim();
       setMvpOverrides((current) => ({
         ...current,
         [matchId]: { player_name: playerName, team_name: teamName },
       }));
+      if (matchId === viewMatch.id && trimmedName) {
+        setMvpPlayerName(trimmedName);
+      }
       onMvpSaved?.(matchId, playerName, teamName);
       if (panelView.kind === "mvp" && panelView.matchId === matchId) {
         replaceCurrent({
@@ -254,7 +259,7 @@ export function QuickPredictionModal({
         });
       }
     },
-    [onMvpSaved, panelView, replaceCurrent]
+    [onMvpSaved, panelView, replaceCurrent, viewMatch.id]
   );
 
   useEffect(() => {
@@ -264,6 +269,7 @@ export function QuickPredictionModal({
       matchSlideLockRef.current = false;
       setMatchSlide(null);
       setMvpOverrides({});
+      setMvpPlayerName(null);
       return;
     }
 
@@ -278,24 +284,34 @@ export function QuickPredictionModal({
   }, [open, match, orderedMatches, clearMatchSlideTimer]);
 
   useEffect(() => {
-    if (!open || mvpSnapshotFromMatch(viewMatch)) return;
+    if (!open) return;
+
+    const fromProps =
+      mvpPlayerNameFromMatch(viewMatch) ||
+      mvpPlayerNameFromMatch(match) ||
+      mvpOverrides[viewMatch.id]?.player_name?.trim() ||
+      null;
+    setMvpPlayerName(fromProps);
 
     let cancelled = false;
-    void fetchSavedMvpPrediction(poolId, viewMatch.id).then((saved) => {
-      if (cancelled || !saved?.player_name?.trim() || !saved.team_name?.trim()) return;
-      setMvpOverrides((current) => ({
-        ...current,
-        [viewMatch.id]: {
-          player_name: saved.player_name,
-          team_name: saved.team_name,
-        },
-      }));
+    void fetchSavedMvpPlayerName(poolId, viewMatch.id).then((name) => {
+      if (cancelled) return;
+      setMvpPlayerName(name ?? fromProps);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [open, poolId, viewMatch.id, viewMatch.mvpPrediction?.player_name]);
+  }, [
+    open,
+    poolId,
+    viewMatch.id,
+    viewMatch.mvpPrediction?.player_name,
+    viewMatch.mvpPrediction?.updated_at,
+    match.mvpPrediction?.player_name,
+    match.mvpPrediction?.updated_at,
+    mvpOverrides,
+  ]);
 
   useEffect(() => () => clearMatchSlideTimer(), [clearMatchSlideTimer]);
 
@@ -389,9 +405,26 @@ export function QuickPredictionModal({
               layout="teamAnchors"
               className="mt-[0.35rem] [&>div]:min-h-[2rem]"
               match={targetMatch}
+              mvpPlayerName={mvpPlayerName}
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
               onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-              onOpenMvp={() => push(buildMvpView(poolId, targetMatch))}
+              onOpenMvp={() =>
+                push(
+                  buildMvpView(poolId, {
+                    ...targetMatch,
+                    mvpPrediction: mvpPlayerName
+                      ? {
+                          id: targetMatch.mvpPrediction?.id ?? "",
+                          player_name: mvpPlayerName,
+                          team_name: targetMatch.mvpPrediction?.team_name ?? "",
+                          points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
+                          updated_at:
+                            targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                        }
+                      : targetMatch.mvpPrediction,
+                  })
+                )
+              }
             />
 
             {error ? (

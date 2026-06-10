@@ -19,6 +19,8 @@ type MatchContextActionsRowProps = {
   homeAnchor?: string;
   /** Ancla horizontal de alineación visitante. */
   awayAnchor?: string;
+  /** MVP resuelto (p. ej. leído de `match_mvp_predictions` en el modal). */
+  mvpPlayerName?: string | null;
   className?: string;
 };
 
@@ -32,9 +34,10 @@ export function MatchContextActionsRow({
   hideMvp = false,
   homeAnchor = "10%",
   awayAnchor = "90%",
+  mvpPlayerName,
   className,
 }: MatchContextActionsRowProps) {
-  const mvpSaved = match.mvpPrediction?.player_name ?? null;
+  const mvpSaved = mvpPlayerName?.trim() || match.mvpPrediction?.player_name?.trim() || null;
 
   if (layout === "teamAnchors") {
     return (
