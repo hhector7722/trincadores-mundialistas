@@ -106,3 +106,53 @@ test("findMvpOptionBySaved tolera alias de nombre", () => {
   const match = findMvpOptionBySaved(options, "Pedri González", "Spain");
   assert.equal(match?.key, "Spain::10::pedri");
 });
+
+test("findMvpOptionBySaved prioriza dorsal sobre nombre ambiguo", () => {
+  const options = [
+    {
+      key: "Mexico::1::raul rangel",
+      name: "Raul Rangel",
+      teamName: "Mexico",
+      shirtNumber: 1,
+    },
+    {
+      key: "Mexico::9::raul jimenez",
+      name: "Raúl Jiménez",
+      teamName: "Mexico",
+      shirtNumber: 9,
+    },
+  ];
+
+  assert.equal(
+    findMvpOptionBySaved(options, "Raúl Jiménez", "Mexico", 9)?.name,
+    "Raúl Jiménez"
+  );
+  assert.equal(
+    findMvpOptionBySaved(options, "Raúl", "Mexico", 9)?.name,
+    "Raúl Jiménez"
+  );
+  assert.equal(
+    findMvpOptionBySaved(options, "Raul Rangel", "Mexico", 1)?.name,
+    "Raul Rangel"
+  );
+});
+test("findMvpOptionBySaved no confunde jugadores con el mismo nombre de pila sin dorsal", () => {
+  const options = [
+    {
+      key: "Mexico::1::raul rangel",
+      name: "Raul Rangel",
+      teamName: "Mexico",
+      shirtNumber: 1,
+    },
+    {
+      key: "Mexico::9::raul jimenez",
+      name: "Raúl Jiménez",
+      teamName: "Mexico",
+      shirtNumber: 9,
+    },
+  ];
+
+  assert.equal(findMvpOptionBySaved(options, "Raúl Jiménez", "Mexico")?.name, "Raúl Jiménez");
+  assert.equal(findMvpOptionBySaved(options, "Jiménez", "Mexico")?.name, "Raúl Jiménez");
+  assert.equal(findMvpOptionBySaved(options, "Raul Rangel", "Mexico")?.name, "Raul Rangel");
+});

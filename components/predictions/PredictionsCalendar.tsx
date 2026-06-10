@@ -507,9 +507,9 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           match={activeMatch}
           matches={localMatches}
           onMatchChange={setActiveMatch}
-          onMvpSaved={(matchId, playerName, teamName) => {
+          onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>
-              patchMatchMvpPrediction(current, playerName, teamName);
+              patchMatchMvpPrediction(current, playerName, teamName, shirtNumber);
 
             setLocalMatchState((current) =>
               current.source !== matches

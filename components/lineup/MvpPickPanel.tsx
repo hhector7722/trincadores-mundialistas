@@ -23,7 +23,8 @@ type MvpPickPanelProps = {
   serverEditable: boolean;
   savedPlayerName?: string | null;
   savedTeamName?: string | null;
-  onSaved?: (playerName: string, teamName: string) => void;
+  savedShirtNumber?: number | null;
+  onSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   onFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
 };
 
@@ -71,6 +72,7 @@ export function MvpPickPanel({
   serverEditable,
   savedPlayerName,
   savedTeamName,
+  savedShirtNumber,
   onSaved,
   onFormationsChange,
 }: MvpPickPanelProps) {
@@ -148,14 +150,46 @@ export function MvpPickPanel({
     );
   }, [resolvedAwayLineup?.formationLabel, resolvedHomeLineup?.formationLabel]);
 
+  const userEditedRef = useRef(false);
+  const lastSavedRef = useRef({
+    player: savedPlayerName,
+    team: savedTeamName,
+    shirt: savedShirtNumber,
+  });
+
   useEffect(() => {
+    userEditedRef.current = false;
+  }, [matchId]);
+
+  useEffect(() => {
+    if (
+      savedPlayerName !== lastSavedRef.current.player ||
+      savedTeamName !== lastSavedRef.current.team ||
+      savedShirtNumber !== lastSavedRef.current.shirt
+    ) {
+      lastSavedRef.current = {
+        player: savedPlayerName,
+        team: savedTeamName,
+        shirt: savedShirtNumber,
+      };
+      userEditedRef.current = false;
+    }
+  }, [savedPlayerName, savedTeamName, savedShirtNumber]);
+
+  useEffect(() => {
+    if (userEditedRef.current) return;
     if (!savedPlayerName || !savedTeamName) {
       setSelectedKey(null);
       return;
     }
-    const match = findMvpOptionBySaved(options, savedPlayerName, savedTeamName);
+    const match = findMvpOptionBySaved(
+      options,
+      savedPlayerName,
+      savedTeamName,
+      savedShirtNumber
+    );
     setSelectedKey(match?.key ?? null);
-  }, [options, savedPlayerName, savedTeamName]);
+  }, [options, savedPlayerName, savedTeamName, savedShirtNumber]);
 
   const selectedOption = useMemo(
     () => resolveMvpSelection(options, selectedKey, lineupPlayers) ?? null,
@@ -175,13 +209,14 @@ export function MvpPickPanel({
         poolId,
         matchId,
         selected.name,
-        selected.teamName
+        selected.teamName,
+        selected.shirtNumber
       );
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      onSaved?.(result.playerName, result.teamName);
+      onSaved?.(result.playerName, result.teamName, result.shirtNumber);
       router.refresh();
     });
   }
@@ -242,7 +277,10 @@ export function MvpPickPanel({
         selectedKey={selectedKey}
         selectedPlayer={selectedOption}
         disabled={pickDisabled}
-        onSelect={setSelectedKey}
+        onSelect={(key) => {
+          userEditedRef.current = true;
+          setSelectedKey(key);
+        }}
       />
     </TacticalLineupsPanelShell>
   );

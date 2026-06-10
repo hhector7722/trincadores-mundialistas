@@ -40,7 +40,7 @@ type EntityModalControllerProps = {
   /** Lista ordenada para deslizar entre alineaciones (solo en vista lineup raíz). */
   carouselTeams?: string[];
   onCarouselTeamChange?: (teamName: string) => void;
-  onMvpSaved?: (playerName: string, teamName: string) => void;
+  onMvpSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   opaque?: boolean;
 };
 
@@ -48,7 +48,7 @@ function renderEntityView(
   view: EntityModalView,
   handlers: {
     onPlayerClick: (teamName: string, playerName: string) => void;
-    onMvpSaved?: (playerName: string, teamName: string) => void;
+    onMvpSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
     onMvpFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
     onFormationResolved?: (formationLabel: string) => void;
   },
@@ -91,6 +91,7 @@ function renderEntityView(
           serverEditable={view.serverEditable}
           savedPlayerName={view.savedPlayerName}
           savedTeamName={view.savedTeamName}
+          savedShirtNumber={view.savedShirtNumber}
           onSaved={handlers.onMvpSaved}
           onFormationsChange={handlers.onMvpFormationsChange}
         />
@@ -310,7 +311,11 @@ export function buildMvpView(
     away_team: string;
     kickoff_at: string;
     serverEditable: boolean;
-    mvpPrediction?: { player_name: string; team_name: string } | null;
+    mvpPrediction?: {
+      player_name: string;
+      team_name: string;
+      shirt_number?: number | null;
+    } | null;
   }
 ): EntityModalView {
   return {
@@ -323,5 +328,6 @@ export function buildMvpView(
     serverEditable: match.serverEditable,
     savedPlayerName: match.mvpPrediction?.player_name ?? null,
     savedTeamName: match.mvpPrediction?.team_name ?? null,
+    savedShirtNumber: match.mvpPrediction?.shirt_number ?? null,
   };
 }

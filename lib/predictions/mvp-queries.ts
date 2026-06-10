@@ -4,6 +4,7 @@ export type MvpPrediction = {
   id: string;
   player_name: string;
   team_name: string;
+  shirt_number: number | null;
   points_awarded: number | null;
   updated_at: string;
 };
@@ -24,7 +25,7 @@ export async function fetchMvpPredictionsForMatches(
     const batch = matchIds.slice(offset, offset + MVP_MATCH_ID_BATCH);
     const { data, error } = await supabase
       .from("match_mvp_predictions")
-      .select("id, match_id, player_name, team_name, points_awarded, updated_at")
+      .select("id, match_id, player_name, team_name, shirt_number, points_awarded, updated_at")
       .eq("pool_id", poolId)
       .eq("profile_id", profileId)
       .in("match_id", batch);
@@ -36,6 +37,7 @@ export async function fetchMvpPredictionsForMatches(
         id: row.id,
         player_name: row.player_name,
         team_name: row.team_name,
+        shirt_number: row.shirt_number ?? null,
         points_awarded: row.points_awarded,
         updated_at: row.updated_at,
       });

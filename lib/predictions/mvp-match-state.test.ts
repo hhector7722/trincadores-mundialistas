@@ -34,6 +34,7 @@ test("preferMatchMvpData usa el MVP del partido activo cuando la lista está des
       id: "mvp-1",
       player_name: "Lamine Yamal",
       team_name: "España",
+      shirt_number: 19,
       points_awarded: null,
       updated_at: "2026-06-10T10:00:00.000Z",
     },
@@ -50,6 +51,7 @@ test("mvpOverridesFromMatchListAndActive incluye el MVP del partido activo", () 
       id: "mvp-2",
       player_name: "Vinícius Júnior",
       team_name: "Brasil",
+      shirt_number: 7,
       points_awarded: null,
       updated_at: "2026-06-10T10:00:00.000Z",
     },
@@ -60,5 +62,6 @@ test("mvpOverridesFromMatchListAndActive incluye el MVP del partido activo", () 
   assert.deepEqual(overrides["match-2"], {
     player_name: "Vinícius Júnior",
     team_name: "Brasil",
+    shirt_number: 7,
   });
 });

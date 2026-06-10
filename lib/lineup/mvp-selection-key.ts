@@ -153,22 +153,69 @@ export function resolveMvpSelection<T extends MvpResolvedSelection>(
 export function findMvpOptionBySaved<T extends MvpSelectablePlayer & { teamName: string }>(
   options: T[],
   savedPlayerName: string,
-  savedTeamName: string
+  savedTeamName: string,
+  savedShirtNumber?: number | null
 ): T | undefined {
+  const teamOptions = options.filter((option) => option.teamName === savedTeamName);
+  if (!teamOptions.length) return undefined;
+
+  if (savedShirtNumber != null && savedShirtNumber > 0) {
+    const byShirt = teamOptions.filter((option) => option.shirtNumber === savedShirtNumber);
+    if (byShirt.length === 1) return byShirt[0];
+    if (byShirt.length > 1 && savedPlayerName.trim()) {
+      const byShirtAndName = byShirt.filter((option) =>
+        mvpPlayersMatch(savedTeamName, option, {
+          name: savedPlayerName,
+          teamName: savedTeamName,
+          shirtNumber: savedShirtNumber,
+        })
+      );
+      if (byShirtAndName.length === 1) return byShirtAndName[0];
+    }
+  }
+
+  const trimmedSaved = savedPlayerName.trim();
   const normalizedSaved = normalizePlayerName(savedPlayerName);
-  const savedToken = normalizedSaved.split(" ")[0] ?? "";
+  if (!normalizedSaved) return undefined;
 
-  return options.find((option) => {
-    if (option.teamName !== savedTeamName) return false;
+  const exactNormalized = teamOptions.filter(
+    (option) => normalizePlayerName(option.name) === normalizedSaved
+  );
+  if (exactNormalized.length === 1) return exactNormalized[0];
+
+  const exactTrimmed = teamOptions.filter((option) => option.name.trim() === trimmedSaved);
+  if (exactTrimmed.length === 1) return exactTrimmed[0];
+
+  const suffixMatches = teamOptions.filter((option) => {
     const normalizedOption = normalizePlayerName(option.name);
-    if (normalizedOption === normalizedSaved) return true;
-    if (option.name.trim() === savedPlayerName.trim()) return true;
-
-    const optionToken = normalizedOption.split(" ")[0] ?? "";
-    if (savedToken && savedToken === optionToken) return true;
-
-    return (
-      normalizedSaved.includes(normalizedOption) || normalizedOption.includes(normalizedSaved)
-    );
+    if (normalizedOption === normalizedSaved) return false;
+    return nameHintMatchesOption(normalizedSaved, option.name);
   });
+  if (suffixMatches.length === 1) return suffixMatches[0];
+
+  const savedParts = normalizedSaved.split(" ").filter(Boolean);
+  if (savedParts.length >= 2) {
+    const savedSurname = savedParts.at(-1)!;
+    const bySurname = teamOptions.filter((option) => {
+      const parts = normalizePlayerName(option.name).split(" ").filter(Boolean);
+      return parts.at(-1) === savedSurname;
+    });
+    if (bySurname.length === 1) return bySurname[0];
+    if (bySurname.length > 1) {
+      const savedFirst = savedParts[0]!;
+      const byFirstAndSurname = bySurname.filter((option) => {
+        const parts = normalizePlayerName(option.name).split(" ").filter(Boolean);
+        return parts[0] === savedFirst;
+      });
+      if (byFirstAndSurname.length === 1) return byFirstAndSurname[0];
+    }
+  }
+
+  const includesMatches = teamOptions.filter((option) => {
+    const normalizedOption = normalizePlayerName(option.name);
+    return normalizedSaved.includes(normalizedOption) || normalizedOption.includes(normalizedSaved);
+  });
+  if (includesMatches.length === 1) return includesMatches[0];
+
+  return undefined;
 }

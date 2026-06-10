@@ -272,9 +272,9 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
-          onMvpSaved={(matchId, playerName, teamName) => {
+          onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>
-              patchMatchMvpPrediction(current, playerName, teamName);
+              patchMatchMvpPrediction(current, playerName, teamName, shirtNumber);
 
             setLocalMatches((current) =>
               current.map((item) => (item.id === matchId ? patch(item) : item))

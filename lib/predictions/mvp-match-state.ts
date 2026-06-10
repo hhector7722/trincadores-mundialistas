@@ -3,6 +3,7 @@ import type { MatchWithPrediction } from "@/lib/predictions/queries";
 export type MvpSnapshot = {
   player_name: string;
   team_name: string;
+  shirt_number?: number | null;
 };
 
 export function mvpPlayerNameFromMatch(match: MatchWithPrediction): string | null {
@@ -10,11 +11,20 @@ export function mvpPlayerNameFromMatch(match: MatchWithPrediction): string | nul
   return player_name || null;
 }
 
+export function mvpShirtNumberFromMatch(match: MatchWithPrediction): number | null {
+  const shirt = match.mvpPrediction?.shirt_number;
+  return shirt != null && shirt > 0 ? shirt : null;
+}
+
 export function mvpSnapshotFromMatch(match: MatchWithPrediction): MvpSnapshot | null {
   const player_name = mvpPlayerNameFromMatch(match);
   const team_name = match.mvpPrediction?.team_name?.trim();
   if (!player_name || !team_name) return null;
-  return { player_name, team_name };
+  return {
+    player_name,
+    team_name,
+    shirt_number: mvpShirtNumberFromMatch(match),
+  };
 }
 
 export function mergeMvpIntoMatch(
@@ -29,6 +39,7 @@ export function mergeMvpIntoMatch(
       id: match.mvpPrediction?.id ?? "",
       player_name: mvp.player_name,
       team_name: mvp.team_name,
+      shirt_number: mvp.shirt_number ?? match.mvpPrediction?.shirt_number ?? null,
       points_awarded: match.mvpPrediction?.points_awarded ?? null,
       updated_at: match.mvpPrediction?.updated_at ?? new Date().toISOString(),
     },
@@ -59,11 +70,13 @@ export function preferMatchMvpData(
 export function patchMatchMvpPrediction(
   match: MatchWithPrediction,
   playerName: string,
-  teamName: string
+  teamName: string,
+  shirtNumber?: number | null
 ): MatchWithPrediction {
   return mergeMvpIntoMatch(match, {
     player_name: playerName,
     team_name: teamName,
+    shirt_number: shirtNumber ?? null,
   });
 }
 

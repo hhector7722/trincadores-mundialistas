@@ -58,7 +58,12 @@ type QuickPredictionModalProps = {
   match: MatchWithPrediction;
   matches?: MatchWithPrediction[];
   onMatchChange?: (match: MatchWithPrediction) => void;
-  onMvpSaved?: (matchId: string, playerName: string, teamName: string) => void;
+  onMvpSaved?: (
+    matchId: string,
+    playerName: string,
+    teamName: string,
+    shirtNumber?: number | null
+  ) => void;
   /** Panel y backdrop opacos (calendario). */
   opaque?: boolean;
 };
@@ -256,21 +261,31 @@ export function QuickPredictionModal({
   finishMatchSlideRef.current = finishMatchSlide;
 
   const handleMvpSaved = useCallback(
-    (matchId: string, playerName: string, teamName: string) => {
+    (
+      matchId: string,
+      playerName: string,
+      teamName: string,
+      shirtNumber?: number | null
+    ) => {
       const trimmedName = playerName.trim();
       setMvpOverrides((current) => ({
         ...current,
-        [matchId]: { player_name: playerName, team_name: teamName },
+        [matchId]: {
+          player_name: playerName,
+          team_name: teamName,
+          shirt_number: shirtNumber ?? null,
+        },
       }));
       if (matchId === viewMatch.id && trimmedName) {
         setMvpPlayerName(trimmedName);
       }
-      onMvpSaved?.(matchId, playerName, teamName);
+      onMvpSaved?.(matchId, playerName, teamName, shirtNumber);
       if (panelView.kind === "mvp" && panelView.matchId === matchId) {
         replaceCurrent({
           ...panelView,
           savedPlayerName: playerName,
           savedTeamName: teamName,
+          savedShirtNumber: shirtNumber ?? null,
         });
       }
     },
@@ -438,6 +453,7 @@ export function QuickPredictionModal({
                                   id: targetMatch.mvpPrediction?.id ?? "",
                                   player_name: mvpPlayerName,
                                   team_name: targetMatch.mvpPrediction?.team_name ?? "",
+                                  shirt_number: targetMatch.mvpPrediction?.shirt_number ?? null,
                                   points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
                                   updated_at:
                                     targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
@@ -506,7 +522,10 @@ export function QuickPredictionModal({
           serverEditable={view.serverEditable}
           savedPlayerName={view.savedPlayerName}
           savedTeamName={view.savedTeamName}
-          onSaved={(playerName, teamName) => handleMvpSaved(view.matchId, playerName, teamName)}
+          savedShirtNumber={view.savedShirtNumber}
+          onSaved={(playerName, teamName, shirtNumber) =>
+            handleMvpSaved(view.matchId, playerName, teamName, shirtNumber)
+          }
         />
       );
     }

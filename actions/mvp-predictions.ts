@@ -10,7 +10,7 @@ import { getMvpPredictionForMatch } from "@/lib/predictions/mvp-queries";
 import { createClient } from "@/lib/supabase/server";
 
 export type MvpPredictionActionResult =
-  | { ok: true; playerName: string; teamName: string; updatedAt: string }
+  | { ok: true; playerName: string; teamName: string; shirtNumber: number | null; updatedAt: string }
   | { ok: false; error: string };
 
 function mapMvpDbError(message: string): string {
@@ -49,10 +49,13 @@ export async function saveMvpPrediction(
   poolId: string,
   matchId: string,
   playerName: string,
-  teamName: string
+  teamName: string,
+  shirtNumber?: number | null
 ): Promise<MvpPredictionActionResult> {
   const trimmedPlayer = playerName.trim();
   const trimmedTeam = teamName.trim();
+  const normalizedShirt =
+    shirtNumber != null && shirtNumber > 0 && Number.isInteger(shirtNumber) ? shirtNumber : null;
   if (!trimmedPlayer || !trimmedTeam) {
     return { ok: false, error: "Selecciona un jugador válido." };
   }
@@ -99,6 +102,7 @@ export async function saveMvpPrediction(
   const payload = {
     player_name: trimmedPlayer,
     team_name: trimmedTeam,
+    shirt_number: normalizedShirt,
     updated_at: new Date().toISOString(),
   };
 
@@ -127,7 +131,7 @@ export async function saveMvpPrediction(
 
   const { data: saved, error: savedError } = await supabase
     .from("match_mvp_predictions")
-    .select("player_name, team_name, updated_at")
+    .select("player_name, team_name, shirt_number, updated_at")
     .eq("pool_id", poolId)
     .eq("match_id", matchId)
     .eq("profile_id", user.id)
@@ -144,6 +148,7 @@ export async function saveMvpPrediction(
     ok: true,
     playerName: saved.player_name,
     teamName: saved.team_name,
+    shirtNumber: saved.shirt_number ?? null,
     updatedAt: saved.updated_at,
   };
 }

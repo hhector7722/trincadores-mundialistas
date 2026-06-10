@@ -61,8 +61,12 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     setMvpSnapshot(mvpSnapshotFromMatch(match));
   }, [match.id, match.mvpPrediction?.player_name, match.mvpPrediction?.updated_at]);
 
-  function handleMvpSaved(playerName: string, teamName: string) {
-    setMvpSnapshot({ player_name: playerName, team_name: teamName });
+  function handleMvpSaved(playerName: string, teamName: string, shirtNumber?: number | null) {
+    setMvpSnapshot({
+      player_name: playerName,
+      team_name: teamName,
+      shirt_number: shirtNumber ?? null,
+    });
   }
 
   const isLive = displayMatch.status === "live";
@@ -204,7 +208,9 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
         onClose={() => setScoreModalOpen(false)}
         poolId={poolId}
         match={displayMatch}
-        onMvpSaved={(_matchId, playerName, teamName) => handleMvpSaved(playerName, teamName)}
+        onMvpSaved={(_matchId, playerName, teamName, shirtNumber) =>
+          handleMvpSaved(playerName, teamName, shirtNumber)
+        }
       />
 
       <EntityModalController

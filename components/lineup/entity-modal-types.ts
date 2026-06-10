@@ -11,6 +11,7 @@ export type EntityModalView =
       serverEditable: boolean;
       savedPlayerName?: string | null;
       savedTeamName?: string | null;
+      savedShirtNumber?: number | null;
     }
   | {
       kind: "possible-lineups";
