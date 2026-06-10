@@ -375,74 +375,78 @@ export function QuickPredictionModal({
       return (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pb-0 pt-2">
-            <div className="mt-2">
-              <MatchTeamsDisplay
-                layout="predictionModal"
-                homeTeam={targetMatch.home_team}
-                awayTeam={targetMatch.away_team}
-                kickoffAt={targetMatch.kickoff_at}
-                isLive={targetMatch.status === "live"}
-                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-                homeScoreSlot={
-                  <ScoreStepper
-                    label={targetMatch.home_team}
-                    value={home}
-                    disabled={controlsDisabled}
-                    onChange={setHome}
-                    variant="floating"
-                    hideLabel
-                  />
-                }
-                awayScoreSlot={
-                  <ScoreStepper
-                    label={targetMatch.away_team}
-                    value={away}
-                    disabled={controlsDisabled}
-                    onChange={setAway}
-                    variant="floating"
-                    hideLabel
-                  />
-                }
-              />
-            </div>
+            <div className="mt-2 flex min-h-[7.25rem] flex-col">
+              <div className="shrink-0">
+                <MatchTeamsDisplay
+                  layout="predictionModal"
+                  homeTeam={targetMatch.home_team}
+                  awayTeam={targetMatch.away_team}
+                  kickoffAt={targetMatch.kickoff_at}
+                  isLive={targetMatch.status === "live"}
+                  onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                  onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                  homeScoreSlot={
+                    <ScoreStepper
+                      label={targetMatch.home_team}
+                      value={home}
+                      disabled={controlsDisabled}
+                      onChange={setHome}
+                      variant="floating"
+                      hideLabel
+                    />
+                  }
+                  awayScoreSlot={
+                    <ScoreStepper
+                      label={targetMatch.away_team}
+                      value={away}
+                      disabled={controlsDisabled}
+                      onChange={setAway}
+                      variant="floating"
+                      hideLabel
+                    />
+                  }
+                />
+              </div>
 
-            <div
-              className="flex min-h-[1.75rem] items-center justify-center py-1"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <MvpPredictionButton
-                savedPlayerName={mvpPlayerName}
-                onClick={() =>
-                  push(
-                    buildMvpView(poolId, {
-                      ...targetMatch,
-                      mvpPrediction: mvpPlayerName
-                        ? {
-                            id: targetMatch.mvpPrediction?.id ?? "",
-                            player_name: mvpPlayerName,
-                            team_name: targetMatch.mvpPrediction?.team_name ?? "",
-                            points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
-                            updated_at:
-                              targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                          }
-                        : targetMatch.mvpPrediction,
-                    })
-                  )
-                }
-                variant="compact"
-                className="w-full"
-              />
-            </div>
+              <div
+                className="flex min-h-[1.25rem] flex-1 items-center justify-center"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <MvpPredictionButton
+                  savedPlayerName={mvpPlayerName}
+                  onClick={() =>
+                    push(
+                      buildMvpView(poolId, {
+                        ...targetMatch,
+                        mvpPrediction: mvpPlayerName
+                          ? {
+                              id: targetMatch.mvpPrediction?.id ?? "",
+                              player_name: mvpPlayerName,
+                              team_name: targetMatch.mvpPrediction?.team_name ?? "",
+                              points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
+                              updated_at:
+                                targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                            }
+                          : targetMatch.mvpPrediction,
+                      })
+                    )
+                  }
+                  variant="compact"
+                  className="w-full"
+                />
+              </div>
 
-            <MatchContextActionsRow
-              compact
-              layout="teamAnchors"
-              className="mt-[0.15rem] [&>div]:min-h-[2rem]"
-              onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-              onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-              onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
-            />
+              <div className="shrink-0">
+                <MatchContextActionsRow
+                  compact
+                  layout="teamAnchors"
+                  className="[&>div]:min-h-[2rem]"
+                  onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                  onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                  onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
+                />
+              </div>
+            </div>
 
             {error ? (
               <p className="mt-3 text-center text-sm text-[var(--tm-danger)]" role="alert">

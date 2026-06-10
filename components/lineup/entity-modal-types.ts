@@ -28,7 +28,7 @@ export function entityModalTitle(view: EntityModalView): string {
     case "mvp":
       return "MVP del partido";
     case "possible-lineups":
-      return "Posibles alineaciones";
+      return "POSIBLES ALINEACIONES";
     default:
       return "Detalle";
   }

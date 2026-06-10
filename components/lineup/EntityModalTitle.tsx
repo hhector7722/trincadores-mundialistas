@@ -40,7 +40,7 @@ export function entityModalTitleContent(
     case "mvp":
       return "MVP";
     case "possible-lineups":
-      return "Posibles alineaciones";
+      return "POSIBLES ALINEACIONES";
     default:
       return "Detalle";
   }

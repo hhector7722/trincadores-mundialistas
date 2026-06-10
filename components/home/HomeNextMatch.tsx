@@ -98,20 +98,21 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               Ver todos
             </Link>
           </div>
-          <div className="mt-2 flex flex-col">
-            <MatchTeamsDisplay
-              homeTeam={displayMatch.home_team}
-              awayTeam={displayMatch.away_team}
-              kickoffAt={displayMatch.kickoff_at}
-              isLive={isLive}
-              onHomeTeamClick={() =>
-                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-              }
-              onAwayTeamClick={() =>
-                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-              }
-              centerSlotAlign={saved ? "default" : "teamNames"}
-              centerSlot={
+          <div className="mt-2 flex min-h-[7.25rem] flex-col">
+            <div className="shrink-0">
+              <MatchTeamsDisplay
+                homeTeam={displayMatch.home_team}
+                awayTeam={displayMatch.away_team}
+                kickoffAt={displayMatch.kickoff_at}
+                isLive={isLive}
+                onHomeTeamClick={() =>
+                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+                }
+                onAwayTeamClick={() =>
+                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+                }
+                centerSlotAlign={saved ? "default" : "teamNames"}
+                centerSlot={
                 saved ? (
                   <div className="inline-block">
                     <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
@@ -160,9 +161,10 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                   </button>
                 )
               }
-            />
+              />
+            </div>
             <div
-              className="flex min-h-[1.75rem] items-center justify-center py-1"
+              className="flex min-h-[1.25rem] flex-1 items-center justify-center"
               onClick={(event) => event.stopPropagation()}
             >
               <MvpPredictionButton
@@ -172,7 +174,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 className="w-full"
               />
             </div>
-            <div onClick={(event) => event.stopPropagation()}>
+            <div className="shrink-0" onClick={(event) => event.stopPropagation()}>
               <MatchContextActionsRow
                 compact
                 layout="teamAnchors"
