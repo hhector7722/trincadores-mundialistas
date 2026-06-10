@@ -16,8 +16,6 @@ export function LineupFormationInfo({
   align = "center",
   className,
 }: LineupFormationInfoProps) {
-  if (!formationLabel) return null;
-
   return (
     <div
       className={cn(
@@ -32,12 +30,16 @@ export function LineupFormationInfo({
       <span className="truncate text-[10px] font-medium text-[var(--tm-fg)]">
         {teamNameEs(teamName)}
       </span>
-      <span aria-hidden className="shrink-0 text-[10px] text-[var(--tm-muted)]">
-        ·
-      </span>
-      <span className="shrink-0 text-[10px] font-semibold tabular-nums text-[var(--tm-fg)]">
-        {formationLabel}
-      </span>
+      {formationLabel ? (
+        <>
+          <span aria-hidden className="shrink-0 text-[10px] text-[var(--tm-muted)]">
+            ·
+          </span>
+          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-[var(--tm-fg)]">
+            {formationLabel}
+          </span>
+        </>
+      ) : null}
     </div>
   );
 }

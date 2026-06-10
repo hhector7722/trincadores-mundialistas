@@ -44,7 +44,7 @@ export function MvpBenchColumn({
       <p
         className={cn(
           "m-0 w-full leading-none",
-          align === "right" && "text-right"
+          align === "left" ? "text-left" : "text-right"
         )}
         style={{ fontSize: fontPx, lineHeight: 1.1 }}
       >

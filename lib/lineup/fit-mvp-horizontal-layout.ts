@@ -62,7 +62,7 @@ export function estimateMvpInlineBenchLayout(
 }
 
 /**
- * MVP horizontal: convocatoria local arriba, campo en el centro, visitante abajo.
+ * MVP horizontal: visitante (izq. en campo) arriba, campo en el centro, local (der.) abajo.
  */
 export function computeFitMvpHorizontalLayout(
   opts: ComputeFitMvpHorizontalLayoutOptions

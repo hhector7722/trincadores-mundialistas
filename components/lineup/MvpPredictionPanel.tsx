@@ -49,7 +49,7 @@ type SquadPlayerOption = {
 };
 
 const MVP_FORMATION_ROW_PX = 22;
-const MVP_FOOTER_PX = 56;
+const MVP_FOOTER_PX = 40;
 const MVP_FOOTER_CLOSED_PX = 20;
 const MVP_ERROR_PX = 18;
 
@@ -299,60 +299,12 @@ export function MvpPredictionPanel({
   return (
     <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 pt-0.5">
-        {homeBench.length > 0 || resolvedHomeLineup?.formationLabel ? (
-          <div
-            className="mx-auto w-full shrink-0 pb-0.5"
-            style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
-          >
-            <div className="w-full min-w-0">
-              <LineupFormationInfo
-                teamName={homeTeam}
-                formationLabel={resolvedHomeLineup?.formationLabel}
-                align="right"
-              />
-              {homeBench.length > 0 ? (
-                <MvpBenchColumn
-                  teamName={homeTeam}
-                  players={homeBench}
-                  selectedKey={selectedKey}
-                  disabled={pickDisabled}
-                  align="left"
-                  gridLayout={fitLayout?.homeBench}
-                  onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
-                />
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
-        <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          {(markFieldReady) => (
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-              <MvpHorizontalFieldGraphic
-                awaySlots={awaySlots}
-                homeSlots={homeSlots}
-                awayTeam={awayTeam}
-                homeTeam={homeTeam}
-                awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
-                homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                onSelect={setSelectedKey}
-                onFieldReady={markFieldReady}
-                widthPx={fitLayout?.fieldWidthPx}
-                heightPx={fitLayout?.fieldHeightPx}
-                chipScale={chipScale}
-              />
-            </div>
-          )}
-        </LineupFieldGate>
-
-        {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
-          <div
-            className="mx-auto w-full shrink-0 pt-0.5 pb-1"
-            style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
-          >
-            <div className="w-full min-w-0">
+        <div
+          className="mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden"
+          style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
+        >
+          {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
+            <div className="w-full shrink-0 pb-0.5">
               <LineupFormationInfo
                 teamName={awayTeam}
                 formationLabel={resolvedAwayLineup?.formationLabel}
@@ -370,8 +322,51 @@ export function MvpPredictionPanel({
                 />
               ) : null}
             </div>
-          </div>
-        ) : null}
+          ) : null}
+
+          <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            {(markFieldReady) => (
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+                <MvpHorizontalFieldGraphic
+                  awaySlots={awaySlots}
+                  homeSlots={homeSlots}
+                  awayTeam={awayTeam}
+                  homeTeam={homeTeam}
+                  awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
+                  homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
+                  selectedKey={selectedKey}
+                  disabled={pickDisabled}
+                  onSelect={setSelectedKey}
+                  onFieldReady={markFieldReady}
+                  widthPx={fitLayout?.fieldWidthPx}
+                  heightPx={fitLayout?.fieldHeightPx}
+                  chipScale={chipScale}
+                />
+              </div>
+            )}
+          </LineupFieldGate>
+
+          {homeBench.length > 0 || resolvedHomeLineup?.formationLabel ? (
+            <div className="w-full shrink-0 pt-0.5 pb-1">
+              <LineupFormationInfo
+                teamName={homeTeam}
+                formationLabel={resolvedHomeLineup?.formationLabel}
+                align="right"
+              />
+              {homeBench.length > 0 ? (
+                <MvpBenchColumn
+                  teamName={homeTeam}
+                  players={homeBench}
+                  selectedKey={selectedKey}
+                  disabled={pickDisabled}
+                  align="right"
+                  gridLayout={fitLayout?.homeBench}
+                  onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
+                />
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {!serverEditable ? (
@@ -387,9 +382,9 @@ export function MvpPredictionPanel({
       ) : null}
 
       {serverEditable ? (
-        <div className="flex shrink-0 gap-2 px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 justify-center px-2 py-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <Button
-            className="min-h-11 flex-1 text-sm"
+            className="h-auto min-h-8 shrink-0 px-4 py-1.5 text-xs"
             disabled={!selectedKey || pending}
             onClick={onSave}
             title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
