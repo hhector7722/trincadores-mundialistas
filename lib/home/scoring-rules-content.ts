@@ -38,7 +38,7 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
     body: [
       `Campeón: +${champion} pts.`,
       `Finalistas — un equipo acertado: +${finalistSingle} pts.`,
-      `Finalistas — los dos equipos acertados: +${finalists} pts (el orden no importa).`,
+      `Finalistas — los dos equipos acertados: +${finalists} pts.`,
       `Máximo goleador: +${topScorer} pts.`,
       `MVP: +${tournamentMvp} pts.`,
       `Mejor portero: +${goldenGlove} pts.`,
