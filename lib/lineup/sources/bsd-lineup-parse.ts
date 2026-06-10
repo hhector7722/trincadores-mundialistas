@@ -1,4 +1,5 @@
 import { dedupeBenchAgainstStarters } from "@/lib/lineup/bench-dedupe";
+import { fillUnmatchedStarterSlotsFromSquad } from "@/lib/lineup/fill-unmatched-starter-slots";
 import {
   fallbackSlotKeyForRole,
   normalizeFormationTemplate,
@@ -99,8 +100,9 @@ function resolvePredictedStarterIdentity(
   }
 
   const bsdName = starter.name?.trim() ?? "";
-  const isPlaceholder = !bsdName;
-  const name = squadPlayer?.player_name ?? (bsdName || "Por confirmar");
+  const enforceOfficial = officialSquad.length > 0;
+  const isPlaceholder = squadPlayer ? false : enforceOfficial || !bsdName;
+  const name = squadPlayer?.player_name ?? (enforceOfficial ? "Por confirmar" : bsdName || "Por confirmar");
   const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
 
   return {
@@ -186,7 +188,16 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
     };
   });
 
-  const slots: LineupSlot[] = layoutPredictedStarters(starterInputs, formationLabel);
+  const filledStarters = useOfficial
+    ? fillUnmatchedStarterSlotsFromSquad(
+        starterInputs,
+        officialSquad,
+        usedSquadIdentities,
+        usedShirtNumbers
+      )
+    : starterInputs;
+
+  const slots: LineupSlot[] = layoutPredictedStarters(filledStarters, formationLabel);
 
   const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {

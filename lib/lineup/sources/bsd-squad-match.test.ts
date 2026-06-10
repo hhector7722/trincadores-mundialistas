@@ -145,7 +145,7 @@ test("assignStarterShirtNumbers prioriza dorsal oficial antes que BSD del slot",
 
 
 
-test("assignStarterShirtNumbers permite BSD fuera de la plantilla y null si no hay dorsal fiable", () => {
+test("assignStarterShirtNumbers con convocatoria oficial no asigna dorsales BSD", () => {
 
   const shirts = assignStarterShirtNumbers(
 
@@ -164,8 +164,25 @@ test("assignStarterShirtNumbers permite BSD fuera de la plantilla y null si no h
 
   assert.equal(shirts.length, 2);
 
-  assert.equal(shirts[0], 37);
+  assert.equal(shirts[0], null);
   assert.equal(shirts[1], null);
+
+});
+
+
+
+test("assignStarterShirtNumbers sin convocatoria oficial permite dorsal BSD", () => {
+
+  const shirts = assignStarterShirtNumbers(
+
+    [{ official: null, bsdJersey: 37 }],
+
+    false,
+    []
+
+  );
+
+  assert.deepEqual(shirts, [37]);
 
 });
 

@@ -14,12 +14,21 @@ export function hasDuplicateStarterShirts(lineup: ResolvedLineup): boolean {
   return new Set(shirts).size !== shirts.length;
 }
 
-/** Cache predicted obsoleta: duplicados, placeholders o BSD anterior a la politica de dorsales. */
+function hasGhostBsdStarters(lineup: ResolvedLineup): boolean {
+  return lineup.slots.some((slot) => {
+    if (slot.isPlaceholder) return false;
+    if (slot.shirtNumber == null) return slot.name.trim().toLowerCase() !== "por confirmar";
+    return false;
+  });
+}
+
+/** Cache predicted obsoleta: duplicados, fantasmas BSD o política anterior a convocatoria-only. */
 export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
   if (lineup.sourceKind !== "predicted") return false;
 
   if (hasDuplicateStarterShirts(lineup)) return true;
   if (lineup.dataSourceCode === BSD_SOURCE_CODE) return true;
+  if (hasGhostBsdStarters(lineup)) return true;
 
   if (
     lineup.slots.some(

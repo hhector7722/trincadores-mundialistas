@@ -43,7 +43,7 @@ test("parseBsdPredictedTeamLineup genera predicted con 11 titulares", () => {
   );
   assert.ok(lineup);
   assert.equal(lineup.sourceKind, "predicted");
-  assert.equal(lineup.dataSourceCode, "bsd-predicted-official-shirts-v2");
+  assert.equal(lineup.dataSourceCode, "bsd-predicted-squad-only-v3");
   assert.equal(lineup.slots.length, 11);
   assert.equal(lineup.bench?.length, 1);
 });
@@ -162,6 +162,12 @@ test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
     { player_name: "Armando Gonzalez", position: "MF", shirt_number: 14 },
     { player_name: "Gilberto Mora", position: "MF", shirt_number: 19 },
     { player_name: "Roberto Alvarado", position: "FW", shirt_number: 25 },
+    { player_name: "Guillermo Ochoa", position: "GK", shirt_number: 13 },
+    { player_name: "Luis Chavez", position: "MF", shirt_number: 24 },
+    { player_name: "Santiago Gimenez", position: "FW", shirt_number: 11 },
+    { player_name: "Carlos Acevedo", position: "GK", shirt_number: 12 },
+    { player_name: "Cesar Montes", position: "DF", shirt_number: 3 },
+    { player_name: "Gerardo Arteaga", position: "DF", shirt_number: 6 },
   ];
 
   const payload = {
@@ -202,19 +208,81 @@ test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
   assert.equal(vega.name, "Alexis Vega");
   assert.equal(vega.isPlaceholder, false);
 
-  const bryan = lineup.slots.find((slot) => slot.name.includes("Gonz"));
-  assert.ok(bryan);
-  assert.equal(bryan.isPlaceholder, false);
-  assert.equal(bryan.shirtNumber, null);
-  assert.equal(bryan.name, "Bryan González");
-
-  const ledezma = lineup.slots.find((slot) => slot.name.includes("Ledezma"));
-  assert.ok(ledezma);
-  assert.equal(ledezma.shirtNumber, 37);
-
   const roberto = lineup.slots.find((slot) => slot.name === "Roberto Alvarado");
   assert.ok(roberto);
   assert.equal(roberto.shirtNumber, 25);
 
-  assert.ok(!lineup.slots.some((slot) => slot.name === "Por confirmar"));
+  const officialNames = new Set(squad.map((player) => player.player_name));
+  for (const slot of lineup.slots) {
+    assert.ok(
+      officialNames.has(slot.name),
+      `Titular fuera de convocatoria: ${slot.name}`
+    );
+    assert.ok(slot.shirtNumber != null, `Titular sin dorsal oficial: ${slot.name}`);
+    assert.equal(slot.isPlaceholder, false);
+  }
+
+  assert.ok(!lineup.slots.some((slot) => slot.name.includes("Ledezma")));
+  assert.ok(!lineup.slots.some((slot) => slot.name.includes("Bryan")));
+});
+
+test("parseBsdPredictedTeamLineup España solo muestra convocados oficiales", () => {
+  const officialSquad = [
+    { player_name: "David Raya", position: "GK", shirt_number: 1 },
+    { player_name: "Marc Pubill", position: "DF", shirt_number: 2 },
+    { player_name: "Alex Grimaldo", position: "DF", shirt_number: 3 },
+    { player_name: "Eric Garcia", position: "DF", shirt_number: 4 },
+    { player_name: "Marcos Llorente", position: "DF", shirt_number: 5 },
+    { player_name: "Ferran Torres", position: "FW", shirt_number: 7 },
+    { player_name: "Fabian Ruiz", position: "MF", shirt_number: 8 },
+    { player_name: "Gavi", position: "MF", shirt_number: 9 },
+    { player_name: "Dani Olmo", position: "FW", shirt_number: 10 },
+    { player_name: "Jose Garcia", position: "GK", shirt_number: 13 },
+    { player_name: "Rodri", position: "MF", shirt_number: 16 },
+    { player_name: "Nico Williams", position: "FW", shirt_number: 17 },
+    { player_name: "Martin Zubimendi", position: "MF", shirt_number: 18 },
+    { player_name: "Lamine Yamal", position: "FW", shirt_number: 19 },
+    { player_name: "Aitor Munoz", position: "DF", shirt_number: 25 },
+  ];
+
+  const payload = {
+    team: "Spain",
+    predicted_formation: "4-2-3-1",
+    starters: [
+      { name: "Unai Simon", jersey_number: 23, predicted_slot: "GK", position: "G" },
+      { name: "Marc Cucurella", jersey_number: 24, predicted_slot: "LB", position: "D" },
+      { name: "Aymeric Laporte", jersey_number: 14, predicted_slot: "CB", position: "D" },
+      { name: "Pau Cubarsi", jersey_number: 22, predicted_slot: "CB", position: "D" },
+      { name: "Pedro Porro", jersey_number: 12, predicted_slot: "RB", position: "D" },
+      { name: "Pedri", jersey_number: 20, predicted_slot: "DM", position: "M" },
+      { name: "Mikel Merino", jersey_number: 6, predicted_slot: "DM", position: "M" },
+      { name: "Mikel Oyarzabal", jersey_number: 21, predicted_slot: "LW", position: "F" },
+      { name: "Alex Baena", jersey_number: 15, predicted_slot: "AM", position: "M" },
+      { name: "Yeremy Pino", jersey_number: 11, predicted_slot: "RW", position: "F" },
+      { name: "Borja Iglesias", jersey_number: 26, predicted_slot: "ST", position: "F" },
+    ],
+    substitutes: [],
+    updated_at: "2026-06-10T12:00:00+00:00",
+  };
+
+  const lineup = parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    officialSquad,
+    payload.updated_at,
+    toOfficial(officialSquad)
+  );
+  assert.ok(lineup);
+
+  const officialNames = new Set(officialSquad.map((player) => player.player_name));
+  for (const slot of lineup.slots) {
+    assert.ok(
+      officialNames.has(slot.name),
+      `Titular fuera de convocatoria: ${slot.name}`
+    );
+    assert.ok(slot.shirtNumber != null);
+  }
+
+  assert.ok(!lineup.slots.some((slot) => slot.name === "Unai Simon"));
+  assert.ok(!lineup.slots.some((slot) => slot.name === "Pedro Porro"));
+  assert.ok(lineup.slots.some((slot) => slot.name === "David Raya"));
 });
