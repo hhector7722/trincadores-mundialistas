@@ -37,6 +37,7 @@ type EntityModalControllerProps = {
   /** Lista ordenada para deslizar entre alineaciones (solo en vista lineup raíz). */
   carouselTeams?: string[];
   onCarouselTeamChange?: (teamName: string) => void;
+  onMvpSaved?: (playerName: string, teamName: string) => void;
 };
 
 function renderEntityView(
@@ -105,6 +106,7 @@ export function EntityModalController({
   onPlayerPicked,
   carouselTeams,
   onCarouselTeamChange,
+  onMvpSaved,
 }: EntityModalControllerProps) {
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
@@ -174,6 +176,7 @@ export function EntityModalController({
       view,
       {
         onPlayerClick: handlePlayerClick,
+        onMvpSaved,
         onMvpFormationsChange: (awayFormation, homeFormation) =>
           setMvpFormations({ awayFormation, homeFormation }),
         onFormationResolved: setLineupFormation,

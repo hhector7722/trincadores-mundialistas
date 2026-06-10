@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,11 @@ import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
+import {
+  mergeMvpIntoMatch,
+  mvpSnapshotFromMatch,
+  type MvpSnapshot,
+} from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 
 type HomeNextMatchProps = {
@@ -34,16 +39,32 @@ function hasSavedPrediction(match: MatchWithPrediction): boolean {
 
 export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
+  const [mvpSnapshot, setMvpSnapshot] = useState<MvpSnapshot | null>(() =>
+    mvpSnapshotFromMatch(match)
+  );
   const [entityModal, setEntityModal] = useState<{
     open: boolean;
     view: EntityModalView;
   }>({ open: false, view: buildLineupView(match.home_team) });
 
-  const isLive = match.status === "live";
-  const saved = hasSavedPrediction(match);
+  const displayMatch = useMemo(
+    () => mergeMvpIntoMatch(match, mvpSnapshot),
+    [match, mvpSnapshot]
+  );
+
+  useEffect(() => {
+    setMvpSnapshot(mvpSnapshotFromMatch(match));
+  }, [match.id, match.mvpPrediction?.player_name, match.mvpPrediction?.updated_at]);
+
+  function handleMvpSaved(playerName: string, teamName: string) {
+    setMvpSnapshot({ player_name: playerName, team_name: teamName });
+  }
+
+  const isLive = displayMatch.status === "live";
+  const saved = hasSavedPrediction(displayMatch);
   const scoreText = formatListScore(
-    match.prediction?.home_goals ?? null,
-    match.prediction?.away_goals ?? null
+    displayMatch.prediction?.home_goals ?? null,
+    displayMatch.prediction?.away_goals ?? null
   );
 
   function openEntityModal(view: EntityModalView) {
@@ -77,12 +98,16 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
           </div>
           <div className="relative mt-2 min-h-[6.75rem]">
             <MatchTeamsDisplay
-              homeTeam={match.home_team}
-              awayTeam={match.away_team}
-              kickoffAt={match.kickoff_at}
+              homeTeam={displayMatch.home_team}
+              awayTeam={displayMatch.away_team}
+              kickoffAt={displayMatch.kickoff_at}
               isLive={isLive}
-              onHomeTeamClick={() => openEntityModal(buildLineupView(match.home_team, match.id))}
-              onAwayTeamClick={() => openEntityModal(buildLineupView(match.away_team, match.id))}
+              onHomeTeamClick={() =>
+                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+              }
+              onAwayTeamClick={() =>
+                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+              }
               centerSlotAlign={saved ? "default" : "teamNames"}
               centerSlot={
                 saved ? (
@@ -144,10 +169,14 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 homeAnchor="15%"
                 awayAnchor="85%"
                 className="[&>div]:min-h-[2rem]"
-                match={match}
-                onOpenHomeLineup={() => openEntityModal(buildLineupView(match.home_team, match.id))}
-                onOpenAwayLineup={() => openEntityModal(buildLineupView(match.away_team, match.id))}
-                onOpenMvp={() => openEntityModal(buildMvpView(poolId, match))}
+                match={displayMatch}
+                onOpenHomeLineup={() =>
+                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+                }
+                onOpenAwayLineup={() =>
+                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+                }
+                onOpenMvp={() => openEntityModal(buildMvpView(poolId, displayMatch))}
               />
             </div>
           </div>
@@ -158,14 +187,16 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
         open={scoreModalOpen}
         onClose={() => setScoreModalOpen(false)}
         poolId={poolId}
-        match={match}
+        match={displayMatch}
+        onMvpSaved={(_matchId, playerName, teamName) => handleMvpSaved(playerName, teamName)}
       />
 
       <EntityModalController
         open={entityModal.open}
         onClose={() => setEntityModal((current) => ({ ...current, open: false }))}
         initialView={entityModal.view}
-        carouselTeams={[match.home_team, match.away_team]}
+        carouselTeams={[displayMatch.home_team, displayMatch.away_team]}
+        onMvpSaved={handleMvpSaved}
       />
     </>
   );

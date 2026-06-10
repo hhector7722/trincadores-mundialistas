@@ -16,6 +16,11 @@ import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
+import {
+  mergeMvpIntoMatch,
+  mvpOverridesFromMatches,
+  type MvpSnapshot,
+} from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
   LINEUP_MODAL_PANEL_CLASS,
@@ -31,11 +36,6 @@ import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { cn } from "@/lib/utils";
 
-type MvpOverride = {
-  player_name: string;
-  team_name: string;
-};
-
 type QuickPredictionModalProps = {
   open: boolean;
   onClose: () => void;
@@ -45,25 +45,6 @@ type QuickPredictionModalProps = {
   onMatchChange?: (match: MatchWithPrediction) => void;
   onMvpSaved?: (matchId: string, playerName: string, teamName: string) => void;
 };
-
-function applyMvpOverride(
-  target: MatchWithPrediction,
-  overrides: Record<string, MvpOverride>
-): MatchWithPrediction {
-  const override = overrides[target.id];
-  if (!override) return target;
-
-  return {
-    ...target,
-    mvpPrediction: {
-      id: target.mvpPrediction?.id ?? "",
-      player_name: override.player_name,
-      team_name: override.team_name,
-      points_awarded: target.mvpPrediction?.points_awarded ?? null,
-      updated_at: target.mvpPrediction?.updated_at ?? new Date().toISOString(),
-    },
-  };
-}
 
 type DotPosition = "start" | "middle" | "end";
 type QuickPanelView = { kind: "prediction" } | EntityModalView;
@@ -135,7 +116,7 @@ export function QuickPredictionModal({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
-  const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpOverride>>({});
+  const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -144,7 +125,7 @@ export function QuickPredictionModal({
 
   const baseViewMatch = orderedMatches[activeIndex] ?? match;
   const viewMatch = useMemo(
-    () => applyMvpOverride(baseViewMatch, mvpOverrides),
+    () => mergeMvpIntoMatch(baseViewMatch, mvpOverrides[baseViewMatch.id]),
     [baseViewMatch, mvpOverrides]
   );
   const canSwipeMatches = orderedMatches.length > 1 && Boolean(onMatchChange);
@@ -286,6 +267,7 @@ export function QuickPredictionModal({
       setActiveIndex(idx >= 0 ? idx : 0);
       setMatchSlide(null);
       matchSlideLockRef.current = false;
+      setMvpOverrides(mvpOverridesFromMatches(orderedMatches));
     }
   }, [open, match.id, orderedMatches, clearMatchSlideTimer]);
 
@@ -455,7 +437,7 @@ export function QuickPredictionModal({
           phase: matchSlide.phase,
           incoming: renderPanelView(
             { kind: "prediction" },
-            applyMvpOverride(matchSlide.target, mvpOverrides)
+            mergeMvpIntoMatch(matchSlide.target, mvpOverrides[matchSlide.target.id])
           ),
           onTransitionEnd: () => finishMatchSlideRef.current(),
         }
