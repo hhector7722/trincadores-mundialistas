@@ -95,9 +95,9 @@ function resolvePredictedStarter(
     reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
   }
 
-  const useOfficial = officialSquad.length > 0;
-  const isPlaceholder = useOfficial ? squadPlayer == null : !starter.name;
-  const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
+  const bsdName = starter.name?.trim() ?? "";
+  const isPlaceholder = !bsdName;
+  const name = squadPlayer?.player_name ?? (bsdName || "Por confirmar");
   const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
 
   return {
@@ -159,8 +159,8 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
     return {
       slotKey,
       role,
-      key: `${row.name}-${row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? row.index}`,
-      name: row.isPlaceholder ? "Por confirmar" : row.name,
+      key: `${slotKey}-${row.index}`,
+      name: row.name,
       shirtNumber: useOfficial
         ? (row.squadPlayer?.shirt_number ?? null)
         : (row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? null),

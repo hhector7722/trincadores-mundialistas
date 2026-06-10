@@ -127,7 +127,6 @@ export function findSquadPlayer(
     return key && !exclude.has(key);
   });
 
-  const officialShirts = new Set(officialSquad.map((player) => player.shirtNumber));
   let matched: LineupPlayerInput | null = null;
 
   const candidates = nameCandidates(bsdPlayer.name, available);
@@ -137,23 +136,6 @@ export function findSquadPlayer(
     const byShirt = candidates.filter((player) => player.shirt_number === bsdPlayer.shirtNumber);
     if (byShirt.length === 1) {
       matched = resolveOfficialLineupPlayer(byShirt[0]!, officialSquad);
-    }
-  }
-
-  if (
-    !matched &&
-    bsdPlayer.shirtNumber > 0 &&
-    officialShirts.has(bsdPlayer.shirtNumber)
-  ) {
-    const official = officialSquad.find(
-      (player) => player.shirtNumber === bsdPlayer.shirtNumber
-    );
-    if (official) {
-      const lineup = officialToLineupInput(official);
-      const key = squadIdentity(lineup);
-      if (key && !exclude.has(key)) {
-        matched = lineup;
-      }
     }
   }
 

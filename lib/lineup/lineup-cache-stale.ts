@@ -21,8 +21,17 @@ export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
     .map((slot) => slot.shirtNumber)
     .filter((shirt): shirt is number => shirt != null);
 
-  if (shirts.length === 0) return false;
   if (hasDuplicateStarterShirts(lineup)) return true;
+
+  if (
+    lineup.slots.some(
+      (slot) => slot.isPlaceholder && slot.name.trim().toLowerCase() === "por confirmar"
+    )
+  ) {
+    return true;
+  }
+
+  if (shirts.length === 0) return false;
 
   return shirts.some((shirt) => shirt < 1 || shirt > FIFA_SQUAD_SHIRT_MAX);
 }

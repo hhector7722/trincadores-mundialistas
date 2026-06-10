@@ -202,6 +202,15 @@ test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
   assert.equal(vega.name, "Alexis Vega");
   assert.equal(vega.isPlaceholder, false);
 
-  assert.equal(lineup.slots.filter((slot) => slot.isPlaceholder).length, 4);
+  const bryan = lineup.slots.find((slot) => slot.name.includes("Gonz"));
+  assert.ok(bryan);
+  assert.equal(bryan.isPlaceholder, false);
+  assert.equal(bryan.shirtNumber, null);
+
+  const ledezma = lineup.slots.find((slot) => slot.name.includes("Ledezma"));
+  assert.ok(ledezma);
+  assert.equal(ledezma.shirtNumber, null);
+
   assert.ok(!lineup.slots.some((slot) => slot.shirtNumber === 37));
+  assert.ok(!lineup.slots.some((slot) => slot.name === "Por confirmar"));
 });
