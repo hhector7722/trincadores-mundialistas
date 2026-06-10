@@ -73,4 +73,22 @@ describe("bracket grid guide (invisible layout)", () => {
     expect(segments.some((segment) => segment.variant === "final")).toBe(true);
     expect(segments.every((segment) => segment.d.startsWith("M"))).toBe(true);
   });
+
+  it("draws vertical gutter fork from M74 (1E vs 3º) toward M89 (W74 vs W77)", () => {
+    const geoms = buildBracketGeometry();
+    const m74 = geoms.find((geom) => geom.matchNumber === 74);
+    const segments = buildBracketConnectorPaths(geoms);
+
+    expect(m74).toBeDefined();
+    const fromM74 = segments.filter(
+      (segment) =>
+        segment.variant === "default" &&
+        segment.d.startsWith("M ") &&
+        segment.d.includes(` ${m74!.midY} `)
+    );
+
+    expect(fromM74.length).toBeGreaterThan(0);
+    expect(fromM74.some((segment) => /\sV\s/.test(segment.d))).toBe(true);
+    expect(fromM74.every((segment) => !/\sH\s[\d.]+\sH\s/.test(segment.d))).toBe(true);
+  });
 });

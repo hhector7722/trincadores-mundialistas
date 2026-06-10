@@ -180,9 +180,6 @@ const LEFT_SF = [101] as const;
 const RIGHT_R32 = [76, 78, 79, 80, 85, 86, 87, 88] as const;
 const RIGHT_R16 = [91, 92, 95, 96] as const;
 
-/** Octavos cuyo conector vertical no debe prolongarse hacia el borde de la página. */
-const R16_CLIP_VERTICAL_TO_TOP = new Set([89, 91]);
-const R16_CLIP_VERTICAL_TO_BOTTOM = new Set([94, 96]);
 const RIGHT_QF = [99, 100] as const;
 const RIGHT_SF = [102] as const;
 
@@ -325,25 +322,6 @@ export function buildPairCentersInBand(matchCount: number): readonly number[] {
   );
 }
 
-function verticalAnchorY(
-  child: BracketMatchGeometry,
-  parent: BracketMatchGeometry
-): number {
-  if (parent.round !== "r16") return parent.midY;
-
-  const childAbove = child.midY < parent.midY;
-
-  if (R16_CLIP_VERTICAL_TO_TOP.has(parent.matchNumber)) {
-    return childAbove ? parent.homeY : parent.midY;
-  }
-
-  if (R16_CLIP_VERTICAL_TO_BOTTOM.has(parent.matchNumber)) {
-    return childAbove ? parent.midY : parent.awayY;
-  }
-
-  return parent.midY;
-}
-
 function connectChildToParent(
   child: BracketMatchGeometry,
   parent: BracketMatchGeometry
@@ -356,18 +334,7 @@ function connectChildToParent(
   const xStart = connectorEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = connectorEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
-  const childAbove = child.midY < parent.midY;
-  if (
-    parent.round === "r16" &&
-    R16_CLIP_VERTICAL_TO_TOP.has(parent.matchNumber) &&
-    childAbove
-  ) {
-    return `M ${xStart} ${child.midY} H ${xVertical} H ${xEnd}`;
-  }
-
-  const yAnchor = verticalAnchorY(child, parent);
-
-  return `M ${xStart} ${child.midY} H ${xVertical} V ${yAnchor} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
 }
 
 function connectSemiToFinal(
