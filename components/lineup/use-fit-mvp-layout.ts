@@ -61,7 +61,10 @@ export function useFitMvpLayout(
     function measure() {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const rect = node.getBoundingClientRect();
+        const el = containerRef.current;
+        if (!el) return;
+
+        const rect = el.getBoundingClientRect();
         if (rect.width < 1 || rect.height < 1) return;
 
         const next = computeFitMvpHorizontalLayout({
