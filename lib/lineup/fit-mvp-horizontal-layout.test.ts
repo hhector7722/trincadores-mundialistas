@@ -52,9 +52,13 @@ describe("computeFitMvpHorizontalLayout", () => {
       gapPx,
     });
 
-    const benchHeight = Math.max(layout.awayBench.heightPx, layout.homeBench.heightPx);
     const total =
-      benchHeight + layout.fieldHeightPx + footerPx + formationRowPx + gapPx * 2;
+      layout.homeBench.heightPx +
+      layout.awayBench.heightPx +
+      layout.fieldHeightPx +
+      footerPx +
+      formationRowPx * 2 +
+      gapPx * 3;
 
     expect(total).toBeLessThanOrEqual(heightPx + 2);
   });

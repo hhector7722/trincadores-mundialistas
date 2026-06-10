@@ -41,7 +41,7 @@ const FORMATION_ROW_PX = 22;
 const BENCH_CELL_MIN_PX = 30;
 
 /**
- * MVP horizontal: campo arriba, meta + convocatorias abajo (ancho del terreno), sin scroll.
+ * MVP horizontal: convocatoria local arriba, campo en el centro, visitante abajo.
  */
 export function computeFitMvpHorizontalLayout(
   opts: ComputeFitMvpHorizontalLayoutOptions
@@ -51,19 +51,19 @@ export function computeFitMvpHorizontalLayout(
   const usableWidth = Math.max(0, opts.widthPx);
   const usableHeight = Math.max(
     0,
-    opts.heightPx - opts.footerPx - formationRowPx - gap * 2
+    opts.heightPx - opts.footerPx - formationRowPx * 2 - gap * 3
   );
 
   const estFieldWidth = Math.min(
     usableWidth,
-    usableHeight * HORIZONTAL_PITCH_ASPECT * 0.72
+    usableHeight * HORIZONTAL_PITCH_ASPECT * 0.55
   );
   const maxColumnsPerSide = Math.max(
     4,
     Math.floor(estFieldWidth / 2 / BENCH_CELL_MIN_PX)
   );
 
-  const maxBenchHeight = Math.min(usableHeight * 0.36, 96);
+  const maxBenchHeight = Math.min(usableHeight * 0.22, 80);
   const awayBench = pickBenchGrid(opts.awayBenchCount, maxBenchHeight, MVP_BENCH, {
     minRows: opts.awayBenchCount >= 6 ? 2 : 1,
     maxRows: 3,
@@ -75,8 +75,8 @@ export function computeFitMvpHorizontalLayout(
     maxColumns: maxColumnsPerSide,
   });
 
-  const benchHeight = Math.max(awayBench.heightPx, homeBench.heightPx);
-  const fieldByHeight = Math.max(0, usableHeight - benchHeight - gap);
+  const benchStackHeight = awayBench.heightPx + homeBench.heightPx;
+  const fieldByHeight = Math.max(0, usableHeight - benchStackHeight);
   const fieldByWidth = usableWidth / HORIZONTAL_PITCH_ASPECT;
   const fieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
   const fieldWidthPx = fieldHeightPx * HORIZONTAL_PITCH_ASPECT;
