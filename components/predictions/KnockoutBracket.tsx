@@ -48,6 +48,13 @@ function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
   home: TeamSlotLayout;
   away: TeamSlotLayout;
 } {
+  if (geom.round === "r32") {
+    return {
+      home: { x: columnX, y: geom.homeY },
+      away: { x: columnX, y: geom.awayY },
+    };
+  }
+
   return {
     home: { x: columnX, y: geom.midY - ORB_PAIR_HALF_Y },
     away: { x: columnX, y: geom.midY + ORB_PAIR_HALF_Y },

@@ -23,10 +23,36 @@ const R32_SLOT_COUNT = 8;
 /** Escala global de tarjetas con equipos (ancho + alto proporcional). */
 export const KO_CARD_SIZE_SCALE = 0.92;
 
-/** Mitad de la separación vertical entre los dos orbes de un enfrentamiento (% canvas Y). */
+/** Mitad de la separación vertical entre los dos orbes (rondas interiores, % canvas Y). */
 export const ORB_PAIR_HALF_Y = 3.2;
 
-const R32_PAIR_HALF = ORB_PAIR_HALF_Y;
+/** Radio vertical aproximado del orbe en dieciseisavos (% canvas Y). */
+const R32_ORB_HALF_Y = 1.7;
+
+/** Holgura mínima entre bordes de dos orbes del mismo enfrentamiento (% canvas Y). */
+const R32_INNER_EDGE_GAP_Y = 0.55;
+
+/** Holgura mínima entre bordes de orbes de enfrentamientos consecutivos (% canvas Y). */
+const R32_OUTER_EDGE_GAP_Y = 1.6;
+
+/** Mitad de la separación centro-a-centro dentro de un enfrentamiento r32 (% canvas Y). */
+export const R32_PAIR_INNER_HALF_Y = R32_ORB_HALF_Y + R32_INNER_EDGE_GAP_Y / 2;
+
+function buildR32PairCenters(): readonly number[] {
+  const innerHalf = R32_PAIR_INNER_HALF_Y;
+  const orbHalf = R32_ORB_HALF_Y;
+  const topBound = R32_TOP_ANCHOR_Y + innerHalf + orbHalf;
+  const bottomBound = R32_BOTTOM_ANCHOR_Y - innerHalf - orbHalf;
+  const centerSpan = bottomBound - topBound;
+  const pairPitch = centerSpan / (R32_SLOT_COUNT - 1);
+
+  return Array.from(
+    { length: R32_SLOT_COUNT },
+    (_, index) => topBound + index * pairPitch
+  );
+}
+
+const R32_PAIR_CENTERS = buildR32PairCenters();
 
 export const FINAL_CENTER_X = 50;
 
@@ -113,12 +139,11 @@ const RIGHT_QF = [99, 100] as const;
 const RIGHT_SF = [102] as const;
 
 function r32YFromSlot(slotIndex: number) {
-  const t = slotIndex / (R32_SLOT_COUNT - 1);
-  const midY = R32_TOP_ANCHOR_Y + t * (R32_BOTTOM_ANCHOR_Y - R32_TOP_ANCHOR_Y);
+  const midY = R32_PAIR_CENTERS[slotIndex] ?? R32_TOP_ANCHOR_Y;
   return {
     midY,
-    homeY: midY - R32_PAIR_HALF,
-    awayY: midY + R32_PAIR_HALF,
+    homeY: midY - R32_PAIR_INNER_HALF_Y,
+    awayY: midY + R32_PAIR_INNER_HALF_Y,
   };
 }
 
