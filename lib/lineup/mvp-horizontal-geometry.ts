@@ -3,8 +3,8 @@ import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
  * Proyección al campo MVP horizontal.
- * Local a la izquierda (banquillo arriba); visitante a la derecha.
- * Ambos equipos espejan el eje lateral al rotar 90° sobre el terreno.
+ * Local a la izquierda (banquillo arriba); visitante a la derecha (banquillo abajo).
+ * El lateral (LI/LD, etc.) viene del slot BSD anclado en la formación, no de espejar al rotar.
  */
 
 export type MvpHorizontalSlot = LineupSlot & { scale: number };
@@ -34,12 +34,7 @@ function clampY(y: number): number {
   return Math.min(PLAYABLE_Y_MAX, Math.max(PLAYABLE_Y_MIN, y));
 }
 
-/** Espejo lateral al rotar sobre el terreno (LD↔LI, extremo dcho↔izdo, etc.). */
-export function mirrorTacticalLateral(coord: FieldCoordinate): FieldCoordinate {
-  return { ...coord, x: Math.round((100 - coord.x) * 10) / 10 };
-}
-
-/** Local (coord ya espejada): profundidad → eje X hacia la derecha; lateral → eje Y. */
+/** Local: profundidad → eje X hacia la derecha; lateral del ancla → eje Y. */
 export function compressCoordToHomeLeft(coord: FieldCoordinate): FieldCoordinate {
   const depth = sourceDepth(coord.y);
   return {
@@ -48,7 +43,7 @@ export function compressCoordToHomeLeft(coord: FieldCoordinate): FieldCoordinate
   };
 }
 
-/** Visitante (coord ya espejada): profundidad → eje X hacia la izquierda; lateral → eje Y. */
+/** Visitante: profundidad → eje X hacia la izquierda; lateral del ancla → eje Y. */
 export function compressCoordToAwayRight(coord: FieldCoordinate): FieldCoordinate {
   const depth = sourceDepth(coord.y);
   return {
@@ -58,21 +53,19 @@ export function compressCoordToAwayRight(coord: FieldCoordinate): FieldCoordinat
 }
 
 function mapSlotToHomeLeft(slot: LineupSlot): MvpHorizontalSlot {
-  const mirrored = mirrorTacticalLateral(slot);
-  return { ...slot, ...compressCoordToHomeLeft(mirrored), scale: 1 };
+  return { ...slot, ...compressCoordToHomeLeft(slot), scale: 1 };
 }
 
 function mapSlotToAwayRight(slot: LineupSlot): MvpHorizontalSlot {
-  const mirrored = mirrorTacticalLateral(slot);
-  return { ...slot, ...compressCoordToAwayRight(mirrored), scale: 1 };
+  return { ...slot, ...compressCoordToAwayRight(slot), scale: 1 };
 }
 
-/** Local en mitad izquierda del campo horizontal (con espejo lateral). */
+/** Local en mitad izquierda del campo horizontal. */
 export function mapSlotsToHomeLeft(slots: LineupSlot[]): MvpHorizontalSlot[] {
   return slots.map(mapSlotToHomeLeft);
 }
 
-/** Visitante en mitad derecha del campo horizontal (con espejo lateral). */
+/** Visitante en mitad derecha del campo horizontal. */
 export function mapSlotsToAwayRight(slots: LineupSlot[]): MvpHorizontalSlot[] {
   return slots.map(mapSlotToAwayRight);
 }
