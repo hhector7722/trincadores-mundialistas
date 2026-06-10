@@ -213,7 +213,7 @@ export function MvpPickPanel({
           ) : (
             <Button
               variant="ghost"
-              className="h-fit min-h-0 shrink-0 rounded-none px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wide leading-none text-[var(--tm-accent)] hover:bg-transparent hover:opacity-80"
+              className="h-fit min-h-0 shrink-0 rounded-none px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wide leading-none !text-[var(--tm-accent)] hover:bg-transparent hover:!text-[var(--tm-accent)] hover:opacity-80 disabled:!text-[var(--tm-accent)] disabled:opacity-40"
               disabled={!selectedOption || pending}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
