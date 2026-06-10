@@ -5,8 +5,7 @@ import { layoutPredictedStarters } from "./predicted-slot-layout";
 import {
   mapSlotsToAwayHalf,
   mapSlotsToHomeHalf,
-  MVP_AWAY_BOUNDS,
-  MVP_HOME_BOUNDS,
+  mirrorCoordVertical,
 } from "./match-field-geometry";
 
 const SPAIN_4231 = [
@@ -23,6 +22,12 @@ const SPAIN_4231 = [
   { slotKey: "ST", role: "FW" as const },
 ];
 
+test("mirrorCoordVertical invierte sobre el eje central del campo", () => {
+  assert.deepEqual(mirrorCoordVertical({ x: 50, y: 92 }), { x: 50, y: 8 });
+  assert.deepEqual(mirrorCoordVertical({ x: 15, y: 22 }), { x: 15, y: 78 });
+  assert.deepEqual(mirrorCoordVertical(mirrorCoordVertical({ x: 35, y: 60 })), { x: 35, y: 60 });
+});
+
 test("mapSlotsToAwayHalf coloca portero arriba del campo MVP", () => {
   const mapped = mapSlotsToAwayHalf([
     {
@@ -37,24 +42,32 @@ test("mapSlotsToAwayHalf coloca portero arriba del campo MVP", () => {
     },
   ]);
 
-  assert.equal(mapped[0]!.y, 6);
+  assert.equal(mapped[0]!.y, 8);
 });
 
-test("mapSlotsToAwayHalf separa portero y defensa en bandas distintas", () => {
+test("mapSlotsToAwayHalf refleja la plantilla maestra", () => {
   const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const mapped = mapSlotsToAwayHalf(template);
-  const gk = mapped.find((slot) => slot.role === "GK");
-  const defenders = mapped.filter((slot) => slot.role === "DF");
 
-  assert.ok(gk);
-  for (const defender of defenders) {
-    assert.ok(defender.y - gk!.y >= 5, `defensa demasiado cerca del portero (${defender.y})`);
-    assert.ok(defender.y <= MVP_AWAY_BOUNDS.yMax);
-    assert.ok(defender.y >= MVP_AWAY_BOUNDS.yMin);
-  }
+  assert.deepEqual(
+    mapped.map((slot) => ({ x: slot.x, y: slot.y })).sort((a, b) => a.y - b.y || a.x - b.x),
+    template
+      .map((slot) => mirrorCoordVertical(slot))
+      .sort((a, b) => a.y - b.y || a.x - b.x)
+  );
 });
 
-test("mapSlotsToHomeHalf mantiene delantero en mitad inferior", () => {
+test("mapSlotsToHomeHalf conserva coordenadas maestras", () => {
+  const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const mapped = mapSlotsToHomeHalf(template);
+
+  assert.deepEqual(
+    mapped.map((slot) => ({ x: slot.x, y: slot.y })).sort((a, b) => a.y - b.y || a.x - b.x),
+    template.map((slot) => ({ x: slot.x, y: slot.y })).sort((a, b) => a.y - b.y || a.x - b.x)
+  );
+});
+
+test("mapSlotsToHomeHalf mantiene delantero en posición maestra", () => {
   const mapped = mapSlotsToHomeHalf([
     {
       key: "st",
@@ -64,32 +77,39 @@ test("mapSlotsToHomeHalf mantiene delantero en mitad inferior", () => {
       role: "FW",
       isPlaceholder: false,
       x: 50,
-      y: 18,
+      y: 20,
     },
   ]);
 
-  assert.equal(mapped[0]!.y, 71);
+  assert.equal(mapped[0]!.y, 20);
 });
 
 test("proyeccion MVP mantiene coords horizontales de plantilla", () => {
   const template = getFormationTemplateCoordinates("4-2-3-1");
   const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const home = mapSlotsToHomeHalf(slots);
+  const away = mapSlotsToAwayHalf(slots);
 
   assert.deepEqual(
     home.map((slot) => slot.x).sort((a, b) => a - b),
     template.map((coord) => coord.x).sort((a, b) => a - b)
   );
+  assert.deepEqual(
+    away.map((slot) => slot.x).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
 });
 
-test("mapSlotsToHomeHalf respeta bounds del local", () => {
+test("ambos equipos son simétricos respecto a y=50", () => {
   const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
-  const mapped = mapSlotsToHomeHalf(template);
+  const home = mapSlotsToHomeHalf(template);
+  const away = mapSlotsToAwayHalf(template);
+  const awayBySlotKey = new Map(away.map((slot) => [slot.slotKey, slot]));
 
-  for (const slot of mapped) {
-    assert.ok(slot.y >= MVP_HOME_BOUNDS.yMin);
-    assert.ok(slot.y <= MVP_HOME_BOUNDS.yMax);
-    assert.ok(slot.x >= MVP_HOME_BOUNDS.xMin);
-    assert.ok(slot.x <= MVP_HOME_BOUNDS.xMax);
+  for (const h of home) {
+    const a = awayBySlotKey.get(h.slotKey);
+    assert.ok(a, `falta slot visitante para ${h.slotKey}`);
+    assert.equal(h.x, a.x);
+    assert.equal(h.y + a.y, 100, `slot ${h.slotKey}: home y=${h.y}, away y=${a.y}`);
   }
 });

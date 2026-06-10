@@ -9,8 +9,9 @@ type FootballPitchSurfaceProps = {
 };
 
 /**
- * Campo vertical: porterías arriba/abajo, coincidente con el sistema de coords
- * (y bajo = portería propia, y alto = línea de ataque).
+ * Campo vertical recortado al terreno reglamentario (sin césped exterior).
+ * viewBox = líneas de banda; el 100 % del contenedor coincide con el área táctica.
+ * Coordenadas: y bajo = portería propia, y alto = línea de ataque.
  */
 export function FootballPitchSurface({ className, onReady }: FootballPitchSurfaceProps) {
   useEffect(() => {
@@ -19,7 +20,7 @@ export function FootballPitchSurface({ className, onReady }: FootballPitchSurfac
 
   return (
     <svg
-      viewBox="0 0 68 105"
+      viewBox="6 6 56 93"
       aria-hidden
       className={cn("h-full w-full", className)}
       preserveAspectRatio="xMidYMid meet"
@@ -36,9 +37,9 @@ export function FootballPitchSurface({ className, onReady }: FootballPitchSurfac
         </linearGradient>
       </defs>
 
-      <rect x="2" y="2" width="64" height="101" rx="3" fill="url(#pitch-grass)" />
-      <rect x="2" y="2" width="64" height="50.5" fill="url(#pitch-stripe-a)" />
-      <rect x="2" y="52.5" width="64" height="50.5" fill="url(#pitch-stripe-a)" opacity="0.55" />
+      <rect x="6" y="6" width="56" height="93" fill="url(#pitch-grass)" />
+      <rect x="6" y="6" width="56" height="46.5" fill="url(#pitch-stripe-a)" />
+      <rect x="6" y="52.5" width="56" height="46.5" fill="url(#pitch-stripe-a)" opacity="0.55" />
 
       <g
         fill="none"

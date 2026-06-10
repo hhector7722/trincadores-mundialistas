@@ -1,10 +1,10 @@
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
-/** Proporción ancho:alto de un campo en vista vertical (~68×105 m). */
+/** Proporción ancho:alto del terreno reglamentario (~68×105 m). */
 export const PITCH_ASPECT_CLASS = "aspect-[68/105]";
 
-/** Campo MVP (dos equipos): más alto para 22 fichas en dos mitades. */
-export const MVP_PITCH_ASPECT_CLASS = "aspect-[68/148]";
+/** Campo MVP: misma superficie táctica; el rival se refleja verticalmente. */
+export const MVP_PITCH_ASPECT_CLASS = PITCH_ASPECT_CLASS;
 
 import { TACTICAL_LINE_Y } from "@/lib/lineup/formation-coordinates";
 

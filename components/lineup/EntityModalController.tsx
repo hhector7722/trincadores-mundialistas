@@ -171,7 +171,7 @@ export function EntityModalController({
       hideHeaderDivider
       headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
       className={cn(
-        current.kind === "mvp" && "max-h-[min(100dvh-0.5rem,34rem)]",
+        current.kind === "mvp" && "max-h-[min(100dvh-0.5rem,32rem)]",
         current.kind === "lineup" && "max-h-[calc(100dvh-1rem)]",
         className
       )}

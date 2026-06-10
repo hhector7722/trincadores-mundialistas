@@ -43,13 +43,13 @@ export function TeamLineupGraphic({
 
       <div
         className={cn(
-          "relative w-full shrink-0 self-center",
+          "relative w-full shrink-0 self-center overflow-visible",
           PITCH_ASPECT_CLASS,
-          isModal ? "max-w-[13.5rem] overflow-visible" : "max-w-[11rem] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:max-w-[12.5rem]"
+          isModal ? "max-w-[min(94vw,16.5rem)]" : "max-w-[min(90vw,14.5rem)] sm:max-w-[15rem]"
         )}
       >
-        <div className={cn("absolute inset-0", !isModal && "rounded-2xl bg-[#143d24]")}>
-          <FootballPitchSurface className="object-contain object-center" onReady={onFieldReady} />
+        <div className="absolute inset-0">
+          <FootballPitchSurface onReady={onFieldReady} />
         </div>
 
         {slots.map((slot) => (

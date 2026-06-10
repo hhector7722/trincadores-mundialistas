@@ -75,12 +75,12 @@ export function MatchMvpFieldGraphic({
   return (
     <div
       className={cn(
-        "relative w-full shrink-0 self-center max-w-[16.5rem] overflow-visible",
+        "relative h-full max-h-full w-auto max-w-[min(98vw,22rem)] shrink-0 self-center overflow-visible",
         MVP_PITCH_ASPECT_CLASS,
         className
       )}
     >
-      <div className="absolute inset-0 rounded-lg bg-[#143d24]">
+      <div className="absolute inset-0">
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 

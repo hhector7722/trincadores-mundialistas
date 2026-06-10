@@ -31,7 +31,7 @@ export const TACTICAL_X = {
 
 export const TACTICAL_Y = {
   /** Delanteros (18–25 %) */
-  FORWARD: 22,
+  FORWARD: 20,
   /** Mediapuntas (35–45 %) */
   ATTACK: 40,
   /** Centrocampistas (45–55 %) */
@@ -142,6 +142,9 @@ export const FORMATION_SLOT_ANCHORS: Record<FormationId, FormationSlotAnchor[]> 
     { key: "RST", accept: ["ST", "CF", "SS", "RST", "DC"], coord: { x: X.IR, y: Y.FORWARD } },
   ],
 };
+
+/** Alias legible del registro maestro de formaciones. */
+export const FORMATIONS = FORMATION_SLOT_ANCHORS;
 
 export function isFormationId(value: string): value is FormationId {
   return (FORMATION_IDS as readonly string[]).includes(value);

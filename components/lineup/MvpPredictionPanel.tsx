@@ -9,7 +9,6 @@ import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
-import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import {
@@ -237,75 +236,67 @@ export function MvpPredictionPanel({
 
   const pickDisabled = !serverEditable || pending;
 
+  const awayFormation = resolvedAwayLineup?.formationLabel;
+  const homeFormation = resolvedHomeLineup?.formationLabel;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col px-1 py-1 sm:px-1.5">
+      <div className="flex min-h-0 flex-1 flex-col px-0.5 py-0.5">
         {!serverEditable ? (
-          <p className="mb-1 shrink-0 px-1 text-sm text-[var(--tm-muted)]">
+          <p className="mb-0.5 shrink-0 px-1 text-xs text-[var(--tm-muted)]">
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
-        ) : (
-          <p className="mb-0.5 shrink-0 px-1 text-center text-[9px] text-[var(--tm-muted)]">
-            {selectedOption
-              ? `MVP: ${selectedOption.name} (${selectedOption.teamName})`
-              : "Pulsa un jugador del once probable o de las reservas."}
+        ) : selectedOption ? (
+          <p className="mb-0 shrink-0 truncate px-1 text-center text-[8px] text-[var(--tm-muted)]">
+            MVP: {selectedOption.name}
           </p>
-        )}
+        ) : null}
 
         <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
           {(markFieldReady) => (
-            <div className="flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto overscroll-contain">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <BenchPlayersStrip
                 teamName={awayTeam}
                 players={awayBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
-                compact
+                density="minimal"
+                showTeamHeader={false}
                 onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
                 position="top"
               />
 
-              <MatchMvpFieldGraphic
-                homeSlots={homeSlots}
-                awaySlots={awaySlots}
-                homeTeam={homeTeam}
-                awayTeam={awayTeam}
-                homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
-                awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                onSelect={setSelectedKey}
-                onFieldReady={markFieldReady}
-              />
+              <div className="flex min-h-0 flex-1 items-center justify-center py-0.5">
+                <MatchMvpFieldGraphic
+                  homeSlots={homeSlots}
+                  awaySlots={awaySlots}
+                  homeTeam={homeTeam}
+                  awayTeam={awayTeam}
+                  homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
+                  awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
+                  selectedKey={selectedKey}
+                  disabled={pickDisabled}
+                  onSelect={setSelectedKey}
+                  onFieldReady={markFieldReady}
+                />
+              </div>
 
               <BenchPlayersStrip
                 teamName={homeTeam}
                 players={homeBench}
                 selectedKey={selectedKey}
                 disabled={pickDisabled}
-                compact
+                density="minimal"
+                showTeamHeader={false}
                 onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
                 position="bottom"
               />
 
-              <div className="mt-1 flex w-full shrink-0 gap-1.5 px-1">
-                {resolvedAwayLineup ? (
-                  <LineupSourceBadge
-                    compact
-                    sourceKind={resolvedAwayLineup.sourceKind}
-                    formationLabel={`${resolvedAwayLineup.formationLabel} · visitante`}
-                    className="min-w-0 flex-1 [&_p:last-child]:text-[11px]"
-                  />
-                ) : null}
-                {resolvedHomeLineup ? (
-                  <LineupSourceBadge
-                    compact
-                    sourceKind={resolvedHomeLineup.sourceKind}
-                    formationLabel={`${resolvedHomeLineup.formationLabel} · local`}
-                    className="min-w-0 flex-1 [&_p:last-child]:text-[11px]"
-                  />
-                ) : null}
-              </div>
+              {awayFormation || homeFormation ? (
+                <p className="mt-0.5 shrink-0 truncate px-1 text-center text-[7px] text-[var(--tm-muted)] opacity-70">
+                  {[awayFormation, homeFormation].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
             </div>
           )}
         </LineupFieldGate>
