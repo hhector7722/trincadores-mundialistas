@@ -10,7 +10,12 @@ import {
   type MvpModalFormations,
 } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
-import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
+import {
+  LINEUP_MODAL_PANEL_CLASS,
+  LINEUP_MODAL_PANEL_HOST_CLASS,
+  LINEUP_MODAL_WRAPPER_CLASS,
+  MVP_MODAL_WRAPPER_CLASS,
+} from "@/lib/lineup/field-asset";
 import { isGoalkeeperPosition } from "@/lib/lineup/position-map";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
@@ -198,14 +203,19 @@ export function EntityModalController({
       hideHeaderDivider
       headerTitleAlign={isMvpView ? "left" : "center"}
       headerCompact={isMvpView}
-      scrollContent={!isMvpView}
+      scrollContent={!isFieldView}
       containerClassName={isMvpView ? "p-1" : isLineupView ? "p-1.5" : undefined}
       className={cn(
         isMvpView && "max-h-[calc(100dvh-0.5rem)]",
-        isLineupView && "max-h-[calc(100dvh-1rem)]",
+        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         className
       )}
-      wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
+      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
+      wrapperClassName={cn(
+        isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+        isMvpView && MVP_MODAL_WRAPPER_CLASS,
+        wrapperClassName
+      )}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined

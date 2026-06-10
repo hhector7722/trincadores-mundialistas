@@ -222,8 +222,8 @@ function ModalPanelShell({
       )}
       <div
         className={cn(
-          "relative flex min-h-0 flex-1 flex-col",
-          scrollContent ? "overflow-y-auto overscroll-contain" : "overflow-hidden"
+          "relative flex flex-col",
+          scrollContent ? "min-h-0 flex-1 overflow-y-auto overscroll-contain" : "overflow-hidden"
         )}
       >
         {children}

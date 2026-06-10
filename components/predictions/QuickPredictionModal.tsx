@@ -17,7 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
+import {
+  LINEUP_MODAL_PANEL_CLASS,
+  LINEUP_MODAL_PANEL_HOST_CLASS,
+  LINEUP_MODAL_WRAPPER_CLASS,
+  MVP_MODAL_WRAPPER_CLASS,
+} from "@/lib/lineup/field-asset";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
@@ -400,8 +405,9 @@ export function QuickPredictionModal({
       : null;
 
   const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? matchPanelSlide;
-  const isFieldView = panelView.kind === "lineup" || panelView.kind === "mvp";
+  const isLineupView = panelView.kind === "lineup";
   const isMvpView = panelView.kind === "mvp";
+  const isFieldView = isLineupView || isMvpView;
 
   return (
     <Modal
@@ -413,9 +419,17 @@ export function QuickPredictionModal({
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
-      className={cn(isFieldView && "max-h-[calc(100dvh-1rem)]")}
+      scrollContent={!isFieldView}
+      className={cn(
+        isMvpView && "max-h-[calc(100dvh-1rem)]",
+        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+      )}
       containerClassName={isFieldView ? "p-1.5" : undefined}
-      wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS)}
+      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
+      wrapperClassName={cn(
+        isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+        isMvpView && MVP_MODAL_WRAPPER_CLASS
+      )}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeMatches && atPredictionRoot && !activePanelSlide

@@ -8,7 +8,11 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
-import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
+import {
+  LINEUP_MODAL_PANEL_CLASS,
+  LINEUP_MODAL_PANEL_HOST_CLASS,
+  LINEUP_MODAL_WRAPPER_CLASS,
+} from "@/lib/lineup/field-asset";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
@@ -290,7 +294,11 @@ export function GroupStandingsModal({
       onClose={onClose}
       title={groupPanelTitle(panelView, lineupFormation)}
       hideHeaderDivider
-      className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
+      scrollContent={!isLineupView}
+      className={cn(
+        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+      )}
+      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
