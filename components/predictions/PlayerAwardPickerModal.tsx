@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchAllTournamentPlayersAction } from "@/actions/lineup";
 import { PlayerSearchBar } from "@/components/players/PlayerSearchBar";
+import { TeamPickerGridItem, TEAM_PICKER_GRID_CLASS } from "@/components/predictions/TeamPickerGridItem";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { Modal } from "@/components/ui/modal";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -13,7 +14,7 @@ import {
   searchPlayers,
   type SearchablePlayer,
 } from "@/lib/players/search-players";
-import { teamAbbr, teamNameEs } from "@/lib/teams/display";
+import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 type PlayerAwardPickerModalProps = {
@@ -125,27 +126,18 @@ export function PlayerAwardPickerModal({
               <ul
                 aria-hidden={showSearchResults}
                 className={cn(
-                  "absolute inset-0 grid grid-cols-6 items-stretch gap-2 overflow-y-auto p-2.5 sm:gap-2.5 sm:p-3",
+                  "absolute inset-0",
+                  TEAM_PICKER_GRID_CLASS,
                   showSearchResults && "pointer-events-none invisible"
                 )}
               >
                 {teams.map((team) => (
-                  <li key={team} className="flex min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => onPickTeam(team)}
-                      aria-label={`Ver plantilla de ${teamNameEs(team)}`}
-                      className={cn(
-                        "flex h-[3.75rem] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] px-1 text-center transition-colors",
-                        "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
-                      )}
-                    >
-                      <TeamFlagBadge name={team} size="sm" className="shrink-0" />
-                      <span className="w-full min-w-0 truncate text-center text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-[10px]">
-                        {teamAbbr(team)}
-                      </span>
-                    </button>
-                  </li>
+                  <TeamPickerGridItem
+                    key={team}
+                    team={team}
+                    onClick={() => onPickTeam(team)}
+                    ariaLabel={`Ver plantilla de ${teamNameEs(team)}`}
+                  />
                 ))}
               </ul>
 

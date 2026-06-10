@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { TeamPickerGridItem, TEAM_PICKER_GRID_CLASS } from "@/components/predictions/TeamPickerGridItem";
 import { Modal } from "@/components/ui/modal";
 import { getAllWorldCupTeamsAlphabetically } from "@/lib/predictions/teams-picker-data";
-import { teamAbbr, teamNameEs } from "@/lib/teams/display";
-import { cn } from "@/lib/utils";
+import { teamNameEs } from "@/lib/teams/display";
 
 export type TeamsPickerMode = "view" | "pickOne" | "pickTwo";
 
@@ -91,33 +90,21 @@ export function TeamsPickerModal({
           {pickHint}
         </p>
       ) : null}
-      <ul className="grid grid-cols-6 items-stretch gap-2 overflow-y-auto p-2.5 sm:gap-2.5 sm:p-3">
+      <ul className={TEAM_PICKER_GRID_CLASS}>
         {teams.map((team) => {
           const selectedAsFirst = mode === "pickTwo" && firstFinalist === team;
           return (
-            <li key={team} className="flex min-w-0">
-              <button
-                type="button"
-                onClick={() => handleTeamClick(team)}
-                aria-label={
-                  mode === "view"
-                    ? `Ver plantilla de ${teamNameEs(team)}`
-                    : `Elegir ${teamNameEs(team)}`
-                }
-                className={cn(
-                  "flex h-[3.75rem] w-full min-w-0 flex-col items-center justify-center gap-1 rounded-lg border px-1 text-center transition-colors",
-                  selectedAsFirst
-                    ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)]"
-                    : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)]",
-                  "hover:bg-[rgba(111,43,255,0.22)] active:bg-[rgba(111,43,255,0.28)]"
-                )}
-              >
-                <TeamFlagBadge name={team} size="sm" className="shrink-0" />
-                <span className="w-full min-w-0 truncate text-center text-[8px] font-semibold uppercase tracking-wide text-[var(--tm-fg)] sm:text-[10px]">
-                  {teamAbbr(team)}
-                </span>
-              </button>
-            </li>
+            <TeamPickerGridItem
+              key={team}
+              team={team}
+              selected={selectedAsFirst}
+              onClick={() => handleTeamClick(team)}
+              ariaLabel={
+                mode === "view"
+                  ? `Ver plantilla de ${teamNameEs(team)}`
+                  : `Elegir ${teamNameEs(team)}`
+              }
+            />
           );
         })}
       </ul>
