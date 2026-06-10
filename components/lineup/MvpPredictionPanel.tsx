@@ -8,6 +8,7 @@ import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
+import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
 import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
@@ -43,9 +44,10 @@ type SquadPlayerOption = {
   position: string | null;
 };
 
-const MVP_FOOTER_PX = 44;
-const MVP_FOOTER_CLOSED_PX = 0;
+const MVP_FOOTER_PX = 52;
+const MVP_FOOTER_CLOSED_PX = 18;
 const MVP_ERROR_PX = 18;
+const MVP_FORMATION_ROW_PX = 18;
 
 function sortBenchByShirt<T extends { shirtNumber: number | null; name: string }>(
   players: T[]
@@ -221,6 +223,9 @@ export function MvpPredictionPanel({
     homeBenchCount: homeBench.length,
     footerPx,
     enabled: !loading && kitColorsReady,
+    mode: "mvp",
+    formationRowPx: MVP_FORMATION_ROW_PX,
+    gapPx: 3,
   });
 
   useEffect(() => {
@@ -283,7 +288,7 @@ export function MvpPredictionPanel({
     <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-0.5">
             <BenchPlayersStrip
               teamName={awayTeam}
               players={awayBench}
@@ -296,7 +301,12 @@ export function MvpPredictionPanel({
               position="top"
             />
 
-            <div className="flex shrink-0 items-center justify-center overflow-visible">
+            <LineupFormationInfo
+              teamName={awayTeam}
+              formationLabel={resolvedAwayLineup?.formationLabel}
+            />
+
+            <div className="flex shrink-0 items-center justify-center overflow-visible py-0.5">
               <MatchMvpFieldGraphic
                 homeSlots={homeSlots}
                 awaySlots={awaySlots}
@@ -314,6 +324,11 @@ export function MvpPredictionPanel({
               />
             </div>
 
+            <LineupFormationInfo
+              teamName={homeTeam}
+              formationLabel={resolvedHomeLineup?.formationLabel}
+            />
+
             <BenchPlayersStrip
               teamName={homeTeam}
               players={homeBench}
@@ -330,19 +345,19 @@ export function MvpPredictionPanel({
       </LineupFieldGate>
 
       {!serverEditable ? (
-        <p className="shrink-0 px-1 py-0.5 text-center text-[9px] text-[var(--tm-muted)]">
+        <p className="shrink-0 px-1 py-1 text-center text-[9px] text-[var(--tm-muted)]">
           Predicción cerrada.
         </p>
       ) : null}
 
       {error ? (
-        <p className="shrink-0 px-2 text-[10px] text-[var(--tm-danger)]" role="alert">
+        <p className="shrink-0 px-2 py-0.5 text-[10px] text-[var(--tm-danger)]" role="alert">
           {error}
         </p>
       ) : null}
 
       {serverEditable ? (
-        <div className="flex shrink-0 gap-2 px-1 py-0.5 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 gap-2 px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <Button
             className="min-h-11 flex-1 text-sm"
             disabled={!selectedKey || pending}

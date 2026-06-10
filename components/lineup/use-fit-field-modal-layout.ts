@@ -4,6 +4,7 @@ import { useEffect, useState, type RefObject } from "react";
 import {
   computeFitFieldModalLayout,
   type FitFieldModalLayout,
+  type FitFieldModalLayoutMode,
 } from "@/lib/lineup/fit-field-modal-layout";
 
 type UseFitFieldModalLayoutOptions = {
@@ -11,13 +12,24 @@ type UseFitFieldModalLayoutOptions = {
   homeBenchCount: number;
   footerPx: number;
   enabled?: boolean;
+  mode?: FitFieldModalLayoutMode;
+  formationRowPx?: number;
+  gapPx?: number;
 };
 
 export function useFitFieldModalLayout(
   containerRef: RefObject<HTMLElement | null>,
   options: UseFitFieldModalLayoutOptions
 ): FitFieldModalLayout | null {
-  const { awayBenchCount, homeBenchCount, footerPx, enabled = true } = options;
+  const {
+    awayBenchCount,
+    homeBenchCount,
+    footerPx,
+    enabled = true,
+    mode = "lineup",
+    formationRowPx,
+    gapPx,
+  } = options;
   const [layout, setLayout] = useState<FitFieldModalLayout | null>(null);
 
   useEffect(() => {
@@ -40,7 +52,9 @@ export function useFitFieldModalLayout(
           awayBenchCount,
           homeBenchCount,
           footerPx,
-          gapPx: 2,
+          gapPx,
+          mode,
+          formationRowPx,
         })
       );
     }
@@ -51,7 +65,16 @@ export function useFitFieldModalLayout(
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [containerRef, awayBenchCount, homeBenchCount, footerPx, enabled]);
+  }, [
+    containerRef,
+    awayBenchCount,
+    homeBenchCount,
+    footerPx,
+    enabled,
+    mode,
+    formationRowPx,
+    gapPx,
+  ]);
 
   return layout;
 }

@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRef } from "react";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
+import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
@@ -23,6 +27,8 @@ type ProbableXIProps = {
   className?: string;
 };
 
+const LINEUP_META_PX = 52;
+
 function formationHref(teamSlug: string, formation: FormationId, year?: number | null): string {
   const params = new URLSearchParams();
   if (year) params.set("year", String(year));
@@ -41,8 +47,25 @@ export function ProbableXI({
   backHref = "/predictions",
   className,
 }: ProbableXIProps) {
+  const layoutRef = useRef<HTMLDivElement>(null);
   const displayName = teamNameEs(teamName);
   const labelYear = year ?? squad?.year;
+
+  const lineup =
+    squad && squad.players.length > 0
+      ? resolvedLineup ?? buildFallbackLineup(squad.players, formation)
+      : null;
+  const bench =
+    squad && lineup ? resolveBenchPlayers(squad, lineup) : [];
+
+  const fitLayout = useFitFieldModalLayout(layoutRef, {
+    awayBenchCount: bench.length,
+    homeBenchCount: 0,
+    footerPx: LINEUP_META_PX,
+    enabled: Boolean(lineup),
+    mode: "lineup",
+    gapPx: 4,
+  });
 
   if (!squad || squad.players.length === 0) {
     return (
@@ -65,10 +88,9 @@ export function ProbableXI({
     );
   }
 
-  const lineup = resolvedLineup ?? buildFallbackLineup(squad.players, formation);
-  const activeFormation = formation ?? lineup.formation;
-  const showFormationPicker = lineup.sourceKind === "fallback" && teamSlug;
-  const bench = resolveBenchPlayers(squad, lineup);
+  const lineupResolved = lineup!;
+  const activeFormation = formation ?? lineupResolved.formation;
+  const showFormationPicker = lineupResolved.sourceKind === "fallback" && teamSlug;
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
@@ -113,38 +135,40 @@ export function ProbableXI({
         </div>
       ) : null}
 
-      <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
-        {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 py-1">
-            {bench.length > 0 ? (
-              <BenchPlayersStrip
-                teamName={teamName}
-                players={bench}
-                density="minimal"
-                showTeamHeader={false}
-                position="top"
-                onPlayerClick={() => {}}
-              />
-            ) : null}
+      <div ref={layoutRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          {(markFieldReady) => (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 pt-1">
+              {bench.length > 0 ? (
+                <BenchPlayersStrip
+                  teamName={teamName}
+                  players={bench}
+                  density="secondary"
+                  showTeamHeader={false}
+                  gridLayout={fitLayout?.awayBench}
+                  position="top"
+                  onPlayerClick={() => {}}
+                />
+              ) : null}
 
-            <div className="flex min-h-[14rem] flex-1 items-center justify-center py-0.5">
-              <TeamLineupGraphic
-                slots={lineup.slots}
-                teamName={teamName}
-                onFieldReady={markFieldReady}
-              />
+              <div className="flex min-h-[14rem] flex-1 items-center justify-center py-1">
+                <TeamLineupGraphic
+                  slots={lineupResolved.slots}
+                  teamName={teamName}
+                  onFieldReady={markFieldReady}
+                />
+              </div>
             </div>
+          )}
+        </LineupFieldGate>
 
-            <LineupMetaLine
-              className="mt-1"
-              teamName={teamName}
-              sourceKind={lineup.sourceKind}
-              formationLabel={lineup.formationLabel}
-              fetchedAt={lineup.fetchedAt}
-            />
-          </div>
-        )}
-      </LineupFieldGate>
+        <LineupMetaLine
+          teamName={teamName}
+          sourceKind={lineupResolved.sourceKind}
+          formationLabel={lineupResolved.formationLabel}
+          fetchedAt={lineupResolved.fetchedAt}
+        />
+      </div>
     </div>
   );
 }
