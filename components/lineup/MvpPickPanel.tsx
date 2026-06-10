@@ -12,6 +12,7 @@ import {
   resolveMvpSelection,
 } from "@/lib/lineup/mvp-selection-key";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
+import { MVP_MODAL_SAVE_FOOTER_REM } from "@/lib/lineup/field-asset";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
 
 type MvpPickPanelProps = {
@@ -202,7 +203,10 @@ export function MvpPickPanel({
       loading={!ready}
       className="h-full min-h-0"
       footer={
-        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-0.5">
+        <div
+          className="flex shrink-0 flex-col items-center justify-center gap-0.5 px-2"
+          style={{ height: `${MVP_MODAL_SAVE_FOOTER_REM}rem`, minHeight: `${MVP_MODAL_SAVE_FOOTER_REM}rem` }}
+        >
           {error ? (
             <p className="text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
               {error}
