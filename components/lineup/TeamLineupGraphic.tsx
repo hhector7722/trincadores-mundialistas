@@ -42,7 +42,7 @@ export function TeamLineupGraphic({
           "relative shrink-0 self-center overflow-visible",
           !sized && PITCH_ASPECT_CLASS,
           !sized &&
-            (isModal ? "w-full max-w-[min(98vw,18.5rem)]" : "w-full max-w-[min(92vw,16.5rem)] sm:max-w-[17rem]")
+            (isModal ? "w-full max-w-[min(98vw,14.8rem)]" : "w-full max-w-[min(92vw,16.5rem)] sm:max-w-[17rem]")
         )}
         style={
           sized

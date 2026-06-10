@@ -234,8 +234,8 @@ export function MvpPredictionPanel({
   const chipScale = useMemo(() => {
     if (!fitLayout) return 1;
     return computeMvpFieldChipScale(
-      fitLayout.fieldWidthPx,
-      fitLayout.fieldHeightPx,
+      fitLayout.chipReferenceWidthPx,
+      fitLayout.chipReferenceHeightPx,
       [...awaySlots, ...homeSlots]
     );
   }, [fitLayout, awaySlots, homeSlots]);

@@ -1,3 +1,5 @@
+import { scaleModalFieldContainer } from "./modal-field-scale";
+
 /** Proporción ancho:alto del terreno reglamentario (~68×105 m). */
 export const PITCH_ASPECT = 68 / 105;
 
@@ -13,6 +15,7 @@ export type BenchLayoutConfig = {
 export type FitFieldModalLayout = {
   fieldWidthPx: number;
   fieldHeightPx: number;
+  /** Siempre 1: las fichas modal usan tamaño fijo en CSS, independiente del campo. */
   chipScale: number;
   awayBench: BenchLayoutConfig;
   homeBench: BenchLayoutConfig;
@@ -76,16 +79,16 @@ export function computeFitFieldModalLayout(
     const benchHeight = awayBench.heightPx + homeBench.heightPx;
     const fieldByHeight = Math.max(0, usableHeight - benchHeight);
     const fieldByWidth = usableWidth / PITCH_ASPECT;
-    const fieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
-    const fieldWidthPx = fieldHeightPx * PITCH_ASPECT;
-    const chipScale = Math.min(1, Math.max(0.58, fieldHeightPx / 270));
+    const naturalFieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
+    const naturalFieldWidthPx = naturalFieldHeightPx * PITCH_ASPECT;
+    const scaledField = scaleModalFieldContainer(naturalFieldWidthPx, naturalFieldHeightPx);
 
-    const total = benchHeight + fieldHeightPx;
+    const total = benchHeight + scaledField.heightPx;
     if (total <= usableHeight + 0.5 || attempt === 7) {
       return {
-        fieldWidthPx: fieldWidthPx,
-        fieldHeightPx: fieldHeightPx,
-        chipScale,
+        fieldWidthPx: scaledField.widthPx,
+        fieldHeightPx: scaledField.heightPx,
+        chipScale: 1,
         awayBench,
         homeBench,
       };
@@ -96,10 +99,11 @@ export function computeFitFieldModalLayout(
     numberFont = Math.max(8, numberFont - 0.5);
   }
 
+  const fallbackNatural = scaleModalFieldContainer(usableWidth, usableWidth / PITCH_ASPECT);
   return {
-    fieldWidthPx: usableWidth,
-    fieldHeightPx: usableWidth / PITCH_ASPECT,
-    chipScale: 0.58,
+    fieldWidthPx: fallbackNatural.widthPx,
+    fieldHeightPx: fallbackNatural.heightPx,
+    chipScale: 1,
     awayBench: benchConfig(opts.awayBenchCount, 20, 7, 8),
     homeBench: benchConfig(opts.homeBenchCount, 20, 7, 8),
   };
