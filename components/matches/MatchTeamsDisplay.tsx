@@ -49,7 +49,7 @@ function TeamFlagButton({ name, onClick }: { name: string; onClick?: () => void 
         onClick();
       }}
       className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
-      aria-label={`Ver alineación de ${displayName}`}
+      aria-label={`Ver plantilla de ${displayName}`}
     >
       <TeamFlagCircle name={name} />
     </button>
@@ -76,7 +76,7 @@ function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
         onClick();
       }}
       className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
-      aria-label={`Ver alineación de ${displayName}`}
+      aria-label={`Ver plantilla de ${displayName}`}
     >
       <TeamFlagCircle name={name} />
       <TeamNameLabel name={name} />

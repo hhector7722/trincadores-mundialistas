@@ -91,6 +91,17 @@ function renderEntityView(
           onFormationsChange={handlers.onMvpFormationsChange}
         />
       );
+    case "possible-lineups":
+      return (
+        <MvpPredictionPanel
+          matchId={view.matchId}
+          homeTeam={view.homeTeam}
+          awayTeam={view.awayTeam}
+          serverEditable={false}
+          preview
+          onFormationsChange={handlers.onMvpFormationsChange}
+        />
+      );
     default:
       return null;
   }
@@ -196,8 +207,9 @@ export function EntityModalController({
   const activePanelSlide = panelSlide ?? teamCarouselSlide;
   const isLineupView = current.kind === "lineup";
   const isMvpView = current.kind === "mvp";
+  const isPossibleLineupsView = current.kind === "possible-lineups";
   const isPlayerView = current.kind === "player";
-  const isFieldView = isLineupView || isMvpView;
+  const isFieldView = isLineupView || isMvpView || isPossibleLineupsView;
   const isCompactModal = isFieldView || isPlayerView;
 
   return (
@@ -209,14 +221,18 @@ export function EntityModalController({
         lineupFormation: isLineupView ? lineupFormation : undefined,
       })}
       hideHeaderDivider
-      headerTitleAlign={isMvpView ? "left" : "center"}
+      headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "center"}
       headerCompact={isCompactModal}
       scrollContent={!isCompactModal}
       containerClassName={
-        isMvpView ? "p-1" : isLineupView || isPlayerView ? "p-1.5" : undefined
+        isMvpView || isPossibleLineupsView
+          ? "p-1"
+          : isLineupView || isPlayerView
+            ? "p-1.5"
+            : undefined
       }
       className={cn(
-        isMvpView && "max-h-[calc(100dvh-0.5rem)]",
+        (isMvpView || isPossibleLineupsView) && "max-h-[calc(100dvh-0.5rem)]",
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         className
@@ -231,7 +247,7 @@ export function EntityModalController({
       wrapperClassName={cn(
         isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
         isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
-        isMvpView && MVP_MODAL_WRAPPER_CLASS,
+        (isMvpView || isPossibleLineupsView) && MVP_MODAL_WRAPPER_CLASS,
         wrapperClassName
       )}
       backdropClassName="bg-[#2a1058]/40"
@@ -256,6 +272,19 @@ export function EntityModalController({
 
 export function buildLineupView(teamName: string, matchId?: string): EntityModalView {
   return { kind: "lineup", teamName, matchId };
+}
+
+export function buildPossibleLineupsView(match: {
+  id: string;
+  home_team: string;
+  away_team: string;
+}): EntityModalView {
+  return {
+    kind: "possible-lineups",
+    matchId: match.id,
+    homeTeam: match.home_team,
+    awayTeam: match.away_team,
+  };
 }
 
 export function buildMvpView(

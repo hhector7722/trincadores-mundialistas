@@ -4,10 +4,15 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { fetchSavedMvpPlayerName } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
-import { buildLineupView, buildMvpView } from "@/components/lineup/EntityModalController";
+import {
+  buildLineupView,
+  buildMvpView,
+  buildPossibleLineupsView,
+} from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
+import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
@@ -401,31 +406,41 @@ export function QuickPredictionModal({
               />
             </div>
 
+            <div
+              className="flex min-h-[1.75rem] items-center justify-center py-1"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <MvpPredictionButton
+                savedPlayerName={mvpPlayerName}
+                onClick={() =>
+                  push(
+                    buildMvpView(poolId, {
+                      ...targetMatch,
+                      mvpPrediction: mvpPlayerName
+                        ? {
+                            id: targetMatch.mvpPrediction?.id ?? "",
+                            player_name: mvpPlayerName,
+                            team_name: targetMatch.mvpPrediction?.team_name ?? "",
+                            points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
+                            updated_at:
+                              targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                          }
+                        : targetMatch.mvpPrediction,
+                    })
+                  )
+                }
+                variant="compact"
+                className="w-full"
+              />
+            </div>
+
             <MatchContextActionsRow
               compact
               layout="teamAnchors"
-              className="mt-[0.35rem] [&>div]:min-h-[2rem]"
-              match={targetMatch}
-              mvpPlayerName={mvpPlayerName}
+              className="mt-[0.15rem] [&>div]:min-h-[2rem]"
               onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
               onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-              onOpenMvp={() =>
-                push(
-                  buildMvpView(poolId, {
-                    ...targetMatch,
-                    mvpPrediction: mvpPlayerName
-                      ? {
-                          id: targetMatch.mvpPrediction?.id ?? "",
-                          player_name: mvpPlayerName,
-                          team_name: targetMatch.mvpPrediction?.team_name ?? "",
-                          points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
-                          updated_at:
-                            targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                        }
-                      : targetMatch.mvpPrediction,
-                  })
-                )
-              }
+              onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
             />
 
             {error ? (
@@ -467,16 +482,28 @@ export function QuickPredictionModal({
       return <PlayerDetailPanel teamName={view.teamName} playerName={view.playerName} />;
     }
 
+    if (view.kind === "mvp") {
+      return (
+        <MvpPredictionPanel
+          poolId={view.poolId}
+          matchId={view.matchId}
+          homeTeam={view.homeTeam}
+          awayTeam={view.awayTeam}
+          serverEditable={view.serverEditable}
+          savedPlayerName={view.savedPlayerName}
+          savedTeamName={view.savedTeamName}
+          onSaved={(playerName, teamName) => handleMvpSaved(view.matchId, playerName, teamName)}
+        />
+      );
+    }
+
     return (
       <MvpPredictionPanel
-        poolId={view.poolId}
         matchId={view.matchId}
         homeTeam={view.homeTeam}
         awayTeam={view.awayTeam}
-        serverEditable={view.serverEditable}
-        savedPlayerName={view.savedPlayerName}
-        savedTeamName={view.savedTeamName}
-        onSaved={(playerName, teamName) => handleMvpSaved(view.matchId, playerName, teamName)}
+        serverEditable={false}
+        preview
       />
     );
   }
@@ -506,8 +533,9 @@ export function QuickPredictionModal({
   const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? matchPanelSlide;
   const isLineupView = panelView.kind === "lineup";
   const isMvpView = panelView.kind === "mvp";
+  const isPossibleLineupsView = panelView.kind === "possible-lineups";
   const isPlayerView = panelView.kind === "player";
-  const isFieldView = isLineupView || isMvpView;
+  const isFieldView = isLineupView || isMvpView || isPossibleLineupsView;
   const isCompactModal = isFieldView || isPlayerView;
 
   return (
@@ -519,11 +547,11 @@ export function QuickPredictionModal({
       hideHeaderDivider
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
-      headerTitleAlign={isMvpView ? "left" : "default"}
+      headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "default"}
       headerCompact={isCompactModal}
       scrollContent={!isCompactModal}
       className={cn(
-        isMvpView && "max-h-[calc(100dvh-1rem)]",
+        (isMvpView || isPossibleLineupsView) && "max-h-[calc(100dvh-1rem)]",
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
       )}
@@ -538,7 +566,7 @@ export function QuickPredictionModal({
       wrapperClassName={cn(
         isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
         isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
-        isMvpView && MVP_MODAL_WRAPPER_CLASS
+        (isMvpView || isPossibleLineupsView) && MVP_MODAL_WRAPPER_CLASS
       )}
       backdropClassName="bg-[#2a1058]/40"
       onSwipeLeft={

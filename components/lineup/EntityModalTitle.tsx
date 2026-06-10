@@ -39,6 +39,8 @@ export function entityModalTitleContent(
       return view.playerName;
     case "mvp":
       return "MVP";
+    case "possible-lineups":
+      return "Posibles alineaciones";
     default:
       return "Detalle";
   }

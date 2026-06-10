@@ -7,11 +7,13 @@ import { cn } from "@/lib/utils";
 import {
   buildLineupView,
   buildMvpView,
+  buildPossibleLineupsView,
   EntityModalController,
 } from "@/components/lineup/EntityModalController";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
+import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import {
@@ -96,7 +98,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               Ver todos
             </Link>
           </div>
-          <div className="relative mt-2 min-h-[6.75rem]">
+          <div className="mt-2 flex flex-col">
             <MatchTeamsDisplay
               homeTeam={displayMatch.home_team}
               awayTeam={displayMatch.away_team}
@@ -160,23 +162,32 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               }
             />
             <div
-              className="absolute inset-x-0 bottom-0"
+              className="flex min-h-[1.75rem] items-center justify-center py-1"
               onClick={(event) => event.stopPropagation()}
             >
+              <MvpPredictionButton
+                savedPlayerName={displayMatch.mvpPrediction?.player_name}
+                onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                variant="compact"
+                className="w-full"
+              />
+            </div>
+            <div onClick={(event) => event.stopPropagation()}>
               <MatchContextActionsRow
                 compact
                 layout="teamAnchors"
                 homeAnchor="15%"
                 awayAnchor="85%"
                 className="[&>div]:min-h-[2rem]"
-                match={displayMatch}
                 onOpenHomeLineup={() =>
                   openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
                 }
                 onOpenAwayLineup={() =>
                   openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
                 }
-                onOpenMvp={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                onOpenPossibleLineups={() =>
+                  openEntityModal(buildPossibleLineupsView(displayMatch))
+                }
               />
             </div>
           </div>

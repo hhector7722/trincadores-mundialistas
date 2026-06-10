@@ -29,7 +29,7 @@ import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
 
 type MvpPredictionPanelProps = {
-  poolId: string;
+  poolId?: string;
   matchId: string;
   homeTeam: string;
   awayTeam: string;
@@ -38,6 +38,8 @@ type MvpPredictionPanelProps = {
   savedTeamName?: string | null;
   onSaved?: (playerName: string, teamName: string) => void;
   onFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
+  /** Vista solo lectura del campo táctico (sin guardar MVP). */
+  preview?: boolean;
 };
 
 type SquadPlayerOption = {
@@ -111,6 +113,7 @@ export function MvpPredictionPanel({
   savedTeamName,
   onSaved,
   onFormationsChange,
+  preview = false,
 }: MvpPredictionPanelProps) {
   const router = useRouter();
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -249,7 +252,11 @@ export function MvpPredictionPanel({
   }, [awaySlots, homeSlots, awayBench, homeBench, awayTeam, homeTeam]);
 
   const footerPx =
-    (serverEditable ? MVP_FOOTER_PX : MVP_FOOTER_CLOSED_PX) + (error ? MVP_ERROR_PX : 0);
+    (preview
+      ? 0
+      : serverEditable
+        ? MVP_FOOTER_PX
+        : MVP_FOOTER_CLOSED_PX) + (error ? MVP_ERROR_PX : 0);
 
   const fitLayout = useFitMvpLayout(layoutRef, {
     awayBenchCount: awayBench.length,
@@ -286,6 +293,8 @@ export function MvpPredictionPanel({
   const tacticalReady = homeSlots.length + awaySlots.length >= 22;
 
   function onSave() {
+    if (preview || !poolId) return;
+
     const selected = resolveMvpSelection(options, selectedKey, lineupPlayers);
     if (!selected) {
       setError("Selecciona un jugador.");
@@ -323,7 +332,7 @@ export function MvpPredictionPanel({
     );
   }
 
-  const pickDisabled = !serverEditable || pending;
+  const pickDisabled = preview ? false : !serverEditable || pending;
 
   return (
     <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
@@ -401,7 +410,7 @@ export function MvpPredictionPanel({
         </div>
       </div>
 
-      {!serverEditable ? (
+      {!preview && !serverEditable ? (
         <p className="shrink-0 px-1 py-1 text-center text-[9px] text-[var(--tm-muted)]">
           Predicción cerrada.
         </p>
@@ -413,7 +422,7 @@ export function MvpPredictionPanel({
         </p>
       ) : null}
 
-      {serverEditable ? (
+      {!preview && serverEditable ? (
         <div className="flex shrink-0 justify-center px-2 py-0.5 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
           <Button
             className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"

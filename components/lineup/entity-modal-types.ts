@@ -11,6 +11,12 @@ export type EntityModalView =
       serverEditable: boolean;
       savedPlayerName?: string | null;
       savedTeamName?: string | null;
+    }
+  | {
+      kind: "possible-lineups";
+      matchId: string;
+      homeTeam: string;
+      awayTeam: string;
     };
 
 export function entityModalTitle(view: EntityModalView): string {
@@ -21,6 +27,8 @@ export function entityModalTitle(view: EntityModalView): string {
       return view.playerName;
     case "mvp":
       return "MVP del partido";
+    case "possible-lineups":
+      return "Posibles alineaciones";
     default:
       return "Detalle";
   }
