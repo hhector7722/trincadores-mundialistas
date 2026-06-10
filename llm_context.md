@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-07T11:56:32.899Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-10T10:54:45.322Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,9 +16,9 @@
 | **Fase actual** | 2b datos externos Mundiales (Fjelstul + worldcup2026 feed) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Slide home quiz en hero carousel · Quiz auto-generacion: banco hechos + plantillas + generate-day + seed integrado · Quiz training rejugable (migracion RPC/índice) · Bonus deprecado en UI/seed · Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo · Quiz generador: distractores semanticos + owner replay ilimitado
+**Completado reciente:** Quiz entradilla TV: animacion + video gabri + barra de carga antes del play · Alineaciones: optimización carga (bundle actions, ventana confirmada, BSD lookup acotado) · Alineaciones: plantilla visual fija por formación + relayout al leer caché (coords consistentes entre equipos) · MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px · Sistema táctico unificado: `formation-coordinates` (6 formaciones incl. 4-1-4-1) + espejo vertical MVP + UI compacta (reservas arriba, meta abajo, sin pastilla de formación) · Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, horizonte 48h, TTL 6h)
 
-**Siguiente:** Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
+**Siguiente:** API-Football free tier: temporada 2026 no disponible; lineups confirmadas vía BSD o plan de pago API-Football
 
 
 ## Arquitectura
@@ -109,6 +109,7 @@ flowchart TB
 | `/ranking` | `app/(app)/ranking/page.tsx` | force-dynamic |
 | `/teams/:teamSlug/lineup` | `app/(app)/teams/[teamSlug]/lineup/page.tsx` | force-dynamic |
 | `/login` | `app/(auth)/login/page.tsx` | default |
+| `/(onboarding)/bienvenida` | `app/(onboarding)/bienvenida/page.tsx` | default |
 
 ### Layouts
 
@@ -116,8 +117,10 @@ flowchart TB
 |---------|-----|
 | `app/(app)/layout.tsx` | Auth/pool guard |
 | `app/(app)/predictions/layout.tsx` | Shell visual |
+| `app/(app)/profile/layout.tsx` | Shell visual |
 | `app/(app)/ranking/layout.tsx` | Shell visual |
 | `app/(auth)/layout.tsx` | Shell visual |
+| `app/(onboarding)/layout.tsx` | Shell visual |
 | `app/layout.tsx` | Shell visual |
 
 ### Componentes por módulo
@@ -127,6 +130,7 @@ flowchart TB
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `AdminResultForm` | `components/admin/AdminResultForm.tsx` | client | AdminResultForm |
+| `AdminTournamentAwardsForm` | `components/admin/AdminTournamentAwardsForm.tsx` | client | AdminTournamentAwardsForm |
 
 #### auth
 
@@ -140,12 +144,20 @@ flowchart TB
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `BackgroundPlayerLayer` | `components/home/BackgroundPlayerLayer.tsx` | server | BackgroundPlayerLayer |
+| `GeneralPredictionRow` | `components/home/GeneralPredictionRow.tsx` | client | GeneralPredictionRow |
 | `HomeAtmosphere` | `components/home/HomeAtmosphere.tsx` | server | HomeAtmosphere |
+| `HomeDailyFactCard` | `components/home/HomeDailyFactCard.tsx` | server | HomeDailyFactCard |
+| `HomeDailyQuizCard` | `components/home/HomeDailyQuizCard.tsx` | client | HomeDailyQuizCard |
+| `HomeGeneralPredictionsCard` | `components/home/HomeGeneralPredictionsCard.tsx` | client | HomeGeneralPredictionsCard |
 | `HomeHero` | `components/home/HomeHero.tsx` | server | HomeHero |
 | `HomeHeroCarousel` | `components/home/HomeHeroCarousel.tsx` | client | HomeHeroCarousel |
+| `HomeMiniRankingTable` | `components/home/HomeMiniRankingTable.tsx` | server | HomeMiniRankingTable |
 | `HomeNextMatch` | `components/home/HomeNextMatch.tsx` | client | HomeNextMatch |
+| `HomeScoringRulesCard` | `components/home/HomeScoringRulesCard.tsx` | client | HomeScoringRulesCard |
 | `HomeStandingCard` | `components/home/HomeStandingCard.tsx` | server | HomeStandingCard |
 | `HomeTopThree` | `components/home/HomeTopThree.tsx` | server | HomeTopThree |
+| `HomeViewportShell` | `components/home/HomeViewportShell.tsx` | server | HomeViewportShell |
+| `ScoringRulesModal` | `components/home/ScoringRulesModal.tsx` | client | ScoringRulesModal |
 
 #### layout
 
@@ -155,24 +167,42 @@ flowchart TB
 | `AppHeader` | `components/layout/AppHeader.tsx` | server | AppHeader |
 | `AppHeaderGate` | `components/layout/AppHeaderGate.tsx` | client | AppHeaderGate |
 | `AppShell` | `components/layout/AppShell.tsx` | server | AppShell |
+| `BottomChrome` | `components/layout/BottomChrome.tsx` | client | BottomChrome |
 | `BrandLogo` | `components/layout/BrandLogo.tsx` | server | BrandLogo, BrandLogoFixed |
+| `NavigationLoadingProvider` | `components/layout/NavigationLoadingProvider.tsx` | client | useAppNavigation, NavigationLoadingProvider |
 | `PoolSwitcher` | `components/layout/PoolSwitcher.tsx` | client | PoolSwitcher |
 | `TabBar` | `components/layout/TabBar.tsx` | client | TabBar |
-| `ViewportMetricsSync` | `components/layout/ViewportMetricsSync.tsx` | client | ViewportMetricsSync |
+| `TabBarWrapper` | `components/layout/TabBarWrapper.tsx` | client | TabBarWrapper |
+| `TabNavigationProvider` | `components/layout/TabNavigationProvider.tsx` | client | TabNavigationProvider, useTabNavigation, useTabIndicatorProgress |
+| `TabPageIndicators` | `components/layout/TabPageIndicators.tsx` | client | TabPageIndicators |
+| `TabSwipeNavigator` | `components/layout/TabSwipeNavigator.tsx` | client | TabSwipeNavigator |
+| `ViewportLayoutDebug` | `components/layout/ViewportLayoutDebug.tsx` | client | ViewportLayoutDebug |
+| `ViewportLayoutRoot` | `components/layout/ViewportLayoutRoot.tsx` | client | ViewportLayoutRoot |
 
 #### lineup
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `BenchPlayersStrip` | `components/lineup/BenchPlayersStrip.tsx` | client | benchPlayerKey, BenchPlayersStrip |
 | `EntityModalController` | `components/lineup/EntityModalController.tsx` | client | EntityModalController, buildLineupView, buildMvpView |
+| `EntityModalTitle` | `components/lineup/EntityModalTitle.tsx` | client | entityModalTitleContent, MvpModalFormations, EntityModalTitleOptions |
+| `FootballPitchSurface` | `components/lineup/FootballPitchSurface.tsx` | client | FootballPitchSurface |
+| `HorizontalPitchSurface` | `components/lineup/HorizontalPitchSurface.tsx` | client | HorizontalPitchSurface |
+| `LineupFieldGate` | `components/lineup/LineupFieldGate.tsx` | client | LineupFieldGate |
+| `LineupFormationInfo` | `components/lineup/LineupFormationInfo.tsx` | server | LineupFormationInfo |
+| `LineupMetaLine` | `components/lineup/LineupMetaLine.tsx` | server | LineupMetaLine |
 | `LineupModalPanel` | `components/lineup/LineupModalPanel.tsx` | client | LineupModalPanel |
 | `LineupPlayerChip` | `components/lineup/LineupPlayerChip.tsx` | server | LineupPlayerChip |
+| `LineupSourceBadge` | `components/lineup/LineupSourceBadge.tsx` | server | LineupSourceBadge |
 | `MatchContextActionButton` | `components/lineup/MatchContextActionButton.tsx` | client | MatchContextActionButton |
 | `MatchContextActionsRow` | `components/lineup/MatchContextActionsRow.tsx` | client | MatchContextActionsRow |
+| `MatchMvpFieldGraphic` | `components/lineup/MatchMvpFieldGraphic.tsx` | client | MatchMvpFieldGraphic |
+| `MvpBenchColumn` | `components/lineup/MvpBenchColumn.tsx` | client | MvpBenchColumn |
+| `MvpHorizontalFieldGraphic` | `components/lineup/MvpHorizontalFieldGraphic.tsx` | client | MvpHorizontalFieldGraphic |
 | `MvpPredictionPanel` | `components/lineup/MvpPredictionPanel.tsx` | client | MvpPredictionPanel |
 | `PlayerDetailPanel` | `components/lineup/PlayerDetailPanel.tsx` | client | PlayerDetailPanel |
 | `ProbableXI` | `components/lineup/ProbableXI.tsx` | server | ProbableXI |
-| `TeamLineupGraphic` | `components/lineup/TeamLineupGraphic.tsx` | server | TeamLineupGraphic |
+| `TeamLineupGraphic` | `components/lineup/TeamLineupGraphic.tsx` | client | TeamLineupGraphic |
 
 #### match
 
@@ -186,20 +216,28 @@ flowchart TB
 |------------|------|------|--------|
 | `MatchTeamsDisplay` | `components/matches/MatchTeamsDisplay.tsx` | server | MatchTeamsDisplay |
 
+#### players
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `PlayerSearchBar` | `components/players/PlayerSearchBar.tsx` | client | PlayerSearchBar |
+
 #### predictions
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `AllGroupsStandingsModal` | `components/predictions/AllGroupsStandingsModal.tsx` | client | AllGroupsStandingsModal |
+| `AllTeamsLineupModal` | `components/predictions/AllTeamsLineupModal.tsx` | client | AllTeamsLineupModal |
 | `CalendarGroupsPanel` | `components/predictions/CalendarGroupsPanel.tsx` | server | CalendarGroupsPanel |
-| `CalendarSidebarCard` | `components/predictions/CalendarSidebarCard.tsx` | server | CalendarSidebarCard |
-| `CalendarSidebarFooter` | `components/predictions/CalendarSidebarFooter.tsx` | client | CalendarSidebarFooter |
+| `CalendarSidebarAccessDock` | `components/predictions/CalendarSidebarAccessDock.tsx` | client | CalendarSidebarAccessDock |
+| `CalendarSidebarSlot` | `components/predictions/CalendarSidebarSlot.tsx` | server | CalendarSidebarSlot |
 | `group-standings-table` | `components/predictions/group-standings-table.tsx` | server | formatGroupDg, GroupStandingsTable, GROUP_STANDINGS_STAT_COLUMNS |
 | `GroupStandingsModal` | `components/predictions/GroupStandingsModal.tsx` | client | GroupStandingsModal |
 | `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
 | `MvpPredictionButton` | `components/predictions/MvpPredictionButton.tsx` | client | MvpPredictionButton |
 | `PeerPredictionsList` | `components/predictions/PeerPredictionsList.tsx` | server | PeerPredictionsList |
+| `PlayerAwardPickerModal` | `components/predictions/PlayerAwardPickerModal.tsx` | client | PlayerAwardPickerModal |
 | `PredictionDeadlineCountdown` | `components/predictions/PredictionDeadlineCountdown.tsx` | client | PredictionDeadlineCountdown |
 | `PredictionForm` | `components/predictions/PredictionForm.tsx` | client | PredictionForm |
 | `PredictionsCalendar` | `components/predictions/PredictionsCalendar.tsx` | client | PredictionsCalendar |
@@ -207,36 +245,51 @@ flowchart TB
 | `QuickPredictionModal` | `components/predictions/QuickPredictionModal.tsx` | client | QuickPredictionModal |
 | `ScoreStepper` | `components/predictions/ScoreStepper.tsx` | client | ScoreStepper |
 | `TeamFlagBadge` | `components/predictions/TeamFlagBadge.tsx` | server | TeamFlagBadge |
+| `TeamsPickerModal` | `components/predictions/TeamsPickerModal.tsx` | client | TeamsPickerModal, TeamsPickerMode |
 | `TournamentStatsModal` | `components/predictions/TournamentStatsModal.tsx` | client | TournamentStatsModal |
 
 #### profile
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `AvatarDisplay` | `components/profile/AvatarDisplay.tsx` | server | AvatarDisplay, AvatarDisplaySize |
+| `AvatarPreviewModal` | `components/profile/AvatarPreviewModal.tsx` | client | AvatarPreviewModal |
 | `MemberStandingCard` | `components/profile/MemberStandingCard.tsx` | server | MemberStandingCard |
-| `ProfileAvatar` | `components/profile/ProfileAvatar.tsx` | server | ProfileAvatar |
+| `ProfileAvatar` | `components/profile/ProfileAvatar.tsx` | server | ProfileAvatar, ProfileAvatarVariant |
+| `ProfileAvatarButton` | `components/profile/ProfileAvatarButton.tsx` | client | ProfileAvatarButton |
+
+#### pwa
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `AppUpdateNotifier` | `components/pwa/AppUpdateNotifier.tsx` | client | AppUpdateNotifier |
+| `AvatarGenerationStep` | `components/pwa/AvatarGenerationStep.tsx` | client | AvatarGenerationStep |
+| `PwaOnboardingFlow` | `components/pwa/PwaOnboardingFlow.tsx` | client | PwaOnboardingFlow |
 
 #### quiz
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
-| `QuizHub` | `components/quiz/QuizHub.tsx` | server | QuizHub |
+| `QuizDailyIntro` | `components/quiz/QuizDailyIntro.tsx` | client | QuizDailyIntro |
+| `QuizHub` | `components/quiz/QuizHub.tsx` | client | QuizHub |
 | `QuizImage` | `components/quiz/QuizImage.tsx` | server | QuizImage |
 | `QuizLeaderboardTable` | `components/quiz/QuizLeaderboardTable.tsx` | server | QuizLeaderboardTable |
 | `QuizModeBadge` | `components/quiz/QuizModeBadge.tsx` | server | QuizModeBadge |
 | `QuizOptionButton` | `components/quiz/QuizOptionButton.tsx` | client | QuizOptionButton |
-| `QuizPageShell` | `components/quiz/QuizPageShell.tsx` | server | QuizPageShell |
+| `QuizPageShell` | `components/quiz/QuizPageShell.tsx` | client | QuizPageShell |
 | `QuizPlaySession` | `components/quiz/QuizPlaySession.tsx` | client | QuizPlaySession |
 | `QuizProgressDots` | `components/quiz/QuizProgressDots.tsx` | server | QuizProgressDots |
 | `QuizQuestionStage` | `components/quiz/QuizQuestionStage.tsx` | client | QuizQuestionStage |
 | `QuizResultSummary` | `components/quiz/QuizResultSummary.tsx` | server | QuizResultSummary |
 | `QuizSlotCard` | `components/quiz/QuizSlotCard.tsx` | server | QuizSlotCard |
+| `QuizWaitModal` | `components/quiz/QuizWaitModal.tsx` | client | QuizWaitModal |
 
 #### ranking
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
 | `PositionTrendIndicator` | `components/ranking/PositionTrendIndicator.tsx` | server | PositionTrendIndicator |
+| `RankingMemberCells` | `components/ranking/RankingMemberCells.tsx` | client | RankingMemberCells |
 | `RankingRow` | `components/ranking/RankingRow.tsx` | server | RankingRow |
 | `RankingTable` | `components/ranking/RankingTable.tsx` | server | RankingTable |
 
@@ -250,6 +303,7 @@ flowchart TB
 | `hero-cta` | `components/ui/hero-cta.tsx` | server | HeroCtaLink, HeroCtaButton, heroCtaClassName |
 | `input` | `components/ui/input.tsx` | server | Input |
 | `modal` | `components/ui/modal.tsx` | client | Modal, ModalPanelSlide |
+| `spinner` | `components/ui/spinner.tsx` | server | TmSpinner, LoadingCenter, LoadingOverlay |
 
 
 ### Gestión de estado
@@ -273,23 +327,46 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Función | Archivo | Firma (resumen) |
 |---------|---------|-----------------|
 | `submitMatchResult` | `actions/admin.ts` | `export async function submitMatchResult( poolId: string, matchId: string, homeGo` |
+| `submitTournamentOfficialAwards` | `actions/admin.ts` | `export async function submitTournamentOfficialAwards( poolId: string, awards: To` |
 | `regenerateAccessCode` | `actions/admin.ts` | `export async function regenerateAccessCode( poolId: string, targetUsername: stri` |
 | `AdminActionResult` | `actions/admin.ts` | `AdminActionResult` |
+| `TournamentOfficialAwardsPayload` | `actions/admin.ts` | `TournamentOfficialAwardsPayload` |
 | `signIn` | `actions/auth.ts` | `export async function signIn( usernameRaw: string, accessCodeRaw: string ): Prom` |
+| `signInWithPhone` | `actions/auth.ts` | `export async function signInWithPhone(phoneRaw: string): Promise<AuthActionResul` |
 | `signOut` | `actions/auth.ts` | `export async function signOut(): Promise<void> ` |
 | `setActivePool` | `actions/auth.ts` | `export async function setActivePool(poolId: string): Promise<AuthActionResult> ` |
 | `AuthActionResult` | `actions/auth.ts` | `AuthActionResult` |
+| `fetchAllTournamentPlayersAction` | `actions/lineup.ts` | `export async function fetchAllTournamentPlayersAction(): Promise< LineupActionRe` |
 | `fetchTeamSquadAction` | `actions/lineup.ts` | `export async function fetchTeamSquadAction( teamName: string ): Promise<LineupAc` |
 | `fetchPlayerDetailAction` | `actions/lineup.ts` | `export async function fetchPlayerDetailAction( teamName: string, playerName: str` |
+| `fetchTeamKitHexMapAction` | `actions/lineup.ts` | `export async function fetchTeamKitHexMapAction(): Promise< LineupActionResult<Re` |
+| `fetchTeamLineupBundleAction` | `actions/lineup.ts` | `export async function fetchTeamLineupBundleAction( teamName: string, options?: {` |
+| `fetchMatchLineupBundleAction` | `actions/lineup.ts` | `export async function fetchMatchLineupBundleAction( matchId: string, homeTeam: s` |
 | `fetchMatchSquadsAction` | `actions/lineup.ts` | `export async function fetchMatchSquadsAction( homeTeam: string, awayTeam: string` |
+| `fetchResolvedTeamLineupAction` | `actions/lineup.ts` | `export async function fetchResolvedTeamLineupAction( teamName: string, options?:` |
+| `fetchResolvedMatchLineupsAction` | `actions/lineup.ts` | `export async function fetchResolvedMatchLineupsAction( matchId: string, homeTeam` |
 | `LineupActionResult` | `actions/lineup.ts` | `LineupActionResult` |
 | `saveMvpPrediction` | `actions/mvp-predictions.ts` | `export async function saveMvpPrediction( poolId: string, matchId: string, player` |
 | `MvpPredictionActionResult` | `actions/mvp-predictions.ts` | `MvpPredictionActionResult` |
 | `savePrediction` | `actions/predictions.ts` | `export async function savePrediction( poolId: string, matchId: string, homeGoals` |
 | `PredictionActionResult` | `actions/predictions.ts` | `PredictionActionResult` |
+| `resolvePwaEntryRoute` | `actions/pwa-onboarding.ts` | `export async function resolvePwaEntryRoute(): Promise<PwaEntryRoute> ` |
+| `hasCompletedPwaOnboarding` | `actions/pwa-onboarding.ts` | `export async function hasCompletedPwaOnboarding(): Promise<boolean> ` |
+| `confirmStandaloneInstallation` | `actions/pwa-onboarding.ts` | `export async function confirmStandaloneInstallation(): Promise<ActionResult<null` |
+| `identifyParticipantByUsername` | `actions/pwa-onboarding.ts` | `export async function identifyParticipantByUsername( usernameRaw: string ): Prom` |
+| `identifyParticipantByPhone` | `actions/pwa-onboarding.ts` | `export async function identifyParticipantByPhone( phoneRaw: string ): Promise<Ac` |
+| `assignParticipantAvatar` | `actions/pwa-onboarding.ts` | `export async function assignParticipantAvatar( usernameRaw: string ): Promise<Ac` |
+| `completePwaOnboarding` | `actions/pwa-onboarding.ts` | `export async function completePwaOnboarding( usernameRaw: string ): Promise<Acti` |
+| `PwaEntryRoute` | `actions/pwa-onboarding.ts` | `PwaEntryRoute` |
 | `startQuiz` | `actions/quiz.ts` | `export async function startQuiz( poolId: string, quizId: string ): Promise<QuizA` |
 | `submitQuiz` | `actions/quiz.ts` | `export async function submitQuiz( poolId: string, attemptId: string, answers: Re` |
 | `QuizActionResult` | `actions/quiz.ts` | `QuizActionResult` |
+| `saveTournamentChampion` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentChampion( poolId: string, teamName: string )` |
+| `saveTournamentFinalists` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentFinalists( poolId: string, teamA: string, te` |
+| `saveTournamentTopScorer` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentTopScorer( poolId: string, playerName: strin` |
+| `saveTournamentMvp` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentMvp( poolId: string, playerName: string, tea` |
+| `saveTournamentGoldenGlove` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentGoldenGlove( poolId: string, playerName: str` |
+| `TournamentGeneralActionResult` | `actions/tournament-general-predictions.ts` | `TournamentGeneralActionResult` |
 
 ### Detalle de acciones
 
@@ -312,15 +389,29 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 ### Módulos lib/ (capa de datos)
 
-**auth/** — 5 archivos
+**auth/** — 12 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/auth/access-code.ts` | 24 líneas | generateAccessCode, normalizeAccessCode, validateAccessCode, ACCESS_CODE_LENGTH |
+| `lib/auth/clear-device-cookies.ts` | 17 líneas | clearDeviceCookiesOnResponse |
 | `lib/auth/credentials.ts` | 21 líneas | getAuthInternalDomain, toAuthEmail, fromAuthEmail |
-| `lib/auth/participants.ts` | 26 líneas | REAL_POOL_SLUG, REAL_POOL_NAME, ParticipantSeed |
+| `lib/auth/onboarding-device.ts` | 73 líneas | getOnboardedDeviceUsername, clearOnboardedDeviceCookie, setOnboardedDeviceCookie, readOnboardedUsernameFromCookieValue, isProfileOnboardingComplete, ONBOARDED_USER_COOKIE, ONBOARDED_USER_MAX_AGE_SECONDS, OnboardingProfileRow |
+| `lib/auth/participants.ts` | 27 líneas | REAL_POOL_SLUG, REAL_POOL_NAME, ParticipantSeed |
+| `lib/auth/phone-sign-in.ts` | 161 líneas | signInUserByPhoneWithClient, signInUserByPhone, signInUserByUsernameWithClient, signInUserByUsername, PhoneSignInResult |
+| `lib/auth/profile-phone.ts` | 94 líneas | lookupProfileByPhone, lookupPhoneByUsername, ProfilePhoneRow |
+| `lib/auth/restore-session.ts` | 52 líneas | restoreSessionForUsername, RestoreSessionResult |
 | `lib/auth/session.ts` | 41 líneas | getActivePoolIdFromCookie, setActivePoolCookie, clearActivePoolCookie, resolvePoolMemberships, ACTIVE_POOL_COOKIE, PoolMembershipResolution |
-| `lib/auth/validation.ts` | 13 líneas | normalizeUsername, validateUsername, USERNAME_REGEX |
+| `lib/auth/stamp-onboarding-completed.ts` | 28 líneas | stampOnboardingCompletedIfNeeded |
+| `lib/auth/trusted-sign-in.ts` | 26 líneas | signInTrustedUserByUsername |
+| `lib/auth/validation.ts` | 15 líneas | normalizeUsername, validateUsername, USERNAME_REGEX |
+
+**avatars/** — 2 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/avatars/display-classes.ts` | 9 líneas | AVATAR_DISPLAY_PROFILE, AVATAR_DISPLAY_RANKING, AVATAR_DISPLAY_HOME_MINI |
+| `lib/avatars/presets.ts` | 28 líneas | getPresetAvatarUrl, getAvatarBadgeObjectPosition |
 
 **dev/** — 1 archivos
 
@@ -336,16 +427,86 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/fjelstul-worldcup/normalize.ts` | 274 líneas | isWomenTournament, isMenTournament, inferGender, onlyMenTournaments, menTournamentExternalIds, filterByMenTournaments, playerDisplayName, normalizeTournaments, normalizeTeams, normalizeStadiums, normalizeMatches, normalizeGoals, normalizeAwardWinners, normalizeStandings, normalizeSquads, assertErrorRate, WOMENS_WC_TOURNAMENT_IDS, NormalizeStats |
 | `lib/fjelstul-worldcup/parse-csv.ts` | 79 líneas | parseCsvContent, readBool, readInt, readOptionalText, CsvRow |
 
-**lineup/** — 6 archivos
+**home/** — 2 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/lineup/bench-players.ts` | 30 líneas | getBenchPlayers, BenchPlayer |
-| `lib/lineup/build-probable-xi.ts` | 126 líneas | buildProbableXI |
+| `lib/home/daily-fact.ts` | 88 líneas | todayDateKey, validateDailyFact, parseDailyFactsFile, loadDailyFacts, pickDailyFactForDate, getDailyFactForDate, getDailyFactForToday, DEFAULT_DAILY_FACTS_PATH, DailyFact |
+| `lib/home/scoring-rules-content.ts` | 66 líneas | ScoringRulesCardLine, ScoringRulesSection |
+
+**layout/** — 6 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/layout/bottom-chrome.ts` | 2 líneas | BOTTOM_CHROME_PLACEHOLDER_ID |
+| `lib/layout/layout-debug-metrics.ts` | 136 líneas | collectExtendedLayoutMetrics, emitLayoutDebugLog, ExtendedLayoutMetrics |
+| `lib/layout/main-tabs.ts` | 54 líneas | isMainTabActive, getMainTabSectionIndex, getMainTabIndex, isMainTabRoot, isPredictionsTabPath, shouldShowTabPageIndicators, MAIN_TABS, MAIN_TAB_HREFS, MainTabHref |
+| `lib/layout/tab-indicators-position.ts` | 50 líneas | measureTabIndicatorsBottom, applyTabIndicatorsBottom, resetTabIndicatorsBottom, TAB_INDICATOR_DOT_SIZE, TAB_INDICATORS_SYNC_EVENT |
+| `lib/layout/tab-swipe.ts` | 72 líneas | getTabNeighborForSwipe, pointerOffsetToSwipeDirection, shouldApplyEdgeResistance, resolveTabSwipeCommit, getTabSwipeProgress, getMainTabBarNeighbors, TabSwipeDirection |
+| `lib/layout/viewport-chrome.ts` | 67 líneas | readTabBarTop, readLayoutBottomAboveIndicators, syncLayoutAboveTabBar, syncLayoutAboveIndicators, resetLayoutAboveTabBar |
+
+**lineup/** — 52 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/lineup/bench-dedupe.ts` | 38 líneas | starterIdentitySet, isStarterPlayer, dedupeBenchAgainstStarters |
+| `lib/lineup/bench-from-lineup.ts` | 65 líneas | resolveBenchPlayers |
+| `lib/lineup/bench-grid-layout.ts` | 108 líneas | pickBenchGrid, BenchLayoutConfig, BenchSizePrefs, PickBenchGridOptions |
+| `lib/lineup/bench-players.ts` | 47 líneas | getBenchPlayers, BenchPlayer |
+| `lib/lineup/build-fallback-lineup.ts` | 18 líneas | buildFallbackLineup |
+| `lib/lineup/build-probable-xi.ts` | 133 líneas | buildProbableXI |
+| `lib/lineup/confirmed-lineup-window.ts` | 18 líneas | shouldFetchConfirmedLineup, CONFIRMED_LINEUP_WINDOW_MS |
+| `lib/lineup/ensure-eleven-starter-slots.ts` | 64 líneas | ensureElevenStarterSlots |
+| `lib/lineup/field-asset.ts` | 8 líneas | GOYA_FIELD_ASSET_VERSION, GOYA_FIELD_SRC, LINEUP_MODAL_WRAPPER_CLASS |
+| `lib/lineup/field-layout.ts` | 102 líneas | clampToPlayable, clampToBounds, separateOverlappingSlots, PITCH_ASPECT_CLASS, MVP_PITCH_ASPECT_CLASS, PLAYABLE_X_MIN, PLAYABLE_X_MAX, PLAYABLE_Y_MIN, PLAYABLE_Y_MAX, PlayableBounds |
+| `lib/lineup/fit-field-modal-layout.ts` | 107 líneas | computeFitFieldModalLayout, PITCH_ASPECT, BenchLayoutConfig, FitFieldModalLayout, ComputeFitFieldModalLayoutOptions |
+| `lib/lineup/fit-mvp-horizontal-layout.ts` | 113 líneas | estimateMvpInlineBenchLayout, computeFitMvpHorizontalLayout, HORIZONTAL_PITCH_ASPECT, FitMvpHorizontalLayout, ComputeFitMvpHorizontalLayoutOptions |
+| `lib/lineup/formation-coordinates.ts` | 179 líneas | isFormationId, isFormationTemplateId, getFormationSlotAnchors, getFormationCoordinates, TACTICAL_X, TACTICAL_Y, TACTICAL_LINE_Y, FORMATIONS, FormationSlotAnchor |
+| `lib/lineup/formation-templates.ts` | 252 líneas | normalizeFormationTemplate, normalizeSlotKey, getFormationTemplate, getFormationTemplateCoordinates, getRoleCoordinatesFromTemplate, fallbackSlotKeyForRole, assignFormationTemplateCoordinates, normalizeFormationId |
+| `lib/lineup/lineup-queries.ts` | 135 líneas | loadCachedTeamLineup, findPrimaryMatchIdForTeam, upsertTeamLineup, isBetterLineupSource |
+| `lib/lineup/match-field-geometry.ts` | 84 líneas | compressCoordToAwayHalf, compressCoordToHomeHalf, mirrorCoordVertical, applyGoyaPerspective, mapSlotsToHomeHalf, mapSlotsToAwayHalf, goyaScaleFactor, goyaWidthFactor, AWAY_HALF_Y, HOME_HALF_Y, MatchFieldSlot |
+| `lib/lineup/modal-field-scale.ts` | 6 líneas | MODAL_PITCH_DECOR_SCALE |
+| `lib/lineup/mvp-field-chip-scale.ts` | 78 líneas | computeMvpFieldChipScale, MVP_STARTER_CHIP_SCALE_MULTIPLIER |
+| `lib/lineup/mvp-horizontal-geometry.ts` | 71 líneas | compressCoordToAwayLeft, compressCoordToHomeRight, mapSlotsToAwayLeft, mapSlotsToHomeRight, AWAY_HALF_X, HOME_HALF_X, PLAYABLE_Y_MIN, PLAYABLE_Y_MAX, MvpHorizontalSlot |
+| `lib/lineup/mvp-selection-key.ts` | 38 líneas | mvpSelectionKey, findMvpOptionBySaved, MvpSelectablePlayer |
+| `lib/lineup/player-dedupe.ts` | 36 líneas | normalizePlayerName, playerIdentityKey, dedupePlayersByIdentity, PlayerIdentity |
 | `lib/lineup/player-detail.ts` | 54 líneas | getPlayerDetail, PlayerDetail |
-| `lib/lineup/position-map.ts` | 86 líneas | normalizePositionRole, positionLabelEs, formationRoleCounts, pickFormation, coordinatesForFormation |
-| `lib/lineup/squad-name.ts` | 32 líneas | squadTeamNameFromSlug, squadSlugFromTeamName |
-| `lib/lineup/types.ts` | 30 líneas | PositionRole, FormationId, LineupPlayerInput, LineupPlayer, FieldCoordinate, LineupSlot, ProbableXIResult |
+| `lib/lineup/position-map.ts` | 57 líneas | normalizePositionRole, isGoalkeeperPosition, positionLabelEs, formationRoleCounts, pickFormation, coordinatesForFormation |
+| `lib/lineup/predicted-slot-layout.ts` | 15 líneas | layoutPredictedStarters |
+| `lib/lineup/prewarm-lineups.ts` | 161 líneas | prewarmUpcomingLineups |
+| `lib/lineup/prewarm-types.ts` | 36 líneas | isPrewarmCacheFresh, PREWARM_HORIZON_MS, PREWARM_PREDICTED_TTL_MS, PrewarmTeamOutcome, PrewarmLineupsResult |
+| `lib/lineup/relayout-lineup.ts` | 59 líneas | relayoutLineupSlots |
+| `lib/lineup/resolve-lineup.ts` | 261 líneas | fetchConfirmedLineup, fetchPredictedLineup, getLineupSource, resolveTeamLineup, resolveMatchLineups, benchPlayersExcludingStarters, LineupSourceResolution |
+| `lib/lineup/short-player-name.ts` | 119 líneas | shirtPlayerName, squadDisplayNames, displayNameInSquad, abbreviateMvpFieldLabel, mvpFieldDisplayName, shortPlayerName |
+| `lib/lineup/source-labels.ts` | 33 líneas | lineupSourceHeadline, lineupSourceDetail, lineupSourceBadgeClass |
+| `lib/lineup/sources/api-football-client.ts` | 90 líneas | fetchWorldCupFixturesFromApiFootball, getApiFootballKey, isApiFootballConfigured |
+| `lib/lineup/sources/api-football-constants.ts` | 6 líneas | API_FOOTBALL_SOURCE_CODE, API_FOOTBALL_BASE_URL, API_FOOTBALL_WC_LEAGUE_ID, API_FOOTBALL_WC_SEASON |
+| `lib/lineup/sources/api-football-grid.ts` | 26 líneas | apiFootballGridToCoordinate |
+| `lib/lineup/sources/api-football-match-mapper.ts` | 86 líneas | kickoffToMs, kickoffDeltaMinutes, mapFixturesToInternalMatches, InternalMatchRef, ApiFootballFixtureRef, FixtureMapResult |
+| `lib/lineup/sources/api-football-names.ts` | 44 líneas | normalizeTeamName, teamNamesMatch |
+| `lib/lineup/sources/api-football.ts` | 250 líneas | fetchConfirmedLineupFromApiFootball, parseApiFootballTeamLineup |
+| `lib/lineup/sources/bsd-client.ts` | 227 líneas | fetchWorldCupEventsFromBsd, fetchBsdEventsForMatchLookup, fetchBsdConfirmedLineups, fetchBsdPredictedLineup, getBsdApiKey, isBsdConfigured, buildBsdEventsLookupPath, BSD_FETCH_TIMEOUT_MS, BsdEventRef, BsdConfirmedLineupsPayload, BsdConfirmedPlayer, BsdConfirmedTeamLineup, BsdPredictedPlayer, BsdPredictedTeamLineup, BsdPredictedLineupsPayload |
+| `lib/lineup/sources/bsd-confirmed.ts` | 59 líneas | fetchConfirmedLineupFromBsd |
+| `lib/lineup/sources/bsd-constants.ts` | 7 líneas | BSD_SOURCE_CODE, BSD_API_BASE_URL, BSD_WC_LEAGUE_ID, BSD_WC_SEASON_ID |
+| `lib/lineup/sources/bsd-event-lookup.ts` | 76 líneas | resolveBsdEventId, pickBsdTeamSide |
+| `lib/lineup/sources/bsd-lineup-parse.ts` | 210 líneas | parseBsdPredictedTeamLineup, parseBsdConfirmedTeamLineup |
+| `lib/lineup/sources/bsd-predicted.ts` | 57 líneas | fetchPredictedLineupFromBsd |
+| `lib/lineup/sources/bsd-slot-coords.ts` | 64 líneas | coordinateForPredictedSlot, coordinateForConfirmedIndex |
+| `lib/lineup/sources/bsd-squad-match.ts` | 91 líneas | findSquadPlayer, reserveSquadPlayerIdentity, FindSquadPlayerOptions |
+| `lib/lineup/sources/predicted-provider.ts` | 17 líneas | fetchPredictedLineup |
+| `lib/lineup/sources/types.ts` | 20 líneas | LineupFetchParams, ConfirmedLineupProvider, PredictedLineupProvider |
+| `lib/lineup/squad-name.ts` | 35 líneas | squadTeamNameFromSlug, squadSlugFromTeamName |
+| `lib/lineup/tactical-profile.ts` | 254 líneas | tacticalProfileKey, normalizeTacticalSlot, lookupTacticalProfile, resolveTacticalProfile, refinePredictedSlotKey, swapMirroredDefenderSlots, swapMirroredForwardSlots, tacticalSlotLabelEs, TacticalSlot, PredictedStarterSlotInput |
+| `lib/lineup/team-kit-colors.ts` | 157 líneas | setTeamKitHexFromDb, getTeamKitHex, teamKitColorsClash, getTeamKitColors, TeamKitColors |
+| `lib/lineup/team-kit-queries.ts` | 21 líneas | loadTeamKitHexBySlug |
+| `lib/lineup/types.ts` | 71 líneas | PositionRole, FormationId, LineupPlayerInput, LineupPlayer, FieldCoordinate, LineupSlot, ProbableXIResult, LineupSourceKind, ResolvedLineup, StoredLineupRow, LineupBenchPlayer, LineupResolveContext |
+| `lib/lineup/use-goya-field-ready.ts` | 20 líneas | useGoyaFieldReady |
+
+**media/** — 1 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/media/save-image-to-gallery.ts` | 117 líneas | saveImageToGallery, isShareSaveCancellation, canSaveImageToGallery |
 
 **narrative/** — 4 archivos
 
@@ -368,36 +529,59 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/openfootball/types.ts` | 70 líneas | COMPETITION_CODE, COMPETITION_YEAR, SOURCE_PATH, ParsedStadium, ParsedTeam, StageType, ParsedStage, ParsedMatch, ParsedCalendarMatchday, ParseFootballTxtResult, ParseCupFinalsResult |
 | `lib/openfootball/wc2026-groups.ts` | 20 líneas | WC2026_GROUP_CODES |
 
+**players/** — 1 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/players/search-players.ts` | 95 líneas | searchPlayers, goalkeeperFilter, SearchablePlayer, ScoredPlayer, PlayerSearchOptions |
+
 **pool/** — 9 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
-| `lib/pool/calendar-layout.ts` | 297 líneas | getMaxMatchesInMonthGrid, fitCalendarLayout, resetCalendarLayout, CalendarLayoutResult |
+| `lib/pool/calendar-layout.ts` | 646 líneas | getMaxMatchesInMonthGrid, syncCalendarGridHeight, resetCalendarGridHeight, fitCalendarLayout, resetCalendarLayout, CALENDAR_SIDEBAR_CARD_ANCHOR, SIDEBAR_CARD_ANCHOR_ATTR, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
-| `lib/pool/group-standings.ts` | 228 líneas | buildGroupStandingsDetail, buildGroupStandings, findGroupStandingDetail, isCalendarGroupsPanelDay, isCalendarSidebarDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_SIDEBAR_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupTeamStanding, GroupStandingRow, GroupStandingDetail |
+| `lib/pool/group-standings.ts` | 278 líneas | toGroupMatchRows, buildGroupStandingsDetail, buildGroupStandings, findGroupStandingDetail, isCalendarGroupsPanelDay, isCalendarSidebarDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_SIDEBAR_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupTeamStanding, GroupStandingRow, GroupStandingDetail, GroupStandingsSource, GroupMatchLike |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
 | `lib/pool/tournament-stats.ts` | 70 líneas | tournamentHasGoals, getTournamentTopScorers, getTournamentStatRows, TournamentScorerRow, TournamentStatRow, TournamentStatKind |
 
-**predictions/** — 7 archivos
+**predictions/** — 11 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
+| `lib/predictions/knockout-bracket-geometry.ts` | 542 líneas | buildColumnCenters, applyQfOppositeFooterAlignment, mapColumnX, gutterX, r32ColumnSlot, r32ColumnSlotWidthPct, r32ColumnSlotCenterX, cardEdgeX, buildBracketGeometry, finalCenterYFromGeometry, buildBracketConnectorPaths, matchPosition, BRACKET_HEADER_BAND_Y, BRACKET_FOOTER_BAND_Y, R32_BOTTOM_ANCHOR_Y, R32_TOP_ANCHOR_Y, KO_CARD_SIZE_SCALE, FINAL_CENTER_X, FINAL_CUP_OFFSET_ABOVE_FINAL, CARD_HALF_WIDTH_BASE, MIN_GAP_X, MIN_GAP_Y, BRACKET_SIDE_INSET, FOOTER_BUTTON_ALIGN_REF, FINAL_ANCHOR_LEFT_X, FINAL_ANCHOR_RIGHT_X, BracketMatchGeometry, R32ColumnSlot, BracketConnectorSegment |
+| `lib/predictions/knockout-bracket-layout.ts` | 98 líneas | buildKnockoutMatchMap, resolveBracketMatch, placeholderPairForMatchNumber, BracketRoundKey |
+| `lib/predictions/knockout-layout.ts` | 27 líneas | syncKnockoutViewportHeight, resetKnockoutViewportHeight |
 | `lib/predictions/mvp-queries.ts` | 50 líneas | fetchMvpPredictionsForMatches, getMvpPredictionForMatch, MvpPrediction |
-| `lib/predictions/queries.ts` | 346 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
-| `lib/predictions/scoring.ts` | 14 líneas | formatMvpPointsLabel, MVP_PREDICTION_POINTS, MATCH_SCORE_POINTS |
+| `lib/predictions/queries.ts` | 356 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow |
+| `lib/predictions/scoring.ts` | 14 líneas | formatMvpPointsLabel, MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS |
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
+| `lib/predictions/teams-picker-data.ts` | 15 líneas | getAllWorldCupTeamsAlphabetically |
 | `lib/predictions/validation.ts` | 24 líneas | parseGoalValue, validatePredictionGoals, MAX_GOALS |
 
-**quiz/** — 22 archivos
+**pwa/** — 7 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/pwa/deployment-version.ts` | 11 líneas | getDeploymentVersion, APP_VERSION_STORAGE_KEY |
+| `lib/pwa/onboarding-access-codes-built-in.ts` | 26 líneas | — |
+| `lib/pwa/onboarding-access-codes.ts` | 45 líneas | getOnboardingAccessCodeMap, getOnboardingAccessCode, hasOnboardingAccessCode |
+| `lib/pwa/onboarding-cookie.ts` | 6 líneas | PWA_ONBOARDING_COOKIE, PWA_STANDALONE_GATE_COOKIE, PWA_ONBOARDING_MAX_AGE_SECONDS, PWA_STANDALONE_GATE_MAX_AGE_SECONDS |
+| `lib/pwa/onboarding-participants.ts` | 79 líneas | getOnboardingParticipants, isKnownOnboardingParticipant, OnboardingParticipant |
+| `lib/pwa/onboarding-phones.ts` | 52 líneas | normalizePhone, isOnboardingEligibleUsername, resolveParticipantByAlias, resolveParticipantByPhone, ONBOARDING_ELIGIBLE_USERNAMES, PhoneParticipant |
+| `lib/pwa/standalone.ts` | 30 líneas | isStandalonePWA, detectMobileOs, MobileOs |
+
+**quiz/** — 29 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/quiz/cron.ts` | 29 líneas | madridHour, isQuizCronWindow, quizDateForCron, assertCronAuthorized |
 | `lib/quiz/date.ts` | 12 líneas | todayQuizDate |
 | `lib/quiz/distractors.ts` | 153 líneas | getOptionSemanticType, buildDistractorLabels, buildMcqOptions, McqOption, OptionSemanticType |
 | `lib/quiz/facts.ts` | 141 líneas | validateQuizFact, parseFactsFile, loadFacts, DEFAULT_FACTS_PATH, QuizFactCategory, QuizFactType, QuizFactDifficulty, QuizFact |
@@ -405,35 +589,42 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/generate-question.ts` | 58 líneas | generateQuestionFromFact, GeneratedQuizQuestion |
 | `lib/quiz/generate-worldcup-facts.ts` | 217 líneas | buildWorldcupFactsFromHistoric |
 | `lib/quiz/generated-day.ts` | 69 líneas | toSeedQuestion, generatedDayToSeedFile, parseGeneratedOrSeedDay, questionsMetaFromDay, GeneratedQuizDayFile |
-| `lib/quiz/home-teaser.ts` | 87 líneas | homeQuizSlideFromHub, HomeQuizSlide |
+| `lib/quiz/home-teaser.ts` | 88 líneas | homeQuizSlideFromHub, HomeQuizSlide |
+| `lib/quiz/intro-countdown.ts` | 29 líneas | introCountdownFromRemaining, IntroCountdownView |
+| `lib/quiz/intro.ts` | 18 líneas | QUIZ_INTRO_VIDEO_SRC, QUIZ_INTRO_TITLE_MS, QUIZ_INTRO_CROSSFADE_MS, QUIZ_INTRO_OUTRO_MS, QUIZ_INTRO_OUTRO_LEAD_S, QUIZ_PLAY_ENTER_MS |
 | `lib/quiz/mode.ts` | 42 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
 | `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
 | `lib/quiz/parse-session.ts` | 101 líneas | parseQuizStartSession |
 | `lib/quiz/play-flow.ts` | 44 líneas | pickWrongOptionId, resolveOptionVisualState, shouldAutoSubmit, nextStepAfterFeedback, QUESTION_TIME_SEC, FEEDBACK_DELAY_MS, QuestionPhase, OptionVisualState |
+| `lib/quiz/play-routes.ts` | 10 líneas | isQuizPlayResume, QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF |
+| `lib/quiz/publish-day.ts` | 87 líneas | publishQuizDay, PublishQuizDayResult, PublishQuizDayOptions |
 | `lib/quiz/quality.ts` | 144 líneas | validateSemanticCoherence, validateGeneratedQuestion, assertGeneratedQuestions, QualityResult |
 | `lib/quiz/queries.ts` | 342 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, getLatestSubmittedAttemptId, isQuizPlayable |
 | `lib/quiz/question-templates.ts` | 57 líneas | renderQuestionFromFact, QuestionTemplateResult |
 | `lib/quiz/quiz-facts-repository.ts` | 118 líneas | upsertWorldcupFacts, shouldPersistFacts, validateWorldcupFactRow, prepareFactsForUpsert, toUpsertPayload, QUIZ_FACTS_WORLDCUP_TABLE, PrepareFactsResult, UpsertFactsResult, UpsertWorldcupFactsDeps |
+| `lib/quiz/recent-fact-ids.ts` | 66 líneas | loadRecentFactIdsFromDb |
 | `lib/quiz/rng.ts` | 33 líneas | mulberry32, hashString, seedFromQuizDate, shuffleWithRng |
 | `lib/quiz/seed-day.ts` | 154 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
+| `lib/quiz/seed-db.ts` | 225 líneas | ensureQuizPool, isPoolCompetitiveAdmin, findQuizForDate, upsertQuizBundle, seedQuizDayToDb, QuizAdminClient |
 | `lib/quiz/slot-status.ts` | 78 líneas | getQuizSlotStatus, canOpenQuizPlay, canReplayQuiz, formatQuizSlotStatusLabel, QuizSlotStatus, QuizPlayAccessOptions |
 | `lib/quiz/types.ts` | 100 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizQuestionPlay, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
 | `lib/quiz/worldcup-facts-source.ts` | 189 líneas | fetchWorldcupFactsFromDb, loadQuizFactsWithFallback, isMenQuizFact, mapWorldcupRowToQuizFact, parseWorldcupFactsRows, mergeFactPools, MIN_FACTS_FOR_DAY, MIN_FACTS_POOL, QuizFactsSourceKind, QuizFactsLoadResult, LoadQuizFactsDeps |
 
-**ranking/** — 3 archivos
+**ranking/** — 4 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/ranking/context-rows.ts` | 34 líneas | pickContextualLeaderboardRows |
 | `lib/ranking/format.ts` | 4 líneas | formatAggregateStat |
-| `lib/ranking/queries.ts` | 388 líneas | getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
+| `lib/ranking/queries.ts` | 418 líneas | getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
 | `lib/ranking/reliability.ts` | 17 líneas | computeReliabilityPct, formatReliabilityPct, MAX_POINTS_PER_MATCH |
 
 **scoring/** — 1 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/scoring/compute.ts` | 36 líneas | matchOutcome, computeMatchPoints, ScoreInput |
+| `lib/scoring/compute.ts` | 31 líneas | matchOutcome, computeMatchPoints, ScoreInput |
 
 **scripts/** — 3 archivos
 
@@ -449,27 +640,45 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/site-url.ts` | 19 líneas | getSiteUrl |
 
-**supabase/** — 4 archivos
+**supabase/** — 5 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/supabase/admin.ts` | 16 líneas | createAdminClient |
 | `lib/supabase/client.ts` | 11 líneas | createClient |
-| `lib/supabase/middleware.ts` | 72 líneas | updateSession |
+| `lib/supabase/middleware.ts` | 148 líneas | updateSession |
+| `lib/supabase/route.ts` | 27 líneas | createClientFromRoute |
 | `lib/supabase/server.ts` | 30 líneas | createClient |
 
 **teams/** — 2 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/teams/display.ts` | 82 líneas | teamNameEs, teamAbbr, formatMatchCalendarAbbr |
+| `lib/teams/display.ts` | 117 líneas | teamNameEs, teamAbbr, formatMatchCalendarAbbr, knockoutBracketDisplayName, knockoutTeamLabel |
 | `lib/teams/flags.ts` | 62 líneas | teamFlagCode, teamFlagUrl |
+
+**text/** — 1 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/text/normalize-alias.ts` | 29 líneas | normalizeText, normalizeAlias |
+
+**tournament-predictions/** — 6 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/tournament-predictions/display.ts` | 31 líneas | formatChampionDisplay, formatFinalistsDisplay, formatPlayerDisplay, hasFinalists |
+| `lib/tournament-predictions/official-awards-queries.ts` | 59 líneas | getTournamentOfficialAwards, TournamentOfficialAwards |
+| `lib/tournament-predictions/queries.ts` | 91 líneas | fetchTournamentGeneralPredictionsEditable, getTournamentGeneralPredictions |
+| `lib/tournament-predictions/score-queries.ts` | 76 líneas | loadTournamentGeneralScoresByProfile, getTournamentGeneralScoreForProfile, TournamentGeneralPredictionScoreRow |
+| `lib/tournament-predictions/scoring.ts` | 142 líneas | computeTournamentChampionPoints, computeTournamentFinalistsPoints, computeTournamentPlayerAwardPoints, computeTournamentGeneralScoreBreakdown, TOURNAMENT_GENERAL_SCORE_POINTS, TournamentGeneralScoreBreakdown, TournamentOfficialAwardsInput, TournamentGeneralPredictionsInput |
+| `lib/tournament-predictions/types.ts` | 33 líneas | TournamentGeneralPredictions, TournamentGeneralPredictionField |
 
 **ui/** — 1 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/ui/use-panel-slide-stack.ts` | 132 líneas | usePanelSlideStack |
+| `lib/ui/use-panel-slide-stack.ts` | 146 líneas | usePanelSlideStack |
 
 **utils.ts/** — 1 archivos
 
@@ -477,20 +686,25 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/utils.ts` | 4 líneas | cn |
 
-**worldcup-data/** — 2 archivos
+**worldcup-data/** — 3 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/worldcup-data/squad-queries.ts` | 53 líneas | getTeamSquadByName, TeamSquadWithPlayers |
+| `lib/worldcup-data/all-squad-players-queries.ts` | 44 líneas | getAllTournamentPlayers |
+| `lib/worldcup-data/squad-queries.ts` | 100 líneas | getTeamSquadByName, TeamSquadWithPlayers |
 | `lib/worldcup-data/types.ts` | 195 líneas | FJELSTUL_SOURCE, FJELSTUL_SOURCE_URL, FJELSTUL_SOURCE_LABEL, WC2026_FEED_SOURCE, OPENFOOTBALL_SOURCE, WcHistoricGender, WcHistoricTournamentRow, WcHistoricTeamRow, WcHistoricStadiumRow, WcHistoricMatchRow, WcHistoricGoalRow, WcHistoricAwardWinnerRow, WcHistoricStandingRow, TeamSquadRow, TeamSquadPlayerRow, QuizFactWorldcupRow, Wc2026TeamRow, Wc2026StadiumRow, Wc2026GameRow, ExternalIdMapRow, MatchLiveStateRow, OpenFootballMatchRef, OpenFootballTeamRef, OpenFootballHostCityRef |
 
-**worldcup2026/** — 3 archivos
+**worldcup2026/** — 7 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/worldcup2026/api-client.ts` | 41 líneas | fetchWc2026Games, fetchWc2026Teams, Wc2026ApiGame |
+| `lib/worldcup2026/fifa-squads.ts` | 127 líneas | fetchFifaCalendarTeams, fetchFifaTeamSquad, titleCasePlayerName, FifaCalendarTeamRef, FifaSquadPlayerRaw |
 | `lib/worldcup2026/match-mapper.ts` | 132 líneas | buildTeamLookup, mapGamesToOpenFootball, mapStadiumsToHostCities, MatchMappingResult |
+| `lib/worldcup2026/normalize-squads.ts` | 112 líneas | normalizePositionForStorage, squadExternalKey, normalizeFifaSquadsToRows, normalizeCsvSquadsToRows, WC2026_SQUAD_YEAR, WC2026_SQUAD_COMPETITION, Wc2026SquadCsvRow |
 | `lib/worldcup2026/parse-csv.ts` | 83 líneas | parseWc2026TeamsCsv, parseWc2026StadiaCsv, parseWc2026GamesCsv, parseWc2026GroupsCsv, wc2026ExternalKey |
+| `lib/worldcup2026/parse-squads-csv.ts` | 48 líneas | parseWc2026SquadsCsv, serializeWc2026SquadsCsv |
+| `lib/worldcup2026/squad-team-names.ts` | 112 líneas | openFootballTeamName, squadLookupNames, openFootballNameFromFifaCode |
 
 
 ### Jobs / Cron / Webhooks
@@ -510,10 +724,10 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 12 archivos en `supabase/migrations/` |
-| Tablas | 39 |
+| Migraciones | 21 archivos en `supabase/migrations/` |
+| Tablas | 43 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
-| Funciones SQL | 16 |
+| Funciones SQL | 30 |
 | Políticas RLS | 0 |
 | Vistas | quiz_leaderboard, quiz_questions_public |
 
@@ -556,6 +770,7 @@ erDiagram
 | `match_live_state` | Ver migraciones SQL | RLS habilitado |
 | `match_mvp_predictions` | Ver migraciones SQL | RLS habilitado |
 | `match_results` | Marcador oficial (1:1 con match) | RLS habilitado |
+| `match_team_lineups` | Ver migraciones SQL | RLS habilitado |
 | `matchdays` | Jornadas de competición dentro de una porra | RLS habilitado |
 | `matches` | Partidos con kickoff, equipos y status | RLS habilitado |
 | `news_items` | Noticias/narrativa generada por pool | RLS habilitado |
@@ -576,6 +791,9 @@ erDiagram
 | `team_squad_players` | Ver migraciones SQL | RLS habilitado |
 | `team_squads` | Ver migraciones SQL | RLS habilitado |
 | `teams` | Ver migraciones SQL | RLS habilitado |
+| `tournament_general_prediction_scores` | Ver migraciones SQL | RLS habilitado |
+| `tournament_general_predictions` | Ver migraciones SQL | RLS habilitado |
+| `tournament_official_awards` | Ver migraciones SQL | RLS habilitado |
 | `tournament_stages` | Ver migraciones SQL | RLS habilitado |
 | `wc_historic_award_winners` | Ver migraciones SQL | RLS habilitado |
 | `wc_historic_goals` | Ver migraciones SQL | RLS habilitado |
@@ -613,19 +831,33 @@ erDiagram
 | `can_view_peer_predictions` | RPC / trigger |
 | `compute_match_points` | RPC / trigger |
 | `compute_mvp_points` | RPC / trigger |
+| `compute_tournament_champion_points` | RPC / trigger |
+| `compute_tournament_finalists_points` | RPC / trigger |
+| `compute_tournament_player_award_points` | RPC / trigger |
 | `consume_invite_and_join` | RPC / trigger |
 | `expire_stale_quiz_attempts` | RPC / trigger |
 | `generate_news_batch` | RPC / trigger |
 | `is_pool_admin` | RPC / trigger |
 | `is_pool_member` | RPC / trigger |
 | `is_pool_owner` | RPC / trigger |
+| `match_exact_points` | RPC / trigger |
+| `match_sign_points` | RPC / trigger |
 | `mvp_prediction_points` | RPC / trigger |
 | `prediction_edit_allowed` | RPC / trigger |
 | `rebuild_pool_member_scores` | RPC / trigger |
 | `recalculate_match_mvp_scores` | RPC / trigger |
 | `recalculate_match_scores` | RPC / trigger |
+| `recalculate_tournament_general_scores` | RPC / trigger |
 | `start_quiz_attempt` | RPC / trigger |
 | `submit_quiz_attempt` | RPC / trigger |
+| `tournament_champion_points` | RPC / trigger |
+| `tournament_finalists_points` | RPC / trigger |
+| `tournament_general_predictions_edit_allowed` | RPC / trigger |
+| `tournament_golden_glove_points` | RPC / trigger |
+| `tournament_mvp_award_points` | RPC / trigger |
+| `tournament_player_prediction_match` | RPC / trigger |
+| `tournament_top_scorer_points` | RPC / trigger |
+| `upsert_tournament_official_awards` | RPC / trigger |
 
 ### Migraciones
 
@@ -641,6 +873,15 @@ erDiagram
 - `supabase/migrations/20260607140000_quiz_play_keys_owner.sql` (129 líneas)
 - `supabase/migrations/20260608000000_worldcup_external_data.sql` (285 líneas)
 - `supabase/migrations/20260608120000_match_mvp_predictions.sql` (186 líneas)
+- `supabase/migrations/20260609120000_tournament_general_predictions.sql` (67 líneas)
+- `supabase/migrations/20260609140000_profile_phones.sql` (39 líneas)
+- `supabase/migrations/20260609150000_profile_phone_aitor.sql` (15 líneas)
+- `supabase/migrations/20260610120000_tournament_general_scoring.sql` (297 líneas)
+- `supabase/migrations/20260610140000_match_team_lineups_upsert_rls.sql` (11 líneas)
+- `supabase/migrations/20260611120000_scoring_scale_v2.sql` (103 líneas)
+- `supabase/migrations/20260612120000_profile_onboarding_completed.sql` (8 líneas)
+- `supabase/migrations/20260613120000_teams_primary_kit_hex.sql` (71 líneas)
+- `supabase/migrations/20260614120000_match_team_lineups.sql` (31 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -699,21 +940,28 @@ sequenceDiagram
 | `ALLOW_BOOTSTRAP` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `ALLOW_IMPORT` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `ALLOW_QUIZ_SEED` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
+| `API_FOOTBALL_KEY` | Ver código | Opcional | `` | lib/lineup/sources/api-football-client.ts, lib/lineup/sources/api-football.ts |
 | `AUTH_INTERNAL_DOMAIN` | Dominio email sintético | Opcional | `auth.trincadores.local` | lib/auth/credentials.ts |
+| `BSD_API_KEY` | Ver código | Opcional | `` | lib/lineup/sources/bsd-client.ts, scripts/emit-bsd-map-sql.ts, scripts/preview-bsd-fixtures.ts |
 | `CONFIRM_PURGE` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `CONFIRM_REIMPORT` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
-| `CONFIRM_RESEED` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
-| `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | — |
+| `CONFIRM_RESEED` | Ver código | Opcional | `` | scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
+| `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | lib/quiz/cron.ts |
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
-| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/server.ts |
+| `FIFA_API_BASE_URL` | Ver código | Opcional | `` | lib/worldcup2026/fifa-squads.ts |
+| `FIFA_SEASON_ID` | Ver código | Opcional | `` | lib/worldcup2026/fifa-squads.ts |
+| `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts, scripts/bootstrap-participants.ts |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/route.ts |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
-| `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | lib/auth/session.ts |
+| `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | actions/pwa-onboarding.ts, lib/auth/clear-device-cookies.ts, lib/auth/onboarding-device.ts |
+| `ONBOARDING_ACCESS_CODES_JSON` | Ver código | Opcional | `` | lib/pwa/onboarding-access-codes.test.ts, lib/pwa/onboarding-access-codes.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
-| `POOL_SLUG` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
-| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/generate-quiz-day.ts, scripts/seed-quiz-day.ts |
+| `POOL_SLUG` | Ver código | Opcional | `` | lib/quiz/seed-db.ts, scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
+| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/generate-quiz-day.ts, scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
 | `QUIZ_DAY_FILE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
+| `VERCEL_DEPLOYMENT_ID` | Ver código | Opcional | `` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
+| `VERCEL_GIT_COMMIT_SHA` | Ver código | Opcional | `` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
 | `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 | `VERCEL_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 | `WC2026_API_BASE` | Ver código | Opcional | `` | lib/worldcup2026/api-client.ts |
@@ -831,24 +1079,38 @@ docs/               → AUTH, RLS, SEED
 | Archivo | Líneas | Nota |
 |---------|--------|------|
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 389 | Revisar extracción |
-| `lib/ranking/queries.ts` | 388 | Revisar extracción |
-| `components/predictions/QuickPredictionModal.tsx` | 383 | Revisar extracción |
-| `lib/predictions/queries.ts` | 346 | Revisar extracción |
+| `lib/pool/calendar-layout.ts` | 646 | Revisar extracción |
+| `lib/predictions/knockout-bracket-geometry.ts` | 542 | Revisar extracción |
+| `components/ui/modal.tsx` | 510 | Revisar extracción |
+| `components/predictions/QuickPredictionModal.tsx` | 449 | Revisar extracción |
+| `components/layout/TabSwipeNavigator.tsx` | 436 | Revisar extracción |
+| `components/pwa/PwaOnboardingFlow.tsx` | 428 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 427 | Revisar extracción |
+| `lib/ranking/queries.ts` | 418 | Revisar extracción |
+| `components/lineup/MvpPredictionPanel.tsx` | 404 | Revisar extracción |
+| `lib/predictions/queries.ts` | 356 | Revisar extracción |
+| `components/quiz/QuizPlaySession.tsx` | 351 | Revisar extracción |
 | `lib/quiz/queries.ts` | 342 | Revisar extracción |
-| `components/ui/modal.tsx` | 337 | Revisar extracción |
+| `components/predictions/GroupStandingsModal.tsx` | 324 | Revisar extracción |
 | `supabase/migrations/20260606053311_quiz_mvp_fields.sql` | 319 | Revisar extracción |
 
 ### Código posiblemente sin uso
 
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
+- `components/home/HomeTopThree.tsx` — posible código muerto
+- `components/lineup/LineupSourceBadge.tsx` — posible código muerto
+- `components/lineup/MatchMvpFieldGraphic.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
+- `components/quiz/QuizModeBadge.tsx` — posible código muerto
 - `components/quiz/QuizProgressDots.tsx` — posible código muerto
+- `components/quiz/QuizSlotCard.tsx` — posible código muerto
 - `components/ui/hero-cta.tsx` — posible código muerto
-- `lib/auth/participants.ts` — posible código muerto
+- `lib/auth/trusted-sign-in.ts` — posible código muerto
 - `lib/dev/seed-ids.ts` — posible código muerto
 - `lib/fjelstul-worldcup/download.ts` — posible código muerto
+- `lib/lineup/sources/bsd-slot-coords.ts` — posible código muerto
+- `lib/lineup/sources/predicted-provider.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
 - `lib/quiz/generate-worldcup-facts.ts` — posible código muerto
 - `lib/scripts/cli.ts` — posible código muerto
@@ -898,10 +1160,16 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 - [x] MVP partido: prediccion por partido, scoring +5 pts, modal reutilizable (home/calendario/pronostico)
+- [x] Alineaciones con capa de fuentes: confirmed (BSD/API-Football) > predicted (BSD) > fallback dorsal; BD `match_team_lineups` + badge UI
+- [x] Integración BSD (Bzzoiro): predicted lineups WC 2026 + confirmed ~1h antes del pitido
 - [x] Migracion `worldcup_external_data` aplicada en remoto (MCP)
 - [x] Migracion `match_mvp_predictions` aplicada en remoto (MCP)
 - [x] Import Fjelstul historico + plantillas (625 squads, ~13k jugadores)
+- [x] Import plantillas oficiales WC 2026 (48 squads, 1248 jugadores, source worldcup2026/FIFA)
 - [x] Import feed worldcup2026 (32 partidos mapeados; 40 pending por TBD/plantilla CSV parcial 72 juegos)
+- [x] Migracion `match_team_lineups` aplicada en remoto (MCP)
+- [x] Script `db:map-api-football-fixtures` (matches → fixture IDs API-Football)
+- [x] Mapeo BSD remoto: 93/104 partidos en `external_id_map` (72 grupos + 21 eliminatorias; 11 sin match por placeholders `3A/B/C/D/F` vs BSD)
 - [x] TabBar: Quiz sustituye Actividad (`/quiz`, icono Brain)
 - [x] Quiz safe-area: `QuizPageShell` + CSS `tm-quiz-page` (play con scroll interno)
 - [x] Slide home quiz en hero carousel
@@ -910,9 +1178,18 @@ docs/               → AUTH, RLS, SEED
 - [x] Bonus deprecado en UI/seed
 - [x] Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo
 - [x] Quiz generador: distractores semanticos + owner replay ilimitado
+- [x] Quiz cron diario 5:00 Madrid (`/api/cron/quiz-daily` + `publishQuizDay`)
+- [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play
+- [x] Alineaciones: optimización carga (bundle actions, ventana confirmada, BSD lookup acotado)
+- [x] Alineaciones: plantilla visual fija por formación + relayout al leer caché (coords consistentes entre equipos)
+- [x] MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px
+- [x] Sistema táctico unificado: `formation-coordinates` (6 formaciones incl. 4-1-4-1) + espejo vertical MVP + UI compacta (reservas arriba, meta abajo, sin pastilla de formación)
+- [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, horizonte 48h, TTL 6h)
 
 ### En desarrollo / pendiente
 
+- [ ] API-Football free tier: temporada 2026 no disponible; lineups confirmadas vía BSD o plan de pago API-Football
+- [ ] Enchufar proveedor predicted lineups gratuito cuando exista fuente fiable
 - [ ] Mejorar match-mapper cuando se resuelvan placeholders UEFA en worldcup2026
 - [ ] Probar flujo E2E con login real (official + bonus)
 - [ ] Fase 1e activity feed real
@@ -924,7 +1201,8 @@ _Ninguno._
 
 ### TODOs / FIXMEs en código
 
-_Sin comentarios TODO/FIXME en el código._
+- `lib/lineup/fit-field-modal-layout.test.ts:21` — it("encaja todo en viewports bajos sin depender de scroll", () => {
+- `lib/lineup/fit-mvp-horizontal-layout.test.ts:39` — it("encaja todo en viewports bajos sin scroll", () => {
 
 ### Roadmap implícito
 
@@ -942,7 +1220,7 @@ _Sin comentarios TODO/FIXME en el código._
 ## Meta
 
 - **Generador:** `npm run llm-context` → `scripts/generate-llm-context.ts`
-- **Auto-actualización:** hook git pre-commit (si cambian archivos vigilados)
+- **Auto-actualización:** manual (`npm run llm-context`). Hook git desactivado.
 - **Archivos vigilados:** `app/`, `actions/`, `components/`, `lib/`, `types/`, `supabase/migrations/`, `docs/`, configs raíz
 - **Límites escalabilidad:** 40 ítems por grupo; archivos >300 líneas solo en riesgos
 

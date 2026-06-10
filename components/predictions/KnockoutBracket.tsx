@@ -15,9 +15,9 @@ import {
   FINAL_CUP_OFFSET_ABOVE_FINAL,
   finalCenterYFromGeometry,
   matchPosition,
+  ORB_PAIR_HALF_Y,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
-import type { BracketRoundKey } from "@/lib/predictions/knockout-bracket-layout";
 import {
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
@@ -39,14 +39,6 @@ type KnockoutBracketProps = {
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 
-const ORB_PAIR_HALF: Record<BracketRoundKey, number> = {
-  r32: 1.45,
-  r16: 1.15,
-  qf: 1.2,
-  sf: 1.25,
-  final: 0,
-};
-
 type TeamSlotLayout = {
   x: number;
   y: number;
@@ -56,34 +48,21 @@ function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
   home: TeamSlotLayout;
   away: TeamSlotLayout;
 } {
-  if (geom.round === "r32") {
-    return {
-      home: { x: columnX, y: geom.homeY },
-      away: { x: columnX, y: geom.awayY },
-    };
-  }
-
-  const half =
-    (geom.round === "final" ? 0.95 : ORB_PAIR_HALF[geom.round]) * geom.layoutScale;
   return {
-    home: { x: columnX, y: geom.midY - half },
-    away: { x: columnX, y: geom.midY + half },
+    home: { x: columnX, y: geom.midY - ORB_PAIR_HALF_Y },
+    away: { x: columnX, y: geom.midY + ORB_PAIR_HALF_Y },
   };
 }
 
 function BracketTeamOrb({
   teamName,
-  round,
   layout,
-  layoutScale,
   isWinner,
   isLive,
   isSaved,
 }: {
   teamName: string;
-  round: BracketRoundKey | "final";
   layout: TeamSlotLayout;
-  layoutScale: number;
   isWinner?: boolean;
   isLive?: boolean;
   isSaved?: boolean;
@@ -97,18 +76,11 @@ function BracketTeamOrb({
     <div
       className={cn(
         "tm-ko-orb",
-        round === "r32" && "tm-ko-orb--r32",
         isWinner && "tm-ko-orb--winner",
         isLive && "tm-ko-orb--live",
         isSaved && "tm-ko-orb--saved"
       )}
-      style={
-        {
-          left: `${layout.x}%`,
-          top: `${layout.y}%`,
-          "--tm-ko-orb-scale": layoutScale,
-        } as CSSProperties
-      }
+      style={{ left: `${layout.x}%`, top: `${layout.y}%` }}
       title={title}
       aria-hidden
     >
@@ -166,13 +138,7 @@ function BracketMatchNode({
           isSaved && "tm-ko-match-hit--saved",
           state === "locked" && "tm-ko-match-hit--locked"
         )}
-        style={
-          {
-            left: `${columnX}%`,
-            top: `${geom.midY}%`,
-            "--tm-ko-orb-scale": geom.layoutScale,
-          } as CSSProperties
-        }
+        style={{ left: `${columnX}%`, top: `${geom.midY}%` }}
         onClick={() => match && onOpen(match)}
         aria-label={
           match
@@ -184,18 +150,14 @@ function BracketMatchNode({
       />
       <BracketTeamOrb
         teamName={homeName}
-        round={geom.round}
         layout={slots.home}
-        layoutScale={geom.layoutScale}
         isWinner={homeWins}
         isLive={isLive}
         isSaved={isSaved}
       />
       <BracketTeamOrb
         teamName={awayName}
-        round={geom.round}
         layout={slots.away}
-        layoutScale={geom.layoutScale}
         isWinner={awayWins}
         isLive={isLive}
         isSaved={isSaved}

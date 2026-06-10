@@ -1,3 +1,7 @@
+/**
+ * @legacy @do-not-use Grid API-Football sustituido por `formation-coordinates.ts`.
+ * Solo referencia en tests; no usar en parsers ni componentes.
+ */
 import type { FieldCoordinate } from "@/lib/lineup/types";
 
 /** Convierte grid API-Football ("fila:columna") a coordenadas % del campo. */

@@ -1,4 +1,5 @@
-import { assignFormationTemplateCoordinates } from "@/lib/lineup/formation-templates";
+import { normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
+import { resolveFormationSlotsFromStarters } from "@/lib/lineup/resolve-formation-slots";
 import type { FieldCoordinate, PositionRole } from "@/lib/lineup/types";
 
 type LayoutInput = {
@@ -10,5 +11,8 @@ export function layoutPredictedStarters<T extends LayoutInput>(
   starters: T[],
   formationLabel?: string
 ): Array<T & FieldCoordinate> {
-  return assignFormationTemplateCoordinates(starters, formationLabel);
+  return resolveFormationSlotsFromStarters(
+    starters,
+    normalizeFormationTemplate(formationLabel)
+  );
 }

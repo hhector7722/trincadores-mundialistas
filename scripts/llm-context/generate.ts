@@ -651,7 +651,7 @@ ${section("Roadmap implícito", 3)}| Fase | Estado |
 
 function buildMeta(): string {
   return `${section("Meta", 2)}- **Generador:** \`npm run llm-context\` → \`scripts/generate-llm-context.ts\`
-- **Auto-actualización:** manual (`npm run llm-context`). Hook git desactivado.
+- **Auto-actualización:** manual (\`npm run llm-context\`). Hook git desactivado.
 - **Archivos vigilados:** \`app/\`, \`actions/\`, \`components/\`, \`lib/\`, \`types/\`, \`supabase/migrations/\`, \`docs/\`, configs raíz
 - **Límites escalabilidad:** ${LIMITS.maxItemsPerGroup} ítems por grupo; archivos >${LIMITS.maxFileLinesDetail} líneas solo en riesgos
 

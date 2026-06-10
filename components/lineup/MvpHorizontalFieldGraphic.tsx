@@ -3,7 +3,6 @@
 import { HorizontalPitchSurface } from "@/components/lineup/HorizontalPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { HORIZONTAL_PITCH_ASPECT } from "@/lib/lineup/fit-mvp-horizontal-layout";
-import { MODAL_PITCH_DECOR_SCALE } from "@/lib/lineup/field-layout";
 import type { MvpHorizontalSlot } from "@/lib/lineup/mvp-horizontal-geometry";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
@@ -43,9 +42,22 @@ export function MvpHorizontalFieldGraphic({
   heightPx,
   chipScale = 1,
 }: MvpHorizontalFieldGraphicProps) {
+  const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
+
+  if (!sized) {
+    return (
+      <div
+        aria-hidden
+        className={cn(
+          "relative shrink-0 aspect-[105/68] w-full max-w-full rounded-sm border border-[var(--tm-border)] bg-[rgba(42,107,60,0.28)]",
+          className
+        )}
+      />
+    );
+  }
+
   const awayKitClash = teamKitColorsClash(homeTeam, awayTeam);
   const starterCount = awaySlots.length + homeSlots.length;
-  const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
 
   function renderSlot(
     teamName: string,
@@ -85,29 +97,15 @@ export function MvpHorizontalFieldGraphic({
     <div
       role="img"
       aria-label={`Campo táctico MVP horizontal: ${starterCount} titulares, ${teamNameEs(awayTeam)} a la izquierda y ${teamNameEs(homeTeam)} a la derecha`}
-      className={cn(
-        "relative shrink-0 overflow-visible",
-        !sized && "aspect-[105/68] w-full max-w-full",
-        className
-      )}
-      style={
-        sized
-          ? {
-              width: widthPx,
-              height: heightPx,
-              maxWidth: "100%",
-              aspectRatio: String(HORIZONTAL_PITCH_ASPECT),
-            }
-          : undefined
-      }
+      className={cn("relative shrink-0 overflow-visible", className)}
+      style={{
+        width: widthPx,
+        height: heightPx,
+        maxWidth: "100%",
+        aspectRatio: String(HORIZONTAL_PITCH_ASPECT),
+      }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        style={{
-          transform: `scale(${MODAL_PITCH_DECOR_SCALE})`,
-          transformOrigin: "center center",
-        }}
-      >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <HorizontalPitchSurface onReady={onFieldReady} />
       </div>
 

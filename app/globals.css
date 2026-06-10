@@ -1213,9 +1213,8 @@ html:has(.tm-app-frame) {
   --tm-ko-wire: rgba(160, 120, 230, 0.34);
   --tm-ko-wire-pair: rgba(160, 120, 230, 0.28);
   --tm-ko-wire-final: rgba(160, 120, 230, 0.5);
-  --tm-ko-orb-size: min(5.8cqw, 1.5rem);
-  --tm-ko-orb-size-r32: min(9.5cqw, 2.4rem);
-  --tm-ko-orb-scale-factor: 0.92;
+  --tm-ko-orb-size: min(5.4cqw, 1.35rem);
+  --tm-ko-orb-pair-gap: min(3.2cqh, 0.85rem);
   --tm-ko-header-band: 10%;
   --tm-ko-footer-band: 10%;
   display: flex;
@@ -1355,27 +1354,17 @@ html:has(.tm-app-frame) {
   border-radius: 9999px;
   background: #ffffff;
   pointer-events: none;
-  transform: translate(-50%, -50%)
-    scale(calc(var(--tm-ko-orb-scale, 1) * var(--tm-ko-orb-scale-factor, 1)));
+  transform: translate(-50%, -50%);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
-}
-
-.tm-ko-orb--r32 {
-  width: var(--tm-ko-orb-size-r32);
-  height: var(--tm-ko-orb-size-r32);
 }
 
 .tm-ko-orb-label {
   font-family: var(--font-display, inherit);
-  font-size: clamp(6px, 1.55cqw, 8.5px);
+  font-size: clamp(6px, 1.5cqw, 8px);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
   color: #000000;
-}
-
-.tm-ko-orb--r32 .tm-ko-orb-label {
-  font-size: clamp(8px, 2.1cqw, 11px);
 }
 
 .tm-ko-orb--saved {
@@ -1399,25 +1388,17 @@ html:has(.tm-app-frame) {
 .tm-ko-match-hit {
   position: absolute;
   z-index: 0;
-  min-width: max(48px, calc(var(--tm-ko-orb-size) * 1.35));
-  min-height: max(48px, calc(var(--tm-ko-orb-size) * 2.8));
+  min-width: max(48px, calc(var(--tm-ko-orb-size) * 1.2));
+  min-height: max(
+    48px,
+    calc(var(--tm-ko-orb-size) * 2 + var(--tm-ko-orb-pair-gap))
+  );
   border: none;
   border-radius: 9999px;
   background: transparent;
   cursor: pointer;
   touch-action: manipulation;
-  transform: translate(-50%, -50%)
-    scale(calc(var(--tm-ko-orb-scale, 1) * var(--tm-ko-orb-scale-factor, 1)));
-}
-
-.tm-ko-match-hit--r32 {
-  min-width: max(48px, calc(var(--tm-ko-orb-size-r32) * 1.35));
-  min-height: max(48px, calc(var(--tm-ko-orb-size-r32) * 2.8));
-}
-
-.tm-ko-match-hit--final {
-  min-width: max(48px, calc(var(--tm-ko-orb-size) * 2.6));
-  min-height: max(48px, calc(var(--tm-ko-orb-size) * 1.35));
+  transform: translate(-50%, -50%);
 }
 
 .tm-ko-match-hit:disabled,

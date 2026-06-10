@@ -13,7 +13,7 @@ import { useFitMvpLayout } from "@/components/lineup/use-fit-mvp-layout";
 import { computeMvpFieldChipScale } from "@/lib/lineup/mvp-field-chip-scale";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
-import { ensureElevenStarterSlots } from "@/lib/lineup/ensure-eleven-starter-slots";
+import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import {
   findMvpOptionBySaved,
@@ -188,14 +188,14 @@ export function MvpPredictionPanel({
   const awaySlots = useMemo(
     () =>
       resolvedAwayLineup
-        ? mapSlotsToAwayLeft(ensureElevenStarterSlots(resolvedAwayLineup))
+        ? mapSlotsToAwayLeft(resolveFormationSlotsFromLineup(resolvedAwayLineup))
         : [],
     [resolvedAwayLineup]
   );
   const homeSlots = useMemo(
     () =>
       resolvedHomeLineup
-        ? mapSlotsToHomeRight(ensureElevenStarterSlots(resolvedHomeLineup))
+        ? mapSlotsToHomeRight(resolveFormationSlotsFromLineup(resolvedHomeLineup))
         : [],
     [resolvedHomeLineup]
   );

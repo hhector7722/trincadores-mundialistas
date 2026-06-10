@@ -1,3 +1,7 @@
+/**
+ * @legacy @do-not-use Coordenadas ad-hoc pre-`formation-coordinates.ts`.
+ * No importar en código de producción; usar `resolveFormationSlots` + plantillas fijas.
+ */
 import type { FieldCoordinate } from "@/lib/lineup/types";
 
 const BASE_SLOT_COORDS: Record<string, FieldCoordinate> = {

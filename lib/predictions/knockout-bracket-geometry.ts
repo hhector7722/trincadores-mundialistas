@@ -23,7 +23,10 @@ const R32_SLOT_COUNT = 8;
 /** Escala global de tarjetas con equipos (ancho + alto proporcional). */
 export const KO_CARD_SIZE_SCALE = 0.92;
 
-const R32_PAIR_HALF = 1.45 * KO_CARD_SIZE_SCALE;
+/** Mitad de la separación vertical entre los dos orbes de un enfrentamiento (% canvas Y). */
+export const ORB_PAIR_HALF_Y = 3.2;
+
+const R32_PAIR_HALF = ORB_PAIR_HALF_Y;
 
 export const FINAL_CENTER_X = 50;
 
@@ -46,7 +49,7 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 
 /** Margen lateral homogéneo para las 9 columnas del cuadro (% canvas). */
-export const BRACKET_COLUMN_INSET = 4;
+export const BRACKET_COLUMN_INSET = 3.5;
 
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0

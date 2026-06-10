@@ -187,7 +187,8 @@ function expandedAccept(
   return [...keys];
 }
 
-function starterMatchesAnchor(
+/** Matching slot táctico ↔ ancla de plantilla (usado por `resolveFormationSlots`). */
+export function starterMatchesAnchor(
   starter: LayoutInput,
   formation: FormationId,
   accept: readonly string[]
@@ -205,47 +206,14 @@ function starterMatchesAnchor(
 }
 
 /**
- * Asigna coordenadas fijas de plantilla según slot táctico y formación.
- * Todos los equipos con la misma formación comparten la misma geometría.
+ * Asigna coordenadas de plantilla. Delega en `resolveFormationSlotsFromStarters`.
+ * No invocar desde componentes visuales; usar `resolveFormationSlots` / `resolveFormationSlotsFromLineup`.
  */
 export function assignFormationTemplateCoordinates<T extends LayoutInput>(
   starters: T[],
   formationLabel: string | null | undefined
 ): Array<T & FieldCoordinate & { slotKey: string }> {
-  const formation = normalizeFormationTemplate(formationLabel);
-  const anchors = FORMATION_SLOT_ANCHORS[formation];
-  const pool = starters.map((starter, index) => ({ starter, index }));
-  const positioned: Array<T & FieldCoordinate & { slotKey: string }> = [];
-  const usedAnchors = new Set<number>();
-
-  for (let anchorIndex = 0; anchorIndex < anchors.length; anchorIndex++) {
-    const anchor = anchors[anchorIndex]!;
-    const matchIndex = pool.findIndex(({ starter }) =>
-      starterMatchesAnchor(starter, formation, anchor.accept)
-    );
-
-    if (matchIndex === -1) continue;
-
-    const [{ starter }] = pool.splice(matchIndex, 1);
-    usedAnchors.add(anchorIndex);
-    positioned.push({
-      ...starter,
-      slotKey: anchor.key,
-      ...clampToPlayable(anchor.coord),
-    });
-  }
-
-  for (let anchorIndex = 0; anchorIndex < anchors.length && pool.length > 0; anchorIndex++) {
-    if (usedAnchors.has(anchorIndex)) continue;
-    const anchor = anchors[anchorIndex]!;
-    const [{ starter }] = pool.splice(0, 1);
-    usedAnchors.add(anchorIndex);
-    positioned.push({
-      ...starter,
-      slotKey: anchor.key,
-      ...clampToPlayable(anchor.coord),
-    });
-  }
-
-  return positioned;
+  // Import dinámico para evitar ciclo formation-templates ↔ resolve-formation-slots.
+  const { resolveFormationSlotsFromStarters } = require("./resolve-formation-slots") as typeof import("./resolve-formation-slots");
+  return resolveFormationSlotsFromStarters(starters, normalizeFormationTemplate(formationLabel));
 }

@@ -3,7 +3,7 @@ import {
   normalizeFormationTemplate,
   normalizeSlotKey,
 } from "@/lib/lineup/formation-templates";
-import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
+import { resolveFormationSlotsFromStarters } from "@/lib/lineup/resolve-formation-slots";
 import type { LineupSlot, PositionRole, ResolvedLineup } from "@/lib/lineup/types";
 
 const UNAMBIGUOUS_LABEL_TO_SLOT: Record<string, string> = {
@@ -53,6 +53,6 @@ export function relayoutLineupSlots(lineup: ResolvedLineup): ResolvedLineup {
 
   return {
     ...lineup,
-    slots: layoutPredictedStarters(inputs, lineup.formationLabel),
+    slots: resolveFormationSlotsFromStarters(inputs, templateId),
   };
 }

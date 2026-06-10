@@ -1,8 +1,12 @@
 "use client";
 
+/**
+ * @deprecated Campo MVP vertical legacy. Usar `MvpHorizontalFieldGraphic` (pipeline activo en `MvpPredictionPanel`).
+ */
+
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { MODAL_PITCH_DECOR_SCALE, MVP_PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
+import { MODAL_FIELD_WRAPPER_SCALE, MVP_PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import { type MatchFieldSlot } from "@/lib/lineup/match-field-geometry";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
@@ -21,12 +25,12 @@ type MatchMvpFieldGraphicProps = {
   onSelect: (key: string) => void;
   onFieldReady?: () => void;
   className?: string;
-  /** Dimensiones explícitas del layout adaptativo (sin recortes). */
   widthPx?: number;
   heightPx?: number;
   chipScale?: number;
 };
 
+/** @deprecated Ver `MvpHorizontalFieldGraphic`. */
 export function MatchMvpFieldGraphic({
   homeSlots,
   awaySlots,
@@ -98,16 +102,13 @@ export function MatchMvpFieldGraphic({
               height: heightPx,
               maxWidth: "100%",
             }
-          : undefined
+          : {
+              transform: `scale(${MODAL_FIELD_WRAPPER_SCALE})`,
+              transformOrigin: "center center",
+            }
       }
     >
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        style={{
-          transform: `scale(${MODAL_PITCH_DECOR_SCALE})`,
-          transformOrigin: "center center",
-        }}
-      >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 

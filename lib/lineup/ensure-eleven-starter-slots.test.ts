@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { getFormationCoordinates } from "./formation-templates";
 import { ensureElevenStarterSlots } from "./ensure-eleven-starter-slots";
 import type { ResolvedLineup } from "./types";
 
@@ -35,7 +36,7 @@ test("ensureElevenStarterSlots rellena hasta 11 titulares", () => {
   assert.equal(ensured.length, 11);
 });
 
-test("ensureElevenStarterSlots conserva 11 slots completos", () => {
+test("ensureElevenStarterSlots delega coords fijas de plantilla", () => {
   const lineup = baseLineup(
     Array.from({ length: 11 }, (_, index) => ({
       key: `p-${index}`,
@@ -52,5 +53,8 @@ test("ensureElevenStarterSlots conserva 11 slots completos", () => {
 
   const ensured = ensureElevenStarterSlots(lineup);
   assert.equal(ensured.length, 11);
-  assert.equal(ensured.filter((slot) => !slot.isPlaceholder).length, 11);
+  assert.deepEqual(
+    ensured.map((slot) => ({ x: slot.x, y: slot.y })),
+    getFormationCoordinates("4-3-3")
+  );
 });

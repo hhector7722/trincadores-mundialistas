@@ -6,6 +6,7 @@ import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { teamNameEs } from "@/lib/teams/display";
@@ -94,6 +95,7 @@ export function LineupModalPanel({
   }
 
   const resolvedLineup = lineup ?? buildFallbackLineup(squad.players);
+  const formationSlots = resolveFormationSlotsFromLineup(resolvedLineup);
   const bench = resolveBenchPlayers(squad, resolvedLineup);
 
   function handlePlayerInteraction(playerName: string) {
@@ -117,7 +119,7 @@ export function LineupModalPanel({
         {(markFieldReady) => (
           <div className="flex min-h-0 flex-1 flex-col items-center px-1 py-1 sm:px-1.5">
             <TeamLineupGraphic
-              slots={resolvedLineup.slots}
+              slots={formationSlots}
               teamName={teamName}
               squadPlayerNames={squad.players.map((player) => player.player_name)}
               size="modal"
