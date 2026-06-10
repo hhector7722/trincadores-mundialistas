@@ -10,6 +10,7 @@ type UseFitFieldModalLayoutOptions = {
   awayBenchCount: number;
   homeBenchCount: number;
   footerPx: number;
+  gapPx?: number;
   enabled?: boolean;
 };
 
@@ -17,7 +18,7 @@ export function useFitFieldModalLayout(
   containerRef: RefObject<HTMLElement | null>,
   options: UseFitFieldModalLayoutOptions
 ): FitFieldModalLayout | null {
-  const { awayBenchCount, homeBenchCount, footerPx, enabled = true } = options;
+  const { awayBenchCount, homeBenchCount, footerPx, gapPx = 2, enabled = true } = options;
   const [layout, setLayout] = useState<FitFieldModalLayout | null>(null);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function useFitFieldModalLayout(
           awayBenchCount,
           homeBenchCount,
           footerPx,
-          gapPx: 2,
+          gapPx,
         })
       );
     }
@@ -51,7 +52,7 @@ export function useFitFieldModalLayout(
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [containerRef, awayBenchCount, homeBenchCount, footerPx, enabled]);
+  }, [containerRef, awayBenchCount, homeBenchCount, footerPx, gapPx, enabled]);
 
   return layout;
 }
