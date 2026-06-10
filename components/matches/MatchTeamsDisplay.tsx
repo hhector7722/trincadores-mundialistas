@@ -11,8 +11,11 @@ export const PREDICTION_MODAL_NAMES_BOTTOM_CLASS =
 /** Altura reservada para plantilla / posibles alineaciones bajo el MVP (card inicio). */
 export const PREDICTION_MODAL_ACTIONS_ROW_CLASS = "h-8";
 
-/** Modal pronóstico: plantilla arriba + posibles alineaciones abajo. */
+/** Modal pronóstico: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const PREDICTION_MODAL_ACTIONS_STACKED_CLASS = "h-16";
+
+/** Altura mínima del bloque equipos + acciones en modal pronóstico. */
+export const PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS = "min-h-[10.5rem]";
 
 /** Card inicio: borde inferior de la fila de nombres de equipo (ancla MVP). */
 export const HOME_CARD_NAMES_BOTTOM_CLASS =

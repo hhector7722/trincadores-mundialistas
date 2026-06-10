@@ -23,10 +23,8 @@ import {
   mapSlotsToAwayLeft,
   mapSlotsToHomeRight,
 } from "@/lib/lineup/mvp-horizontal-geometry";
-import { computeFitMvpHorizontalLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
 import {
   MVP_MODAL_FIELD_BODY_CLASS,
-  MVP_MODAL_FIELD_BODY_HEIGHT_REM,
 } from "@/lib/lineup/field-asset";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
@@ -260,38 +258,26 @@ export function MvpPredictionPanel({
   /** Misma reserva en preview y MVP: el pie de guardar va fuera del área medida. */
   const footerPx = MVP_CHIP_BLEED_PX;
 
+  const tacticalReady = homeSlots.length + awaySlots.length >= 22;
+  const showTactical = !loading && kitColorsReady && tacticalReady;
+
   const fitLayout = useFitMvpLayout(layoutRef, {
     awayBenchCount: awayBench.length,
     homeBenchCount: homeBench.length,
     footerPx,
     formationRowPx: MVP_FORMATION_ROW_PX,
-    enabled: !loading && kitColorsReady,
+    enabled: showTactical,
     gapPx: 2,
   });
 
-  const fallbackLayout = useMemo(
-    () =>
-      computeFitMvpHorizontalLayout({
-        widthPx: 304,
-        heightPx: MVP_MODAL_FIELD_BODY_HEIGHT_REM * 16,
-        awayBenchCount: awayBench.length,
-        homeBenchCount: homeBench.length,
-        footerPx,
-        formationRowPx: MVP_FORMATION_ROW_PX,
-        gapPx: 2,
-      }),
-    [awayBench.length, homeBench.length, footerPx]
-  );
-
-  const activeLayout = fitLayout ?? fallbackLayout;
-
   const chipScale = useMemo(() => {
+    if (!fitLayout) return 1;
     return computeMvpFieldChipScale(
-      activeLayout.fieldWidthPx,
-      activeLayout.fieldHeightPx,
+      fitLayout.fieldWidthPx,
+      fitLayout.fieldHeightPx,
       [...awaySlots, ...homeSlots]
     );
-  }, [activeLayout, awaySlots, homeSlots]);
+  }, [fitLayout, awaySlots, homeSlots]);
 
   useEffect(() => {
     if (!savedPlayerName || !savedTeamName) {
@@ -306,8 +292,6 @@ export function MvpPredictionPanel({
     () => resolveMvpSelection(options, selectedKey, lineupPlayers) ?? null,
     [options, selectedKey, lineupPlayers]
   );
-
-  const tacticalReady = homeSlots.length + awaySlots.length >= 22;
 
   function onSave() {
     if (preview || !poolId) return;
@@ -335,21 +319,18 @@ export function MvpPredictionPanel({
     });
   }
 
-  if (loading || !kitColorsReady) {
-    return <LoadingCenter label="Cargando alineaciones…" />;
-  }
-
-  if (!tacticalReady) {
+  if (!loading && !tacticalReady) {
     return (
       <div className="px-4 py-8 text-center">
         <p className="text-sm text-[var(--tm-muted)]">
-          No hay alineaciones disponibles para mostrar el campo táctico.
+          {error ?? "No hay alineaciones disponibles para mostrar el campo táctico."}
         </p>
       </div>
     );
   }
 
   const pickDisabled = preview ? false : !serverEditable || pending;
+  const tacticalVisible = showTactical && fitLayout != null;
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
@@ -357,10 +338,22 @@ export function MvpPredictionPanel({
         ref={layoutRef}
         className={cn(
           MVP_MODAL_FIELD_BODY_CLASS,
-          "flex flex-col overflow-hidden px-1 pt-0.5"
+          "relative flex flex-col overflow-hidden px-1 pt-0.5"
         )}
       >
-        <div className="mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
+        {!tacticalVisible ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]">
+            <LoadingCenter label="Cargando alineaciones…" minHeightClassName="min-h-0" />
+          </div>
+        ) : null}
+
+        {fitLayout ? (
+        <div
+          className={cn(
+            "mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden",
+            !tacticalVisible && "invisible pointer-events-none"
+          )}
+        >
           {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
             <div className="w-full shrink-0 pb-0.5">
               <LineupFormationInfo
@@ -376,7 +369,7 @@ export function MvpPredictionPanel({
                   selectedPlayer={selectedOption}
                   disabled={pickDisabled}
                   align="left"
-                  gridLayout={activeLayout.awayBench}
+                  gridLayout={fitLayout.awayBench}
                   onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(awayTeam, player))}
                 />
               ) : null}
@@ -395,8 +388,8 @@ export function MvpPredictionPanel({
               selectedPlayer={selectedOption}
               disabled={pickDisabled}
               onSelect={setSelectedKey}
-              widthPx={activeLayout.fieldWidthPx}
-              heightPx={activeLayout.fieldHeightPx}
+              widthPx={fitLayout.fieldWidthPx}
+              heightPx={fitLayout.fieldHeightPx}
               chipScale={chipScale}
             />
           </div>
@@ -416,13 +409,14 @@ export function MvpPredictionPanel({
                   selectedPlayer={selectedOption}
                   disabled={pickDisabled}
                   align="right"
-                  gridLayout={activeLayout.homeBench}
+                  gridLayout={fitLayout.homeBench}
                   onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
                 />
               ) : null}
             </div>
           ) : null}
         </div>
+        ) : null}
       </div>
 
       {!preview ? (

@@ -19,7 +19,7 @@ import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import {
   MatchTeamsDisplay,
   PREDICTION_MODAL_ACTIONS_STACKED_CLASS,
-  PREDICTION_MODAL_NAMES_BOTTOM_CLASS,
+  PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
@@ -380,7 +380,12 @@ export function QuickPredictionModal({
       return (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pb-0 pt-2">
-            <div className="relative mt-2 min-h-[8.25rem]">
+            <div
+              className={cn(
+                "relative mt-2 pb-1",
+                PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS
+              )}
+            >
               <MatchTeamsDisplay
                 layout="predictionModal"
                 homeTeam={targetMatch.home_team}
@@ -412,44 +417,39 @@ export function QuickPredictionModal({
               />
 
               <div
-                className={cn(
-                  "absolute inset-x-0 bottom-16 flex items-center justify-center",
-                  PREDICTION_MODAL_NAMES_BOTTOM_CLASS
-                )}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <MvpPredictionButton
-                  savedPlayerName={mvpPlayerName}
-                  onClick={() =>
-                    push(
-                      buildMvpView(poolId, {
-                        ...targetMatch,
-                        mvpPrediction: mvpPlayerName
-                          ? {
-                              id: targetMatch.mvpPrediction?.id ?? "",
-                              player_name: mvpPlayerName,
-                              team_name: targetMatch.mvpPrediction?.team_name ?? "",
-                              points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
-                              updated_at:
-                                targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                            }
-                          : targetMatch.mvpPrediction,
-                      })
-                    )
-                  }
-                  variant="compact"
-                  className="w-full"
-                />
-              </div>
-
-              <div
                 className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
                   compact
-                  layout="predictionModalStacked"
+                  layout="homeCardStacked"
+                  homeAnchor="10%"
+                  awayAnchor="90%"
                   className="h-full"
+                  centerSlot={
+                    <MvpPredictionButton
+                      savedPlayerName={mvpPlayerName}
+                      onClick={() =>
+                        push(
+                          buildMvpView(poolId, {
+                            ...targetMatch,
+                            mvpPrediction: mvpPlayerName
+                              ? {
+                                  id: targetMatch.mvpPrediction?.id ?? "",
+                                  player_name: mvpPlayerName,
+                                  team_name: targetMatch.mvpPrediction?.team_name ?? "",
+                                  points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
+                                  updated_at:
+                                    targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                                }
+                              : targetMatch.mvpPrediction,
+                          })
+                        )
+                      }
+                      variant="compact"
+                      className="w-full"
+                    />
+                  }
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
