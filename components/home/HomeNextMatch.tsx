@@ -13,9 +13,8 @@ import {
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import {
-  HOME_CARD_NAMES_BOTTOM_CLASS,
+  HOME_CARD_ACTIONS_STACKED_CLASS,
   MatchTeamsDisplay,
-  PREDICTION_MODAL_ACTIONS_ROW_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
@@ -102,7 +101,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               Ver todos
             </Link>
           </div>
-          <div className="relative mt-2 min-h-[7.25rem]">
+          <div className="relative mt-2 min-h-[8.25rem]">
             <MatchTeamsDisplay
               homeTeam={displayMatch.home_team}
               awayTeam={displayMatch.away_team}
@@ -167,30 +166,23 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
             />
 
             <div
-              className={cn(
-                "absolute inset-x-0 bottom-8 flex items-center justify-center",
-                HOME_CARD_NAMES_BOTTOM_CLASS
-              )}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <MvpPredictionButton
-                savedPlayerName={displayMatch.mvpPrediction?.player_name}
-                onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
-                variant="compact"
-                className="w-full"
-              />
-            </div>
-
-            <div
-              className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_ROW_CLASS)}
+              className={cn("absolute inset-x-0 bottom-0", HOME_CARD_ACTIONS_STACKED_CLASS)}
               onClick={(event) => event.stopPropagation()}
             >
               <MatchContextActionsRow
                 compact
-                layout="teamAnchors"
+                layout="homeCardStacked"
                 homeAnchor="15%"
                 awayAnchor="85%"
-                className="[&>div]:min-h-[2rem]"
+                className="h-full"
+                centerSlot={
+                  <MvpPredictionButton
+                    savedPlayerName={displayMatch.mvpPrediction?.player_name}
+                    onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                    variant="compact"
+                    className="w-full"
+                  />
+                }
                 onOpenHomeLineup={() =>
                   openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
                 }

@@ -18,6 +18,9 @@ export const PREDICTION_MODAL_ACTIONS_STACKED_CLASS = "h-16";
 export const HOME_CARD_NAMES_BOTTOM_CLASS =
   "top-[calc(2.5rem+0.25rem+0.625rem)] sm:top-[calc(2.75rem+0.25rem+0.625rem)]";
 
+/** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
+export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-16";
+
 function TeamFlagCircle({ name }: { name: string }) {
   const flagCode = teamFlagCode(name);
 
