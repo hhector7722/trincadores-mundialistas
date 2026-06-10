@@ -17,6 +17,7 @@ import {
   FINAL_CUP_OFFSET_ABOVE_FINAL,
   finalCenterYFromGeometry,
   finalHitSpanPercent,
+  gridRowToPercentY,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
 import {
@@ -40,6 +41,8 @@ type KnockoutBracketProps = {
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
+/** Fila 2 de la rejilla guía (octavos superiores / banda cabecera). */
+const PERRETE_CENTER_Y = gridRowToPercentY(2);
 
 type TeamSlotLayout = {
   x: number;
@@ -214,6 +217,24 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           aria-label="Cuadro de eliminatorias Mundial 2026"
         >
           <div className="tm-ko-header-band" aria-hidden />
+
+          <div
+            className="tm-ko-perrete"
+            style={{
+              left: "50%",
+              top: `${PERRETE_CENTER_Y}%`,
+            }}
+            aria-hidden
+          >
+            <Image
+              src="/icons/PERRETE.png"
+              alt=""
+              width={455}
+              height={351}
+              className="tm-ko-perrete-img"
+              priority
+            />
+          </div>
 
           <svg
             className="tm-ko-wires"

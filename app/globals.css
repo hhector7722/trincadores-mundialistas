@@ -1291,6 +1291,21 @@ html:has(.tm-app-frame) {
   stroke-width: 1px;
 }
 
+.tm-ko-perrete {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-perrete-img {
+  display: block;
+  width: min(34cqw, 8rem);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.28));
+}
+
 .tm-ko-cup {
   position: absolute;
   z-index: 2;
