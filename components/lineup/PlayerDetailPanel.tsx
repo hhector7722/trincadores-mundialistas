@@ -6,7 +6,6 @@ import type { PlayerDetail } from "@/lib/lineup/player-detail";
 import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { LoadingCenter } from "@/components/ui/spinner";
 import { teamNameEs } from "@/lib/teams/display";
-import { cn } from "@/lib/utils";
 
 type PlayerDetailPanelProps = {
   teamName: string;
@@ -83,47 +82,40 @@ export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelPro
   return (
     <div className="flex flex-col items-center px-2 pb-1.5 pt-1">
       <div className="relative w-full max-w-[11.5rem] shrink-0">
-        <div
-          className={cn(
-            "relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--tm-border)]",
-            "bg-[rgba(111,43,255,0.12)] shadow-[var(--tm-shadow-soft)]"
-          )}
-        >
-          {flagCode ? (
-            <img
-              src={teamFlagUrl(flagCode, 240)}
-              alt=""
-              width={184}
-              height={184}
-              className="h-full w-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center font-display text-2xl text-[var(--tm-accent)]">
-              {teamName.slice(0, 2).toUpperCase()}
-            </div>
-          )}
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1a0a38]/95 via-[#2a1058]/75 to-transparent px-2.5 pb-2 pt-10">
-            <p className="mb-1 truncate text-center text-[10px] font-medium text-white/80">
-              {displayTeam}
-            </p>
-            <dl className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-              <StatItem label="Dorsal" value={statValue(detail.shirtNumber)} />
-              <StatItem label="Posición" value={statValue(detail.position)} />
-              <div className="col-span-2">
-                <StatItem label="Club" value={statValue(detail.club)} />
-              </div>
-              <StatItem label="Goles en Mundiales" value={statValue(detail.worldCupGoals)} />
-              <StatItem label="Estado" value={statValue(detail.status)} />
-            </dl>
-            {awards.length > 0 ? (
-              <p className="mt-1.5 truncate text-center text-[9px] font-semibold text-[var(--tm-accent)]">
-                {awards.join(" · ")}
-              </p>
-            ) : null}
+        {flagCode ? (
+          <img
+            src={teamFlagUrl(flagCode, 240)}
+            alt=""
+            width={184}
+            height={184}
+            className="aspect-square w-full rounded-xl object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div className="flex aspect-square w-full items-center justify-center rounded-xl font-display text-2xl text-[var(--tm-accent)]">
+            {teamName.slice(0, 2).toUpperCase()}
           </div>
+        )}
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-xl bg-gradient-to-t from-[#1a0a38]/95 via-[#2a1058]/75 to-transparent px-2.5 pb-2 pt-10">
+          <p className="mb-1 truncate text-center text-[10px] font-medium text-white/80">
+            {displayTeam}
+          </p>
+          <dl className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+            <StatItem label="Dorsal" value={statValue(detail.shirtNumber)} />
+            <StatItem label="Posición" value={statValue(detail.position)} />
+            <div className="col-span-2">
+              <StatItem label="Club" value={statValue(detail.club)} />
+            </div>
+            <StatItem label="Goles en Mundiales" value={statValue(detail.worldCupGoals)} />
+            <StatItem label="Estado" value={statValue(detail.status)} />
+          </dl>
+          {awards.length > 0 ? (
+            <p className="mt-1.5 truncate text-center text-[9px] font-semibold text-[var(--tm-accent)]">
+              {awards.join(" · ")}
+            </p>
+          ) : null}
         </div>
       </div>
 
