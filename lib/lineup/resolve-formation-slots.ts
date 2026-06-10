@@ -13,14 +13,18 @@ import type {
   ResolvedLineup,
 } from "@/lib/lineup/types";
 
-export type FormationStarterInput = {
+/** Mínimo para matching táctico; los titulares completos añaden datos de jugador. */
+export type FormationSlotMatchInput = {
+  slotKey: string;
+  role: PositionRole;
+};
+
+export type FormationStarterInput = FormationSlotMatchInput & {
   key: string;
   name: string;
   shirtNumber: number | null;
   positionLabel: string;
-  role: PositionRole;
   isPlaceholder: boolean;
-  slotKey: string;
 };
 
 function slotRoleForAnchorKey(slotKey: string): PositionRole {
@@ -49,7 +53,7 @@ function placeholderForAnchor(anchorKey: string, coord: { x: number; y: number }
  * Asigna jugadores a anclas fijas en orden de plantilla.
  * Siempre fuerza coordenadas del anchor; sin `pool.shift()` ni coords de caché.
  */
-export function resolveFormationSlotsFromStarters<T extends FormationStarterInput>(
+export function resolveFormationSlotsFromStarters<T extends FormationSlotMatchInput>(
   starters: T[],
   formationId: FormationId
 ): Array<T & { slotKey: string; x: number; y: number }> {
@@ -64,7 +68,7 @@ export function resolveFormationSlotsFromStarters<T extends FormationStarterInpu
     );
 
     if (matchIndex === -1) {
-      return placeholderForAnchor(anchor.key, coord) as T & {
+      return placeholderForAnchor(anchor.key, coord) as unknown as T & {
         slotKey: string;
         x: number;
         y: number;

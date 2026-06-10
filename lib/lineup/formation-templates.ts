@@ -215,5 +215,8 @@ export function assignFormationTemplateCoordinates<T extends LayoutInput>(
 ): Array<T & FieldCoordinate & { slotKey: string }> {
   // Import dinámico para evitar ciclo formation-templates ↔ resolve-formation-slots.
   const { resolveFormationSlotsFromStarters } = require("./resolve-formation-slots") as typeof import("./resolve-formation-slots");
-  return resolveFormationSlotsFromStarters(starters, normalizeFormationTemplate(formationLabel));
+  return resolveFormationSlotsFromStarters(
+    starters,
+    normalizeFormationTemplate(formationLabel)
+  ) as Array<T & FieldCoordinate & { slotKey: string }>;
 }
