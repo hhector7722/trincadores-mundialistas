@@ -68,9 +68,8 @@ export function MvpBenchColumn({
                 disabled={disabled}
                 onClick={() => onPlayerClick(player)}
                 className={cn(
-                  "inline min-h-0 touch-manipulation rounded-sm px-0.5 py-0 align-baseline transition-colors",
+                  "inline min-h-0 touch-manipulation px-0.5 py-0 align-baseline transition-colors",
                   "hover:opacity-90 active:opacity-80",
-                  active && "bg-[rgba(212,255,0,0.14)] ring-1 ring-[var(--tm-accent)]/40",
                   disabled && "opacity-60"
                 )}
               >
