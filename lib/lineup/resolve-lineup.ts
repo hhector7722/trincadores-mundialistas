@@ -4,6 +4,7 @@ import {
   findPrimaryMatchIdForTeam,
   isBetterLineupSource,
   loadCachedTeamLineup,
+  loadLastKnownFormation,
   upsertTeamLineup,
 } from "@/lib/lineup/lineup-queries";
 import { apiFootballConfirmedProvider } from "@/lib/lineup/sources/api-football";
@@ -145,6 +146,15 @@ function benchFromResolved(lineup: ResolvedLineup, context: LineupResolveContext
     }));
 }
 
+async function buildFallbackWithKnownFormation(
+  supabase: SupabaseClient,
+  context: LineupResolveContext
+): Promise<ResolvedLineup> {
+  const knownFormation =
+    context.formationOverride ?? (await loadLastKnownFormation(supabase, context.teamName)) ?? undefined;
+  return buildFallbackLineup(context.players, { knownFormation });
+}
+
 /**
  * Resuelve la alineación con prioridad:
  * 1. confirmed (API-Football u otra fuente enchufada),
@@ -157,7 +167,7 @@ export async function resolveTeamLineup(
 ): Promise<ResolvedLineup> {
   const matchId = await resolveContextMatchId(supabase, context);
   if (!matchId) {
-    return buildFallbackLineup(context.players, context.formationOverride);
+    return buildFallbackWithKnownFormation(supabase, context);
   }
 
   const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
@@ -211,12 +221,12 @@ export async function resolveTeamLineup(
     return predicted;
   }
 
-  if (cached && cached.sourceKind === "fallback") {
-    return cached;
-  }
-
-  const fallback = buildFallbackLineup(context.players, context.formationOverride);
-  if (isBetterLineupSource(fallback.sourceKind, cached?.sourceKind ?? null) || !cached) {
+  const fallback = await buildFallbackWithKnownFormation(supabase, context);
+  const shouldPersist =
+    !cached ||
+    isBetterLineupSource(fallback.sourceKind, cached.sourceKind) ||
+    cached.formation !== fallback.formation;
+  if (shouldPersist) {
     await upsertTeamLineup(
       supabase,
       matchId,

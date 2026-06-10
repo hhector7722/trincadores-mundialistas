@@ -1,6 +1,10 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
-import { loadCachedTeamLineup, upsertTeamLineup } from "@/lib/lineup/lineup-queries";
+import {
+  loadCachedTeamLineup,
+  loadLastKnownFormation,
+  upsertTeamLineup,
+} from "@/lib/lineup/lineup-queries";
 import {
   isPrewarmCacheFresh,
   PREWARM_HORIZON_MS,
@@ -97,7 +101,8 @@ async function prewarmTeamLineup(
     return { status: "unchanged", reason: "no_external_data" };
   }
 
-  const fallback = buildFallbackLineup(players);
+  const knownFormation = await loadLastKnownFormation(supabase, teamName);
+  const fallback = buildFallbackLineup(players, { knownFormation: knownFormation ?? undefined });
   await upsertTeamLineup(
     supabase,
     match.id,

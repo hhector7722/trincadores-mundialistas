@@ -66,7 +66,8 @@ export function ProbableXI({
     );
   }
 
-  const lineup = resolvedLineup ?? buildFallbackLineup(squad.players, formation);
+  const lineup =
+    resolvedLineup ?? buildFallbackLineup(squad.players, { knownFormation: formation });
   const formationSlots = resolveFormationSlotsFromLineup(lineup);
   const activeFormation = formation ?? lineup.formation;
   const showFormationPicker = lineup.sourceKind === "fallback" && teamSlug;

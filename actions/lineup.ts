@@ -82,7 +82,7 @@ async function loadTeamLineupBundle(
   if (!squad || squad.players.length === 0) {
     return {
       squad,
-      lineup: buildFallbackLineup([], options?.formation),
+      lineup: buildFallbackLineup([], { knownFormation: options?.formation }),
     };
   }
 

@@ -1,6 +1,8 @@
-import { normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
+import { isFormationId } from "@/lib/lineup/formation-coordinates";
+import { normalizeFormationId, normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
 import type {
+  FormationId,
   LineupBenchPlayer,
   LineupSourceKind,
   LineupSlot,
@@ -48,6 +50,32 @@ export async function loadCachedTeamLineup(
 
   if (error || !data) return null;
   return rowToResolved(data as StoredLineupRow);
+}
+
+/** Última formación externa conocida del equipo (predicted o confirmed). */
+export async function loadLastKnownFormation(
+  supabase: SupabaseClient,
+  teamName: string
+): Promise<FormationId | null> {
+  try {
+    const { data, error } = await supabase
+      .from("match_team_lineups")
+      .select("formation")
+      .eq("team_name", teamName)
+      .in("source_kind", ["predicted", "confirmed"])
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data?.formation) return null;
+
+    const formation = (data.formation as string).trim();
+    if (!formation || !isFormationId(formation)) return null;
+
+    return normalizeFormationId(formation);
+  } catch {
+    return null;
+  }
 }
 
 export function isBetterLineupSource(
