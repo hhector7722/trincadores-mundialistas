@@ -107,6 +107,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               awayTeam={displayMatch.away_team}
               kickoffAt={displayMatch.kickoff_at}
               isLive={isLive}
+              teamBlocksTopClass="top-1.5"
               onHomeTeamClick={() =>
                 openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
               }

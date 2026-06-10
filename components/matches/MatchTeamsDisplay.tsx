@@ -102,6 +102,8 @@ type MatchTeamsDisplayProps = {
   predictionLabel?: string;
   homeScoreSlot?: ReactNode;
   awayScoreSlot?: ReactNode;
+  /** Desplazamiento vertical solo de bandera + nombre (p. ej. card inicio). */
+  teamBlocksTopClass?: string;
   onHomeTeamClick?: () => void;
   onAwayTeamClick?: () => void;
 };
@@ -122,6 +124,7 @@ export function MatchTeamsDisplay({
   awayScoreSlot,
   onHomeTeamClick,
   onAwayTeamClick,
+  teamBlocksTopClass,
 }: MatchTeamsDisplayProps) {
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
@@ -168,11 +171,17 @@ export function MatchTeamsDisplay({
       )}
 
       <div className={cn("relative w-full min-h-[4.25rem]", showSectionLabel && "mt-2")}>
-        <div className={cn("absolute top-0 -translate-x-1/2")} style={{ left: homeAnchor }}>
+        <div
+          className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
+          style={{ left: homeAnchor }}
+        >
           <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
         </div>
 
-        <div className={cn("absolute top-0 -translate-x-1/2")} style={{ left: awayAnchor }}>
+        <div
+          className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
+          style={{ left: awayAnchor }}
+        >
           <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
         </div>
 
