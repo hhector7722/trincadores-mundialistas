@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,45 @@ const EDIT_PENCIL_STROKE = 2;
 /** Clases del label/botón de acción (p. ej. «Añadir MVP», «Guardar MVP»). */
 export const MATCH_CONTEXT_ACTION_TEXT_CLASS =
   "text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80";
+
+export const MATCH_CONTEXT_ACTION_BUTTON_CLASS =
+  "block w-full text-center text-[var(--tm-accent)] transition-opacity hover:opacity-80";
+
+type MatchContextTextActionButtonProps = {
+  children: ReactNode;
+  onClick?: () => void;
+  className?: string;
+  /** Bloquea interacción sin atenuar el color (evita el gris nativo de `disabled`). */
+  inactive?: boolean;
+  title?: string;
+};
+
+/** Botón de texto amarillo compartido (p. ej. «Añadir MVP», «Guardar MVP»). */
+export function MatchContextTextActionButton({
+  children,
+  onClick,
+  className,
+  inactive = false,
+  title,
+}: MatchContextTextActionButtonProps) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-disabled={inactive || undefined}
+      onClick={inactive ? undefined : onClick}
+      className={cn(
+        MATCH_CONTEXT_ACTION_BUTTON_CLASS,
+        inactive && "cursor-default",
+        className
+      )}
+    >
+      <span className={cn("inline-flex items-center justify-center gap-1", MATCH_CONTEXT_ACTION_TEXT_CLASS)}>
+        {children}
+      </span>
+    </button>
+  );
+}
 
 type MatchContextActionButtonProps = {
   caption: string;
@@ -116,18 +155,12 @@ export function MatchContextActionButton({
           ) : null}
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={onClick}
-            className="block w-full text-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-          >
-            <span className={cn("inline-flex items-center justify-center gap-1", MATCH_CONTEXT_ACTION_TEXT_CLASS)}>
-            {addIcon ? (
-              <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-            ) : null}
-            {emptyText}
-          </span>
-        </button>
+        <MatchContextTextActionButton onClick={onClick}>
+          {addIcon ? (
+            <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+          ) : null}
+          {emptyText}
+        </MatchContextTextActionButton>
       )}
     </div>
   );

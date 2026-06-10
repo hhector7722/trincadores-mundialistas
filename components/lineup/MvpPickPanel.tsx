@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
-import { MATCH_CONTEXT_ACTION_TEXT_CLASS } from "@/components/lineup/MatchContextActionButton";
+import { MatchContextTextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
 import {
   findMvpOptionBySaved,
@@ -13,7 +13,6 @@ import {
 } from "@/lib/lineup/mvp-selection-key";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
-import { cn } from "@/lib/utils";
 
 type MvpPickPanelProps = {
   poolId: string;
@@ -212,18 +211,13 @@ export function MvpPickPanel({
           {!serverEditable ? (
             <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
           ) : (
-            <button
-              type="button"
-              className={cn(
-                "block w-full shrink-0 text-center disabled:opacity-40",
-                MATCH_CONTEXT_ACTION_TEXT_CLASS
-              )}
-              disabled={!selectedOption || pending}
+            <MatchContextTextActionButton
+              inactive={!selectedOption || pending}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
             >
               {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
-            </button>
+            </MatchContextTextActionButton>
           )}
         </div>
       }
