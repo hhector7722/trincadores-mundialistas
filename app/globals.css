@@ -1848,7 +1848,7 @@ html:has(.tm-app-frame) {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  gap: var(--tm-cal-groups-flag-gap, 1px);
+  gap: var(--tm-cal-groups-flag-gap, 3px);
   justify-content: flex-start;
   align-items: center;
   padding-inline: 0;
