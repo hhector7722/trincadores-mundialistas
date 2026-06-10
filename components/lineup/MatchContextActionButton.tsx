@@ -11,6 +11,10 @@ const EDIT_ICON_GAP_PX = 10;
 const EDIT_PENCIL_CLASS = "h-3 w-3 shrink-0";
 const EDIT_PENCIL_STROKE = 2;
 
+/** Clases del label/botón de acción (p. ej. «Añadir MVP», «Guardar MVP»). */
+export const MATCH_CONTEXT_ACTION_TEXT_CLASS =
+  "text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80";
+
 type MatchContextActionButtonProps = {
   caption: string;
   onClick: () => void;
@@ -115,9 +119,9 @@ export function MatchContextActionButton({
         <button
           type="button"
           onClick={onClick}
-          className="block w-full text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-        >
-          <span className="inline-flex items-center justify-center gap-1">
+            className="block w-full text-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+          >
+            <span className={cn("inline-flex items-center justify-center gap-1", MATCH_CONTEXT_ACTION_TEXT_CLASS)}>
             {addIcon ? (
               <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
             ) : null}
