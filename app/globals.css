@@ -1461,6 +1461,12 @@ html:has(.tm-app-frame) {
   border-bottom: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 
+.tm-porra-calendar .tm-cal-body > .tm-cal-sidebar-slot {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
+
 .tm-porra-calendar .tm-cal-cell,
 .tm-porra-calendar .tm-cal-cell-pad,
 .tm-porra-calendar .tm-cal-cell-surface {
@@ -1637,7 +1643,7 @@ html:has(.tm-app-frame) {
   background: #fff;
   min-height: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-body {
@@ -1648,6 +1654,7 @@ html:has(.tm-app-frame) {
   flex: 1 1 auto;
   gap: 0;
   justify-content: flex-start;
+  overflow: visible;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-card {
@@ -1655,14 +1662,13 @@ html:has(.tm-app-frame) {
   flex-direction: column;
   flex: 0 0 auto;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 10px;
   border: 0.5px solid var(--tm-cal-sidebar-border);
   background: var(--tm-cal-sidebar-bg);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   box-shadow: var(--tm-cal-sidebar-shadow);
-  isolation: isolate;
 }
 
 .tm-porra-calendar .tm-cal-sidebar-unified-card {
@@ -1684,6 +1690,8 @@ html:has(.tm-app-frame) {
   height: 100%;
   padding-bottom: var(--tm-cal-sidebar-card-bottom-pad, 6px);
   box-sizing: border-box;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .tm-porra-calendar .tm-cal-groups-title {
