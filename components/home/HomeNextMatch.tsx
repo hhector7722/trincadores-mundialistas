@@ -12,7 +12,11 @@ import {
 } from "@/components/lineup/EntityModalController";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
-import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
+import {
+  HOME_CARD_NAMES_BOTTOM_CLASS,
+  MatchTeamsDisplay,
+  PREDICTION_MODAL_ACTIONS_ROW_CLASS,
+} from "@/components/matches/MatchTeamsDisplay";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { formatListScore } from "@/lib/predictions/edit-state";
@@ -98,21 +102,20 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
               Ver todos
             </Link>
           </div>
-          <div className="mt-2 flex min-h-[7.25rem] flex-col">
-            <div className="shrink-0">
-              <MatchTeamsDisplay
-                homeTeam={displayMatch.home_team}
-                awayTeam={displayMatch.away_team}
-                kickoffAt={displayMatch.kickoff_at}
-                isLive={isLive}
-                onHomeTeamClick={() =>
-                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-                }
-                onAwayTeamClick={() =>
-                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-                }
-                centerSlotAlign={saved ? "default" : "teamNames"}
-                centerSlot={
+          <div className="relative mt-2 min-h-[7.25rem]">
+            <MatchTeamsDisplay
+              homeTeam={displayMatch.home_team}
+              awayTeam={displayMatch.away_team}
+              kickoffAt={displayMatch.kickoff_at}
+              isLive={isLive}
+              onHomeTeamClick={() =>
+                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+              }
+              onAwayTeamClick={() =>
+                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+              }
+              centerSlotAlign={saved ? "default" : "teamNames"}
+              centerSlot={
                 saved ? (
                   <div className="inline-block">
                     <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
@@ -161,10 +164,13 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                   </button>
                 )
               }
-              />
-            </div>
+            />
+
             <div
-              className="flex min-h-[1.25rem] flex-1 items-center justify-center"
+              className={cn(
+                "absolute inset-x-0 bottom-8 flex items-center justify-center",
+                HOME_CARD_NAMES_BOTTOM_CLASS
+              )}
               onClick={(event) => event.stopPropagation()}
             >
               <MvpPredictionButton
@@ -174,7 +180,11 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 className="w-full"
               />
             </div>
-            <div className="shrink-0" onClick={(event) => event.stopPropagation()}>
+
+            <div
+              className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_ROW_CLASS)}
+              onClick={(event) => event.stopPropagation()}
+            >
               <MatchContextActionsRow
                 compact
                 layout="teamAnchors"

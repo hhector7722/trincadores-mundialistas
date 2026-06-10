@@ -11,6 +11,10 @@ export const PREDICTION_MODAL_NAMES_BOTTOM_CLASS =
 /** Altura reservada para plantilla / posibles alineaciones bajo el MVP. */
 export const PREDICTION_MODAL_ACTIONS_ROW_CLASS = "h-8";
 
+/** Card inicio: borde inferior de la fila de nombres de equipo (ancla MVP). */
+export const HOME_CARD_NAMES_BOTTOM_CLASS =
+  "top-[calc(2.5rem+0.25rem+0.625rem)] sm:top-[calc(2.75rem+0.25rem+0.625rem)]";
+
 function TeamFlagCircle({ name }: { name: string }) {
   const flagCode = teamFlagCode(name);
 
