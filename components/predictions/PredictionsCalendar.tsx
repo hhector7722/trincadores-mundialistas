@@ -1,6 +1,15 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from "react";
+import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
 import { CalendarSidebarSlot } from "@/components/predictions/CalendarSidebarSlot";
@@ -293,8 +302,14 @@ function useCalendarViewportLayout(
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
-  const matchesByDate = useMemo(() => indexMatchesByDate(matches), [matches]);
+  const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
+
+  useEffect(() => {
+    setLocalMatches(matches);
+  }, [matches]);
+
+  const matchesByDate = useMemo(() => indexMatchesByDate(localMatches), [localMatches]);
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
   const [allGroupsOpen, setAllGroupsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -313,7 +328,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
     return trimmed.length > 0 ? trimmed : grid;
   }, [matchesByDate]);
 
-  const groupMatchRows = useMemo(() => toGroupMatchRows(matches), [matches]);
+  const groupMatchRows = useMemo(() => toGroupMatchRows(localMatches), [localMatches]);
 
   const groupStandings = useMemo(
     () => buildGroupStandings(groupMatchRows, "official"),
@@ -333,7 +348,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
 
-  if (!matches.length) {
+  if (!localMatches.length) {
     return (
       <p className="py-8 text-center text-sm text-[var(--tm-muted)]">
         No hay partidos de fase de grupos cargados.
@@ -417,22 +432,17 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
-          matches={matches}
+          matches={localMatches}
           onMatchChange={setActiveMatch}
           onMvpSaved={(matchId, playerName, teamName) => {
+            const patch = (current: MatchWithPrediction) =>
+              patchMatchMvpPrediction(current, playerName, teamName);
+
+            setLocalMatches((current) =>
+              current.map((item) => (item.id === matchId ? patch(item) : item))
+            );
             setActiveMatch((current) =>
-              current?.id === matchId
-                ? {
-                    ...current,
-                    mvpPrediction: {
-                      id: current.mvpPrediction?.id ?? "",
-                      player_name: playerName,
-                      team_name: teamName,
-                      points_awarded: current.mvpPrediction?.points_awarded ?? null,
-                      updated_at: current.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                    },
-                  }
-                : current
+              current?.id === matchId ? patch(current) : current
             );
           }}
         />

@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
+import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
   formatListScore,
@@ -176,8 +177,13 @@ function BracketMatchNode({
 
 export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
+  const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
-  const matchMap = useMemo(() => buildKnockoutMatchMap(matches), [matches]);
+  const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
+
+  useEffect(() => {
+    setLocalMatches(matches);
+  }, [matches]);
 
   useKnockoutViewportLayout(pageRef);
 
@@ -232,11 +238,22 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
 
       {activeMatch ? (
         <QuickPredictionModal
-          key={`${activeMatch.id}:${activeMatch.prediction?.updated_at ?? "none"}`}
+          key={`${activeMatch.id}:${activeMatch.prediction?.updated_at ?? "none"}:${activeMatch.mvpPrediction?.updated_at ?? "no-mvp"}`}
           open
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
+          onMvpSaved={(matchId, playerName, teamName) => {
+            const patch = (current: MatchWithPrediction) =>
+              patchMatchMvpPrediction(current, playerName, teamName);
+
+            setLocalMatches((current) =>
+              current.map((item) => (item.id === matchId ? patch(item) : item))
+            );
+            setActiveMatch((current) =>
+              current?.id === matchId ? patch(current) : current
+            );
+          }}
         />
       ) : null}
     </div>

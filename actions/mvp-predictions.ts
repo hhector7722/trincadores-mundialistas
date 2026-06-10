@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
-import { assertMatchInPool, fetchMatchEditableFromDb } from "@/lib/predictions/queries";
+import {
+  assertMatchInPool,
+  fetchMatchEditableFromDb,
+} from "@/lib/predictions/queries";
+import { getMvpPredictionForMatch } from "@/lib/predictions/mvp-queries";
 import { createClient } from "@/lib/supabase/server";
 
 export type MvpPredictionActionResult =
@@ -15,6 +19,23 @@ function mapMvpDbError(message: string): string {
     return "Predicción cerrada. Ya no puedes editar el MVP de este partido.";
   }
   return "No se pudo guardar el MVP. Comprueba la conexión e inténtalo otra vez.";
+}
+
+export async function fetchSavedMvpPrediction(poolId: string, matchId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const member = await assertPoolMembership(user.id, poolId);
+  if (!member) return null;
+
+  const inPool = await assertMatchInPool(poolId, matchId);
+  if (!inPool) return null;
+
+  return getMvpPredictionForMatch(poolId, user.id, matchId);
 }
 
 export async function saveMvpPrediction(

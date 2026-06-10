@@ -40,3 +40,34 @@ export function mvpOverridesFromMatches(
   }
   return overrides;
 }
+
+/** Partido de lista + MVP del `match` activo (p. ej. tras guardar en `match_mvp_predictions`). */
+export function preferMatchMvpData(
+  listed: MatchWithPrediction,
+  preferred: MatchWithPrediction
+): MatchWithPrediction {
+  if (listed.id !== preferred.id) return listed;
+  const snapshot = mvpSnapshotFromMatch(preferred);
+  return snapshot ? mergeMvpIntoMatch(listed, snapshot) : listed;
+}
+
+export function patchMatchMvpPrediction(
+  match: MatchWithPrediction,
+  playerName: string,
+  teamName: string
+): MatchWithPrediction {
+  return mergeMvpIntoMatch(match, {
+    player_name: playerName,
+    team_name: teamName,
+  });
+}
+
+export function mvpOverridesFromMatchListAndActive(
+  matches: MatchWithPrediction[],
+  active: MatchWithPrediction
+): Record<string, MvpSnapshot> {
+  const overrides = mvpOverridesFromMatches(matches);
+  const activeSnapshot = mvpSnapshotFromMatch(active);
+  if (activeSnapshot) overrides[active.id] = activeSnapshot;
+  return overrides;
+}

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
+import { fetchSavedMvpPrediction } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
 import { buildLineupView, buildMvpView } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
@@ -18,7 +19,9 @@ import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
-  mvpOverridesFromMatches,
+  mvpOverridesFromMatchListAndActive,
+  mvpSnapshotFromMatch,
+  preferMatchMvpData,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -123,7 +126,10 @@ export function QuickPredictionModal({
   const onMatchChangeRef = useRef(onMatchChange);
   const wasOpenRef = useRef(false);
 
-  const baseViewMatch = orderedMatches[activeIndex] ?? match;
+  const baseViewMatch = useMemo(
+    () => preferMatchMvpData(orderedMatches[activeIndex] ?? match, match),
+    [activeIndex, orderedMatches, match]
+  );
   const viewMatch = useMemo(
     () => mergeMvpIntoMatch(baseViewMatch, mvpOverrides[baseViewMatch.id]),
     [baseViewMatch, mvpOverrides]
@@ -267,9 +273,29 @@ export function QuickPredictionModal({
       setActiveIndex(idx >= 0 ? idx : 0);
       setMatchSlide(null);
       matchSlideLockRef.current = false;
-      setMvpOverrides(mvpOverridesFromMatches(orderedMatches));
+      setMvpOverrides(mvpOverridesFromMatchListAndActive(orderedMatches, match));
     }
-  }, [open, match.id, orderedMatches, clearMatchSlideTimer]);
+  }, [open, match, orderedMatches, clearMatchSlideTimer]);
+
+  useEffect(() => {
+    if (!open || mvpSnapshotFromMatch(viewMatch)) return;
+
+    let cancelled = false;
+    void fetchSavedMvpPrediction(poolId, viewMatch.id).then((saved) => {
+      if (cancelled || !saved?.player_name?.trim() || !saved.team_name?.trim()) return;
+      setMvpOverrides((current) => ({
+        ...current,
+        [viewMatch.id]: {
+          player_name: saved.player_name,
+          team_name: saved.team_name,
+        },
+      }));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, poolId, viewMatch.id, viewMatch.mvpPrediction?.player_name]);
 
   useEffect(() => () => clearMatchSlideTimer(), [clearMatchSlideTimer]);
 
