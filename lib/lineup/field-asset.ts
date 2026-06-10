@@ -14,12 +14,12 @@ export const LINEUP_MODAL_PANEL_CLASS = `h-auto ${LINEUP_MODAL_FIELD_WIDTH_CLASS
 
 export const LINEUP_MODAL_PANEL_HOST_CLASS = LINEUP_MODAL_FIELD_WIDTH_CLASS;
 
-/** Modal detalle jugador: ancho al contenido (bandera + stats). */
-export const PLAYER_MODAL_WRAPPER_CLASS = "w-max max-w-[min(100vw-1rem,18rem)]";
+/** Modal detalle jugador: mismo ancho que plantilla para layout homogéneo. */
+export const PLAYER_MODAL_WRAPPER_CLASS = LINEUP_MODAL_WRAPPER_CLASS;
 
-export const PLAYER_MODAL_PANEL_CLASS = "h-auto w-max";
+export const PLAYER_MODAL_PANEL_CLASS = LINEUP_MODAL_PANEL_CLASS;
 
-export const PLAYER_MODAL_PANEL_HOST_CLASS = "w-max";
+export const PLAYER_MODAL_PANEL_HOST_CLASS = LINEUP_MODAL_PANEL_HOST_CLASS;
 
 /** Modal MVP: dos equipos en campo horizontal. */
 export const MVP_MODAL_WRAPPER_CLASS = "max-w-[min(100vw-1rem,32rem)]";

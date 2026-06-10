@@ -36,7 +36,14 @@ export function entityModalTitleContent(
         </span>
       );
     case "player":
-      return view.playerName;
+      return (
+        <span className="flex min-w-0 flex-1 items-center justify-center gap-2">
+          <TeamFlagBadge name={view.teamName} size="xxs" loading="eager" />
+          <span className="truncate font-display text-sm uppercase tracking-wide">
+            {view.playerName}
+          </span>
+        </span>
+      );
     case "mvp":
       return "MVP";
     case "possible-lineups":

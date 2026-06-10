@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { fetchPlayerDetailAction } from "@/actions/lineup";
 import type { PlayerDetail } from "@/lib/lineup/player-detail";
-import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { LoadingCenter } from "@/components/ui/spinner";
 import { teamNameEs } from "@/lib/teams/display";
+import { cn } from "@/lib/utils";
 
 type PlayerDetailPanelProps = {
   teamName: string;
@@ -19,41 +19,21 @@ function statValue(value: number | string | null | undefined): string {
   return String(value);
 }
 
-function StatItem({ label, value }: { label: string; value: string }) {
+function StatItem({ label, value, className }: { label: string; value: string; className?: string }) {
   if (value.trim() === "") return null;
 
   return (
-    <div className="min-w-0">
-      <dt className="text-[8px] uppercase tracking-wide text-white/65">{label}</dt>
+    <div
+      className={cn(
+        "flex min-w-0 flex-col gap-0.5 rounded-lg bg-[rgba(111,43,255,0.12)] px-2.5 py-2",
+        className
+      )}
+    >
+      <dt className="text-[9px] uppercase tracking-wide text-white/60">{label}</dt>
       <dd className="truncate font-display text-sm font-semibold leading-tight text-white">
         {value}
       </dd>
     </div>
-  );
-}
-
-function TeamFlagHero({ teamName, flagCode }: { teamName: string; flagCode: string }): ReactNode {
-  const [failed, setFailed] = useState(false);
-
-  if (failed) {
-    return (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-[rgba(111,43,255,0.12)] font-display text-2xl text-[var(--tm-accent)]">
-        {teamName.slice(0, 2).toUpperCase()}
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={teamFlagUrl(flagCode, 320)}
-      alt=""
-      width={184}
-      height={184}
-      className="aspect-square w-full rounded-xl object-cover"
-      loading="eager"
-      decoding="async"
-      onError={() => setFailed(true)}
-    />
   );
 }
 
@@ -101,42 +81,27 @@ export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelPro
   if (detail.goldenBoot) awards.push("Bota de Oro");
   if (detail.bestYoungPlayer) awards.push("Mejor joven");
 
-  const flagCode = teamFlagCode(teamName);
   const displayTeam = teamNameEs(teamName);
 
   return (
-    <div className="flex flex-col items-center px-2 pb-1.5 pt-1">
-      <div className="relative w-full max-w-[11.5rem] shrink-0">
-        {flagCode ? (
-          <TeamFlagHero teamName={teamName} flagCode={flagCode} />
-        ) : (
-          <div className="flex aspect-square w-full items-center justify-center rounded-xl font-display text-2xl text-[var(--tm-accent)]">
-            {teamName.slice(0, 2).toUpperCase()}
-          </div>
-        )}
+    <div className="flex flex-col gap-3 px-3 py-3">
+      <p className="text-center text-[11px] font-medium text-white/75">{displayTeam}</p>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-xl bg-gradient-to-t from-[#1a0a38]/95 via-[#2a1058]/75 to-transparent px-2.5 pb-2 pt-10">
-          <p className="mb-1 truncate text-center text-[10px] font-medium text-white/80">
-            {displayTeam}
-          </p>
-          <dl className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-            <StatItem label="Dorsal" value={statValue(detail.shirtNumber)} />
-            <StatItem label="Posición" value={statValue(detail.position)} />
-            <div className="col-span-2">
-              <StatItem label="Club" value={statValue(detail.club)} />
-            </div>
-            <StatItem label="Goles en Mundiales" value={statValue(detail.worldCupGoals)} />
-            <StatItem label="Estado" value={statValue(detail.status)} />
-          </dl>
-          {awards.length > 0 ? (
-            <p className="mt-1.5 truncate text-center text-[9px] font-semibold text-[var(--tm-accent)]">
-              {awards.join(" · ")}
-            </p>
-          ) : null}
-        </div>
-      </div>
+      <dl className="grid grid-cols-2 gap-2">
+        <StatItem label="Dorsal" value={statValue(detail.shirtNumber)} />
+        <StatItem label="Posición" value={statValue(detail.position)} />
+        <StatItem label="Club" value={statValue(detail.club)} className="col-span-2" />
+        <StatItem label="Goles en Mundiales" value={statValue(detail.worldCupGoals)} />
+        <StatItem label="Estado" value={statValue(detail.status)} />
+      </dl>
 
-      <p className="mt-1.5 whitespace-nowrap text-center text-[7px] leading-none tracking-tight text-[var(--tm-muted)]">
+      {awards.length > 0 ? (
+        <p className="rounded-lg bg-[rgba(212,255,0,0.08)] px-2.5 py-2 text-center text-[10px] font-semibold text-[var(--tm-accent)]">
+          {awards.join(" · ")}
+        </p>
+      ) : null}
+
+      <p className="text-center text-[7px] leading-snug text-[var(--tm-muted)]">
         Datos históricos de convocatorias y registros de Mundiales anteriores.
       </p>
     </div>
