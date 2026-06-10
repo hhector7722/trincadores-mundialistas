@@ -70,25 +70,23 @@ export function MvpBenchColumn({
                 disabled={disabled}
                 onClick={() => onPlayerClick(player)}
                 className={cn(
-                  "inline min-h-0 align-baseline transition-colors",
-                  active ? "px-0 py-0" : "px-0.5 py-0",
+                  "inline min-h-0 px-0.5 py-0 align-baseline transition-colors",
                   !readOnly && "touch-manipulation hover:opacity-90 active:opacity-80",
                   readOnly && "pointer-events-none cursor-default",
                   disabled && "opacity-60"
                 )}
               >
+                <span className="font-display font-bold text-[var(--tm-accent)]">{dorsal}</span>
                 {active ? (
                   <span className="inline-block rounded border border-[var(--tm-accent)] bg-[var(--tm-accent)] px-0.5 font-bold leading-none text-[var(--tm-primary-fg)]">
+                    {" "}
                     {labels[index]}
                   </span>
                 ) : (
-                  <>
-                    <span className="font-display font-bold text-[var(--tm-accent)]">{dorsal}</span>
-                    <span className="font-medium text-[var(--tm-fg)]/90">
-                      {" "}
-                      {labels[index]}
-                    </span>
-                  </>
+                  <span className="font-medium text-[var(--tm-fg)]/90">
+                    {" "}
+                    {labels[index]}
+                  </span>
                 )}
               </button>
               {index < players.length - 1 ? (
