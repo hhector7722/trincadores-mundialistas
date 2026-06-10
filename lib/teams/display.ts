@@ -93,6 +93,19 @@ export function knockoutBracketDisplayName(teamName: string): string {
   return teamNameEs(teamName);
 }
 
+/** Etiqueta en orbes del cuadro KO cuando el equipo aún no está definido (1H, W74, 3…). */
+export function knockoutBracketSlotLabel(teamName: string): string {
+  const trimmed = teamName.trim();
+  if (!trimmed) return " ";
+
+  if (isPlaceholderTeam(trimmed)) {
+    if (/^3[A-L](\/[A-L])+/i.test(trimmed)) return "3";
+    return trimmed.toUpperCase();
+  }
+
+  return teamAbbr(trimmed);
+}
+
 /** Etiqueta compacta para celdas del cuadro KO (WA, 2A, W74…). */
 export function knockoutTeamLabel(teamName: string): string {
   const trimmed = teamName.trim();
