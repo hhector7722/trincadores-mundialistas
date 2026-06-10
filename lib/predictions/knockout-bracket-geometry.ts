@@ -270,22 +270,45 @@ export function gutterX(columnA: number, columnB: number): number {
   return (mapColumnX(columnA) + mapColumnX(columnB)) / 2;
 }
 
-/** Ancho útil de la columna de dieciseisavos (% del canvas), centrado en `columnX`. */
-export function r32ColumnSlotWidthPct(column: number): number {
-  const center = mapColumnX(column);
+export type R32ColumnSlot = {
+  left: number;
+  right: number;
+  center: number;
+  width: number;
+};
 
+/** Hueco visual de dieciseisavos entre borde de pantalla y la siguiente ronda. */
+export function r32ColumnSlot(column: number): R32ColumnSlot {
   if (column === 0) {
-    return 2 * Math.min(center - R32_VISIBLE_EDGE_INSET, gutterX(0, 1) - center);
+    const left = R32_VISIBLE_EDGE_INSET;
+    const right = gutterX(0, 1);
+    return { left, right, center: (left + right) / 2, width: right - left };
   }
 
   if (column === 8) {
-    return (
-      2 *
-      Math.min(center - gutterX(7, 8), 100 - R32_VISIBLE_EDGE_INSET - center)
-    );
+    const left = gutterX(7, 8);
+    const right = 100 - R32_VISIBLE_EDGE_INSET;
+    return { left, right, center: (left + right) / 2, width: right - left };
   }
 
-  return CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.r32 * 2;
+  const center = mapColumnX(column);
+  const width = CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.r32 * 2;
+  return {
+    left: center - width / 2,
+    right: center + width / 2,
+    center,
+    width,
+  };
+}
+
+/** Ancho útil de la columna de dieciseisavos (% del canvas), centrado en el hueco visual. */
+export function r32ColumnSlotWidthPct(column: number): number {
+  return r32ColumnSlot(column).width;
+}
+
+/** Centro horizontal del hueco visual de dieciseisavos (% del canvas). */
+export function r32ColumnSlotCenterX(column: number): number {
+  return r32ColumnSlot(column).center;
 }
 
 export function cardEdgeX(
@@ -512,5 +535,7 @@ export function buildBracketConnectorPaths(
 }
 
 export function matchPosition(geom: BracketMatchGeometry): { x: number; y: number } {
-  return { x: geom.columnX, y: geom.midY };
+  const x =
+    geom.round === "r32" ? r32ColumnSlotCenterX(geom.column) : geom.columnX;
+  return { x, y: geom.midY };
 }

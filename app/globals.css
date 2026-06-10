@@ -1429,10 +1429,23 @@ html:has(.tm-app-frame) {
 }
 
 .tm-ko-card--r32 .tm-ko-card-row {
+  display: grid;
   width: 100%;
-  justify-content: center;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
   padding-block: 0.18rem;
   padding-inline: 0.2rem;
+}
+
+.tm-ko-card--r32 .tm-ko-card-row-primary {
+  grid-column: 1;
+  justify-self: end;
+  text-align: right;
+}
+
+.tm-ko-card--r32 .tm-ko-card-row-score {
+  grid-column: 2;
+  justify-self: center;
 }
 
 .tm-ko-card--r32 .tm-ko-card-row-primary,
