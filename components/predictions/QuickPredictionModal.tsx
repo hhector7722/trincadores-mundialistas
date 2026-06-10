@@ -11,7 +11,8 @@ import {
 } from "@/components/lineup/EntityModalController";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
-import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
+import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
+import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
@@ -38,8 +39,8 @@ import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
-  MVP_MODAL_PANEL_CLASS,
   MVP_MODAL_PICK_PANEL_CLASS,
+  POSSIBLE_LINEUPS_MODAL_PANEL_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
   PLAYER_MODAL_PANEL_CLASS,
   PLAYER_MODAL_PANEL_HOST_CLASS,
@@ -498,7 +499,7 @@ export function QuickPredictionModal({
 
     if (view.kind === "mvp") {
       return (
-        <MvpPredictionPanel
+        <MvpPickPanel
           poolId={view.poolId}
           matchId={view.matchId}
           homeTeam={view.homeTeam}
@@ -512,12 +513,10 @@ export function QuickPredictionModal({
     }
 
     return (
-      <MvpPredictionPanel
+      <PossibleLineupsPanel
         matchId={view.matchId}
         homeTeam={view.homeTeam}
         awayTeam={view.awayTeam}
-        serverEditable={false}
-        preview
       />
     );
   }
@@ -566,7 +565,8 @@ export function QuickPredictionModal({
       scrollContent={!isCompactModal}
       className={cn(
         isMvpView && cn(MVP_MODAL_PICK_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
-        isPossibleLineupsView && cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isPossibleLineupsView &&
+          cn(POSSIBLE_LINEUPS_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
       )}

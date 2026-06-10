@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
-import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
+import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
+import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import {
   entityModalTitleContent,
@@ -14,8 +15,8 @@ import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
-  MVP_MODAL_PANEL_CLASS,
   MVP_MODAL_PICK_PANEL_CLASS,
+  POSSIBLE_LINEUPS_MODAL_PANEL_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
   PLAYER_MODAL_PANEL_CLASS,
   PLAYER_MODAL_PANEL_HOST_CLASS,
@@ -81,7 +82,7 @@ function renderEntityView(
       return <PlayerDetailPanel teamName={view.teamName} playerName={view.playerName} />;
     case "mvp":
       return (
-        <MvpPredictionPanel
+        <MvpPickPanel
           poolId={view.poolId}
           matchId={view.matchId}
           homeTeam={view.homeTeam}
@@ -95,12 +96,10 @@ function renderEntityView(
       );
     case "possible-lineups":
       return (
-        <MvpPredictionPanel
+        <PossibleLineupsPanel
           matchId={view.matchId}
           homeTeam={view.homeTeam}
           awayTeam={view.awayTeam}
-          serverEditable={false}
-          preview
         />
       );
     default:
@@ -246,7 +245,7 @@ export function EntityModalController({
         isMvpView &&
           cn(MVP_MODAL_PICK_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
         isPossibleLineupsView &&
-          cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
+          cn(POSSIBLE_LINEUPS_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         className

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * @deprecated Campo MVP vertical legacy. Usar `MvpHorizontalFieldGraphic` (pipeline activo en `MvpPredictionPanel`).
+ * @deprecated Campo MVP vertical legacy. Usar `MvpHorizontalFieldGraphic` (pipeline activo en `MvpPickPanel`).
  */
 
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
