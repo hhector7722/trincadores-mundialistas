@@ -12,6 +12,9 @@ import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
+  PLAYER_MODAL_PANEL_CLASS,
+  PLAYER_MODAL_PANEL_HOST_CLASS,
+  PLAYER_MODAL_WRAPPER_CLASS,
 } from "@/lib/lineup/field-asset";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
@@ -287,6 +290,8 @@ export function GroupStandingsModal({
 
   const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? groupPanelSlide;
   const isLineupView = panelView.kind === "lineup";
+  const isPlayerView = panelView.kind === "player";
+  const isCompactModal = isLineupView || isPlayerView;
 
   return (
     <Modal
@@ -294,13 +299,24 @@ export function GroupStandingsModal({
       onClose={onClose}
       title={groupPanelTitle(panelView, lineupFormation)}
       hideHeaderDivider
-      headerCompact={isLineupView}
-      scrollContent={!isLineupView}
+      headerCompact={isCompactModal}
+      scrollContent={!isCompactModal}
       className={cn(
-        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
       )}
-      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
-      wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}
+      panelHostClassName={
+        isLineupView
+          ? LINEUP_MODAL_PANEL_HOST_CLASS
+          : isPlayerView
+            ? PLAYER_MODAL_PANEL_HOST_CLASS
+            : undefined
+      }
+      wrapperClassName={cn(
+        isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+        isPlayerView && PLAYER_MODAL_WRAPPER_CLASS
+      )}
+      containerClassName={isCompactModal ? "p-1.5" : undefined}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeGroups && atStandingsRoot && !activePanelSlide

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { fetchPlayerDetailAction } from "@/actions/lineup";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { PlayerDetail } from "@/lib/lineup/player-detail";
+import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { LoadingCenter } from "@/components/ui/spinner";
 import { teamNameEs } from "@/lib/teams/display";
+import { cn } from "@/lib/utils";
 
 type PlayerDetailPanelProps = {
   teamName: string;
@@ -17,6 +18,19 @@ function statValue(value: number | string | null | undefined): string {
   if (typeof value === "number" && value === 0) return " ";
   if (value === "") return " ";
   return String(value);
+}
+
+function StatItem({ label, value }: { label: string; value: string }) {
+  if (value.trim() === "") return null;
+
+  return (
+    <div className="min-w-0">
+      <dt className="text-[8px] uppercase tracking-wide text-white/65">{label}</dt>
+      <dd className="truncate font-display text-sm font-semibold leading-tight text-white">
+        {value}
+      </dd>
+    </div>
+  );
 }
 
 export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelProps) {
@@ -63,63 +77,57 @@ export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelPro
   if (detail.goldenBoot) awards.push("Bota de Oro");
   if (detail.bestYoungPlayer) awards.push("Mejor joven");
 
+  const flagCode = teamFlagCode(teamName);
+  const displayTeam = teamNameEs(teamName);
+
   return (
-    <div className="space-y-4 px-4 py-4">
-      <div className="flex items-center gap-3">
-        <TeamFlagBadge name={teamName} size="md" />
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-lg font-bold text-[var(--tm-fg)]">
-            {detail.playerName}
-          </h3>
-          <p className="text-sm text-[var(--tm-muted)]">{teamNameEs(teamName)}</p>
+    <div className="flex flex-col items-center px-2 pb-1.5 pt-1">
+      <div className="relative w-full max-w-[11.5rem] shrink-0">
+        <div
+          className={cn(
+            "relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--tm-border)]",
+            "bg-[rgba(111,43,255,0.12)] shadow-[var(--tm-shadow-soft)]"
+          )}
+        >
+          {flagCode ? (
+            <img
+              src={teamFlagUrl(flagCode, 240)}
+              alt=""
+              width={184}
+              height={184}
+              className="h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center font-display text-2xl text-[var(--tm-accent)]">
+              {teamName.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1a0a38]/95 via-[#2a1058]/75 to-transparent px-2.5 pb-2 pt-10">
+            <p className="mb-1 truncate text-center text-[10px] font-medium text-white/80">
+              {displayTeam}
+            </p>
+            <dl className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+              <StatItem label="Dorsal" value={statValue(detail.shirtNumber)} />
+              <StatItem label="Posición" value={statValue(detail.position)} />
+              <div className="col-span-2">
+                <StatItem label="Club" value={statValue(detail.club)} />
+              </div>
+              <StatItem label="Goles en Mundiales" value={statValue(detail.worldCupGoals)} />
+              <StatItem label="Estado" value={statValue(detail.status)} />
+            </dl>
+            {awards.length > 0 ? (
+              <p className="mt-1.5 truncate text-center text-[9px] font-semibold text-[var(--tm-accent)]">
+                {awards.join(" · ")}
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3 rounded-xl border border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] p-3">
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">Dorsal</dt>
-          <dd className="font-display text-base text-[var(--tm-fg)]">
-            {statValue(detail.shirtNumber)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">Posición</dt>
-          <dd className="text-sm text-[var(--tm-fg)]">{statValue(detail.position)}</dd>
-        </div>
-        <div className="col-span-2">
-          <dt className="text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">Club</dt>
-          <dd className="truncate text-sm text-[var(--tm-fg)]">{statValue(detail.club)}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">
-            Goles en Mundiales
-          </dt>
-          <dd className="font-display text-base text-[var(--tm-fg)]">
-            {statValue(detail.worldCupGoals)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">Estado</dt>
-          <dd className="text-sm text-[var(--tm-fg)]">{statValue(detail.status)}</dd>
-        </div>
-      </dl>
-
-      {awards.length > 0 ? (
-        <div className="rounded-xl border border-[var(--tm-accent)]/30 bg-[rgba(212,255,0,0.08)] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
-            Palmarés en Mundiales
-          </p>
-          <ul className="mt-2 space-y-1">
-            {awards.map((award) => (
-              <li key={award} className="text-sm text-[var(--tm-fg)]">
-                {award}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      <p className="text-center text-[11px] text-[var(--tm-muted)]">
+      <p className="mt-1.5 whitespace-nowrap text-center text-[7px] leading-none tracking-tight text-[var(--tm-muted)]">
         Datos históricos de convocatorias y registros de Mundiales anteriores.
       </p>
     </div>

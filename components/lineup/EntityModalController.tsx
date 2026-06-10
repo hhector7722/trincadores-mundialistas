@@ -15,6 +15,9 @@ import {
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
+  PLAYER_MODAL_PANEL_CLASS,
+  PLAYER_MODAL_PANEL_HOST_CLASS,
+  PLAYER_MODAL_WRAPPER_CLASS,
 } from "@/lib/lineup/field-asset";
 import { isGoalkeeperPosition } from "@/lib/lineup/position-map";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
@@ -190,7 +193,9 @@ export function EntityModalController({
   const activePanelSlide = panelSlide ?? teamCarouselSlide;
   const isLineupView = current.kind === "lineup";
   const isMvpView = current.kind === "mvp";
+  const isPlayerView = current.kind === "player";
   const isFieldView = isLineupView || isMvpView;
+  const isCompactModal = isFieldView || isPlayerView;
 
   return (
     <Modal
@@ -202,17 +207,27 @@ export function EntityModalController({
       })}
       hideHeaderDivider
       headerTitleAlign={isMvpView ? "left" : "center"}
-      headerCompact={isFieldView}
-      scrollContent={!isFieldView}
-      containerClassName={isMvpView ? "p-1" : isLineupView ? "p-1.5" : undefined}
+      headerCompact={isCompactModal}
+      scrollContent={!isCompactModal}
+      containerClassName={
+        isMvpView ? "p-1" : isLineupView || isPlayerView ? "p-1.5" : undefined
+      }
       className={cn(
         isMvpView && "max-h-[calc(100dvh-0.5rem)]",
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         className
       )}
-      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
+      panelHostClassName={
+        isLineupView
+          ? LINEUP_MODAL_PANEL_HOST_CLASS
+          : isPlayerView
+            ? PLAYER_MODAL_PANEL_HOST_CLASS
+            : undefined
+      }
       wrapperClassName={cn(
         isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+        isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
         isMvpView && MVP_MODAL_WRAPPER_CLASS,
         wrapperClassName
       )}

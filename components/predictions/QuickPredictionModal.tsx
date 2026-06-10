@@ -22,6 +22,9 @@ import {
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
+  PLAYER_MODAL_PANEL_CLASS,
+  PLAYER_MODAL_PANEL_HOST_CLASS,
+  PLAYER_MODAL_WRAPPER_CLASS,
 } from "@/lib/lineup/field-asset";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
@@ -407,7 +410,9 @@ export function QuickPredictionModal({
   const activePanelSlide = entityPanelSlide ?? teamCarouselSlide ?? matchPanelSlide;
   const isLineupView = panelView.kind === "lineup";
   const isMvpView = panelView.kind === "mvp";
+  const isPlayerView = panelView.kind === "player";
   const isFieldView = isLineupView || isMvpView;
+  const isCompactModal = isFieldView || isPlayerView;
 
   return (
     <Modal
@@ -419,16 +424,24 @@ export function QuickPredictionModal({
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
-      headerCompact={isFieldView}
-      scrollContent={!isFieldView}
+      headerCompact={isCompactModal}
+      scrollContent={!isCompactModal}
       className={cn(
         isMvpView && "max-h-[calc(100dvh-1rem)]",
-        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
       )}
-      containerClassName={isFieldView ? "p-1.5" : undefined}
-      panelHostClassName={isLineupView ? LINEUP_MODAL_PANEL_HOST_CLASS : undefined}
+      containerClassName={isCompactModal ? "p-1.5" : undefined}
+      panelHostClassName={
+        isLineupView
+          ? LINEUP_MODAL_PANEL_HOST_CLASS
+          : isPlayerView
+            ? PLAYER_MODAL_PANEL_HOST_CLASS
+            : undefined
+      }
       wrapperClassName={cn(
         isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+        isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
         isMvpView && MVP_MODAL_WRAPPER_CLASS
       )}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
