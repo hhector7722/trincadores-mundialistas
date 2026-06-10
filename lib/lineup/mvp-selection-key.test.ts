@@ -5,6 +5,7 @@ import {
   findMvpOptionBySaved,
   mvpPlayersMatch,
   mvpSelectionKey,
+  resolveMvpSelection,
 } from "./mvp-selection-key";
 
 test("mvpSelectionKey distingue jugadores con el mismo dorsal", () => {
@@ -27,6 +28,49 @@ test("mvpPlayersMatch solo marca un jugador con dorsal duplicado", () => {
   assert.equal(mvpPlayersMatch("Mexico", { name: "Vega", shirtNumber: 10 }, vega), true);
   assert.equal(mvpPlayersMatch("Mexico", { name: "Álvarez", shirtNumber: 10 }, vega), false);
   assert.equal(mvpPlayersMatch("Mexico", { name: "Álvarez", shirtNumber: 10 }, alvarez), true);
+});
+
+test("findMvpOptionByKey no confunde jugadores con el mismo dorsal", () => {
+  const options = [
+    {
+      key: "Mexico::10::julian alvarez",
+      name: "Julian Alvarez",
+      teamName: "Mexico",
+      shirtNumber: 10,
+    },
+    {
+      key: "Mexico::10::erick vega",
+      name: "Erick Vega",
+      teamName: "Mexico",
+      shirtNumber: 10,
+    },
+  ];
+
+  assert.equal(findMvpOptionByKey(options, "Mexico::10::vega")?.name, "Erick Vega");
+  assert.equal(findMvpOptionByKey(options, "Mexico::10::alvarez")?.name, "Julian Alvarez");
+});
+
+test("resolveMvpSelection usa jugador tactico si la plantilla no coincide", () => {
+  const options = [
+    {
+      key: "Mexico::10::erick vega",
+      name: "Erick Vega",
+      teamName: "Mexico",
+      shirtNumber: 10,
+    },
+  ];
+  const lineupPlayers = [
+    { name: "Alexis Vega", teamName: "Mexico", shirtNumber: 10 },
+  ];
+
+  const resolved = resolveMvpSelection(
+    options,
+    "Mexico::10::alexis vega",
+    lineupPlayers
+  );
+
+  assert.equal(resolved?.name, "Alexis Vega");
+  assert.equal(resolved?.teamName, "Mexico");
 });
 
 test("findMvpOptionByKey resuelve nombre abreviado del campo", () => {

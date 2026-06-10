@@ -15,9 +15,9 @@ import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import {
-  findMvpOptionByKey,
   findMvpOptionBySaved,
   mvpSelectionKey,
+  resolveMvpSelection,
 } from "@/lib/lineup/mvp-selection-key";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import {
@@ -219,6 +219,35 @@ export function MvpPredictionPanel({
     [awaySquad, resolvedAwayLineup]
   );
 
+  const lineupPlayers = useMemo(() => {
+    const players: Array<{ name: string; shirtNumber: number | null; teamName: string }> = [];
+    for (const slot of awaySlots) {
+      if (!slot.isPlaceholder) {
+        players.push({
+          teamName: awayTeam,
+          name: slot.name,
+          shirtNumber: slot.shirtNumber,
+        });
+      }
+    }
+    for (const slot of homeSlots) {
+      if (!slot.isPlaceholder) {
+        players.push({
+          teamName: homeTeam,
+          name: slot.name,
+          shirtNumber: slot.shirtNumber,
+        });
+      }
+    }
+    for (const player of awayBench) {
+      players.push({ teamName: awayTeam, name: player.name, shirtNumber: player.shirtNumber });
+    }
+    for (const player of homeBench) {
+      players.push({ teamName: homeTeam, name: player.name, shirtNumber: player.shirtNumber });
+    }
+    return players;
+  }, [awaySlots, homeSlots, awayBench, homeBench, awayTeam, homeTeam]);
+
   const footerPx =
     (serverEditable ? MVP_FOOTER_PX : MVP_FOOTER_CLOSED_PX) + (error ? MVP_ERROR_PX : 0);
 
@@ -250,14 +279,14 @@ export function MvpPredictionPanel({
   }, [options, savedPlayerName, savedTeamName]);
 
   const selectedOption = useMemo(
-    () => findMvpOptionByKey(options, selectedKey) ?? null,
-    [options, selectedKey]
+    () => resolveMvpSelection(options, selectedKey, lineupPlayers) ?? null,
+    [options, selectedKey, lineupPlayers]
   );
 
   const tacticalReady = homeSlots.length + awaySlots.length >= 22;
 
   function onSave() {
-    const selected = findMvpOptionByKey(options, selectedKey);
+    const selected = resolveMvpSelection(options, selectedKey, lineupPlayers);
     if (!selected) {
       setError("Selecciona un jugador.");
       return;
@@ -388,7 +417,7 @@ export function MvpPredictionPanel({
         <div className="flex shrink-0 justify-center px-2 py-0.5 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
           <Button
             className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
-            disabled={!selectedKey || pending}
+            disabled={!selectedOption || pending}
             onClick={onSave}
             title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
           >
