@@ -34,15 +34,10 @@ export function LineupMetaLine({
   const updatedLabel = fetchedAt ? formatFetchedAt(fetchedAt) : null;
 
   return (
-    <div
-      className={cn(
-        "shrink-0 space-y-0.5 border-t border-[var(--tm-border)]/60 px-2 py-2 text-center",
-        className
-      )}
-    >
-      <p className="min-h-[14px] text-[10px] font-semibold uppercase leading-snug tracking-wide text-[var(--tm-fg)]">
+    <div className={cn("shrink-0 text-center", className)}>
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
         {teamName ? (
-          <span className="inline-flex flex-wrap items-center justify-center gap-1">
+          <span className="inline-flex items-center justify-center gap-1">
             <TeamFlagBadge name={teamName} size="xs" />
             <span>{teamNameEs(teamName)}</span>
             <span className="text-[var(--tm-muted)]">·</span>
@@ -53,12 +48,8 @@ export function LineupMetaLine({
         </span>
       </p>
       {updatedLabel ? (
-        <p className="min-h-[12px] text-[9px] leading-snug text-[var(--tm-muted)]">
-          Actualizado {updatedLabel}
-        </p>
-      ) : (
-        <p className="min-h-[12px]" aria-hidden="true" />
-      )}
+        <p className="mt-0.5 text-[9px] text-[var(--tm-muted)]">Actualizado {updatedLabel}</p>
+      ) : null}
     </div>
   );
 }

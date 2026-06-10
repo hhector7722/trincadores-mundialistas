@@ -184,14 +184,9 @@ export function EntityModalController({
       containerClassName={isFieldView ? "p-1" : undefined}
       className={cn(
         isFieldView && "max-h-[calc(100dvh-0.5rem)]",
-        current.kind === "mvp" && "max-h-[calc(100dvh-1rem)]",
         className
       )}
-      wrapperClassName={cn(
-        current.kind === "lineup" && LINEUP_MODAL_WRAPPER_CLASS,
-        current.kind === "mvp" && "max-w-[min(100vw-0.5rem,42rem)]",
-        wrapperClassName
-      )}
+      wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"
       onSwipeLeft={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined
@@ -201,9 +196,7 @@ export function EntityModalController({
       }
       belowPanel={
         canSwipeTeams && atLineupCarousel ? (
-          <div className="mt-2 shrink-0 pb-2 pt-1">
-            <CarouselSwipeDots activeIndex={teamCarouselIndex} total={carouselTeams?.length ?? 0} />
-          </div>
+          <CarouselSwipeDots activeIndex={teamCarouselIndex} total={carouselTeams?.length ?? 0} />
         ) : undefined
       }
       onBack={canGoBack && !isSliding && !isCarouselSliding ? pop : undefined}

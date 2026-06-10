@@ -5,7 +5,7 @@ import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
-import { useFitLineupLayout } from "@/components/lineup/use-fit-lineup-layout";
+import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
@@ -23,8 +23,8 @@ type LineupModalPanelProps = {
   selectionBlockedMessage?: string;
 };
 
-const LINEUP_META_PX = 56;
-const LINEUP_PICK_MSG_PX = 18;
+const LINEUP_META_PX = 28;
+const LINEUP_PICK_MSG_PX = 16;
 
 export function LineupModalPanel({
   teamName,
@@ -74,14 +74,15 @@ export function LineupModalPanel({
   const bench =
     squad && resolvedLineup ? resolveBenchPlayers(squad, resolvedLineup) : [];
 
-  const pickMsgPx =
-    selectionMode === "pick" && selectionBlockedMessage ? LINEUP_PICK_MSG_PX : 0;
+  const footerPx =
+    LINEUP_META_PX +
+    (selectionMode === "pick" && selectionBlockedMessage ? LINEUP_PICK_MSG_PX : 0);
 
-  const fitLayout = useFitLineupLayout(layoutRef, {
-    benchCount: bench.length,
-    metaPx: LINEUP_META_PX + pickMsgPx,
+  const fitLayout = useFitFieldModalLayout(layoutRef, {
+    awayBenchCount: bench.length,
+    homeBenchCount: 0,
+    footerPx,
     enabled: !loading && Boolean(resolvedLineup),
-    gapPx: 4,
   });
 
   function handlePlayerInteraction(playerName: string) {
@@ -123,46 +124,49 @@ export function LineupModalPanel({
   return (
     <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       {selectionMode === "pick" && selectionBlockedMessage ? (
-        <p className="shrink-0 px-2 py-1 text-center text-[9px] leading-snug text-[var(--tm-muted)]">
+        <p className="shrink-0 px-2 py-0.5 text-center text-[9px] text-[var(--tm-muted)]">
           {selectionBlockedMessage}
         </p>
       ) : null}
 
-      {bench.length > 0 ? (
-        <BenchPlayersStrip
-          teamName={teamName}
-          players={bench}
-          density="secondary"
-          showTeamHeader={false}
-          gridLayout={fitLayout?.bench}
-          position="top"
-          className="shrink-0 px-1 pt-0.5"
-          onPlayerClick={(player) => handlePlayerInteraction(player.name)}
-        />
-      ) : null}
-
-      <LineupFieldGate className="flex shrink-0 flex-col items-center justify-center overflow-visible px-1">
+      <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {(markFieldReady) => (
-          <TeamLineupGraphic
-            slots={lineupResolved.slots}
-            teamName={teamName}
-            squadPlayerNames={squad.players.map((player) => player.player_name)}
-            size="modal"
-            onPlayerClick={handlePlayerInteraction}
-            onFieldReady={markFieldReady}
-            widthPx={fitLayout?.fieldWidthPx}
-            heightPx={fitLayout?.fieldHeightPx}
-            chipScale={1}
-          />
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
+            {bench.length > 0 ? (
+              <BenchPlayersStrip
+                teamName={teamName}
+                players={bench}
+                density="minimal"
+                showTeamHeader={false}
+                gridLayout={fitLayout?.awayBench}
+                position="top"
+                onPlayerClick={(player) => handlePlayerInteraction(player.name)}
+              />
+            ) : null}
+
+            <div className="flex shrink-0 items-center justify-center overflow-visible">
+              <TeamLineupGraphic
+                slots={lineupResolved.slots}
+                teamName={teamName}
+                squadPlayerNames={squad.players.map((player) => player.player_name)}
+                size="modal"
+                onPlayerClick={handlePlayerInteraction}
+                onFieldReady={markFieldReady}
+                widthPx={fitLayout?.fieldWidthPx}
+                heightPx={fitLayout?.fieldHeightPx}
+                chipScale={fitLayout?.chipScale}
+              />
+            </div>
+          </div>
         )}
       </LineupFieldGate>
 
       <LineupMetaLine
+        className="shrink-0 px-1 py-0.5"
         teamName={teamName}
         sourceKind={lineupResolved.sourceKind}
         formationLabel={lineupResolved.formationLabel}
         fetchedAt={lineupResolved.fetchedAt}
-        className="mt-auto"
       />
     </div>
   );
