@@ -45,18 +45,29 @@ export function useFitMvpLayout(
       const rect = node!.getBoundingClientRect();
       if (rect.width < 1 || rect.height < 1) return;
 
-      setLayout(
-        computeFitMvpHorizontalLayout({
-          widthPx: rect.width,
-          heightPx: rect.height,
-          awayBenchCount,
-          homeBenchCount,
-          footerPx,
-          formationRowPx,
-          headerPx,
-          gapPx,
-        })
-      );
+      const next = computeFitMvpHorizontalLayout({
+        widthPx: rect.width,
+        heightPx: rect.height,
+        awayBenchCount,
+        homeBenchCount,
+        footerPx,
+        formationRowPx,
+        headerPx,
+        gapPx,
+      });
+
+      setLayout((prev) => {
+        if (
+          prev &&
+          Math.round(prev.fieldWidthPx) === Math.round(next.fieldWidthPx) &&
+          Math.round(prev.fieldHeightPx) === Math.round(next.fieldHeightPx) &&
+          prev.awayBench.heightPx === next.awayBench.heightPx &&
+          prev.homeBench.heightPx === next.homeBench.heightPx
+        ) {
+          return prev;
+        }
+        return next;
+      });
     }
 
     measure();

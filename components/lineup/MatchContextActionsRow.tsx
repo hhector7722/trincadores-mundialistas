@@ -32,7 +32,7 @@ export function MatchContextActionsRow({
       <div className={className}>
         <div className="relative min-h-[2.75rem] w-full">
           <div
-            className="absolute top-0 w-max max-w-[38%] -translate-x-1/2"
+            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
             style={{ left: homeAnchor }}
           >
             <MatchContextActionButton
@@ -41,7 +41,7 @@ export function MatchContextActionsRow({
               onClick={onOpenHomeLineup}
             />
           </div>
-          <div className="absolute inset-x-0 top-0 z-[2] px-1">
+          <div className="absolute left-1/2 top-0 z-[1] w-max max-w-[44%] -translate-x-1/2 px-1">
             <MatchContextActionButton
               caption="Posibles alineaciones"
               hideCaption={compact}
@@ -49,7 +49,7 @@ export function MatchContextActionsRow({
             />
           </div>
           <div
-            className="absolute top-0 w-max max-w-[38%] -translate-x-1/2"
+            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
             style={{ left: awayAnchor }}
           >
             <MatchContextActionButton

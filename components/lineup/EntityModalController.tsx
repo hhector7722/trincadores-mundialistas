@@ -14,6 +14,7 @@ import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
+  MVP_MODAL_PANEL_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
   PLAYER_MODAL_PANEL_CLASS,
   PLAYER_MODAL_PANEL_HOST_CLASS,
@@ -99,7 +100,6 @@ function renderEntityView(
           awayTeam={view.awayTeam}
           serverEditable={false}
           preview
-          onFormationsChange={handlers.onMvpFormationsChange}
         />
       );
     default:
@@ -232,7 +232,8 @@ export function EntityModalController({
             : undefined
       }
       className={cn(
-        (isMvpView || isPossibleLineupsView) && "max-h-[calc(100dvh-0.5rem)]",
+        (isMvpView || isPossibleLineupsView) &&
+          cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         className

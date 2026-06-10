@@ -23,3 +23,9 @@ export const PLAYER_MODAL_PANEL_HOST_CLASS = "w-max";
 
 /** Modal MVP: dos equipos en campo horizontal. */
 export const MVP_MODAL_WRAPPER_CLASS = "max-w-[min(100vw-1rem,32rem)]";
+
+/** Altura fija del panel MVP/preview para evitar bucles de ResizeObserver. */
+export const MVP_MODAL_PANEL_CLASS = "h-[min(calc(100dvh-5rem),26rem)]";
+
+/** Cuerpo medible del campo MVP (cabecera del modal aparte). */
+export const MVP_MODAL_BODY_CLASS = "h-[min(calc(100dvh-6.5rem),24rem)]";
