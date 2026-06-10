@@ -35,25 +35,19 @@ export function MatchContextActionButton({
         </p>
       ) : null}
       {saved ? (
-        <div className="relative w-0 min-w-full">
-          <button
-            type="button"
-            onClick={onClick}
-            className="block w-full truncate text-center font-display text-[10px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80 sm:text-xs"
-          >
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={showEdit ? `Editar ${caption}: ${savedValue}` : savedValue ?? caption}
+          className="flex w-full min-w-0 items-center justify-center gap-0.5 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+        >
+          <span className="truncate text-center font-display text-[10px] font-semibold normal-case sm:text-xs">
             {savedValue}
-          </button>
+          </span>
           {showEdit ? (
-            <button
-              type="button"
-              onClick={onClick}
-              aria-label={`Editar ${caption}`}
-              className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-            >
-              <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-            </button>
+            <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
           ) : null}
-        </div>
+        </button>
       ) : (
         <button
           type="button"

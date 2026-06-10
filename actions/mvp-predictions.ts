@@ -32,9 +32,6 @@ export async function fetchSavedMvpPrediction(poolId: string, matchId: string) {
   const member = await assertPoolMembership(user.id, poolId);
   if (!member) return null;
 
-  const inPool = await assertMatchInPool(poolId, matchId);
-  if (!inPool) return null;
-
   return getMvpPredictionForMatch(poolId, user.id, matchId);
 }
 

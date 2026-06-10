@@ -289,15 +289,17 @@ export function QuickPredictionModal({
     const fromProps =
       mvpPlayerNameFromMatch(viewMatch) ||
       mvpPlayerNameFromMatch(match) ||
-      mvpOverrides[viewMatch.id]?.player_name?.trim() ||
       null;
-    setMvpPlayerName(fromProps);
+    if (fromProps) setMvpPlayerName(fromProps);
 
     let cancelled = false;
-    void fetchSavedMvpPlayerName(poolId, viewMatch.id).then((name) => {
-      if (cancelled) return;
-      setMvpPlayerName(name ?? fromProps);
-    });
+    void fetchSavedMvpPlayerName(poolId, viewMatch.id)
+      .then((name) => {
+        if (!cancelled && name) setMvpPlayerName(name);
+      })
+      .catch(() => {
+        if (!cancelled && fromProps) setMvpPlayerName(fromProps);
+      });
 
     return () => {
       cancelled = true;
@@ -310,7 +312,6 @@ export function QuickPredictionModal({
     viewMatch.mvpPrediction?.updated_at,
     match.mvpPrediction?.player_name,
     match.mvpPrediction?.updated_at,
-    mvpOverrides,
   ]);
 
   useEffect(() => () => clearMatchSlideTimer(), [clearMatchSlideTimer]);
