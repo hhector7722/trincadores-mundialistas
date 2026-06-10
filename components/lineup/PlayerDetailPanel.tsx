@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { fetchPlayerDetailAction } from "@/actions/lineup";
 import type { PlayerDetail } from "@/lib/lineup/player-detail";
 import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
@@ -29,6 +29,31 @@ function StatItem({ label, value }: { label: string; value: string }) {
         {value}
       </dd>
     </div>
+  );
+}
+
+function TeamFlagHero({ teamName, flagCode }: { teamName: string; flagCode: string }): ReactNode {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-[rgba(111,43,255,0.12)] font-display text-2xl text-[var(--tm-accent)]">
+        {teamName.slice(0, 2).toUpperCase()}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={teamFlagUrl(flagCode, 320)}
+      alt=""
+      width={184}
+      height={184}
+      className="aspect-square w-full rounded-xl object-cover"
+      loading="eager"
+      decoding="async"
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -83,15 +108,7 @@ export function PlayerDetailPanel({ teamName, playerName }: PlayerDetailPanelPro
     <div className="flex flex-col items-center px-2 pb-1.5 pt-1">
       <div className="relative w-full max-w-[11.5rem] shrink-0">
         {flagCode ? (
-          <img
-            src={teamFlagUrl(flagCode, 240)}
-            alt=""
-            width={184}
-            height={184}
-            className="aspect-square w-full rounded-xl object-cover"
-            loading="eager"
-            decoding="async"
-          />
+          <TeamFlagHero teamName={teamName} flagCode={flagCode} />
         ) : (
           <div className="flex aspect-square w-full items-center justify-center rounded-xl font-display text-2xl text-[var(--tm-accent)]">
             {teamName.slice(0, 2).toUpperCase()}

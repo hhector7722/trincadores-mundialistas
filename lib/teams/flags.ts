@@ -56,6 +56,17 @@ export function teamFlagCode(teamName: string): string | null {
   return FLAG_CODE_BY_TEAM_SLUG[toSlug(teamName)] ?? null;
 }
 
+/** Anchos soportados por flagcdn.com (otros devuelven 404). */
+const FLAGCDN_WIDTHS = [20, 40, 80, 160, 320, 640] as const;
+
+/** Ajusta al ancho flagcdn más cercano para evitar URLs rotas (p. ej. w240 → w320). */
+export function nearestFlagcdnWidth(requested: number): number {
+  return FLAGCDN_WIDTHS.reduce((best, candidate) =>
+    Math.abs(candidate - requested) < Math.abs(best - requested) ? candidate : best
+  );
+}
+
 export function teamFlagUrl(flagCode: string, width = 80): string {
-  return `https://flagcdn.com/w${width}/${flagCode}.png`;
+  const w = nearestFlagcdnWidth(width);
+  return `https://flagcdn.com/w${w}/${flagCode}.png`;
 }
