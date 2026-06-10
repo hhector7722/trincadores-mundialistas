@@ -4,7 +4,11 @@ import { HorizontalPitchSurface } from "@/components/lineup/HorizontalPitchSurfa
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { HORIZONTAL_PITCH_ASPECT } from "@/lib/lineup/fit-mvp-horizontal-layout";
 import type { MvpHorizontalSlot } from "@/lib/lineup/mvp-horizontal-geometry";
-import { mvpPlayersMatch, mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
+import {
+  mvpPlayersMatch,
+  mvpSelectionKey,
+  type MvpSelectablePlayer,
+} from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -17,7 +21,7 @@ type MvpHorizontalFieldGraphicProps = {
   awaySquadPlayerNames?: string[];
   homeSquadPlayerNames?: string[];
   selectedKey: string | null;
-  selectedPlayer?: (MvpHorizontalSlot & { teamName: string }) | null;
+  selectedPlayer?: (MvpSelectablePlayer & { teamName: string }) | null;
   disabled?: boolean;
   onSelect: (key: string) => void;
   onFieldReady?: () => void;
