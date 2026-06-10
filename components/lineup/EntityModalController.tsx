@@ -188,8 +188,8 @@ export function EntityModalController({
         className
       )}
       wrapperClassName={cn(
-        isFieldView && LINEUP_MODAL_WRAPPER_CLASS,
-        current.kind === "mvp" && "max-w-[min(100vw-1rem,28rem)]",
+        current.kind === "lineup" && LINEUP_MODAL_WRAPPER_CLASS,
+        current.kind === "mvp" && "max-w-[min(100vw-0.5rem,42rem)]",
         wrapperClassName
       )}
       backdropClassName="bg-[#2a1058]/40 backdrop-blur-[2px]"

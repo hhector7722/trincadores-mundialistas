@@ -5,7 +5,7 @@ import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
-import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
+import { useFitLineupLayout } from "@/components/lineup/use-fit-lineup-layout";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
@@ -23,7 +23,7 @@ type LineupModalPanelProps = {
   selectionBlockedMessage?: string;
 };
 
-const LINEUP_META_PX = 52;
+const LINEUP_META_PX = 56;
 const LINEUP_PICK_MSG_PX = 18;
 
 export function LineupModalPanel({
@@ -77,12 +77,10 @@ export function LineupModalPanel({
   const pickMsgPx =
     selectionMode === "pick" && selectionBlockedMessage ? LINEUP_PICK_MSG_PX : 0;
 
-  const fitLayout = useFitFieldModalLayout(layoutRef, {
-    awayBenchCount: bench.length,
-    homeBenchCount: 0,
-    footerPx: LINEUP_META_PX + pickMsgPx,
+  const fitLayout = useFitLineupLayout(layoutRef, {
+    benchCount: bench.length,
+    metaPx: LINEUP_META_PX + pickMsgPx,
     enabled: !loading && Boolean(resolvedLineup),
-    mode: "lineup",
     gapPx: 4,
   });
 
@@ -139,7 +137,7 @@ export function LineupModalPanel({
                 players={bench}
                 density="secondary"
                 showTeamHeader={false}
-                gridLayout={fitLayout?.awayBench}
+                gridLayout={fitLayout?.bench}
                 position="top"
                 onPlayerClick={(player) => handlePlayerInteraction(player.name)}
               />

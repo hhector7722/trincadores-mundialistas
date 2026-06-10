@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
-import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
+import { useFitLineupLayout } from "@/components/lineup/use-fit-lineup-layout";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
@@ -27,7 +27,7 @@ type ProbableXIProps = {
   className?: string;
 };
 
-const LINEUP_META_PX = 52;
+const LINEUP_META_PX = 56;
 
 function formationHref(teamSlug: string, formation: FormationId, year?: number | null): string {
   const params = new URLSearchParams();
@@ -58,12 +58,10 @@ export function ProbableXI({
   const bench =
     squad && lineup ? resolveBenchPlayers(squad, lineup) : [];
 
-  const fitLayout = useFitFieldModalLayout(layoutRef, {
-    awayBenchCount: bench.length,
-    homeBenchCount: 0,
-    footerPx: LINEUP_META_PX,
+  const fitLayout = useFitLineupLayout(layoutRef, {
+    benchCount: bench.length,
+    metaPx: LINEUP_META_PX,
     enabled: Boolean(lineup),
-    mode: "lineup",
     gapPx: 4,
   });
 
@@ -145,7 +143,7 @@ export function ProbableXI({
                   players={bench}
                   density="secondary"
                   showTeamHeader={false}
-                  gridLayout={fitLayout?.awayBench}
+                  gridLayout={fitLayout?.bench}
                   position="top"
                   onPlayerClick={() => {}}
                 />
