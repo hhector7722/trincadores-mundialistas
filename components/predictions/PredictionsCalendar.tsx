@@ -100,7 +100,7 @@ function CalendarMatchCard({
       onClick={onOpen}
       {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
       className={cn(
-        "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden transition-colors",
+        "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]"
       )}
     >
