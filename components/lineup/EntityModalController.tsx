@@ -170,7 +170,9 @@ export function EntityModalController({
       : null;
 
   const activePanelSlide = panelSlide ?? teamCarouselSlide;
-  const isFieldView = current.kind === "lineup" || current.kind === "mvp";
+  const isLineupView = current.kind === "lineup";
+  const isMvpView = current.kind === "mvp";
+  const isFieldView = isLineupView || isMvpView;
 
   return (
     <Modal
@@ -178,12 +180,13 @@ export function EntityModalController({
       onClose={onClose}
       title={entityModalTitleContent(current, mvpFormations)}
       hideHeaderDivider
-      headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
-      headerCompact={isFieldView}
-      scrollContent={!isFieldView}
-      containerClassName={isFieldView ? "p-1" : undefined}
+      headerTitleAlign={isMvpView ? "left" : "center"}
+      headerCompact={isMvpView}
+      scrollContent={!isMvpView}
+      containerClassName={isMvpView ? "p-1" : undefined}
       className={cn(
-        isFieldView && "max-h-[calc(100dvh-0.5rem)]",
+        isMvpView && "max-h-[calc(100dvh-0.5rem)]",
+        isLineupView && "max-h-[calc(100dvh-1rem)]",
         className
       )}
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}

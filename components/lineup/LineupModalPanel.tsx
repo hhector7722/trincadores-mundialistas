@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
-import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
@@ -23,9 +22,6 @@ type LineupModalPanelProps = {
   selectionBlockedMessage?: string;
 };
 
-const LINEUP_META_PX = 28;
-const LINEUP_PICK_MSG_PX = 16;
-
 export function LineupModalPanel({
   teamName,
   matchId,
@@ -34,7 +30,6 @@ export function LineupModalPanel({
   playerFilter,
   selectionBlockedMessage,
 }: LineupModalPanelProps) {
-  const layoutRef = useRef<HTMLDivElement>(null);
   const [squad, setSquad] = useState<TeamSquadWithPlayers | null>(null);
   const [lineup, setLineup] = useState<ResolvedLineup | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,34 +62,6 @@ export function LineupModalPanel({
 
   const displayName = teamNameEs(teamName);
 
-  const resolvedLineup =
-    !loading && squad && squad.players.length > 0
-      ? lineup ?? buildFallbackLineup(squad.players)
-      : null;
-  const bench =
-    squad && resolvedLineup ? resolveBenchPlayers(squad, resolvedLineup) : [];
-
-  const footerPx =
-    LINEUP_META_PX +
-    (selectionMode === "pick" && selectionBlockedMessage ? LINEUP_PICK_MSG_PX : 0);
-
-  const fitLayout = useFitFieldModalLayout(layoutRef, {
-    awayBenchCount: bench.length,
-    homeBenchCount: 0,
-    footerPx,
-    enabled: !loading && Boolean(resolvedLineup),
-  });
-
-  function handlePlayerInteraction(playerName: string) {
-    if (selectionMode === "pick" && playerFilter && squad) {
-      const player = squad.players.find((p) => p.player_name === playerName);
-      if (!playerFilter(player?.position ?? null)) {
-        return;
-      }
-    }
-    onPlayerClick(playerName);
-  }
-
   if (loading) {
     return <LoadingCenter label="Cargando plantilla…" />;
   }
@@ -119,55 +86,61 @@ export function LineupModalPanel({
     );
   }
 
-  const lineupResolved = resolvedLineup!;
+  const resolvedLineup = lineup ?? buildFallbackLineup(squad.players);
+  const bench = resolveBenchPlayers(squad, resolvedLineup);
+
+  function handlePlayerInteraction(playerName: string) {
+    if (selectionMode === "pick" && playerFilter && squad) {
+      const player = squad.players.find((p) => p.player_name === playerName);
+      if (!playerFilter(player?.position ?? null)) {
+        return;
+      }
+    }
+    onPlayerClick(playerName);
+  }
 
   return (
-    <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col">
       {selectionMode === "pick" && selectionBlockedMessage ? (
-        <p className="shrink-0 px-2 py-0.5 text-center text-[9px] text-[var(--tm-muted)]">
+        <p className="shrink-0 px-3 py-1 text-center text-[9px] text-[var(--tm-muted)]">
           {selectionBlockedMessage}
         </p>
       ) : null}
-
-      <LineupFieldGate className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 py-0.5">
             {bench.length > 0 ? (
               <BenchPlayersStrip
                 teamName={teamName}
                 players={bench}
                 density="minimal"
                 showTeamHeader={false}
-                gridLayout={fitLayout?.awayBench}
                 position="top"
                 onPlayerClick={(player) => handlePlayerInteraction(player.name)}
               />
             ) : null}
 
-            <div className="flex shrink-0 items-center justify-center overflow-visible">
+            <div className="flex min-h-[14rem] flex-1 items-center justify-center py-0.5">
               <TeamLineupGraphic
-                slots={lineupResolved.slots}
+                slots={resolvedLineup.slots}
                 teamName={teamName}
                 squadPlayerNames={squad.players.map((player) => player.player_name)}
                 size="modal"
                 onPlayerClick={handlePlayerInteraction}
                 onFieldReady={markFieldReady}
-                widthPx={fitLayout?.fieldWidthPx}
-                heightPx={fitLayout?.fieldHeightPx}
-                chipScale={fitLayout?.chipScale}
               />
             </div>
+
+            <LineupMetaLine
+              className="mt-0.5"
+              teamName={teamName}
+              sourceKind={resolvedLineup.sourceKind}
+              formationLabel={resolvedLineup.formationLabel}
+              fetchedAt={resolvedLineup.fetchedAt}
+            />
           </div>
         )}
       </LineupFieldGate>
-
-      <LineupMetaLine
-        className="shrink-0 px-1 py-0.5"
-        teamName={teamName}
-        sourceKind={lineupResolved.sourceKind}
-        formationLabel={lineupResolved.formationLabel}
-        fetchedAt={lineupResolved.fetchedAt}
-      />
     </div>
   );
 }
