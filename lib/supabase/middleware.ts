@@ -12,6 +12,7 @@ const AUTH_PATHS = ["/login"];
 const ONBOARDING_PATHS = ["/bienvenida"];
 const RESTORE_PATH = "/api/auth/restore";
 const PHONE_LOGIN_PATH = "/api/auth/phone-login";
+const CRON_PATH = "/api/cron";
 
 const PUBLIC_PATHS = [
   "/manifest.webmanifest",
@@ -34,6 +35,10 @@ function isRestorePath(pathname: string): boolean {
 
 function isPhoneLoginPath(pathname: string): boolean {
   return pathname === PHONE_LOGIN_PATH || pathname.startsWith(`${PHONE_LOGIN_PATH}/`);
+}
+
+function isCronPath(pathname: string): boolean {
+  return pathname === CRON_PATH || pathname.startsWith(`${CRON_PATH}/`);
 }
 
 function isPublicPath(pathname: string): boolean {
@@ -91,7 +96,12 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (isPublicPath(pathname) || isRestorePath(pathname) || isPhoneLoginPath(pathname)) {
+  if (
+    isPublicPath(pathname) ||
+    isRestorePath(pathname) ||
+    isPhoneLoginPath(pathname) ||
+    isCronPath(pathname)
+  ) {
     return supabaseResponse;
   }
 
