@@ -226,7 +226,6 @@ function DayCell({
   }
 
   const hasMatches = cell.matches.length > 0;
-  const isToday = cell.dateKey === todayKey;
 
   return (
     <div
@@ -240,8 +239,7 @@ function DayCell({
       {!hideDayNumber ? (
         <span
           className={cn(
-            "tm-cal-day-num shrink-0 font-semibold tabular-nums",
-            isToday ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]"
+            "tm-cal-day-num shrink-0 font-semibold tabular-nums text-black"
           )}
         >
           {cell.dayNumber}

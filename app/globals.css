@@ -1462,14 +1462,15 @@ html:has(.tm-app-frame) {
 }
 
 .tm-porra-calendar .tm-cal-cell,
-.tm-porra-calendar .tm-cal-cell-pad {
+.tm-porra-calendar .tm-cal-cell-pad,
+.tm-porra-calendar .tm-cal-cell-surface {
   min-width: 0;
   overflow: hidden;
-  background: var(--tm-cal-cell-bg);
+  background: #fff;
 }
 
 .tm-porra-calendar .tm-cal-cell--matches {
-  background: rgba(212, 255, 0, 0.035);
+  background: #fff;
 }
 
 .tm-porra-calendar .tm-cal-match-card {
@@ -1537,6 +1538,7 @@ html:has(.tm-app-frame) {
 .tm-porra-calendar .tm-cal-day-num {
   font-size: 0.375rem;
   line-height: 1;
+  color: #000;
 }
 
 .tm-porra-calendar .tm-cal-flags {
@@ -1761,7 +1763,7 @@ html:has(.tm-app-frame) {
 }
 
 .tm-porra-calendar .tm-cal-cell-surface {
-  background: var(--tm-cal-cell-bg);
+  background: #fff;
 }
 
 .tm-porra-calendar .tm-cal-dock-surface {
