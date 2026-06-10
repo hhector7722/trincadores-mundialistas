@@ -30,7 +30,7 @@ export function MvpBenchColumn({
   if (players.length === 0) return null;
 
   const labels = squadDisplayNames(players.map((player) => player.name));
-  const useFitGrid = Boolean(gridLayout && gridLayout.columns > 0);
+  const fontPx = gridLayout?.nameFontPx ?? 10;
 
   return (
     <section
@@ -39,69 +39,53 @@ export function MvpBenchColumn({
         align === "right" ? "text-right" : "text-left",
         className
       )}
-      style={useFitGrid ? { height: gridLayout!.heightPx } : undefined}
+      style={gridLayout?.heightPx ? { minHeight: gridLayout.heightPx } : undefined}
     >
-      <div
+      <p
         className={cn(
-          "grid h-full gap-x-0.5 gap-y-0.5 overflow-hidden",
-          align === "right" && "justify-items-end"
+          "m-0 w-full leading-snug",
+          align === "right" && "text-right"
         )}
-        style={
-          useFitGrid
-            ? {
-                gridTemplateColumns: `repeat(${gridLayout!.columns}, minmax(0, 1fr))`,
-              }
-            : { gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }
-        }
+        style={{ fontSize: fontPx }}
       >
         {players.map((player, index) => {
           const key = mvpSelectionKey(teamName, player);
           const active = selectedKey === key;
+          const dorsal = player.shirtNumber ?? "—";
 
           return (
-            <button
-              key={key}
-              type="button"
-              disabled={disabled}
-              onClick={() => onPlayerClick(player)}
-              className={cn(
-                "flex min-h-0 w-full flex-col items-center justify-center rounded-sm px-0 py-0 text-center transition-colors",
-                align === "right" && "items-end",
-                "hover:opacity-90 active:opacity-80",
-                active && "bg-[rgba(212,255,0,0.14)] ring-1 ring-[var(--tm-accent)]/40",
-                disabled && "opacity-60"
-              )}
-              style={
-                useFitGrid
-                  ? { minHeight: gridLayout!.rowHeightPx, height: gridLayout!.rowHeightPx }
-                  : undefined
-              }
-            >
-              <span
+            <span key={key} className="inline">
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onPlayerClick(player)}
                 className={cn(
-                  "font-display font-bold leading-none",
-                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
+                  "inline min-h-6 touch-manipulation rounded-sm px-0.5 py-0 align-baseline transition-colors",
+                  "hover:opacity-90 active:opacity-80",
+                  active && "bg-[rgba(212,255,0,0.14)] ring-1 ring-[var(--tm-accent)]/40",
+                  disabled && "opacity-60"
                 )}
-                style={{ fontSize: gridLayout?.numberFontPx ?? 10 }}
               >
-                {player.shirtNumber ?? "—"}
-              </span>
-              <span
-                className={cn(
-                  "whitespace-normal break-words text-center leading-tight",
-                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]/85"
-                )}
-                style={{
-                  fontSize: gridLayout?.nameFontPx ?? 9,
-                  fontWeight: 500,
-                }}
-              >
-                {labels[index]}
-              </span>
-            </button>
+                <span className="font-display font-bold text-[var(--tm-accent)]">{dorsal}</span>
+                <span
+                  className={cn(
+                    "font-medium",
+                    active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]/90"
+                  )}
+                >
+                  {" "}
+                  {labels[index]}
+                </span>
+              </button>
+              {index < players.length - 1 ? (
+                <span className="text-[var(--tm-muted)]" aria-hidden>
+                  ,{" "}
+                </span>
+              ) : null}
+            </span>
           );
         })}
-      </div>
+      </p>
     </section>
   );
 }

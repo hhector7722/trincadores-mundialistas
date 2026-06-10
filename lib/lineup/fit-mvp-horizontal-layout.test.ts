@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { pickBenchGrid } from "./bench-grid-layout";
 import {
   computeFitMvpHorizontalLayout,
+  estimateMvpInlineBenchLayout,
   HORIZONTAL_PITCH_ASPECT,
 } from "./fit-mvp-horizontal-layout";
-
 describe("computeFitMvpHorizontalLayout", () => {
   it("distribuye convocatorias en varias filas", () => {
     const layout = computeFitMvpHorizontalLayout({
@@ -64,23 +63,10 @@ describe("computeFitMvpHorizontalLayout", () => {
   });
 });
 
-describe("pickBenchGrid MVP", () => {
-  it("limita columnas en columnas estrechas", () => {
-    const grid = pickBenchGrid(
-      12,
-      72,
-      {
-        rowHeight: 24,
-        nameFont: 9,
-        numberFont: 10,
-        minRowHeight: 22,
-        minNameFont: 8,
-        minNumberFont: 9,
-      },
-      { minRows: 2, maxRows: 3, maxColumns: 6 }
-    );
-
-    expect(grid.rows).toBeGreaterThanOrEqual(2);
-    expect(grid.columns).toBeLessThanOrEqual(6);
+describe("estimateMvpInlineBenchLayout", () => {
+  it("envuelve reservas en varias líneas según ancho del campo", () => {
+    const layout = estimateMvpInlineBenchLayout(12, 360);
+    expect(layout.rows).toBeGreaterThanOrEqual(2);
+    expect(layout.nameFontPx).toBe(10);
   });
 });
