@@ -1,6 +1,7 @@
 "use client";
 
-import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
+import { useState } from "react";
+import { CalendarDataAccessModal } from "@/components/predictions/CalendarDataAccessModal";
 import { cn } from "@/lib/utils";
 
 type CalendarSidebarAccessDockProps = {
@@ -16,28 +17,29 @@ export function CalendarSidebarAccessDock({
   onOpenSquads,
   className,
 }: CalendarSidebarAccessDockProps) {
-  const { navigate } = useAppNavigation();
+  const [dataAccessOpen, setDataAccessOpen] = useState(false);
 
   return (
-    <div className={cn("tm-cal-sidebar-access-dock shrink-0", className)}>
-      <div className="tm-cal-sidebar-access-grid">
-        <button
-          type="button"
-          onClick={() => navigate("/predictions/knockout")}
-          className="tm-cal-sidebar-access-btn"
-        >
-          Ver cuadro
-        </button>
-        <button type="button" onClick={onOpenAllGroups} className="tm-cal-sidebar-access-btn">
-          Ver grupos
-        </button>
-        <button type="button" onClick={onOpenStats} className="tm-cal-sidebar-access-btn">
-          Ver stats
-        </button>
-        <button type="button" onClick={onOpenSquads} className="tm-cal-sidebar-access-btn">
-          Ver equipos
-        </button>
+    <>
+      <div className={cn("tm-cal-sidebar-access-dock shrink-0", className)}>
+        <div className="tm-cal-sidebar-access-grid">
+          <button
+            type="button"
+            onClick={() => setDataAccessOpen(true)}
+            className="tm-cal-sidebar-access-btn"
+          >
+            Ver datos
+          </button>
+        </div>
       </div>
-    </div>
+
+      <CalendarDataAccessModal
+        open={dataAccessOpen}
+        onClose={() => setDataAccessOpen(false)}
+        onOpenAllGroups={onOpenAllGroups}
+        onOpenStats={onOpenStats}
+        onOpenSquads={onOpenSquads}
+      />
+    </>
   );
 }

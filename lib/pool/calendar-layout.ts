@@ -25,10 +25,10 @@ const MIN_GROUPS_FLAG_PX = 7;
 const MIN_PREDICTION_FS_PX = 4;
 const MAX_PREDICTION_FS_RATIO = 0.62;
 const ACCESS_DOCK_GRID_GAP_PX = 9;
-const ACCESS_DOCK_COLS = 2;
-const ACCESS_DOCK_ROWS = 2;
-const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.78;
-const ACCESS_DOCK_LONGEST_LABEL = "VER EQUIPOS";
+const ACCESS_DOCK_COLS = 1;
+const ACCESS_DOCK_ROWS = 1;
+const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.92;
+const ACCESS_DOCK_LONGEST_LABEL = "VER DATOS";
 const ACCESS_CARD_INSET_PX = 4;
 const ACCESS_CARD_EXTRA_VPAD_PX = 2;
 const ACCESS_BTN_PAD_Y_PX = 2;
@@ -212,7 +212,7 @@ function computeAccessDockHeight(
   return ACCESS_CARD_INSET_PX * 2 + ACCESS_CARD_EXTRA_VPAD_PX * 2 + gridH;
 }
 
-/** Reserva la franja inferior L-M-X para los botones de acceso (rejilla 2×2). */
+/** Reserva la franja inferior L-M-X para el botón de acceso. */
 function syncSidebarAccessDockMetrics(
   calendar: HTMLElement,
   grid: HTMLElement,
@@ -309,7 +309,7 @@ function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): voi
   calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", "0px");
 }
 
-/** Reserva mínima para la rejilla 2×2 centrada bajo los grupos. */
+/** Reserva mínima para el botón centrado bajo los grupos. */
 function getMinAccessDockReserve(): number {
   const cellW = 48;
   const { btnFs, btnPadX, btnPy, gridGap } = resolveAccessDockButtonMetrics(cellW, 18);
@@ -351,23 +351,6 @@ function syncSidebarCardMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   }
 
   calendar.style.setProperty("--tm-cal-sidebar-card-h", `${cardHeight}px`);
-}
-
-function measureSidebarAccessDockTargetHeight(grid: HTMLElement): number | undefined {
-  const slot = grid.querySelector<HTMLElement>(".tm-cal-sidebar-slot");
-  const card = slot?.querySelector<HTMLElement>(".tm-cal-sidebar-card");
-  const groupsSection = slot?.querySelector<HTMLElement>(".tm-cal-groups-section");
-  if (!card || !groupsSection) return undefined;
-
-  const cardBottom =
-    card.getBoundingClientRect().bottom -
-    SIDEBAR_CARD_BOTTOM_PAD_PX -
-    ACCESS_CARD_INSET_PX;
-  const groupsBottom = groupsSection.getBoundingClientRect().bottom;
-  const target = Math.floor(cardBottom - groupsBottom);
-
-  if (target <= 0) return undefined;
-  return Math.max(getMinAccessDockReserve(), target);
 }
 
 /** Escala título, letras y banderas del panel GRUPOS al tamaño de la celda fusionada. */
@@ -583,11 +566,7 @@ export function fitCalendarLayout(
   syncSidebarAccessSpacing(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
-  syncSidebarAccessDockMetrics(
-    calendar,
-    grid,
-    measureSidebarAccessDockTargetHeight(grid)
-  );
+  syncSidebarAccessDockMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
@@ -599,11 +578,7 @@ export function fitCalendarLayout(
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
-    syncSidebarAccessDockMetrics(
-      calendar,
-      grid,
-      measureSidebarAccessDockTargetHeight(grid)
-    );
+    syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
   }

@@ -45,7 +45,7 @@ export function CalendarSidebarSlot({
           aria-label="Panel de grupos y accesos del calendario"
         >
           <div className="tm-cal-sidebar-card-inner flex min-h-0 min-w-0 flex-1 flex-col">
-            <section className="tm-cal-groups-section flex min-h-0 min-w-0 shrink-0 flex-col">
+            <section className="tm-cal-groups-section flex min-h-0 min-w-0 flex-1 flex-col">
               <h3 className="tm-cal-groups-title shrink-0">GRUPOS</h3>
               <CalendarGroupsPanel groups={groups} onGroupClick={onGroupClick} />
             </section>
