@@ -1,4 +1,5 @@
 import { isFormationId } from "@/lib/lineup/formation-coordinates";
+import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import { normalizeFormationId, normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
 import type {
@@ -189,7 +190,12 @@ export async function upsertTeamLineup(
   bench: LineupBenchPlayer[] = []
 ): Promise<void> {
   const existing = await loadCachedTeamLineup(supabase, matchId, teamName);
-  if (existing && !isBetterLineupSource(lineup.sourceKind, existing.sourceKind)) {
+  const refreshStalePredicted =
+    existing?.sourceKind === "predicted" &&
+    lineup.sourceKind === "predicted" &&
+    isPredictedLineupCacheStale(existing);
+
+  if (existing && !isBetterLineupSource(lineup.sourceKind, existing.sourceKind) && !refreshStalePredicted) {
     return;
   }
 

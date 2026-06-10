@@ -5,6 +5,7 @@ import {
   loadLastKnownFormation,
   upsertTeamLineup,
 } from "@/lib/lineup/lineup-queries";
+import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
   isPrewarmCacheFresh,
   PREWARM_HORIZON_MS,
@@ -86,7 +87,8 @@ async function prewarmTeamLineup(
 
   if (
     cached?.sourceKind === "predicted" &&
-    isPrewarmCacheFresh(cached.fetchedAt)
+    isPrewarmCacheFresh(cached.fetchedAt) &&
+    !isPredictedLineupCacheStale(cached)
   ) {
     return { status: "skipped", reason: "predicted_fresh" };
   }

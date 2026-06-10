@@ -46,7 +46,8 @@ export async function fetchPredictedLineupFromBsd(
   return await parseBsdPredictedTeamLineup(
     teamPayload,
     params.players,
-    new Date().toISOString()
+    new Date().toISOString(),
+    { supabase: params.supabase }
   );
 }
 

@@ -1,5 +1,6 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
+import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
   findPrimaryMatchIdForTeam,
   isBetterLineupSource,
@@ -181,7 +182,11 @@ export async function resolveTeamLineup(
     matchMeta?.status
   );
 
-  if (cached?.sourceKind === "predicted" && !tryConfirmed) {
+  if (
+    cached?.sourceKind === "predicted" &&
+    !tryConfirmed &&
+    !isPredictedLineupCacheStale(cached)
+  ) {
     return cached;
   }
 
@@ -202,7 +207,7 @@ export async function resolveTeamLineup(
     }
   }
 
-  if (cached?.sourceKind === "predicted") {
+  if (cached?.sourceKind === "predicted" && !isPredictedLineupCacheStale(cached)) {
     return cached;
   }
 

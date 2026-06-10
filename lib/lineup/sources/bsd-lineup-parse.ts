@@ -5,8 +5,10 @@ import {
 } from "@/lib/lineup/formation-templates";
 import {
   loadOfficialSquad,
+  loadOfficialSquadFromClient,
   type OfficialSquadPlayer,
 } from "@/lib/lineup/lineup-queries";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import {
   refinePredictedSlotKey,
@@ -206,10 +208,16 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
 export async function parseBsdPredictedTeamLineup(
   payload: BsdPredictedTeamLineup,
   players: LineupPlayerInput[],
-  fetchedAt: string
+  fetchedAt: string,
+  options?: { supabase?: SupabaseClient }
 ): Promise<ResolvedLineup | null> {
   const teamName = payload.team?.trim() ?? "";
-  const officialSquad = teamName ? await loadOfficialSquad(teamName) : [];
+  let officialSquad: OfficialSquadPlayer[] = [];
+  if (teamName) {
+    officialSquad = options?.supabase
+      ? await loadOfficialSquadFromClient(options.supabase, teamName)
+      : await loadOfficialSquad(teamName);
+  }
   return parseBsdPredictedTeamLineupWithOfficialSquad(
     payload,
     players,
