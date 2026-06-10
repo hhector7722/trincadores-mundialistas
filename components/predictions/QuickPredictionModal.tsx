@@ -16,7 +16,11 @@ import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButto
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
-import { MatchTeamsDisplay } from "@/components/matches/MatchTeamsDisplay";
+import {
+  MatchTeamsDisplay,
+  PREDICTION_MODAL_ACTIONS_ROW_CLASS,
+  PREDICTION_MODAL_NAMES_BOTTOM_CLASS,
+} from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
@@ -376,41 +380,42 @@ export function QuickPredictionModal({
       return (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pb-0 pt-2">
-            <div className="mt-2 flex min-h-[7.25rem] flex-col">
-              <div className="shrink-0">
-                <MatchTeamsDisplay
-                  layout="predictionModal"
-                  homeTeam={targetMatch.home_team}
-                  awayTeam={targetMatch.away_team}
-                  kickoffAt={targetMatch.kickoff_at}
-                  isLive={targetMatch.status === "live"}
-                  onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-                  onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-                  homeScoreSlot={
-                    <ScoreStepper
-                      label={targetMatch.home_team}
-                      value={home}
-                      disabled={controlsDisabled}
-                      onChange={setHome}
-                      variant="floating"
-                      hideLabel
-                    />
-                  }
-                  awayScoreSlot={
-                    <ScoreStepper
-                      label={targetMatch.away_team}
-                      value={away}
-                      disabled={controlsDisabled}
-                      onChange={setAway}
-                      variant="floating"
-                      hideLabel
-                    />
-                  }
-                />
-              </div>
+            <div className="relative mt-2 min-h-[7.25rem]">
+              <MatchTeamsDisplay
+                layout="predictionModal"
+                homeTeam={targetMatch.home_team}
+                awayTeam={targetMatch.away_team}
+                kickoffAt={targetMatch.kickoff_at}
+                isLive={targetMatch.status === "live"}
+                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                homeScoreSlot={
+                  <ScoreStepper
+                    label={targetMatch.home_team}
+                    value={home}
+                    disabled={controlsDisabled}
+                    onChange={setHome}
+                    variant="floating"
+                    hideLabel
+                  />
+                }
+                awayScoreSlot={
+                  <ScoreStepper
+                    label={targetMatch.away_team}
+                    value={away}
+                    disabled={controlsDisabled}
+                    onChange={setAway}
+                    variant="floating"
+                    hideLabel
+                  />
+                }
+              />
 
               <div
-                className="flex min-h-[1.25rem] flex-1 items-center justify-center"
+                className={cn(
+                  "absolute inset-x-0 bottom-8 flex items-center justify-center",
+                  PREDICTION_MODAL_NAMES_BOTTOM_CLASS
+                )}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MvpPredictionButton
@@ -437,7 +442,10 @@ export function QuickPredictionModal({
                 />
               </div>
 
-              <div className="shrink-0">
+              <div
+                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_ROW_CLASS)}
+                onClick={(event) => event.stopPropagation()}
+              >
                 <MatchContextActionsRow
                   compact
                   layout="teamAnchors"

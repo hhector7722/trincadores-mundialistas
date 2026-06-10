@@ -4,6 +4,13 @@ import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
+/** predictionModal: borde inferior de la fila de nombres (ancla MVP). */
+export const PREDICTION_MODAL_NAMES_BOTTOM_CLASS =
+  "top-[calc(1.15rem+2.5rem+0.25rem+0.625rem)] sm:top-[calc(1.15rem+2.75rem+0.25rem+0.625rem)]";
+
+/** Altura reservada para plantilla / posibles alineaciones bajo el MVP. */
+export const PREDICTION_MODAL_ACTIONS_ROW_CLASS = "h-8";
+
 function TeamFlagCircle({ name }: { name: string }) {
   const flagCode = teamFlagCode(name);
 
@@ -127,7 +134,7 @@ export function MatchTeamsDisplay({
 
   if (isPredictionModal) {
     return (
-      <div className="relative w-full min-h-[5.5rem]">
+      <div className="relative w-full min-h-[calc(1.15rem+2.5rem+0.25rem+0.625rem)] sm:min-h-[calc(1.15rem+2.75rem+0.25rem+0.625rem)]">
         <p className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
           {predictionLabel}
         </p>
