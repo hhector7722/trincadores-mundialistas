@@ -1,12 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseBsdPredictedTeamLineup } from "./bsd-lineup-parse";
+import type { OfficialSquadPlayer } from "@/lib/lineup/lineup-queries";
+import {
+  parseBsdPredictedTeamLineupWithOfficialSquad,
+} from "./bsd-lineup-parse";
 
 const squad = Array.from({ length: 11 }, (_, i) => ({
   player_name: `Jugador ${i + 1}`,
   position: i === 0 ? "GK" : i < 5 ? "DF" : i < 8 ? "MF" : "FW",
   shirt_number: i + 1,
 }));
+
+function toOfficial(players: typeof squad): OfficialSquadPlayer[] {
+  return players.map((player) => ({
+    playerName: player.player_name,
+    shirtNumber: player.shirt_number,
+    position: player.position,
+  }));
+}
 
 test("parseBsdPredictedTeamLineup genera predicted con 11 titulares", () => {
   const payload = {
@@ -24,7 +35,12 @@ test("parseBsdPredictedTeamLineup genera predicted con 11 titulares", () => {
     updated_at: "2026-06-08T20:31:18.804286+00:00",
   };
 
-  const lineup = parseBsdPredictedTeamLineup(payload, squad, "2026-06-08T20:31:18.804286+00:00");
+  const lineup = parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    squad,
+    "2026-06-08T20:31:18.804286+00:00",
+    toOfficial(squad)
+  );
   assert.ok(lineup);
   assert.equal(lineup.sourceKind, "predicted");
   assert.equal(lineup.dataSourceCode, "bsd");
@@ -67,7 +83,12 @@ test("parseBsdPredictedTeamLineup corrige Laporte/Porro mal ubicados por BSD", (
     updated_at: "2026-06-09T20:00:00+00:00",
   };
 
-  const lineup = parseBsdPredictedTeamLineup(payload, squad, payload.updated_at);
+  const lineup = parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    squad,
+    payload.updated_at,
+    toOfficial(squad)
+  );
   assert.ok(lineup);
 
   const laporte = lineup.slots.find((slot) => slot.name === "Aymeric Laporte");
@@ -114,7 +135,12 @@ test("parseBsdPredictedTeamLineup coloca Iglesias de 9 y Pino en banda", () => {
     updated_at: "2026-06-09T20:00:00+00:00",
   };
 
-  const lineup = parseBsdPredictedTeamLineup(payload, squad, payload.updated_at);
+  const lineup = parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    squad,
+    payload.updated_at,
+    toOfficial(squad)
+  );
   assert.ok(lineup);
 
   const iglesias = lineup.slots.find((slot) => slot.name === "Borja Iglesias");
@@ -125,4 +151,57 @@ test("parseBsdPredictedTeamLineup coloca Iglesias de 9 y Pino en banda", () => {
   assert.equal(pino.positionLabel, "ED");
   assert.equal(iglesias.x, 50);
   assert.ok(iglesias.y < pino.y, "El 9 debe quedar más arriba que el extremo");
+});
+
+test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
+  const squad = [
+    { player_name: "Raul Rangel", position: "GK", shirt_number: 1 },
+    { player_name: "Johan Vasquez", position: "DF", shirt_number: 5 },
+    { player_name: "Edson Alvarez", position: "DF", shirt_number: 4 },
+    { player_name: "Alexis Vega", position: "FW", shirt_number: 10 },
+    { player_name: "Armando Gonzalez", position: "MF", shirt_number: 14 },
+    { player_name: "Gilberto Mora", position: "MF", shirt_number: 19 },
+    { player_name: "Roberto Alvarado", position: "FW", shirt_number: 25 },
+  ];
+
+  const payload = {
+    team: "Mexico",
+    predicted_formation: "4-3-3",
+    starters: [
+      { name: "Raul Rangel", jersey_number: 1, predicted_slot: "GK", position: "G" },
+      { name: "Bryan González", jersey_number: 5, predicted_slot: "CB", position: "D" },
+      { name: "Everardo López", jersey_number: 25, predicted_slot: "RB", position: "D" },
+      { name: "Victor Guzmán", jersey_number: 4, predicted_slot: "CB", position: "D" },
+      { name: "Richard Ledezma", jersey_number: 37, predicted_slot: "LB", position: "D" },
+      { name: "Alexis Vega", jersey_number: 10, predicted_slot: "LW", position: "F" },
+      { name: "Marcel Ruíz", jersey_number: 14, predicted_slot: "CM", position: "M" },
+      { name: "Carlos Rodríguez", jersey_number: 19, predicted_slot: "CM", position: "M" },
+      { name: "Roberto Alvarado", jersey_number: 25, predicted_slot: "RW", position: "F" },
+      { name: "Germán Berterame", jersey_number: 19, predicted_slot: "ST", position: "F" },
+      { name: "Efrain Alvarez", jersey_number: 10, predicted_slot: "AM", position: "M" },
+    ],
+    substitutes: [],
+    updated_at: "2026-06-10T12:00:00+00:00",
+  };
+
+  const lineup = parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    squad,
+    payload.updated_at,
+    toOfficial(squad)
+  );
+  assert.ok(lineup);
+
+  const shirts = lineup.slots
+    .map((slot) => slot.shirtNumber)
+    .filter((shirt): shirt is number => shirt != null);
+  assert.equal(new Set(shirts).size, shirts.length, "No debe haber dorsales duplicados");
+
+  const vega = lineup.slots.find((slot) => slot.shirtNumber === 10);
+  assert.ok(vega);
+  assert.equal(vega.name, "Alexis Vega");
+  assert.equal(vega.isPlaceholder, false);
+
+  assert.equal(lineup.slots.filter((slot) => slot.isPlaceholder).length, 4);
+  assert.ok(!lineup.slots.some((slot) => slot.shirtNumber === 37));
 });

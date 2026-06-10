@@ -9,8 +9,22 @@ import type {
   ResolvedLineup,
   StoredLineupRow,
 } from "@/lib/lineup/types";
+import { normalizeTeamName } from "@/lib/lineup/sources/api-football-names";
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
+import {
+  WC2026_SQUAD_COMPETITION,
+  WC2026_SQUAD_YEAR,
+} from "@/lib/worldcup2026/normalize-squads";
+import { squadLookupNames } from "@/lib/worldcup2026/squad-team-names";
+import { getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+export interface OfficialSquadPlayer {
+  playerName: string;
+  shirtNumber: number;
+  position: string;
+}
 
 const SOURCE_PRIORITY: Record<LineupSourceKind, number> = {
   confirmed: 3,
@@ -32,6 +46,53 @@ function rowToResolved(row: StoredLineupRow): ResolvedLineup {
     dataSourceCode: row.data_source_code,
     fetchedAt: row.fetched_at,
   });
+}
+
+/** Plantilla oficial WC2026 desde BD (dorsales únicos). */
+export async function loadOfficialSquadFromClient(
+  supabase: SupabaseClient,
+  teamName: string
+): Promise<OfficialSquadPlayer[]> {
+  const normalized = normalizeTeamName(teamName);
+  const lookupNames = [
+    ...new Set([teamName.trim(), ...squadLookupNames(teamName), ...squadLookupNames(normalized)]),
+  ];
+  if (!lookupNames.length) return [];
+
+  for (const lookupName of lookupNames) {
+    const squad = await getTeamSquadByName(supabase, lookupName, {
+      year: WC2026_SQUAD_YEAR,
+      competitionCode: WC2026_SQUAD_COMPETITION,
+    });
+
+    if (!squad?.players?.length) continue;
+
+    const players = squad.players
+      .filter(
+        (player) =>
+          player.shirt_number != null &&
+          player.shirt_number > 0 &&
+          player.player_name.trim().length > 0
+      )
+      .map((player) => ({
+        playerName: player.player_name.trim(),
+        shirtNumber: player.shirt_number!,
+        position: player.position?.trim() ?? "",
+      }));
+
+    if (players.length > 0) return players;
+  }
+
+  return [];
+}
+
+export async function loadOfficialSquad(teamName: string): Promise<OfficialSquadPlayer[]> {
+  try {
+    const supabase = await createClient();
+    return await loadOfficialSquadFromClient(supabase, teamName);
+  } catch {
+    return [];
+  }
 }
 
 export async function loadCachedTeamLineup(

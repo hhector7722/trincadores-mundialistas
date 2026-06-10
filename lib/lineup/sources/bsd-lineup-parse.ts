@@ -3,6 +3,10 @@ import {
   fallbackSlotKeyForRole,
   normalizeFormationTemplate,
 } from "@/lib/lineup/formation-templates";
+import {
+  loadOfficialSquad,
+  type OfficialSquadPlayer,
+} from "@/lib/lineup/lineup-queries";
 import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
 import {
   refinePredictedSlotKey,
@@ -50,22 +54,66 @@ function roleFromPosition(position: string | null | undefined): PositionRole {
 function toBenchPlayer(
   player: BsdConfirmedPlayer | BsdPredictedPlayer,
   squadPlayer: LineupPlayerInput | null,
-  index: number
+  index: number,
+  useOfficialShirtsOnly: boolean
 ): LineupBenchPlayer | null {
   const name = squadPlayer?.player_name ?? player.name;
   if (!name) return null;
   return {
     key: `${name}-${squadPlayer?.shirt_number ?? player.jersey_number ?? index}`,
     name,
-    shirtNumber: squadPlayer?.shirt_number ?? player.jersey_number ?? null,
+    shirtNumber: useOfficialShirtsOnly
+      ? (squadPlayer?.shirt_number ?? null)
+      : (squadPlayer?.shirt_number ?? player.jersey_number ?? null),
     position: squadPlayer?.position ?? player.position ?? null,
   };
 }
 
-export function parseBsdPredictedTeamLineup(
+function resolvePredictedStarter(
+  starter: BsdPredictedPlayer,
+  index: number,
+  players: LineupPlayerInput[],
+  officialSquad: OfficialSquadPlayer[],
+  usedShirtNumbers: Set<number>,
+  usedSquadIdentities: Set<string>
+) {
+  const squadPlayer = findSquadPlayer(
+    {
+      name: starter.name ?? "",
+      shirtNumber: starter.jersey_number ?? 0,
+    },
+    players,
+    officialSquad,
+    usedShirtNumbers,
+    { excludeIdentities: usedSquadIdentities }
+  );
+
+  if (squadPlayer?.shirt_number) {
+    usedShirtNumbers.add(squadPlayer.shirt_number);
+    reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
+  }
+
+  const useOfficial = officialSquad.length > 0;
+  const isPlaceholder = useOfficial ? squadPlayer == null : !starter.name;
+  const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
+  const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
+
+  return {
+    name,
+    slotKey: rawSlot,
+    squadPosition: squadPlayer?.position ?? starter.position ?? null,
+    index,
+    starter,
+    squadPlayer,
+    isPlaceholder,
+  };
+}
+
+export function parseBsdPredictedTeamLineupWithOfficialSquad(
   payload: BsdPredictedTeamLineup,
   players: LineupPlayerInput[],
-  fetchedAt: string
+  fetchedAt: string,
+  officialSquad: OfficialSquadPlayer[]
 ): ResolvedLineup | null {
   const starters = (payload.starters ?? []).filter(
     (player) => (player.availability ?? "available") === "available"
@@ -74,26 +122,22 @@ export function parseBsdPredictedTeamLineup(
 
   const formationLabel = normalizeFormationLabel(payload.predicted_formation);
   const formation = toFormationId(formationLabel);
-
+  const useOfficial = officialSquad.length > 0;
+  const usedShirtNumbers = new Set<number>();
   const usedSquadIdentities = new Set<string>();
 
-  const rawStarterInputs = starters.slice(0, 11).map((starter, index) => {
-    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players, {
-      excludeIdentities: usedSquadIdentities,
-    });
-    reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
-    const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
-    const rawSlot = (starter.predicted_slot ?? starter.position ?? "CM").toUpperCase();
-
-    return {
-      name,
-      slotKey: rawSlot,
-      squadPosition: squadPlayer?.position ?? starter.position ?? null,
-      index,
-      starter,
-      squadPlayer,
-    };
-  });
+  const rawStarterInputs = starters
+    .slice(0, 11)
+    .map((starter, index) =>
+      resolvePredictedStarter(
+        starter,
+        index,
+        players,
+        officialSquad,
+        usedShirtNumbers,
+        usedSquadIdentities
+      )
+    );
 
   const refinedSlots = swapMirroredForwardSlots(
     swapMirroredDefenderSlots(
@@ -113,13 +157,15 @@ export function parseBsdPredictedTeamLineup(
     return {
       slotKey,
       role,
-      key: `${row.name}-${row.starter.jersey_number ?? row.index}`,
-      name: row.name,
-      shirtNumber: row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? null,
+      key: `${row.name}-${row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? row.index}`,
+      name: row.isPlaceholder ? "Por confirmar" : row.name,
+      shirtNumber: useOfficial
+        ? (row.squadPlayer?.shirt_number ?? null)
+        : (row.squadPlayer?.shirt_number ?? row.starter.jersey_number ?? null),
       positionLabel:
         tacticalLabel ??
         positionLabelEs(role, row.squadPlayer?.position ?? row.starter.position ?? null),
-      isPlaceholder: !row.name,
+      isPlaceholder: row.isPlaceholder,
     };
   });
 
@@ -127,8 +173,18 @@ export function parseBsdPredictedTeamLineup(
 
   const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {
-      const squadPlayer = findSquadPlayer(player.name ?? "", player.jersey_number, players);
-      return toBenchPlayer(player, squadPlayer, index);
+      const squadPlayer = findSquadPlayer(
+        { name: player.name ?? "", shirtNumber: player.jersey_number ?? 0 },
+        players,
+        officialSquad,
+        usedShirtNumbers,
+        { excludeIdentities: usedSquadIdentities }
+      );
+      if (squadPlayer?.shirt_number) {
+        usedShirtNumbers.add(squadPlayer.shirt_number);
+        reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
+      }
+      return toBenchPlayer(player, squadPlayer, index, useOfficial);
     })
     .filter((player): player is LineupBenchPlayer => player != null);
 
@@ -147,6 +203,21 @@ export function parseBsdPredictedTeamLineup(
   };
 }
 
+export async function parseBsdPredictedTeamLineup(
+  payload: BsdPredictedTeamLineup,
+  players: LineupPlayerInput[],
+  fetchedAt: string
+): Promise<ResolvedLineup | null> {
+  const teamName = payload.team?.trim() ?? "";
+  const officialSquad = teamName ? await loadOfficialSquad(teamName) : [];
+  return parseBsdPredictedTeamLineupWithOfficialSquad(
+    payload,
+    players,
+    fetchedAt,
+    officialSquad
+  );
+}
+
 export function parseBsdConfirmedTeamLineup(
   payload: BsdConfirmedTeamLineup,
   players: LineupPlayerInput[],
@@ -162,9 +233,13 @@ export function parseBsdConfirmedTeamLineup(
   const roleGroups: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
 
   const starterInputs = starters.slice(0, 11).map((starter, index) => {
-    const squadPlayer = findSquadPlayer(starter.name ?? "", starter.jersey_number, players, {
-      excludeIdentities: usedSquadIdentities,
-    });
+    const squadPlayer = findSquadPlayer(
+      { name: starter.name ?? "", shirtNumber: starter.jersey_number ?? 0 },
+      players,
+      [],
+      new Set<number>(),
+      { excludeIdentities: usedSquadIdentities }
+    );
     reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
     const role = roleFromPosition(squadPlayer?.position ?? starter.position);
     const roleIndex = roleGroups[role];
@@ -188,8 +263,13 @@ export function parseBsdConfirmedTeamLineup(
 
   const rawBench = (payload.substitutes ?? [])
     .map((player, index) => {
-      const squadPlayer = findSquadPlayer(player.name ?? "", player.jersey_number, players);
-      return toBenchPlayer(player, squadPlayer, index);
+      const squadPlayer = findSquadPlayer(
+        { name: player.name ?? "", shirtNumber: player.jersey_number ?? 0 },
+        players,
+        [],
+        new Set<number>()
+      );
+      return toBenchPlayer(player, squadPlayer, index, false);
     })
     .filter((player): player is LineupBenchPlayer => player != null);
 

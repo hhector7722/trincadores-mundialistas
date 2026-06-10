@@ -114,7 +114,7 @@ async function main() {
     );
   }
 
-  const parsed = parseBsdPredictedTeamLineup(teamPayload, players, new Date().toISOString());
+  const parsed = await parseBsdPredictedTeamLineup(teamPayload, players, new Date().toISOString());
   if (parsed) {
     console.log("\nCampo (izquierda → derecha):");
     for (const slot of [...parsed.slots].sort((a, b) => a.x - b.x)) {

@@ -43,7 +43,7 @@ export async function fetchPredictedLineupFromBsd(
   const teamPayload = payload.lineups[side];
   if (!teamPayload) return null;
 
-  return parseBsdPredictedTeamLineup(
+  return await parseBsdPredictedTeamLineup(
     teamPayload,
     params.players,
     new Date().toISOString()

@@ -33,7 +33,7 @@ async function main() {
   const squad = await getTeamSquadByName(supabase, "Spain");
   if (!squad) return;
 
-  const parsed = parseBsdPredictedTeamLineup(
+  const parsed = await parseBsdPredictedTeamLineup(
     team,
     squad.players.map((p) => ({
       player_name: p.player_name,

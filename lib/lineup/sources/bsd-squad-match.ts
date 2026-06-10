@@ -1,3 +1,4 @@
+import type { OfficialSquadPlayer } from "@/lib/lineup/lineup-queries";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import type { LineupPlayerInput } from "@/lib/lineup/types";
 
@@ -52,18 +53,41 @@ function nameCandidates(apiName: string, players: LineupPlayerInput[]): LineupPl
   return byLast.length === 1 ? byLast : [];
 }
 
+function officialToLineupInput(player: OfficialSquadPlayer): LineupPlayerInput {
+  return {
+    player_name: player.playerName,
+    shirt_number: player.shirtNumber,
+    position: player.position || null,
+  };
+}
+
+function resolveOfficialLineupPlayer(
+  candidate: LineupPlayerInput,
+  officialSquad: OfficialSquadPlayer[]
+): LineupPlayerInput | null {
+  const byShirt = officialSquad.find((player) => player.shirtNumber === candidate.shirt_number);
+  if (byShirt) return officialToLineupInput(byShirt);
+
+  const normalizedCandidate = normalizeName(candidate.player_name);
+  const byName = officialSquad.find(
+    (player) => normalizeName(player.playerName) === normalizedCandidate
+  );
+  if (byName) return officialToLineupInput(byName);
+
+  return null;
+}
+
 export type FindSquadPlayerOptions = {
   /** Evita reutilizar el mismo jugador de convocatoria en dos slots. */
   excludeIdentities?: Set<string>;
 };
 
-export function findSquadPlayer(
+function findSquadPlayerLegacy(
   apiName: string,
   shirtNumber: number | null | undefined,
   players: LineupPlayerInput[],
-  options?: FindSquadPlayerOptions
+  exclude: Set<string>
 ): LineupPlayerInput | null {
-  const exclude = options?.excludeIdentities ?? new Set<string>();
   const available = players.filter((player) => {
     const key = squadIdentity(player);
     return key && !exclude.has(key);
@@ -78,6 +102,65 @@ export function findSquadPlayer(
   }
 
   return null;
+}
+
+export function findSquadPlayer(
+  bsdPlayer: { name: string; shirtNumber: number },
+  squadPlayers: LineupPlayerInput[],
+  officialSquad: OfficialSquadPlayer[],
+  usedShirtNumbers: Set<number>,
+  options?: FindSquadPlayerOptions
+): LineupPlayerInput | null {
+  const exclude = options?.excludeIdentities ?? new Set<string>();
+
+  if (!officialSquad.length) {
+    return findSquadPlayerLegacy(
+      bsdPlayer.name,
+      bsdPlayer.shirtNumber,
+      squadPlayers,
+      exclude
+    );
+  }
+
+  const available = squadPlayers.filter((player) => {
+    const key = squadIdentity(player);
+    return key && !exclude.has(key);
+  });
+
+  const officialShirts = new Set(officialSquad.map((player) => player.shirtNumber));
+  let matched: LineupPlayerInput | null = null;
+
+  const candidates = nameCandidates(bsdPlayer.name, available);
+  if (candidates.length === 1) {
+    matched = resolveOfficialLineupPlayer(candidates[0]!, officialSquad);
+  } else if (candidates.length > 1 && bsdPlayer.shirtNumber > 0) {
+    const byShirt = candidates.filter((player) => player.shirt_number === bsdPlayer.shirtNumber);
+    if (byShirt.length === 1) {
+      matched = resolveOfficialLineupPlayer(byShirt[0]!, officialSquad);
+    }
+  }
+
+  if (
+    !matched &&
+    bsdPlayer.shirtNumber > 0 &&
+    officialShirts.has(bsdPlayer.shirtNumber)
+  ) {
+    const official = officialSquad.find(
+      (player) => player.shirtNumber === bsdPlayer.shirtNumber
+    );
+    if (official) {
+      const lineup = officialToLineupInput(official);
+      const key = squadIdentity(lineup);
+      if (key && !exclude.has(key)) {
+        matched = lineup;
+      }
+    }
+  }
+
+  if (!matched?.shirt_number) return null;
+  if (usedShirtNumbers.has(matched.shirt_number)) return null;
+
+  return matched;
 }
 
 export function reserveSquadPlayerIdentity(
