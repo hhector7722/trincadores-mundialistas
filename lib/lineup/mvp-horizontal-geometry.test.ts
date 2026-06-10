@@ -82,6 +82,16 @@ test("mapSlotsToAwayRight mantiene todos los jugadores en x > 50", () => {
   }
 });
 
+test("local espejado: LB queda más cerca del centro que RB", () => {
+  const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  const mapped = mapSlotsToHomeLeft(template);
+  const lb = mapped.find((slot) => slot.slotKey === "LB");
+  const rb = mapped.find((slot) => slot.slotKey === "RB");
+
+  assert.ok(lb && rb);
+  assert.ok(lb.y > rb.y, "LB local debe quedar más abajo (hacia centro) que RB");
+});
+
 test("visitante espejado: RB queda más cerca del centro que LB", () => {
   const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const mapped = mapSlotsToAwayRight(template);
@@ -92,18 +102,13 @@ test("visitante espejado: RB queda más cerca del centro que LB", () => {
   assert.ok(rb.y < lb.y, "RB visitante debe quedar más arriba (hacia centro) que LB");
 });
 
-test("proyección horizontal: local conserva spread lateral; visitante lo espeja", () => {
+test("proyección horizontal: local y visitante espejan el spread lateral", () => {
   const template = getFormationTemplateCoordinates("4-2-3-1");
   const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const home = mapSlotsToHomeLeft(slots);
   const away = mapSlotsToAwayRight(slots);
+  const mirroredX = template.map((coord) => 100 - coord.x).sort((a, b) => a - b);
 
-  assert.deepEqual(
-    home.map((slot) => slot.y).sort((a, b) => a - b),
-    template.map((coord) => coord.x).sort((a, b) => a - b)
-  );
-  assert.deepEqual(
-    away.map((slot) => slot.y).sort((a, b) => a - b),
-    template.map((coord) => 100 - coord.x).sort((a, b) => a - b)
-  );
+  assert.deepEqual(home.map((slot) => slot.y).sort((a, b) => a - b), mirroredX);
+  assert.deepEqual(away.map((slot) => slot.y).sort((a, b) => a - b), mirroredX);
 });

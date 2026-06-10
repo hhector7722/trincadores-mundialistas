@@ -3,7 +3,8 @@ import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
  * Proyección al campo MVP horizontal.
- * Local a la izquierda (banquillo arriba); visitante a la derecha con espejo lateral.
+ * Local a la izquierda (banquillo arriba); visitante a la derecha.
+ * Ambos equipos espejan el eje lateral al rotar 90° sobre el terreno.
  */
 
 export type MvpHorizontalSlot = LineupSlot & { scale: number };
@@ -33,12 +34,12 @@ function clampY(y: number): number {
   return Math.min(PLAYABLE_Y_MAX, Math.max(PLAYABLE_Y_MIN, y));
 }
 
-/** Espejo lateral al rotar al visitante (LD↔LI, extremo dcho↔izdo, etc.). */
+/** Espejo lateral al rotar sobre el terreno (LD↔LI, extremo dcho↔izdo, etc.). */
 export function mirrorTacticalLateral(coord: FieldCoordinate): FieldCoordinate {
   return { ...coord, x: Math.round((100 - coord.x) * 10) / 10 };
 }
 
-/** Local: profundidad → eje X hacia la derecha; lateral maestro → eje Y. */
+/** Local (coord ya espejada): profundidad → eje X hacia la derecha; lateral → eje Y. */
 export function compressCoordToHomeLeft(coord: FieldCoordinate): FieldCoordinate {
   const depth = sourceDepth(coord.y);
   return {
@@ -57,7 +58,8 @@ export function compressCoordToAwayRight(coord: FieldCoordinate): FieldCoordinat
 }
 
 function mapSlotToHomeLeft(slot: LineupSlot): MvpHorizontalSlot {
-  return { ...slot, ...compressCoordToHomeLeft(slot), scale: 1 };
+  const mirrored = mirrorTacticalLateral(slot);
+  return { ...slot, ...compressCoordToHomeLeft(mirrored), scale: 1 };
 }
 
 function mapSlotToAwayRight(slot: LineupSlot): MvpHorizontalSlot {
@@ -65,7 +67,7 @@ function mapSlotToAwayRight(slot: LineupSlot): MvpHorizontalSlot {
   return { ...slot, ...compressCoordToAwayRight(mirrored), scale: 1 };
 }
 
-/** Local en mitad izquierda del campo horizontal. */
+/** Local en mitad izquierda del campo horizontal (con espejo lateral). */
 export function mapSlotsToHomeLeft(slots: LineupSlot[]): MvpHorizontalSlot[] {
   return slots.map(mapSlotToHomeLeft);
 }
