@@ -117,7 +117,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex flex-col">
         {(markFieldReady) => (
-          <div className="flex flex-col items-center px-1 py-1 sm:px-1.5">
+          <div className="flex flex-col items-center px-1 pt-0.5 pb-0 sm:px-1.5">
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}

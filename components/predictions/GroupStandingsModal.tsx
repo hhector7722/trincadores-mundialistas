@@ -294,6 +294,7 @@ export function GroupStandingsModal({
       onClose={onClose}
       title={groupPanelTitle(panelView, lineupFormation)}
       hideHeaderDivider
+      headerCompact={isLineupView}
       scrollContent={!isLineupView}
       className={cn(
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")

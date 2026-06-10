@@ -419,6 +419,7 @@ export function QuickPredictionModal({
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
       headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
       headerTitleAlign={isMvpView ? "left" : "default"}
+      headerCompact={isFieldView}
       scrollContent={!isFieldView}
       className={cn(
         isMvpView && "max-h-[calc(100dvh-1rem)]",

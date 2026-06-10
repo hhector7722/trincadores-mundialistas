@@ -3,7 +3,11 @@
 import type { ReactNode } from "react";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { MODAL_FIELD_WRAPPER_SCALE, PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
+import { PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
+import {
+  MODAL_FIELD_WRAPPER_SCALE,
+  modalFieldScaleBottomTrim,
+} from "@/lib/lineup/modal-field-scale";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +55,7 @@ export function TeamLineupGraphic({
             ? {
                 transform: `scale(${MODAL_FIELD_WRAPPER_SCALE})`,
                 transformOrigin: "top center",
+                marginBottom: modalFieldScaleBottomTrim(),
               }
             : undefined
         }

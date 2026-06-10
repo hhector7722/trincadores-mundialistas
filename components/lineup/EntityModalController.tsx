@@ -202,7 +202,7 @@ export function EntityModalController({
       })}
       hideHeaderDivider
       headerTitleAlign={isMvpView ? "left" : "center"}
-      headerCompact={isMvpView}
+      headerCompact={isFieldView}
       scrollContent={!isFieldView}
       containerClassName={isMvpView ? "p-1" : isLineupView ? "p-1.5" : undefined}
       className={cn(
