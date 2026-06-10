@@ -23,6 +23,7 @@ type MvpHorizontalFieldGraphicProps = {
   selectedKey: string | null;
   selectedPlayer?: (MvpSelectablePlayer & { teamName: string }) | null;
   disabled?: boolean;
+  readOnly?: boolean;
   onSelect: (key: string) => void;
   onFieldReady?: () => void;
   className?: string;
@@ -41,6 +42,7 @@ export function MvpHorizontalFieldGraphic({
   selectedKey,
   selectedPlayer = null,
   disabled,
+  readOnly = false,
   onSelect,
   onFieldReady,
   className,
@@ -95,7 +97,9 @@ export function MvpHorizontalFieldGraphic({
           selected={active}
           disabled={disabled}
           awayKitClashBorder={isAway && awayKitClash}
-          onClick={!slot.isPlaceholder ? () => onSelect(key) : undefined}
+          onClick={
+            !readOnly && !disabled && !slot.isPlaceholder ? () => onSelect(key) : undefined
+          }
         />
       </div>
     );

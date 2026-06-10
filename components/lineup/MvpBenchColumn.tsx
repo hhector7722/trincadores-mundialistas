@@ -17,6 +17,7 @@ type MvpBenchColumnProps = {
   selectedKey?: string | null;
   selectedPlayer?: (MvpSelectablePlayer & { teamName: string }) | null;
   disabled?: boolean;
+  readOnly?: boolean;
   align?: "left" | "right";
   gridLayout?: BenchLayoutConfig;
   className?: string;
@@ -29,6 +30,7 @@ export function MvpBenchColumn({
   selectedKey = null,
   selectedPlayer = null,
   disabled,
+  readOnly = false,
   align = "left",
   gridLayout,
   className,
@@ -68,8 +70,9 @@ export function MvpBenchColumn({
                 disabled={disabled}
                 onClick={() => onPlayerClick(player)}
                 className={cn(
-                  "inline min-h-0 touch-manipulation px-0.5 py-0 align-baseline transition-colors",
-                  "hover:opacity-90 active:opacity-80",
+                  "inline min-h-0 px-0.5 py-0 align-baseline transition-colors",
+                  !readOnly && "touch-manipulation hover:opacity-90 active:opacity-80",
+                  readOnly && "pointer-events-none cursor-default",
                   disabled && "opacity-60"
                 )}
               >

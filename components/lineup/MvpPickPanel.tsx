@@ -13,7 +13,6 @@ import {
 } from "@/lib/lineup/mvp-selection-key";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
-import { cn } from "@/lib/utils";
 
 type MvpPickPanelProps = {
   poolId: string;
@@ -203,22 +202,17 @@ export function MvpPickPanel({
       loading={!ready}
       className="h-full min-h-0"
       footer={
-        <div
-          className={cn(
-            "shrink-0 bg-[var(--tm-accent)]",
-            "px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
-          )}
-        >
+        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-0.5">
           {error ? (
-            <p className="mb-1 text-center text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
+            <p className="text-[10px] leading-tight text-[var(--tm-danger)]" role="alert">
               {error}
             </p>
           ) : null}
           {!serverEditable ? (
-            <p className="py-1 text-center text-[9px] text-black/70">Predicción cerrada.</p>
+            <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
           ) : (
             <Button
-              className="h-10 min-h-10 w-full rounded-full bg-black/10 text-sm font-semibold text-black hover:bg-black/15"
+              className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
               disabled={!selectedOption || pending}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}

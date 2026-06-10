@@ -64,7 +64,7 @@ export function MvpTacticalFieldBody({
     [layout, awaySlots, homeSlots]
   );
 
-  const pickDisabled = !interactive || disabled;
+  const pickDisabled = interactive && disabled;
 
   return (
     <div
@@ -89,6 +89,7 @@ export function MvpTacticalFieldBody({
               disabled={pickDisabled}
               align="left"
               gridLayout={layout.awayBench}
+              readOnly={!interactive}
               onPlayerClick={
                 interactive && onSelect
                   ? (player) => onSelect(mvpSelectionKey(awayTeam, player))
@@ -110,6 +111,7 @@ export function MvpTacticalFieldBody({
           selectedKey={interactive ? selectedKey : null}
           selectedPlayer={interactive ? selectedPlayer : null}
           disabled={pickDisabled}
+          readOnly={!interactive}
           onSelect={onSelect ?? (() => {})}
           widthPx={layout.fieldWidthPx}
           heightPx={layout.fieldHeightPx}
@@ -133,6 +135,7 @@ export function MvpTacticalFieldBody({
               disabled={pickDisabled}
               align="right"
               gridLayout={layout.homeBench}
+              readOnly={!interactive}
               onPlayerClick={
                 interactive && onSelect
                   ? (player) => onSelect(mvpSelectionKey(homeTeam, player))
