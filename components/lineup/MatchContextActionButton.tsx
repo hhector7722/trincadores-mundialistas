@@ -7,6 +7,10 @@ import { cn } from "@/lib/utils";
 /** Separación fija entre el final del nombre y el icono de edición. */
 const EDIT_ICON_GAP_PX = 10;
 
+/** Mismo estilo que el lápiz del pronóstico guardado en home/modal. */
+const EDIT_PENCIL_CLASS = "h-3.5 w-3.5 shrink-0";
+const EDIT_PENCIL_STROKE = 2;
+
 type MatchContextActionButtonProps = {
   caption: string;
   onClick: () => void;
@@ -32,11 +36,11 @@ export function MatchContextActionButton({
   const emptyText = emptyLabel ?? caption;
   const containerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
-  const [editIconLeft, setEditIconLeft] = useState<number | null>(null);
+  const [editIconPos, setEditIconPos] = useState<{ left: number; top: number } | null>(null);
 
   useLayoutEffect(() => {
     if (!saved || !showEdit) {
-      setEditIconLeft(null);
+      setEditIconPos(null);
       return;
     }
 
@@ -47,7 +51,10 @@ export function MatchContextActionButton({
 
       const labelRect = label.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
-      setEditIconLeft(labelRect.right - containerRect.left + EDIT_ICON_GAP_PX);
+      setEditIconPos({
+        left: labelRect.right - containerRect.left + EDIT_ICON_GAP_PX,
+        top: labelRect.top - containerRect.top + labelRect.height / 2,
+      });
     };
 
     update();
@@ -83,15 +90,19 @@ export function MatchContextActionButton({
               {savedValue}
             </span>
           </button>
-          {showEdit && editIconLeft != null ? (
+          {showEdit && editIconPos != null ? (
             <button
               type="button"
               onClick={onClick}
               aria-label={`Editar ${caption}: ${savedValue}`}
-              className="absolute top-1/2 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-              style={{ left: editIconLeft }}
+              className="absolute flex -translate-y-1/2 items-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+              style={{ left: editIconPos.left, top: editIconPos.top }}
             >
-              <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+              <Pencil
+                className={EDIT_PENCIL_CLASS}
+                strokeWidth={EDIT_PENCIL_STROKE}
+                aria-hidden="true"
+              />
             </button>
           ) : null}
         </div>
