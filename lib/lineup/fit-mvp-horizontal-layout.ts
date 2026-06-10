@@ -33,8 +33,8 @@ const FORMATION_ROW_PX = 22;
 
 const MVP_BENCH_INLINE = {
   fontPx: 10,
-  lineHeightPx: 14,
-  lineGapPx: 2,
+  lineHeightPx: 11,
+  lineGapPx: 0,
   /** Ancho medio de "12 Apellido, " en px con font 10. */
   avgPlayerPx: 58,
 };

@@ -43,10 +43,10 @@ export function MvpBenchColumn({
     >
       <p
         className={cn(
-          "m-0 w-full leading-snug",
+          "m-0 w-full leading-none",
           align === "right" && "text-right"
         )}
-        style={{ fontSize: fontPx }}
+        style={{ fontSize: fontPx, lineHeight: 1.1 }}
       >
         {players.map((player, index) => {
           const key = mvpSelectionKey(teamName, player);
@@ -60,7 +60,7 @@ export function MvpBenchColumn({
                 disabled={disabled}
                 onClick={() => onPlayerClick(player)}
                 className={cn(
-                  "inline min-h-6 touch-manipulation rounded-sm px-0.5 py-0 align-baseline transition-colors",
+                  "inline min-h-0 touch-manipulation rounded-sm px-0.5 py-0 align-baseline transition-colors",
                   "hover:opacity-90 active:opacity-80",
                   active && "bg-[rgba(212,255,0,0.14)] ring-1 ring-[var(--tm-accent)]/40",
                   disabled && "opacity-60"
