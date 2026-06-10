@@ -14,8 +14,8 @@ import { computeMvpFieldChipScale } from "@/lib/lineup/mvp-field-chip-scale";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
-import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import {
+  findMvpOptionByKey,
   findMvpOptionBySaved,
   mvpSelectionKey,
 } from "@/lib/lineup/mvp-selection-key";
@@ -72,11 +72,11 @@ function flattenSquadPlayers(
   const seen = new Set<string>();
   return squad.players
     .filter((player) => {
-      const key = playerIdentityKey({
+      const key = mvpSelectionKey(teamName, {
         name: player.player_name,
         shirtNumber: player.shirt_number,
       });
-      if (!key || seen.has(key)) return false;
+      if (seen.has(key)) return false;
       seen.add(key);
       return true;
     })
@@ -250,14 +250,14 @@ export function MvpPredictionPanel({
   }, [options, savedPlayerName, savedTeamName]);
 
   const selectedOption = useMemo(
-    () => options.find((option) => option.key === selectedKey) ?? null,
+    () => findMvpOptionByKey(options, selectedKey) ?? null,
     [options, selectedKey]
   );
 
   const tacticalReady = homeSlots.length + awaySlots.length >= 22;
 
   function onSave() {
-    const selected = options.find((option) => option.key === selectedKey);
+    const selected = findMvpOptionByKey(options, selectedKey);
     if (!selected) {
       setError("Selecciona un jugador.");
       return;
@@ -315,6 +315,7 @@ export function MvpPredictionPanel({
                   teamName={awayTeam}
                   players={awayBench}
                   selectedKey={selectedKey}
+                  selectedPlayer={selectedOption}
                   disabled={pickDisabled}
                   align="left"
                   gridLayout={fitLayout?.awayBench}
@@ -335,6 +336,7 @@ export function MvpPredictionPanel({
                   awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
                   homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
                   selectedKey={selectedKey}
+                  selectedPlayer={selectedOption}
                   disabled={pickDisabled}
                   onSelect={setSelectedKey}
                   onFieldReady={markFieldReady}
@@ -358,6 +360,7 @@ export function MvpPredictionPanel({
                   teamName={homeTeam}
                   players={homeBench}
                   selectedKey={selectedKey}
+                  selectedPlayer={selectedOption}
                   disabled={pickDisabled}
                   align="right"
                   gridLayout={fitLayout?.homeBench}

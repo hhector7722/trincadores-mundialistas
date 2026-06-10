@@ -1,6 +1,10 @@
 "use client";
 
-import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
+import {
+  mvpPlayersMatch,
+  mvpSelectionKey,
+  type MvpSelectablePlayer,
+} from "@/lib/lineup/mvp-selection-key";
 import type { BenchLayoutConfig } from "@/lib/lineup/fit-mvp-horizontal-layout";
 import { squadDisplayNames } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
@@ -11,6 +15,7 @@ type MvpBenchColumnProps = {
   players: BenchPlayer[];
   onPlayerClick: (player: BenchPlayer) => void;
   selectedKey?: string | null;
+  selectedPlayer?: (MvpSelectablePlayer & { teamName: string }) | null;
   disabled?: boolean;
   align?: "left" | "right";
   gridLayout?: BenchLayoutConfig;
@@ -22,6 +27,7 @@ export function MvpBenchColumn({
   players,
   onPlayerClick,
   selectedKey = null,
+  selectedPlayer = null,
   disabled,
   align = "left",
   gridLayout,
@@ -50,7 +56,9 @@ export function MvpBenchColumn({
       >
         {players.map((player, index) => {
           const key = mvpSelectionKey(teamName, player);
-          const active = selectedKey === key;
+          const active = selectedPlayer
+            ? mvpPlayersMatch(teamName, player, selectedPlayer)
+            : selectedKey === key;
           const dorsal = player.shirtNumber ?? "—";
 
           return (

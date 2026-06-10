@@ -4,7 +4,7 @@ import { HorizontalPitchSurface } from "@/components/lineup/HorizontalPitchSurfa
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { HORIZONTAL_PITCH_ASPECT } from "@/lib/lineup/fit-mvp-horizontal-layout";
 import type { MvpHorizontalSlot } from "@/lib/lineup/mvp-horizontal-geometry";
-import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
+import { mvpPlayersMatch, mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ type MvpHorizontalFieldGraphicProps = {
   awaySquadPlayerNames?: string[];
   homeSquadPlayerNames?: string[];
   selectedKey: string | null;
+  selectedPlayer?: (MvpHorizontalSlot & { teamName: string }) | null;
   disabled?: boolean;
   onSelect: (key: string) => void;
   onFieldReady?: () => void;
@@ -34,6 +35,7 @@ export function MvpHorizontalFieldGraphic({
   awaySquadPlayerNames,
   homeSquadPlayerNames,
   selectedKey,
+  selectedPlayer = null,
   disabled,
   onSelect,
   onFieldReady,
@@ -66,7 +68,9 @@ export function MvpHorizontalFieldGraphic({
     squadPlayerNames?: string[]
   ) {
     const key = mvpSelectionKey(teamName, slot);
-    const active = selectedKey === key;
+    const active = selectedPlayer
+      ? mvpPlayersMatch(teamName, slot, selectedPlayer)
+      : selectedKey === key;
     const scale = slot.scale * chipScale;
 
     return (
