@@ -70,24 +70,18 @@ test("mapSlotsToHomeRight mantiene todos los jugadores en x > 50", () => {
   }
 });
 
-test("proyección horizontal conserva spread lateral tras microajuste anti-solape", () => {
+test("proyección horizontal mantiene spread lateral como eje Y", () => {
   const template = getFormationTemplateCoordinates("4-2-3-1");
   const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const home = mapSlotsToHomeRight(slots);
   const away = mapSlotsToAwayLeft(slots);
 
-  for (const mapped of [home, away]) {
-    for (const slot of mapped) {
-      assert.ok(slot.y >= 12 && slot.y <= 88, `${slot.slotKey} fuera de banda lateral`);
-    }
-    const ys = mapped.map((slot) => slot.y).sort((a, b) => a - b);
-    const templateYs = template.map((coord) => coord.x).sort((a, b) => a - b);
-    assert.equal(ys.length, templateYs.length);
-    for (let i = 0; i < ys.length; i += 1) {
-      assert.ok(
-        Math.abs(ys[i]! - templateYs[i]!) <= 9,
-        `desplazamiento lateral excesivo en índice ${i}`
-      );
-    }
-  }
+  assert.deepEqual(
+    home.map((slot) => slot.y).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
+  assert.deepEqual(
+    away.map((slot) => slot.y).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
 });

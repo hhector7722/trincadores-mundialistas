@@ -3,9 +3,7 @@ import {
   normalizeFormationTemplate,
   normalizeSlotKey,
 } from "@/lib/lineup/formation-templates";
-import { SINGLE_TEAM_BOUNDS } from "@/lib/lineup/field-layout";
 import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
-import { resolveTacticalSlotCollisions } from "@/lib/lineup/tactical-collision-resolve";
 import type { LineupSlot, PositionRole, ResolvedLineup } from "@/lib/lineup/types";
 
 const UNAMBIGUOUS_LABEL_TO_SLOT: Record<string, string> = {
@@ -53,13 +51,8 @@ export function relayoutLineupSlots(lineup: ResolvedLineup): ResolvedLineup {
     };
   });
 
-  const slots = layoutPredictedStarters(inputs, lineup.formationLabel);
-
   return {
     ...lineup,
-    slots: resolveTacticalSlotCollisions(slots, {
-      bounds: SINGLE_TEAM_BOUNDS,
-      mode: "master",
-    }),
+    slots: layoutPredictedStarters(inputs, lineup.formationLabel),
   };
 }

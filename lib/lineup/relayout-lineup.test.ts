@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getFormationSlotAnchors } from "./formation-coordinates";
 import { getFormationTemplateCoordinates } from "./formation-templates";
 import { relayoutLineupSlots } from "./relayout-lineup";
-import { hasTacticalSlotCollisions } from "./tactical-collision-resolve";
 import type { LineupSlot, ResolvedLineup } from "./types";
 
 function legacyLineup(slots: Omit<LineupSlot, "slotKey">[]): ResolvedLineup {
@@ -35,11 +33,10 @@ test("relayoutLineupSlots corrige coords antiguas en caché sin slotKey", () => 
   );
 
   const relaid = relayoutLineupSlots(stale);
-  const gk = relaid.slots.find((slot) => slot.role === "GK");
-
-  assert.equal(gk?.y, 94);
-  assert.ok(relaid.slots.some((slot) => slot.x !== 50 || slot.y !== 50));
-  assert.ok(!hasTacticalSlotCollisions(relaid.slots) || relaid.slots.length > 1);
+  assert.deepEqual(
+    relaid.slots.map((slot) => ({ x: slot.x, y: slot.y })),
+    template
+  );
 });
 
 test("relayoutLineupSlots preserva slotKey y normaliza geometría", () => {
@@ -75,18 +72,8 @@ test("relayoutLineupSlots preserva slotKey y normaliza geometría", () => {
     fetchedAt: null,
   });
 
-  for (const slot of relaid.slots) {
-    assert.ok(slot.slotKey);
-  }
-
-  const templateBySlot = new Map(
-    getFormationSlotAnchors("4-2-3-1").map((anchor) => [anchor.key, anchor.coord])
+  assert.deepEqual(
+    relaid.slots.map((slot) => ({ x: slot.x, y: slot.y })).sort((a, b) => a.y - b.y || a.x - b.x),
+    getFormationTemplateCoordinates("4-2-3-1").sort((a, b) => a.y - b.y || a.x - b.x)
   );
-
-  for (const slot of relaid.slots) {
-    const base = templateBySlot.get(slot.slotKey ?? "");
-    assert.ok(base, `slot ${slot.slotKey}`);
-    assert.ok(Math.abs(slot.x - base.x) <= 16);
-    assert.ok(Math.abs(slot.y - base.y) <= 16);
-  }
 });

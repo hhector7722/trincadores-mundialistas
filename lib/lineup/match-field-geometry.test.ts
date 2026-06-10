@@ -66,8 +66,8 @@ test("delanteros quedan enfrentados cerca de la linea central", () => {
   const homeSt = home.find((slot) => slot.slotKey === "ST");
 
   assert.ok(awaySt && homeSt);
-  assert.ok(Math.abs(awaySt.y - 40) <= 6);
-  assert.ok(Math.abs(homeSt.y - 60) <= 6);
+  assert.equal(awaySt.y, 40);
+  assert.equal(homeSt.y, 60);
   assert.ok(homeSt.y - awaySt.y >= 15);
 });
 
@@ -80,21 +80,18 @@ test("porteros quedan junto a sus porterias", () => {
   assert.equal(homeGk?.y, 90);
 });
 
-test("proyeccion MVP conserva bandas horizontales tras microajuste", () => {
+test("proyeccion MVP mantiene coords horizontales de plantilla", () => {
   const template = getFormationTemplateCoordinates("4-2-3-1");
   const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
   const home = mapSlotsToHomeHalf(slots);
   const away = mapSlotsToAwayHalf(slots);
 
-  for (const mapped of [home, away]) {
-    const xs = mapped.map((slot) => slot.x).sort((a, b) => a - b);
-    const templateXs = template.map((coord) => coord.x).sort((a, b) => a - b);
-    assert.equal(xs.length, templateXs.length);
-    for (let i = 0; i < xs.length; i += 1) {
-      assert.ok(
-        Math.abs(xs[i]! - templateXs[i]!) <= 14,
-        `desplazamiento horizontal excesivo en índice ${i}`
-      );
-    }
-  }
+  assert.deepEqual(
+    home.map((slot) => slot.x).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
+  assert.deepEqual(
+    away.map((slot) => slot.x).sort((a, b) => a - b),
+    template.map((coord) => coord.x).sort((a, b) => a - b)
+  );
 });

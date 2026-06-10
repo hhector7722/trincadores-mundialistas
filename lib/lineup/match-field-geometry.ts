@@ -1,6 +1,4 @@
 import { TACTICAL_Y } from "@/lib/lineup/formation-coordinates";
-import type { PlayableBounds } from "@/lib/lineup/field-layout";
-import { resolveTacticalSlotCollisions } from "@/lib/lineup/tactical-collision-resolve";
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
@@ -23,20 +21,6 @@ export const HOME_HALF_Y = { MIN: 60, MAX: 90 } as const;
 
 const AWAY_HALF_SPAN = AWAY_HALF_Y.MAX - AWAY_HALF_Y.MIN;
 const HOME_HALF_SPAN = HOME_HALF_Y.MAX - HOME_HALF_Y.MIN;
-
-export const AWAY_VERTICAL_BOUNDS: PlayableBounds = {
-  xMin: 10,
-  xMax: 90,
-  yMin: AWAY_HALF_Y.MIN,
-  yMax: AWAY_HALF_Y.MAX,
-};
-
-export const HOME_VERTICAL_BOUNDS: PlayableBounds = {
-  xMin: 10,
-  xMax: 90,
-  yMin: HOME_HALF_Y.MIN,
-  yMax: HOME_HALF_Y.MAX,
-};
 
 function sourceDepth(y: number): number {
   return (SOURCE_Y_GK - y) / SOURCE_Y_SPAN;
@@ -80,31 +64,14 @@ function mapSlotToAwayHalf(slot: LineupSlot): MatchFieldSlot {
   return applyGoyaPerspective({ ...slot, ...compressCoordToAwayHalf(slot) });
 }
 
-function resolveVerticalHalf(
-  slots: LineupSlot[],
-  mapFn: (slot: LineupSlot) => MatchFieldSlot,
-  bounds: PlayableBounds,
-  mode: "vertical-away" | "vertical-home"
-): MatchFieldSlot[] {
-  const mapped = slots.map(mapFn);
-  return resolveTacticalSlotCollisions(mapped, {
-    bounds,
-    mode,
-    maxNudge: 12,
-  }).map((slot) => ({
-    ...slot,
-    scale: 1,
-  }));
-}
-
 /** Local: mitad inferior comprimida desde plantilla maestra. */
 export function mapSlotsToHomeHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return resolveVerticalHalf(slots, mapSlotToHomeHalf, HOME_VERTICAL_BOUNDS, "vertical-home");
+  return slots.map(mapSlotToHomeHalf);
 }
 
 /** Visitante: mitad superior comprimida desde plantilla maestra. */
 export function mapSlotsToAwayHalf(slots: LineupSlot[]): MatchFieldSlot[] {
-  return resolveVerticalHalf(slots, mapSlotToAwayHalf, AWAY_VERTICAL_BOUNDS, "vertical-away");
+  return slots.map(mapSlotToAwayHalf);
 }
 
 export function goyaScaleFactor(_y: number): number {
