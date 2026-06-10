@@ -18,7 +18,7 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import {
   MatchTeamsDisplay,
-  PREDICTION_MODAL_ACTIONS_ROW_CLASS,
+  PREDICTION_MODAL_ACTIONS_STACKED_CLASS,
   PREDICTION_MODAL_NAMES_BOTTOM_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
@@ -380,7 +380,7 @@ export function QuickPredictionModal({
       return (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pb-0 pt-2">
-            <div className="relative mt-2 min-h-[7.25rem]">
+            <div className="relative mt-2 min-h-[8.25rem]">
               <MatchTeamsDisplay
                 layout="predictionModal"
                 homeTeam={targetMatch.home_team}
@@ -413,7 +413,7 @@ export function QuickPredictionModal({
 
               <div
                 className={cn(
-                  "absolute inset-x-0 bottom-8 flex items-center justify-center",
+                  "absolute inset-x-0 bottom-16 flex items-center justify-center",
                   PREDICTION_MODAL_NAMES_BOTTOM_CLASS
                 )}
                 onClick={(event) => event.stopPropagation()}
@@ -443,13 +443,13 @@ export function QuickPredictionModal({
               </div>
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_ROW_CLASS)}
+                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
                   compact
-                  layout="teamAnchors"
-                  className="[&>div]:min-h-[2rem]"
+                  layout="predictionModalStacked"
+                  className="h-full"
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}

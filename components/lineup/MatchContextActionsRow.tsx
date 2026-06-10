@@ -9,7 +9,7 @@ type MatchContextActionsRowProps = {
   /** Sin etiquetas grises ni borde superior. */
   compact?: boolean;
   /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
-  layout?: "grid" | "teamAnchors";
+  layout?: "grid" | "teamAnchors" | "predictionModalStacked";
   /** Ancla horizontal de plantilla local (debe coincidir con `MatchTeamsDisplay`). */
   homeAnchor?: string;
   /** Ancla horizontal de plantilla visitante. */
@@ -27,6 +27,42 @@ export function MatchContextActionsRow({
   awayAnchor = "90%",
   className,
 }: MatchContextActionsRowProps) {
+  if (layout === "predictionModalStacked") {
+    return (
+      <div className={className}>
+        <div className="relative min-h-[2rem] w-full">
+          <div
+            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
+            style={{ left: homeAnchor }}
+          >
+            <MatchContextActionButton
+              caption="Plantilla"
+              hideCaption={compact}
+              onClick={onOpenHomeLineup}
+            />
+          </div>
+          <div
+            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
+            style={{ left: awayAnchor }}
+          >
+            <MatchContextActionButton
+              caption="Plantilla"
+              hideCaption={compact}
+              onClick={onOpenAwayLineup}
+            />
+          </div>
+        </div>
+        <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
+          <MatchContextActionButton
+            caption="Posibles alineaciones"
+            hideCaption={compact}
+            onClick={onOpenPossibleLineups}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (layout === "teamAnchors") {
     return (
       <div className={className}>
