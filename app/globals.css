@@ -1164,7 +1164,7 @@ html:has(.tm-app-frame) {
   --tm-cal-grid-line-width: 0.75px;
   --tm-cal-dock-bg: rgba(26, 8, 56, 0.9);
   --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
-  --tm-cal-match-card-bg: rgba(111, 43, 255, 0.16);
+  --tm-cal-match-card-bg: rgba(30, 10, 62, 0.94);
   --tm-cal-match-card-border: rgba(255, 255, 255, 0.12);
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
   --tm-cal-sidebar-border: rgba(217, 255, 0, 0.18);
@@ -1620,7 +1620,7 @@ html:has(.tm-app-frame) {
   display: flex;
   flex-direction: column;
   padding: calc(0.0625rem * var(--tm-cal-ui-scale, 1));
-  background: var(--tm-cal-cell-bg);
+  background: #fff;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
