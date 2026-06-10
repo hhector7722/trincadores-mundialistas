@@ -419,6 +419,22 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           match={activeMatch}
           matches={matches}
           onMatchChange={setActiveMatch}
+          onMvpSaved={(matchId, playerName, teamName) => {
+            setActiveMatch((current) =>
+              current?.id === matchId
+                ? {
+                    ...current,
+                    mvpPrediction: {
+                      id: current.mvpPrediction?.id ?? "",
+                      player_name: playerName,
+                      team_name: teamName,
+                      points_awarded: current.mvpPrediction?.points_awarded ?? null,
+                      updated_at: current.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                    },
+                  }
+                : current
+            );
+          }}
         />
       )}
     </div>

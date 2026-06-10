@@ -31,6 +31,11 @@ import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { cn } from "@/lib/utils";
 
+type MvpOverride = {
+  player_name: string;
+  team_name: string;
+};
+
 type QuickPredictionModalProps = {
   open: boolean;
   onClose: () => void;
@@ -38,7 +43,27 @@ type QuickPredictionModalProps = {
   match: MatchWithPrediction;
   matches?: MatchWithPrediction[];
   onMatchChange?: (match: MatchWithPrediction) => void;
+  onMvpSaved?: (matchId: string, playerName: string, teamName: string) => void;
 };
+
+function applyMvpOverride(
+  target: MatchWithPrediction,
+  overrides: Record<string, MvpOverride>
+): MatchWithPrediction {
+  const override = overrides[target.id];
+  if (!override) return target;
+
+  return {
+    ...target,
+    mvpPrediction: {
+      id: target.mvpPrediction?.id ?? "",
+      player_name: override.player_name,
+      team_name: override.team_name,
+      points_awarded: target.mvpPrediction?.points_awarded ?? null,
+      updated_at: target.mvpPrediction?.updated_at ?? new Date().toISOString(),
+    },
+  };
+}
 
 type DotPosition = "start" | "middle" | "end";
 type QuickPanelView = { kind: "prediction" } | EntityModalView;
@@ -100,6 +125,7 @@ export function QuickPredictionModal({
   match,
   matches,
   onMatchChange,
+  onMvpSaved,
 }: QuickPredictionModalProps) {
   const router = useRouter();
   const orderedMatches = useMemo(
@@ -109,13 +135,18 @@ export function QuickPredictionModal({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
+  const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpOverride>>({});
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
   const onMatchChangeRef = useRef(onMatchChange);
   const wasOpenRef = useRef(false);
 
-  const viewMatch = orderedMatches[activeIndex] ?? match;
+  const baseViewMatch = orderedMatches[activeIndex] ?? match;
+  const viewMatch = useMemo(
+    () => applyMvpOverride(baseViewMatch, mvpOverrides),
+    [baseViewMatch, mvpOverrides]
+  );
   const canSwipeMatches = orderedMatches.length > 1 && Boolean(onMatchChange);
   const dotPosition = resolveDotPosition(activeIndex, orderedMatches.length);
 
@@ -221,12 +252,31 @@ export function QuickPredictionModal({
   const finishMatchSlideRef = useRef(finishMatchSlide);
   finishMatchSlideRef.current = finishMatchSlide;
 
+  const handleMvpSaved = useCallback(
+    (matchId: string, playerName: string, teamName: string) => {
+      setMvpOverrides((current) => ({
+        ...current,
+        [matchId]: { player_name: playerName, team_name: teamName },
+      }));
+      onMvpSaved?.(matchId, playerName, teamName);
+      if (panelView.kind === "mvp" && panelView.matchId === matchId) {
+        replaceCurrent({
+          ...panelView,
+          savedPlayerName: playerName,
+          savedTeamName: teamName,
+        });
+      }
+    },
+    [onMvpSaved, panelView, replaceCurrent]
+  );
+
   useEffect(() => {
     if (!open) {
       wasOpenRef.current = false;
       clearMatchSlideTimer();
       matchSlideLockRef.current = false;
       setMatchSlide(null);
+      setMvpOverrides({});
       return;
     }
 
@@ -384,6 +434,7 @@ export function QuickPredictionModal({
         serverEditable={view.serverEditable}
         savedPlayerName={view.savedPlayerName}
         savedTeamName={view.savedTeamName}
+        onSaved={(playerName, teamName) => handleMvpSaved(view.matchId, playerName, teamName)}
       />
     );
   }
@@ -402,7 +453,10 @@ export function QuickPredictionModal({
       ? {
           direction: matchSlide.direction,
           phase: matchSlide.phase,
-          incoming: renderPanelView({ kind: "prediction" }, matchSlide.target),
+          incoming: renderPanelView(
+            { kind: "prediction" },
+            applyMvpOverride(matchSlide.target, mvpOverrides)
+          ),
           onTransitionEnd: () => finishMatchSlideRef.current(),
         }
       : null;
