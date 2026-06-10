@@ -69,8 +69,8 @@ export function BenchPlayersStrip({
       });
 
     return (
-      <section className={cn("w-full max-w-lg self-center px-0.5", className)}>
-        <p className="text-center text-sm leading-snug text-[var(--tm-fg)]">
+      <section className={cn("w-full px-0", className)}>
+        <p className="text-left text-[9px] leading-snug text-[var(--tm-fg)]">
           {ordered.map(({ player, label }, index) => {
             const key = benchPlayerKey(teamName, player);
             const active = selectedKey === key;

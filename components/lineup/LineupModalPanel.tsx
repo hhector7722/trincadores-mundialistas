@@ -125,19 +125,19 @@ export function LineupModalPanel({
               size="modal"
               onPlayerClick={handlePlayerInteraction}
               onFieldReady={markFieldReady}
+              benchAbove={
+                bench.length > 0 ? (
+                  <BenchPlayersStrip
+                    teamName={teamName}
+                    players={bench}
+                    density="inline"
+                    showTeamHeader={false}
+                    position="none"
+                    onPlayerClick={(player) => handlePlayerInteraction(player.name)}
+                  />
+                ) : null
+              }
             />
-
-            {bench.length > 0 ? (
-              <BenchPlayersStrip
-                teamName={teamName}
-                players={bench}
-                density="inline"
-                showTeamHeader={false}
-                position="none"
-                className="mt-1.5"
-                onPlayerClick={(player) => handlePlayerInteraction(player.name)}
-              />
-            ) : null}
           </div>
         )}
       </LineupFieldGate>

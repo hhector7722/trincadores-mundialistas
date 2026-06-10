@@ -118,22 +118,23 @@ export function ProbableXI({
       <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 py-1">
-            {bench.length > 0 ? (
-              <BenchPlayersStrip
-                teamName={teamName}
-                players={bench}
-                density="minimal"
-                showTeamHeader={false}
-                position="top"
-                onPlayerClick={() => {}}
-              />
-            ) : null}
-
             <div className="flex min-h-[14rem] flex-1 items-center justify-center py-0.5">
               <TeamLineupGraphic
                 slots={formationSlots}
                 teamName={teamName}
                 onFieldReady={markFieldReady}
+                benchAbove={
+                  bench.length > 0 ? (
+                    <BenchPlayersStrip
+                      teamName={teamName}
+                      players={bench}
+                      density="inline"
+                      showTeamHeader={false}
+                      position="none"
+                      onPlayerClick={() => {}}
+                    />
+                  ) : null
+                }
               />
             </div>
 
