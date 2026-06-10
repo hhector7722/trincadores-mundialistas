@@ -80,9 +80,9 @@ export function TeamLineupGraphic({
   }
 
   return (
-    <div className={cn("flex w-full flex-col items-center", className)}>
-      <div className={cn("flex shrink-0 flex-col items-center self-center", !sized && pitchMaxW)}>
-        {benchAbove ? <div className="mb-1 w-full shrink-0">{benchAbove}</div> : null}
+    <div className={cn("flex w-full flex-col", className)}>
+      <div className={cn("flex w-full shrink-0 flex-col items-stretch", !sized && pitchMaxW)}>
+        {benchAbove ? <div className="mb-1 w-full min-w-0 shrink-0">{benchAbove}</div> : null}
         <div
           className={cn("relative w-full shrink-0 overflow-visible", !sized && PITCH_ASPECT_CLASS)}
           style={

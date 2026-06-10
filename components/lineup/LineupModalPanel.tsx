@@ -6,6 +6,8 @@ import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import { LINEUP_MODAL_FIELD_WIDTH_PX } from "@/lib/lineup/field-asset";
+import { estimateMvpInlineBenchLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
@@ -74,7 +76,7 @@ export function LineupModalPanel({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center px-1 pt-0.5 pb-2.5 sm:px-1.5">
+      <div className="flex w-full flex-col px-1 pt-0.5 pb-2.5 sm:px-1.5">
         <LineupModalFieldShell>
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <FootballPitchSurface />
@@ -110,6 +112,7 @@ export function LineupModalPanel({
   const resolvedLineup = lineup ?? buildFallbackLineup(squad.players);
   const formationSlots = resolveFormationSlotsFromLineup(resolvedLineup);
   const bench = resolveBenchPlayers(squad, resolvedLineup);
+  const benchLayout = estimateMvpInlineBenchLayout(bench.length, LINEUP_MODAL_FIELD_WIDTH_PX);
 
   function handlePlayerInteraction(playerName: string) {
     if (selectionMode === "pick" && playerFilter && squad) {
@@ -130,7 +133,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex flex-col">
         {(markFieldReady) => (
-          <div className="flex flex-col items-center px-1 pt-0.5 pb-2.5 sm:px-1.5">
+          <div className="flex w-full flex-col px-1 pt-0.5 pb-2.5 sm:px-1.5">
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}
@@ -146,6 +149,7 @@ export function LineupModalPanel({
                     density="inline"
                     showTeamHeader={false}
                     position="none"
+                    gridLayout={benchLayout}
                     onPlayerClick={(player) => handlePlayerInteraction(player.name)}
                   />
                 ) : null

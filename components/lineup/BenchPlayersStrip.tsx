@@ -68,9 +68,17 @@ export function BenchPlayersStrip({
         return na - nb;
       });
 
+    const fontPx = gridLayout?.nameFontPx ?? 9;
+
     return (
-      <section className={cn("w-full px-0", className)}>
-        <p className="text-left text-[9px] leading-snug text-[var(--tm-fg)]">
+      <section
+        className={cn("w-full min-w-0 shrink-0 self-stretch", className)}
+        style={gridLayout?.heightPx ? { minHeight: gridLayout.heightPx } : undefined}
+      >
+        <p
+          className="m-0 w-full text-left leading-snug text-[var(--tm-fg)]"
+          style={{ fontSize: fontPx, lineHeight: 1.25 }}
+        >
           {ordered.map(({ player, label }, index) => {
             const key = benchPlayerKey(teamName, player);
             const active = selectedKey === key;

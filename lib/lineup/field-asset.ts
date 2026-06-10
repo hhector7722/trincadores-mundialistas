@@ -6,6 +6,9 @@ export const GOYA_FIELD_SRC = `/icons/goya.png?v=${GOYA_FIELD_ASSET_VERSION}`;
 /** Ancho fijo del campo táctico en modal (evita colapso de `w-max` durante carga). */
 export const LINEUP_MODAL_FIELD_WIDTH_CLASS = "w-[min(98vw,18.5rem)]";
 
+/** Ancho nominal del campo en modal plantilla (18.5rem @ 16px). */
+export const LINEUP_MODAL_FIELD_WIDTH_PX = 296;
+
 /** Modal plantilla: mismo ancho que el campo (~18.5rem). */
 export const LINEUP_MODAL_WRAPPER_CLASS = LINEUP_MODAL_FIELD_WIDTH_CLASS;
 

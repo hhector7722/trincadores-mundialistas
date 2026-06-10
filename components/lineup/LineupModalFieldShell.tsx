@@ -22,19 +22,19 @@ export function LineupModalFieldShell({
   benchAbove,
 }: LineupModalFieldShellProps) {
   return (
-    <div className={cn("flex w-full flex-col items-center", className)}>
+    <div className={cn("flex w-full flex-col", className)}>
       <div
         className={cn(
-          "flex shrink-0 flex-col items-center self-center",
+          "flex w-full shrink-0 flex-col items-stretch",
           LINEUP_MODAL_FIELD_WIDTH_CLASS
         )}
         style={{
           transform: `scale(${MODAL_FIELD_WRAPPER_SCALE})`,
-          transformOrigin: "top center",
+          transformOrigin: "top left",
           marginBottom: modalFieldScaleBottomTrim(),
         }}
       >
-        {benchAbove ? <div className="mb-1 w-full shrink-0">{benchAbove}</div> : null}
+        {benchAbove ? <div className="mb-1 w-full min-w-0 shrink-0">{benchAbove}</div> : null}
         <div className={cn("relative w-full shrink-0 overflow-visible", PITCH_ASPECT_CLASS)}>
           {children}
         </div>
