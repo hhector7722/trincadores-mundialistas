@@ -23,41 +23,54 @@ const R32_SLOT_COUNT = 8;
 /** Escala global de tarjetas con equipos (ancho + alto proporcional). */
 export const KO_CARD_SIZE_SCALE = 0.92;
 
-/** Mitad de la separación vertical entre los dos orbes (rondas interiores, % canvas Y). */
-export const ORB_PAIR_HALF_Y = 3.2;
-
-/** Radio vertical aproximado del orbe en dieciseisavos (% canvas Y). */
-const R32_ORB_HALF_Y = 1.7;
+/** Radio vertical aproximado del orbe (% canvas Y). */
+const ORB_HALF_Y = 1.7;
 
 /** Holgura mínima entre bordes de dos orbes del mismo enfrentamiento (% canvas Y). */
-const R32_INNER_EDGE_GAP_Y = 0.55;
+const ORB_INNER_EDGE_GAP_Y = 0.55;
 
-/** Holgura mínima entre bordes de orbes de enfrentamientos consecutivos (% canvas Y). */
-const R32_OUTER_EDGE_GAP_Y = 1.6;
+/** Mitad de la separación centro-a-centro dentro de un enfrentamiento (% canvas Y). */
+export const ORB_PAIR_INNER_HALF_Y = ORB_HALF_Y + ORB_INNER_EDGE_GAP_Y / 2;
 
-/** Mitad de la separación centro-a-centro dentro de un enfrentamiento r32 (% canvas Y). */
-export const R32_PAIR_INNER_HALF_Y = R32_ORB_HALF_Y + R32_INNER_EDGE_GAP_Y / 2;
+/** @deprecated Usar ORB_PAIR_INNER_HALF_Y */
+export const R32_PAIR_INNER_HALF_Y = ORB_PAIR_INNER_HALF_Y;
 
+/** Centros verticales de emparejamientos r32 (8 por lado). */
 function buildR32PairCenters(): readonly number[] {
-  const innerHalf = R32_PAIR_INNER_HALF_Y;
-  const orbHalf = R32_ORB_HALF_Y;
-  const topBound = R32_TOP_ANCHOR_Y + innerHalf + orbHalf;
-  const bottomBound = R32_BOTTOM_ANCHOR_Y - innerHalf - orbHalf;
-  const centerSpan = bottomBound - topBound;
-  const pairPitch = centerSpan / (R32_SLOT_COUNT - 1);
-
-  return Array.from(
-    { length: R32_SLOT_COUNT },
-    (_, index) => topBound + index * pairPitch
-  );
+  return buildPairCentersInBand(R32_SLOT_COUNT);
 }
 
 const R32_PAIR_CENTERS = buildR32PairCenters();
 
-export const FINAL_CENTER_X = 50;
+/** Reparte centros de emparejamientos homogéneamente en la banda visible del canvas. */
+export function buildPairCentersInBand(matchCount: number): readonly number[] {
+  if (matchCount <= 0) return [];
 
-/** Separación mínima entre el centro de semifinales y el de la final (% canvas). */
-const MIN_FINAL_SEMI_GAP_Y = 12.5;
+  const innerHalf = ORB_PAIR_INNER_HALF_Y;
+  const topBound = R32_TOP_ANCHOR_Y + innerHalf + ORB_HALF_Y;
+  const bottomBound = R32_BOTTOM_ANCHOR_Y - innerHalf - ORB_HALF_Y;
+
+  if (matchCount === 1) {
+    return [(topBound + bottomBound) / 2];
+  }
+
+  const centerSpan = bottomBound - topBound;
+  const pairPitch = centerSpan / (matchCount - 1);
+  return Array.from(
+    { length: matchCount },
+    (_, index) => topBound + index * pairPitch
+  );
+}
+
+function yFromPairCenter(midY: number) {
+  return {
+    midY,
+    homeY: midY - ORB_PAIR_INNER_HALF_Y,
+    awayY: midY + ORB_PAIR_INNER_HALF_Y,
+  };
+}
+
+export const FINAL_CENTER_X = 50;
 
 /** Copa flotante: distancia sobre el centro de la final (% canvas). */
 export const FINAL_CUP_OFFSET_ABOVE_FINAL = 5.5;
@@ -147,35 +160,7 @@ const RIGHT_SF = [102] as const;
 
 function r32YFromSlot(slotIndex: number) {
   const midY = R32_PAIR_CENTERS[slotIndex] ?? R32_TOP_ANCHOR_Y;
-  return {
-    midY,
-    homeY: midY - R32_PAIR_INNER_HALF_Y,
-    awayY: midY + R32_PAIR_INNER_HALF_Y,
-  };
-}
-
-function findMatch(
-  matches: BracketMatchGeometry[],
-  matchNumber: number
-): BracketMatchGeometry {
-  const match = matches.find((entry) => entry.matchNumber === matchNumber);
-  if (!match) {
-    throw new Error(`Missing bracket match ${matchNumber}`);
-  }
-  return match;
-}
-
-function yFromChildPair(
-  childA: BracketMatchGeometry,
-  childB: BracketMatchGeometry
-) {
-  const top = childA.midY <= childB.midY ? childA : childB;
-  const bottom = childA.midY <= childB.midY ? childB : childA;
-  return {
-    midY: (top.midY + bottom.midY) / 2,
-    homeY: top.homeY,
-    awayY: bottom.awayY,
-  };
+  return yFromPairCenter(midY);
 }
 
 export function mapColumnX(column: number): number {
@@ -222,18 +207,16 @@ function pushRoundFromChildren(
   column: number,
   childGroups: readonly [number, number][]
 ) {
+  const pairCenters = buildPairCentersInBand(matchNumbers.length);
+
   matchNumbers.forEach((matchNumber, index) => {
     const [childANumber, childBNumber] = childGroups[index];
-    const y = yFromChildPair(
-      findMatch(out, childANumber),
-      findMatch(out, childBNumber)
-    );
     out.push({
       matchNumber,
       round,
       side,
       column,
-      ...y,
+      ...yFromPairCenter(pairCenters[index] ?? R32_TOP_ANCHOR_Y),
       columnX: mapColumnX(column),
       layoutScale: ROUND_LAYOUT_SCALE[round],
       childMatches: [childANumber, childBNumber],
@@ -271,17 +254,14 @@ export function buildBracketGeometry(): BracketMatchGeometry[] {
   ]);
   pushRoundFromChildren(matches, RIGHT_SF, "sf", "right", 5, [[RIGHT_QF[0], RIGHT_QF[1]]]);
 
-  const semiMidY = findMatch(matches, LEFT_SF[0]).midY;
-  const finalCenterY = semiMidY - MIN_FINAL_SEMI_GAP_Y;
+  const finalCenterY = buildPairCentersInBand(1)[0] ?? 50;
 
   matches.push({
     matchNumber: 104,
     round: "final",
     side: "center",
     column: 4,
-    homeY: finalCenterY,
-    awayY: finalCenterY,
-    midY: finalCenterY,
+    ...yFromPairCenter(finalCenterY),
     columnX: FINAL_CENTER_X,
     layoutScale: ROUND_LAYOUT_SCALE.final,
     childMatches: [LEFT_SF[0], RIGHT_SF[0]],

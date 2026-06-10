@@ -15,7 +15,6 @@ import {
   FINAL_CUP_OFFSET_ABOVE_FINAL,
   finalCenterYFromGeometry,
   matchPosition,
-  ORB_PAIR_HALF_Y,
   type BracketMatchGeometry,
 } from "@/lib/predictions/knockout-bracket-geometry";
 import {
@@ -48,16 +47,9 @@ function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
   home: TeamSlotLayout;
   away: TeamSlotLayout;
 } {
-  if (geom.round === "r32") {
-    return {
-      home: { x: columnX, y: geom.homeY },
-      away: { x: columnX, y: geom.awayY },
-    };
-  }
-
   return {
-    home: { x: columnX, y: geom.midY - ORB_PAIR_HALF_Y },
-    away: { x: columnX, y: geom.midY + ORB_PAIR_HALF_Y },
+    home: { x: columnX, y: geom.homeY },
+    away: { x: columnX, y: geom.awayY },
   };
 }
 
