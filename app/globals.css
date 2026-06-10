@@ -1652,7 +1652,7 @@ html:has(.tm-app-frame) {
 }
 
 .tm-porra-calendar .tm-cal-sidebar-unified-card {
-  width: calc(100% - calc(0.5rem * var(--tm-cal-ui-scale, 1)));
+  width: calc(100% - calc(1rem * var(--tm-cal-ui-scale, 1)));
   height: var(--tm-cal-sidebar-card-h, auto);
   margin-top: var(--tm-cal-sidebar-card-offset-top, 0px);
   margin-right: auto;
