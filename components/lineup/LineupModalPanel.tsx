@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
-import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
@@ -17,6 +16,7 @@ type LineupModalPanelProps = {
   teamName: string;
   matchId?: string;
   onPlayerClick: (playerName: string) => void;
+  onFormationResolved?: (formationLabel: string) => void;
   selectionMode?: "navigate" | "pick";
   playerFilter?: (position: string | null) => boolean;
   selectionBlockedMessage?: string;
@@ -26,6 +26,7 @@ export function LineupModalPanel({
   teamName,
   matchId,
   onPlayerClick,
+  onFormationResolved,
   selectionMode = "navigate",
   playerFilter,
   selectionBlockedMessage,
@@ -61,6 +62,12 @@ export function LineupModalPanel({
   }, [teamName, matchId]);
 
   const displayName = teamNameEs(teamName);
+
+  useEffect(() => {
+    if (loading || !squad?.players.length) return;
+    const resolved = lineup ?? buildFallbackLineup(squad.players);
+    onFormationResolved?.(resolved.formationLabel);
+  }, [loading, squad, lineup, onFormationResolved, teamName]);
 
   if (loading) {
     return <LoadingCenter label="Cargando plantilla…" />;
@@ -122,20 +129,13 @@ export function LineupModalPanel({
               <BenchPlayersStrip
                 teamName={teamName}
                 players={bench}
+                density="inline"
                 showTeamHeader={false}
                 position="none"
                 className="mt-4"
                 onPlayerClick={(player) => handlePlayerInteraction(player.name)}
               />
             ) : null}
-
-            <div className="mt-4 max-w-lg self-center px-2 pb-1">
-              <LineupSourceBadge
-                sourceKind={resolvedLineup.sourceKind}
-                formationLabel={resolvedLineup.formationLabel}
-                fetchedAt={resolvedLineup.fetchedAt}
-              />
-            </div>
           </div>
         )}
       </LineupFieldGate>

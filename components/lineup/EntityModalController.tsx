@@ -37,6 +37,7 @@ function renderEntityView(
     onPlayerClick: (teamName: string, playerName: string) => void;
     onMvpSaved?: (playerName: string, teamName: string) => void;
     onMvpFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
+    onFormationResolved?: (formationLabel: string) => void;
   },
   playerPickMode: PlayerPickMode
 ) {
@@ -46,6 +47,7 @@ function renderEntityView(
         <LineupModalPanel
           teamName={view.teamName}
           matchId={view.matchId}
+          onFormationResolved={handlers.onFormationResolved}
           onPlayerClick={(playerName) => handlers.onPlayerClick(view.teamName, playerName)}
           selectionMode={playerPickMode === "none" ? "navigate" : "pick"}
           playerFilter={
@@ -97,8 +99,11 @@ export function EntityModalController({
   onCarouselTeamChange,
 }: EntityModalControllerProps) {
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
+  const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
+
+  const lineupTeamName = current.kind === "lineup" ? current.teamName : null;
 
   const atLineupCarousel = current.kind === "lineup";
   const lineupMatchId =
@@ -137,8 +142,15 @@ export function EntityModalController({
     if (open) {
       reset(initialView);
       setMvpFormations({});
+      setLineupFormation(undefined);
     }
   }, [open, initialView, reset]);
+
+  useEffect(() => {
+    if (lineupTeamName) {
+      setLineupFormation(undefined);
+    }
+  }, [lineupTeamName]);
 
   function handlePlayerClick(teamName: string, playerName: string) {
     if (playerPickMode !== "none" && onPlayerPicked) {
@@ -156,6 +168,7 @@ export function EntityModalController({
         onPlayerClick: handlePlayerClick,
         onMvpFormationsChange: (awayFormation, homeFormation) =>
           setMvpFormations({ awayFormation, homeFormation }),
+        onFormationResolved: setLineupFormation,
       },
       playerPickMode
     );
@@ -178,7 +191,10 @@ export function EntityModalController({
     <Modal
       open={open}
       onClose={onClose}
-      title={entityModalTitleContent(current, mvpFormations)}
+      title={entityModalTitleContent(current, {
+        mvpFormations,
+        lineupFormation: isLineupView ? lineupFormation : undefined,
+      })}
       hideHeaderDivider
       headerTitleAlign={isMvpView ? "left" : "center"}
       headerCompact={isMvpView}

@@ -12,7 +12,7 @@ export function benchPlayerKey(teamName: string, player: BenchPlayer): string {
   return mvpSelectionKey(teamName, player);
 }
 
-type BenchDensity = "default" | "compact" | "minimal" | "mvp";
+type BenchDensity = "default" | "compact" | "minimal" | "mvp" | "inline";
 
 type BenchPlayersStripProps = {
   teamName: string;
@@ -51,9 +51,57 @@ export function BenchPlayersStrip({
   const resolvedDensity: BenchDensity = density ?? (compact ? "compact" : "default");
   const labels = squadDisplayNames(players.map((player) => player.name));
   const isMvp = resolvedDensity === "mvp";
+  const isInline = resolvedDensity === "inline";
   const isMinimal = resolvedDensity === "minimal";
   const isCompact = resolvedDensity === "compact" || isMinimal;
   const useFitGrid = Boolean(gridLayout && gridLayout.columns > 0);
+
+  if (isInline) {
+    const ordered = [...players]
+      .map((player, index) => ({ player, label: labels[index]! }))
+      .sort((a, b) => {
+        const na = a.player.shirtNumber;
+        const nb = b.player.shirtNumber;
+        if (na == null && nb == null) return 0;
+        if (na == null) return 1;
+        if (nb == null) return -1;
+        return na - nb;
+      });
+
+    return (
+      <section className={cn("w-full max-w-lg self-center px-0.5", className)}>
+        <p className="text-center text-sm leading-snug text-[var(--tm-fg)]">
+          {ordered.map(({ player, label }, index) => {
+            const key = benchPlayerKey(teamName, player);
+            const active = selectedKey === key;
+
+            return (
+              <span key={key}>
+                {index > 0 ? ", " : null}
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => onPlayerClick(player)}
+                  className={cn(
+                    "inline text-left whitespace-nowrap transition-colors",
+                    "hover:opacity-90 active:opacity-80",
+                    disabled && "opacity-60"
+                  )}
+                >
+                  <span className="font-display font-bold text-[var(--tm-accent)]">
+                    {player.shirtNumber ?? "—"}
+                  </span>{" "}
+                  <span className={cn(active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]")}>
+                    {label}
+                  </span>
+                </button>
+              </span>
+            );
+          })}
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section

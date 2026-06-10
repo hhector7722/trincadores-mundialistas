@@ -78,9 +78,11 @@ function MatchSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-function quickPanelTitle(view: QuickPanelView): ReactNode {
+function quickPanelTitle(view: QuickPanelView, lineupFormation?: string): ReactNode {
   if (view.kind === "prediction") return "Pronóstico";
-  return entityModalTitleContent(view);
+  return entityModalTitleContent(view, {
+    lineupFormation: view.kind === "lineup" ? lineupFormation : undefined,
+  });
 }
 
 export function QuickPredictionModal({
@@ -98,6 +100,7 @@ export function QuickPredictionModal({
   );
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -127,6 +130,12 @@ export function QuickPredictionModal({
     [viewMatch.home_team, viewMatch.away_team]
   );
   const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : viewMatch.home_team;
+
+  useEffect(() => {
+    if (panelView.kind === "lineup") {
+      setLineupFormation(undefined);
+    }
+  }, [lineupTeamName, panelView.kind]);
 
   const {
     activeIndex: teamCarouselIndex,
@@ -346,6 +355,7 @@ export function QuickPredictionModal({
         <LineupModalPanel
           teamName={view.teamName}
           matchId={view.matchId}
+          onFormationResolved={setLineupFormation}
           onPlayerClick={(playerName) =>
             push({ kind: "player", teamName: view.teamName, playerName })
           }
@@ -397,7 +407,7 @@ export function QuickPredictionModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={quickPanelTitle(panelView)}
+      title={quickPanelTitle(panelView, lineupFormation)}
       hideTitle={atPredictionRoot}
       hideHeaderDivider
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}

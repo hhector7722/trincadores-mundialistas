@@ -65,9 +65,11 @@ function GroupSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-function groupPanelTitle(view: GroupPanelView): ReactNode {
+function groupPanelTitle(view: GroupPanelView, lineupFormation?: string): ReactNode {
   if (view.kind === "standings") return `Grupo ${view.group.code}`;
-  return entityModalTitleContent(view);
+  return entityModalTitleContent(view, {
+    lineupFormation: view.kind === "lineup" ? lineupFormation : undefined,
+  });
 }
 
 export function GroupStandingsModal({
@@ -85,6 +87,7 @@ export function GroupStandingsModal({
   const onGroupChangeRef = useRef(onGroupChange);
   const wasOpenRef = useRef(false);
 
+  const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const viewGroup = orderedGroups[activeIndex] ?? null;
   const canSwipeGroups = orderedGroups.length > 1 && Boolean(onGroupChange);
   const dotPosition = resolveDotPosition(activeIndex, orderedGroups.length);
@@ -113,6 +116,12 @@ export function GroupStandingsModal({
     [viewGroup]
   );
   const lineupTeamName = panelView.kind === "lineup" ? panelView.teamName : groupTeamNames[0] ?? "";
+
+  useEffect(() => {
+    if (panelView.kind === "lineup") {
+      setLineupFormation(undefined);
+    }
+  }, [lineupTeamName, panelView.kind]);
 
   const {
     activeIndex: teamCarouselIndex,
@@ -231,6 +240,7 @@ export function GroupStandingsModal({
       return (
         <LineupModalPanel
           teamName={view.teamName}
+          onFormationResolved={setLineupFormation}
           onPlayerClick={(playerName) =>
             push({ kind: "player", teamName: view.teamName, playerName })
           }
@@ -278,7 +288,7 @@ export function GroupStandingsModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={groupPanelTitle(panelView)}
+      title={groupPanelTitle(panelView, lineupFormation)}
       hideHeaderDivider
       className={cn(isLineupView && "max-h-[calc(100dvh-1rem)]")}
       wrapperClassName={cn(isLineupView && LINEUP_MODAL_WRAPPER_CLASS)}

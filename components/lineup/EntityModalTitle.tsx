@@ -10,16 +10,29 @@ export type MvpModalFormations = {
   homeFormation?: string;
 };
 
+export type EntityModalTitleOptions = {
+  mvpFormations?: MvpModalFormations;
+  lineupFormation?: string;
+};
+
 export function entityModalTitleContent(
   view: EntityModalView,
-  _mvpFormations?: MvpModalFormations
+  options?: EntityModalTitleOptions
 ): ReactNode {
   switch (view.kind) {
     case "lineup":
       return (
         <span className="flex min-w-0 flex-1 items-center gap-2">
           <TeamFlagBadge name={view.teamName} size="xs" />
-          <span className="truncate">{teamNameEs(view.teamName)}</span>
+          <span className="truncate">
+            {teamNameEs(view.teamName)}
+            {options?.lineupFormation ? (
+              <>
+                <span className="text-[var(--tm-muted)]"> · </span>
+                <span className="text-[var(--tm-fg)]">{options.lineupFormation}</span>
+              </>
+            ) : null}
+          </span>
         </span>
       );
     case "player":
