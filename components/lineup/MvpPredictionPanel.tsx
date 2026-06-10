@@ -10,6 +10,7 @@ import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlay
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
+import { ensureElevenStarterSlots } from "@/lib/lineup/ensure-eleven-starter-slots";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import {
   findMvpOptionBySaved,
@@ -79,6 +80,15 @@ function flattenSquadPlayers(
     }));
 }
 
+function resolveTeamLineup(
+  lineup: ResolvedLineup | null,
+  squad: TeamSquadWithPlayers | null
+): ResolvedLineup | null {
+  if (lineup) return lineup;
+  if (!squad || squad.players.length === 0) return null;
+  return buildFallbackLineup(squad.players);
+}
+
 export function MvpPredictionPanel({
   poolId,
   matchId,
@@ -142,24 +152,26 @@ export function MvpPredictionPanel({
   const options = useMemo(() => [...homeOptions, ...awayOptions], [homeOptions, awayOptions]);
 
   const resolvedHomeLineup = useMemo(
-    () =>
-      homeLineup ??
-      (homeSquad ? buildFallbackLineup(homeSquad.players) : null),
+    () => resolveTeamLineup(homeLineup, homeSquad),
     [homeLineup, homeSquad]
   );
   const resolvedAwayLineup = useMemo(
-    () =>
-      awayLineup ??
-      (awaySquad ? buildFallbackLineup(awaySquad.players) : null),
+    () => resolveTeamLineup(awayLineup, awaySquad),
     [awayLineup, awaySquad]
   );
 
   const homeSlots = useMemo(
-    () => (resolvedHomeLineup ? mapSlotsToHomeHalf(resolvedHomeLineup.slots) : []),
+    () =>
+      resolvedHomeLineup
+        ? mapSlotsToHomeHalf(ensureElevenStarterSlots(resolvedHomeLineup))
+        : [],
     [resolvedHomeLineup]
   );
   const awaySlots = useMemo(
-    () => (resolvedAwayLineup ? mapSlotsToAwayHalf(resolvedAwayLineup.slots) : []),
+    () =>
+      resolvedAwayLineup
+        ? mapSlotsToAwayHalf(ensureElevenStarterSlots(resolvedAwayLineup))
+        : [],
     [resolvedAwayLineup]
   );
 
@@ -196,6 +208,8 @@ export function MvpPredictionPanel({
     [options, selectedKey]
   );
 
+  const tacticalReady = homeSlots.length + awaySlots.length >= 22;
+
   function onSave() {
     const selected = options.find((option) => option.key === selectedKey);
     if (!selected) {
@@ -221,14 +235,14 @@ export function MvpPredictionPanel({
   }
 
   if (loading || !kitColorsReady) {
-    return <LoadingCenter label="Cargando jugadores…" />;
+    return <LoadingCenter label="Cargando alineaciones…" />;
   }
 
-  if (options.length === 0) {
+  if (!tacticalReady) {
     return (
       <div className="px-4 py-8 text-center">
         <p className="text-sm text-[var(--tm-muted)]">
-          No hay plantillas disponibles para elegir MVP.
+          No hay alineaciones disponibles para mostrar el campo táctico.
         </p>
       </div>
     );
@@ -236,77 +250,76 @@ export function MvpPredictionPanel({
 
   const pickDisabled = !serverEditable || pending;
 
-  const awayFormation = resolvedAwayLineup?.formationLabel;
-  const homeFormation = resolvedHomeLineup?.formationLabel;
-
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col px-0.5 py-0.5">
+      {/* Cabecera contextual: selección MVP (prioridad 2) */}
+      <div className="shrink-0 px-1 py-0.5">
         {!serverEditable ? (
-          <p className="mb-0.5 shrink-0 px-1 text-xs text-[var(--tm-muted)]">
+          <p className="text-center text-[10px] text-[var(--tm-muted)]">
             Predicción cerrada. El plazo terminó 5 minutos antes del pitido.
           </p>
         ) : selectedOption ? (
-          <p className="mb-0 shrink-0 truncate px-1 text-center text-[8px] text-[var(--tm-muted)]">
+          <p className="truncate text-center text-[9px] font-medium text-[var(--tm-accent)]">
             MVP: {selectedOption.name}
           </p>
-        ) : null}
-
-        <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
-          {(markFieldReady) => (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <BenchPlayersStrip
-                teamName={awayTeam}
-                players={awayBench}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                density="minimal"
-                showTeamHeader={false}
-                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
-                position="top"
-              />
-
-              <div className="flex min-h-0 flex-1 items-center justify-center py-0.5">
-                <MatchMvpFieldGraphic
-                  homeSlots={homeSlots}
-                  awaySlots={awaySlots}
-                  homeTeam={homeTeam}
-                  awayTeam={awayTeam}
-                  homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
-                  awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
-                  selectedKey={selectedKey}
-                  disabled={pickDisabled}
-                  onSelect={setSelectedKey}
-                  onFieldReady={markFieldReady}
-                />
-              </div>
-
-              <BenchPlayersStrip
-                teamName={homeTeam}
-                players={homeBench}
-                selectedKey={selectedKey}
-                disabled={pickDisabled}
-                density="minimal"
-                showTeamHeader={false}
-                onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
-                position="bottom"
-              />
-
-              {awayFormation || homeFormation ? (
-                <p className="mt-0.5 shrink-0 truncate px-1 text-center text-[7px] text-[var(--tm-muted)] opacity-70">
-                  {[awayFormation, homeFormation].filter(Boolean).join(" · ")}
-                </p>
-              ) : null}
-            </div>
-          )}
-        </LineupFieldGate>
-
-        {error ? (
-          <p className="mt-2 px-4 text-sm text-[var(--tm-danger)]" role="alert">
-            {error}
+        ) : (
+          <p className="text-center text-[9px] text-[var(--tm-muted)]">
+            Pulsa un titular en el campo o un suplente
           </p>
-        ) : null}
+        )}
       </div>
+
+      {/* Vista táctica: suplentes → campo (22 titulares) → suplentes */}
+      <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
+        {(markFieldReady) => (
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <BenchPlayersStrip
+              teamName={awayTeam}
+              players={awayBench}
+              selectedKey={selectedKey}
+              disabled={pickDisabled}
+              density="minimal"
+              showTeamHeader={false}
+              onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
+              position="top"
+            />
+
+            <div className="flex min-h-[13.5rem] flex-1 items-center justify-center px-0.5 py-0.5">
+              <MatchMvpFieldGraphic
+                homeSlots={homeSlots}
+                awaySlots={awaySlots}
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+                homeFormation={resolvedHomeLineup?.formationLabel}
+                awayFormation={resolvedAwayLineup?.formationLabel}
+                homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
+                awaySquadPlayerNames={awaySquad?.players.map((player) => player.player_name)}
+                selectedKey={selectedKey}
+                disabled={pickDisabled}
+                onSelect={setSelectedKey}
+                onFieldReady={markFieldReady}
+              />
+            </div>
+
+            <BenchPlayersStrip
+              teamName={homeTeam}
+              players={homeBench}
+              selectedKey={selectedKey}
+              disabled={pickDisabled}
+              density="minimal"
+              showTeamHeader={false}
+              onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
+              position="bottom"
+            />
+          </div>
+        )}
+      </LineupFieldGate>
+
+      {error ? (
+        <p className="mt-1 shrink-0 px-4 text-sm text-[var(--tm-danger)]" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       {serverEditable ? (
         <div className="flex shrink-0 gap-2 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
