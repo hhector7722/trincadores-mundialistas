@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchTeamLineupBundleAction } from "@/actions/lineup";
 import { BenchPlayersStrip } from "@/components/lineup/BenchPlayersStrip";
 import { LineupMetaLine } from "@/components/lineup/LineupMetaLine";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
+import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { ResolvedLineup } from "@/lib/lineup/types";
@@ -21,6 +22,9 @@ type LineupModalPanelProps = {
   playerFilter?: (position: string | null) => boolean;
   selectionBlockedMessage?: string;
 };
+
+/** Altura reservada bajo el campo para la línea de meta (fuente · formación). */
+const LINEUP_META_FOOTER_PX = 34;
 
 export function LineupModalPanel({
   teamName,
@@ -59,6 +63,22 @@ export function LineupModalPanel({
       cancelled = true;
     };
   }, [teamName, matchId]);
+
+  const layoutRef = useRef<HTMLDivElement>(null);
+
+  const benchCount = useMemo(() => {
+    if (!squad || squad.players.length === 0) return 0;
+    const resolved = lineup ?? buildFallbackLineup(squad.players);
+    return resolveBenchPlayers(squad, resolved).length;
+  }, [squad, lineup]);
+
+  const fitLayout = useFitFieldModalLayout(layoutRef, {
+    awayBenchCount: benchCount,
+    homeBenchCount: 0,
+    footerPx: LINEUP_META_FOOTER_PX,
+    gapPx: 2,
+    enabled: !loading && benchCount >= 0 && Boolean(squad?.players.length),
+  });
 
   const displayName = teamNameEs(teamName);
 
@@ -108,16 +128,25 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 py-0.5">
+          <div
+            ref={layoutRef}
+            className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 py-0.5"
+          >
             {bench.length > 0 ? (
-              <BenchPlayersStrip
-                teamName={teamName}
-                players={bench}
-                density="minimal"
-                showTeamHeader={false}
-                position="top"
-                onPlayerClick={(player) => handlePlayerInteraction(player.name)}
-              />
+              <div
+                className="mx-auto w-full shrink-0 self-center"
+                style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
+              >
+                <BenchPlayersStrip
+                  teamName={teamName}
+                  players={bench}
+                  density="minimal"
+                  showTeamHeader={false}
+                  position="top"
+                  gridLayout={fitLayout?.awayBench}
+                  onPlayerClick={(player) => handlePlayerInteraction(player.name)}
+                />
+              </div>
             ) : null}
 
             <div className="flex min-h-[14rem] flex-1 items-center justify-center py-0.5">
@@ -128,16 +157,24 @@ export function LineupModalPanel({
                 size="modal"
                 onPlayerClick={handlePlayerInteraction}
                 onFieldReady={markFieldReady}
+                widthPx={fitLayout?.fieldWidthPx}
+                heightPx={fitLayout?.fieldHeightPx}
+                chipScale={fitLayout?.chipScale}
               />
             </div>
 
-            <LineupMetaLine
-              className="mt-0.5"
-              teamName={teamName}
-              sourceKind={resolvedLineup.sourceKind}
-              formationLabel={resolvedLineup.formationLabel}
-              fetchedAt={resolvedLineup.fetchedAt}
-            />
+            <div
+              className="mx-auto w-full shrink-0"
+              style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
+            >
+              <LineupMetaLine
+                className="mt-0.5"
+                teamName={teamName}
+                sourceKind={resolvedLineup.sourceKind}
+                formationLabel={resolvedLineup.formationLabel}
+                fetchedAt={resolvedLineup.fetchedAt}
+              />
+            </div>
           </div>
         )}
       </LineupFieldGate>
