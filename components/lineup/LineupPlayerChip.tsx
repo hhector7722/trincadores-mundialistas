@@ -43,7 +43,7 @@ export function LineupPlayerChip({
     : useKitColors
       ? kit.border
       : "rgba(255,255,255,0.25)";
-  const jerseyStrokeWidth = clashOutline ? 3.5 : 1.2;
+  const jerseyStrokeWidth = clashOutline ? 2 : 1.2;
   const dorsalColor = useKitColors ? kit.dorsal : "var(--tm-accent)";
 
   const displayName = isMatch
@@ -72,7 +72,7 @@ export function LineupPlayerChip({
             d="M24 4.5C18.8 4.5 15 7 13.4 10.6L6.8 13.2 3 21.8 8.4 23.4V47.5H39.6V23.4L45 21.8 41.2 13.2 34.6 10.6C33 7 29.2 4.5 24 4.5Zm0 3.2c2.6 0 4.7 1 5.9 2.7-1.4-.8-3-1.2-5.9-1.2s-4.5.4-5.9 1.2c1.2-1.7 3.3-2.7 5.9-2.7Z"
             fill="none"
             stroke="#FFFFFF"
-            strokeWidth={5.5}
+            strokeWidth={3.2}
             strokeLinejoin="round"
             opacity={0.92}
           />

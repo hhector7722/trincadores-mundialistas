@@ -49,7 +49,7 @@ type SquadPlayerOption = {
 };
 
 const MVP_FORMATION_ROW_PX = 22;
-const MVP_FOOTER_PX = 40;
+const MVP_FOOTER_PX = 34;
 const MVP_FOOTER_CLOSED_PX = 20;
 const MVP_ERROR_PX = 18;
 
@@ -384,7 +384,7 @@ export function MvpPredictionPanel({
       {serverEditable ? (
         <div className="flex shrink-0 justify-center px-2 py-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <Button
-            className="h-auto min-h-8 shrink-0 px-4 py-1.5 text-xs"
+            className="h-auto min-h-6 shrink-0 px-3.5 py-1 text-xs leading-tight"
             disabled={!selectedKey || pending}
             onClick={onSave}
             title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
