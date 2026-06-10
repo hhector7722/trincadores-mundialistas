@@ -1169,6 +1169,7 @@ html:has(.tm-app-frame) {
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
   --tm-cal-sidebar-border: rgba(217, 255, 0, 0.18);
   --tm-cal-sidebar-heading-fs: clamp(6px, 1.6cqw, 8px);
+  --tm-cal-groups-title-fs: clamp(9px, 2.4cqw, 12px);
   --tm-cal-sidebar-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 8px 22px rgba(0, 0, 0, 0.32),
@@ -1657,6 +1658,7 @@ html:has(.tm-app-frame) {
 .tm-porra-calendar .tm-cal-sidebar-card-inner {
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   min-height: 0;
   min-width: 0;
   flex: 1 1 auto;
@@ -1665,20 +1667,12 @@ html:has(.tm-app-frame) {
   box-sizing: border-box;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-section {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
-  overflow: hidden;
-}
-
 .tm-porra-calendar .tm-cal-groups-title {
   width: 100%;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   padding: 2px 4px 0;
   text-align: center;
-  font-size: var(--tm-cal-sidebar-heading-fs);
+  font-size: var(--tm-cal-groups-title-fs, var(--tm-cal-sidebar-heading-fs));
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: 0.05em;
@@ -1686,8 +1680,20 @@ html:has(.tm-app-frame) {
   color: var(--tm-accent);
 }
 
+.tm-porra-calendar .tm-cal-groups-block {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  overflow: hidden;
+}
+
 .tm-porra-calendar .tm-cal-sidebar-card .tm-cal-groups-panel {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
   min-width: 0;
   width: 100%;

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal } from "@/components/ui/modal";
+import { ModalPlainBackButton } from "@/components/ui/modal-plain-back-button";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { cn } from "@/lib/utils";
 
@@ -142,6 +143,7 @@ function GroupsGrid({
 type AllGroupsStandingsModalProps = {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
   officialGroups: GroupStandingDetail[];
   predictedGroups: GroupStandingDetail[];
   onSelectGroup: (groupCode: string) => void;
@@ -150,6 +152,7 @@ type AllGroupsStandingsModalProps = {
 export function AllGroupsStandingsModal({
   open,
   onClose,
+  onBack,
   officialGroups,
   predictedGroups,
   onSelectGroup,
@@ -244,7 +247,11 @@ export function AllGroupsStandingsModal({
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 px-2.5 pb-2 pt-2.5 sm:px-3 sm:pt-3">
-          <span aria-hidden="true" />
+          {onBack ? (
+            <ModalPlainBackButton onClick={onBack} />
+          ) : (
+            <span aria-hidden="true" />
+          )}
           <div className="flex justify-center">
             <GroupStandingsViewToggle value={toggleView} onChange={startViewSlide} />
           </div>

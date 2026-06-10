@@ -11,9 +11,10 @@ import { getAllWorldCupTeamsAlphabetically } from "@/lib/predictions/teams-picke
 type AllTeamsLineupModalProps = {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
 };
 
-export function AllTeamsLineupModal({ open, onClose }: AllTeamsLineupModalProps) {
+export function AllTeamsLineupModal({ open, onClose, onBack }: AllTeamsLineupModalProps) {
   const teams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
@@ -31,6 +32,7 @@ export function AllTeamsLineupModal({ open, onClose }: AllTeamsLineupModalProps)
       <TeamsPickerModal
         open={open}
         onClose={handleCloseAll}
+        onBack={onBack}
         mode="view"
         title="Plantillas"
         onViewTeam={setSelectedTeam}

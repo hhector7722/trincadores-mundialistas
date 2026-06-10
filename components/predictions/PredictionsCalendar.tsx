@@ -47,6 +47,7 @@ import {
   type CalendarWeek,
   type MonthYear,
 } from "@/lib/pool/match-calendar";
+import type { CalendarModalOpener } from "@/lib/predictions/calendar-data-access";
 import { cn } from "@/lib/utils";
 
 const WEEKDAY_LABELS_MOBILE = ["L", "M", "X", "J", "V", "S", "D"] as const;
@@ -141,9 +142,9 @@ function renderCalendarGridCells(
   onOpenMatch: (match: MatchWithPrediction) => void,
   groups: GroupStandingRow[],
   onGroupClick: (groupCode: string) => void,
-  onOpenAllGroups: () => void,
-  onOpenStats: () => void,
-  onOpenSquads: () => void
+  onOpenAllGroups: CalendarModalOpener,
+  onOpenStats: CalendarModalOpener,
+  onOpenSquads: CalendarModalOpener
 ) {
   return weeks.flatMap((week, weekIndex) => {
     const row = weekIndex + 1;
@@ -321,6 +322,28 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   const [allGroupsOpen, setAllGroupsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [squadsOpen, setSquadsOpen] = useState(false);
+  const [allGroupsDataAccessBack, setAllGroupsDataAccessBack] = useState<(() => void) | null>(
+    null
+  );
+  const [statsDataAccessBack, setStatsDataAccessBack] = useState<(() => void) | null>(null);
+  const [squadsDataAccessBack, setSquadsDataAccessBack] = useState<(() => void) | null>(null);
+
+  const openAllGroupsModal: CalendarModalOpener = (options) => {
+    setAllGroupsDataAccessBack(
+      options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null
+    );
+    setAllGroupsOpen(true);
+  };
+
+  const openStatsModal: CalendarModalOpener = (options) => {
+    setStatsDataAccessBack(options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null);
+    setStatsOpen(true);
+  };
+
+  const openSquadsModal: CalendarModalOpener = (options) => {
+    setSquadsDataAccessBack(options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null);
+    setSquadsOpen(true);
+  };
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -395,9 +418,9 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
             setActiveMatch,
             groupStandings,
             setActiveGroupCode,
-            () => setAllGroupsOpen(true),
-            () => setStatsOpen(true),
-            () => setSquadsOpen(true)
+            openAllGroupsModal,
+            openStatsModal,
+            openSquadsModal
           )}
         </div>
       </section>
@@ -405,22 +428,66 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       {allGroupsOpen && (
         <AllGroupsStandingsModal
           open
-          onClose={() => setAllGroupsOpen(false)}
+          onClose={() => {
+            setAllGroupsOpen(false);
+            setAllGroupsDataAccessBack(null);
+          }}
+          onBack={
+            allGroupsDataAccessBack
+              ? () => {
+                  setAllGroupsOpen(false);
+                  allGroupsDataAccessBack();
+                  setAllGroupsDataAccessBack(null);
+                }
+              : undefined
+          }
           officialGroups={groupStandingsDetail}
           predictedGroups={groupStandingsPredicted}
           onSelectGroup={(code) => {
             setAllGroupsOpen(false);
+            setAllGroupsDataAccessBack(null);
             setActiveGroupCode(code);
           }}
         />
       )}
 
       {statsOpen && (
-        <TournamentStatsModal open onClose={() => setStatsOpen(false)} matches={matches} />
+        <TournamentStatsModal
+          open
+          onClose={() => {
+            setStatsOpen(false);
+            setStatsDataAccessBack(null);
+          }}
+          onBack={
+            statsDataAccessBack
+              ? () => {
+                  setStatsOpen(false);
+                  statsDataAccessBack();
+                  setStatsDataAccessBack(null);
+                }
+              : undefined
+          }
+          matches={matches}
+        />
       )}
 
       {squadsOpen && (
-        <AllTeamsLineupModal open onClose={() => setSquadsOpen(false)} />
+        <AllTeamsLineupModal
+          open
+          onClose={() => {
+            setSquadsOpen(false);
+            setSquadsDataAccessBack(null);
+          }}
+          onBack={
+            squadsDataAccessBack
+              ? () => {
+                  setSquadsOpen(false);
+                  squadsDataAccessBack();
+                  setSquadsDataAccessBack(null);
+                }
+              : undefined
+          }
+        />
       )}
 
       {activeGroupCode && (

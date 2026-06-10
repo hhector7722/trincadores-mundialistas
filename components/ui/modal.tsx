@@ -44,6 +44,8 @@ type ModalProps = {
   headerCenter?: ReactNode;
   /** Cabecera mínima para modales de campo (menos padding y targets más pequeños). */
   headerCompact?: boolean;
+  /** Flecha de volver sin marco ni relleno. */
+  backButtonPlain?: boolean;
   /** Si false, el contenido no hace scroll interno (layout adaptativo sin recortes). */
   scrollContent?: boolean;
 };
@@ -91,6 +93,7 @@ function ModalPanelShell({
   headerTitleAlign = "default",
   headerCenter,
   headerCompact = false,
+  backButtonPlain = false,
   scrollContent = true,
   className,
   children,
@@ -107,6 +110,7 @@ function ModalPanelShell({
   headerTitleAlign?: "left" | "default" | "center";
   headerCenter?: ReactNode;
   headerCompact?: boolean;
+  backButtonPlain?: boolean;
   scrollContent?: boolean;
   className?: string;
   children: ReactNode;
@@ -136,8 +140,15 @@ function ModalPanelShell({
             aria-label="Volver"
             onClick={onBack}
             className={cn(
-              "relative z-10 flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]",
-              headerCompact ? "h-8 w-8" : "h-10 w-10"
+              "relative z-10 flex shrink-0 items-center justify-center text-[var(--tm-muted)] transition-colors hover:text-[var(--tm-fg)]",
+              backButtonPlain
+                ? headerCompact
+                  ? "h-8 w-8"
+                  : "h-10 w-10"
+                : cn(
+                    "rounded-full hover:bg-[var(--tm-surface-elevated)]",
+                    headerCompact ? "h-8 w-8" : "h-10 w-10"
+                  )
             )}
           >
             <ChevronLeft className={headerCompact ? "h-4 w-4" : "h-5 w-5"} />
@@ -259,6 +270,7 @@ export function Modal({
   headerTitleAlign = "default",
   headerCenter,
   headerCompact = false,
+  backButtonPlain = false,
   scrollContent = true,
 }: ModalProps) {
   const titleId = useId();
@@ -409,6 +421,7 @@ export function Modal({
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
                       headerCompact={headerCompact}
+                      backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
                       className={className}
                       loading={loading}
@@ -429,6 +442,7 @@ export function Modal({
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
                       headerCompact={headerCompact}
+                      backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
                       className={className}
                       loading={loading}
@@ -452,6 +466,7 @@ export function Modal({
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
                       headerCompact={headerCompact}
+                      backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
                       className={className}
                       loading={loading}
@@ -472,6 +487,7 @@ export function Modal({
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
                       headerCompact={headerCompact}
+                      backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
                       className={className}
                       loading={loading}
@@ -495,6 +511,7 @@ export function Modal({
               headerTitleAlign={headerTitleAlign}
               headerCenter={headerCenter}
               headerCompact={headerCompact}
+              backButtonPlain={backButtonPlain}
               scrollContent={scrollContent}
               className={className}
               loading={loading}

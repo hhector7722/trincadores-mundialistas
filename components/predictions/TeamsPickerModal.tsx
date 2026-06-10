@@ -12,6 +12,7 @@ export type TeamsPickerMode = "view" | "pickOne" | "pickTwo";
 type TeamsPickerModalProps = {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
   mode?: TeamsPickerMode;
   title?: string;
   /** Si false, pickOne no cierra el modal (p. ej. paso intermedio antes de elegir jugador). */
@@ -24,6 +25,7 @@ type TeamsPickerModalProps = {
 export function TeamsPickerModal({
   open,
   onClose,
+  onBack,
   mode = "view",
   title = "Plantillas",
   closeOnPick = true,
@@ -73,6 +75,8 @@ export function TeamsPickerModal({
     <Modal
       open={open}
       onClose={onClose}
+      onBack={onBack}
+      backButtonPlain={Boolean(onBack)}
       title={title}
       headerTitleAlign="center"
       hideHeaderDivider

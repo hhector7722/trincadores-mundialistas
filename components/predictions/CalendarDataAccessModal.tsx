@@ -29,9 +29,9 @@ export function CalendarDataAccessModal({
   const { navigate } = useAppNavigation();
 
   function handleAction(actionId: (typeof ACCESS_ACTIONS)[number]["id"]) {
-    onClose();
     switch (actionId) {
       case "knockout":
+        onClose();
         navigate("/predictions/knockout");
         break;
       case "groups":

@@ -75,7 +75,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-block, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -381,17 +381,22 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
 
   const sidebarSlot = panel.closest<HTMLElement>(".tm-cal-sidebar-slot");
   if (sidebarSlot) {
-    const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
-    const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
-    const minDockReserve = getMinAccessDockReserve();
-    const titleH = title?.offsetHeight ?? 0;
-    const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
-    const cardH = card?.clientHeight ?? body?.clientHeight ?? 0;
-    const maxPanelH = Math.max(
-      0,
-      cardH - minDockReserve - titleH - SIDEBAR_CARD_BOTTOM_PAD_PX
-    );
-    innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
+    const groupsBlock = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-block");
+    if (groupsBlock && groupsBlock.clientHeight > 0) {
+      innerH = Math.max(0, groupsBlock.clientHeight - GROUPS_EDGE_INSET_PX * 2);
+    } else {
+      const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
+      const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
+      const minDockReserve = getMinAccessDockReserve();
+      const titleH = title?.offsetHeight ?? 0;
+      const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
+      const cardH = card?.clientHeight ?? body?.clientHeight ?? 0;
+      const maxPanelH = Math.max(
+        0,
+        cardH - minDockReserve - titleH - SIDEBAR_CARD_BOTTOM_PAD_PX
+      );
+      innerH = Math.max(0, maxPanelH - GROUPS_EDGE_INSET_PX * 2);
+    }
   } else {
     innerH = Math.max(0, panel.clientHeight - GROUPS_EDGE_INSET_PX * 2);
   }
