@@ -1213,7 +1213,8 @@ html:has(.tm-app-frame) {
   --tm-ko-wire: rgba(160, 120, 230, 0.34);
   --tm-ko-wire-pair: rgba(160, 120, 230, 0.28);
   --tm-ko-wire-final: rgba(160, 120, 230, 0.5);
-  --tm-ko-orb-size: min(5.2cqw, 1.35rem);
+  --tm-ko-orb-size: min(5.8cqw, 1.5rem);
+  --tm-ko-orb-size-r32: min(9.5cqw, 2.4rem);
   --tm-ko-orb-scale-factor: 0.92;
   --tm-ko-header-band: 10%;
   --tm-ko-footer-band: 10%;
@@ -1350,28 +1351,18 @@ html:has(.tm-app-frame) {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 9999px;
+  background: #ffffff;
   pointer-events: none;
   transform: translate(-50%, -50%)
     scale(calc(var(--tm-ko-orb-scale, 1) * var(--tm-ko-orb-scale-factor, 1)));
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
 }
 
-.tm-ko-orb--placeholder {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(18, 6, 40, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.tm-ko-orb:not(.tm-ko-orb--placeholder) {
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  background: transparent;
-}
-
-.tm-ko-orb-flag {
-  width: 100%;
-  height: 100%;
+.tm-ko-orb--r32 {
+  width: var(--tm-ko-orb-size-r32);
+  height: var(--tm-ko-orb-size-r32);
 }
 
 .tm-ko-orb-label {
@@ -1380,13 +1371,17 @@ html:has(.tm-app-frame) {
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
-  color: var(--tm-accent);
+  color: #000000;
 }
 
-.tm-ko-orb--saved:not(.tm-ko-orb--placeholder) {
+.tm-ko-orb--r32 .tm-ko-orb-label {
+  font-size: clamp(8px, 2.1cqw, 11px);
+}
+
+.tm-ko-orb--saved {
   box-shadow:
-    0 0 0 1.5px rgba(212, 255, 0, 0.45),
-    0 2px 10px rgba(0, 0, 0, 0.35);
+    0 0 0 1.5px rgba(212, 255, 0, 0.55),
+    0 2px 10px rgba(0, 0, 0, 0.28);
 }
 
 .tm-ko-orb--live {
@@ -1413,6 +1408,11 @@ html:has(.tm-app-frame) {
   touch-action: manipulation;
   transform: translate(-50%, -50%)
     scale(calc(var(--tm-ko-orb-scale, 1) * var(--tm-ko-orb-scale-factor, 1)));
+}
+
+.tm-ko-match-hit--r32 {
+  min-width: max(48px, calc(var(--tm-ko-orb-size-r32) * 1.35));
+  min-height: max(48px, calc(var(--tm-ko-orb-size-r32) * 2.8));
 }
 
 .tm-ko-match-hit--final {

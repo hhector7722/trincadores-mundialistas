@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
   formatListScore,
@@ -28,6 +27,7 @@ import {
 import { isPlaceholderTeam } from "@/lib/openfootball/slug";
 import {
   knockoutBracketSlotLabel,
+  teamAbbr,
   teamNameEs,
 } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -81,6 +81,7 @@ function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
 
 function BracketTeamOrb({
   teamName,
+  round,
   layout,
   layoutScale,
   isWinner,
@@ -88,6 +89,7 @@ function BracketTeamOrb({
   isSaved,
 }: {
   teamName: string;
+  round: BracketRoundKey | "final";
   layout: TeamSlotLayout;
   layoutScale: number;
   isWinner?: boolean;
@@ -95,15 +97,15 @@ function BracketTeamOrb({
   isSaved?: boolean;
 }) {
   const trimmed = teamName.trim();
-  const showPlaceholder = !trimmed || isPlaceholderTeam(trimmed);
-  const label = knockoutBracketSlotLabel(teamName);
-  const title = showPlaceholder ? label : teamNameEs(teamName);
+  const isPlaceholder = !trimmed || isPlaceholderTeam(trimmed);
+  const label = isPlaceholder ? knockoutBracketSlotLabel(teamName) : teamAbbr(teamName);
+  const title = isPlaceholder ? label : teamNameEs(teamName);
 
   return (
     <div
       className={cn(
         "tm-ko-orb",
-        showPlaceholder && "tm-ko-orb--placeholder",
+        round === "r32" && "tm-ko-orb--r32",
         isWinner && "tm-ko-orb--winner",
         isLive && "tm-ko-orb--live",
         isSaved && "tm-ko-orb--saved"
@@ -118,16 +120,7 @@ function BracketTeamOrb({
       title={title}
       aria-hidden
     >
-      {showPlaceholder ? (
-        <span className="tm-ko-orb-label">{label}</span>
-      ) : (
-        <TeamFlagBadge
-          name={teamName}
-          size="ko"
-          className="tm-ko-orb-flag border-0 bg-transparent"
-          loading="lazy"
-        />
-      )}
+      <span className="tm-ko-orb-label">{label}</span>
     </div>
   );
 }
@@ -199,6 +192,7 @@ function BracketMatchNode({
       />
       <BracketTeamOrb
         teamName={homeName}
+        round={geom.round}
         layout={slots.home}
         layoutScale={geom.layoutScale}
         isWinner={homeWins}
@@ -207,6 +201,7 @@ function BracketMatchNode({
       />
       <BracketTeamOrb
         teamName={awayName}
+        round={geom.round}
         layout={slots.away}
         layoutScale={geom.layoutScale}
         isWinner={awayWins}
