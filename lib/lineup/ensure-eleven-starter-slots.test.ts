@@ -11,7 +11,7 @@ function baseLineup(slots: ResolvedLineup["slots"]): ResolvedLineup {
     benchCount: 0,
     isProbable: true,
     sourceKind: "fallback",
-    dataSourceCode: "internal",
+    dataSourceCode: null,
     fetchedAt: null,
   };
 }

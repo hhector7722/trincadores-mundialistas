@@ -32,18 +32,34 @@ export function isBsdConfigured(): boolean {
   return Boolean(getBsdApiKey());
 }
 
+/** BSD puede tardar >30s; cortamos para no bloquear la UI del usuario. */
+export const BSD_FETCH_TIMEOUT_MS = 8_000;
+
 async function bsdFetch<T>(path: string): Promise<T | null> {
   const apiKey = getBsdApiKey();
   if (!apiKey) return null;
 
   const url = path.startsWith("http") ? path : `${BSD_API_BASE_URL}${path}`;
-  const response = await fetch(url, {
-    headers: { Authorization: `Token ${apiKey}` },
-    next: { revalidate: 300 },
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), BSD_FETCH_TIMEOUT_MS);
 
-  if (!response.ok) return null;
-  return (await response.json()) as T;
+  try {
+    const response = await fetch(url, {
+      headers: { Authorization: `Token ${apiKey}` },
+      next: { revalidate: 300 },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) return null;
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      console.warn("[bsd] fetch timeout", path);
+    }
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 function parseEventRows(payload: BsdEventsResponse): BsdEventRef[] {

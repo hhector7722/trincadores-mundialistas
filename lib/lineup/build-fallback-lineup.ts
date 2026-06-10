@@ -11,7 +11,7 @@ export function buildFallbackLineup(
     ...result,
     formationLabel: result.formation,
     sourceKind: "fallback",
-    dataSourceCode: "internal",
+    dataSourceCode: null,
     fetchedAt: null,
   };
 }

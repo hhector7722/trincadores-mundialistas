@@ -7,6 +7,7 @@ import type {
   ResolvedLineup,
   StoredLineupRow,
 } from "@/lib/lineup/types";
+import { createAdminClient } from "@/lib/scripts/supabase-admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SOURCE_PRIORITY: Record<LineupSourceKind, number> = {
@@ -117,11 +118,17 @@ export async function upsertTeamLineup(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabase.from("match_team_lineups").upsert(payload, {
-    onConflict: "match_id,team_name",
-  });
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin.from("match_team_lineups").upsert(payload, {
+      onConflict: "match_id,team_name",
+    });
 
-  if (error) {
-    console.error("[lineup] upsertTeamLineup failed", error.message);
+    if (error) {
+      console.error("[lineup] upsertTeamLineup failed", error.message);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "admin client unavailable";
+    console.error("[lineup] upsertTeamLineup failed", message);
   }
 }

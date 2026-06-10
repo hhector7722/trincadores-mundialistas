@@ -3,7 +3,8 @@ export type PlayerIdentity = {
   shirtNumber: number | null;
 };
 
-export function normalizePlayerName(name: string): string {
+export function normalizePlayerName(name: string | null | undefined): string {
+  if (!name?.trim()) return "";
   return name
     .normalize("NFD")
     .replace(/\p{M}/gu, "")

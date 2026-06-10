@@ -127,7 +127,7 @@ export async function getLineupSource(
     }
   }
 
-  return { kind: "fallback", dataSourceCode: "internal", fromCache: false };
+  return { kind: "fallback", dataSourceCode: null, fromCache: false };
 }
 
 function benchFromResolved(lineup: ResolvedLineup, context: LineupResolveContext): LineupBenchPlayer[] {
