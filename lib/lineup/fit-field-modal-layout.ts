@@ -45,23 +45,32 @@ const EMPTY_BENCH: BenchLayoutConfig = {
   numberFontPx: 0,
 };
 
-const LINEUP_BENCH = {
+type BenchSizePrefs = {
+  rowHeight: number;
+  nameFont: number;
+  numberFont: number;
+  minRowHeight: number;
+  minNameFont: number;
+  minNumberFont: number;
+};
+
+const LINEUP_BENCH: BenchSizePrefs = {
   rowHeight: 28,
   nameFont: 10,
   numberFont: 12,
   minRowHeight: 22,
   minNameFont: 8,
   minNumberFont: 10,
-} as const;
+};
 
-const MVP_BENCH = {
+const MVP_BENCH: BenchSizePrefs = {
   rowHeight: 24,
   nameFont: 9,
   numberFont: 11,
   minRowHeight: 20,
   minNameFont: 8,
   minNumberFont: 9,
-} as const;
+};
 
 /** Reducción del campo MVP respecto al máximo teórico (~20 %). */
 const MVP_FIELD_SCALE = 0.8;
@@ -91,7 +100,7 @@ function benchConfig(
 function fitBenchInHeight(
   count: number,
   maxHeight: number,
-  prefs: typeof LINEUP_BENCH | typeof MVP_BENCH
+  prefs: BenchSizePrefs
 ): BenchLayoutConfig {
   if (count <= 0) return EMPTY_BENCH;
 
