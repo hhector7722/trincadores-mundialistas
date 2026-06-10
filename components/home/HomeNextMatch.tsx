@@ -90,7 +90,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
       >
         <div className="px-4 pb-2 pt-2">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tm-accent)]">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
               {isLive ? "En juego" : "Proximo partido"}
             </p>
             <Link
