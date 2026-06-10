@@ -45,29 +45,8 @@ export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
 /** Ancho aproximado de media tarjeta (% canvas) para anclar conectores. */
 export const CARD_HALF_WIDTH_BASE = 4.2 * KO_CARD_SIZE_SCALE;
 
-/**
- * Separación mínima horizontal entre tarjetas (en % del canvas 0–100).
- * Ajustable: 24px aprox en móvil suele rondar ~6–7% del ancho.
- */
-export const MIN_GAP_X = 5.5;
-
-/** Separación mínima vertical (en % del canvas). */
-export const MIN_GAP_Y = 3;
-
-/** Margen lateral para dieciseisavos (en % del canvas). */
-export const BRACKET_SIDE_INSET = 5.25;
-
-/** Empuje extra de dieciseisavos hacia el exterior (sin salir del viewport). */
-const R32_EXTRA_OUTWARD_NUDGE = 1.35;
-
-/** Margen mínimo al borde visible de pantalla (%). */
-const R32_VISIBLE_EDGE_INSET = 3.5;
-
-/** Punto medio entre acercar al centro (3.5) y alejar de la final (2.5). */
-const NUDGE_SF_LATERAL = 0.5;
-
-/** Empuje ligero de octavos hacia la final. */
-const NUDGE_R16_TOWARD_FINAL = 4.75;
+/** Margen lateral homogéneo para las 9 columnas del cuadro (% canvas). */
+export const BRACKET_COLUMN_INSET = 4;
 
 const COLUMN_SCALE_BY_INDEX: readonly number[] = [
   ROUND_LAYOUT_SCALE.r32, // 0
@@ -86,114 +65,16 @@ function halfWidthForColumn(column: number): number {
   return CARD_HALF_WIDTH_BASE * scale;
 }
 
-/** Acerca columnas interiores ~15–20 % (octavos→final). */
-function gapMultiplier(colA: number, colB: number): number {
-  const minCol = Math.min(colA, colB);
-  const maxCol = Math.max(colA, colB);
-  const distFromCenter = Math.min(Math.abs(minCol - 4), Math.abs(maxCol - 4));
-  if (distFromCenter <= 1) return 0.8;
-  if (distFromCenter === 2) return 0.86;
-  return 0.92;
-}
-
-function minCenterDistance(colA: number, colB: number): number {
-  return (
-    halfWidthForColumn(colA) +
-    halfWidthForColumn(colB) +
-    MIN_GAP_X * gapMultiplier(colA, colB)
-  );
-}
-
 /**
- * Calcula las X de las 9 columnas garantizando que:
- * - La final tiene su propia columna física (col 4).
- * - Hay zona central y distancia mínima entre columnas adyacentes (sin solapes).
- * - Simetría perfecta izquierda/derecha.
+ * Nueve columnas equiespaciadas de izquierda a derecha:
+ * r32 → r16 → qf → sf → final → sf → qf → r16 → r32.
  */
 export function buildColumnCenters(): readonly number[] {
-  const x: number[] = Array(9).fill(50);
-  x[4] = FINAL_CENTER_X;
-
-  // Construcción desde el centro hacia fuera (garantiza hueco entre rondas).
-  for (let step = 1; step <= 4; step++) {
-    const left = 4 - step;
-    const right = 4 + step;
-    const prevLeft = left + 1;
-    const prevRight = right - 1;
-    x[left] = x[prevLeft] - minCenterDistance(left, prevLeft);
-    x[right] = x[prevRight] + minCenterDistance(right, prevRight);
-  }
-
-  // Clamp a márgenes laterales manteniendo simetría (si fuese necesario).
-  const minX = BRACKET_SIDE_INSET + halfWidthForColumn(0);
-  const maxX = 100 - BRACKET_SIDE_INSET - halfWidthForColumn(8);
-  const overflowLeft = minX - x[0];
-  const overflowRight = x[8] - maxX;
-
-  const shift = Math.max(0, overflowLeft, overflowRight);
-  if (shift > 0) {
-    // Reducimos expansión desde el centro (escala horizontal global).
-    const leftSpan = FINAL_CENTER_X - minX;
-    const rightSpan = maxX - FINAL_CENTER_X;
-    const maxSpan = Math.min(leftSpan, rightSpan);
-    const currentSpan = Math.max(FINAL_CENTER_X - x[0], x[8] - FINAL_CENTER_X);
-    const factor = currentSpan > 0 ? Math.max(0.72, maxSpan / currentSpan) : 1;
-
-    for (let i = 0; i < 9; i++) {
-      x[i] = FINAL_CENTER_X + (x[i] - FINAL_CENTER_X) * factor;
-    }
-  }
-
-  const minR32X = BRACKET_SIDE_INSET + halfWidthForColumn(0);
-  const maxR32X = 100 - BRACKET_SIDE_INSET - halfWidthForColumn(8);
-
-  const minSafeR32X = R32_VISIBLE_EDGE_INSET + halfWidthForColumn(0);
-  const maxSafeR32X = 100 - R32_VISIBLE_EDGE_INSET - halfWidthForColumn(8);
-
-  // Dieciseisavos hacia el exterior, con tope antes del borde no visible.
-  x[0] = Math.max(minSafeR32X, minR32X - R32_EXTRA_OUTWARD_NUDGE);
-  x[8] = Math.min(maxSafeR32X, maxR32X + R32_EXTRA_OUTWARD_NUDGE);
-
-  // Semifinales en posición intermedia; la final no se mueve.
-  x[3] += NUDGE_SF_LATERAL;
-  x[5] -= NUDGE_SF_LATERAL;
-
-  // Octavos ligeramente más cerca de la final.
-  x[1] += NUDGE_R16_TOWARD_FINAL;
-  x[7] -= NUDGE_R16_TOWARD_FINAL;
-
-  return x;
-}
-
-/** Referencia del botón «Ver fase Prévia» (52vw centrado ≈ 24%–76%). */
-export const FOOTER_BUTTON_ALIGN_REF = { leftPct: 24, rightPct: 76 } as const;
-
-/** Empuje ligero de cuartos hacia fuera (alejados de la final). */
-const NUDGE_QF_AWAY_FROM_FINAL = 3.25;
-
-/**
- * Invierte el desplazamiento del ajuste anterior (borde cuarto ↔ borde botón):
- * misma magnitud, sentido opuesto respecto a la columna natural.
- */
-export function applyQfOppositeFooterAlignment(
-  geoms: readonly BracketMatchGeometry[]
-): BracketMatchGeometry[] {
-  return geoms.map((geom) => {
-    if (geom.round !== "qf") return geom;
-
-    const half = CARD_HALF_WIDTH_BASE * geom.layoutScale;
-    const baseX = mapColumnX(geom.column);
-
-    if (geom.side === "left") {
-      const footerColX = FOOTER_BUTTON_ALIGN_REF.leftPct - half;
-      return { ...geom, columnX: baseX - (footerColX - baseX) - NUDGE_QF_AWAY_FROM_FINAL };
-    }
-    if (geom.side === "right") {
-      const footerColX = FOOTER_BUTTON_ALIGN_REF.rightPct + half;
-      return { ...geom, columnX: baseX - (footerColX - baseX) + NUDGE_QF_AWAY_FROM_FINAL };
-    }
-    return geom;
-  });
+  const span = 100 - 2 * BRACKET_COLUMN_INSET;
+  return Array.from(
+    { length: 9 },
+    (_, index) => BRACKET_COLUMN_INSET + (span * index) / 8
+  );
 }
 
 const COLUMN_CENTERS = buildColumnCenters();
@@ -268,47 +149,6 @@ export function mapColumnX(column: number): number {
 
 export function gutterX(columnA: number, columnB: number): number {
   return (mapColumnX(columnA) + mapColumnX(columnB)) / 2;
-}
-
-export type R32ColumnSlot = {
-  left: number;
-  right: number;
-  center: number;
-  width: number;
-};
-
-/** Hueco visual de dieciseisavos entre borde de pantalla y la siguiente ronda. */
-export function r32ColumnSlot(column: number): R32ColumnSlot {
-  if (column === 0) {
-    const left = R32_VISIBLE_EDGE_INSET;
-    const right = gutterX(0, 1);
-    return { left, right, center: (left + right) / 2, width: right - left };
-  }
-
-  if (column === 8) {
-    const left = gutterX(7, 8);
-    const right = 100 - R32_VISIBLE_EDGE_INSET;
-    return { left, right, center: (left + right) / 2, width: right - left };
-  }
-
-  const center = mapColumnX(column);
-  const width = CARD_HALF_WIDTH_BASE * ROUND_LAYOUT_SCALE.r32 * 2;
-  return {
-    left: center - width / 2,
-    right: center + width / 2,
-    center,
-    width,
-  };
-}
-
-/** Ancho útil de la columna de dieciseisavos (% del canvas), centrado en el hueco visual. */
-export function r32ColumnSlotWidthPct(column: number): number {
-  return r32ColumnSlot(column).width;
-}
-
-/** Centro horizontal del hueco visual de dieciseisavos (% del canvas). */
-export function r32ColumnSlotCenterX(column: number): number {
-  return r32ColumnSlot(column).center;
 }
 
 export function cardEdgeX(
@@ -535,7 +375,5 @@ export function buildBracketConnectorPaths(
 }
 
 export function matchPosition(geom: BracketMatchGeometry): { x: number; y: number } {
-  const x =
-    geom.round === "r32" ? r32ColumnSlotCenterX(geom.column) : geom.columnX;
-  return { x, y: geom.midY };
+  return { x: geom.columnX, y: geom.midY };
 }

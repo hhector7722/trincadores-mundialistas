@@ -10,7 +10,6 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  applyQfOppositeFooterAlignment,
   buildBracketGeometry,
   FINAL_CENTER_X,
   FINAL_CUP_OFFSET_ABOVE_FINAL,
@@ -37,7 +36,7 @@ type KnockoutBracketProps = {
   matches: MatchWithPrediction[];
 };
 
-const BRACKET_GEOMETRY = applyQfOppositeFooterAlignment(buildBracketGeometry());
+const BRACKET_GEOMETRY = buildBracketGeometry();
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 
 const ORB_PAIR_HALF: Record<BracketRoundKey, number> = {
@@ -64,15 +63,8 @@ function teamSlotLayouts(geom: BracketMatchGeometry, columnX: number): {
     };
   }
 
-  if (geom.round === "final") {
-    const spread = 1.35 * geom.layoutScale;
-    return {
-      home: { x: columnX - spread, y: geom.midY },
-      away: { x: columnX + spread, y: geom.midY },
-    };
-  }
-
-  const half = ORB_PAIR_HALF[geom.round] * geom.layoutScale;
+  const half =
+    (geom.round === "final" ? 0.95 : ORB_PAIR_HALF[geom.round]) * geom.layoutScale;
   return {
     home: { x: columnX, y: geom.midY - half },
     away: { x: columnX, y: geom.midY + half },
