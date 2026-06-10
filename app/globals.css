@@ -292,6 +292,14 @@ html:has(.tm-app-frame) {
   -webkit-backdrop-filter: blur(20px);
 }
 
+.tm-flag-depth {
+  border: 0.5px solid rgba(255, 255, 255, 0.42);
+  background: #ffffff;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.28),
+    0 0 0 0.5px rgba(0, 0, 0, 0.14);
+}
+
 .tm-spinner {
   width: 2.5rem;
   height: 2.5rem;
@@ -1567,15 +1575,6 @@ html:has(.tm-app-frame) {
   height: 0.875rem;
   width: 0.875rem;
   flex-shrink: 0;
-}
-
-.tm-porra-calendar .tm-cal-match-card .tm-cal-flag,
-.tm-porra-calendar .tm-cal-group-flag {
-  border: 0.5px solid rgba(255, 255, 255, 0.42);
-  background: #ffffff;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.28),
-    0 0 0 0.5px rgba(0, 0, 0, 0.14);
 }
 
 .tm-porra-calendar .tm-cal-flag span {

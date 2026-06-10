@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 type TeamFlagBadgeProps = {
   name: string;
-  size?: "cal" | "ko" | "xxs" | "xs" | "sm" | "md";
+  size?: "cal" | "ko" | "xxs" | "xs" | "sm" | "md" | "lg";
   className?: string;
   loading?: "lazy" | "eager";
 };
@@ -21,7 +21,9 @@ export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }
           ? "h-5 w-5"
           : size === "sm"
             ? "h-7 w-7"
-            : "h-9 w-9";
+            : size === "lg"
+              ? "h-10 w-10 sm:h-11 sm:w-11"
+              : "h-9 w-9";
   const px = scaled
     ? 40
     : size === "ko"
@@ -32,7 +34,9 @@ export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }
           ? 40
           : size === "sm"
             ? 80
-            : 120;
+            : size === "lg"
+              ? 160
+              : 120;
   const imgSize = scaled
     ? undefined
     : size === "ko"
@@ -43,12 +47,14 @@ export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }
           ? 20
           : size === "sm"
             ? 28
-            : 36;
+            : size === "lg"
+              ? 44
+              : 36;
 
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)]",
+        "tm-flag-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
         dim,
         className
       )}
@@ -71,7 +77,9 @@ export function TeamFlagBadge({ name, size = "sm", className, loading = "lazy" }
               ? "text-[6px]"
               : size === "xs"
                 ? "text-[8px]"
-                : "text-[10px]"
+                : size === "lg"
+                  ? "text-base"
+                  : "text-[10px]"
           )}
         >
           {name.slice(0, 2).toUpperCase()}

@@ -1,6 +1,6 @@
 import type { MouseEvent, ReactNode } from "react";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
-import { teamFlagCode, teamFlagUrl } from "@/lib/teams/flags";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -25,25 +25,7 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-16";
 
 function TeamFlagCircle({ name }: { name: string }) {
-  const flagCode = teamFlagCode(name);
-
-  return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--tm-border)] bg-[rgba(111,43,255,0.12)] sm:h-11 sm:w-11">
-      {flagCode ? (
-        <img
-          src={teamFlagUrl(flagCode, 160)}
-          alt=""
-          width={44}
-          height={44}
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <span className="font-display text-base text-[var(--tm-accent)]">
-          {name.slice(0, 2).toUpperCase()}
-        </span>
-      )}
-    </div>
-  );
+  return <TeamFlagBadge name={name} size="lg" loading="eager" />;
 }
 
 function TeamNameLabel({ name }: { name: string }) {
