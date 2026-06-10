@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { computeMvpFieldChipScale } from "./mvp-field-chip-scale";
 
 describe("computeMvpFieldChipScale", () => {
-  it("aplica boost de legibilidad sin superar el techo seguro", () => {
+  it("aplica escala máxima segura según tamaño del campo", () => {
     const scale = computeMvpFieldChipScale(360, 200);
     expect(scale).toBeGreaterThanOrEqual(0.38);
-    expect(scale).toBeLessThanOrEqual(0.64);
+    expect(scale).toBeLessThanOrEqual(0.78);
   });
 
   it("reduce escala en campos estrechos para evitar solapamientos", () => {

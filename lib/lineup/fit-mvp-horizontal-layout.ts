@@ -21,6 +21,9 @@ export type ComputeFitMvpHorizontalLayoutOptions = {
   awayBenchCount: number;
   homeBenchCount: number;
   footerPx: number;
+  /** Fila bandera · equipo · formación bajo el campo. */
+  formationRowPx?: number;
+  /** @deprecated Usar formationRowPx */
   headerPx?: number;
   gapPx?: number;
 };
@@ -34,23 +37,33 @@ const MVP_BENCH = {
   minNumberFont: 9,
 };
 
+const FORMATION_ROW_PX = 22;
+const BENCH_CELL_MIN_PX = 30;
+
 /**
- * MVP horizontal: convocatorias en 2–3 filas + campo + botón, sin scroll.
+ * MVP horizontal: campo arriba, meta + convocatorias abajo (ancho del terreno), sin scroll.
  */
 export function computeFitMvpHorizontalLayout(
   opts: ComputeFitMvpHorizontalLayoutOptions
 ): FitMvpHorizontalLayout {
   const gap = opts.gapPx ?? 4;
-  const headerPx = opts.headerPx ?? 20;
+  const formationRowPx = opts.formationRowPx ?? opts.headerPx ?? FORMATION_ROW_PX;
   const usableWidth = Math.max(0, opts.widthPx);
   const usableHeight = Math.max(
     0,
-    opts.heightPx - opts.footerPx - headerPx - gap * 3
+    opts.heightPx - opts.footerPx - formationRowPx - gap * 2
   );
 
-  const maxBenchHeight = Math.min(usableHeight * 0.32, 88);
-  const maxColumnsPerSide = Math.max(4, Math.floor(usableWidth / 2 / 36));
+  const estFieldWidth = Math.min(
+    usableWidth,
+    usableHeight * HORIZONTAL_PITCH_ASPECT * 0.72
+  );
+  const maxColumnsPerSide = Math.max(
+    4,
+    Math.floor(estFieldWidth / 2 / BENCH_CELL_MIN_PX)
+  );
 
+  const maxBenchHeight = Math.min(usableHeight * 0.36, 96);
   const awayBench = pickBenchGrid(opts.awayBenchCount, maxBenchHeight, MVP_BENCH, {
     minRows: opts.awayBenchCount >= 6 ? 2 : 1,
     maxRows: 3,
@@ -68,11 +81,32 @@ export function computeFitMvpHorizontalLayout(
   const fieldHeightPx = Math.min(fieldByHeight, fieldByWidth);
   const fieldWidthPx = fieldHeightPx * HORIZONTAL_PITCH_ASPECT;
 
+  const benchColumnsCap = Math.max(
+    4,
+    Math.floor(fieldWidthPx / 2 / BENCH_CELL_MIN_PX)
+  );
+  const awayBenchFinal =
+    awayBench.columns > benchColumnsCap
+      ? pickBenchGrid(opts.awayBenchCount, maxBenchHeight, MVP_BENCH, {
+          minRows: opts.awayBenchCount >= 6 ? 2 : 1,
+          maxRows: 3,
+          maxColumns: benchColumnsCap,
+        })
+      : awayBench;
+  const homeBenchFinal =
+    homeBench.columns > benchColumnsCap
+      ? pickBenchGrid(opts.homeBenchCount, maxBenchHeight, MVP_BENCH, {
+          minRows: opts.homeBenchCount >= 6 ? 2 : 1,
+          maxRows: 3,
+          maxColumns: benchColumnsCap,
+        })
+      : homeBench;
+
   return {
     fieldWidthPx,
     fieldHeightPx,
     chipScale: computeMvpFieldChipScale(fieldWidthPx, fieldHeightPx),
-    awayBench,
-    homeBench,
+    awayBench: awayBenchFinal,
+    homeBench: homeBenchFinal,
   };
 }

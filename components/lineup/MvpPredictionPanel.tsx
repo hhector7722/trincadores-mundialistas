@@ -10,6 +10,7 @@ import { MvpBenchColumn } from "@/components/lineup/MvpBenchColumn";
 import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { useFitMvpLayout } from "@/components/lineup/use-fit-mvp-layout";
+import { computeMvpFieldChipScale } from "@/lib/lineup/mvp-field-chip-scale";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { ensureElevenStarterSlots } from "@/lib/lineup/ensure-eleven-starter-slots";
@@ -47,7 +48,7 @@ type SquadPlayerOption = {
   position: string | null;
 };
 
-const MVP_HEADER_PX = 20;
+const MVP_FORMATION_ROW_PX = 22;
 const MVP_FOOTER_PX = 56;
 const MVP_FOOTER_CLOSED_PX = 20;
 const MVP_ERROR_PX = 18;
@@ -225,10 +226,19 @@ export function MvpPredictionPanel({
     awayBenchCount: awayBench.length,
     homeBenchCount: homeBench.length,
     footerPx,
-    headerPx: MVP_HEADER_PX,
+    formationRowPx: MVP_FORMATION_ROW_PX,
     enabled: !loading && kitColorsReady,
     gapPx: 4,
   });
+
+  const chipScale = useMemo(() => {
+    if (!fitLayout) return 1;
+    return computeMvpFieldChipScale(
+      fitLayout.fieldWidthPx,
+      fitLayout.fieldHeightPx,
+      [...awaySlots, ...homeSlots]
+    );
+  }, [fitLayout, awaySlots, homeSlots]);
 
   useEffect(() => {
     if (!savedPlayerName || !savedTeamName) {
@@ -288,53 +298,9 @@ export function MvpPredictionPanel({
 
   return (
     <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="grid shrink-0 grid-cols-2 gap-2 px-1 pb-1">
-        <LineupFormationInfo
-          teamName={awayTeam}
-          formationLabel={resolvedAwayLineup?.formationLabel}
-          align="left"
-        />
-        <LineupFormationInfo
-          teamName={homeTeam}
-          formationLabel={resolvedHomeLineup?.formationLabel}
-          align="right"
-        />
-      </div>
-
-      <div
-        className="grid shrink-0 grid-cols-2 gap-2 px-1 pb-1"
-        style={
-          fitLayout
-            ? {
-                height:
-                  Math.max(fitLayout.awayBench.heightPx, fitLayout.homeBench.heightPx) || undefined,
-              }
-            : undefined
-        }
-      >
-        <MvpBenchColumn
-          teamName={awayTeam}
-          players={awayBench}
-          selectedKey={selectedKey}
-          disabled={pickDisabled}
-          align="left"
-          gridLayout={fitLayout?.awayBench}
-          onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(awayTeam, player))}
-        />
-        <MvpBenchColumn
-          teamName={homeTeam}
-          players={homeBench}
-          selectedKey={selectedKey}
-          disabled={pickDisabled}
-          align="right"
-          gridLayout={fitLayout?.homeBench}
-          onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
-        />
-      </div>
-
       <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-1 py-0.5">
+          <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-1 pt-0.5">
             <MvpHorizontalFieldGraphic
               awaySlots={awaySlots}
               homeSlots={homeSlots}
@@ -348,11 +314,61 @@ export function MvpPredictionPanel({
               onFieldReady={markFieldReady}
               widthPx={fitLayout?.fieldWidthPx}
               heightPx={fitLayout?.fieldHeightPx}
-              chipScale={fitLayout?.chipScale}
+              chipScale={chipScale}
             />
           </div>
         )}
       </LineupFieldGate>
+
+      <div
+        className="mx-auto flex w-full shrink-0 flex-col gap-0.5 px-1 pb-1"
+        style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
+      >
+        <div className="grid grid-cols-2 gap-1">
+          <LineupFormationInfo
+            teamName={awayTeam}
+            formationLabel={resolvedAwayLineup?.formationLabel}
+            align="left"
+          />
+          <LineupFormationInfo
+            teamName={homeTeam}
+            formationLabel={resolvedHomeLineup?.formationLabel}
+            align="right"
+          />
+        </div>
+
+        <div
+          className="grid grid-cols-2 gap-1"
+          style={
+            fitLayout
+              ? {
+                  height:
+                    Math.max(fitLayout.awayBench.heightPx, fitLayout.homeBench.heightPx) ||
+                    undefined,
+                }
+              : undefined
+          }
+        >
+          <MvpBenchColumn
+            teamName={awayTeam}
+            players={awayBench}
+            selectedKey={selectedKey}
+            disabled={pickDisabled}
+            align="left"
+            gridLayout={fitLayout?.awayBench}
+            onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(awayTeam, player))}
+          />
+          <MvpBenchColumn
+            teamName={homeTeam}
+            players={homeBench}
+            selectedKey={selectedKey}
+            disabled={pickDisabled}
+            align="right"
+            gridLayout={fitLayout?.homeBench}
+            onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
+          />
+        </div>
+      </div>
 
       {!serverEditable ? (
         <p className="shrink-0 px-1 py-1 text-center text-[9px] text-[var(--tm-muted)]">

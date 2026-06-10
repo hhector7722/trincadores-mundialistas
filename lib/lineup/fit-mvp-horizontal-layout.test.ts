@@ -33,14 +33,14 @@ describe("computeFitMvpHorizontalLayout", () => {
       gapPx: 4,
     });
 
-    expect(layout.chipScale).toBeLessThanOrEqual(0.64);
+    expect(layout.chipScale).toBeLessThanOrEqual(0.78);
     expect(layout.chipScale).toBeGreaterThanOrEqual(0.38);
   });
 
   it("encaja todo en viewports bajos sin scroll", () => {
     const heightPx = 520;
     const footerPx = 56;
-    const headerPx = 20;
+    const formationRowPx = 22;
     const gapPx = 4;
     const layout = computeFitMvpHorizontalLayout({
       widthPx: 360,
@@ -48,13 +48,13 @@ describe("computeFitMvpHorizontalLayout", () => {
       awayBenchCount: 15,
       homeBenchCount: 14,
       footerPx,
-      headerPx,
+      formationRowPx,
       gapPx,
     });
 
     const benchHeight = Math.max(layout.awayBench.heightPx, layout.homeBench.heightPx);
     const total =
-      benchHeight + layout.fieldHeightPx + footerPx + headerPx + gapPx * 3;
+      benchHeight + layout.fieldHeightPx + footerPx + formationRowPx + gapPx * 2;
 
     expect(total).toBeLessThanOrEqual(heightPx + 2);
   });

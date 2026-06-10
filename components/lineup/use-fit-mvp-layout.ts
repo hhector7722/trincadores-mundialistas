@@ -11,6 +11,8 @@ type UseFitMvpLayoutOptions = {
   homeBenchCount: number;
   footerPx: number;
   enabled?: boolean;
+  formationRowPx?: number;
+  /** @deprecated Usar formationRowPx */
   headerPx?: number;
   gapPx?: number;
 };
@@ -24,6 +26,7 @@ export function useFitMvpLayout(
     homeBenchCount,
     footerPx,
     enabled = true,
+    formationRowPx,
     headerPx,
     gapPx,
   } = options;
@@ -49,6 +52,7 @@ export function useFitMvpLayout(
           awayBenchCount,
           homeBenchCount,
           footerPx,
+          formationRowPx,
           headerPx,
           gapPx,
         })
@@ -67,6 +71,7 @@ export function useFitMvpLayout(
     homeBenchCount,
     footerPx,
     enabled,
+    formationRowPx,
     headerPx,
     gapPx,
   ]);
