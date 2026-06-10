@@ -8,7 +8,9 @@ import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import type { ResolvedLineup } from "@/lib/lineup/types";
+import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
+import { LineupModalFieldShell } from "@/components/lineup/LineupModalFieldShell";
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -71,7 +73,18 @@ export function LineupModalPanel({
   }, [loading, squad, lineup, onFormationResolved, teamName]);
 
   if (loading) {
-    return <LoadingCenter label="Cargando plantilla…" />;
+    return (
+      <div className="flex flex-col items-center px-1 pt-0.5 pb-0 sm:px-1.5">
+        <LineupModalFieldShell>
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <FootballPitchSurface />
+          </div>
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]/40">
+            <LoadingCenter label="Cargando plantilla…" minHeightClassName="min-h-0" />
+          </div>
+        </LineupModalFieldShell>
+      </div>
+    );
   }
 
   if (error) {
