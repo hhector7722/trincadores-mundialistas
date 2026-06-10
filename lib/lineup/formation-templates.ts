@@ -1,58 +1,15 @@
-import { clampToPlayable, TACTICAL_LINE_Y } from "@/lib/lineup/field-layout";
+import { clampToPlayable } from "@/lib/lineup/field-layout";
+import {
+  FORMATION_SLOT_ANCHORS,
+  getFormationCoordinates,
+  getFormationSlotAnchors,
+  isFormationId,
+  type FormationSlotAnchor,
+} from "@/lib/lineup/formation-coordinates";
 import type { FieldCoordinate, FormationId, PositionRole } from "@/lib/lineup/types";
 
-/** Formaciones con plantilla visual fija (misma disposición siempre). */
-export type FormationTemplateId = "4-3-3" | "4-4-2" | "4-2-3-1";
-
-type TemplateAnchor = {
-  key: string;
-  accept: readonly string[];
-  coord: FieldCoordinate;
-};
-
-const { GOALKEEPER, DEFENSE, HOLDING, MIDFIELD, ATTACK, FORWARD } = TACTICAL_LINE_Y;
-
-const TEMPLATES: Record<FormationTemplateId, TemplateAnchor[]> = {
-  "4-3-3": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
-    { key: "LM", accept: ["LM", "LCM", "CM"], coord: { x: 26, y: MIDFIELD } },
-    { key: "CM", accept: ["CM"], coord: { x: 50, y: MIDFIELD } },
-    { key: "RM", accept: ["RM", "RCM", "CM"], coord: { x: 74, y: MIDFIELD } },
-    { key: "LW", accept: ["LW"], coord: { x: 22, y: FORWARD } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: FORWARD } },
-    { key: "RW", accept: ["RW"], coord: { x: 80, y: FORWARD } },
-  ],
-  "4-4-2": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
-    { key: "LM", accept: ["LM", "LW"], coord: { x: 20, y: MIDFIELD } },
-    { key: "LCM", accept: ["CM", "DM", "LCM"], coord: { x: 40, y: MIDFIELD } },
-    { key: "RCM", accept: ["CM", "DM", "RCM"], coord: { x: 60, y: MIDFIELD } },
-    { key: "RM", accept: ["RM", "RW"], coord: { x: 80, y: MIDFIELD } },
-    { key: "LST", accept: ["ST", "CF", "LST", "DC"], coord: { x: 38, y: FORWARD } },
-    { key: "RST", accept: ["ST", "CF", "SS", "RST", "DC"], coord: { x: 62, y: FORWARD } },
-  ],
-  "4-2-3-1": [
-    { key: "GK", accept: ["GK"], coord: { x: 50, y: GOALKEEPER } },
-    { key: "LB", accept: ["LB", "LWB"], coord: { x: 20, y: DEFENSE } },
-    { key: "LCB", accept: ["CB", "LCB", "DFC"], coord: { x: 40, y: DEFENSE } },
-    { key: "RCB", accept: ["CB", "RCB", "DFC"], coord: { x: 60, y: DEFENSE } },
-    { key: "RB", accept: ["RB", "RWB"], coord: { x: 80, y: DEFENSE } },
-    { key: "LDM", accept: ["DM", "CDM", "LDM", "MCD"], coord: { x: 36, y: HOLDING } },
-    { key: "RDM", accept: ["DM", "CDM", "RDM", "MCD"], coord: { x: 64, y: HOLDING } },
-    { key: "LW", accept: ["LW"], coord: { x: 22, y: ATTACK } },
-    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: 50, y: ATTACK } },
-    { key: "RW", accept: ["RW"], coord: { x: 80, y: ATTACK } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: 50, y: FORWARD } },
-  ],
-};
+export type { FormationSlotAnchor };
+export { getFormationCoordinates, getFormationSlotAnchors, isFormationId };
 
 const SLOT_KEY_ALIASES: Record<string, string> = {
   G: "GK",
@@ -80,26 +37,35 @@ const SLOT_KEY_ALIASES: Record<string, string> = {
   POR: "GK",
 };
 
-export function normalizeFormationTemplate(label: string | null | undefined): FormationTemplateId {
+export function normalizeFormationTemplate(label: string | null | undefined): FormationId {
   const value = (label ?? "").trim();
-  if (value === "4-4-2") return "4-4-2";
-  if (value === "4-2-3-1") return "4-2-3-1";
+  if (isFormationId(value)) return value;
   return "4-3-3";
 }
+
+/** Alias semántico para normalizar etiquetas de formación. */
+export const normalizeFormationId = normalizeFormationTemplate;
 
 export function normalizeSlotKey(raw: string | null | undefined): string {
   const key = (raw ?? "CM").trim().toUpperCase();
   return SLOT_KEY_ALIASES[key] ?? key;
 }
 
-export function getFormationTemplate(formation: FormationTemplateId): TemplateAnchor[] {
-  return TEMPLATES[formation];
+export function getFormationTemplate(formation: FormationId): FormationSlotAnchor[] {
+  return getFormationSlotAnchors(formation);
 }
 
-export function getFormationTemplateCoordinates(
-  formation: FormationTemplateId
-): FieldCoordinate[] {
-  return TEMPLATES[formation].map((anchor) => anchor.coord);
+export function getFormationTemplateCoordinates(formation: FormationId): FieldCoordinate[] {
+  return getFormationCoordinates(formation);
+}
+
+function roleForFormationSlot(formation: FormationId, slotKey: string): PositionRole {
+  if (slotKey === "GK") return "GK";
+  if (["LST", "RST", "ST"].includes(slotKey)) return "FW";
+  if (["LW", "RW"].includes(slotKey)) return "FW";
+  if (formation === "3-5-2" && (slotKey === "LWB" || slotKey === "RWB")) return "MF";
+  if (["LB", "RB", "LCB", "RCB", "CB", "LWB", "RWB"].includes(slotKey)) return "DF";
+  return "MF";
 }
 
 /** Agrupa coords de plantilla por rol (orden de anclas) para el fallback dorsal+posición. */
@@ -107,7 +73,7 @@ export function getRoleCoordinatesFromTemplate(
   formation: FormationId
 ): Record<PositionRole, FieldCoordinate[]> {
   const templateId = normalizeFormationTemplate(formation);
-  const anchors = TEMPLATES[templateId];
+  const anchors = FORMATION_SLOT_ANCHORS[templateId];
   const buckets: Record<PositionRole, FieldCoordinate[]> = {
     GK: [],
     DF: [],
@@ -116,11 +82,8 @@ export function getRoleCoordinatesFromTemplate(
   };
 
   for (const anchor of anchors) {
-    const key = normalizeSlotKey(anchor.accept[0] ?? "CM");
-    if (key === "GK") buckets.GK.push(anchor.coord);
-    else if (["LB", "CB", "RB", "LWB", "RWB", "LCB", "RCB"].includes(key)) buckets.DF.push(anchor.coord);
-    else if (["ST", "CF", "SS", "LW", "RW", "LST", "RST"].includes(key)) buckets.FW.push(anchor.coord);
-    else buckets.MF.push(anchor.coord);
+    const role = roleForFormationSlot(templateId, anchor.key);
+    buckets[role].push(anchor.coord);
   }
 
   return buckets;
@@ -128,11 +91,23 @@ export function getRoleCoordinatesFromTemplate(
 
 /** Slot sintético cuando la fuente solo aporta rol + índice (fallback / confirmada). */
 export function fallbackSlotKeyForRole(
-  formation: FormationTemplateId,
+  formation: FormationId,
   role: PositionRole,
   index: number
 ): string {
   if (role === "GK") return "GK";
+
+  if (formation === "3-5-2") {
+    if (role === "DF") return (["LCB", "CB", "RCB"] as const)[index] ?? "CB";
+    if (role === "MF") return (["LWB", "LCM", "CM", "RCM", "RWB"] as const)[index] ?? "CM";
+    return index === 0 ? "LST" : "RST";
+  }
+
+  if (formation === "5-3-2") {
+    if (role === "DF") return (["LWB", "LCB", "CB", "RCB", "RWB"] as const)[index] ?? "CB";
+    if (role === "MF") return (["LCM", "CM", "RCM"] as const)[index] ?? "CM";
+    return index === 0 ? "LST" : "RST";
+  }
 
   if (role === "DF") {
     return (["LB", "LCB", "RCB", "RB"] as const)[index] ?? "CB";
@@ -150,7 +125,7 @@ export function fallbackSlotKeyForRole(
   }
 
   // 4-3-3
-  if (role === "MF") return (["LM", "CM", "RM"] as const)[index] ?? "CM";
+  if (role === "MF") return (["DM", "LCM", "RCM"] as const)[index] ?? "CM";
   if (role === "FW") return (["LW", "ST", "RW"] as const)[index] ?? "ST";
   return "CM";
 }
@@ -161,16 +136,19 @@ type LayoutInput = {
 };
 
 function expandedAccept(
-  formation: FormationTemplateId,
+  formation: FormationId,
   accept: readonly string[]
 ): string[] {
   const keys = new Set(accept.map((key) => normalizeSlotKey(key)));
 
   if (formation === "4-3-3") {
-    const midfieldLine = ["LM", "LCM", "CM", "RM", "RCM"];
+    const midfieldLine = ["LCM", "RCM", "CM", "LM", "RM"];
     if ([...keys].some((key) => midfieldLine.includes(key))) {
       keys.add("DM");
       keys.add("AM");
+    }
+    if (keys.has("DM")) {
+      keys.add("CM");
     }
   }
 
@@ -184,12 +162,22 @@ function expandedAccept(
     }
   }
 
+  if (formation === "3-5-2") {
+    if (keys.has("LWB")) keys.add("LB");
+    if (keys.has("RWB")) keys.add("RB");
+  }
+
+  if (formation === "5-3-2") {
+    if (keys.has("LWB")) keys.add("LB");
+    if (keys.has("RWB")) keys.add("RB");
+  }
+
   return [...keys];
 }
 
 function starterMatchesAnchor(
   starter: LayoutInput,
-  formation: FormationTemplateId,
+  formation: FormationId,
   accept: readonly string[]
 ): boolean {
   const key = normalizeSlotKey(starter.slotKey);
@@ -213,7 +201,7 @@ export function assignFormationTemplateCoordinates<T extends LayoutInput>(
   formationLabel: string | null | undefined
 ): Array<T & FieldCoordinate & { slotKey: string }> {
   const formation = normalizeFormationTemplate(formationLabel);
-  const anchors = TEMPLATES[formation];
+  const anchors = FORMATION_SLOT_ANCHORS[formation];
   const pool = starters.map((starter, index) => ({ starter, index }));
   const positioned: Array<T & FieldCoordinate & { slotKey: string }> = [];
   const usedAnchors = new Set<number>();

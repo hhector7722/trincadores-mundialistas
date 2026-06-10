@@ -3,6 +3,7 @@ import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
+import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import type { FormationId, ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 type ProbableXIProps = {
   squad: TeamSquadWithPlayers | null;
   teamName: string;
+  teamSlug?: string;
   lineup?: ResolvedLineup | null;
   year?: number | null;
   formation?: FormationId;
@@ -19,9 +21,18 @@ type ProbableXIProps = {
   className?: string;
 };
 
+function formationHref(teamSlug: string, formation: FormationId, year?: number | null): string {
+  const params = new URLSearchParams();
+  if (year) params.set("year", String(year));
+  params.set("formation", formation);
+  const query = params.toString();
+  return `/teams/${teamSlug}/lineup${query ? `?${query}` : ""}`;
+}
+
 export function ProbableXI({
   squad,
   teamName,
+  teamSlug,
   lineup: resolvedLineup,
   year,
   formation,
@@ -64,6 +75,8 @@ export function ProbableXI({
   }
 
   const lineup = resolvedLineup ?? buildFallbackLineup(squad.players, formation);
+  const activeFormation = formation ?? lineup.formation;
+  const showFormationPicker = lineup.sourceKind === "fallback" && teamSlug;
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
@@ -97,6 +110,34 @@ export function ProbableXI({
           />
         </div>
       </header>
+
+      {showFormationPicker ? (
+        <div className="shrink-0 border-b border-[var(--tm-border)] px-4 py-3">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--tm-muted)]">
+            Formación
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {FORMATION_IDS.map((option) => {
+              const selected = activeFormation === option;
+              return (
+                <Link
+                  key={option}
+                  href={formationHref(teamSlug, option, labelYear)}
+                  className={cn(
+                    "inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl border px-3 text-sm font-semibold transition-colors",
+                    selected
+                      ? "border-[var(--tm-accent)] bg-[rgba(212,255,0,0.12)] text-[var(--tm-fg)]"
+                      : "border-[var(--tm-border)] bg-[rgba(111,43,255,0.08)] text-[var(--tm-muted)] hover:text-[var(--tm-fg)]"
+                  )}
+                  aria-current={selected ? "page" : undefined}
+                >
+                  {option}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <LineupFieldGate className="flex min-h-0 flex-1 flex-col">
         {(markFieldReady) => (

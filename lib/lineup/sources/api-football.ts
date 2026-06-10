@@ -11,7 +11,6 @@ import { API_FOOTBALL_BASE_URL, API_FOOTBALL_SOURCE_CODE } from "@/lib/lineup/so
 import { teamNamesMatch } from "@/lib/lineup/sources/api-football-names";
 import type { ConfirmedLineupProvider } from "@/lib/lineup/sources/types";
 import type {
-  FormationId,
   LineupBenchPlayer,
   LineupPlayerInput,
   LineupSlot,
@@ -55,9 +54,8 @@ function normalizeFormationLabel(raw: string | null | undefined): string {
   return value.length > 0 ? value : "4-3-3";
 }
 
-function toFormationId(label: string): FormationId {
-  if (label === "4-4-2") return "4-4-2";
-  return "4-3-3";
+function toFormationId(label: string) {
+  return normalizeFormationTemplate(label);
 }
 
 function squadIndex(players: LineupPlayerInput[]): Map<string, LineupPlayerInput> {

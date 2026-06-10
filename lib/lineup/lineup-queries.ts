@@ -1,3 +1,4 @@
+import { normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
 import type {
   LineupBenchPlayer,
@@ -15,7 +16,7 @@ const SOURCE_PRIORITY: Record<LineupSourceKind, number> = {
 };
 
 function rowToResolved(row: StoredLineupRow): ResolvedLineup {
-  const formation = row.formation === "4-4-2" ? "4-4-2" : "4-3-3";
+  const formation = normalizeFormationTemplate(row.formation);
   const bench = row.bench as LineupBenchPlayer[];
   return relayoutLineupSlots({
     formation,

@@ -1,4 +1,5 @@
 import { ProbableXI } from "@/components/lineup/ProbableXI";
+import { isFormationId } from "@/lib/lineup/formation-coordinates";
 import { resolveTeamLineup } from "@/lib/lineup/resolve-lineup";
 import { squadTeamNameFromSlug } from "@/lib/lineup/squad-name";
 import type { FormationId } from "@/lib/lineup/types";
@@ -6,8 +7,6 @@ import { CURRENT_WORLD_CUP_YEAR, getTeamSquadByName } from "@/lib/worldcup-data/
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-
-const FORMATIONS = new Set<FormationId>(["4-3-3", "4-4-2"]);
 
 export default async function TeamLineupPage({
   params,
@@ -21,9 +20,7 @@ export default async function TeamLineupPage({
   const teamName = squadTeamNameFromSlug(teamSlug);
   const parsedYear = query.year ? Number(query.year) : CURRENT_WORLD_CUP_YEAR;
   const year = Number.isInteger(parsedYear) ? parsedYear : CURRENT_WORLD_CUP_YEAR;
-  const formation = FORMATIONS.has(query.formation as FormationId)
-    ? (query.formation as FormationId)
-    : undefined;
+  const formation = isFormationId(query.formation ?? "") ? (query.formation as FormationId) : undefined;
 
   const supabase = await createClient();
   const squad = await getTeamSquadByName(supabase, teamName, { year });
@@ -40,6 +37,7 @@ export default async function TeamLineupPage({
     <ProbableXI
       squad={squad}
       teamName={teamName}
+      teamSlug={teamSlug}
       lineup={lineup}
       year={year}
       formation={formation}

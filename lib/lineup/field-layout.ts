@@ -6,25 +6,16 @@ export const PITCH_ASPECT_CLASS = "aspect-[68/105]";
 /** Campo MVP (dos equipos): más alto para 22 fichas en dos mitades. */
 export const MVP_PITCH_ASPECT_CLASS = "aspect-[68/148]";
 
-/** Zona jugable dentro del SVG (%): evita esquinas y líneas de banda. */
-export const PLAYABLE_X_MIN = 20;
-export const PLAYABLE_X_MAX = 80;
-export const PLAYABLE_Y_MIN = 16;
-/** Permite anclar al portero en la portería inferior (≈ y 93 del SVG). */
-export const PLAYABLE_Y_MAX = 94;
+import { TACTICAL_LINE_Y } from "@/lib/lineup/formation-coordinates";
 
-/**
- * Bandas verticales tácticas en vista de once (y alto = portería propia).
- * DEFENSE coincide con el borde exterior del área grande del SVG (~81%).
- */
-export const TACTICAL_LINE_Y = {
-  GOALKEEPER: 92,
-  DEFENSE: 81,
-  HOLDING: 68,
-  MIDFIELD: 52,
-  ATTACK: 38,
-  FORWARD: 22,
-} as const;
+export { TACTICAL_LINE_Y };
+
+/** Zona jugable dentro del SVG (%): alineada con el sistema maestro de coordenadas. */
+export const PLAYABLE_X_MIN = 10;
+export const PLAYABLE_X_MAX = 90;
+export const PLAYABLE_Y_MIN = 18;
+/** Permite anclar al portero en la portería inferior. */
+export const PLAYABLE_Y_MAX = 94;
 
 export type PlayableBounds = {
   xMin: number;

@@ -38,7 +38,9 @@ const MEXICO_433 = [
 test("normalizeFormationTemplate reconoce variantes BSD", () => {
   assert.equal(normalizeFormationTemplate("4-2-3-1"), "4-2-3-1");
   assert.equal(normalizeFormationTemplate("4-4-2"), "4-4-2");
-  assert.equal(normalizeFormationTemplate("3-5-2"), "4-3-3");
+  assert.equal(normalizeFormationTemplate("3-5-2"), "3-5-2");
+  assert.equal(normalizeFormationTemplate("5-3-2"), "5-3-2");
+  assert.equal(normalizeFormationTemplate("3-4-3"), "4-3-3");
 });
 
 test("todos los 4-2-3-1 comparten las mismas coordenadas de plantilla", () => {
@@ -76,7 +78,7 @@ test("plantilla ancla portero en porteria y defensa en borde del area", () => {
   assert.ok(gk);
   assert.ok(gk.y >= 90, `portero demasiado adelantado (y=${gk.y})`);
   for (const defender of defenders) {
-    assert.ok(defender.y >= 79 && defender.y <= 83, `defensa fuera del borde del area (y=${defender.y})`);
+    assert.ok(defender.y >= 73 && defender.y <= 77, `defensa fuera de línea (y=${defender.y})`);
   }
 });
 
@@ -93,6 +95,30 @@ test("assignFormationTemplateCoordinates coloca porteria abajo y delantero arrib
   const st = positioned.find((slot) => slot.slotKey === "ST");
   assert.ok(gk && st);
   assert.ok(gk.y > st.y);
+});
+
+test("4-4-2 mantiene cuatro medios en la misma línea", () => {
+  const positioned = layoutPredictedStarters(
+    [
+      { slotKey: "GK", role: "GK" },
+      { slotKey: "LB", role: "DF" },
+      { slotKey: "CB", role: "DF" },
+      { slotKey: "CB", role: "DF" },
+      { slotKey: "RB", role: "DF" },
+      { slotKey: "LM", role: "MF" },
+      { slotKey: "CM", role: "MF" },
+      { slotKey: "CM", role: "MF" },
+      { slotKey: "RM", role: "MF" },
+      { slotKey: "ST", role: "FW" },
+      { slotKey: "ST", role: "FW" },
+    ],
+    "4-4-2"
+  );
+
+  const mids = positioned.filter((slot) => ["LM", "LCM", "RCM", "RM"].includes(slot.slotKey));
+  assert.equal(mids.length, 4);
+  assert.ok(mids.every((slot) => slot.y === mids[0]!.y));
+  assert.ok(mids.every((slot) => slot.y > positioned.find((s) => s.slotKey === "LST")!.y));
 });
 
 test("4-3-3 acepta pivotes DM en la linea de tres medios", () => {

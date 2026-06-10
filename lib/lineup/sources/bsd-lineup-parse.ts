@@ -23,7 +23,6 @@ import type {
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import { normalizePositionRole, positionLabelEs } from "@/lib/lineup/position-map";
 import type {
-  FormationId,
   LineupBenchPlayer,
   LineupPlayerInput,
   LineupSlot,
@@ -36,9 +35,8 @@ function normalizeFormationLabel(raw: string | null | undefined): string {
   return value.length > 0 ? value : "4-3-3";
 }
 
-function toFormationId(label: string): FormationId {
-  if (label === "4-4-2") return "4-4-2";
-  return "4-3-3";
+function toFormationId(label: string) {
+  return normalizeFormationTemplate(label);
 }
 
 function roleFromPosition(position: string | null | undefined): PositionRole {

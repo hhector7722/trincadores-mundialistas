@@ -54,3 +54,36 @@ test("buildProbableXI usa placeholders si faltan jugadores", () => {
   assert.equal(result.slots.length, 11);
   assert.ok(result.slots.some((s) => s.isPlaceholder));
 });
+
+test("buildProbableXI respeta conteos tácticos en 3-5-2 y 5-3-2", () => {
+  const squad = [
+    { player_name: "POR", position: "GK", shirt_number: 1 },
+    ...Array.from({ length: 8 }, (_, i) => ({
+      player_name: `DEF ${i}`,
+      position: "DF",
+      shirt_number: i + 2,
+    })),
+    ...Array.from({ length: 8 }, (_, i) => ({
+      player_name: `MED ${i}`,
+      position: "MF",
+      shirt_number: i + 20,
+    })),
+    ...Array.from({ length: 4 }, (_, i) => ({
+      player_name: `DEL ${i}`,
+      position: "FW",
+      shirt_number: i + 30,
+    })),
+  ];
+
+  const f352 = buildProbableXI(squad, "3-5-2");
+  assert.equal(f352.formation, "3-5-2");
+  assert.equal(f352.slots.filter((slot) => slot.role === "DF").length, 3);
+  assert.equal(f352.slots.filter((slot) => slot.role === "MF").length, 5);
+  assert.equal(f352.slots.filter((slot) => slot.role === "FW").length, 2);
+
+  const f532 = buildProbableXI(squad, "5-3-2");
+  assert.equal(f532.formation, "5-3-2");
+  assert.equal(f532.slots.filter((slot) => slot.role === "DF").length, 5);
+  assert.equal(f532.slots.filter((slot) => slot.role === "MF").length, 3);
+  assert.equal(f532.slots.filter((slot) => slot.role === "FW").length, 2);
+});

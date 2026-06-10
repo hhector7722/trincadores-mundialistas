@@ -1,3 +1,5 @@
+import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
+import { getRoleCoordinatesFromTemplate } from "@/lib/lineup/formation-templates";
 import type { FieldCoordinate, FormationId, PositionRole } from "@/lib/lineup/types";
 
 const ROLE_LABEL_ES: Record<PositionRole, string> = {
@@ -27,13 +29,9 @@ export function positionLabelEs(role: PositionRole, rawPosition: string | null):
   return ROLE_LABEL_ES[role];
 }
 
-/** Coordenadas % del campo vertical (x: ancho, y: arriba=ataque, abajo=portería). */
-import { getRoleCoordinatesFromTemplate } from "@/lib/lineup/formation-templates";
-
-const FORMATION_COORDS: Record<FormationId, Record<PositionRole, FieldCoordinate[]>> = {
-  "4-3-3": getRoleCoordinatesFromTemplate("4-3-3"),
-  "4-4-2": getRoleCoordinatesFromTemplate("4-4-2"),
-};
+const FORMATION_COORDS = Object.fromEntries(
+  FORMATION_IDS.map((formation) => [formation, getRoleCoordinatesFromTemplate(formation)])
+) as Record<FormationId, Record<PositionRole, FieldCoordinate[]>>;
 
 export function formationRoleCounts(formation: FormationId): Record<PositionRole, number> {
   const coords = FORMATION_COORDS[formation];
@@ -46,6 +44,9 @@ export function formationRoleCounts(formation: FormationId): Record<PositionRole
 }
 
 export function pickFormation(playerCounts: Record<PositionRole, number>): FormationId {
+  if (playerCounts.DF >= 5) return "5-3-2";
+  if (playerCounts.DF <= 3 && playerCounts.MF >= 5) return "3-5-2";
+  if (playerCounts.FW === 1 && playerCounts.MF >= 5) return "4-2-3-1";
   if (playerCounts.FW >= 3 && playerCounts.MF >= 3) return "4-3-3";
   return "4-4-2";
 }

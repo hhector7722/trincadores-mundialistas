@@ -10,15 +10,15 @@ const AWAY_LINE_Y = [6, 13, 20, 25, 29] as const;
 const HOME_LINE_Y = [71, 76, 82, 88, 93] as const;
 
 export const MVP_AWAY_BOUNDS: PlayableBounds = {
-  xMin: 18,
-  xMax: 82,
+  xMin: 10,
+  xMax: 90,
   yMin: 5,
   yMax: 31,
 };
 
 export const MVP_HOME_BOUNDS: PlayableBounds = {
-  xMin: 18,
-  xMax: 82,
+  xMin: 10,
+  xMax: 90,
   yMin: 69,
   yMax: 95,
 };
@@ -26,10 +26,10 @@ export const MVP_HOME_BOUNDS: PlayableBounds = {
 export type MatchFieldSlot = LineupSlot & { scale: number };
 
 function lineupLineIndex(y: number): number {
-  if (y >= 86) return 0;
-  if (y >= 74) return 1;
-  if (y >= 58) return 2;
-  if (y >= 30) return 3;
+  if (y >= 85) return 0;
+  if (y >= 68) return 1;
+  if (y >= 47) return 2;
+  if (y >= 32) return 3;
   return 4;
 }
 
