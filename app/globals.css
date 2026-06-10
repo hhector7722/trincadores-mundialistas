@@ -1569,7 +1569,8 @@ html:has(.tm-app-frame) {
   flex-shrink: 0;
 }
 
-.tm-porra-calendar .tm-cal-match-card .tm-cal-flag {
+.tm-porra-calendar .tm-cal-match-card .tm-cal-flag,
+.tm-porra-calendar .tm-cal-group-flag {
   border: 0.5px solid rgba(255, 255, 255, 0.42);
   background: #ffffff;
   box-shadow:
