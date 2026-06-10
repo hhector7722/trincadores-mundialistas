@@ -1,9 +1,14 @@
+import { ViewportLayoutRoot } from "@/components/layout/ViewportLayoutRoot";
 import { LoadingCenter } from "@/components/ui/spinner";
 
 export default function AppSectionLoading() {
   return (
-    <div className="relative z-10 pb-4" aria-busy="true" aria-label="Cargando seccion">
-      <LoadingCenter minHeightClassName="min-h-[min(55dvh,24rem)]" />
-    </div>
+    <ViewportLayoutRoot
+      className="tm-tab-scroll-layout relative z-10 flex flex-col items-center justify-center overflow-hidden"
+      aria-busy="true"
+      aria-label="Cargando seccion"
+    >
+      <LoadingCenter minHeightClassName="min-h-0" />
+    </ViewportLayoutRoot>
   );
 }

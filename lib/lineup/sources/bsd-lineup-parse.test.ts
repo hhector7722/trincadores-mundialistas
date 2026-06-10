@@ -43,7 +43,7 @@ test("parseBsdPredictedTeamLineup genera predicted con 11 titulares", () => {
   );
   assert.ok(lineup);
   assert.equal(lineup.sourceKind, "predicted");
-  assert.equal(lineup.dataSourceCode, "bsd");
+  assert.equal(lineup.dataSourceCode, "bsd-predicted-official-shirts-v2");
   assert.equal(lineup.slots.length, 11);
   assert.equal(lineup.bench?.length, 1);
 });
@@ -205,7 +205,7 @@ test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
   const bryan = lineup.slots.find((slot) => slot.name.includes("Gonz"));
   assert.ok(bryan);
   assert.equal(bryan.isPlaceholder, false);
-  assert.equal(bryan.shirtNumber, 5);
+  assert.equal(bryan.shirtNumber, null);
   assert.equal(bryan.name, "Bryan González");
 
   const ledezma = lineup.slots.find((slot) => slot.name.includes("Ledezma"));
@@ -216,6 +216,5 @@ test("parseBsdPredictedTeamLineup Mexico no duplica dorsales oficiales", () => {
   assert.ok(roberto);
   assert.equal(roberto.shirtNumber, 25);
 
-  assert.ok(lineup.slots.every((slot) => slot.shirtNumber != null && slot.shirtNumber > 0));
   assert.ok(!lineup.slots.some((slot) => slot.name === "Por confirmar"));
 });

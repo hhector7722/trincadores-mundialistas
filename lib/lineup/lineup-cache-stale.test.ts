@@ -4,6 +4,7 @@ import {
   hasDuplicateStarterShirts,
   isPredictedLineupCacheStale,
 } from "./lineup-cache-stale";
+import { BSD_PREDICTED_SOURCE_CODE, BSD_SOURCE_CODE } from "./sources/bsd-constants";
 import type { ResolvedLineup } from "./types";
 
 function predictedLineup(
@@ -28,7 +29,7 @@ function predictedLineup(
     benchCount: 0,
     isProbable: true,
     sourceKind: "predicted",
-    dataSourceCode: "bsd",
+    dataSourceCode: BSD_PREDICTED_SOURCE_CODE,
     fetchedAt: new Date().toISOString(),
     ...overrides,
   };
@@ -39,10 +40,10 @@ test("hasDuplicateStarterShirts detecta dorsales repetidos", () => {
   assert.equal(hasDuplicateStarterShirts(predictedLineup([1, 5, 10, 14])), false);
 });
 
-test("isPredictedLineupCacheStale detecta titulares sin dorsal", () => {
+test("isPredictedLineupCacheStale permite titulares sin dorsal cuando la politica es nueva", () => {
   const lineup = predictedLineup([1, 5, 4, 10]);
-  lineup.slots[2] = { ...lineup.slots[2]!, shirtNumber: null };
-  assert.equal(isPredictedLineupCacheStale(lineup), true);
+  lineup.slots[2] = { ...lineup.slots[2]!, shirtNumber: null, isPlaceholder: false };
+  assert.equal(isPredictedLineupCacheStale(lineup), false);
 });
 
 test("isPredictedLineupCacheStale detecta placeholders Por confirmar", () => {
@@ -58,7 +59,11 @@ test("isPredictedLineupCacheStale detecta placeholders Por confirmar", () => {
 
 test("isPredictedLineupCacheStale detecta duplicados y dorsal BSD inválido", () => {
   assert.equal(isPredictedLineupCacheStale(predictedLineup([1, 5, 25, 25])), true);
-  assert.equal(isPredictedLineupCacheStale(predictedLineup([1, 5, 4, 37])), true);
+  assert.equal(isPredictedLineupCacheStale(predictedLineup([1, 5, 4, 37])), false);
+  assert.equal(
+    isPredictedLineupCacheStale(predictedLineup([1, 5, 4, 10], { dataSourceCode: BSD_SOURCE_CODE })),
+    true
+  );
   assert.equal(isPredictedLineupCacheStale(predictedLineup([1, 5, 4, 10])), false);
   assert.equal(
     isPredictedLineupCacheStale(

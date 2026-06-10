@@ -5,6 +5,7 @@ import {
   resetLayoutAboveTabBar,
   syncLayoutAboveIndicators,
   syncLayoutAboveTabBar,
+  VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 import { TAB_INDICATORS_SYNC_EVENT } from "@/lib/layout/tab-indicators-position";
 
@@ -46,6 +47,7 @@ export function useLayoutAboveTabBar(
     }
 
     window.addEventListener("resize", sync);
+    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, sync);
     window.visualViewport?.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("scroll", sync);
     if (bottomAnchor === "indicators") {
@@ -55,6 +57,7 @@ export function useLayoutAboveTabBar(
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", sync);
+      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, sync);
       window.visualViewport?.removeEventListener("resize", sync);
       window.visualViewport?.removeEventListener("scroll", sync);
       if (bottomAnchor === "indicators") {

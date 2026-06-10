@@ -1,8 +1,10 @@
 import type { ResolvedLineup } from "@/lib/lineup/types";
+import {
+  BSD_PREDICTED_SOURCE_CODE,
+  BSD_SOURCE_CODE,
+} from "@/lib/lineup/sources/bsd-constants";
 
-const FIFA_SQUAD_SHIRT_MAX = 26;
-
-/** Dorsales repetidos entre titulares (caché anterior al matching oficial). */
+/** Dorsales repetidos entre titulares (cache anterior al matching oficial). */
 export function hasDuplicateStarterShirts(lineup: ResolvedLineup): boolean {
   const shirts = lineup.slots
     .filter((slot) => !slot.isPlaceholder)
@@ -12,16 +14,12 @@ export function hasDuplicateStarterShirts(lineup: ResolvedLineup): boolean {
   return new Set(shirts).size !== shirts.length;
 }
 
-/** Caché predicted obsoleta: duplicados o dorsales fuera de convocatoria FIFA (1–26). */
+/** Cache predicted obsoleta: duplicados, placeholders o BSD anterior a la politica de dorsales. */
 export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
   if (lineup.sourceKind !== "predicted") return false;
 
-  const shirts = lineup.slots
-    .filter((slot) => !slot.isPlaceholder)
-    .map((slot) => slot.shirtNumber)
-    .filter((shirt): shirt is number => shirt != null);
-
   if (hasDuplicateStarterShirts(lineup)) return true;
+  if (lineup.dataSourceCode === BSD_SOURCE_CODE) return true;
 
   if (
     lineup.slots.some(
@@ -31,13 +29,5 @@ export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
     return true;
   }
 
-  if (
-    lineup.slots.some((slot) => !slot.isPlaceholder && slot.shirtNumber == null)
-  ) {
-    return true;
-  }
-
-  if (shirts.length === 0) return false;
-
-  return shirts.some((shirt) => shirt < 1 || shirt > FIFA_SQUAD_SHIRT_MAX);
+  return lineup.dataSourceCode !== BSD_PREDICTED_SOURCE_CODE && lineup.dataSourceCode != null;
 }

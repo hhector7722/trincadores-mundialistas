@@ -1,4 +1,5 @@
 export const BSD_SOURCE_CODE = "bsd";
+export const BSD_PREDICTED_SOURCE_CODE = "bsd-predicted-official-shirts-v2";
 export const BSD_API_BASE_URL = "https://sports.bzzoiro.com";
 /** Liga Mundial 2026 en BSD. */
 export const BSD_WC_LEAGUE_ID = 27;

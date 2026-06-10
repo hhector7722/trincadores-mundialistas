@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef, type HTMLAttributes, type ReactNode } from "react";
 import {
   useLayoutAboveTabBar,
   type LayoutBottomAnchor,
 } from "@/components/layout/useLayoutAboveTabBar";
 import { cn } from "@/lib/utils";
 
-type ViewportLayoutRootProps = {
+type ViewportLayoutRootProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   children: ReactNode;
   bottomAnchor?: LayoutBottomAnchor;
@@ -18,12 +18,13 @@ export function ViewportLayoutRoot({
   className,
   children,
   bottomAnchor = "tabbar",
+  ...props
 }: ViewportLayoutRootProps) {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutAboveTabBar(ref, true, bottomAnchor);
 
   return (
-    <div ref={ref} className={cn(className)}>
+    <div ref={ref} className={cn(className)} {...props}>
       {children}
     </div>
   );

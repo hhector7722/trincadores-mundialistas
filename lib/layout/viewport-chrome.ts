@@ -1,4 +1,10 @@
 const TAB_BAR_SELECTOR = 'nav[aria-label="Navegacion principal"]';
+export const VIEWPORT_CHROME_SYNC_EVENT = "tm:viewport-chrome-sync";
+
+function readVisibleViewportBottom(): number {
+  const vv = window.visualViewport;
+  return vv ? vv.offsetTop + vv.height : window.innerHeight;
+}
 
 /** Borde superior visible de la TabBar (contenido usable termina aquí). */
 export function readTabBarTop(): number {
@@ -16,7 +22,7 @@ export function readTabBarTop(): number {
       getComputedStyle(document.documentElement).getPropertyValue("--tm-tabbar-core")
     ) || 80;
 
-  return window.innerHeight - tabBarCore - safeBottom;
+  return readVisibleViewportBottom() - tabBarCore - safeBottom;
 }
 
 const INDICATOR_GAP_ABOVE_PX = 10;

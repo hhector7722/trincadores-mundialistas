@@ -28,7 +28,10 @@ import type {
   BsdPredictedPlayer,
   BsdPredictedTeamLineup,
 } from "@/lib/lineup/sources/bsd-client";
-import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
+import {
+  BSD_PREDICTED_SOURCE_CODE,
+  BSD_SOURCE_CODE,
+} from "@/lib/lineup/sources/bsd-constants";
 import { normalizePositionRole, positionLabelEs } from "@/lib/lineup/position-map";
 import type {
   LineupBenchPlayer,
@@ -146,10 +149,11 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
       official: row.squadPlayer,
       bsdJersey: row.bsdJersey,
     })),
-    useOfficial
+    useOfficial,
+    officialSquad
   );
   for (const shirt of starterShirts) {
-    if (shirt > 0) usedShirtNumbers.add(shirt);
+    if (shirt != null && shirt > 0) usedShirtNumbers.add(shirt);
   }
 
   const refinedSlots = swapMirroredForwardSlots(
@@ -211,7 +215,7 @@ export function parseBsdPredictedTeamLineupWithOfficialSquad(
     benchCount: bench.length,
     isProbable: true,
     sourceKind: "predicted",
-    dataSourceCode: BSD_SOURCE_CODE,
+    dataSourceCode: BSD_PREDICTED_SOURCE_CODE,
     fetchedAt: payload.updated_at ?? fetchedAt,
   };
 }

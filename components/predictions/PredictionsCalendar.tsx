@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -26,6 +25,7 @@ import {
   resetCalendarLayout,
   SIDEBAR_CARD_ANCHOR_ATTR,
 } from "@/lib/pool/calendar-layout";
+import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   buildGroupStandings,
@@ -287,12 +287,14 @@ function useCalendarViewportLayout(
     observer.observe(calendar);
     observer.observe(grid);
     window.addEventListener("resize", syncLayout);
+    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, syncLayout);
     window.visualViewport?.addEventListener("resize", syncLayout);
     window.visualViewport?.addEventListener("scroll", syncLayout);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", syncLayout);
+      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, syncLayout);
       window.visualViewport?.removeEventListener("resize", syncLayout);
       window.visualViewport?.removeEventListener("scroll", syncLayout);
       const layoutEl = layout instanceof HTMLElement ? layout : null;
@@ -302,12 +304,17 @@ function useCalendarViewportLayout(
 }
 
 export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
-  const [localMatches, setLocalMatches] = useState(matches);
+  const [localMatchState, setLocalMatchState] = useState(() => ({
+    source: matches,
+    items: matches,
+  }));
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
 
-  useEffect(() => {
-    setLocalMatches(matches);
-  }, [matches]);
+  if (localMatchState.source !== matches) {
+    setLocalMatchState({ source: matches, items: matches });
+  }
+
+  const localMatches = localMatchState.source === matches ? localMatchState.items : matches;
 
   const matchesByDate = useMemo(() => indexMatchesByDate(localMatches), [localMatches]);
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
@@ -438,8 +445,15 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
             const patch = (current: MatchWithPrediction) =>
               patchMatchMvpPrediction(current, playerName, teamName);
 
-            setLocalMatches((current) =>
-              current.map((item) => (item.id === matchId ? patch(item) : item))
+            setLocalMatchState((current) =>
+              current.source !== matches
+                ? current
+                : {
+                    source: current.source,
+                    items: current.items.map((item) =>
+                      item.id === matchId ? patch(item) : item
+                    ),
+                  }
             );
             setActiveMatch((current) =>
               current?.id === matchId ? patch(current) : current

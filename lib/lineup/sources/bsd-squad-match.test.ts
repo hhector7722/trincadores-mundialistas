@@ -134,17 +134,18 @@ test("assignStarterShirtNumbers prioriza dorsal oficial antes que BSD del slot",
 
     ],
 
-    true
+    true,
+    mexicoOfficial
 
   );
 
-  assert.deepEqual(shirts, [1, 25]);
+  assert.deepEqual(shirts, [null, 25]);
 
 });
 
 
 
-test("assignStarterShirtNumbers nunca deja camisetas vacías", () => {
+test("assignStarterShirtNumbers permite BSD fuera de la plantilla y null si no hay dorsal fiable", () => {
 
   const shirts = assignStarterShirtNumbers(
 
@@ -156,15 +157,15 @@ test("assignStarterShirtNumbers nunca deja camisetas vacías", () => {
 
     ],
 
-    true
+    true,
+    mexicoOfficial
 
   );
 
   assert.equal(shirts.length, 2);
 
-  assert.ok(shirts.every((shirt) => shirt != null && shirt > 0));
-
   assert.equal(shirts[0], 37);
+  assert.equal(shirts[1], null);
 
 });
 

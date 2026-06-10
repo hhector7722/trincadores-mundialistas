@@ -2,8 +2,6 @@ import type { OfficialSquadPlayer } from "@/lib/lineup/lineup-queries";
 import { playerIdentityKey } from "@/lib/lineup/player-dedupe";
 import type { LineupPlayerInput } from "@/lib/lineup/types";
 
-const FIFA_SQUAD_SHIRT_MAX = 26;
-
 function normalizeName(value: string): string {
   return value
     .normalize("NFD")
@@ -203,21 +201,27 @@ export type StarterShirtInput = {
 };
 
 /**
- * Asigna dorsales sin dejar camisetas vacías:
+ * Asigna dorsales sin presentar como oficial un dorsal que viene solo de BSD:
  * 1) dorsal FIFA si hubo match por nombre,
- * 2) dorsal BSD del predictor para ese slot (sin robar identidad ajena),
- * 3) primer dorsal libre 1–26.
+ * 2) dorsal BSD solo si no pisa un dorsal de la convocatoria FIFA,
+ * 3) sin dorsal cuando no hay identidad oficial fiable.
  */
 export function assignStarterShirtNumbers(
   rows: StarterShirtInput[],
-  useOfficial: boolean
-): number[] {
+  useOfficial: boolean,
+  officialSquad: OfficialSquadPlayer[] = []
+): Array<number | null> {
   if (!useOfficial) {
     return rows.map((row) => (row.bsdJersey > 0 ? row.bsdJersey : 1));
   }
 
   const shirts: Array<number | null> = rows.map(() => null);
   const used = new Set<number>();
+  const officialShirts = new Set(
+    officialSquad
+      .map((player) => player.shirtNumber)
+      .filter((shirt) => shirt > 0)
+  );
 
   for (let i = 0; i < rows.length; i++) {
     const official = rows[i]!.official?.shirt_number;
@@ -230,31 +234,14 @@ export function assignStarterShirtNumbers(
   for (let i = 0; i < rows.length; i++) {
     if (shirts[i] != null) continue;
     const bsd = rows[i]!.bsdJersey;
-    if (bsd > 0 && !used.has(bsd)) {
+    if (bsd > 0 && !used.has(bsd) && !officialShirts.has(bsd)) {
       shirts[i] = bsd;
       used.add(bsd);
     }
   }
 
-  for (let i = 0; i < rows.length; i++) {
-    if (shirts[i] != null) continue;
-    for (let n = 1; n <= FIFA_SQUAD_SHIRT_MAX; n++) {
-      if (!used.has(n)) {
-        shirts[i] = n;
-        used.add(n);
-        break;
-      }
-    }
-    if (shirts[i] == null) {
-      const fallback = rows[i]!.bsdJersey > 0 ? rows[i]!.bsdJersey : FIFA_SQUAD_SHIRT_MAX;
-      shirts[i] = fallback;
-      used.add(fallback);
-    }
-  }
-
-  return shirts as number[];
+  return shirts;
 }
-
 export function reserveSquadPlayerIdentity(
   player: LineupPlayerInput | null,
   usedIdentities: Set<string>
@@ -263,4 +250,4 @@ export function reserveSquadPlayerIdentity(
   const key = squadIdentity(player);
   if (key) usedIdentities.add(key);
 }
-
+
