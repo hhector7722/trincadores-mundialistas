@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useLayoutEffect, useState, type RefObject } from "react";
 import {
   computeFitMvpHorizontalLayout,
   type FitMvpHorizontalLayout,
@@ -17,6 +17,21 @@ type UseFitMvpLayoutOptions = {
   gapPx?: number;
 };
 
+function layoutsEqual(
+  prev: FitMvpHorizontalLayout | null,
+  next: FitMvpHorizontalLayout
+): boolean {
+  if (!prev) return false;
+  return (
+    Math.round(prev.fieldWidthPx) === Math.round(next.fieldWidthPx) &&
+    Math.round(prev.fieldHeightPx) === Math.round(next.fieldHeightPx) &&
+    prev.awayBench.heightPx === next.awayBench.heightPx &&
+    prev.homeBench.heightPx === next.homeBench.heightPx &&
+    prev.awayBench.columns === next.awayBench.columns &&
+    prev.homeBench.columns === next.homeBench.columns
+  );
+}
+
 export function useFitMvpLayout(
   containerRef: RefObject<HTMLElement | null>,
   options: UseFitMvpLayoutOptions
@@ -32,7 +47,7 @@ export function useFitMvpLayout(
   } = options;
   const [layout, setLayout] = useState<FitMvpHorizontalLayout | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!enabled) {
       setLayout(null);
       return;
@@ -41,41 +56,38 @@ export function useFitMvpLayout(
     const node = containerRef.current;
     if (!node) return;
 
+    let rafId = 0;
+
     function measure() {
-      const rect = node!.getBoundingClientRect();
-      if (rect.width < 1 || rect.height < 1) return;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const rect = node.getBoundingClientRect();
+        if (rect.width < 1 || rect.height < 1) return;
 
-      const next = computeFitMvpHorizontalLayout({
-        widthPx: rect.width,
-        heightPx: rect.height,
-        awayBenchCount,
-        homeBenchCount,
-        footerPx,
-        formationRowPx,
-        headerPx,
-        gapPx,
-      });
+        const next = computeFitMvpHorizontalLayout({
+          widthPx: rect.width,
+          heightPx: rect.height,
+          awayBenchCount,
+          homeBenchCount,
+          footerPx,
+          formationRowPx,
+          headerPx,
+          gapPx,
+        });
 
-      setLayout((prev) => {
-        if (
-          prev &&
-          Math.round(prev.fieldWidthPx) === Math.round(next.fieldWidthPx) &&
-          Math.round(prev.fieldHeightPx) === Math.round(next.fieldHeightPx) &&
-          prev.awayBench.heightPx === next.awayBench.heightPx &&
-          prev.homeBench.heightPx === next.homeBench.heightPx
-        ) {
-          return prev;
-        }
-        return next;
+        setLayout((prev) => (layoutsEqual(prev, next) ? prev : next));
       });
     }
 
     measure();
 
-    const observer = new ResizeObserver(() => measure());
+    const observer = new ResizeObserver(measure);
     observer.observe(node);
 
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
   }, [
     containerRef,
     awayBenchCount,

@@ -35,3 +35,7 @@ export const MVP_MODAL_PANEL_CLASS = `h-[min(calc(100dvh-4rem),${MVP_MODAL_FIELD
 
 /** Panel elección MVP: mismo viewport + pie de guardado. */
 export const MVP_MODAL_PICK_PANEL_CLASS = `h-[min(calc(100dvh-3.5rem),calc(${MVP_MODAL_FIELD_HEIGHT_REM}rem+${MVP_MODAL_SAVE_FOOTER_REM}rem))]`;
+
+/** Cuerpo táctico medible (panel menos cabecera compacta). Altura fija evita bucles de ResizeObserver. */
+export const MVP_MODAL_FIELD_BODY_HEIGHT_REM = 25;
+export const MVP_MODAL_FIELD_BODY_CLASS = `h-[min(calc(100dvh-6.5rem),${MVP_MODAL_FIELD_BODY_HEIGHT_REM}rem)] w-full shrink-0`;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
@@ -183,14 +183,24 @@ export function EntityModalController({
     push({ kind: "player", teamName, playerName });
   }
 
+  const handleMvpFormationsChange = useCallback(
+    (awayFormation?: string, homeFormation?: string) => {
+      setMvpFormations((prev) =>
+        prev.awayFormation === awayFormation && prev.homeFormation === homeFormation
+          ? prev
+          : { awayFormation, homeFormation }
+      );
+    },
+    []
+  );
+
   const renderView = (view: EntityModalView) =>
     renderEntityView(
       view,
       {
         onPlayerClick: handlePlayerClick,
         onMvpSaved,
-        onMvpFormationsChange: (awayFormation, homeFormation) =>
-          setMvpFormations({ awayFormation, homeFormation }),
+        onMvpFormationsChange: handleMvpFormationsChange,
         onFormationResolved: setLineupFormation,
       },
       playerPickMode
