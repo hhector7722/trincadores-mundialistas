@@ -20,6 +20,7 @@ type TeamsPickerModalProps = {
   onPickTeam?: (teamName: string) => void;
   onPickTwoTeams?: (teamA: string, teamB: string) => void;
   onViewTeam?: (teamName: string) => void;
+  opaque?: boolean;
 };
 
 export function TeamsPickerModal({
@@ -32,6 +33,7 @@ export function TeamsPickerModal({
   onPickTeam,
   onPickTwoTeams,
   onViewTeam,
+  opaque = false,
 }: TeamsPickerModalProps) {
   const teams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
   const [firstFinalist, setFirstFinalist] = useState<string | null>(null);
@@ -82,7 +84,7 @@ export function TeamsPickerModal({
       hideHeaderDivider
       className="max-h-[calc(100dvh-1rem)]"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
-      backdropClassName="bg-[#2a1058]/40"
+      opaque={opaque}
     >
       {pickHint ? (
         <p className="shrink-0 border-b border-[var(--tm-border)] px-3 py-2 text-center text-[10px] font-medium uppercase tracking-wide text-[var(--tm-muted)]">

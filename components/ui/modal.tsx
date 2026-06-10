@@ -48,6 +48,8 @@ type ModalProps = {
   backButtonPlain?: boolean;
   /** Si false, el contenido no hace scroll interno (layout adaptativo sin recortes). */
   scrollContent?: boolean;
+  /** Fondo y panel totalmente opacos (sin glass ni blur). */
+  opaque?: boolean;
 };
 
 function lockPageScroll() {
@@ -78,8 +80,15 @@ function lockPageScroll() {
   };
 }
 
-const panelShellClass =
-  "flex w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] outline-none backdrop-blur-xl";
+const panelShellBaseClass =
+  "flex w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-[var(--tm-border)] shadow-[var(--tm-shadow-soft)] outline-none";
+
+function panelShellClass(opaque: boolean) {
+  return cn(
+    panelShellBaseClass,
+    opaque ? "bg-[var(--tm-bg-elevated)]" : "bg-[var(--tm-glass)] backdrop-blur-xl"
+  );
+}
 
 function ModalPanelShell({
   title,
@@ -95,6 +104,7 @@ function ModalPanelShell({
   headerCompact = false,
   backButtonPlain = false,
   scrollContent = true,
+  opaque = false,
   className,
   children,
   loading = false,
@@ -112,6 +122,7 @@ function ModalPanelShell({
   headerCompact?: boolean;
   backButtonPlain?: boolean;
   scrollContent?: boolean;
+  opaque?: boolean;
   className?: string;
   children: ReactNode;
   loading?: boolean;
@@ -120,7 +131,7 @@ function ModalPanelShell({
   const titleCenter = headerTitleAlign === "center";
 
   return (
-    <div className={cn(panelShellClass, "max-h-[calc(100dvh-2rem)]", className)}>
+    <div className={cn(panelShellClass(opaque), "max-h-[calc(100dvh-2rem)]", className)}>
       {hideHeader ? (
         <span id={titleId} className="sr-only">
           {title}
@@ -240,7 +251,11 @@ function ModalPanelShell({
         )}
       >
         {children}
-        {loading ? <LoadingOverlay /> : null}
+        {loading ? (
+          <LoadingOverlay
+            className={opaque ? "bg-[var(--tm-bg-elevated)] backdrop-blur-none" : undefined}
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -272,6 +287,7 @@ export function Modal({
   headerCompact = false,
   backButtonPlain = false,
   scrollContent = true,
+  opaque = false,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -361,9 +377,10 @@ export function Modal({
         type="button"
         aria-label="Cerrar"
         className={cn(
-          "absolute inset-0 overscroll-none bg-[#2a1058]/40 backdrop-blur-sm",
+          "absolute inset-0 overscroll-none",
+          opaque ? "bg-[#2a1058]" : "bg-[#2a1058]/40 backdrop-blur-sm",
           hasSwipe ? "touch-manipulation" : "touch-none",
-          backdropClassName
+          !opaque && backdropClassName
         )}
         onClick={onBackdropClick}
         onTouchMove={hasSwipe ? undefined : (event) => event.preventDefault()}
@@ -423,6 +440,7 @@ export function Modal({
                       headerCompact={headerCompact}
                       backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
+                      opaque={opaque}
                       className={className}
                       loading={loading}
                     >
@@ -444,6 +462,7 @@ export function Modal({
                       headerCompact={headerCompact}
                       backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
+                      opaque={opaque}
                       className={className}
                       loading={loading}
                     >
@@ -468,6 +487,7 @@ export function Modal({
                       headerCompact={headerCompact}
                       backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
+                      opaque={opaque}
                       className={className}
                       loading={loading}
                     >
@@ -489,6 +509,7 @@ export function Modal({
                       headerCompact={headerCompact}
                       backButtonPlain={backButtonPlain}
                       scrollContent={scrollContent}
+                      opaque={opaque}
                       className={className}
                       loading={loading}
                     >
@@ -513,6 +534,7 @@ export function Modal({
               headerCompact={headerCompact}
               backButtonPlain={backButtonPlain}
               scrollContent={scrollContent}
+              opaque={opaque}
               className={className}
               loading={loading}
             >

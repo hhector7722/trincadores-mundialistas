@@ -59,6 +59,8 @@ type QuickPredictionModalProps = {
   matches?: MatchWithPrediction[];
   onMatchChange?: (match: MatchWithPrediction) => void;
   onMvpSaved?: (matchId: string, playerName: string, teamName: string) => void;
+  /** Panel y backdrop opacos (calendario). */
+  opaque?: boolean;
 };
 
 type DotPosition = "start" | "middle" | "end";
@@ -122,6 +124,7 @@ export function QuickPredictionModal({
   matches,
   onMatchChange,
   onMvpSaved,
+  opaque = false,
 }: QuickPredictionModalProps) {
   const router = useRouter();
   const orderedMatches = useMemo(
@@ -579,7 +582,7 @@ export function QuickPredictionModal({
         isPlayerView && PLAYER_MODAL_WRAPPER_CLASS,
         (isMvpView || isPossibleLineupsView) && MVP_MODAL_WRAPPER_CLASS
       )}
-      backdropClassName="bg-[#2a1058]/40"
+      opaque={opaque}
       onSwipeLeft={
         canSwipeMatches && atPredictionRoot && !activePanelSlide
           ? () => startMatchSlide(1)

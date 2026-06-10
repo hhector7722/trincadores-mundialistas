@@ -501,6 +501,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       {activeMatch && (
         <QuickPredictionModal
           open
+          opaque
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}

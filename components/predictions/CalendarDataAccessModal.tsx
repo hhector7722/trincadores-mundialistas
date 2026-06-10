@@ -47,7 +47,7 @@ export function CalendarDataAccessModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Datos del torneo" ariaLabel="Datos del torneo">
+    <Modal open={open} onClose={onClose} title="Datos del torneo" ariaLabel="Datos del torneo" opaque>
       <div className="flex flex-col gap-2 p-4">
         {ACCESS_ACTIONS.map((action) => (
           <button

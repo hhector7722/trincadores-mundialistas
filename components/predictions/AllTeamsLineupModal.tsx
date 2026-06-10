@@ -31,6 +31,7 @@ export function AllTeamsLineupModal({ open, onClose, onBack }: AllTeamsLineupMod
     <>
       <TeamsPickerModal
         open={open}
+        opaque
         onClose={handleCloseAll}
         onBack={onBack}
         mode="view"
@@ -41,6 +42,7 @@ export function AllTeamsLineupModal({ open, onClose, onBack }: AllTeamsLineupMod
       {selectedTeam ? (
         <EntityModalController
           open
+          opaque
           onClose={handleCloseLineup}
           initialView={buildLineupView(selectedTeam)}
           carouselTeams={teams}

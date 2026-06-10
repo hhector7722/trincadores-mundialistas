@@ -240,7 +240,7 @@ export function AllGroupsStandingsModal({
       ariaLabel="Clasificación de grupos"
       className="flex max-h-[calc(100dvh-1rem)] flex-col"
       wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
-      backdropClassName="bg-[#2a1058]/40"
+      opaque
       onSwipeLeft={viewIndex === 0 && !viewSlide ? () => startViewSlide("predictions") : undefined}
       onSwipeRight={viewIndex === 1 && !viewSlide ? () => startViewSlide("official") : undefined}
       belowPanel={<ViewSwipeDots activeIndex={activeDotIndex} />}

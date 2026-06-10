@@ -41,6 +41,7 @@ type EntityModalControllerProps = {
   carouselTeams?: string[];
   onCarouselTeamChange?: (teamName: string) => void;
   onMvpSaved?: (playerName: string, teamName: string) => void;
+  opaque?: boolean;
 };
 
 function renderEntityView(
@@ -118,6 +119,7 @@ export function EntityModalController({
   carouselTeams,
   onCarouselTeamChange,
   onMvpSaved,
+  opaque = false,
 }: EntityModalControllerProps) {
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
@@ -263,7 +265,7 @@ export function EntityModalController({
         (isMvpView || isPossibleLineupsView) && MVP_MODAL_WRAPPER_CLASS,
         wrapperClassName
       )}
-      backdropClassName="bg-[#2a1058]/40"
+      opaque={opaque}
       onSwipeLeft={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined
       }
