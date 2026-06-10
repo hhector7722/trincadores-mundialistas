@@ -6,35 +6,26 @@ import { cn } from "@/lib/utils";
 type QuizWaitModalProps = {
   open: boolean;
   onClose: () => void;
-  title: string;
   message: string;
-  /** Mensaje corto en una sola línea (fuente más pequeña). */
-  compact?: boolean;
 };
 
-export function QuizWaitModal({
-  open,
-  onClose,
-  title,
-  message,
-  compact = false,
-}: QuizWaitModalProps) {
+export function QuizWaitModal({ open, onClose, message }: QuizWaitModalProps) {
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={title}
-      headerTitleAlign="center"
+      title={message}
+      hideTitle
+      headerCompact
       hideHeaderDivider
-      wrapperClassName={cn("w-full", compact ? "max-w-sm" : "max-w-md")}
+      ariaLabel={message}
+      wrapperClassName="w-full max-w-[min(100vw-1rem,28rem)]"
     >
-      <div className={cn("text-center", compact ? "px-8 py-6" : "px-6 py-8")}>
+      <div className="px-3 py-5 sm:px-4">
         <p
           className={cn(
-            "text-[var(--tm-fg)]",
-            compact
-              ? "text-[11px] leading-snug tracking-tight sm:text-xs"
-              : "text-pretty text-base leading-relaxed"
+            "whitespace-nowrap text-center font-semibold leading-tight tracking-tight text-[var(--tm-fg)]",
+            "text-[length:clamp(0.6875rem,3.6vw,1.25rem)]"
           )}
         >
           {message}
