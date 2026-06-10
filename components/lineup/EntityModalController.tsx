@@ -15,6 +15,7 @@ import {
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
   MVP_MODAL_PANEL_CLASS,
+  MVP_MODAL_PICK_PANEL_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
   PLAYER_MODAL_PANEL_CLASS,
   PLAYER_MODAL_PANEL_HOST_CLASS,
@@ -232,7 +233,9 @@ export function EntityModalController({
             : undefined
       }
       className={cn(
-        (isMvpView || isPossibleLineupsView) &&
+        isMvpView &&
+          cn(MVP_MODAL_PICK_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
+        isPossibleLineupsView &&
           cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-0.5rem)]"),
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),

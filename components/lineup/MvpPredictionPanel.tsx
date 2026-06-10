@@ -24,9 +24,7 @@ import {
   mapSlotsToAwayLeft,
   mapSlotsToHomeRight,
 } from "@/lib/lineup/mvp-horizontal-geometry";
-import { MVP_MODAL_BODY_CLASS } from "@/lib/lineup/field-asset";
 import type { ResolvedLineup } from "@/lib/lineup/types";
-import { cn } from "@/lib/utils";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
 
@@ -53,9 +51,11 @@ type SquadPlayerOption = {
 };
 
 const MVP_FORMATION_ROW_PX = 22;
-const MVP_FOOTER_PX = 28;
-const MVP_FOOTER_CLOSED_PX = 20;
+const MVP_FOOTER_PX = 44;
+const MVP_FOOTER_CLOSED_PX = 28;
 const MVP_ERROR_PX = 18;
+/** Margen bajo el campo: fichas centradas en y% desbordan la línea inferior. */
+const MVP_CHIP_BLEED_PX = 14;
 
 function sortBenchByShirt<T extends { shirtNumber: number | null; name: string }>(
   players: T[]
@@ -256,11 +256,13 @@ export function MvpPredictionPanel({
   }, [awaySlots, homeSlots, awayBench, homeBench, awayTeam, homeTeam]);
 
   const footerPx =
+    MVP_CHIP_BLEED_PX +
     (preview
       ? 0
       : serverEditable
         ? MVP_FOOTER_PX
-        : MVP_FOOTER_CLOSED_PX) + (error ? MVP_ERROR_PX : 0);
+        : MVP_FOOTER_CLOSED_PX) +
+    (error ? MVP_ERROR_PX : 0);
 
   const fitLayout = useFitMvpLayout(layoutRef, {
     awayBenchCount: awayBench.length,
@@ -340,18 +342,18 @@ export function MvpPredictionPanel({
   const layoutReady = fitLayout != null;
 
   return (
-    <div
-      ref={layoutRef}
-      className={cn("flex w-full min-h-0 flex-col overflow-hidden", MVP_MODAL_BODY_CLASS)}
-    >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 pt-0.5">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
+      <div
+        ref={layoutRef}
+        className="flex min-h-0 flex-1 flex-col overflow-hidden px-1 pt-0.5"
+      >
         {!layoutReady ? (
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <LoadingCenter label="Ajustando campo…" minHeightClassName="min-h-0" />
           </div>
         ) : (
         <div
-          className="mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden"
+          className="mx-auto flex min-h-0 w-full min-w-0 flex-1 flex-col"
           style={{ maxWidth: fitLayout.fieldWidthPx }}
         >
           {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
@@ -376,9 +378,9 @@ export function MvpPredictionPanel({
             </div>
           ) : null}
 
-          <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
             {(markFieldReady) => (
-              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible pb-2">
                 <MvpHorizontalFieldGraphic
                   awaySlots={awaySlots}
                   homeSlots={homeSlots}

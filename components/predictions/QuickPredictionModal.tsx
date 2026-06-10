@@ -35,6 +35,7 @@ import {
   LINEUP_MODAL_PANEL_HOST_CLASS,
   LINEUP_MODAL_WRAPPER_CLASS,
   MVP_MODAL_PANEL_CLASS,
+  MVP_MODAL_PICK_PANEL_CLASS,
   MVP_MODAL_WRAPPER_CLASS,
   PLAYER_MODAL_PANEL_CLASS,
   PLAYER_MODAL_PANEL_HOST_CLASS,
@@ -556,8 +557,8 @@ export function QuickPredictionModal({
       headerCompact={isCompactModal}
       scrollContent={!isCompactModal}
       className={cn(
-        (isMvpView || isPossibleLineupsView) &&
-          cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isMvpView && cn(MVP_MODAL_PICK_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+        isPossibleLineupsView && cn(MVP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
         isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
       )}
