@@ -212,7 +212,8 @@ export function MvpPickPanel({
             <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
           ) : (
             <Button
-              className="h-fit min-h-0 shrink-0 px-3 py-0.5 text-[11px] leading-none"
+              variant="ghost"
+              className="h-fit min-h-0 shrink-0 rounded-none px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wide leading-none text-[var(--tm-accent)] hover:bg-transparent hover:opacity-80"
               disabled={!selectedOption || pending}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}

@@ -85,7 +85,12 @@ export function MatchContextActionButton({
           >
             <span
               ref={labelRef}
-              className="inline-block max-w-full truncate text-center font-display text-[10px] font-semibold normal-case sm:text-xs"
+              className={cn(
+                "inline-block max-w-full truncate text-center text-[10px] font-semibold sm:text-xs",
+                hideCaption
+                  ? "uppercase tracking-wide"
+                  : "font-display normal-case"
+              )}
             >
               {savedValue}
             </span>
