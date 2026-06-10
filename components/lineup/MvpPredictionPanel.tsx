@@ -304,7 +304,7 @@ export function MvpPredictionPanel({
             className="mx-auto w-full shrink-0 pb-0.5"
             style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
           >
-            <div className="ml-auto w-1/2 min-w-0">
+            <div className="w-full min-w-0">
               <LineupFormationInfo
                 teamName={homeTeam}
                 formationLabel={resolvedHomeLineup?.formationLabel}
@@ -316,7 +316,7 @@ export function MvpPredictionPanel({
                   players={homeBench}
                   selectedKey={selectedKey}
                   disabled={pickDisabled}
-                  align="right"
+                  align="left"
                   gridLayout={fitLayout?.homeBench}
                   onPlayerClick={(player) => setSelectedKey(mvpSelectionKey(homeTeam, player))}
                 />
@@ -352,7 +352,7 @@ export function MvpPredictionPanel({
             className="mx-auto w-full shrink-0 pt-0.5 pb-1"
             style={fitLayout ? { maxWidth: fitLayout.fieldWidthPx } : undefined}
           >
-            <div className="w-1/2 min-w-0">
+            <div className="w-full min-w-0">
               <LineupFormationInfo
                 teamName={awayTeam}
                 formationLabel={resolvedAwayLineup?.formationLabel}

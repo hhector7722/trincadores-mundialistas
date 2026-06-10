@@ -15,6 +15,9 @@ const MIN_SLOT_GAP_Y_PCT = 6.5;
 
 const SCALE_MIN = 0.38;
 const SCALE_MAX = 0.78;
+
+/** Multiplicador visual del 11 inicial respecto al cálculo base anti-solapamiento. */
+export const MVP_STARTER_CHIP_SCALE_MULTIPLIER = 2;
 const SLOT_SCALE_PADDING = 0.96;
 
 function maxScaleForSlotPair(
@@ -66,5 +69,9 @@ export function computeMvpFieldChipScale(
     scale = Math.min(scale, maxScaleFromSlots(slots, fieldWidthPx, fieldHeightPx));
   }
 
-  return Math.max(SCALE_MIN, Math.round(scale * 1000) / 1000);
+  const rawScale = Math.max(SCALE_MIN, Math.round(scale * 1000) / 1000);
+  return Math.min(
+    SCALE_MAX * MVP_STARTER_CHIP_SCALE_MULTIPLIER,
+    Math.round(rawScale * MVP_STARTER_CHIP_SCALE_MULTIPLIER * 1000) / 1000
+  );
 }

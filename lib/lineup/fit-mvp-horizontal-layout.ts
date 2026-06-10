@@ -60,7 +60,7 @@ export function computeFitMvpHorizontalLayout(
   );
   const maxColumnsPerSide = Math.max(
     4,
-    Math.floor(estFieldWidth / 2 / BENCH_CELL_MIN_PX)
+    Math.floor(estFieldWidth / BENCH_CELL_MIN_PX)
   );
 
   const maxBenchHeight = Math.min(usableHeight * 0.22, 80);
@@ -83,7 +83,7 @@ export function computeFitMvpHorizontalLayout(
 
   const benchColumnsCap = Math.max(
     4,
-    Math.floor(fieldWidthPx / 2 / BENCH_CELL_MIN_PX)
+    Math.floor(fieldWidthPx / BENCH_CELL_MIN_PX)
   );
   const awayBenchFinal =
     awayBench.columns > benchColumnsCap
