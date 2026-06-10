@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 /** Separación fija entre el final del nombre y el icono de edición. */
 const EDIT_ICON_GAP_PX = 10;
 
-/** Mismo estilo que el lápiz del pronóstico guardado en home/modal. */
-const EDIT_PENCIL_CLASS = "h-3.5 w-3.5 shrink-0";
+/** Mismo tamaño que el lápiz de «Mi pronóstico» (HomeNextMatch). */
+const EDIT_PENCIL_CLASS = "h-3 w-3 shrink-0";
 const EDIT_PENCIL_STROKE = 2;
 
 type MatchContextActionButtonProps = {
