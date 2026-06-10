@@ -42,6 +42,10 @@ type ModalProps = {
   headerTitleAlign?: "left" | "default" | "center";
   /** Contenido centrado en la barra cuando `hideTitle` (p. ej. fecha del partido). */
   headerCenter?: ReactNode;
+  /** Cabecera mínima para modales de campo (menos padding y targets más pequeños). */
+  headerCompact?: boolean;
+  /** Si false, el contenido no hace scroll interno (layout adaptativo sin recortes). */
+  scrollContent?: boolean;
 };
 
 function lockPageScroll() {
@@ -86,6 +90,8 @@ function ModalPanelShell({
   headerTrailing,
   headerTitleAlign = "default",
   headerCenter,
+  headerCompact = false,
+  scrollContent = true,
   className,
   children,
   loading = false,
@@ -100,6 +106,8 @@ function ModalPanelShell({
   headerTrailing?: ReactNode;
   headerTitleAlign?: "left" | "default" | "center";
   headerCenter?: ReactNode;
+  headerCompact?: boolean;
+  scrollContent?: boolean;
   className?: string;
   children: ReactNode;
   loading?: boolean;
@@ -116,8 +124,9 @@ function ModalPanelShell({
       ) : (
       <div
         className={cn(
-          "relative flex shrink-0 items-center gap-2 px-4",
-          hideTitle ? "py-2" : "py-3",
+          "relative flex shrink-0 items-center gap-1",
+          headerCompact ? "px-2 py-1" : "gap-2 px-4",
+          !headerCompact && (hideTitle ? "py-2" : "py-3"),
           !hideHeaderDivider && "border-b border-[var(--tm-border)]"
         )}
       >
@@ -126,9 +135,12 @@ function ModalPanelShell({
             type="button"
             aria-label="Volver"
             onClick={onBack}
-            className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+            className={cn(
+              "relative z-10 flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]",
+              headerCompact ? "h-8 w-8" : "h-10 w-10"
+            )}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className={headerCompact ? "h-4 w-4" : "h-5 w-5"} />
           </button>
         ) : (
           <span
@@ -140,7 +152,9 @@ function ModalPanelShell({
                   ? "w-0"
                   : hideTitle || (titleLeft && !onBack)
                     ? "w-0"
-                    : "w-10"
+                    : headerCompact
+                      ? "w-0"
+                      : "w-10"
             )}
             aria-hidden="true"
           />
@@ -149,7 +163,8 @@ function ModalPanelShell({
           <h2
             id={titleId}
             className={cn(
-              "relative z-10 min-w-0 flex-1 truncate font-display text-sm text-[var(--tm-fg)]",
+              "relative z-10 min-w-0 flex-1 truncate font-display text-[var(--tm-fg)]",
+              headerCompact ? "text-xs" : "text-sm",
               titleLeft ? "text-left normal-case tracking-normal" : "uppercase tracking-wide"
             )}
           >
@@ -195,14 +210,22 @@ function ModalPanelShell({
             type="button"
             aria-label="Cerrar modal"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]"
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]",
+              headerCompact ? "h-8 w-8" : "h-10 w-10"
+            )}
           >
-            <X className="h-5 w-5" />
+            <X className={headerCompact ? "h-4 w-4" : "h-5 w-5"} />
           </button>
         </div>
       </div>
       )}
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+      <div
+        className={cn(
+          "relative flex min-h-0 flex-1 flex-col",
+          scrollContent ? "overflow-y-auto overscroll-contain" : "overflow-hidden"
+        )}
+      >
         {children}
         {loading ? <LoadingOverlay /> : null}
       </div>
@@ -233,6 +256,8 @@ export function Modal({
   headerTrailing,
   headerTitleAlign = "default",
   headerCenter,
+  headerCompact = false,
+  scrollContent = true,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -381,6 +406,8 @@ export function Modal({
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
+                      headerCompact={headerCompact}
+                      scrollContent={scrollContent}
                       className={className}
                       loading={loading}
                     >
@@ -399,6 +426,8 @@ export function Modal({
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
+                      headerCompact={headerCompact}
+                      scrollContent={scrollContent}
                       className={className}
                       loading={loading}
                     >
@@ -420,6 +449,8 @@ export function Modal({
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
+                      headerCompact={headerCompact}
+                      scrollContent={scrollContent}
                       className={className}
                       loading={loading}
                     >
@@ -438,6 +469,8 @@ export function Modal({
                       headerTrailing={headerTrailing}
                       headerTitleAlign={headerTitleAlign}
                       headerCenter={headerCenter}
+                      headerCompact={headerCompact}
+                      scrollContent={scrollContent}
                       className={className}
                       loading={loading}
                     >
@@ -459,6 +492,8 @@ export function Modal({
               headerTrailing={headerTrailing}
               headerTitleAlign={headerTitleAlign}
               headerCenter={headerCenter}
+              headerCompact={headerCompact}
+              scrollContent={scrollContent}
               className={className}
               loading={loading}
             >

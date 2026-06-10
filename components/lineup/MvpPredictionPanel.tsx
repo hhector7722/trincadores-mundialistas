@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { fetchMatchLineupBundleAction } from "@/actions/lineup";
 import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MatchMvpFieldGraphic } from "@/components/lineup/MatchMvpFieldGraphic";
 import { BenchPlayersStrip, benchPlayerKey } from "@/components/lineup/BenchPlayersStrip";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
+import { useFitFieldModalLayout } from "@/components/lineup/use-fit-field-modal-layout";
 import { Button } from "@/components/ui/button";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { ensureElevenStarterSlots } from "@/lib/lineup/ensure-eleven-starter-slots";
@@ -31,6 +32,7 @@ type MvpPredictionPanelProps = {
   savedPlayerName?: string | null;
   savedTeamName?: string | null;
   onSaved?: (playerName: string, teamName: string) => void;
+  onFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
 };
 
 type SquadPlayerOption = {
@@ -40,6 +42,10 @@ type SquadPlayerOption = {
   shirtNumber: number | null;
   position: string | null;
 };
+
+const MVP_FOOTER_PX = 44;
+const MVP_FOOTER_CLOSED_PX = 0;
+const MVP_ERROR_PX = 18;
 
 function sortBenchByShirt<T extends { shirtNumber: number | null; name: string }>(
   players: T[]
@@ -98,8 +104,10 @@ export function MvpPredictionPanel({
   savedPlayerName,
   savedTeamName,
   onSaved,
+  onFormationsChange,
 }: MvpPredictionPanelProps) {
   const router = useRouter();
+  const layoutRef = useRef<HTMLDivElement>(null);
   const [homeSquad, setHomeSquad] = useState<TeamSquadWithPlayers | null>(null);
   const [awaySquad, setAwaySquad] = useState<TeamSquadWithPlayers | null>(null);
   const [homeLineup, setHomeLineup] = useState<ResolvedLineup | null>(null);
@@ -160,6 +168,17 @@ export function MvpPredictionPanel({
     [awayLineup, awaySquad]
   );
 
+  useEffect(() => {
+    onFormationsChange?.(
+      resolvedAwayLineup?.formationLabel,
+      resolvedHomeLineup?.formationLabel
+    );
+  }, [
+    onFormationsChange,
+    resolvedAwayLineup?.formationLabel,
+    resolvedHomeLineup?.formationLabel,
+  ]);
+
   const homeSlots = useMemo(
     () =>
       resolvedHomeLineup
@@ -193,6 +212,16 @@ export function MvpPredictionPanel({
       ),
     [awaySquad, resolvedAwayLineup]
   );
+
+  const footerPx =
+    (serverEditable ? MVP_FOOTER_PX : MVP_FOOTER_CLOSED_PX) + (error ? MVP_ERROR_PX : 0);
+
+  const fitLayout = useFitFieldModalLayout(layoutRef, {
+    awayBenchCount: awayBench.length,
+    homeBenchCount: homeBench.length,
+    footerPx,
+    enabled: !loading && kitColorsReady,
+  });
 
   useEffect(() => {
     if (!savedPlayerName || !savedTeamName) {
@@ -251,29 +280,23 @@ export function MvpPredictionPanel({
   const pickDisabled = !serverEditable || pending;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {serverEditable && selectedOption ? (
-        <p className="shrink-0 truncate px-1 py-0.5 text-center text-[9px] font-medium text-[var(--tm-accent)]">
-          MVP: {selectedOption.name}
-        </p>
-      ) : null}
-
-      <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col">
+    <div ref={layoutRef} className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+      <LineupFieldGate label="Cargando campo…" className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {(markFieldReady) => (
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-0.5">
+          <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
             <BenchPlayersStrip
               teamName={awayTeam}
               players={awayBench}
-              formationLabel={resolvedAwayLineup?.formationLabel}
               selectedKey={selectedKey}
               disabled={pickDisabled}
               density="mvp"
-              showTeamHeader
+              showTeamHeader={false}
+              gridLayout={fitLayout?.awayBench}
               onPlayerClick={(player) => setSelectedKey(benchPlayerKey(awayTeam, player))}
               position="top"
             />
 
-            <div className="flex min-h-[15rem] flex-1 items-center justify-center py-0.5">
+            <div className="flex shrink-0 items-center justify-center overflow-visible">
               <MatchMvpFieldGraphic
                 homeSlots={homeSlots}
                 awaySlots={awaySlots}
@@ -285,17 +308,20 @@ export function MvpPredictionPanel({
                 disabled={pickDisabled}
                 onSelect={setSelectedKey}
                 onFieldReady={markFieldReady}
+                widthPx={fitLayout?.fieldWidthPx}
+                heightPx={fitLayout?.fieldHeightPx}
+                chipScale={fitLayout?.chipScale}
               />
             </div>
 
             <BenchPlayersStrip
               teamName={homeTeam}
               players={homeBench}
-              formationLabel={resolvedHomeLineup?.formationLabel}
               selectedKey={selectedKey}
               disabled={pickDisabled}
               density="mvp"
-              showTeamHeader
+              showTeamHeader={false}
+              gridLayout={fitLayout?.homeBench}
               onPlayerClick={(player) => setSelectedKey(benchPlayerKey(homeTeam, player))}
               position="bottom"
             />
@@ -310,14 +336,19 @@ export function MvpPredictionPanel({
       ) : null}
 
       {error ? (
-        <p className="shrink-0 px-3 text-sm text-[var(--tm-danger)]" role="alert">
+        <p className="shrink-0 px-2 text-[10px] text-[var(--tm-danger)]" role="alert">
           {error}
         </p>
       ) : null}
 
       {serverEditable ? (
-        <div className="flex shrink-0 gap-2 px-2 py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
-          <Button className="min-h-11 flex-1" disabled={!selectedKey || pending} onClick={onSave}>
+        <div className="flex shrink-0 gap-2 px-1 py-0.5 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+          <Button
+            className="min-h-11 flex-1 text-sm"
+            disabled={!selectedKey || pending}
+            onClick={onSave}
+            title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
+          >
             {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
           </Button>
         </div>

@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MvpPredictionPanel } from "@/components/lineup/MvpPredictionPanel";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
-import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
+import {
+  entityModalTitleContent,
+  type MvpModalFormations,
+} from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { LINEUP_MODAL_WRAPPER_CLASS } from "@/lib/lineup/field-asset";
 import { isGoalkeeperPosition } from "@/lib/lineup/position-map";
@@ -33,6 +36,7 @@ function renderEntityView(
   handlers: {
     onPlayerClick: (teamName: string, playerName: string) => void;
     onMvpSaved?: (playerName: string, teamName: string) => void;
+    onMvpFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
   },
   playerPickMode: PlayerPickMode
 ) {
@@ -73,6 +77,7 @@ function renderEntityView(
           savedPlayerName={view.savedPlayerName}
           savedTeamName={view.savedTeamName}
           onSaved={handlers.onMvpSaved}
+          onFormationsChange={handlers.onMvpFormationsChange}
         />
       );
     default:
@@ -91,6 +96,7 @@ export function EntityModalController({
   carouselTeams,
   onCarouselTeamChange,
 }: EntityModalControllerProps) {
+  const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
 
@@ -130,6 +136,7 @@ export function EntityModalController({
   useEffect(() => {
     if (open) {
       reset(initialView);
+      setMvpFormations({});
     }
   }, [open, initialView, reset]);
 
@@ -147,6 +154,8 @@ export function EntityModalController({
       view,
       {
         onPlayerClick: handlePlayerClick,
+        onMvpFormationsChange: (awayFormation, homeFormation) =>
+          setMvpFormations({ awayFormation, homeFormation }),
       },
       playerPickMode
     );
@@ -167,12 +176,14 @@ export function EntityModalController({
     <Modal
       open={open}
       onClose={onClose}
-      title={entityModalTitleContent(current)}
+      title={entityModalTitleContent(current, mvpFormations)}
       hideHeaderDivider
       headerTitleAlign={current.kind === "mvp" ? "left" : "center"}
+      headerCompact={isFieldView}
+      scrollContent={!isFieldView}
+      containerClassName={isFieldView ? "p-1" : undefined}
       className={cn(
-        current.kind === "mvp" && "max-h-[min(100dvh-0.5rem,27rem)]",
-        current.kind === "lineup" && "max-h-[calc(100dvh-1rem)]",
+        isFieldView && "max-h-[calc(100dvh-0.5rem)]",
         className
       )}
       wrapperClassName={cn(isFieldView && LINEUP_MODAL_WRAPPER_CLASS, wrapperClassName)}
