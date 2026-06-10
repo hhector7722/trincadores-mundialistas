@@ -52,7 +52,7 @@ export function ScoreStepper({
           onClick={() => onChange(Math.max(0, value - 1))}
           className={
             isFloating
-              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(168,78,78,0.38)]")
+              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(178,68,68,0.55)]")
               : cn(defaultControlClass, (disabled || value <= 0) && "opacity-40")
           }
         >
@@ -80,7 +80,7 @@ export function ScoreStepper({
           onClick={() => onChange(Math.min(MAX_GOALS, value + 1))}
           className={
             isFloating
-              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(74,132,88,0.38)]")
+              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(62,138,82,0.55)]")
               : cn(defaultControlClass, (disabled || value >= MAX_GOALS) && "opacity-40")
           }
         >
