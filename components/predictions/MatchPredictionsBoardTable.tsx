@@ -5,7 +5,7 @@ import {
 } from "@/components/predictions/match-predictions-grid";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
-import { teamNameEs } from "@/lib/teams/display";
+import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
 const EMPTY_ROW_COUNT = 11;
@@ -21,7 +21,7 @@ function TeamHeader({ team }: { team: string }) {
   return (
     <span className="inline-flex items-center justify-center gap-1 whitespace-nowrap">
       <TeamFlagBadge name={team} size="xxs" loading="eager" />
-      <span>{teamNameEs(team)}</span>
+      <span>{teamAbbr(team)}</span>
     </span>
   );
 }
