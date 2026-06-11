@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Plus } from "lucide-react";
+import type { MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 
 type GeneralPredictionRowProps = {
@@ -20,6 +21,11 @@ export function GeneralPredictionRow({
 }: GeneralPredictionRowProps) {
   const hasValue = Boolean(value);
 
+  function stopCardNavigation(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   return (
     <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)_1.25rem] items-center gap-1">
       <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
@@ -33,7 +39,10 @@ export function GeneralPredictionRow({
         ) : editable ? (
           <button
             type="button"
-            onClick={onAdd}
+            onClick={(event) => {
+              stopCardNavigation(event);
+              onAdd();
+            }}
             className={cn(
               "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
               "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
@@ -52,7 +61,10 @@ export function GeneralPredictionRow({
         {hasValue && editable ? (
           <button
             type="button"
-            onClick={onEdit}
+            onClick={(event) => {
+              stopCardNavigation(event);
+              onEdit();
+            }}
             aria-label={`Editar ${label}`}
             className="shrink-0 text-[#CCFF00] transition-opacity hover:opacity-80"
           >

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   saveTournamentChampion,
@@ -103,13 +104,17 @@ export function HomeGeneralPredictionsCard({
 
   return (
     <>
-      <div className="tm-home-top-stat-card @container relative flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
-        <Link
-          href="/general-predictions"
-          className="absolute right-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-        >
+      <Link
+        href="/general-predictions"
+        aria-label="Ver pronósticos globales de todos los trincadores"
+        className={cn(
+          "tm-home-top-stat-card @container relative flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card",
+          "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
+        )}
+      >
+        <span className="pointer-events-none absolute right-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
           Ver todos
-        </Link>
+        </span>
         <div className="tm-home-general-predictions__body">
           <GeneralPredictionRow
             label={labels.champion}
@@ -164,7 +169,7 @@ export function HomeGeneralPredictionsCard({
             {error}
           </p>
         ) : null}
-      </div>
+      </Link>
 
       {activeFlow?.kind === "champion" ? (
         <TeamsPickerModal
