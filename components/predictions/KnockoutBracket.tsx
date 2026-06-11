@@ -45,7 +45,7 @@ const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 /** Fila 2 de la rejilla guía (octavos superiores / banda cabecera). */
 const PERRETE_CENTER_Y = gridRowToPercentY(2);
-const KO_MASCOT_SRC = "/icons/psoe-logo.png";
+const KO_MASCOT_SRC = "/icons/psoe.png";
 
 type TeamSlotLayout = {
   x: number;
