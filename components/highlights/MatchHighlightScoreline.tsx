@@ -29,9 +29,9 @@ export function MatchHighlightScoreline({
         className,
       )}
     >
-      <TeamFlagBadge name={homeTeam} size="xxs" loading="eager" imageWidth={80} />
-      <span className="text-[clamp(7px,1.9cqw,9px)] font-bold uppercase tracking-wide text-white/85">
-        {teamAbbr(homeTeam)}
+      <span className="inline-flex items-center gap-0.5 text-[clamp(7px,1.9cqw,9px)] font-bold uppercase leading-none tracking-wide text-white/85">
+        <TeamFlagBadge name={homeTeam} size="text" loading="eager" className="shrink-0" />
+        <span className="whitespace-nowrap">{teamAbbr(homeTeam)}</span>
       </span>
       <span
         className={cn(
@@ -50,10 +50,10 @@ export function MatchHighlightScoreline({
       >
         {awayDisplay}
       </span>
-      <span className="text-[clamp(7px,1.9cqw,9px)] font-bold uppercase tracking-wide text-white/85">
-        {teamAbbr(awayTeam)}
+      <span className="inline-flex items-center gap-0.5 text-[clamp(7px,1.9cqw,9px)] font-bold uppercase leading-none tracking-wide text-white/85">
+        <span className="whitespace-nowrap">{teamAbbr(awayTeam)}</span>
+        <TeamFlagBadge name={awayTeam} size="text" loading="eager" className="shrink-0" />
       </span>
-      <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" imageWidth={80} />
     </div>
   );
 }
