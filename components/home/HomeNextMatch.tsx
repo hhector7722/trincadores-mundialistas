@@ -25,6 +25,10 @@ import {
   mvpSnapshotFromMatch,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
+import {
+  possibleLineupsActionCaptionFromConfirmed,
+  POSSIBLE_LINEUPS_ACTION_CAPTION,
+} from "@/lib/lineup/lineups-modal-copy";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 
 type HomeNextMatchProps = {
@@ -52,7 +56,10 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     open: boolean;
     view: EntityModalView;
   }>({ open: false, view: buildLineupView(match.home_team) });
-  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState("Posibles alineaciones");
+  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState(
+    POSSIBLE_LINEUPS_ACTION_CAPTION,
+  );
+  const [possibleLineupsConfirmed, setPossibleLineupsConfirmed] = useState(false);
 
   const displayMatch = useMemo(
     () => mergeMvpIntoMatch(match, mvpSnapshot),
@@ -67,8 +74,9 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     let cancelled = false;
     void fetchMatchLineupsStatusAction(match.id, match.home_team, match.away_team).then((result) => {
       if (cancelled || !result.ok) return;
+      setPossibleLineupsConfirmed(result.data.bothConfirmed);
       setPossibleLineupsCaption(
-        result.data.bothConfirmed ? "Alineaciones oficiales" : "Posibles alineaciones",
+        possibleLineupsActionCaptionFromConfirmed(result.data.bothConfirmed),
       );
     });
     return () => {
@@ -210,6 +218,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                   openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
                 }
                 possibleLineupsCaption={possibleLineupsCaption}
+                possibleLineupsConfirmed={possibleLineupsConfirmed}
                 onOpenPossibleLineups={() =>
                   openEntityModal(buildPossibleLineupsView(displayMatch))
                 }

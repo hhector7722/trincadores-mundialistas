@@ -70,3 +70,19 @@ export function teamFlagUrl(flagCode: string, width = 80): string {
   const w = nearestFlagcdnWidth(width);
   return `https://flagcdn.com/w${w}/${flagCode}.png`;
 }
+
+function isoCodeToFlagEmoji(isoCode: string): string {
+  const upper = isoCode.toUpperCase();
+  if (upper.length !== 2) return "🏳️";
+  return String.fromCodePoint(
+    ...[...upper].map((char) => 0x1f1e6 + char.charCodeAt(0) - 65),
+  );
+}
+
+/** Emoji de bandera para notificaciones y texto (fallback 🏳️). */
+export function teamFlagEmoji(teamName: string): string {
+  const code = teamFlagCode(teamName);
+  if (!code) return "🏳️";
+  const iso = code.split("-")[0] ?? code;
+  return isoCodeToFlagEmoji(iso);
+}

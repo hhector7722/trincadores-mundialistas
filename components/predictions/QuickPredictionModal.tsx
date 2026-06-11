@@ -27,6 +27,10 @@ import { PredictionDeadlineCountdown } from "@/components/predictions/Prediction
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import {
+  possibleLineupsActionCaptionFromConfirmed,
+  POSSIBLE_LINEUPS_ACTION_CAPTION,
+} from "@/lib/lineup/lineups-modal-copy";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
@@ -119,12 +123,18 @@ function MatchSwipeDots({ position }: { position: DotPosition }) {
 
 function quickPanelTitle(
   view: QuickPanelView,
-  options?: { lineupFormation?: string; possibleLineupsTitle?: string },
+  options?: {
+    lineupFormation?: string;
+    possibleLineupsTitle?: string;
+    possibleLineupsConfirmed?: boolean;
+  },
 ): ReactNode {
   if (view.kind === "prediction") return "Pronóstico";
   return entityModalTitleContent(view, {
     lineupFormation: view.kind === "lineup" ? options?.lineupFormation : undefined,
     possibleLineupsTitle: view.kind === "possible-lineups" ? options?.possibleLineupsTitle : undefined,
+    possibleLineupsConfirmed:
+      view.kind === "possible-lineups" ? options?.possibleLineupsConfirmed : undefined,
   });
 }
 
@@ -148,7 +158,10 @@ export function QuickPredictionModal({
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const [possibleLineupsTitle, setPossibleLineupsTitle] = useState<string | undefined>();
-  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState("Posibles alineaciones");
+  const [possibleLineupsConfirmed, setPossibleLineupsConfirmed] = useState(false);
+  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState(
+    POSSIBLE_LINEUPS_ACTION_CAPTION,
+  );
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
@@ -194,6 +207,7 @@ export function QuickPredictionModal({
     }
     if (panelView.kind === "possible-lineups") {
       setPossibleLineupsTitle(undefined);
+      setPossibleLineupsConfirmed(false);
     }
   }, [lineupTeamName, panelView.kind]);
 
@@ -206,8 +220,9 @@ export function QuickPredictionModal({
       viewMatch.away_team,
     ).then((result) => {
       if (cancelled || !result.ok) return;
+      setPossibleLineupsConfirmed(result.data.bothConfirmed);
       setPossibleLineupsCaption(
-        result.data.bothConfirmed ? "Alineaciones oficiales" : "Posibles alineaciones",
+        possibleLineupsActionCaptionFromConfirmed(result.data.bothConfirmed),
       );
     });
     return () => {
@@ -501,6 +516,7 @@ export function QuickPredictionModal({
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   possibleLineupsCaption={possibleLineupsCaption}
+                  possibleLineupsConfirmed={possibleLineupsConfirmed}
                   onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
                 />
               </div>
@@ -569,6 +585,7 @@ export function QuickPredictionModal({
         homeTeam={view.homeTeam}
         awayTeam={view.awayTeam}
         onTitleChange={setPossibleLineupsTitle}
+        onConfirmedChange={setPossibleLineupsConfirmed}
       />
     );
   }
@@ -607,7 +624,11 @@ export function QuickPredictionModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={quickPanelTitle(panelView, { lineupFormation, possibleLineupsTitle })}
+      title={quickPanelTitle(panelView, {
+        lineupFormation,
+        possibleLineupsTitle,
+        possibleLineupsConfirmed,
+      })}
       hideTitle={atPredictionRoot}
       hideHeaderDivider
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}

@@ -3,7 +3,10 @@
 import { useEffect, useMemo } from "react";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
 import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
-import { possibleLineupsModalTitle } from "@/lib/lineup/lineups-modal-copy";
+import {
+  areMatchLineupsFullyConfirmed,
+  possibleLineupsModalTitle,
+} from "@/lib/lineup/lineups-modal-copy";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
 import { useMatchTacticalLineupData } from "@/lib/lineup/use-match-tactical-lineup-data";
 import { teamNameEs } from "@/lib/teams/display";
@@ -13,6 +16,7 @@ type PossibleLineupsPanelProps = {
   homeTeam: string;
   awayTeam: string;
   onTitleChange?: (title: string) => void;
+  onConfirmedChange?: (confirmed: boolean) => void;
 };
 
 export function PossibleLineupsPanel({
@@ -20,6 +24,7 @@ export function PossibleLineupsPanel({
   homeTeam,
   awayTeam,
   onTitleChange,
+  onConfirmedChange,
 }: PossibleLineupsPanelProps) {
   const {
     homeSquad,
@@ -46,10 +51,13 @@ export function PossibleLineupsPanel({
     [resolvedHomeLineup, resolvedAwayLineup],
   );
 
+  const bothConfirmed = areMatchLineupsFullyConfirmed(resolvedHomeLineup, resolvedAwayLineup);
+
   useEffect(() => {
     if (!ready) return;
     onTitleChange?.(modalTitle);
-  }, [ready, modalTitle, onTitleChange]);
+    onConfirmedChange?.(bothConfirmed);
+  }, [ready, modalTitle, bothConfirmed, onTitleChange, onConfirmedChange]);
 
   if (!loading && !tacticalReady) {
     return (

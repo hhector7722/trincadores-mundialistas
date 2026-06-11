@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Pencil, Plus } from "lucide-react";
+import { ConfirmedLineupCheckIcon } from "@/components/lineup/ConfirmedLineupCheckIcon";
 import { cn } from "@/lib/utils";
 
 /** Separación fija entre el final del nombre y el icono de edición. */
@@ -60,6 +61,7 @@ type MatchContextActionButtonProps = {
   savedValue?: string | null;
   showEdit?: boolean;
   addIcon?: boolean;
+  showConfirmedBadge?: boolean;
   hideCaption?: boolean;
   emptyLabel?: string;
   className?: string;
@@ -71,6 +73,7 @@ export function MatchContextActionButton({
   savedValue,
   showEdit = false,
   addIcon = false,
+  showConfirmedBadge = false,
   hideCaption = false,
   emptyLabel,
   className,
@@ -160,6 +163,7 @@ export function MatchContextActionButton({
             <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
           ) : null}
           {emptyText}
+          {showConfirmedBadge ? <ConfirmedLineupCheckIcon /> : null}
         </MatchContextTextActionButton>
       )}
     </div>

@@ -52,6 +52,7 @@ function renderEntityView(
     onMvpFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
     onFormationResolved?: (formationLabel: string) => void;
     onPossibleLineupsTitleChange?: (title: string) => void;
+    onPossibleLineupsConfirmedChange?: (confirmed: boolean) => void;
   },
   playerPickMode: PlayerPickMode
 ) {
@@ -104,6 +105,7 @@ function renderEntityView(
           homeTeam={view.homeTeam}
           awayTeam={view.awayTeam}
           onTitleChange={handlers.onPossibleLineupsTitleChange}
+          onConfirmedChange={handlers.onPossibleLineupsConfirmedChange}
         />
       );
     default:
@@ -127,6 +129,7 @@ export function EntityModalController({
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const [possibleLineupsTitle, setPossibleLineupsTitle] = useState<string | undefined>();
+  const [possibleLineupsConfirmed, setPossibleLineupsConfirmed] = useState(false);
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
 
@@ -171,6 +174,7 @@ export function EntityModalController({
       setMvpFormations({});
       setLineupFormation(undefined);
       setPossibleLineupsTitle(undefined);
+      setPossibleLineupsConfirmed(false);
     }
   }, [open, initialView, reset]);
 
@@ -209,6 +213,7 @@ export function EntityModalController({
         onMvpFormationsChange: handleMvpFormationsChange,
         onFormationResolved: setLineupFormation,
         onPossibleLineupsTitleChange: setPossibleLineupsTitle,
+        onPossibleLineupsConfirmedChange: setPossibleLineupsConfirmed,
       },
       playerPickMode
     );
@@ -238,6 +243,7 @@ export function EntityModalController({
         mvpFormations,
         lineupFormation: isLineupView ? lineupFormation : undefined,
         possibleLineupsTitle: isPossibleLineupsView ? possibleLineupsTitle : undefined,
+        possibleLineupsConfirmed: isPossibleLineupsView ? possibleLineupsConfirmed : undefined,
       })}
       hideHeaderDivider
       headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "center"}

@@ -8,6 +8,7 @@ type MatchContextActionsRowProps = {
   onOpenAwayLineup: () => void;
   onOpenPossibleLineups: () => void;
   possibleLineupsCaption?: string;
+  possibleLineupsConfirmed?: boolean;
   /** Sin etiquetas grises ni borde superior. */
   compact?: boolean;
   /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
@@ -26,6 +27,7 @@ export function MatchContextActionsRow({
   onOpenAwayLineup,
   onOpenPossibleLineups,
   possibleLineupsCaption = "Posibles alineaciones",
+  possibleLineupsConfirmed = false,
   compact = false,
   layout = "grid",
   homeAnchor = "10%",
@@ -65,6 +67,7 @@ export function MatchContextActionsRow({
           <MatchContextActionButton
             caption={possibleLineupsCaption}
             hideCaption={compact}
+            showConfirmedBadge={possibleLineupsConfirmed}
             onClick={onOpenPossibleLineups}
           />
         </div>
@@ -101,6 +104,7 @@ export function MatchContextActionsRow({
           <MatchContextActionButton
             caption={possibleLineupsCaption}
             hideCaption={compact}
+            showConfirmedBadge={possibleLineupsConfirmed}
             onClick={onOpenPossibleLineups}
           />
         </div>
@@ -124,8 +128,9 @@ export function MatchContextActionsRow({
           </div>
           <div className="absolute left-1/2 top-0 z-[1] w-max max-w-[44%] -translate-x-1/2 px-1">
             <MatchContextActionButton
-              caption="Posibles alineaciones"
+              caption={possibleLineupsCaption}
               hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
               onClick={onOpenPossibleLineups}
             />
           </div>
@@ -158,6 +163,7 @@ export function MatchContextActionsRow({
           <MatchContextActionButton
             caption={possibleLineupsCaption}
             hideCaption={compact}
+            showConfirmedBadge={possibleLineupsConfirmed}
             onClick={onOpenPossibleLineups}
           />
         </div>
