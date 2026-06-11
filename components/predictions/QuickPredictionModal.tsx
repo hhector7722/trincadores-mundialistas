@@ -14,6 +14,7 @@ import { LineupModalPanel } from "@/components/lineup/LineupModalPanel";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
 import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
+import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
@@ -27,6 +28,7 @@ import { PredictionDeadlineCountdown } from "@/components/predictions/Prediction
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
 import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
 import { LiveMatchPanelContent } from "@/components/live/LiveMatchPanelContent";
 import { MatchLiveStatsPanel } from "@/components/live/MatchLiveStatsPanel";
@@ -185,7 +187,10 @@ export function QuickPredictionModal({
     [baseViewMatch, mvpOverrides]
   );
   const isLiveMatch = viewMatch.status === "live";
-  const { snapshot: liveSnapshot } = useMatchLiveSnapshot(viewMatch.id, isLiveMatch && open);
+  const isFinishedMatch = viewMatch.status === "finished";
+  const shouldLoadLiveSnapshot = open && (isLiveMatch || isFinishedMatch);
+  const { snapshot: liveSnapshot } = useMatchLiveSnapshot(viewMatch.id, shouldLoadLiveSnapshot);
+  const highlightVideoId = viewMatch.highlightYoutubeId;
   const canSwipeMatches = orderedMatches.length > 1 && Boolean(onMatchChange);
   const dotPosition = resolveDotPosition(activeIndex, orderedMatches.length);
 
@@ -447,7 +452,125 @@ export function QuickPredictionModal({
     });
   }
 
+  function renderMvpCenterSlot(targetMatch: MatchWithPrediction) {
+    const isFinished = targetMatch.status === "finished";
+    const savedTeamName = targetMatch.mvpPrediction?.team_name ?? null;
+
+    return (
+      <MvpPredictionButton
+        savedPlayerName={mvpPlayerName}
+        savedTeamName={savedTeamName}
+        readOnly={targetMatch.status === "live" || isFinished}
+        officialPlayerName={isFinished ? targetMatch.officialMvpPlayerName : undefined}
+        officialTeamName={isFinished ? targetMatch.officialMvpTeamName : undefined}
+        onClick={
+          targetMatch.status === "scheduled"
+            ? () =>
+                push(
+                  buildMvpView(poolId, {
+                    ...targetMatch,
+                    mvpPrediction: mvpPlayerName
+                      ? {
+                          id: targetMatch.mvpPrediction?.id ?? "",
+                          player_name: mvpPlayerName,
+                          team_name: savedTeamName ?? "",
+                          shirt_number: targetMatch.mvpPrediction?.shirt_number ?? null,
+                          points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
+                          updated_at:
+                            targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
+                        }
+                      : targetMatch.mvpPrediction,
+                  })
+                )
+            : undefined
+        }
+        variant="compact"
+        className="w-full"
+      />
+    );
+  }
+
   function renderPanelView(view: QuickPanelView, targetMatch: MatchWithPrediction) {
+    const finishedHomeGoals =
+      targetMatch.officialHome ?? liveSnapshot?.homeScore ?? null;
+    const finishedAwayGoals =
+      targetMatch.officialAway ?? liveSnapshot?.awayScore ?? null;
+    const hasFinishedScore =
+      finishedHomeGoals != null && finishedAwayGoals != null;
+
+    if (
+      view.kind === "prediction" &&
+      targetMatch.status === "finished" &&
+      hasFinishedScore
+    ) {
+      return (
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="px-4 pb-0 pt-2">
+            <div
+              className={cn(
+                "relative mt-2 pb-1",
+                PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS
+              )}
+            >
+              <MatchTeamsDisplay
+                layout="predictionModal"
+                hidePredictionLabel
+                flagPlaceholderStyle={flagPlaceholderStyle}
+                homeTeam={targetMatch.home_team}
+                awayTeam={targetMatch.away_team}
+                kickoffAt={targetMatch.kickoff_at}
+                isLive={false}
+                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+              />
+
+              <FinishedMatchScoreRow
+                homeGoals={finishedHomeGoals}
+                awayGoals={finishedAwayGoals}
+                predictedHome={targetMatch.prediction?.home_goals ?? null}
+                predictedAway={targetMatch.prediction?.away_goals ?? null}
+              />
+
+              <div
+                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <MatchContextActionsRow
+                  compact
+                  layout="homeCardStacked"
+                  homeAnchor="10%"
+                  awayAnchor="90%"
+                  className="h-full"
+                  centerSlot={renderMvpCenterSlot(targetMatch)}
+                  onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                  onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                  possibleLineupsCaption={possibleLineupsCaption}
+                  possibleLineupsConfirmed={possibleLineupsConfirmed}
+                  onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            {highlightVideoId ? (
+              <MatchHighlightBlock
+                homeTeam={targetMatch.home_team}
+                awayTeam={targetMatch.away_team}
+                homeGoals={finishedHomeGoals}
+                awayGoals={finishedAwayGoals}
+                youtubeVideoId={highlightVideoId}
+              />
+            ) : null}
+            <MatchLiveStatsPanel
+              stats={liveSnapshot?.stats ?? null}
+              className={highlightVideoId ? "mt-3" : undefined}
+            />
+          </div>
+        </div>
+      );
+    }
+
     if (view.kind === "prediction" && targetMatch.status === "live") {
       const predictionScoreText = formatListScore(
         targetMatch.prediction?.home_goals ?? null,
@@ -468,6 +591,8 @@ export function QuickPredictionModal({
               predictionScoreText={
                 targetMatch.prediction?.home_goals != null ? predictionScoreText : null
               }
+              mvpPlayerName={mvpPlayerName}
+              mvpTeamName={targetMatch.mvpPrediction?.team_name ?? null}
               lineupsCaption={liveLineupsCaption}
               teamsBlockClassName={cn("relative mt-2 pb-1", PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS)}
               actionsClassName={PREDICTION_MODAL_ACTIONS_STACKED_CLASS}
@@ -534,31 +659,7 @@ export function QuickPredictionModal({
                   homeAnchor="10%"
                   awayAnchor="90%"
                   className="h-full"
-                  centerSlot={
-                    <MvpPredictionButton
-                      savedPlayerName={mvpPlayerName}
-                      onClick={() =>
-                        push(
-                          buildMvpView(poolId, {
-                            ...targetMatch,
-                            mvpPrediction: mvpPlayerName
-                              ? {
-                                  id: targetMatch.mvpPrediction?.id ?? "",
-                                  player_name: mvpPlayerName,
-                                  team_name: targetMatch.mvpPrediction?.team_name ?? "",
-                                  shirt_number: targetMatch.mvpPrediction?.shirt_number ?? null,
-                                  points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
-                                  updated_at:
-                                    targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                                }
-                              : targetMatch.mvpPrediction,
-                          })
-                        )
-                      }
-                      variant="compact"
-                      className="w-full"
-                    />
-                  }
+                  centerSlot={renderMvpCenterSlot(targetMatch)}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   possibleLineupsCaption={possibleLineupsCaption}

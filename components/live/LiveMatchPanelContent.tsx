@@ -2,6 +2,7 @@
 
 import { LiveMatchScorePair } from "@/components/live/LiveMatchScorePair";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
+import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
   MatchTeamsDisplay,
@@ -14,6 +15,8 @@ type LiveMatchPanelContentProps = {
   awayTeam: string;
   liveSnapshot: MatchLiveSnapshot | null;
   predictionScoreText?: string | null;
+  mvpPlayerName?: string | null;
+  mvpTeamName?: string | null;
   lineupsCaption: string;
   teamsBlockClassName?: string;
   actionsClassName?: string;
@@ -28,6 +31,8 @@ export function LiveMatchPanelContent({
   awayTeam,
   liveSnapshot,
   predictionScoreText,
+  mvpPlayerName,
+  mvpTeamName,
   lineupsCaption,
   teamsBlockClassName = "relative mt-2 min-h-[8.25rem]",
   actionsClassName = HOME_CARD_ACTIONS_STACKED_CLASS,
@@ -72,6 +77,17 @@ export function LiveMatchPanelContent({
             homeAnchor="15%"
             awayAnchor="85%"
             className="h-full"
+            centerSlot={
+              mvpPlayerName ? (
+                <MvpPredictionButton
+                  savedPlayerName={mvpPlayerName}
+                  savedTeamName={mvpTeamName}
+                  variant="compact"
+                  readOnly
+                  className="w-full"
+                />
+              ) : null
+            }
             onOpenHomeLineup={onOpenHomeLineup}
             onOpenAwayLineup={onOpenAwayLineup}
             possibleLineupsCaption={lineupsCaption}

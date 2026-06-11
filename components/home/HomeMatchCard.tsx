@@ -140,6 +140,8 @@ export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCa
             awayTeam={displayMatch.away_team}
             liveSnapshot={liveSnapshot}
             predictionScoreText={saved ? scoreText : null}
+            mvpPlayerName={displayMatch.mvpPrediction?.player_name ?? null}
+            mvpTeamName={displayMatch.mvpPrediction?.team_name ?? null}
             lineupsCaption={lineupsCaption}
             teamsBlockClassName="relative mt-2 min-h-[8.25rem]"
             onOpenHomeLineup={() =>

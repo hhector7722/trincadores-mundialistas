@@ -124,6 +124,7 @@ type MatchTeamsDisplayProps = {
   /** Texto placeholder del círculo de bandera (sin imagen). */
   flagPlaceholderStyle?: "default" | "knockout";
   predictionLabel?: string;
+  hidePredictionLabel?: boolean;
   homeScoreSlot?: ReactNode;
   awayScoreSlot?: ReactNode;
   /** Desplazamiento vertical solo de bandera + nombre (p. ej. card inicio). */
@@ -146,6 +147,7 @@ export function MatchTeamsDisplay({
   layout = "default",
   flagPlaceholderStyle = "default",
   predictionLabel = "Mi pronóstico",
+  hidePredictionLabel = false,
   homeScoreSlot,
   awayScoreSlot,
   onHomeTeamClick,
@@ -159,9 +161,11 @@ export function MatchTeamsDisplay({
   if (isPredictionModal) {
     return (
       <div className="relative w-full min-h-[calc(1.15rem+2.5rem+0.25rem+0.625rem)] sm:min-h-[calc(1.15rem+2.75rem+0.25rem+0.625rem)]">
-        <p className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-          {predictionLabel}
-        </p>
+        {!hidePredictionLabel ? (
+          <p className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
+            {predictionLabel}
+          </p>
+        ) : null}
 
         <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
           <TeamFlagButton

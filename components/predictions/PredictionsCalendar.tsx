@@ -26,7 +26,9 @@ import {
   SIDEBAR_CARD_ANCHOR_ATTR,
 } from "@/lib/pool/calendar-layout";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
+import { CalendarGroupRowBadge } from "@/components/predictions/CalendarGroupRowBadge";
 import { displayGoals } from "@/lib/predictions/edit-state";
+import { resolveCalendarFinishedCard } from "@/lib/predictions/calendar-finished-card";
 import {
   buildGroupStandings,
   buildGroupStandingsDetail,
@@ -80,6 +82,18 @@ function formatCalendarPrediction(match: MatchWithPrediction): string {
   return displayGoals(prediction.home_goals, prediction.away_goals);
 }
 
+function formatCalendarOfficialScore(match: MatchWithPrediction): string {
+  if (
+    match.officialHome == null ||
+    match.officialAway == null ||
+    !Number.isInteger(match.officialHome) ||
+    !Number.isInteger(match.officialAway)
+  ) {
+    return "-";
+  }
+  return displayGoals(match.officialHome, match.officialAway);
+}
+
 function CalendarMatchCard({
   match,
   onOpen,
@@ -89,8 +103,74 @@ function CalendarMatchCard({
 }) {
   const time = formatCalendarKickoffHour(match.kickoff_at);
   const predictionLabel = formatCalendarPrediction(match);
-  const title = `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
+  const officialLabel = formatCalendarOfficialScore(match);
+  const finishedState = resolveCalendarFinishedCard(match);
   const isSidebarAnchor = isSidebarCardAnchorMatch(match);
+
+  const title = finishedState
+    ? `${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${officialLabel}`
+    : `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
+
+  if (finishedState) {
+    const kickoffSlotLabel = finishedState.showMvpKickoffLabel
+      ? "MVP"
+      : finishedState.showPredictedInKickoffSlot
+        ? predictionLabel
+        : null;
+
+    return (
+      <button
+        type="button"
+        title={title}
+        aria-label={title}
+        onClick={onOpen}
+        {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
+        className={cn(
+          "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
+          finishedState.showGreenFill && "tm-cal-match-card--exact",
+          finishedState.showSignMvpDoubleBorder && "tm-cal-match-card--sign-mvp",
+        )}
+      >
+        <CalendarGroupRowBadge
+          groupCode={match.group_code}
+          showGroupLetterBadge={finishedState.showGroupLetterBadge}
+          icon={finishedState.groupRowIcon}
+          showMvpLabel={finishedState.groupRowMvpLabel}
+        />
+
+        <div className="tm-cal-match-card-body">
+          {finishedState.showMvpKickoffLabel ? (
+            <span className="tm-cal-kickoff tm-cal-outline-label tm-cal-outline-label--mvp shrink-0 w-full text-center font-bold leading-none">
+              MVP
+            </span>
+          ) : kickoffSlotLabel ? (
+            <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-[var(--tm-accent)]">
+              {kickoffSlotLabel}
+            </span>
+          ) : null}
+
+          <div className="tm-cal-flags relative w-full shrink-0">
+            <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+              <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
+            </div>
+            <span
+              className={cn(
+                "tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums",
+                finishedState.showExactScoreStyle
+                  ? "tm-cal-prediction--exact"
+                  : "text-white",
+              )}
+            >
+              {officialLabel}
+            </span>
+            <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+              <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
+            </div>
+          </div>
+        </div>
+      </button>
+    );
+  }
 
   return (
     <button
@@ -101,7 +181,7 @@ function CalendarMatchCard({
       {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
       className={cn(
         "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
-        match.status === "live" && "ring-1 ring-[var(--tm-live)]"
+        match.status === "live" && "ring-1 ring-[var(--tm-live)]",
       )}
     >
       {match.group_code ? (

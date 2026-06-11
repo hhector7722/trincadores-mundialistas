@@ -19,6 +19,10 @@ export type MatchWithPrediction = {
   group_code: string | null;
   officialHome: number | null;
   officialAway: number | null;
+  officialMvpPlayerName: string | null;
+  officialMvpTeamName: string | null;
+  highlightYoutubeId: string | null;
+  highlightPublishedAt: string | null;
   prediction:
     | Pick<
         Prediction,
@@ -71,7 +75,7 @@ async function fetchPoolMatchesWithPredictions(
   const { data: matches } = await supabase
     .from("matches")
     .select(
-      "id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code, external_match_id, match_number"
+      "id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at"
     )
     .in("matchday_id", filteredDayIds)
     .order("kickoff_at", { ascending: true });
@@ -91,7 +95,7 @@ async function fetchPoolMatchesWithPredictions(
 
   const { data: results } = await supabase
     .from("match_results")
-    .select("match_id, home_goals, away_goals")
+    .select("match_id, home_goals, away_goals, mvp_player_name, mvp_team_name")
     .in("match_id", matchIds);
 
   const resultByMatch = new Map((results ?? []).map((r) => [r.match_id, r]));
@@ -113,6 +117,10 @@ async function fetchPoolMatchesWithPredictions(
       group_code: m.group_code ?? null,
       officialHome: result?.home_goals ?? null,
       officialAway: result?.away_goals ?? null,
+      officialMvpPlayerName: result?.mvp_player_name ?? null,
+      officialMvpTeamName: result?.mvp_team_name ?? null,
+      highlightYoutubeId: m.highlight_youtube_id ?? null,
+      highlightPublishedAt: m.highlight_published_at ?? null,
       prediction: pred
         ? {
             id: pred.id,
@@ -197,7 +205,7 @@ export async function getMatchPredictionDetail(
   const { data: match } = await supabase
     .from("matches")
     .select(
-      "id, matchday_id, home_team, away_team, kickoff_at, status, group_code, external_match_id, match_number"
+      "id, matchday_id, home_team, away_team, kickoff_at, status, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at"
     )
     .eq("id", matchId)
     .in("matchday_id", dayIds)
@@ -215,7 +223,7 @@ export async function getMatchPredictionDetail(
 
   const { data: result } = await supabase
     .from("match_results")
-    .select("home_goals, away_goals")
+    .select("home_goals, away_goals, mvp_player_name, mvp_team_name")
     .eq("match_id", matchId)
     .maybeSingle();
 
@@ -249,6 +257,10 @@ export async function getMatchPredictionDetail(
     hasOfficialResult: !!result,
     officialHome: result?.home_goals ?? null,
     officialAway: result?.away_goals ?? null,
+    officialMvpPlayerName: result?.mvp_player_name ?? null,
+    officialMvpTeamName: result?.mvp_team_name ?? null,
+    highlightYoutubeId: match.highlight_youtube_id ?? null,
+    highlightPublishedAt: match.highlight_published_at ?? null,
   };
 }
 
