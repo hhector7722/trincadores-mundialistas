@@ -2,7 +2,7 @@
 
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
-import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { MATCH_PREDICTIONS_SUBGRID_ROW } from "@/components/predictions/match-predictions-grid";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
@@ -62,7 +62,12 @@ export function MatchPredictionsBoardRow({
               canPreview && "cursor-pointer"
             )}
           >
-            <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="ranking" />
+            <ProfileAvatar
+              avatarUrl={row.avatarUrl}
+              label={row.label}
+              variant="badge"
+              className="size-8 shrink-0"
+            />
           </button>
         </div>
         <span
