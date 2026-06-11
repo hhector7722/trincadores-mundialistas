@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-announcement";
+import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-copy";
 import { QUIZ_PLAY_HREF } from "@/lib/quiz/play-routes";
 
 type QuizActiveNotificationModalProps = {

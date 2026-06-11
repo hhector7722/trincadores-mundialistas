@@ -1,18 +1,10 @@
+import "@/lib/push/server-only";
 import { NOTIFICATION_KIND_QUIZ_ACTIVE } from "@/lib/notifications/kinds";
-import { isVapidConfigured } from "@/lib/push/vapid";
+import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-copy";
 import { quizActiveNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
+import { isVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
-
-export function buildQuizActiveAnnouncementCopy(): { title: string; body: string } {
-  return {
-    title: "Quiz activo",
-    body:
-      "El quiz diario ya está en modo competitivo y cuenta para la clasificación. " +
-      "Al final del torneo, los 4 primeros del ranking sumarán puntos extra a la porra principal (+5/+3/+2/+1). " +
-      "¡Entra y juega el de hoy!",
-  };
-}
 
 export type BroadcastQuizActiveAnnouncementResult = {
   recipients: number;
