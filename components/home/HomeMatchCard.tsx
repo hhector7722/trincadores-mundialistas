@@ -29,6 +29,7 @@ import {
   lineupsModalTitle,
 } from "@/lib/lineup/lineups-modal-copy";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
+import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
@@ -156,7 +157,16 @@ export function HomeMatchCard({
           >
             Ver pronósticos
           </button>
-        ) : null}
+        ) : (
+          <p
+            className={cn(
+              "pointer-events-none absolute inset-x-0 z-20 mx-auto flex items-center justify-center",
+              "text-center font-display text-[10px] font-semibold leading-tight text-[var(--tm-accent)] sm:text-xs",
+            )}
+          >
+            {formatKickoff(displayMatch.kickoff_at)}
+          </p>
+        )}
       </div>
 
       <div className="cursor-pointer" onClick={() => openScoreModal()}>
@@ -185,6 +195,7 @@ export function HomeMatchCard({
             awayTeam={displayMatch.away_team}
             kickoffAt={displayMatch.kickoff_at}
             isLive={false}
+            hideKickoff
             compactTeamColumn
             teamBlocksTopClass="top-0"
             homeFooterSlot={
@@ -217,14 +228,6 @@ export function HomeMatchCard({
               awayAnchor="85%"
               className="h-full"
               centerSlot={
-                <MvpPredictionButton
-                  savedPlayerName={displayMatch.mvpPrediction?.player_name}
-                  onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
-                  variant="compact"
-                  className="w-full"
-                />
-              }
-              predictionSlot={
                 saved ? (
                   <div className="inline-block">
                     <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
@@ -272,6 +275,14 @@ export function HomeMatchCard({
                     Añadir
                   </button>
                 )
+              }
+              predictionSlot={
+                <MvpPredictionButton
+                  savedPlayerName={displayMatch.mvpPrediction?.player_name}
+                  onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                  variant="compact"
+                  className="w-full"
+                />
               }
               onOpenHomeLineup={() =>
                 openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
