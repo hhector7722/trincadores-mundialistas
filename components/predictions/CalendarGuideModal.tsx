@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
+import { CalendarGuidePreviewCell } from "@/components/predictions/CalendarGuidePreviewCell";
 import { Modal } from "@/components/ui/modal";
 import { resolveCalendarFinishedCard } from "@/lib/predictions/calendar-finished-card";
 import { CALENDAR_GUIDE_ENTRIES } from "@/lib/predictions/calendar-guide-demos";
@@ -56,20 +56,7 @@ export function CalendarGuideModal({
                   </p>
                 </div>
 
-                <div className="tm-cal-guide-preview-host">
-                  <div className="tm-porra-calendar tm-cal-guide-preview">
-                    <CalendarFinishedMatchCardVisual
-                      homeTeam={entry.match.home_team}
-                      awayTeam={entry.match.away_team}
-                      groupCode={entry.match.group_code}
-                      predictionHome={entry.match.prediction!.home_goals}
-                      predictionAway={entry.match.prediction!.away_goals}
-                      officialHome={entry.match.officialHome!}
-                      officialAway={entry.match.officialAway!}
-                      finishedState={finishedState}
-                    />
-                  </div>
-                </div>
+                <CalendarGuidePreviewCell entry={entry} finishedState={finishedState} />
               </li>
             );
           })}

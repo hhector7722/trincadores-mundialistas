@@ -1672,6 +1672,7 @@ html:has(.tm-app-frame) {
 }
 
 .tm-porra-calendar.tm-cal-guide-preview {
+  container-type: inline-size;
   width: var(--tm-cal-guide-preview-w, 3.25rem);
   max-width: var(--tm-cal-guide-preview-w, 3.25rem);
   height: auto;
@@ -1681,13 +1682,15 @@ html:has(.tm-app-frame) {
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
-.tm-cal-guide-preview-host {
-  flex-shrink: 0;
-  padding: 1px;
-  border-radius: 2px;
-  background: #f5f5f7;
+.tm-porra-calendar.tm-cal-guide-preview .tm-cal-cell {
+  padding: calc(0.0625rem * var(--tm-cal-ui-scale, 1));
+}
+
+.tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-list {
+  display: flex;
 }
 
 .tm-porra-calendar .tm-cal-match-group-row {

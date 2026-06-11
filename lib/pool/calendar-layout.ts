@@ -450,7 +450,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
   }
 }
 
-function resetPredictionLabelMetrics(root: ParentNode): void {
+export function resetPredictionLabelMetrics(root: ParentNode): void {
   for (const label of root.querySelectorAll<HTMLElement>(".tm-cal-prediction")) {
     label.style.removeProperty("font-size");
     label.style.removeProperty("max-width");
@@ -458,7 +458,7 @@ function resetPredictionLabelMetrics(root: ParentNode): void {
 }
 
 /** Escala cada pronóstico al máximo tamaño que cabe entre las banderas sin truncar. */
-function fitPredictionLabel(label: HTMLElement): void {
+export function fitPredictionLabel(label: HTMLElement): void {
   const flags = label.closest<HTMLElement>(".tm-cal-flags");
   if (!flags) return;
 
@@ -590,6 +590,56 @@ export function fitCalendarLayout(
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
   return { rowHeight, uiScale, matchCardHeight, gridHeight: grid.clientHeight || gridHeight };
+}
+
+const GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX = 52;
+const GUIDE_PREVIEW_FALLBACK_CARD_HEIGHT_PX = 28;
+
+/** Réplica en guía modal: copia métricas del calendario visible y ajusta pronósticos. */
+export function syncCalendarGuidePreview(previewCalendar: HTMLElement): void {
+  const liveCalendar = document.querySelector<HTMLElement>(
+    ".tm-porra-calendar:not(.tm-cal-guide-preview)"
+  );
+  const liveComputed = liveCalendar ? getComputedStyle(liveCalendar) : null;
+
+  for (const varName of [
+    "--tm-cal-match-card-h",
+    "--tm-cal-ui-scale",
+    "--tm-cal-match-gap",
+  ] as const) {
+    const inline =
+      varName === "--tm-cal-match-card-h"
+        ? liveCalendar?.style.getPropertyValue(varName)
+        : "";
+    const value = inline?.trim() || liveComputed?.getPropertyValue(varName).trim();
+    if (value) previewCalendar.style.setProperty(varName, value);
+  }
+
+  const refCell = liveCalendar?.querySelector<HTMLElement>(".tm-cal-cell--matches");
+  const refCard = liveCalendar?.querySelector<HTMLElement>(".tm-cal-match-card");
+  const cellWidth = refCell?.clientWidth ?? refCard?.clientWidth ?? GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX;
+
+  previewCalendar.style.setProperty("--tm-cal-guide-preview-w", `${cellWidth}px`);
+
+  if (!previewCalendar.style.getPropertyValue("--tm-cal-match-card-h").trim()) {
+    previewCalendar.style.setProperty(
+      "--tm-cal-match-card-h",
+      `${GUIDE_PREVIEW_FALLBACK_CARD_HEIGHT_PX}px`
+    );
+  }
+
+  const liveHeadingFs = liveComputed?.getPropertyValue("--tm-cal-sidebar-heading-fs").trim();
+  if (liveHeadingFs && refCell && Math.abs(refCell.clientWidth - cellWidth) < 2) {
+    previewCalendar.style.setProperty("--tm-cal-sidebar-heading-fs", liveHeadingFs);
+  } else {
+    const headingFs = Math.max(6, Math.min(8, cellWidth * 0.016));
+    previewCalendar.style.setProperty("--tm-cal-sidebar-heading-fs", `${headingFs}px`);
+  }
+
+  resetPredictionLabelMetrics(previewCalendar);
+  for (const label of previewCalendar.querySelectorAll<HTMLElement>(".tm-cal-prediction")) {
+    fitPredictionLabel(label);
+  }
 }
 
 export function resetCalendarLayout(
