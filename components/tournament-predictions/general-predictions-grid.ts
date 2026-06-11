@@ -1,3 +1,8 @@
-/** Grid: trincador (avatar+nombre) | cam | fin | gol | mvp | por */
-export const GENERAL_PREDICTIONS_GRID =
-  "grid grid-cols-[minmax(0,1fr)_1.75rem_2rem_2.5rem_2.5rem_2.5rem] items-center gap-x-2";
+/** Columnas: trincador | cam | fin | gol | mvp | por — ancho según el contenido más largo (subgrid). */
+export const GENERAL_PREDICTIONS_COLUMNS =
+  "grid-cols-[max-content_max-content_max-content_max-content_max-content_max-content]";
+
+export const GENERAL_PREDICTIONS_GRID = `grid ${GENERAL_PREDICTIONS_COLUMNS}`;
+
+export const GENERAL_PREDICTIONS_SUBGRID_ROW =
+  "col-span-6 grid grid-cols-subgrid items-center gap-x-2";

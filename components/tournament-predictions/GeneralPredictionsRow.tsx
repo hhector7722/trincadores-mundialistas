@@ -1,5 +1,5 @@
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
-import { GENERAL_PREDICTIONS_GRID } from "@/components/tournament-predictions/general-predictions-grid";
+import { GENERAL_PREDICTIONS_SUBGRID_ROW } from "@/components/tournament-predictions/general-predictions-grid";
 import {
   formatChampionDisplayCompact,
   formatFinalistsDisplay,
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 function CellValue({ value }: { value: string | null }) {
   return (
-    <span className="block w-full truncate text-center text-[10px] text-[var(--tm-fg)]">
+    <span className="whitespace-nowrap text-center text-[10px] text-[var(--tm-fg)]">
       {value ?? "—"}
     </span>
   );
@@ -26,14 +26,15 @@ export function GeneralPredictionsRow({
   return (
     <div
       className={cn(
-        GENERAL_PREDICTIONS_GRID,
-        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+        GENERAL_PREDICTIONS_SUBGRID_ROW,
+        "tm-ranking-row border-b border-[var(--tm-border)] px-3 text-left last:border-0"
       )}
     >
       <RankingMemberCells
         avatarUrl={row.avatarUrl}
         label={row.label}
         size="ranking"
+        truncateName={false}
         nameClassName={cn(
           "text-xs font-medium",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
