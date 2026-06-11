@@ -1,6 +1,9 @@
 /** Horizonte de partidos a precalentar desde el cron. */
 export const PREWARM_HORIZON_MS = 48 * 60 * 60 * 1000;
 
+/** Intervalo del cron `lineup-prewarm` (debe coincidir con `vercel.json`). */
+export const PREWARM_CRON_INTERVAL_MS = 5 * 60 * 1000;
+
 /** Re-fetch de once probable BSD si la caché es más antigua. */
 export const PREWARM_PREDICTED_TTL_MS = 6 * 60 * 60 * 1000;
 

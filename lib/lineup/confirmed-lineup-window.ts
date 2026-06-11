@@ -1,4 +1,4 @@
-/** BSD/API-Football suelen publicar el XI confirmado ~1 h antes del pitido. */
+/** Ventana T-90: desde aquí el cron consulta BSD/API-Football por XI confirmado cada 5 min. */
 export const CONFIRMED_LINEUP_WINDOW_MS = 90 * 60 * 1000;
 
 const LIVE_STATUSES = new Set(["live", "inprogress", "finished", "postponed"]);

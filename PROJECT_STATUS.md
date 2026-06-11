@@ -61,5 +61,5 @@
 - [x] Alineaciones: plantilla visual fija por formación + relayout al leer caché (coords consistentes entre equipos)
 - [x] MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px
 - [x] Sistema táctico unificado: `formation-coordinates` (6 formaciones incl. 4-1-4-1) + espejo vertical MVP + UI compacta (reservas arriba, meta abajo, sin pastilla de formación)
-- [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, horizonte 48h, TTL 6h)
+- [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, cada 5 min, XI confirmado T-90, horizonte 48h)
 - [x] Resúmenes FIFA YouTube: cron RSS `@fifa`, slide hero «Último partido», reproductor in-app, modal partido finalizado

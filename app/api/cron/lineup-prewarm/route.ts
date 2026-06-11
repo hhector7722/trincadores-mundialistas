@@ -4,6 +4,7 @@ import { assertCronAuthorized } from "@/lib/quiz/cron";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
 
 export const dynamic = "force-dynamic";
+/** BSD confirmado: cada 5 min en ventana T-90; probables/fallback en horizonte 48 h. */
 export const maxDuration = 120;
 
 export async function GET(request: Request) {
