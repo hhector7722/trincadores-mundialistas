@@ -20,11 +20,10 @@ export type SendQuizDailyRemindersResult = {
   skippedClosed: number;
 };
 
-export function buildQuizDailyReminderCopy(quizTitle?: string): { title: string; body: string } {
-  const label = quizTitle?.trim() ? `“${quizTitle.trim()}”` : "el quiz de hoy";
+export function buildQuizDailyReminderCopy(): { title: string; body: string } {
   return {
-    title: "Quiz del día pendiente",
-    body: `Aún no has completado ${label}. Tienes hasta las 23:59 para jugar.`,
+    title: "Quiz diario pendiente",
+    body: "Tienes hasta las 23:59 para completarlo.",
   };
 }
 
@@ -81,7 +80,7 @@ export async function sendQuizDailyReminders(
     }
 
     const completed = new Set((submitted ?? []).map((row) => row.profile_id as string));
-    const copy = buildQuizDailyReminderCopy(quiz.title);
+    const copy = buildQuizDailyReminderCopy();
 
     for (const member of members ?? []) {
       const profileId = member.profile_id as string;
