@@ -24,6 +24,12 @@ export function isQuizCloseWindow(now = new Date()): boolean {
   return hour === 23 && minute === 59;
 }
 
+/** 20:00 Europe/Madrid — recordatorio a quien no haya completado el quiz del día. */
+export function isQuizDailyReminderWindow(now = new Date()): boolean {
+  const { hour, minute } = madridLocalParts(now);
+  return hour === 20 && minute === 0;
+}
+
 export function quizCronAction(now = new Date()): QuizCronAction | null {
   if (isQuizOpenWindow(now)) return "open";
   if (isQuizCloseWindow(now)) return "close";

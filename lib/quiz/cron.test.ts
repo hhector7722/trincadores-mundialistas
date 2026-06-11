@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   isQuizCloseWindow,
+  isQuizDailyReminderWindow,
   isQuizOpenWindow,
   madridHour,
   quizCronAction,
@@ -25,6 +26,11 @@ describe("quiz cron", () => {
     const atClose = new Date("2026-06-09T21:59:00.000Z");
     assert.equal(isQuizCloseWindow(atClose), true);
     assert.equal(quizCronAction(atClose), "close");
+  });
+
+  it("isQuizDailyReminderWindow es true a las 20:00 Madrid (CEST)", () => {
+    const atReminder = new Date("2026-06-09T18:00:00.000Z");
+    assert.equal(isQuizDailyReminderWindow(atReminder), true);
   });
 
   it("fuera de medianoche y cierre no dispara accion", () => {
