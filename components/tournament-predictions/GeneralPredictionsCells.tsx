@@ -34,11 +34,9 @@ export function FinalistsPredictionCell({
 
   return (
     <span className="flex h-full min-w-0 items-center justify-center gap-0.5 px-0.5 text-[10px] font-medium text-[var(--tm-fg)]">
-      <TeamFlagBadge name={teamA} size="xxs" loading="eager" className="shrink-0" />
       <span className="whitespace-nowrap">{teamAbbr(teamA)}</span>
       <span className="text-[var(--tm-muted)]">-</span>
       <span className="whitespace-nowrap">{teamAbbr(teamB)}</span>
-      <TeamFlagBadge name={teamB} size="xxs" loading="eager" className="shrink-0" />
     </span>
   );
 }
