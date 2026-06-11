@@ -226,14 +226,16 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
             }}
             aria-hidden
           >
-            <Image
-              src="/icons/PERRETE.png"
-              alt=""
-              width={455}
-              height={351}
-              className="tm-ko-perrete-img"
-              priority
-            />
+            <div className="tm-ko-perrete-frame tm-circle-depth overflow-hidden rounded-xl">
+              <Image
+                src="/icons/psoe.png"
+                alt=""
+                width={1326}
+                height={833}
+                className="tm-ko-perrete-img"
+                priority
+              />
+            </div>
           </div>
 
           <svg

@@ -1298,12 +1298,15 @@ html:has(.tm-app-frame) {
   transform: translate(-50%, -50%);
 }
 
+.tm-ko-perrete-frame {
+  width: min(34cqw, 8rem);
+}
+
 .tm-ko-perrete-img {
   display: block;
-  width: min(34cqw, 8rem);
+  width: 100%;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.28));
 }
 
 .tm-ko-cup {
