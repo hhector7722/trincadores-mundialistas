@@ -129,6 +129,7 @@ export function assertGeneratedQuestions(
     throw new Error("El dia debe tener exactamente 3 preguntas.");
   }
   const factIds = new Set<string>();
+  const prompts = new Set<string>();
   for (const [index, q] of questions.entries()) {
     const fact = factsById?.get(q.fact_id);
     const result = validateGeneratedQuestion(q, fact);
@@ -139,5 +140,11 @@ export function assertGeneratedQuestions(
       throw new Error(`fact_id duplicado en el dia: ${q.fact_id}`);
     }
     factIds.add(q.fact_id);
+
+    const promptKey = q.prompt.trim().toLowerCase();
+    if (prompts.has(promptKey)) {
+      throw new Error(`prompt duplicado en el dia: ${q.prompt}`);
+    }
+    prompts.add(promptKey);
   }
 }

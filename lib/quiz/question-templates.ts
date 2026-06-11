@@ -27,7 +27,9 @@ const TEMPLATES: Record<string, TemplateFn> = {
   },
   top_scorer: (fact) => ({
     template_id: "top_scorer",
-    prompt: "¿Quién es el máximo goleador histórico en la historia de los Mundiales?",
+    prompt: fact.year
+      ? `¿Quién fue el máximo goleador del Mundial ${fact.year}?`
+      : "¿Quién es el máximo goleador histórico en la historia de los Mundiales?",
     correctLabel: fact.value,
   }),
   titles_count: (fact) => ({

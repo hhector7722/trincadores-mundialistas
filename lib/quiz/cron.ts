@@ -1,19 +1,33 @@
-import { todayQuizDate } from "@/lib/quiz/date";
+import { madridLocalParts, todayQuizDate } from "@/lib/quiz/date";
 
 const MADRID_TZ = "Europe/Madrid";
-const TARGET_HOUR = 5;
+
+export type QuizCronAction = "open" | "close";
 
 export function madridHour(now = new Date()): number {
-  const hour = new Intl.DateTimeFormat("en-GB", {
-    timeZone: MADRID_TZ,
-    hour: "numeric",
-    hour12: false,
-  }).format(now);
-  return Number.parseInt(hour, 10);
+  return madridLocalParts(now).hour;
 }
 
-export function isQuizCronWindow(now = new Date()): boolean {
-  return madridHour(now) === TARGET_HOUR;
+export function madridMinute(now = new Date()): number {
+  return madridLocalParts(now).minute;
+}
+
+/** 00:00 Europe/Madrid — publicar y abrir el quiz del dia en curso. */
+export function isQuizOpenWindow(now = new Date()): boolean {
+  const { hour, minute } = madridLocalParts(now);
+  return hour === 0 && minute === 0;
+}
+
+/** 23:59 Europe/Madrid — cerrar el quiz del dia en curso. */
+export function isQuizCloseWindow(now = new Date()): boolean {
+  const { hour, minute } = madridLocalParts(now);
+  return hour === 23 && minute === 59;
+}
+
+export function quizCronAction(now = new Date()): QuizCronAction | null {
+  if (isQuizOpenWindow(now)) return "open";
+  if (isQuizCloseWindow(now)) return "close";
+  return null;
 }
 
 export function quizDateForCron(now = new Date()): string {
@@ -25,4 +39,13 @@ export function assertCronAuthorized(request: Request): boolean {
   if (!secret) return false;
   const auth = request.headers.get("authorization");
   return auth === `Bearer ${secret}`;
+}
+
+export function formatMadridClock(now = new Date()): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: MADRID_TZ,
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  }).format(now);
 }

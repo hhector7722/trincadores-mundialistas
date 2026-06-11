@@ -6,6 +6,10 @@
       "schedule": "0 * * * *"
     },
     {
+      "path": "/api/cron/quiz-daily",
+      "schedule": "59 * * * *"
+    },
+    {
       "path": "/api/cron/lineup-prewarm",
       "schedule": "30 * * * *"
     }

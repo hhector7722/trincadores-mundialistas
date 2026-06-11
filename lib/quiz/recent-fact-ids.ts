@@ -17,7 +17,7 @@ function addDays(quizDate: string, delta: number): string {
   return `${yy}-${mm}-${dd}`;
 }
 
-function factIdsFromSettings(settings: unknown): string[] {
+export function factIdsFromSettings(settings: unknown): string[] {
   if (!settings || typeof settings !== "object") return [];
   const meta = (settings as Record<string, unknown>).questions_meta;
   if (!Array.isArray(meta)) return [];

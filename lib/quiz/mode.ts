@@ -1,10 +1,13 @@
+import { isQuizCompetitiveDay, todayQuizDate } from "@/lib/quiz/date";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Competitivo si ya empezó el torneo en el pool:
- * algún partido live/finished o kickoff del calendario ya pasó.
+ * Competitivo desde el 11-jun-2026 (quiz oficial) o si ya empezó el torneo en el pool.
  */
 export async function isPoolCompetitive(poolId: string): Promise<boolean> {
+  if (isQuizCompetitiveDay(todayQuizDate())) {
+    return true;
+  }
   const supabase = await createClient();
 
   const { data: matchdays, error: mdError } = await supabase

@@ -1,7 +1,10 @@
 import { generatedDayToSeedFile } from "@/lib/quiz/generated-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
-import { loadRecentFactIdsFromDb } from "@/lib/quiz/recent-fact-ids";
+import {
+  factIdsFromSettings,
+  loadRecentFactIdsFromDb,
+} from "@/lib/quiz/recent-fact-ids";
 import {
   ensureQuizPool,
   findQuizForDate,
@@ -24,6 +27,8 @@ export type PublishQuizDayOptions = {
   allowReseed?: boolean;
   /** En servidor local/scripts: también lee historial de data/quiz/generated */
   includeFilesystemHistory?: boolean;
+  /** Hechos a excluir siempre (p. ej. quiz de entreno sustituido manualmente). */
+  extraExcludeFactIds?: string[];
 };
 
 export async function publishQuizDay(
@@ -56,6 +61,23 @@ export async function publishQuizDay(
   const excludeFactIds = new Set(excludeFromDb);
   if (options.includeFilesystemHistory) {
     for (const id of loadRecentFactIds(options.quizDate)) {
+      excludeFactIds.add(id);
+    }
+  }
+
+  for (const id of options.extraExcludeFactIds ?? []) {
+    if (id.trim()) excludeFactIds.add(id.trim());
+  }
+
+  if (existingId && options.allowReseed) {
+    const { data: existingQuiz, error: existingError } = await options.admin
+      .from("quizzes")
+      .select("settings_json")
+      .eq("id", existingId)
+      .maybeSingle();
+
+    if (existingError) throw existingError;
+    for (const id of factIdsFromSettings(existingQuiz?.settings_json)) {
       excludeFactIds.add(id);
     }
   }

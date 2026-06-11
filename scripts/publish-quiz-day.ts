@@ -7,6 +7,10 @@ async function main() {
   assertServiceEnv();
   const quizDate = process.env.QUIZ_DATE?.trim() || todayQuizDate();
   const allowReseed = process.env.CONFIRM_RESEED === "1";
+  const extraExcludeFactIds =
+    process.env.EXCLUDE_FACT_IDS?.split(",")
+      .map((id) => id.trim())
+      .filter(Boolean) ?? [];
 
   const admin = createAdminClient();
   const result = await publishQuizDay({
@@ -14,6 +18,7 @@ async function main() {
     quizDate,
     allowReseed,
     includeFilesystemHistory: true,
+    extraExcludeFactIds,
   });
 
   if (result.skipped) {

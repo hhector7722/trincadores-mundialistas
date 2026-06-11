@@ -1,3 +1,4 @@
+import { isQuizWindowOpen } from "@/lib/quiz/date";
 import type { QuizDaySlot, QuizScoringMode } from "@/lib/quiz/types";
 
 export type QuizSlotStatus =
@@ -9,6 +10,13 @@ export type QuizSlotStatus =
 
 export function getQuizSlotStatus(slot: QuizDaySlot | null): QuizSlotStatus {
   if (!slot) return "unavailable";
+
+  if (!isQuizWindowOpen(slot.quiz)) {
+    if (slot.attempt?.status === "submitted") return "completed";
+    if (slot.attempt?.status === "in_progress") return "expired";
+    return "unavailable";
+  }
+
   if (!slot.attempt) return "ready";
 
   if (slot.attempt.status === "submitted") return "completed";

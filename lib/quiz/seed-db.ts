@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { REAL_POOL_SLUG } from "@/lib/auth/participants";
+import { isQuizCompetitiveDay, quizDayWindow } from "@/lib/quiz/date";
 import { questionsMetaFromDay } from "@/lib/quiz/generated-day";
 import {
   scoringFieldsForMode,
@@ -134,6 +135,7 @@ export async function upsertQuizBundle(args: {
   allowReseed?: boolean;
 }): Promise<string> {
   const scoring = scoringFieldsForMode(args.kind, args.scoringMode);
+  const { opensAt, closesAt } = quizDayWindow(args.quizDate);
   const existingId = await findQuizForDate(args.admin, args.poolId, args.quizDate, args.kind);
 
   if (existingId && !args.allowReseed) {
@@ -150,6 +152,8 @@ export async function upsertQuizBundle(args: {
         scoring_mode: args.scoringMode,
         max_points: scoring.max_points,
         settings_json: args.settingsJson,
+        opens_at: opensAt,
+        closes_at: closesAt,
       })
       .eq("id", quizId);
 
@@ -165,6 +169,8 @@ export async function upsertQuizBundle(args: {
         scoring_mode: args.scoringMode,
         max_points: scoring.max_points,
         settings_json: args.settingsJson,
+        opens_at: opensAt,
+        closes_at: closesAt,
       })
       .select("id")
       .single();
@@ -198,8 +204,11 @@ export async function seedQuizDayToDb(args: {
     args.payload.quiz_date,
     "official"
   );
-  const competitive = await isPoolCompetitiveAdmin(args.admin, args.poolId);
-  const scoringMode: QuizScoringMode = competitive ? "competitive" : "training";
+  const matchCompetitive = await isPoolCompetitiveAdmin(args.admin, args.poolId);
+  const scoringMode: QuizScoringMode =
+    isQuizCompetitiveDay(args.payload.quiz_date) || matchCompetitive
+      ? "competitive"
+      : "training";
 
   const quizId = await upsertQuizBundle({
     admin: args.admin,

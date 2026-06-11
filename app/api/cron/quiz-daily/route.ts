@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { closeQuizDay } from "@/lib/quiz/close-day";
 import {
   assertCronAuthorized,
-  isQuizCronWindow,
+  formatMadridClock,
+  isQuizCloseWindow,
+  isQuizOpenWindow,
   quizDateForCron,
 } from "@/lib/quiz/cron";
 import { publishQuizDay } from "@/lib/quiz/publish-day";
@@ -15,18 +18,19 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const force = new URL(request.url).searchParams.get("force") === "1";
+  const url = new URL(request.url);
+  const force = url.searchParams.get("force");
+  const forceOpen = force === "1" || force === "open";
+  const forceClose = force === "close";
 
-  if (!force && !isQuizCronWindow()) {
+  const shouldOpen = forceOpen || (!forceClose && isQuizOpenWindow());
+  const shouldClose = forceClose || (!forceOpen && isQuizCloseWindow());
+
+  if (!shouldOpen && !shouldClose) {
     return NextResponse.json({
       skipped: true,
-      reason: "Fuera de ventana (5:00 Europe/Madrid)",
-      madridHour: new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Europe/Madrid",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: false,
-      }).format(new Date()),
+      reason: "Fuera de ventana (00:00 abrir, 23:59 cerrar Europe/Madrid)",
+      madridClock: formatMadridClock(),
     });
   }
 
@@ -34,6 +38,20 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
+
+    if (shouldClose) {
+      const result = await closeQuizDay({ admin, quizDate });
+
+      return NextResponse.json({
+        ok: true,
+        action: "close",
+        quizDate: result.quizDate,
+        quizId: result.quizId,
+        expiredAttempts: result.expiredAttempts,
+        skipped: result.skipped,
+      });
+    }
+
     const result = await publishQuizDay({
       admin,
       quizDate,
@@ -42,6 +60,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       ok: true,
+      action: "open",
       quizDate: result.quizDate,
       quizId: result.quizId,
       scoringMode: result.scoringMode,

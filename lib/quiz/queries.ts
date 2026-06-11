@@ -1,4 +1,4 @@
-import { todayQuizDate } from "@/lib/quiz/date";
+import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { isPoolOwner } from "@/lib/pool/admin";
 import { parseQuizOptions } from "@/lib/quiz/options";
@@ -329,6 +329,7 @@ export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | 
 
 export function isQuizPlayable(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
+  if (!isQuizWindowOpen(slot.quiz)) return false;
   if (!slot.attempt) return true;
   if (slot.attempt.status === "submitted") {
     return slot.quiz.scoring_mode === "training";
