@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-copy";
+import { buildQuizActiveModalCopy } from "@/lib/notifications/quiz-active-copy";
 import { QUIZ_PLAY_HREF } from "@/lib/quiz/play-routes";
 
 type QuizActiveNotificationModalProps = {
@@ -11,7 +11,7 @@ type QuizActiveNotificationModalProps = {
   onClose: () => void;
 };
 
-const copy = buildQuizActiveAnnouncementCopy();
+const copy = buildQuizActiveModalCopy();
 
 export function QuizActiveNotificationModal({ open, onClose }: QuizActiveNotificationModalProps) {
   const router = useRouter();
