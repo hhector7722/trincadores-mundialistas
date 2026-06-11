@@ -34,6 +34,7 @@ import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock
 import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
 import { LiveMatchScoreOverlay } from "@/components/live/LiveMatchScorePair";
 import { MatchLiveStatsPanel } from "@/components/live/MatchLiveStatsPanel";
+import { MatchStatsModal, MatchStatsOpenButton } from "@/components/live/MatchStatsModal";
 import {
   lineupsActionCaption,
   lineupsModalTitle,
@@ -194,6 +195,7 @@ export function QuickPredictionModal({
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
   const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -386,6 +388,7 @@ export function QuickPredictionModal({
       setMvpOverrides({});
       setMvpPlayerName(null);
       setPredictionsBoardOpen(false);
+      setStatsModalOpen(false);
       return;
     }
 
@@ -585,6 +588,10 @@ export function QuickPredictionModal({
             {currentProfileId ? (
               <PredictionsBoardOpenButton onClick={() => setPredictionsBoardOpen(true)} />
             ) : null}
+            <MatchStatsOpenButton
+              onClick={() => setStatsModalOpen(true)}
+              className={currentProfileId ? "mt-3" : undefined}
+            />
             {highlightVideoId ? (
               <MatchHighlightBlock
                 homeTeam={targetMatch.home_team}
@@ -593,13 +600,9 @@ export function QuickPredictionModal({
                 awayGoals={finishedAwayGoals}
                 youtubeVideoId={highlightVideoId}
                 highlightSource={targetMatch.highlightSource}
-                className={currentProfileId ? "mt-3" : undefined}
+                className="mt-3"
               />
             ) : null}
-            <MatchLiveStatsPanel
-              stats={liveSnapshot?.stats ?? null}
-              className={highlightVideoId || currentProfileId ? "mt-3" : undefined}
-            />
           </div>
         </div>
       );
@@ -934,6 +937,18 @@ export function QuickPredictionModal({
         homeTeam={viewMatch.home_team}
         awayTeam={viewMatch.away_team}
         currentProfileId={currentProfileId}
+      />
+    ) : null}
+
+    {isFinishedMatch ? (
+      <MatchStatsModal
+        open={statsModalOpen}
+        onClose={() => setStatsModalOpen(false)}
+        homeTeam={viewMatch.home_team}
+        awayTeam={viewMatch.away_team}
+        homeGoals={viewMatch.officialHome ?? liveSnapshot?.homeScore ?? null}
+        awayGoals={viewMatch.officialAway ?? liveSnapshot?.awayScore ?? null}
+        stats={liveSnapshot?.stats ?? null}
       />
     ) : null}
     </>
