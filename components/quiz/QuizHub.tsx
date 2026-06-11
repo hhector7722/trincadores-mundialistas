@@ -51,9 +51,6 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           className="flex min-h-0 min-w-0 flex-1 flex-col"
           aria-label="Clasificacion del quiz"
         >
-          <h2 className="shrink-0 px-3 pb-1 font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
-            Clasificacion del quiz
-          </h2>
           <QuizLeaderboardTable
             rows={leaderboardRows}
             currentProfileId={currentProfileId}

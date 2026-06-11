@@ -26,7 +26,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
         isRanking
           ? "LA TABLA"
           : isQuizHub
-            ? "¿QUIEN SABE MÁS DE LOS MUNDIALES?"
+            ? "¿QUIEN SHANELA MÁS DE LOS MUNDIALES?"
             : isProfile
               ? "Perfil"
               : undefined

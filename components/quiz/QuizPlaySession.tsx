@@ -27,7 +27,7 @@ type QuizPlaySessionProps = {
   skipIntro?: boolean;
 };
 
-const PLAY_TITLE = "¿QUIEN SABE MÁS DE LOS MUNDIALES?";
+const PLAY_TITLE = "¿QUIEN SHANELA MÁS DE LOS MUNDIALES?";
 
 export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlaySessionProps) {
   const router = useRouter();
