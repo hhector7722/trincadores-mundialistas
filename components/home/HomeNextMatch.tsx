@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
 import {
-  HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS,
-  HOME_CARD_BODY_MIN_H_CLASS,
+  HOME_CARD_BODY_H_CAROUSEL_CLASS,
+  HOME_CARD_BODY_H_CLASS,
   HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS,
   HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS,
   HOME_CARD_TEAMS_BLOCK_CLASS,
@@ -47,8 +47,8 @@ export function HomeNextMatch({
     ? HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS
     : HOME_CARD_TEAMS_BLOCK_CLASS;
   const slideBodyClassName = hasCarousel
-    ? HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS
-    : HOME_CARD_BODY_MIN_H_CLASS;
+    ? HOME_CARD_BODY_H_CAROUSEL_CLASS
+    : HOME_CARD_BODY_H_CLASS;
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
@@ -89,7 +89,7 @@ export function HomeNextMatch({
           <div
             ref={scrollRef}
             className={cn(
-              "flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain",
+              "flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
               slideBodyClassName,
               "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
             )}
@@ -109,7 +109,7 @@ export function HomeNextMatch({
             ))}
           </div>
         ) : (
-          <div className={slideBodyClassName}>{renderSlide(slides[0]!)}</div>
+          <div className={cn(slideBodyClassName, "overflow-hidden")}>{renderSlide(slides[0]!)}</div>
         )}
 
         {hasCarousel ? (

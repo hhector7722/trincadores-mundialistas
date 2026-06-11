@@ -41,7 +41,7 @@ export function MatchContextActionsRow({
 }: MatchContextActionsRowProps) {
   if (layout === "homeCardCompactStacked") {
     return (
-      <div className={cn("grid h-full grid-rows-3", className)}>
+      <div className={cn("grid h-full grid-rows-3 gap-0", className)}>
         <div className="flex min-h-0 items-center justify-center px-1">{centerSlot}</div>
         <div className="flex min-h-0 items-center justify-center px-1">{predictionSlot}</div>
         <div className="flex min-h-0 items-center justify-center px-1">

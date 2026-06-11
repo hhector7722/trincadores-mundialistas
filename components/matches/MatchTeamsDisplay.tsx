@@ -24,6 +24,12 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-16";
 
+/** Card próximo partido: acciones justo bajo plantilla (sin hueco central como en live). */
+export const HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS = "top-[3.25rem]";
+
+/** Card próximo partido: filas de pronóstico / MVP / alineaciones más compactas. */
+export const HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS = "h-14";
+
 /** Card inicio: bloque equipos + acciones apiladas (altura fija, igual live / próximo). */
 export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 h-[8.25rem] overflow-hidden";
 
@@ -43,8 +49,14 @@ export const HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS =
 /** Card inicio: altura mínima del cuerpo (cabecera + mt-2 + bloque equipos). */
 export const HOME_CARD_BODY_MIN_H_CLASS = "min-h-[calc(1.5rem+0.5rem+8.25rem)]";
 
+/** Card inicio: altura fija del cuerpo (evita que el slide crezca con el contenido). */
+export const HOME_CARD_BODY_H_CLASS = "h-[calc(1.5rem+0.5rem+8.25rem)]";
+
 /** Card inicio en carrusel: cabecera + bloque equipos compacto (indicadores fuera del slide). */
 export const HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS = `min-h-[calc(1.5rem+0.5rem+8.25rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
+
+/** Card inicio en carrusel: altura fija del slide. */
+export const HOME_CARD_BODY_H_CAROUSEL_CLASS = `h-[calc(1.5rem+0.5rem+8.25rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
 
 function TeamFlagCircle({
   name,

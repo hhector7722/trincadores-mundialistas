@@ -16,8 +16,9 @@ import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import {
-  HOME_CARD_ACTIONS_STACKED_CLASS,
   HOME_CARD_HEADER_CLASS,
+  HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
+  HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
@@ -216,8 +217,9 @@ export function HomeMatchCard({
 
           <div
             className={cn(
-              "absolute inset-x-0 bottom-0 overflow-hidden",
-              HOME_CARD_ACTIONS_STACKED_CLASS,
+              "absolute inset-x-0 overflow-hidden",
+              HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
+              HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
             )}
             onClick={(event) => event.stopPropagation()}
           >
