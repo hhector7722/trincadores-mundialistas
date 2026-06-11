@@ -54,13 +54,20 @@ export async function fetchMatchPredictionsBoardAction(
   }
 
   try {
-    const board = await getMatchPredictionsBoard(poolId, matchId);
+    const board = await getMatchPredictionsBoard(poolId, matchId, user.id);
     if (!board) {
-      return { ok: false, error: "No se pudieron cargar los pronosticos del partido." };
+      return {
+        ok: false,
+        error: "Los pronosticos de rivales aun no estan visibles para este partido.",
+      };
     }
     return { ok: true, board };
-  } catch {
-    return { ok: false, error: "No se pudieron cargar los pronosticos. Comprueba la conexion." };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Error desconocido";
+    return {
+      ok: false,
+      error: `No se pudieron cargar los pronosticos. ${message}`,
+    };
   }
 }
 

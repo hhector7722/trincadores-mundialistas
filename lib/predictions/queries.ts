@@ -1,3 +1,5 @@
+import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { fetchMvpPredictionsForMatches, getMvpPredictionForMatch, type MvpPrediction } from "@/lib/predictions/mvp-queries";
 import {
@@ -341,48 +343,103 @@ export type MatchPredictionsBoard = {
   rows: MatchPredictionsBoardRow[];
 };
 
-type MatchPredictionsBoardRpcRow = {
-  profile_id: string;
-  label: string;
-  avatar_url: string | null;
-  home_goals: number | null;
-  away_goals: number | null;
-  mvp_player_name: string | null;
-};
-
-type MatchPredictionsBoardRpcPayload = {
-  home_team: string;
-  away_team: string;
-  rows: MatchPredictionsBoardRpcRow[] | null;
-};
-
 export async function getMatchPredictionsBoard(
   poolId: string,
-  matchId: string
+  matchId: string,
+  viewerId: string
 ): Promise<MatchPredictionsBoard | null> {
-  const supabase = await createClient();
+  const userClient = await createClient();
 
-  const { data, error } = await supabase.rpc("get_match_predictions_board", {
-    p_pool_id: poolId,
-    p_match_id: matchId,
-  });
+  const { data: canView, error: visibilityError } = await userClient.rpc(
+    "can_view_peer_predictions",
+    {
+      p_pool_id: poolId,
+      p_match_id: matchId,
+      p_viewer: viewerId,
+    }
+  );
 
-  if (error) throw new Error(error.message);
-  if (!data) return null;
+  if (visibilityError) {
+    throw new Error(visibilityError.message);
+  }
+  if (!canView) {
+    return null;
+  }
 
-  const payload = data as MatchPredictionsBoardRpcPayload;
+  const admin = createAdminClient();
+
+  const { data: match, error: matchError } = await admin
+    .from("matches")
+    .select("id, home_team, away_team")
+    .eq("id", matchId)
+    .maybeSingle();
+
+  if (matchError) throw new Error(matchError.message);
+  if (!match) return null;
+
+  const { data: memberships, error: membersError } = await admin
+    .from("pool_members")
+    .select("profile_id")
+    .eq("pool_id", poolId);
+
+  if (membersError) throw new Error(membersError.message);
+  if (!memberships?.length) {
+    return { homeTeam: match.home_team, awayTeam: match.away_team, rows: [] };
+  }
+
+  const profileIds = memberships.map((m) => m.profile_id);
+
+  const [profilesResult, predictionsResult, mvpResult] = await Promise.all([
+    admin
+      .from("profiles")
+      .select("id, username, display_name, avatar_url, onboarding_completed_at")
+      .in("id", profileIds),
+    admin
+      .from("predictions")
+      .select("profile_id, home_goals, away_goals")
+      .eq("pool_id", poolId)
+      .eq("match_id", matchId),
+    admin
+      .from("match_mvp_predictions")
+      .select("profile_id, player_name")
+      .eq("pool_id", poolId)
+      .eq("match_id", matchId),
+  ]);
+
+  if (profilesResult.error) throw new Error(profilesResult.error.message);
+  if (predictionsResult.error) throw new Error(predictionsResult.error.message);
+  if (mvpResult.error) throw new Error(mvpResult.error.message);
+
+  const predictionsByProfile = new Map(
+    (predictionsResult.data ?? []).map((row) => [row.profile_id, row])
+  );
+  const mvpByProfile = new Map(
+    (mvpResult.data ?? []).map((row) => [row.profile_id, row.player_name])
+  );
+
+  const rows: MatchPredictionsBoardRow[] = [];
+
+  for (const profile of profilesResult.data ?? []) {
+    if (!isProfileOnboardingComplete(profile)) continue;
+
+    const prediction = predictionsByProfile.get(profile.id);
+
+    rows.push({
+      profileId: profile.id,
+      label: profile.display_name ?? profile.username,
+      avatarUrl: profile.avatar_url,
+      homeGoals: prediction?.home_goals ?? null,
+      awayGoals: prediction?.away_goals ?? null,
+      mvpPlayerName: mvpByProfile.get(profile.id) ?? null,
+    });
+  }
+
+  rows.sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
 
   return {
-    homeTeam: payload.home_team,
-    awayTeam: payload.away_team,
-    rows: (payload.rows ?? []).map((row) => ({
-      profileId: row.profile_id,
-      label: row.label,
-      avatarUrl: row.avatar_url,
-      homeGoals: row.home_goals,
-      awayGoals: row.away_goals,
-      mvpPlayerName: row.mvp_player_name,
-    })),
+    homeTeam: match.home_team,
+    awayTeam: match.away_team,
+    rows,
   };
 }
 

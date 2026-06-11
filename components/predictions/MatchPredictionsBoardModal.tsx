@@ -43,15 +43,21 @@ export function MatchPredictionsBoardModal({
     setError(null);
     setBoard(null);
 
-    void fetchMatchPredictionsBoardAction(poolId, matchId).then((result) => {
-      if (cancelled) return;
-      setLoading(false);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      setBoard(result.board);
-    });
+    void fetchMatchPredictionsBoardAction(poolId, matchId)
+      .then((result) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setBoard(result.board);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoading(false);
+        setError("No se pudieron cargar los pronosticos. Comprueba la conexion.");
+      });
 
     return () => {
       cancelled = true;
