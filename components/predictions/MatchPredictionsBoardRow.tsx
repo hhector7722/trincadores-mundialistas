@@ -21,7 +21,7 @@ function formatMvpCell(name: string | null): string {
 
 function CellValue({ value }: { value: string }) {
   return (
-    <span className="whitespace-nowrap text-center text-[10px] text-[var(--tm-fg)]">
+    <span className="flex w-full items-center justify-center whitespace-nowrap text-center text-[10px] text-[var(--tm-fg)]">
       {value}
     </span>
   );
@@ -72,7 +72,7 @@ export function MatchPredictionsBoardRow({
         </div>
         <span
           className={cn(
-            "whitespace-nowrap text-xs font-medium",
+            "min-w-0 truncate text-xs font-medium",
             isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
           )}
         >

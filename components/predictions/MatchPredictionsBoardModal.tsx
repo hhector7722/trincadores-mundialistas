@@ -17,6 +17,9 @@ type MatchPredictionsBoardModalProps = {
   currentProfileId: string;
 };
 
+const MODAL_PANEL_CLASS =
+  "flex min-h-[min(78dvh,34rem)] max-h-[min(78dvh,34rem)] w-full max-w-lg flex-col";
+
 export function MatchPredictionsBoardModal({
   open,
   onClose,
@@ -65,32 +68,35 @@ export function MatchPredictionsBoardModal({
   }, [open, poolId, matchId]);
 
   const title = `${teamNameEs(homeTeam)} vs ${teamNameEs(awayTeam)}`;
+  const tableHomeTeam = board?.homeTeam ?? homeTeam;
+  const tableAwayTeam = board?.awayTeam ?? awayTeam;
 
   return (
     <Modal
       open={open}
       onClose={onClose}
       title={title}
-      className="max-w-lg"
-      scrollContent
+      className={MODAL_PANEL_CLASS}
+      scrollContent={false}
       loading={loading}
     >
-      {error ? (
-        <p className="px-3 py-4 text-sm text-[var(--tm-danger)]" role="alert">
-          {error}
-        </p>
-      ) : board ? (
-        <div className="px-1 pb-2">
+      <div className="flex min-h-0 flex-1 flex-col px-1 pb-2">
+        {error ? (
+          <div className="flex flex-1 items-center justify-center px-3">
+            <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
+              {error}
+            </p>
+          </div>
+        ) : (
           <MatchPredictionsBoardTable
-            rows={board.rows}
+            loading={loading}
+            rows={board?.rows ?? []}
             currentProfileId={currentProfileId}
-            homeTeam={board.homeTeam}
-            awayTeam={board.awayTeam}
+            homeTeam={tableHomeTeam}
+            awayTeam={tableAwayTeam}
           />
-        </div>
-      ) : !loading ? (
-        <p className="px-3 py-4 text-sm text-[var(--tm-muted)]">Sin pronosticos disponibles.</p>
-      ) : null}
+        )}
+      </div>
     </Modal>
   );
 }

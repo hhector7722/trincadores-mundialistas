@@ -1,6 +1,7 @@
 import { MatchPredictionsBoardRow } from "@/components/predictions/MatchPredictionsBoardRow";
 import {
   MATCH_PREDICTIONS_GRID,
+  MATCH_PREDICTIONS_ROW_COUNT,
   MATCH_PREDICTIONS_SUBGRID_ROW,
 } from "@/components/predictions/match-predictions-grid";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
@@ -8,18 +9,17 @@ import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
-const EMPTY_ROW_COUNT = 11;
-
 type MatchPredictionsBoardTableProps = {
   rows: MatchPredictionsBoardRowType[];
   currentProfileId: string;
   homeTeam: string;
   awayTeam: string;
+  loading?: boolean;
 };
 
 function TeamHeader({ team }: { team: string }) {
   return (
-    <span className="inline-flex items-center justify-center gap-1 whitespace-nowrap">
+    <span className="inline-flex w-full items-center justify-center gap-1 whitespace-nowrap">
       <TeamFlagBadge name={team} size="xxs" loading="eager" />
       <span>{teamAbbr(team)}</span>
     </span>
@@ -37,7 +37,7 @@ function MatchPredictionsBoardTableHeader({
     <div
       className={cn(
         MATCH_PREDICTIONS_SUBGRID_ROW,
-        "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
+        "shrink-0 border-b border-[var(--tm-border)] py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
       <span className="col-span-2 text-left">Trincador</span>
@@ -57,7 +57,7 @@ function MatchPredictionsEmptyRow() {
     <div
       className={cn(
         MATCH_PREDICTIONS_SUBGRID_ROW,
-        "tm-ranking-row border-b border-[var(--tm-border)] px-3 last:border-0"
+        "tm-ranking-row border-b border-[var(--tm-border)] last:border-0"
       )}
       aria-hidden="true"
     >
@@ -77,24 +77,32 @@ export function MatchPredictionsBoardTable({
   currentProfileId,
   homeTeam,
   awayTeam,
+  loading = false,
 }: MatchPredictionsBoardTableProps) {
+  const dataRows = loading ? [] : rows;
+  const slotCount = Math.max(dataRows.length, MATCH_PREDICTIONS_ROW_COUNT);
+
   return (
-    <div className="tm-match-predictions-board tm-ranking-table">
-      <div className="tm-ranking-body overflow-x-auto">
-        <div className={cn(MATCH_PREDICTIONS_GRID, "w-max min-w-full")}>
-          <MatchPredictionsBoardTableHeader homeTeam={homeTeam} awayTeam={awayTeam} />
-          {rows.length === 0
-            ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
-                <MatchPredictionsEmptyRow key={`empty-${index}`} />
-              ))
-            : rows.map((row) => (
+    <div className="tm-match-predictions-board">
+      <div className={cn(MATCH_PREDICTIONS_GRID, "tm-match-predictions-board__grid")}>
+        <MatchPredictionsBoardTableHeader homeTeam={homeTeam} awayTeam={awayTeam} />
+        {loading
+          ? Array.from({ length: MATCH_PREDICTIONS_ROW_COUNT }, (_, index) => (
+              <MatchPredictionsEmptyRow key={`loading-${index}`} />
+            ))
+          : Array.from({ length: slotCount }, (_, index) => {
+              const row = dataRows[index];
+              if (!row) {
+                return <MatchPredictionsEmptyRow key={`pad-${index}`} />;
+              }
+              return (
                 <MatchPredictionsBoardRow
                   key={row.profileId}
                   row={row}
                   isCurrentUser={row.profileId === currentProfileId}
                 />
-              ))}
-        </div>
+              );
+            })}
       </div>
     </div>
   );

@@ -1229,20 +1229,25 @@ html:has(.tm-app-frame) {
   align-content: center;
 }
 
-/* Tablero de pronósticos en modal: sin height:0 del layout ranking a pantalla completa */
-.tm-match-predictions-board.tm-ranking-table,
-.tm-match-predictions-board .tm-ranking-body {
-  height: auto;
-  flex: none;
+/* Tablero de pronósticos en modal: reparte filas en alto y columnas en ancho */
+.tm-match-predictions-board {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
 }
 
-.tm-match-predictions-board .tm-ranking-body {
-  overflow-x: auto;
-  overflow-y: visible;
+.tm-match-predictions-board__grid {
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: auto repeat(11, minmax(0, 1fr));
 }
 
 .tm-match-predictions-board .tm-ranking-row {
-  flex: none;
+  min-height: 0;
 }
 
 /* ── Porra: calendario a pantalla completa ── */
