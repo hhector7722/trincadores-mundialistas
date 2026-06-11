@@ -4,7 +4,6 @@ import { CalendarFinishedMatchCardVisual } from "@/components/predictions/Calend
 import { Modal } from "@/components/ui/modal";
 import { resolveCalendarFinishedCard } from "@/lib/predictions/calendar-finished-card";
 import { CALENDAR_GUIDE_ENTRIES } from "@/lib/predictions/calendar-guide-demos";
-import { cn } from "@/lib/utils";
 
 type CalendarGuideModalProps = {
   open: boolean;
@@ -57,22 +56,19 @@ export function CalendarGuideModal({
                   </p>
                 </div>
 
-                <div
-                  className={cn(
-                    "tm-porra-calendar tm-cal-guide-preview shrink-0",
-                    "w-[9.5rem] max-w-[42vw] rounded-md bg-[#f5f5f7] p-1"
-                  )}
-                >
-                  <CalendarFinishedMatchCardVisual
-                    homeTeam={entry.match.home_team}
-                    awayTeam={entry.match.away_team}
-                    groupCode={entry.match.group_code}
-                    predictionHome={entry.match.prediction!.home_goals}
-                    predictionAway={entry.match.prediction!.away_goals}
-                    officialHome={entry.match.officialHome!}
-                    officialAway={entry.match.officialAway!}
-                    finishedState={finishedState}
-                  />
+                <div className="tm-cal-guide-preview-host">
+                  <div className="tm-porra-calendar tm-cal-guide-preview">
+                    <CalendarFinishedMatchCardVisual
+                      homeTeam={entry.match.home_team}
+                      awayTeam={entry.match.away_team}
+                      groupCode={entry.match.group_code}
+                      predictionHome={entry.match.prediction!.home_goals}
+                      predictionAway={entry.match.prediction!.away_goals}
+                      officialHome={entry.match.officialHome!}
+                      officialAway={entry.match.officialAway!}
+                      finishedState={finishedState}
+                    />
+                  </div>
                 </div>
               </li>
             );
