@@ -1302,6 +1302,14 @@ html:has(.tm-app-frame) {
   width: min(34cqw, 8rem);
 }
 
+.tm-ko-perrete-trigger {
+  display: block;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .tm-ko-perrete-img {
   display: block;
   width: 100%;

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
+import { ImageLightboxModal } from "@/components/ui/image-lightbox-modal";
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -43,6 +44,7 @@ const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 /** Fila 2 de la rejilla guía (octavos superiores / banda cabecera). */
 const PERRETE_CENTER_Y = gridRowToPercentY(2);
+const KO_MASCOT_SRC = "/icons/psoe.png";
 
 type TeamSlotLayout = {
   x: number;
@@ -192,6 +194,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
+  const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
 
   useEffect(() => {
@@ -224,18 +227,22 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
               left: "50%",
               top: `${PERRETE_CENTER_Y}%`,
             }}
-            aria-hidden
           >
-            <div className="tm-ko-perrete-frame tm-circle-depth overflow-hidden rounded-xl">
+            <button
+              type="button"
+              className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-xl"
+              onClick={() => setMascotPreviewOpen(true)}
+              aria-label="Ampliar imagen"
+            >
               <Image
-                src="/icons/psoe.png"
+                src={KO_MASCOT_SRC}
                 alt=""
                 width={1326}
                 height={833}
                 className="tm-ko-perrete-img"
                 priority
               />
-            </div>
+            </button>
           </div>
 
           <svg
@@ -287,6 +294,12 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           </div>
         </div>
       </div>
+
+      <ImageLightboxModal
+        open={mascotPreviewOpen}
+        onClose={() => setMascotPreviewOpen(false)}
+        src={KO_MASCOT_SRC}
+      />
 
       {activeMatch ? (
         <QuickPredictionModal
