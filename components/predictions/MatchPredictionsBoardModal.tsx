@@ -80,12 +80,14 @@ export function MatchPredictionsBoardModal({
           {error}
         </p>
       ) : board ? (
-        <MatchPredictionsBoardTable
-          rows={board.rows}
-          currentProfileId={currentProfileId}
-          homeTeam={board.homeTeam}
-          awayTeam={board.awayTeam}
-        />
+        <div className="px-1 pb-2">
+          <MatchPredictionsBoardTable
+            rows={board.rows}
+            currentProfileId={currentProfileId}
+            homeTeam={board.homeTeam}
+            awayTeam={board.awayTeam}
+          />
+        </div>
       ) : !loading ? (
         <p className="px-3 py-4 text-sm text-[var(--tm-muted)]">Sin pronosticos disponibles.</p>
       ) : null}

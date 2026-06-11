@@ -79,7 +79,7 @@ export function MatchPredictionsBoardTable({
   awayTeam,
 }: MatchPredictionsBoardTableProps) {
   return (
-    <div className="tm-ranking-table">
+    <div className="tm-match-predictions-board tm-ranking-table">
       <div className="tm-ranking-body overflow-x-auto">
         <div className={cn(MATCH_PREDICTIONS_GRID, "w-max min-w-full")}>
           <MatchPredictionsBoardTableHeader homeTeam={homeTeam} awayTeam={awayTeam} />

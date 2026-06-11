@@ -1229,6 +1229,22 @@ html:has(.tm-app-frame) {
   align-content: center;
 }
 
+/* Tablero de pronósticos en modal: sin height:0 del layout ranking a pantalla completa */
+.tm-match-predictions-board.tm-ranking-table,
+.tm-match-predictions-board .tm-ranking-body {
+  height: auto;
+  flex: none;
+}
+
+.tm-match-predictions-board .tm-ranking-body {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.tm-match-predictions-board .tm-ranking-row {
+  flex: none;
+}
+
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
   box-sizing: border-box;
