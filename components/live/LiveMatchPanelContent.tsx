@@ -1,6 +1,7 @@
 "use client";
 
 import { LiveMatchScoreOverlay, LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
+import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -61,9 +62,18 @@ export function LiveMatchPanelContent({
           isLive
           hideKickoff
           hidePredictionLabel={isModalLayout}
-          teamBlocksTopClass="top-1.5"
-          onHomeTeamClick={useHomeCompactLayout ? onOpenHomeLineup : undefined}
-          onAwayTeamClick={useHomeCompactLayout ? onOpenAwayLineup : undefined}
+          compactTeamColumn={useHomeCompactLayout}
+          teamBlocksTopClass={useHomeCompactLayout ? "top-0" : "top-1.5"}
+          homeFooterSlot={
+            useHomeCompactLayout ? (
+              <HomeSquadFooterLink onClick={onOpenHomeLineup} />
+            ) : undefined
+          }
+          awayFooterSlot={
+            useHomeCompactLayout ? (
+              <HomeSquadFooterLink onClick={onOpenAwayLineup} />
+            ) : undefined
+          }
           homeScoreSlot={
             !isModalLayout && liveSnapshot ? (
               <LiveScoreDisplay score={liveSnapshot.homeScore} />
