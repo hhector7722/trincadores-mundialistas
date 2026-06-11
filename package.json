@@ -30,6 +30,8 @@
     "db:seed-quiz-day": "tsx --env-file=.env.local scripts/seed-quiz-day.ts",
     "quiz:publish-day": "tsx --env-file=.env.local scripts/publish-quiz-day.ts",
     "lineup:prewarm": "tsx --env-file=.env.local scripts/prewarm-lineups.ts",
+    "live:sync": "tsx --env-file=.env.local scripts/sync-live-matches.ts",
+    "test:push": "tsx --test lib/push/urls.test.ts",
     "llm-context": "tsx scripts/generate-llm-context.ts",
     "llm-context:install-hook": "node scripts/install-llm-hook.mjs"
   },

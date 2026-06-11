@@ -3,6 +3,7 @@ import { syncConfirmedLineupNotifications } from "@/lib/notifications/confirmed-
 import { sendPredictionReminders } from "@/lib/notifications/prediction-reminders";
 import { assertCronAuthorized } from "@/lib/quiz/cron";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,9 +15,10 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
+    const siteOrigin = getSiteUrl().origin;
     const [predictionReminders, confirmedLineups] = await Promise.all([
-      sendPredictionReminders(admin),
-      syncConfirmedLineupNotifications(admin),
+      sendPredictionReminders(admin, new Date(), undefined, siteOrigin),
+      syncConfirmedLineupNotifications(admin, new Date(), siteOrigin),
     ]);
 
     return NextResponse.json({

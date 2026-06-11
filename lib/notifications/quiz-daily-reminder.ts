@@ -1,5 +1,8 @@
 import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { NOTIFICATION_KIND_QUIZ_DAILY_REMINDER } from "@/lib/notifications/kinds";
+import { quizDailyReminderNotificationUrl } from "@/lib/push/urls";
+import { sendPushToProfile } from "@/lib/push/send";
+import { isVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type OfficialQuizRow = {
@@ -18,6 +21,9 @@ export type SendQuizDailyRemindersResult = {
   skippedComplete: number;
   skippedDuplicate: number;
   skippedClosed: number;
+  pushSent: number;
+  pushSkipped: number;
+  pushFailed: number;
 };
 
 export function buildQuizDailyReminderCopy(): { title: string; body: string } {
@@ -31,7 +37,10 @@ export async function sendQuizDailyReminders(
   admin: AdminClient,
   quizDate = todayQuizDate(),
   now = new Date(),
+  siteOrigin?: string,
 ): Promise<SendQuizDailyRemindersResult> {
+  const pushEnabled = isVapidConfigured();
+  const pushUrl = quizDailyReminderNotificationUrl(siteOrigin);
   const result: SendQuizDailyRemindersResult = {
     quizDate,
     quizzesChecked: 0,
@@ -39,6 +48,9 @@ export async function sendQuizDailyReminders(
     skippedComplete: 0,
     skippedDuplicate: 0,
     skippedClosed: 0,
+    pushSent: 0,
+    pushSkipped: 0,
+    pushFailed: 0,
   };
 
   const { data: quizzes, error: quizzesError } = await admin
@@ -107,6 +119,22 @@ export async function sendQuizDailyReminders(
       }
 
       result.remindersSent += 1;
+
+      if (!pushEnabled) {
+        result.pushSkipped += 1;
+        continue;
+      }
+
+      const pushResult = await sendPushToProfile(admin, profileId, {
+        title: copy.title,
+        body: copy.body,
+        url: pushUrl,
+        tag: `${NOTIFICATION_KIND_QUIZ_DAILY_REMINDER}:${quiz.id}`,
+      });
+
+      result.pushSent += pushResult.sent;
+      result.pushSkipped += pushResult.skipped;
+      result.pushFailed += pushResult.failed;
     }
   }
 

@@ -7,6 +7,7 @@ import {
   quizDateForCron,
 } from "@/lib/quiz/cron";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await sendQuizDailyReminders(admin, quizDate);
+    const result = await sendQuizDailyReminders(admin, quizDate, new Date(), getSiteUrl().origin);
 
     return NextResponse.json({
       ok: true,

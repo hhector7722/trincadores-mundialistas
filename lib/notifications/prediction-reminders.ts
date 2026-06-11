@@ -1,4 +1,7 @@
 import { NOTIFICATION_KIND_PREDICTION_REMINDER } from "@/lib/notifications/kinds";
+import { predictionReminderNotificationUrl } from "@/lib/push/urls";
+import { sendPushToProfile } from "@/lib/push/send";
+import { isVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 export const PREDICTION_REMINDER_KIND = NOTIFICATION_KIND_PREDICTION_REMINDER;
@@ -24,6 +27,9 @@ export type SendPredictionRemindersResult = {
   remindersSent: number;
   skippedDuplicate: number;
   skippedComplete: number;
+  pushSent: number;
+  pushSkipped: number;
+  pushFailed: number;
 };
 
 /** Dispara una vez por ventana de cron, ~30 min antes del pitido. */
@@ -61,13 +67,18 @@ export async function sendPredictionReminders(
   admin: AdminClient,
   now = new Date(),
   cronIntervalMs = PREDICTION_REMINDER_CRON_INTERVAL_MS,
+  siteOrigin?: string,
 ): Promise<SendPredictionRemindersResult> {
   const nowMs = now.getTime();
+  const pushEnabled = isVapidConfigured();
   const result: SendPredictionRemindersResult = {
     matchesChecked: 0,
     remindersSent: 0,
     skippedDuplicate: 0,
     skippedComplete: 0,
+    pushSent: 0,
+    pushSkipped: 0,
+    pushFailed: 0,
   };
 
   const horizonMin = new Date(nowMs + (PREDICTION_REMINDER_MINUTES - 2) * 60 * 1000).toISOString();
@@ -157,6 +168,22 @@ export async function sendPredictionReminders(
       }
 
       result.remindersSent += 1;
+
+      if (!pushEnabled) {
+        result.pushSkipped += 1;
+        continue;
+      }
+
+      const pushResult = await sendPushToProfile(admin, profileId, {
+        title: copy.title,
+        body: copy.body,
+        url: predictionReminderNotificationUrl(match.id, siteOrigin),
+        tag: `${PREDICTION_REMINDER_KIND}:${match.id}`,
+      });
+
+      result.pushSent += pushResult.sent;
+      result.pushSkipped += pushResult.skipped;
+      result.pushFailed += pushResult.failed;
     }
   }
 
