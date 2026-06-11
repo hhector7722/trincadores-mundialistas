@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
-import type { MatchPredictionsBoard, MatchWithPrediction } from "@/lib/predictions/queries";
+import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
 type HomeNextMatchProps = {
@@ -10,7 +10,6 @@ type HomeNextMatchProps = {
   currentProfileId: string;
   liveMatch: MatchWithPrediction | null;
   nextMatch: MatchWithPrediction | null;
-  livePredictionsBoard: MatchPredictionsBoard | null;
 };
 
 type SlideItem = {
@@ -24,7 +23,6 @@ export function HomeNextMatch({
   currentProfileId,
   liveMatch,
   nextMatch,
-  livePredictionsBoard,
 }: HomeNextMatchProps) {
   const slides = useMemo(() => {
     const items: SlideItem[] = [];
@@ -65,7 +63,6 @@ export function HomeNextMatch({
             match={slide.match}
             mode={slide.mode}
             currentProfileId={currentProfileId}
-            livePredictionsBoard={slide.mode === "live" ? livePredictionsBoard : null}
           />
         </div>
       </section>
@@ -87,12 +84,11 @@ export function HomeNextMatch({
               aria-hidden={index !== activeIndex}
             >
               <HomeMatchCard
-            poolId={poolId}
-            match={slide.match}
-            mode={slide.mode}
-            currentProfileId={currentProfileId}
-            livePredictionsBoard={slide.mode === "live" ? livePredictionsBoard : null}
-          />
+                poolId={poolId}
+                match={slide.match}
+                mode={slide.mode}
+                currentProfileId={currentProfileId}
+              />
             </div>
           ))}
         </div>

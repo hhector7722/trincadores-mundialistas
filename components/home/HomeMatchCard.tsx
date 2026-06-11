@@ -32,7 +32,7 @@ import {
   mvpSnapshotFromMatch,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
-import type { MatchPredictionsBoard, MatchWithPrediction } from "@/lib/predictions/queries";
+import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
 type HomeMatchCardProps = {
@@ -40,7 +40,6 @@ type HomeMatchCardProps = {
   match: MatchWithPrediction;
   mode: "live" | "scheduled";
   currentProfileId: string;
-  livePredictionsBoard?: MatchPredictionsBoard | null;
   onOpenChange?: (open: boolean) => void;
 };
 
@@ -55,7 +54,6 @@ export function HomeMatchCard({
   match,
   mode,
   currentProfileId,
-  livePredictionsBoard = null,
   onOpenChange,
 }: HomeMatchCardProps) {
   const isLive = mode === "live";
@@ -127,40 +125,36 @@ export function HomeMatchCard({
 
   return (
     <>
-      <div className="cursor-pointer" onClick={() => openScoreModal()}>
-        <div className="relative flex items-center justify-between">
-          {isLive ? (
-            <LiveMatchHeaderLabel className="relative z-10" />
-          ) : (
-            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
-              Proximo partido
-            </p>
-          )}
-          <Link
-            href="/predictions"
-            onClick={(event) => event.stopPropagation()}
-            className="relative z-10 text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+      <div className="relative flex min-h-6 items-center justify-between">
+        {isLive ? (
+          <LiveMatchHeaderLabel className="relative z-10" />
+        ) : (
+          <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
+            Proximo partido
+          </p>
+        )}
+        <Link
+          href="/predictions"
+          className="relative z-10 text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+        >
+          Ver todos
+        </Link>
+        {isLive ? (
+          <button
+            type="button"
+            onClick={() => setPredictionsBoardOpen(true)}
+            className={cn(
+              "absolute inset-x-0 z-20 mx-auto flex min-h-12 w-max items-center justify-center",
+              "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
+              "text-[8px] transition-opacity hover:opacity-80",
+            )}
           >
-            Ver todos
-          </Link>
-          {isLive && livePredictionsBoard ? (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                setPredictionsBoardOpen(true);
-              }}
-              className={cn(
-                "absolute inset-x-0 z-20 mx-auto w-max",
-                "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
-                "text-[8px] transition-opacity hover:opacity-80",
-              )}
-            >
-              Ver pronósticos
-            </button>
-          ) : null}
-        </div>
+            Ver pronósticos
+          </button>
+        ) : null}
+      </div>
 
+      <div className="cursor-pointer" onClick={() => openScoreModal()}>
         {isLive ? (
           <LiveMatchPanelContent
             homeTeam={displayMatch.home_team}
@@ -301,11 +295,14 @@ export function HomeMatchCard({
         matchIsLive={isLive}
       />
 
-      {isLive && livePredictionsBoard ? (
+      {isLive ? (
         <MatchPredictionsBoardModal
           open={predictionsBoardOpen}
           onClose={() => setPredictionsBoardOpen(false)}
-          board={livePredictionsBoard}
+          poolId={poolId}
+          matchId={displayMatch.id}
+          homeTeam={displayMatch.home_team}
+          awayTeam={displayMatch.away_team}
           currentProfileId={currentProfileId}
         />
       ) : null}

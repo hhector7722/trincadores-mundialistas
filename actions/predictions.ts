@@ -2,12 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
-import { assertMatchInPool, fetchMatchEditableFromDb } from "@/lib/predictions/queries";
+import {
+  assertMatchInPool,
+  fetchMatchEditableFromDb,
+  getMatchPredictionsBoard,
+  type MatchPredictionsBoard,
+} from "@/lib/predictions/queries";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
 import { createClient } from "@/lib/supabase/server";
 
 export type PredictionActionResult =
   | { ok: true; home: number; away: number; updatedAt: string }
+  | { ok: false; error: string };
+
+export type MatchPredictionsBoardActionResult =
+  | { ok: true; board: MatchPredictionsBoard }
   | { ok: false; error: string };
 
 function mapPredictionDbError(message: string): string {
@@ -19,6 +28,40 @@ function mapPredictionDbError(message: string): string {
     return "Ya existe una prediccion para este partido. Recarga e intentalo de nuevo.";
   }
   return "No se pudo guardar la prediccion. Comprueba la conexion e intentalo otra vez.";
+}
+
+export async function fetchMatchPredictionsBoardAction(
+  poolId: string,
+  matchId: string
+): Promise<MatchPredictionsBoardActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesion no valida. Vuelve a iniciar sesion." };
+  }
+
+  const member = await assertPoolMembership(user.id, poolId);
+  if (!member) {
+    return { ok: false, error: "No perteneces a esta porra." };
+  }
+
+  const inPool = await assertMatchInPool(poolId, matchId);
+  if (!inPool) {
+    return { ok: false, error: "Partido no encontrado en esta porra." };
+  }
+
+  try {
+    const board = await getMatchPredictionsBoard(poolId, matchId);
+    if (!board) {
+      return { ok: false, error: "No se pudieron cargar los pronosticos del partido." };
+    }
+    return { ok: true, board };
+  } catch {
+    return { ok: false, error: "No se pudieron cargar los pronosticos. Comprueba la conexion." };
+  }
 }
 
 export async function savePrediction(
