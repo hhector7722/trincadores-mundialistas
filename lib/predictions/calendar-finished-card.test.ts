@@ -93,6 +93,9 @@ describe("resolveCalendarFinishedCard", () => {
       }),
     );
     assert.equal(state?.variant, "mvp-only");
-    assert.equal(state?.showMvpKickoffLabel, true);
+    assert.equal(state?.showPredictedInKickoffSlot, true);
+    assert.equal(state?.showMvpOnlyDoubleBorder, true);
+    assert.equal(state?.groupRowMvpLabel, true);
+    assert.equal(state?.groupRowIcon, null);
   });
 });

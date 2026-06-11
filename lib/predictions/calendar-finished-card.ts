@@ -19,9 +19,9 @@ export type CalendarFinishedCardState = {
   mvpCorrect: boolean;
   hasPrediction: boolean;
   showPredictedInKickoffSlot: boolean;
-  showMvpKickoffLabel: boolean;
   showGreenFill: boolean;
   showSignMvpDoubleBorder: boolean;
+  showMvpOnlyDoubleBorder: boolean;
   showExactScoreStyle: boolean;
   showGroupLetterBadge: boolean;
   groupRowIcon: "tick" | "cross" | null;
@@ -82,18 +82,14 @@ export function resolveCalendarFinishedCard(
     scoreOutcome,
     mvpCorrect,
     hasPrediction,
-    showPredictedInKickoffSlot: !isExact && variant !== "mvp-only",
-    showMvpKickoffLabel: variant === "mvp-only",
+    showPredictedInKickoffSlot: !isExact,
     showGreenFill: isExact,
     showSignMvpDoubleBorder: variant === "sign-mvp",
+    showMvpOnlyDoubleBorder: variant === "mvp-only",
     showExactScoreStyle: isExact,
     showGroupLetterBadge: isExact,
-    groupRowIcon:
-      variant === "sign"
-        ? "tick"
-        : variant === "miss" || variant === "mvp-only"
-          ? "cross"
-          : null,
-    groupRowMvpLabel: variant === "exact-mvp" || variant === "sign-mvp",
+    groupRowIcon: variant === "sign" ? "tick" : variant === "miss" ? "cross" : null,
+    groupRowMvpLabel:
+      variant === "exact-mvp" || variant === "sign-mvp" || variant === "mvp-only",
   };
 }

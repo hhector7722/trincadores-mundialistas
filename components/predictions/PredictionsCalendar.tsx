@@ -112,11 +112,7 @@ function CalendarMatchCard({
     : `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
 
   if (finishedState) {
-    const kickoffSlotLabel = finishedState.showMvpKickoffLabel
-      ? "MVP"
-      : finishedState.showPredictedInKickoffSlot
-        ? predictionLabel
-        : null;
+    const kickoffSlotLabel = finishedState.showPredictedInKickoffSlot ? predictionLabel : null;
 
     return (
       <button
@@ -129,6 +125,7 @@ function CalendarMatchCard({
           "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
           finishedState.showGreenFill && "tm-cal-match-card--exact",
           finishedState.showSignMvpDoubleBorder && "tm-cal-match-card--sign-mvp",
+          finishedState.showMvpOnlyDoubleBorder && "tm-cal-match-card--mvp-only",
         )}
       >
         <CalendarGroupRowBadge
@@ -139,11 +136,7 @@ function CalendarMatchCard({
         />
 
         <div className="tm-cal-match-card-body">
-          {finishedState.showMvpKickoffLabel ? (
-            <span className="tm-cal-kickoff tm-cal-outline-label tm-cal-outline-label--mvp shrink-0 w-full text-center font-bold leading-none">
-              MVP
-            </span>
-          ) : kickoffSlotLabel ? (
+          {kickoffSlotLabel ? (
             <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-[var(--tm-accent)]">
               {kickoffSlotLabel}
             </span>
