@@ -46,6 +46,7 @@ export function GeneralPredictionsRow({
         value={formatPlayerDisplay(row.topScorerPlayerName)}
       />
       <PlayerPredictionCell
+        accent
         fontSize={playerFontSize}
         value={formatPlayerDisplay(row.tournamentMvpPlayerName)}
       />
