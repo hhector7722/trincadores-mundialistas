@@ -12,7 +12,7 @@ function QuizLeaderboardHeader() {
       )}
     >
       <span className="text-left">Pos</span>
-      <span className="text-center">Trincador</span>
+      <span className="text-left">Trincador</span>
       <span className="text-center">Quiz</span>
       <span className="text-center">Fiab</span>
     </div>
