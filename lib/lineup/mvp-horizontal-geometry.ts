@@ -1,4 +1,5 @@
-import { TACTICAL_Y } from "@/lib/lineup/formation-coordinates";
+import { TACTICAL_X, TACTICAL_Y } from "@/lib/lineup/formation-coordinates";
+import { separateOverlappingSlots, type PlayableBounds } from "@/lib/lineup/field-layout";
 import type { FieldCoordinate, LineupSlot } from "@/lib/lineup/types";
 
 /**
@@ -34,8 +35,34 @@ function sourceDepth(y: number): number {
   return (SOURCE_Y_GK - y) / SOURCE_Y_SPAN;
 }
 
-function clampY(y: number): number {
-  return Math.min(PLAYABLE_Y_MAX, Math.max(PLAYABLE_Y_MIN, y));
+/** Remapea el eje lateral maestro (10–90 %) al rango vertical jugable sin colapsar posiciones. */
+export function mapLateralToPlayableY(x: number): number {
+  const clamped = Math.min(TACTICAL_X.UR, Math.max(TACTICAL_X.UL, x));
+  const t = (clamped - TACTICAL_X.UL) / (TACTICAL_X.UR - TACTICAL_X.UL);
+  return Math.round((PLAYABLE_Y_MIN + t * (PLAYABLE_Y_MAX - PLAYABLE_Y_MIN)) * 10) / 10;
+}
+
+function mvpHalfBounds(isHome: boolean): PlayableBounds {
+  return isHome
+    ? {
+        xMin: HOME_HALF_X.MIN,
+        xMax: HOME_HALF_X.MAX,
+        yMin: PLAYABLE_Y_MIN,
+        yMax: PLAYABLE_Y_MAX,
+      }
+    : {
+        xMin: AWAY_HALF_X.MIN,
+        xMax: AWAY_HALF_X.MAX,
+        yMin: PLAYABLE_Y_MIN,
+        yMax: PLAYABLE_Y_MAX,
+      };
+}
+
+function separateMvpSlots(slots: MvpHorizontalSlot[], isHome: boolean): MvpHorizontalSlot[] {
+  return separateOverlappingSlots(slots, mvpHalfBounds(isHome)).map((slot) => ({
+    ...slot,
+    scale: 1,
+  }));
 }
 
 /** Local: profundidad → eje X hacia la derecha; lateral del ancla → eje Y. */
@@ -43,7 +70,7 @@ export function compressCoordToHomeLeft(coord: FieldCoordinate): FieldCoordinate
   const depth = sourceDepth(coord.y);
   return {
     x: Math.round((HOME_HALF_X.MIN + depth * HOME_X_SPAN) * 10) / 10,
-    y: Math.round(clampY(coord.x) * 10) / 10,
+    y: mapLateralToPlayableY(coord.x),
   };
 }
 
@@ -52,7 +79,7 @@ export function compressCoordToAwayRight(coord: FieldCoordinate): FieldCoordinat
   const depth = sourceDepth(coord.y);
   return {
     x: Math.round((AWAY_HALF_X.MAX - depth * AWAY_X_SPAN) * 10) / 10,
-    y: Math.round(clampY(coord.x) * 10) / 10,
+    y: mapLateralToPlayableY(coord.x),
   };
 }
 
@@ -66,10 +93,10 @@ function mapSlotToAwayRight(slot: LineupSlot): MvpHorizontalSlot {
 
 /** Local en mitad izquierda del campo horizontal. */
 export function mapSlotsToHomeLeft(slots: LineupSlot[]): MvpHorizontalSlot[] {
-  return slots.map(mapSlotToHomeLeft);
+  return separateMvpSlots(slots.map(mapSlotToHomeLeft), true);
 }
 
 /** Visitante en mitad derecha del campo horizontal. */
 export function mapSlotsToAwayRight(slots: LineupSlot[]): MvpHorizontalSlot[] {
-  return slots.map(mapSlotToAwayRight);
+  return separateMvpSlots(slots.map(mapSlotToAwayRight), false);
 }

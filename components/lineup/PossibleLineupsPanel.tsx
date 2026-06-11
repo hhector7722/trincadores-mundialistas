@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { LineupSourceBadge } from "@/components/lineup/LineupSourceBadge";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
 import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
 import { possibleLineupsModalTitle } from "@/lib/lineup/lineups-modal-copy";
@@ -65,30 +64,7 @@ export function PossibleLineupsPanel({
   const showSourceMeta = ready && resolvedHomeLineup && resolvedAwayLineup;
 
   return (
-    <TacticalLineupsPanelShell
-      loading={!ready}
-      className="h-full min-h-0"
-      footer={
-        showSourceMeta ? (
-          <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-[var(--tm-border)] px-2 py-2">
-            <LineupSourceBadge
-              compact
-              sourceKind={resolvedHomeLineup.sourceKind}
-              formationLabel={resolvedHomeLineup.formationLabel}
-              fetchedAt={resolvedHomeLineup.fetchedAt}
-              className="w-full"
-            />
-            <LineupSourceBadge
-              compact
-              sourceKind={resolvedAwayLineup.sourceKind}
-              formationLabel={resolvedAwayLineup.formationLabel}
-              fetchedAt={resolvedAwayLineup.fetchedAt}
-              className="w-full"
-            />
-          </div>
-        ) : null
-      }
-    >
+    <TacticalLineupsPanelShell loading={!ready} className="h-full min-h-0">
       <MvpTacticalFieldBody
         awayTeam={awayTeam}
         homeTeam={homeTeam}
