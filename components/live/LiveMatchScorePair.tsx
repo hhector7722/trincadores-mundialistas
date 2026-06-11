@@ -14,7 +14,7 @@ export function LiveScoreDisplay({ score, className }: LiveScoreDisplayProps) {
         className,
       )}
     >
-      {score === 0 ? " " : score}
+      {score}
     </span>
   );
 }
@@ -28,7 +28,7 @@ type LiveMatchScoreOverlayProps = {
 };
 
 function formatLiveGoal(value: number): string {
-  return value === 0 ? " " : String(value);
+  return String(value);
 }
 
 /** Marcador en vivo posicionado entre bandera y centro (misma lógica que FinishedMatchScoreRow). */
