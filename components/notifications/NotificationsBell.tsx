@@ -7,7 +7,8 @@ import { Bell, Check, Loader2 } from "lucide-react";
 import { NotificationCountBadge } from "@/components/notifications/NotificationCountBadge";
 import { useUnreadNotifications } from "@/components/notifications/UnreadNotificationsContext";
 import { formatNotificationDateTimeLine } from "@/lib/notifications/format";
-import { notificationNavigationPath } from "@/lib/notifications/notification-navigation";
+import { useQuizActiveNotificationModal } from "@/components/notifications/QuizActiveNotificationProvider";
+import { resolveNotificationAction } from "@/lib/notifications/notification-action";
 import type { NotificationRow } from "@/lib/notifications/types";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +90,7 @@ export function NotificationsBell() {
   const router = useRouter();
   const pathname = usePathname();
   const { profileId, unreadCount, items, loading, refresh, supabase } = useUnreadNotifications();
+  const { openQuizActiveModal } = useQuizActiveNotificationModal();
   const [open, setOpen] = useState(false);
   const [portalMounted, setPortalMounted] = useState(false);
   const [clearingAll, setClearingAll] = useState(false);
@@ -167,12 +169,15 @@ export function NotificationsBell() {
     async (row: NotificationRow) => {
       await markRead(row.id);
       setOpen(false);
-      const target = notificationNavigationPath(row);
-      if (target) {
-        router.push(target);
+      const action = resolveNotificationAction(row);
+      if (!action) return;
+      if (action.type === "quiz-active-modal") {
+        openQuizActiveModal();
+        return;
       }
+      router.push(action.path);
     },
-    [markRead, router],
+    [markRead, openQuizActiveModal, router],
   );
 
   const clearAll = useCallback(async () => {

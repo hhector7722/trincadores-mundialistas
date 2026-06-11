@@ -16,6 +16,7 @@ const CRON_PATH = "/api/cron";
 
 const PUBLIC_PATHS = [
   "/manifest.webmanifest",
+  "/sw.js",
   "/icon",
   "/apple-icon",
   "/app-icon",
