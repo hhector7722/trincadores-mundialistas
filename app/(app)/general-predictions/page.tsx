@@ -15,7 +15,7 @@ export default async function GeneralPredictionsPage() {
   const rows = await getPoolTournamentGeneralPredictionsBoard(ctx.activePoolId);
 
   return (
-    <div className="tm-ranking-page">
+    <div className="tm-general-predictions-page tm-ranking-page">
       <GeneralPredictionsTable rows={rows} currentProfileId={user!.id} />
     </div>
   );

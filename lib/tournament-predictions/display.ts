@@ -20,12 +20,25 @@ export function formatFinalistsDisplay(
   return `${teamAbbr(teamA)} · ${teamAbbr(teamB)}`;
 }
 
+export function formatFinalistsDisplayFull(
+  teamA: string | null,
+  teamB: string | null
+): string | null {
+  if (!teamA || !teamB) return null;
+  return `${teamNameEs(teamA)} · ${teamNameEs(teamB)}`;
+}
+
 export function formatPlayerDisplay(
   playerName: string | null,
   _teamName?: string | null
 ): string | null {
   if (!playerName) return null;
   return shirtPlayerName(playerName);
+}
+
+export function formatPlayerDisplayFull(playerName: string | null): string | null {
+  if (!playerName) return null;
+  return playerName.trim();
 }
 
 export function hasFinalists(predictions: TournamentGeneralPredictions): boolean {

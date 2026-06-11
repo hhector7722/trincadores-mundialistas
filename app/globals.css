@@ -1221,6 +1221,14 @@ html:has(.tm-app-frame) {
   line-height: 1.2;
 }
 
+.tm-general-predictions-page {
+  padding: 0.125rem 0.25rem 0;
+}
+
+.tm-general-predictions-table .tm-ranking-row {
+  align-content: center;
+}
+
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
   box-sizing: border-box;

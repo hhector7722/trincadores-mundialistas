@@ -12,6 +12,8 @@ type Props = {
   nameClassName?: string;
   /** Si false, el nombre no se trunca y la columna se ajusta al texto. */
   truncateName?: boolean;
+  /** Permite salto de línea en el nombre dentro del ancho de columna. */
+  wrapName?: boolean;
   /** Evita navegacion del contenedor padre (p. ej. Link del home). */
   stopNavigation?: boolean;
 };
@@ -22,6 +24,7 @@ export function RankingMemberCells({
   size,
   nameClassName,
   truncateName = true,
+  wrapName = false,
   stopNavigation = false,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -40,8 +43,8 @@ export function RankingMemberCells({
     <>
       <div
         className={cn(
-          "flex items-center gap-2.5",
-          truncateName ? "min-w-0" : "w-max"
+          "flex min-w-0 items-center gap-2.5",
+          truncateName || wrapName ? "flex-1" : "w-max"
         )}
       >
         <button
@@ -62,7 +65,9 @@ export function RankingMemberCells({
           onClick={onActivate}
           className={cn(
             "text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tm-purple-deep)] disabled:cursor-default",
-            truncateName ? "min-w-0 flex-1 truncate" : "whitespace-nowrap",
+            truncateName && !wrapName && "min-w-0 flex-1 truncate",
+            wrapName && "min-w-0 flex-1 break-words leading-snug",
+            !truncateName && !wrapName && "whitespace-nowrap",
             canPreview && "cursor-pointer hover:opacity-80 active:opacity-70",
             nameClassName
           )}
