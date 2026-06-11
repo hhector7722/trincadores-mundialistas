@@ -1,6 +1,6 @@
 "use client";
 
-import { LiveMatchScorePair } from "@/components/live/LiveMatchScorePair";
+import { LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -24,6 +24,8 @@ type LiveMatchPanelContentProps = {
   onOpenAwayLineup: () => void;
   onOpenLineups: () => void;
   className?: string;
+  /** Modal pronóstico: banderas 10/90 y marcador 34/66; card inicio: 15/85 y 32.5/67.5. */
+  teamsLayout?: "default" | "predictionModal";
 };
 
 export function LiveMatchPanelContent({
@@ -40,15 +42,13 @@ export function LiveMatchPanelContent({
   onOpenAwayLineup,
   onOpenLineups,
   className,
+  teamsLayout = "default",
 }: LiveMatchPanelContentProps) {
   return (
     <div className={className}>
       <div className={teamsBlockClassName}>
-        {liveSnapshot ? (
-          <LiveMatchScorePair homeScore={liveSnapshot.homeScore} awayScore={liveSnapshot.awayScore} />
-        ) : null}
-
         <MatchTeamsDisplay
+          layout={teamsLayout}
           homeTeam={homeTeam}
           awayTeam={awayTeam}
           kickoffAt=""
@@ -58,6 +58,12 @@ export function LiveMatchPanelContent({
           onHomeTeamClick={onOpenHomeLineup}
           onAwayTeamClick={onOpenAwayLineup}
           centerSlotAlign="teamNames"
+          homeScoreSlot={
+            liveSnapshot ? <LiveScoreDisplay score={liveSnapshot.homeScore} /> : undefined
+          }
+          awayScoreSlot={
+            liveSnapshot ? <LiveScoreDisplay score={liveSnapshot.awayScore} /> : undefined
+          }
           centerSlot={
             predictionScoreText ? (
               <p className="text-center font-display text-sm font-semibold normal-case tabular-nums text-[var(--tm-accent)]">

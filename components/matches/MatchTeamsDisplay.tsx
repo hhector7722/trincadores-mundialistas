@@ -196,6 +196,19 @@ export function MatchTeamsDisplay({
           />
           <TeamNameLabel name={awayTeam} />
         </div>
+
+        {centerSlot ? (
+          <div
+            className={cn(
+              "absolute left-1/2 -translate-x-1/2",
+              centerSlotAlign === "teamNames"
+                ? "top-[calc(1.15rem+2.5rem+0.25rem+0.625rem)] sm:top-[calc(1.15rem+2.75rem+0.25rem+0.625rem)]"
+                : "top-[1.15rem]",
+            )}
+          >
+            {centerSlot}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -222,6 +235,28 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
         </div>
+
+        {homeScoreSlot ? (
+          <div
+            className={cn(
+              "absolute left-[32.5%] flex h-10 -translate-x-1/2 items-center sm:h-11",
+              teamBlocksTopClass,
+            )}
+          >
+            {homeScoreSlot}
+          </div>
+        ) : null}
+
+        {awayScoreSlot ? (
+          <div
+            className={cn(
+              "absolute left-[67.5%] flex h-10 -translate-x-1/2 items-center sm:h-11",
+              teamBlocksTopClass,
+            )}
+          >
+            {awayScoreSlot}
+          </div>
+        ) : null}
 
         <div
           className={cn(

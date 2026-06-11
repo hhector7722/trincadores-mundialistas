@@ -588,6 +588,7 @@ export function QuickPredictionModal({
               homeTeam={targetMatch.home_team}
               awayTeam={targetMatch.away_team}
               liveSnapshot={liveSnapshot}
+              teamsLayout="predictionModal"
               predictionScoreText={
                 targetMatch.prediction?.home_goals != null ? predictionScoreText : null
               }
