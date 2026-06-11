@@ -49,23 +49,30 @@ export const HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS = `min-h-[calc(1.5rem+0.5rem+8.
 function TeamFlagCircle({
   name,
   placeholderStyle,
+  size = "lg",
 }: {
   name: string;
   placeholderStyle?: "default" | "knockout";
+  size?: "sm" | "md" | "lg";
 }) {
   return (
     <TeamFlagBadge
       name={name}
-      size="lg"
+      size={size}
       loading="eager"
       placeholderStyle={placeholderStyle}
     />
   );
 }
 
-function TeamNameLabel({ name }: { name: string }) {
+function TeamNameLabel({ name, compact }: { name: string; compact?: boolean }) {
   return (
-    <p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-[var(--tm-fg)] sm:text-xs">
+    <p
+      className={cn(
+        "whitespace-nowrap text-center font-semibold leading-tight text-[var(--tm-fg)]",
+        compact ? "text-[9px]" : "text-[10px] sm:text-xs",
+      )}
+    >
       {teamNameEs(name)}
     </p>
   );
@@ -101,14 +108,36 @@ function TeamFlagButton({
   );
 }
 
-function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
+function TeamBlock({
+  name,
+  onClick,
+  footerSlot,
+  flagSize = "lg",
+  compactName = false,
+}: {
+  name: string;
+  onClick?: () => void;
+  footerSlot?: ReactNode;
+  flagSize?: "sm" | "md" | "lg";
+  compactName?: boolean;
+}) {
   const displayName = teamNameEs(name);
+
+  if (footerSlot) {
+    return (
+      <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
+        <TeamFlagCircle name={name} size={flagSize} />
+        <TeamNameLabel name={name} compact={compactName} />
+        {footerSlot}
+      </div>
+    );
+  }
 
   if (!onClick) {
     return (
       <div className="inline-flex w-max flex-col items-center gap-1">
-        <TeamFlagCircle name={name} />
-        <TeamNameLabel name={name} />
+        <TeamFlagCircle name={name} size={flagSize} />
+        <TeamNameLabel name={name} compact={compactName} />
       </div>
     );
   }
@@ -123,8 +152,8 @@ function TeamBlock({ name, onClick }: { name: string; onClick?: () => void }) {
       className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} />
-      <TeamNameLabel name={name} />
+      <TeamFlagCircle name={name} size={flagSize} />
+      <TeamNameLabel name={name} compact={compactName} />
     </button>
   );
 }
@@ -151,6 +180,12 @@ type MatchTeamsDisplayProps = {
   awayScoreSlot?: ReactNode;
   /** Desplazamiento vertical solo de bandera + nombre (p. ej. card inicio). */
   teamBlocksTopClass?: string;
+  /** Enlace «Plantilla» bajo el nombre local. */
+  homeFooterSlot?: ReactNode;
+  /** Enlace «Plantilla» bajo el nombre visitante. */
+  awayFooterSlot?: ReactNode;
+  /** Bandera más compacta (card inicio con plantilla bajo el nombre). */
+  compactTeamColumn?: boolean;
   onHomeTeamClick?: () => void;
   onAwayTeamClick?: () => void;
 };
@@ -175,10 +210,15 @@ export function MatchTeamsDisplay({
   onHomeTeamClick,
   onAwayTeamClick,
   teamBlocksTopClass,
+  homeFooterSlot,
+  awayFooterSlot,
+  compactTeamColumn = false,
 }: MatchTeamsDisplayProps) {
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
   const awayAnchor = isPredictionModal ? "90%" : "85%";
+  const teamFlagSize = compactTeamColumn ? "sm" : "lg";
+  const teamColumnCompact = compactTeamColumn || Boolean(homeFooterSlot || awayFooterSlot);
 
   if (isPredictionModal) {
     return (
@@ -248,14 +288,26 @@ export function MatchTeamsDisplay({
           className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
           style={{ left: homeAnchor }}
         >
-          <TeamBlock name={homeTeam} onClick={onHomeTeamClick} />
+          <TeamBlock
+            name={homeTeam}
+            onClick={homeFooterSlot ? undefined : onHomeTeamClick}
+            footerSlot={homeFooterSlot}
+            flagSize={teamFlagSize}
+            compactName={teamColumnCompact}
+          />
         </div>
 
         <div
           className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
           style={{ left: awayAnchor }}
         >
-          <TeamBlock name={awayTeam} onClick={onAwayTeamClick} />
+          <TeamBlock
+            name={awayTeam}
+            onClick={awayFooterSlot ? undefined : onAwayTeamClick}
+            footerSlot={awayFooterSlot}
+            flagSize={teamFlagSize}
+            compactName={teamColumnCompact}
+          />
         </div>
 
         {homeScoreSlot ? (

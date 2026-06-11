@@ -1,6 +1,7 @@
 "use client";
 
 import { LiveMatchScoreOverlay, LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
+import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -48,6 +49,7 @@ export function LiveMatchPanelContent({
   const isModalLayout = teamsLayout === "predictionModal";
   const actionsHomeAnchor = isModalLayout ? "10%" : "15%";
   const actionsAwayAnchor = isModalLayout ? "90%" : "85%";
+  const useHomeCompactLayout = !isModalLayout;
 
   return (
     <div className={className}>
@@ -60,10 +62,18 @@ export function LiveMatchPanelContent({
           isLive
           hideKickoff
           hidePredictionLabel={isModalLayout}
-          teamBlocksTopClass="top-1.5"
-          onHomeTeamClick={onOpenHomeLineup}
-          onAwayTeamClick={onOpenAwayLineup}
-          centerSlotAlign="teamNames"
+          compactTeamColumn={useHomeCompactLayout}
+          teamBlocksTopClass={useHomeCompactLayout ? "top-0" : "top-1.5"}
+          homeFooterSlot={
+            useHomeCompactLayout ? (
+              <HomeSquadFooterLink onClick={onOpenHomeLineup} />
+            ) : undefined
+          }
+          awayFooterSlot={
+            useHomeCompactLayout ? (
+              <HomeSquadFooterLink onClick={onOpenAwayLineup} />
+            ) : undefined
+          }
           homeScoreSlot={
             !isModalLayout && liveSnapshot ? (
               <LiveScoreDisplay score={liveSnapshot.homeScore} />
@@ -75,23 +85,18 @@ export function LiveMatchPanelContent({
             ) : undefined
           }
           centerSlot={
-            predictionScoreText ? (
-              isModalLayout ? (
-                <div className="inline-block text-center">
-                  <p className="text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                    Mi pronóstico
-                  </p>
-                  <p className="font-display text-sm font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
-                    {predictionScoreText}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-center font-display text-sm font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
+            isModalLayout && predictionScoreText ? (
+              <div className="inline-block text-center">
+                <p className="text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                  Mi pronóstico
+                </p>
+                <p className="font-display text-sm font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
                   {predictionScoreText}
                 </p>
-              )
+              </div>
             ) : null
           }
+          centerSlotAlign={isModalLayout ? "teamNames" : undefined}
         />
 
         {isModalLayout && liveSnapshot ? (
@@ -108,7 +113,7 @@ export function LiveMatchPanelContent({
         >
           <MatchContextActionsRow
             compact
-            layout="homeCardStacked"
+            layout={useHomeCompactLayout ? "homeCardCompactStacked" : "homeCardStacked"}
             homeAnchor={actionsHomeAnchor}
             awayAnchor={actionsAwayAnchor}
             className="h-full"
@@ -121,6 +126,13 @@ export function LiveMatchPanelContent({
                   readOnly
                   className="w-full"
                 />
+              ) : null
+            }
+            predictionSlot={
+              useHomeCompactLayout && predictionScoreText ? (
+                <p className="text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
+                  {predictionScoreText}
+                </p>
               ) : null
             }
             onOpenHomeLineup={onOpenHomeLineup}

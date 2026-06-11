@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
+import { cn } from "@/lib/utils";
 
 type MatchContextActionsRowProps = {
   onOpenHomeLineup: () => void;
@@ -12,9 +13,11 @@ type MatchContextActionsRowProps = {
   /** Sin etiquetas grises ni borde superior. */
   compact?: boolean;
   /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
-  layout?: "grid" | "teamAnchors" | "predictionModalStacked" | "homeCardStacked";
+  layout?: "grid" | "teamAnchors" | "predictionModalStacked" | "homeCardStacked" | "homeCardCompactStacked";
   /** Centro de la fila superior (p. ej. MVP en card inicio). */
   centerSlot?: ReactNode;
+  /** Fila central: pronóstico de marcador (entre MVP y alineaciones). */
+  predictionSlot?: ReactNode;
   /** Ancla horizontal de plantilla local (debe coincidir con `MatchTeamsDisplay`). */
   homeAnchor?: string;
   /** Ancla horizontal de plantilla visitante. */
@@ -33,8 +36,26 @@ export function MatchContextActionsRow({
   homeAnchor = "10%",
   awayAnchor = "90%",
   centerSlot,
+  predictionSlot,
   className,
 }: MatchContextActionsRowProps) {
+  if (layout === "homeCardCompactStacked") {
+    return (
+      <div className={cn("grid h-full grid-rows-3", className)}>
+        <div className="flex min-h-0 items-center justify-center px-1">{centerSlot}</div>
+        <div className="flex min-h-0 items-center justify-center px-1">{predictionSlot}</div>
+        <div className="flex min-h-0 items-center justify-center px-1">
+          <MatchContextActionButton
+            caption={possibleLineupsCaption}
+            hideCaption={compact}
+            showConfirmedBadge={possibleLineupsConfirmed}
+            onClick={onOpenPossibleLineups}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (layout === "homeCardStacked") {
     return (
       <div className={className}>

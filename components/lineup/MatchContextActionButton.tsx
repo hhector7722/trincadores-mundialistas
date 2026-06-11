@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { ConfirmedLineupCheckIcon } from "@/components/lineup/ConfirmedLineupCheckIcon";
 import { cn } from "@/lib/utils";
@@ -50,6 +50,29 @@ export function MatchContextTextActionButton({
     >
       <span className={cn("inline-flex items-center justify-center gap-1", MATCH_CONTEXT_ACTION_TEXT_CLASS)}>
         {children}
+      </span>
+    </button>
+  );
+}
+
+/** Enlace «Plantilla» bajo el nombre de selección en la card inicio. */
+export function HomeSquadFooterLink({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className={MATCH_CONTEXT_ACTION_BUTTON_CLASS}
+    >
+      <span
+        className={cn(
+          "inline-flex items-center justify-center gap-1 text-[9px] leading-none",
+          MATCH_CONTEXT_ACTION_TEXT_CLASS,
+        )}
+      >
+        Plantilla
       </span>
     </button>
   );

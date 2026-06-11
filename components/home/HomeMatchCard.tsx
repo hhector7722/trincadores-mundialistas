@@ -14,6 +14,7 @@ import {
 } from "@/components/lineup/EntityModalController";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
+import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
   HOME_CARD_HEADER_CLASS,
@@ -184,62 +185,21 @@ export function HomeMatchCard({
             awayTeam={displayMatch.away_team}
             kickoffAt={displayMatch.kickoff_at}
             isLive={false}
-            teamBlocksTopClass="top-1.5"
-            onHomeTeamClick={() =>
-              openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+            compactTeamColumn
+            teamBlocksTopClass="top-0"
+            homeFooterSlot={
+              <HomeSquadFooterLink
+                onClick={() =>
+                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+                }
+              />
             }
-            onAwayTeamClick={() =>
-              openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-            }
-            centerSlotAlign={saved ? "teamNames" : "teamNames"}
-            centerSlot={
-              saved ? (
-                <div className="inline-block">
-                  <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                    Mi pronóstico
-                  </p>
-                  <div className="relative w-0 min-w-full">
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openScoreModal();
-                      }}
-                      className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                    >
-                      {scoreText}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openScoreModal();
-                      }}
-                      aria-label="Editar pronóstico"
-                      className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                    >
-                      <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    openScoreModal();
-                  }}
-                  className={cn(
-                    "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                    "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
-                    "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                    "transition-opacity hover:opacity-90 active:opacity-80",
-                  )}
-                >
-                  <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                  Añadir
-                </button>
-              )
+            awayFooterSlot={
+              <HomeSquadFooterLink
+                onClick={() =>
+                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+                }
+              />
             }
           />
 
@@ -252,7 +212,7 @@ export function HomeMatchCard({
           >
             <MatchContextActionsRow
               compact
-              layout="homeCardStacked"
+              layout="homeCardCompactStacked"
               homeAnchor="15%"
               awayAnchor="85%"
               className="h-full"
@@ -263,6 +223,55 @@ export function HomeMatchCard({
                   variant="compact"
                   className="w-full"
                 />
+              }
+              predictionSlot={
+                saved ? (
+                  <div className="inline-block">
+                    <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
+                      Mi pronóstico
+                    </p>
+                    <div className="relative w-0 min-w-full">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openScoreModal();
+                        }}
+                        className="block w-full text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      >
+                        {scoreText}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openScoreModal();
+                        }}
+                        aria-label="Editar pronóstico"
+                        className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      >
+                        <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openScoreModal();
+                    }}
+                    className={cn(
+                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+                      "transition-opacity hover:opacity-90 active:opacity-80",
+                    )}
+                  >
+                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                    Añadir
+                  </button>
+                )
               }
               onOpenHomeLineup={() =>
                 openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
