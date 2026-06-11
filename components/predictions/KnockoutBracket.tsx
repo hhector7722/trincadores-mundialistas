@@ -25,6 +25,7 @@ import {
   buildKnockoutMatchMap,
   placeholderPairForMatchNumber,
   resolveBracketMatch,
+  type BracketRoundKey,
 } from "@/lib/predictions/knockout-bracket-layout";
 import { isPlaceholderTeam } from "@/lib/openfootball/slug";
 import {
@@ -59,6 +60,17 @@ function teamSlotLayouts(geom: BracketMatchGeometry): {
     home: { x: geom.homeX ?? geom.columnX, y: geom.homeY },
     away: { x: geom.awayX ?? geom.columnX, y: geom.awayY },
   };
+}
+
+/** Solo dieciseisavos muestran placeholders (2A, 3º…); rondas posteriores quedan vacías hasta equipo real. */
+function bracketSlotTeamName(
+  raw: string | undefined | null,
+  round: BracketRoundKey
+): string {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed) return " ";
+  if (round !== "r32" && isPlaceholderTeam(trimmed)) return " ";
+  return trimmed;
 }
 
 function BracketTeamOrb({
@@ -105,9 +117,10 @@ function BracketMatchNode({
   match: MatchWithPrediction | null;
   onOpen: (match: MatchWithPrediction) => void;
 }) {
-  const fallback = placeholderPairForMatchNumber(geom.matchNumber);
-  const homeName = match?.home_team ?? fallback?.home ?? " ";
-  const awayName = match?.away_team ?? fallback?.away ?? " ";
+  const fallback =
+    geom.round === "r32" ? placeholderPairForMatchNumber(geom.matchNumber) : null;
+  const homeName = bracketSlotTeamName(match?.home_team ?? fallback?.home, geom.round);
+  const awayName = bracketSlotTeamName(match?.away_team ?? fallback?.away, geom.round);
   const savedHome = match?.prediction?.home_goals ?? null;
   const savedAway = match?.prediction?.away_goals ?? null;
   const state = match
@@ -157,9 +170,9 @@ function BracketMatchNode({
         onClick={() => match && onOpen(match)}
         aria-label={
           match
-            ? `Pronostico ${homeName} contra ${awayName}${
-                scoreSummary.trim() ? `, ${scoreSummary}` : ""
-              }`
+            ? `Pronostico ${homeName.trim() || "pendiente"} contra ${
+                awayName.trim() || "pendiente"
+              }${scoreSummary.trim() ? `, ${scoreSummary}` : ""}`
             : `Partido ${geom.matchNumber} sin datos`
         }
       />
