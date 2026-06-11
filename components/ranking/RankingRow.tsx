@@ -1,6 +1,7 @@
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -33,14 +34,14 @@ export function RankingRow({
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
-      <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
+      <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
-      <span className="shrink-0 text-[10px] tabular-nums text-[var(--tm-muted)]">
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]">
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
-      <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
-        {formatAggregateStat(row.quizPoints)}
+      <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
+        {formatQuizScore(row.quizPoints, row.hasQuizParticipated)}
       </span>
     </div>
   );

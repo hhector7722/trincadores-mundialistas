@@ -14,11 +14,11 @@ function RankingTableHeader() {
       )}
     >
       <span aria-hidden="true" />
-      <span>Pos</span>
-      <span className="text-center">Trincador</span>
-      <span className="text-right">Pts</span>
-      <span className="text-right">Fiab</span>
-      <span className="text-right">Quiz</span>
+      <span className="text-left">Pos</span>
+      <span className="text-left">Trincador</span>
+      <span className="text-center">Pts</span>
+      <span className="text-center">Fiab</span>
+      <span className="text-center">Quiz</span>
     </div>
   );
 }

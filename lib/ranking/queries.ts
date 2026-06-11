@@ -25,6 +25,7 @@ export type LeaderboardRow = {
   matchPoints: number;
   generalPoints: number;
   quizPoints: number;
+  hasQuizParticipated: boolean;
   quizFinalBonus: number;
   reliabilityPct: number | null;
 };
@@ -186,7 +187,14 @@ async function loadResolvedPredictionStats(
   return stats;
 }
 
-async function loadQuizPointsByProfile(poolId: string): Promise<Map<string, number>> {
+type QuizProfileStats = {
+  points: number;
+  hasParticipated: boolean;
+};
+
+async function loadQuizStatsByProfile(
+  poolId: string
+): Promise<Map<string, QuizProfileStats>> {
   const supabase = await createClient();
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
@@ -206,13 +214,16 @@ async function loadQuizPointsByProfile(poolId: string): Promise<Map<string, numb
 
   if (scoreError) throw new Error(scoreError.message);
 
-  const totals = new Map<string, number>();
+  const stats = new Map<string, QuizProfileStats>();
   for (const row of scores ?? []) {
     const profileId = row.profile_id as string;
-    totals.set(profileId, (totals.get(profileId) ?? 0) + ((row.best_score as number) ?? 0));
+    const current = stats.get(profileId) ?? { points: 0, hasParticipated: false };
+    current.points += (row.best_score as number) ?? 0;
+    current.hasParticipated = true;
+    stats.set(profileId, current);
   }
 
-  return totals;
+  return stats;
 }
 
 async function loadScoresForMatchday(
@@ -287,7 +298,7 @@ function buildLeaderboardRows(
   scores: Map<string, ScoreRow>,
   reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
   generalPoints: Map<string, number>,
-  quizPoints: Map<string, number>,
+  quizStats: Map<string, QuizProfileStats>,
   quizFinalBonus: Map<string, number>,
   previousPositions: Map<string, number> | null
 ): Omit<LeaderboardRow, "position">[] {
@@ -297,6 +308,7 @@ function buildLeaderboardRows(
     const general = generalPoints.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
     const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
+    const quiz = quizStats.get(m.profileId);
     return {
       profileId: m.profileId,
       label: m.label,
@@ -307,7 +319,8 @@ function buildLeaderboardRows(
       signHits: s?.sign_hits ?? 0,
       matchPoints: s?.match_points ?? 0,
       generalPoints: general,
-      quizPoints: quizPoints.get(m.profileId) ?? 0,
+      quizPoints: quiz?.points ?? 0,
+      hasQuizParticipated: quiz?.hasParticipated ?? false,
       quizFinalBonus: quizBonus,
       reliabilityPct: computeReliabilityPct(
         rel?.resolvedCount ?? 0,
@@ -340,7 +353,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     return { matchday, rows: [] };
   }
 
-  const [scores, previousScores, reliability, generalScoreRows, quizPoints, quizFinalBonus] =
+  const [scores, previousScores, reliability, generalScoreRows, quizStats, quizFinalBonus] =
     await Promise.all([
       matchday
         ? loadScoresForMatchday(poolId, matchday.id)
@@ -350,7 +363,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
         : Promise.resolve(new Map<string, ScoreRow>()),
       loadResolvedPredictionStats(poolId),
       loadTournamentGeneralScoresByProfile(poolId),
-      loadQuizPointsByProfile(poolId),
+      loadQuizStatsByProfile(poolId),
       loadQuizFinalRankingBonusesByProfile(poolId),
     ]);
 
@@ -364,7 +377,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     scores,
     reliability,
     generalPoints,
-    quizPoints,
+    quizStats,
     quizFinalBonus,
     previousPositions
   );
