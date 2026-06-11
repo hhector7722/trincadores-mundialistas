@@ -52,7 +52,7 @@ export function useGeneralPredictionsFontSizes(
       row.tournamentMvpPlayerName,
       row.goldenGlovePlayerName,
     ]);
-    return values.reduce(
+    return values.reduce<string>(
       (max, value) => {
         const trimmed = value?.trim() ?? "";
         return trimmed.length > max.length ? trimmed : max;
