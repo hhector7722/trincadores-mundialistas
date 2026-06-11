@@ -1,6 +1,7 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { HomeViewportShell } from "@/components/home/HomeViewportShell";
+import { getLatestMatchHighlightForPool } from "@/lib/highlights/queries";
 import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
@@ -20,13 +21,15 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [matches, pending, leaderboard, quizHub, generalPredictionsBundle] = await Promise.all([
-    getPoolMatches(ctx.activePoolId),
-    countPendingPredictions(ctx.activePoolId, user!.id),
-    getPoolLeaderboard(ctx.activePoolId),
-    getQuizDayHub(ctx.activePoolId, user!.id),
-    getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
-  ]);
+  const [matches, pending, leaderboard, quizHub, generalPredictionsBundle, lastMatchHighlight] =
+    await Promise.all([
+      getPoolMatches(ctx.activePoolId),
+      countPendingPredictions(ctx.activePoolId, user!.id),
+      getPoolLeaderboard(ctx.activePoolId),
+      getQuizDayHub(ctx.activePoolId, user!.id),
+      getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
+      getLatestMatchHighlightForPool(ctx.activePoolId),
+    ]);
 
   const quizSlide = homeQuizSlideFromHub(quizHub);
 
@@ -48,7 +51,13 @@ export default async function HomePage() {
 
   return (
     <HomeViewportShell
-      hero={<HomeHero pendingCount={pending} quizSlide={quizSlide} />}
+      hero={
+        <HomeHero
+          pendingCount={pending}
+          quizSlide={quizSlide}
+          lastMatchHighlight={lastMatchHighlight}
+        />
+      }
       body={
         <HomeStandingCard
           leaderboardRows={leaderboard.rows}

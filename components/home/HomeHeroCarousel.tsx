@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
+import type { MatchHighlightView } from "@/lib/highlights/types";
 import type { HomeQuizSlide } from "@/lib/quiz/home-teaser";
 import { cn } from "@/lib/utils";
 
@@ -13,20 +15,45 @@ type SlideCta = {
 type Slide = {
   id: string;
   eyebrow: string;
-  headline: React.ReactNode;
-  description: string;
+  headline?: React.ReactNode;
+  description?: string;
   cta?: SlideCta;
+  customBody?: React.ReactNode;
 };
 
 type HomeHeroCarouselProps = {
   pendingCount: number;
   quizSlide: HomeQuizSlide | null;
+  lastMatchHighlight: MatchHighlightView | null;
 };
 
-function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Slide[] {
+function buildSlides(
+  pendingCount: number,
+  quizSlide: HomeQuizSlide | null,
+  lastMatchHighlight: MatchHighlightView | null,
+): Slide[] {
   const pendingDisplay = pendingCount > 0 ? String(pendingCount) : " ";
 
-  const slides: Slide[] = [
+  const slides: Slide[] = [];
+
+  if (lastMatchHighlight) {
+    slides.push({
+      id: "last-match-highlight",
+      eyebrow: "Último partido",
+      customBody: (
+        <MatchHighlightBlock
+          variant="hero"
+          homeTeam={lastMatchHighlight.homeTeam}
+          awayTeam={lastMatchHighlight.awayTeam}
+          homeGoals={lastMatchHighlight.homeGoals}
+          awayGoals={lastMatchHighlight.awayGoals}
+          youtubeVideoId={lastMatchHighlight.youtubeVideoId}
+        />
+      ),
+    });
+  }
+
+  slides.push(
     {
       id: "mundial",
       eyebrow: "Mundial 2026",
@@ -52,7 +79,7 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
       description: "Se cierran 5 min antes de que sonría la redonda",
       cta: { label: "Mis pronósticos", href: "/predictions" },
     },
-  ];
+  );
 
   if (quizSlide) {
     const training = quizSlide.scoringMode === "training" || !quizSlide.competitive;
@@ -84,8 +111,12 @@ function buildSlides(pendingCount: number, quizSlide: HomeQuizSlide | null): Sli
   return slides;
 }
 
-export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselProps) {
-  const slides = buildSlides(pendingCount, quizSlide);
+export function HomeHeroCarousel({
+  pendingCount,
+  quizSlide,
+  lastMatchHighlight,
+}: HomeHeroCarouselProps) {
+  const slides = buildSlides(pendingCount, quizSlide, lastMatchHighlight);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -128,10 +159,18 @@ export function HomeHeroCarousel({ pendingCount, quizSlide }: HomeHeroCarouselPr
               <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
                 {slide.eyebrow}
               </p>
-              {slide.headline}
-              <p className="mt-1.5 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
-                {slide.description}
-              </p>
+              {slide.customBody ? (
+                slide.customBody
+              ) : (
+                <>
+                  {slide.headline}
+                  {slide.description ? (
+                    <p className="mt-1.5 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
+                      {slide.description}
+                    </p>
+                  ) : null}
+                </>
+              )}
               {slide.cta && (
                 <Link
                   href={slide.cta.href}

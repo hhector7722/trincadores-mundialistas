@@ -15,6 +15,8 @@
     "db:map-api-football-fixtures": "tsx --env-file=.env.local scripts/map-api-football-fixtures.ts",
     "db:map-bsd-fixtures": "tsx --env-file=.env.local scripts/map-bsd-fixtures.ts",
     "test:quiz": "tsx --test lib/quiz/date.test.ts lib/quiz/options.test.ts lib/quiz/seed-day.test.ts lib/quiz/facts.test.ts lib/quiz/distractors.test.ts lib/quiz/generate-question.test.ts lib/quiz/generate-day.test.ts lib/quiz/worldcup-facts-source.test.ts lib/quiz/quiz-facts-repository.test.ts lib/quiz/slot-status.test.ts lib/quiz/play-flow.test.ts lib/quiz/quality.test.ts lib/quiz/cron.test.ts lib/quiz/intro-countdown.test.ts",
+    "test:youtube": "tsx --test lib/youtube/match-video.test.ts",
+    "youtube:sync": "tsx --env-file=.env.local scripts/sync-youtube-highlights.ts",
     "test:pwa": "tsx --test lib/pwa/standalone.test.ts lib/pwa/onboarding-access-codes.test.ts lib/pwa/onboarding-phones.test.ts lib/pwa/app-update.test.ts lib/avatars/presets.test.ts lib/text/normalize-alias.test.ts lib/auth/onboarding-device.test.ts",
     "quiz:generate-day": "tsx --env-file=.env.local scripts/generate-quiz-day.ts",
     "db:purge-demo": "tsx --env-file=.env.local scripts/purge-demo-data.ts",
