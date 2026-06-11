@@ -3,7 +3,7 @@ import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
 import { QuizActiveNotificationProvider } from "@/components/notifications/QuizActiveNotificationProvider";
 import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotificationsShell";
-import { PushNotificationPrompt } from "@/components/push/PushNotificationPrompt";
+import { PushNotificationProvider } from "@/components/push/PushNotificationProvider";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
@@ -26,7 +26,7 @@ export function AppShell({
     <NavigationLoadingProvider>
       <UnreadNotificationsShell>
         <QuizActiveNotificationProvider>
-          <PushNotificationPrompt vapidPublicKey={vapidPublicKey} />
+          <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
           <LineupsNotificationOpener />
           <TabNavigationProvider>
             <div className="tm-app-frame">
@@ -51,6 +51,7 @@ export function AppShell({
               <ViewportLayoutDebug />
             </Suspense>
           </TabNavigationProvider>
+          </PushNotificationProvider>
         </QuizActiveNotificationProvider>
       </UnreadNotificationsShell>
     </NavigationLoadingProvider>

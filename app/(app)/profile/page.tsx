@@ -3,6 +3,7 @@ import { signOut } from "@/actions/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
+import { ProfilePushNotificationsCard } from "@/components/profile/ProfilePushNotificationsCard";
 import { isPoolAdmin } from "@/lib/pool/admin";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
@@ -37,6 +38,7 @@ export default async function ProfilePage() {
         />
         <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
       </div>
+      <ProfilePushNotificationsCard />
       {admin && (
         <Card>
           <Link href="/admin" className="text-sm font-medium text-[var(--tm-primary)]">

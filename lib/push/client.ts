@@ -27,16 +27,23 @@ export async function registerPushServiceWorker(): Promise<ServiceWorkerRegistra
   return navigator.serviceWorker.register(SW_PATH, { scope: "/" });
 }
 
-export async function getExistingPushSubscription(): Promise<PushSubscription | null> {
+export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | null> {
   if (!isPushSupported()) return null;
-  const registration = await navigator.serviceWorker.ready;
+  const existing = await navigator.serviceWorker.getRegistration("/");
+  if (existing) return existing;
+  return registerPushServiceWorker();
+}
+
+export async function getExistingPushSubscription(): Promise<PushSubscription | null> {
+  const registration = await getServiceWorkerRegistration();
+  if (!registration) return null;
   return registration.pushManager.getSubscription();
 }
 
 export async function subscribeToPush(vapidPublicKey: string): Promise<PushSubscription | null> {
   if (!isPushSupported()) return null;
 
-  const registration = await registerPushServiceWorker();
+  const registration = await getServiceWorkerRegistration();
   if (!registration) return null;
 
   const existing = await registration.pushManager.getSubscription();
@@ -66,4 +73,13 @@ export function serializePushSubscription(subscription: PushSubscription) {
     p256dh: json.keys.p256dh,
     auth: json.keys.auth,
   };
+}
+
+export type PushClientStatus = "unsupported" | "denied" | "default" | "granted" | "inactive";
+
+export function getPushClientStatus(): PushClientStatus {
+  if (!isPushSupported()) return "unsupported";
+  if (Notification.permission === "denied") return "denied";
+  if (Notification.permission === "granted") return "granted";
+  return "default";
 }

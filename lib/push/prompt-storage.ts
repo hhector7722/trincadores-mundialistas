@@ -8,3 +8,7 @@ export function isPushPromptDismissed(): boolean {
 export function dismissPushPrompt(): void {
   window.localStorage.setItem(DISMISSED_KEY, "1");
 }
+
+export function clearPushPromptDismissed(): void {
+  window.localStorage.removeItem(DISMISSED_KEY);
+}
