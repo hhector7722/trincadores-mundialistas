@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { assertCronAuthorized } from "@/lib/quiz/cron";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
-import { syncYoutubeFifaHighlights } from "@/lib/youtube/sync-highlights";
+import { syncAllMatchHighlights } from "@/lib/youtube/sync-highlights";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await syncYoutubeFifaHighlights(admin);
+    const result = await syncAllMatchHighlights(admin);
 
     return NextResponse.json({
       ok: true,

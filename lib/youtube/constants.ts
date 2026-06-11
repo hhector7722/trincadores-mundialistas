@@ -1,9 +1,27 @@
-/** Canal oficial FIFA en YouTube (@fifa). */
-export const FIFA_YOUTUBE_CHANNEL_ID = "UCpcTrCXblq78GZrTUTPWehg";
+import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 
-export function fifaChannelRssUrl(channelId = FIFA_YOUTUBE_CHANNEL_ID): string {
+/** Canal oficial FIFA en YouTube (@fifa). */
+export const FIFA_YOUTUBE_CHANNEL_ID = "UCpcTrCXblq78GZrTUTLWeBw";
+
+/** Canal Teledeporte RTVE (@TeledeporteRTVE). */
+export const TELEDEPORTE_RTVE_YOUTUBE_CHANNEL_ID = "UC4SBVYTpqOh-exr7BShLAPw";
+
+export function youtubeChannelRssUrl(channelId: string): string {
   return `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 }
+
+export function fifaChannelRssUrl(channelId = FIFA_YOUTUBE_CHANNEL_ID): string {
+  return youtubeChannelRssUrl(channelId);
+}
+
+export function teledeporteRssUrl(channelId = TELEDEPORTE_RTVE_YOUTUBE_CHANNEL_ID): string {
+  return youtubeChannelRssUrl(channelId);
+}
+
+export const HIGHLIGHT_SOURCE_CODES = {
+  fifa: "youtube_fifa",
+  teledeporte: "youtube_rtve_teledeporte",
+} as const satisfies Record<string, HighlightSourceCode>;
 
 export function youtubeThumbnailUrl(videoId: string): string {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;

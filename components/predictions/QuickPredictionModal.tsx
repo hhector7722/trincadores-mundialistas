@@ -585,6 +585,7 @@ export function QuickPredictionModal({
                 homeGoals={finishedHomeGoals}
                 awayGoals={finishedAwayGoals}
                 youtubeVideoId={highlightVideoId}
+                highlightSource={targetMatch.highlightSource}
                 className={currentProfileId ? "mt-3" : undefined}
               />
             ) : null}

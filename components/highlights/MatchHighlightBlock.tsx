@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
+import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,7 @@ type MatchHighlightBlockProps = {
   homeGoals: number;
   awayGoals: number;
   youtubeVideoId: string;
+  highlightSource?: HighlightSourceCode | null;
   variant?: "hero" | "modal";
   className?: string;
 };
@@ -23,11 +25,13 @@ export function MatchHighlightBlock({
   homeGoals,
   awayGoals,
   youtubeVideoId,
+  highlightSource = null,
   variant = "modal",
   className,
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
+  const sourceLabel = highlightSourceLabel(highlightSource);
 
   return (
     <>
@@ -51,7 +55,7 @@ export function MatchHighlightBlock({
         ) : (
           <>
             <p className="mb-2 text-center text-[9px] font-semibold uppercase tracking-[0.14em] text-white/55">
-              Resumen FIFA
+              {sourceLabel}
             </p>
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}

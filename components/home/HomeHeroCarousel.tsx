@@ -39,7 +39,7 @@ function buildSlides(
   if (lastMatchHighlight) {
     slides.push({
       id: "last-match-highlight",
-      eyebrow: "Último partido",
+      eyebrow: "ÚLTIMO PARTIDO",
       customBody: (
         <MatchHighlightBlock
           variant="hero"
@@ -48,6 +48,7 @@ function buildSlides(
           homeGoals={lastMatchHighlight.homeGoals}
           awayGoals={lastMatchHighlight.awayGoals}
           youtubeVideoId={lastMatchHighlight.youtubeVideoId}
+          highlightSource={lastMatchHighlight.source}
         />
       ),
     });

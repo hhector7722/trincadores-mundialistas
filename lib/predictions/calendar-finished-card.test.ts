@@ -21,6 +21,7 @@ function finishedMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithP
     officialMvpTeamName: "España",
     highlightYoutubeId: null,
     highlightPublishedAt: null,
+    highlightSource: null,
     prediction: { id: "p1", home_goals: 2, away_goals: 1, points_awarded: 5, updated_at: "" },
     mvpPrediction: null,
     serverEditable: false,

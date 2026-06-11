@@ -37,6 +37,7 @@ function baseDemoMatch(
     officialMvpTeamName: overrides.officialMvpTeamName,
     highlightYoutubeId: null,
     highlightPublishedAt: null,
+    highlightSource: null,
     prediction: overrides.prediction,
     mvpPrediction: overrides.mvpPrediction,
     serverEditable: false,

@@ -24,6 +24,7 @@ function baseMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithPredi
     officialMvpTeamName: null,
     highlightYoutubeId: null,
     highlightPublishedAt: null,
+    highlightSource: null,
     prediction: null,
     mvpPrediction: null,
     serverEditable: true,

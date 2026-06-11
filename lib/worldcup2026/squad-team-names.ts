@@ -109,3 +109,12 @@ export function squadLookupNames(input: string): string[] {
 export function openFootballNameFromFifaCode(fifaCode: string): string | null {
   return FIFA_CODE_TO_OPENFOOTBALL[fifaCode.trim().toUpperCase()] ?? null;
 }
+
+/** Nombre OpenFootball → código FIFA (MEX, RSA…). */
+export function fifaCodeFromOpenFootball(teamName: string): string | null {
+  const canonical = openFootballTeamName(teamName);
+  for (const [code, name] of Object.entries(FIFA_CODE_TO_OPENFOOTBALL)) {
+    if (name === canonical) return code;
+  }
+  return null;
+}

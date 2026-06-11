@@ -1,10 +1,20 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fifaChannelRssUrl } from "@/lib/youtube/constants";
+import {
+  fifaChannelRssUrl,
+  HIGHLIGHT_SOURCE_CODES,
+  teledeporteRssUrl,
+} from "@/lib/youtube/constants";
+import {
+  shouldReplaceMatchHighlight,
+  type HighlightSourceCode,
+} from "@/lib/youtube/highlight-priority";
 import { parseYoutubeChannelFeed } from "@/lib/youtube/parse-feed";
 import {
   buildTeamAliasIndex,
   isFifaHighlightTitle,
+  isTeledeporteHighlightTitle,
   parseTeamsFromHighlightTitle,
+  parseTeamsFromTeledeporteTitle,
   pickMatchForHighlightVideo,
 } from "@/lib/youtube/match-video";
 import type { YoutubeFeedVideo } from "@/lib/youtube/types";
@@ -16,109 +26,181 @@ export type SyncYoutubeHighlightsResult = {
   errors: string[];
 };
 
-async function loadProcessedVideoIds(admin: SupabaseClient): Promise<Set<string>> {
+export type SyncAllMatchHighlightsResult = {
+  fifa: SyncYoutubeHighlightsResult;
+  teledeporte: SyncYoutubeHighlightsResult;
+};
+
+type MatchHighlightRow = {
+  id: string;
+  home_team: string;
+  away_team: string;
+  kickoff_at: string;
+  highlight_youtube_id: string | null;
+  highlight_published_at: string | null;
+  highlight_source: HighlightSourceCode | null;
+  status: string;
+};
+
+type ChannelSyncConfig = {
+  sourceCode: HighlightSourceCode;
+  feedUrl: string;
+  channelLabel: string;
+  isHighlightTitle: (title: string) => boolean;
+  parseTeams: (title: string) => { home: string; away: string } | null;
+};
+
+const CHANNEL_CONFIGS: ChannelSyncConfig[] = [
+  {
+    sourceCode: HIGHLIGHT_SOURCE_CODES.fifa,
+    feedUrl: fifaChannelRssUrl(),
+    channelLabel: "FIFA",
+    isHighlightTitle: isFifaHighlightTitle,
+    parseTeams: parseTeamsFromHighlightTitle,
+  },
+  {
+    sourceCode: HIGHLIGHT_SOURCE_CODES.teledeporte,
+    feedUrl: teledeporteRssUrl(),
+    channelLabel: "Teledeporte",
+    isHighlightTitle: isTeledeporteHighlightTitle,
+    parseTeams: parseTeamsFromTeledeporteTitle,
+  },
+];
+
+async function loadProcessedVideoIds(
+  admin: SupabaseClient,
+  sourceCode: HighlightSourceCode,
+): Promise<Set<string>> {
   const ids = new Set<string>();
 
   const { data: mapped } = await admin
     .from("external_id_map")
     .select("external_key")
-    .eq("source_code", "youtube_fifa");
+    .eq("source_code", sourceCode);
 
   for (const row of mapped ?? []) {
     if (row.external_key) ids.add(row.external_key);
   }
 
-  const { data: matches } = await admin
-    .from("matches")
-    .select("highlight_youtube_id")
-    .not("highlight_youtube_id", "is", null);
-
-  for (const row of matches ?? []) {
-    if (row.highlight_youtube_id) ids.add(row.highlight_youtube_id);
-  }
-
   return ids;
 }
 
-async function loadMatchCandidates(admin: SupabaseClient) {
+async function loadMatchCandidates(admin: SupabaseClient): Promise<MatchHighlightRow[]> {
   const { data: matches, error } = await admin
     .from("matches")
-    .select("id, home_team, away_team, kickoff_at, highlight_youtube_id, status")
+    .select(
+      "id, home_team, away_team, kickoff_at, highlight_youtube_id, highlight_published_at, highlight_source, status",
+    )
     .eq("status", "finished")
     .order("kickoff_at", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return matches ?? [];
+  return (matches ?? []) as MatchHighlightRow[];
 }
 
-async function fetchChannelVideos(feedUrl: string): Promise<YoutubeFeedVideo[]> {
+async function fetchChannelVideos(
+  feedUrl: string,
+  channelLabel: string,
+): Promise<YoutubeFeedVideo[]> {
   const response = await fetch(feedUrl, {
     headers: { Accept: "application/atom+xml,text/xml" },
     next: { revalidate: 0 },
   });
 
   if (!response.ok) {
-    throw new Error(`Feed YouTube FIFA HTTP ${response.status}`);
+    throw new Error(`Feed YouTube ${channelLabel} HTTP ${response.status}`);
   }
 
   const xml = await response.text();
-  return parseYoutubeChannelFeed(xml, 20);
+  return parseYoutubeChannelFeed(xml, 30);
+}
+
+async function recordMappedVideo(
+  admin: SupabaseClient,
+  video: YoutubeFeedVideo,
+  sourceCode: HighlightSourceCode,
+  matchId: string | null,
+  matchStatus: "mapped" | "skipped",
+  extraMetadata?: Record<string, unknown>,
+): Promise<void> {
+  const publishedAt = new Date(video.publishedAt).toISOString();
+
+  await admin.from("external_id_map").upsert(
+    {
+      source_code: sourceCode,
+      external_key: video.videoId,
+      entity_type: "match",
+      internal_table: matchId ? "matches" : null,
+      internal_id: matchId,
+      metadata: {
+        title: video.title,
+        published_at: publishedAt,
+        ...extraMetadata,
+      },
+      match_status: matchStatus,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "source_code,external_key" },
+  );
 }
 
 async function attachHighlightToMatch(
   admin: SupabaseClient,
   video: YoutubeFeedVideo,
   matchId: string,
-): Promise<boolean> {
+  sourceCode: HighlightSourceCode,
+): Promise<"attached" | "skipped" | "skipped_priority"> {
   const { data: existing, error: readError } = await admin
     .from("matches")
-    .select("id, highlight_youtube_id, highlight_published_at, status")
+    .select("id, highlight_youtube_id, highlight_published_at, highlight_source, status")
     .eq("id", matchId)
     .maybeSingle();
 
-  if (readError || !existing || existing.status !== "finished") return false;
+  if (readError || !existing || existing.status !== "finished") return "skipped";
 
   const publishedAt = new Date(video.publishedAt).toISOString();
-  const shouldReplace =
-    !existing.highlight_youtube_id ||
-    !existing.highlight_published_at ||
-    new Date(publishedAt).getTime() >= new Date(existing.highlight_published_at).getTime();
+  const existingSource = (existing.highlight_source as HighlightSourceCode | null) ?? null;
 
-  if (!shouldReplace) return false;
+  if (
+    !shouldReplaceMatchHighlight(
+      existingSource,
+      existing.highlight_published_at,
+      sourceCode,
+      publishedAt,
+    )
+  ) {
+    if (
+      existingSource === HIGHLIGHT_SOURCE_CODES.fifa &&
+      sourceCode === HIGHLIGHT_SOURCE_CODES.teledeporte
+    ) {
+      await recordMappedVideo(admin, video, sourceCode, matchId, "skipped", {
+        reason: "fifa_priority",
+      });
+      return "skipped_priority";
+    }
+    return "skipped";
+  }
 
   const { error: updateError } = await admin
     .from("matches")
     .update({
       highlight_youtube_id: video.videoId,
       highlight_published_at: publishedAt,
+      highlight_source: sourceCode,
     })
     .eq("id", matchId);
 
-  if (updateError) return false;
+  if (updateError) return "skipped";
 
-  await admin.from("external_id_map").upsert(
-    {
-      source_code: "youtube_fifa",
-      external_key: video.videoId,
-      entity_type: "match",
-      internal_table: "matches",
-      internal_id: matchId,
-      metadata: {
-        title: video.title,
-        published_at: publishedAt,
-      },
-      match_status: "mapped",
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "source_code,external_key" },
-  );
-
-  return true;
+  await recordMappedVideo(admin, video, sourceCode, matchId, "mapped");
+  return "attached";
 }
 
-export async function syncYoutubeFifaHighlights(
+async function syncChannelHighlights(
   admin: SupabaseClient,
-  feedUrl = fifaChannelRssUrl(),
+  config: ChannelSyncConfig,
+  candidates: MatchHighlightRow[],
+  aliasIndex: ReturnType<typeof buildTeamAliasIndex>,
 ): Promise<SyncYoutubeHighlightsResult> {
   const result: SyncYoutubeHighlightsResult = {
     scanned: 0,
@@ -127,16 +209,10 @@ export async function syncYoutubeFifaHighlights(
     errors: [],
   };
 
-  const [videos, candidates, processed] = await Promise.all([
-    fetchChannelVideos(feedUrl),
-    loadMatchCandidates(admin),
-    loadProcessedVideoIds(admin),
+  const [videos, processed] = await Promise.all([
+    fetchChannelVideos(config.feedUrl, config.channelLabel),
+    loadProcessedVideoIds(admin, config.sourceCode),
   ]);
-
-  const teamNames = [
-    ...new Set(candidates.flatMap((match) => [match.home_team, match.away_team])),
-  ];
-  const aliasIndex = buildTeamAliasIndex(teamNames);
 
   const candidateRows = candidates.map((match) => ({
     matchId: match.id,
@@ -153,12 +229,12 @@ export async function syncYoutubeFifaHighlights(
       continue;
     }
 
-    if (!isFifaHighlightTitle(video.title)) {
+    if (!config.isHighlightTitle(video.title)) {
       result.skipped += 1;
       continue;
     }
 
-    const teams = parseTeamsFromHighlightTitle(video.title);
+    const teams = config.parseTeams(video.title);
     if (!teams) {
       result.skipped += 1;
       continue;
@@ -178,12 +254,22 @@ export async function syncYoutubeFifaHighlights(
     }
 
     try {
-      const attached = await attachHighlightToMatch(admin, video, hit.matchId);
-      if (attached) {
+      const outcome = await attachHighlightToMatch(admin, video, hit.matchId, config.sourceCode);
+      if (outcome === "attached") {
         result.matched += 1;
         processed.add(video.videoId);
+
+        const candidate = candidates.find((row) => row.id === hit.matchId);
+        if (candidate) {
+          candidate.highlight_youtube_id = video.videoId;
+          candidate.highlight_published_at = new Date(video.publishedAt).toISOString();
+          candidate.highlight_source = config.sourceCode;
+        }
       } else {
         result.skipped += 1;
+        if (outcome === "skipped_priority") {
+          processed.add(video.videoId);
+        }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error desconocido";
@@ -192,4 +278,40 @@ export async function syncYoutubeFifaHighlights(
   }
 
   return result;
+}
+
+/** Sincroniza FIFA (prioridad) y Teledeporte RTVE (fallback). */
+export async function syncAllMatchHighlights(
+  admin: SupabaseClient,
+): Promise<SyncAllMatchHighlightsResult> {
+  const candidates = await loadMatchCandidates(admin);
+  const teamNames = [
+    ...new Set(candidates.flatMap((match) => [match.home_team, match.away_team])),
+  ];
+  const aliasIndex = buildTeamAliasIndex(teamNames);
+
+  const fifa = await syncChannelHighlights(admin, CHANNEL_CONFIGS[0]!, candidates, aliasIndex);
+  const teledeporte = await syncChannelHighlights(
+    admin,
+    CHANNEL_CONFIGS[1]!,
+    candidates,
+    aliasIndex,
+  );
+
+  return { fifa, teledeporte };
+}
+
+/** @deprecated Usar syncAllMatchHighlights. Mantiene compatibilidad con scripts existentes. */
+export async function syncYoutubeFifaHighlights(
+  admin: SupabaseClient,
+  feedUrl = fifaChannelRssUrl(),
+): Promise<SyncYoutubeHighlightsResult> {
+  const result = await syncAllMatchHighlights(admin);
+  void feedUrl;
+  return {
+    scanned: result.fifa.scanned + result.teledeporte.scanned,
+    matched: result.fifa.matched + result.teledeporte.matched,
+    skipped: result.fifa.skipped + result.teledeporte.skipped,
+    errors: [...result.fifa.errors, ...result.teledeporte.errors],
+  };
 }

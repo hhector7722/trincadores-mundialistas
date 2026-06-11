@@ -1,11 +1,19 @@
 import { toSlug } from "@/lib/openfootball/slug";
-import { teamAbbr } from "@/lib/teams/display";
+import { teamAbbr, teamNameEs } from "@/lib/teams/display";
+import { normalizeText } from "@/lib/text/normalize-alias";
 import type { YoutubeHighlightMatchCandidate } from "@/lib/youtube/types";
 
 const HIGHLIGHT_TITLE_KEYWORDS = [
   "extended highlights",
   "match highlights",
   "highlights",
+] as const;
+
+const TELEDEPORTE_WC_MARKERS = [
+  "copa mundial",
+  "fifa world cup",
+  "world cup 2026",
+  "fifa 2026",
 ] as const;
 
 const EXCLUDED_TITLE_KEYWORDS = [
@@ -16,6 +24,9 @@ const EXCLUDED_TITLE_KEYWORDS = [
   "behind the scenes",
   "podcast",
   "interview",
+  "en directo",
+  "previa",
+  "programa",
 ] as const;
 
 export function isFifaHighlightTitle(title: string): boolean {
@@ -23,6 +34,14 @@ export function isFifaHighlightTitle(title: string): boolean {
   if (!lower.includes("world cup") && !lower.includes("fifa")) return false;
   if (EXCLUDED_TITLE_KEYWORDS.some((word) => lower.includes(word))) return false;
   return HIGHLIGHT_TITLE_KEYWORDS.some((word) => lower.includes(word));
+}
+
+export function isTeledeporteHighlightTitle(title: string): boolean {
+  const lower = normalizeText(title);
+  if (!lower.startsWith("resumen")) return false;
+  if (!TELEDEPORTE_WC_MARKERS.some((marker) => lower.includes(marker))) return false;
+  if (EXCLUDED_TITLE_KEYWORDS.some((word) => lower.includes(word))) return false;
+  return true;
 }
 
 export function parseTeamsFromHighlightTitle(title: string): { home: string; away: string } | null {
@@ -37,8 +56,21 @@ export function parseTeamsFromHighlightTitle(title: string): { home: string; awa
   return { home, away };
 }
 
+/** Ej.: «Resumen México 2 - 0 Sudáfrica | Grupo A | Copa Mundial…». */
+export function parseTeamsFromTeledeporteTitle(title: string): { home: string; away: string } | null {
+  const head = title.split("|")[0]?.trim() ?? title.trim();
+  const match = head.match(/^Resumen\s+(.+?)\s+\d+\s*-\s*\d+\s+(.+)$/i);
+  if (!match) return null;
+
+  const home = match[1]?.trim() ?? "";
+  const away = match[2]?.trim() ?? "";
+  if (!home || !away) return null;
+
+  return { home, away };
+}
+
 function normalizeLabel(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+  return normalizeText(value);
 }
 
 export type TeamAliasIndex = Map<string, string>;
@@ -55,6 +87,7 @@ export function buildTeamAliasIndex(teamNames: string[]): TeamAliasIndex {
     index.set(normalizeLabel(trimmed), trimmed);
     index.set(normalizeLabel(slug.replace(/-/g, " ")), trimmed);
     index.set(normalizeLabel(teamAbbr(trimmed)), trimmed);
+    index.set(normalizeLabel(teamNameEs(trimmed)), trimmed);
 
     if (slug === "usa") {
       index.set("united states", trimmed);

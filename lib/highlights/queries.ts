@@ -7,6 +7,7 @@ type HighlightRow = {
   away_team: string;
   highlight_youtube_id: string;
   highlight_published_at: string;
+  highlight_source: "youtube_fifa" | "youtube_rtve_teledeporte";
   match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
 };
@@ -33,6 +34,7 @@ function rowToHighlightView(row: HighlightRow): MatchHighlightView | null {
     awayGoals,
     youtubeVideoId: row.highlight_youtube_id,
     publishedAt: row.highlight_published_at,
+    source: row.highlight_source,
   };
 }
 
@@ -63,6 +65,7 @@ export async function getLatestMatchHighlightForPool(
       away_team,
       highlight_youtube_id,
       highlight_published_at,
+      highlight_source,
       match_results ( home_goals, away_goals ),
       match_live_state ( home_score, away_score )
     `,
@@ -70,11 +73,13 @@ export async function getLatestMatchHighlightForPool(
     .in("matchday_id", dayIds)
     .eq("status", "finished")
     .not("highlight_youtube_id", "is", null)
-    .order("highlight_published_at", { ascending: false })
+    .order("kickoff_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error || !data?.highlight_youtube_id || !data.highlight_published_at) return null;
+  if (error || !data?.highlight_youtube_id || !data.highlight_published_at || !data.highlight_source) {
+    return null;
+  }
 
   return rowToHighlightView(data as HighlightRow);
 }

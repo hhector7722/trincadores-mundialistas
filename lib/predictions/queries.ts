@@ -25,6 +25,7 @@ export type MatchWithPrediction = {
   officialMvpTeamName: string | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
+  highlightSource: "youtube_fifa" | "youtube_rtve_teledeporte" | null;
   prediction:
     | Pick<
         Prediction,
@@ -77,7 +78,7 @@ async function fetchPoolMatchesWithPredictions(
   const { data: matches } = await supabase
     .from("matches")
     .select(
-      "id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at"
+      "id, matchday_id, home_team, away_team, kickoff_at, status, sort_order, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at, highlight_source"
     )
     .in("matchday_id", filteredDayIds)
     .order("kickoff_at", { ascending: true });
@@ -125,6 +126,8 @@ async function fetchPoolMatchesWithPredictions(
         status === "finished" ? (m.highlight_youtube_id ?? null) : null,
       highlightPublishedAt:
         status === "finished" ? (m.highlight_published_at ?? null) : null,
+      highlightSource:
+        status === "finished" ? (m.highlight_source as MatchWithPrediction["highlightSource"]) : null,
       prediction: pred
         ? {
             id: pred.id,
@@ -209,7 +212,7 @@ export async function getMatchPredictionDetail(
   const { data: match } = await supabase
     .from("matches")
     .select(
-      "id, matchday_id, home_team, away_team, kickoff_at, status, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at"
+      "id, matchday_id, home_team, away_team, kickoff_at, status, group_code, external_match_id, match_number, highlight_youtube_id, highlight_published_at, highlight_source"
     )
     .eq("id", matchId)
     .in("matchday_id", dayIds)
@@ -267,6 +270,10 @@ export async function getMatchPredictionDetail(
       match.status === "finished" ? (match.highlight_youtube_id ?? null) : null,
     highlightPublishedAt:
       match.status === "finished" ? (match.highlight_published_at ?? null) : null,
+    highlightSource:
+      match.status === "finished"
+        ? (match.highlight_source as MatchWithPrediction["highlightSource"])
+        : null,
   };
 }
 

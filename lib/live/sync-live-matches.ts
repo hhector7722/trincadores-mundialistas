@@ -6,6 +6,7 @@ import {
   isBsdEventFinished,
   isBsdEventLive,
 } from "@/lib/live/sources/bsd-live";
+import { syncOfficialMvps } from "@/lib/live/sync-official-mvp";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type MatchRow = {
@@ -23,6 +24,7 @@ export type SyncLiveMatchesResult = {
   markedFinished: number;
   resultsPersisted: number;
   scoresRecalculated: number;
+  mvpsPersisted: number;
   poolsRebuilt: number;
   errors: string[];
 };
@@ -172,6 +174,7 @@ export async function syncLiveMatches(
     markedFinished: 0,
     resultsPersisted: 0,
     scoresRecalculated: 0,
+    mvpsPersisted: 0,
     poolsRebuilt: 0,
     errors: [],
   };
@@ -272,6 +275,8 @@ export async function syncLiveMatches(
       result.errors.push(`${match.id}: ${message}`);
     }
   }
+
+  await syncOfficialMvps(admin, result, poolsToRebuild, nowMs);
 
   for (const poolId of poolsToRebuild) {
     const { error: rebuildError } = await admin.rpc("rebuild_pool_member_scores", {
