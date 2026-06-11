@@ -321,6 +321,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
+          flagPlaceholderStyle="knockout"
           onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>
               patchMatchMvpPrediction(current, playerName, teamName, shirtNumber);

@@ -66,6 +66,8 @@ type QuickPredictionModalProps = {
   ) => void;
   /** Panel y backdrop opacos (calendario). */
   opaque?: boolean;
+  /** Círculo de bandera sin imagen: negro y negrita (eliminatoria). */
+  flagPlaceholderStyle?: "default" | "knockout";
 };
 
 type DotPosition = "start" | "middle" | "end";
@@ -130,6 +132,7 @@ export function QuickPredictionModal({
   onMatchChange,
   onMvpSaved,
   opaque = false,
+  flagPlaceholderStyle = "default",
 }: QuickPredictionModalProps) {
   const router = useRouter();
   const orderedMatches = useMemo(
@@ -403,6 +406,7 @@ export function QuickPredictionModal({
             >
               <MatchTeamsDisplay
                 layout="predictionModal"
+                flagPlaceholderStyle={flagPlaceholderStyle}
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}

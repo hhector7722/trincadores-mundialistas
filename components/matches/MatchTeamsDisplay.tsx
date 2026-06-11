@@ -24,8 +24,21 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-16";
 
-function TeamFlagCircle({ name }: { name: string }) {
-  return <TeamFlagBadge name={name} size="lg" loading="eager" />;
+function TeamFlagCircle({
+  name,
+  placeholderStyle,
+}: {
+  name: string;
+  placeholderStyle?: "default" | "knockout";
+}) {
+  return (
+    <TeamFlagBadge
+      name={name}
+      size="lg"
+      loading="eager"
+      placeholderStyle={placeholderStyle}
+    />
+  );
 }
 
 function TeamNameLabel({ name }: { name: string }) {
@@ -36,11 +49,19 @@ function TeamNameLabel({ name }: { name: string }) {
   );
 }
 
-function TeamFlagButton({ name, onClick }: { name: string; onClick?: () => void }) {
+function TeamFlagButton({
+  name,
+  onClick,
+  placeholderStyle,
+}: {
+  name: string;
+  onClick?: () => void;
+  placeholderStyle?: "default" | "knockout";
+}) {
   const displayName = teamNameEs(name);
 
   if (!onClick) {
-    return <TeamFlagCircle name={name} />;
+    return <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} />;
   }
 
   return (
@@ -53,7 +74,7 @@ function TeamFlagButton({ name, onClick }: { name: string; onClick?: () => void 
       className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} />
+      <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} />
     </button>
   );
 }
@@ -99,6 +120,8 @@ type MatchTeamsDisplayProps = {
   centerSlotAlign?: "default" | "teamNames";
   /** Modal de pronóstico: equipos en 10%/90%, steppers en 34%/66% (entre bandera y centro). */
   layout?: "default" | "predictionModal";
+  /** Texto placeholder del círculo de bandera (sin imagen). */
+  flagPlaceholderStyle?: "default" | "knockout";
   predictionLabel?: string;
   homeScoreSlot?: ReactNode;
   awayScoreSlot?: ReactNode;
@@ -119,6 +142,7 @@ export function MatchTeamsDisplay({
   centerSlot,
   centerSlotAlign = "default",
   layout = "default",
+  flagPlaceholderStyle = "default",
   predictionLabel = "Mi pronóstico",
   homeScoreSlot,
   awayScoreSlot,
@@ -138,7 +162,11 @@ export function MatchTeamsDisplay({
         </p>
 
         <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <TeamFlagButton name={homeTeam} onClick={onHomeTeamClick} />
+          <TeamFlagButton
+            name={homeTeam}
+            onClick={onHomeTeamClick}
+            placeholderStyle={flagPlaceholderStyle}
+          />
           <TeamNameLabel name={homeTeam} />
         </div>
 
@@ -155,7 +183,11 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <TeamFlagButton name={awayTeam} onClick={onAwayTeamClick} />
+          <TeamFlagButton
+            name={awayTeam}
+            onClick={onAwayTeamClick}
+            placeholderStyle={flagPlaceholderStyle}
+          />
           <TeamNameLabel name={awayTeam} />
         </div>
       </div>
