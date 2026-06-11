@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useState, type CSSProperties, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,9 @@ type Props = {
   truncateName?: boolean;
   /** Permite salto de línea en el nombre dentro del ancho de columna. */
   wrapName?: boolean;
+  /** Fuerza una sola línea (p. ej. con font-size calculado). */
+  singleLineName?: boolean;
+  nameStyle?: CSSProperties;
   /** Evita navegacion del contenedor padre (p. ej. Link del home). */
   stopNavigation?: boolean;
 };
@@ -25,6 +28,8 @@ export function RankingMemberCells({
   nameClassName,
   truncateName = true,
   wrapName = false,
+  singleLineName = false,
+  nameStyle,
   stopNavigation = false,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -65,12 +70,14 @@ export function RankingMemberCells({
           onClick={onActivate}
           className={cn(
             "text-left outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tm-purple-deep)] disabled:cursor-default",
-            truncateName && !wrapName && "min-w-0 flex-1 truncate",
-            wrapName && "min-w-0 flex-1 break-words leading-snug",
-            !truncateName && !wrapName && "whitespace-nowrap",
+            truncateName && !wrapName && !singleLineName && "min-w-0 flex-1 truncate",
+            wrapName && !singleLineName && "min-w-0 flex-1 break-words leading-snug",
+            singleLineName && "min-w-0 flex-1 whitespace-nowrap",
+            !truncateName && !wrapName && !singleLineName && "whitespace-nowrap",
             canPreview && "cursor-pointer hover:opacity-80 active:opacity-70",
             nameClassName
           )}
+          style={nameStyle}
         >
           {label}
         </button>

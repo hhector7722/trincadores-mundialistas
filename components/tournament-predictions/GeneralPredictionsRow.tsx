@@ -19,9 +19,11 @@ function CellValue({ value }: { value: string | null }) {
 export function GeneralPredictionsRow({
   row,
   isCurrentUser,
+  nameFontSize,
 }: {
   row: TournamentGeneralPredictionsBoardRow;
   isCurrentUser: boolean;
+  nameFontSize: number;
 }) {
   return (
     <div
@@ -34,9 +36,11 @@ export function GeneralPredictionsRow({
         avatarUrl={row.avatarUrl}
         label={row.label}
         size="ranking"
-        wrapName
+        truncateName={false}
+        singleLineName
+        nameStyle={{ fontSize: `${nameFontSize}px` }}
         nameClassName={cn(
-          "text-xs font-medium leading-snug",
+          "font-medium leading-none",
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
