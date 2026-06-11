@@ -1,16 +1,24 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useState } from "react";
+import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { TournamentGeneralPredictionsBoardRow } from "@/lib/tournament-predictions/types";
 
 const FONT_MAX_PX = 12;
 const FONT_MIN_PX = 6.5;
+const PLAYER_FONT_MAX_PX = 12;
+const PLAYER_FONT_MIN_PX = 9;
 const FONT_STEP_PX = 0.25;
 const RANKING_AVATAR_PX = 36;
 const RANKING_NAME_GAP_PX = 10;
 
-function measureSingleLineFontSize(text: string, availableWidthPx: number): number {
-  if (!text || availableWidthPx <= 0) return FONT_MAX_PX;
+function measureSingleLineFontSize(
+  text: string,
+  availableWidthPx: number,
+  maxPx = FONT_MAX_PX,
+  minPx = FONT_MIN_PX
+): number {
+  if (!text || availableWidthPx <= 0) return maxPx;
 
   const probe = document.createElement("span");
   probe.style.cssText =
@@ -18,8 +26,8 @@ function measureSingleLineFontSize(text: string, availableWidthPx: number): numb
   probe.textContent = text;
   document.body.appendChild(probe);
 
-  let size = FONT_MAX_PX;
-  while (size >= FONT_MIN_PX) {
+  let size = maxPx;
+  while (size >= minPx) {
     probe.style.fontSize = `${size}px`;
     if (probe.offsetWidth <= availableWidthPx) break;
     size -= FONT_STEP_PX;
@@ -55,7 +63,8 @@ export function useGeneralPredictionsFontSizes(
     return values.reduce<string>(
       (max, value) => {
         const trimmed = value?.trim() ?? "";
-        return trimmed.length > max.length ? trimmed : max;
+        const display = trimmed ? shirtPlayerName(trimmed) : "";
+        return display.length > max.length ? display : max;
       },
       ""
     );
@@ -75,7 +84,12 @@ export function useGeneralPredictionsFontSizes(
 
       setFontSizes({
         nameFontSize: measureSingleLineFontSize(longestName, nameWidth),
-        playerFontSize: measureSingleLineFontSize(longestPlayer, playerWidth - 4),
+        playerFontSize: measureSingleLineFontSize(
+          longestPlayer,
+          playerWidth - 4,
+          PLAYER_FONT_MAX_PX,
+          PLAYER_FONT_MIN_PX
+        ),
       });
     }
 

@@ -52,8 +52,8 @@ export function PlayerPredictionCell({
     <span className="flex h-full min-w-0 items-center justify-center px-0.5">
       <span
         className={cn(
-          "text-center leading-snug text-[var(--tm-fg)]",
-          value ? "break-words" : "text-[10px]"
+          "text-center font-medium leading-snug text-[var(--tm-fg)]",
+          value ? "whitespace-nowrap" : "text-[10px]"
         )}
         style={value ? { fontSize: `${fontSize}px` } : undefined}
       >

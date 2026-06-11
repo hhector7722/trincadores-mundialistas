@@ -5,7 +5,7 @@ import {
   PlayerPredictionCell,
 } from "@/components/tournament-predictions/GeneralPredictionsCells";
 import { GENERAL_PREDICTIONS_GRID } from "@/components/tournament-predictions/general-predictions-grid";
-import { formatPlayerDisplayFull } from "@/lib/tournament-predictions/display";
+import { formatPlayerDisplay } from "@/lib/tournament-predictions/display";
 import type { TournamentGeneralPredictionsBoardRow } from "@/lib/tournament-predictions/types";
 import { cn } from "@/lib/utils";
 
@@ -43,15 +43,15 @@ export function GeneralPredictionsRow({
       <FinalistsPredictionCell teamA={row.finalistTeamA} teamB={row.finalistTeamB} />
       <PlayerPredictionCell
         fontSize={playerFontSize}
-        value={formatPlayerDisplayFull(row.topScorerPlayerName)}
+        value={formatPlayerDisplay(row.topScorerPlayerName)}
       />
       <PlayerPredictionCell
         fontSize={playerFontSize}
-        value={formatPlayerDisplayFull(row.tournamentMvpPlayerName)}
+        value={formatPlayerDisplay(row.tournamentMvpPlayerName)}
       />
       <PlayerPredictionCell
         fontSize={playerFontSize}
-        value={formatPlayerDisplayFull(row.goldenGlovePlayerName)}
+        value={formatPlayerDisplay(row.goldenGlovePlayerName)}
       />
     </div>
   );
