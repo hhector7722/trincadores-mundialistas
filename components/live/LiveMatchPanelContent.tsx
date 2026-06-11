@@ -1,7 +1,6 @@
 "use client";
 
 import { LiveMatchScoreOverlay, LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
-import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -62,18 +61,9 @@ export function LiveMatchPanelContent({
           isLive
           hideKickoff
           hidePredictionLabel={isModalLayout}
-          compactTeamColumn={useHomeCompactLayout}
-          teamBlocksTopClass={useHomeCompactLayout ? "top-0" : "top-1.5"}
-          homeFooterSlot={
-            useHomeCompactLayout ? (
-              <HomeSquadFooterLink onClick={onOpenHomeLineup} />
-            ) : undefined
-          }
-          awayFooterSlot={
-            useHomeCompactLayout ? (
-              <HomeSquadFooterLink onClick={onOpenAwayLineup} />
-            ) : undefined
-          }
+          teamBlocksTopClass="top-1.5"
+          onHomeTeamClick={useHomeCompactLayout ? onOpenHomeLineup : undefined}
+          onAwayTeamClick={useHomeCompactLayout ? onOpenAwayLineup : undefined}
           homeScoreSlot={
             !isModalLayout && liveSnapshot ? (
               <LiveScoreDisplay score={liveSnapshot.homeScore} />
@@ -118,7 +108,21 @@ export function LiveMatchPanelContent({
             awayAnchor={actionsAwayAnchor}
             className="h-full"
             centerSlot={
-              mvpPlayerName ? (
+              useHomeCompactLayout ? (
+                predictionScoreText ? (
+                  <p className="text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
+                    {predictionScoreText}
+                  </p>
+                ) : mvpPlayerName ? (
+                  <MvpPredictionButton
+                    savedPlayerName={mvpPlayerName}
+                    savedTeamName={mvpTeamName}
+                    variant="compact"
+                    readOnly
+                    className="w-full"
+                  />
+                ) : null
+              ) : mvpPlayerName ? (
                 <MvpPredictionButton
                   savedPlayerName={mvpPlayerName}
                   savedTeamName={mvpTeamName}
@@ -129,10 +133,14 @@ export function LiveMatchPanelContent({
               ) : null
             }
             predictionSlot={
-              useHomeCompactLayout && predictionScoreText ? (
-                <p className="text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
-                  {predictionScoreText}
-                </p>
+              useHomeCompactLayout && predictionScoreText && mvpPlayerName ? (
+                <MvpPredictionButton
+                  savedPlayerName={mvpPlayerName}
+                  savedTeamName={mvpTeamName}
+                  variant="compact"
+                  readOnly
+                  className="w-full"
+                />
               ) : null
             }
             onOpenHomeLineup={onOpenHomeLineup}
