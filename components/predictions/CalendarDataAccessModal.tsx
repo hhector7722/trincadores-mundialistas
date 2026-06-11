@@ -10,6 +10,7 @@ type CalendarDataAccessModalProps = {
   onOpenAllGroups: () => void;
   onOpenStats: () => void;
   onOpenSquads: () => void;
+  onOpenGuide: () => void;
 };
 
 const ACCESS_ACTIONS = [
@@ -17,6 +18,7 @@ const ACCESS_ACTIONS = [
   { id: "groups", label: "CLASIFICACIONES" },
   { id: "stats", label: "ESTADÍSTICAS" },
   { id: "squads", label: "PLANTILLAS" },
+  { id: "guide", label: "GUÍA CALENDARIO" },
 ] as const;
 
 export function CalendarDataAccessModal({
@@ -25,6 +27,7 @@ export function CalendarDataAccessModal({
   onOpenAllGroups,
   onOpenStats,
   onOpenSquads,
+  onOpenGuide,
 }: CalendarDataAccessModalProps) {
   const { navigate } = useAppNavigation();
 
@@ -42,6 +45,9 @@ export function CalendarDataAccessModal({
         break;
       case "squads":
         onOpenSquads();
+        break;
+      case "guide":
+        onOpenGuide();
         break;
     }
   }

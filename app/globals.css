@@ -1671,6 +1671,11 @@ html:has(.tm-app-frame) {
   box-shadow: inset 0 0 0 2px #ef4444;
 }
 
+.tm-porra-calendar.tm-cal-guide-preview {
+  --tm-cal-match-card-h: 2.65rem;
+  --tm-cal-sidebar-heading-fs: 0.62rem;
+}
+
 .tm-porra-calendar .tm-cal-match-group-row {
   min-height: 1em;
 }

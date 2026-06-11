@@ -12,9 +12,15 @@ type AllTeamsLineupModalProps = {
   open: boolean;
   onClose: () => void;
   onBack?: () => void;
+  stackElevated?: boolean;
 };
 
-export function AllTeamsLineupModal({ open, onClose, onBack }: AllTeamsLineupModalProps) {
+export function AllTeamsLineupModal({
+  open,
+  onClose,
+  onBack,
+  stackElevated = false,
+}: AllTeamsLineupModalProps) {
   const teams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
@@ -32,6 +38,7 @@ export function AllTeamsLineupModal({ open, onClose, onBack }: AllTeamsLineupMod
       <TeamsPickerModal
         open={open}
         opaque
+        stackElevated={stackElevated}
         onClose={handleCloseAll}
         onBack={onBack}
         mode="view"

@@ -144,6 +144,7 @@ type AllGroupsStandingsModalProps = {
   open: boolean;
   onClose: () => void;
   onBack?: () => void;
+  stackElevated?: boolean;
   officialGroups: GroupStandingDetail[];
   predictedGroups: GroupStandingDetail[];
   onSelectGroup: (groupCode: string) => void;
@@ -153,6 +154,7 @@ export function AllGroupsStandingsModal({
   open,
   onClose,
   onBack,
+  stackElevated = false,
   officialGroups,
   predictedGroups,
   onSelectGroup,
@@ -235,6 +237,7 @@ export function AllGroupsStandingsModal({
     <Modal
       open={open}
       onClose={onClose}
+      stackElevated={stackElevated}
       title="Clasificación de grupos"
       hideHeader
       ariaLabel="Clasificación de grupos"

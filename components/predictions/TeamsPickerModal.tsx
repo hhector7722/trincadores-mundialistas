@@ -20,6 +20,7 @@ type TeamsPickerModalProps = {
   onPickTwoTeams?: (teamA: string, teamB: string) => void;
   onViewTeam?: (teamName: string) => void;
   opaque?: boolean;
+  stackElevated?: boolean;
 };
 
 export function TeamsPickerModal({
@@ -33,6 +34,7 @@ export function TeamsPickerModal({
   onPickTwoTeams,
   onViewTeam,
   opaque = false,
+  stackElevated = false,
 }: TeamsPickerModalProps) {
   const teams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
   const [firstFinalist, setFirstFinalist] = useState<string | null>(null);
@@ -77,6 +79,7 @@ export function TeamsPickerModal({
       open={open}
       onClose={onClose}
       onBack={onBack}
+      stackElevated={stackElevated}
       backButtonPlain={Boolean(onBack)}
       title={title}
       headerTitleAlign="center"

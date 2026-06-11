@@ -17,6 +17,7 @@ type TournamentStatsModalProps = {
   open: boolean;
   onClose: () => void;
   onBack?: () => void;
+  stackElevated?: boolean;
   matches: MatchWithPrediction[];
 };
 
@@ -42,7 +43,13 @@ function filterStatRowsByQuery(
   return rows.filter((row) => rankedLabels.has(row.label));
 }
 
-export function TournamentStatsModal({ open, onClose, onBack, matches }: TournamentStatsModalProps) {
+export function TournamentStatsModal({
+  open,
+  onClose,
+  onBack,
+  stackElevated = false,
+  matches,
+}: TournamentStatsModalProps) {
   const [activeStat, setActiveStat] = useState<TournamentStatKind>("scorers");
   const [query, setQuery] = useState("");
 
@@ -82,6 +89,7 @@ export function TournamentStatsModal({ open, onClose, onBack, matches }: Tournam
       open={open}
       onClose={onClose}
       onBack={onBack}
+      stackElevated={stackElevated}
       backButtonPlain={Boolean(onBack)}
       title="Estadísticas del torneo"
       hideHeaderDivider

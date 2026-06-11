@@ -26,7 +26,7 @@ import {
   SIDEBAR_CARD_ANCHOR_ATTR,
 } from "@/lib/pool/calendar-layout";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
-import { CalendarGroupRowBadge } from "@/components/predictions/CalendarGroupRowBadge";
+import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import { resolveCalendarFinishedCard } from "@/lib/predictions/calendar-finished-card";
 import {
@@ -112,56 +112,21 @@ function CalendarMatchCard({
     : `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
 
   if (finishedState) {
-    const kickoffSlotLabel = finishedState.showPredictedInKickoffSlot ? predictionLabel : null;
-
     return (
-      <button
-        type="button"
+      <CalendarFinishedMatchCardVisual
+        interactive
         title={title}
-        aria-label={title}
         onClick={onOpen}
-        {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
-        className={cn(
-          "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
-          finishedState.showGreenFill && "tm-cal-match-card--exact",
-          finishedState.showSignMvpDoubleBorder && "tm-cal-match-card--sign-mvp",
-          finishedState.showMvpOnlyDoubleBorder && "tm-cal-match-card--mvp-only",
-        )}
-      >
-        <CalendarGroupRowBadge
-          groupCode={match.group_code}
-          showGroupLetterBadge={finishedState.showGroupLetterBadge}
-          icon={finishedState.groupRowIcon}
-          showMvpLabel={finishedState.groupRowMvpLabel}
-        />
-
-        <div className="tm-cal-match-card-body">
-          {kickoffSlotLabel ? (
-            <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-[var(--tm-accent)]">
-              {kickoffSlotLabel}
-            </span>
-          ) : null}
-
-          <div className="tm-cal-flags relative w-full shrink-0">
-            <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-              <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
-            </div>
-            <span
-              className={cn(
-                "tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums",
-                finishedState.showExactScoreStyle
-                  ? "tm-cal-prediction--exact"
-                  : "text-white",
-              )}
-            >
-              {officialLabel}
-            </span>
-            <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-              <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
-            </div>
-          </div>
-        </div>
-      </button>
+        anchorAttr={isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : undefined}
+        homeTeam={match.home_team}
+        awayTeam={match.away_team}
+        groupCode={match.group_code}
+        predictionHome={match.prediction!.home_goals}
+        predictionAway={match.prediction!.away_goals}
+        officialHome={match.officialHome!}
+        officialAway={match.officialAway!}
+        finishedState={finishedState}
+      />
     );
   }
 
@@ -398,21 +363,27 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
   );
   const [statsDataAccessBack, setStatsDataAccessBack] = useState<(() => void) | null>(null);
   const [squadsDataAccessBack, setSquadsDataAccessBack] = useState<(() => void) | null>(null);
+  const [allGroupsStackElevated, setAllGroupsStackElevated] = useState(false);
+  const [statsStackElevated, setStatsStackElevated] = useState(false);
+  const [squadsStackElevated, setSquadsStackElevated] = useState(false);
 
   const openAllGroupsModal: CalendarModalOpener = (options) => {
     setAllGroupsDataAccessBack(
       options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null
     );
+    setAllGroupsStackElevated(options?.stackElevated ?? false);
     setAllGroupsOpen(true);
   };
 
   const openStatsModal: CalendarModalOpener = (options) => {
     setStatsDataAccessBack(options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null);
+    setStatsStackElevated(options?.stackElevated ?? false);
     setStatsOpen(true);
   };
 
   const openSquadsModal: CalendarModalOpener = (options) => {
     setSquadsDataAccessBack(options?.fromDataAccess ? (options.reopenDataAccess ?? null) : null);
+    setSquadsStackElevated(options?.stackElevated ?? false);
     setSquadsOpen(true);
   };
   const rootRef = useRef<HTMLDivElement>(null);
@@ -499,9 +470,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       {allGroupsOpen && (
         <AllGroupsStandingsModal
           open
+          stackElevated={allGroupsStackElevated}
           onClose={() => {
             setAllGroupsOpen(false);
             setAllGroupsDataAccessBack(null);
+            setAllGroupsStackElevated(false);
           }}
           onBack={
             allGroupsDataAccessBack
@@ -525,9 +498,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       {statsOpen && (
         <TournamentStatsModal
           open
+          stackElevated={statsStackElevated}
           onClose={() => {
             setStatsOpen(false);
             setStatsDataAccessBack(null);
+            setStatsStackElevated(false);
           }}
           onBack={
             statsDataAccessBack
@@ -545,9 +520,11 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
       {squadsOpen && (
         <AllTeamsLineupModal
           open
+          stackElevated={squadsStackElevated}
           onClose={() => {
             setSquadsOpen(false);
             setSquadsDataAccessBack(null);
+            setSquadsStackElevated(false);
           }}
           onBack={
             squadsDataAccessBack

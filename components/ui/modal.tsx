@@ -50,6 +50,8 @@ type ModalProps = {
   scrollContent?: boolean;
   /** Panel opaco; el fondo exterior (backdrop) se difumina con blur. */
   opaque?: boolean;
+  /** Apila por encima de otro modal (p. ej. al abrir desde «Ver datos»). */
+  stackElevated?: boolean;
 };
 
 function lockPageScroll() {
@@ -288,6 +290,7 @@ export function Modal({
   backButtonPlain = false,
   scrollContent = true,
   opaque = false,
+  stackElevated = false,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -366,7 +369,8 @@ export function Modal({
   return createPortal(
     <div
       className={cn(
-        "fixed inset-0 z-[100] flex items-center justify-center p-4",
+        "fixed inset-0 flex items-center justify-center p-4",
+        stackElevated ? "z-[110]" : "z-[100]",
         slideActive && "touch-none",
         containerClassName
       )}
