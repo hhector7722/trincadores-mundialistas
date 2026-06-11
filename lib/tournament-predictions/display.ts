@@ -22,12 +22,10 @@ export function formatFinalistsDisplay(
 
 export function formatPlayerDisplay(
   playerName: string | null,
-  teamName: string | null
+  _teamName?: string | null
 ): string | null {
   if (!playerName) return null;
-  const player = shirtPlayerName(playerName);
-  if (!teamName) return player;
-  return `${player} (${teamAbbr(teamName)})`;
+  return shirtPlayerName(playerName);
 }
 
 export function hasFinalists(predictions: TournamentGeneralPredictions): boolean {
