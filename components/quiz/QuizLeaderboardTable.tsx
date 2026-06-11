@@ -11,10 +11,10 @@ function QuizLeaderboardHeader() {
         "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
-      <span>Pos</span>
+      <span className="text-left">Pos</span>
       <span className="text-center">Trincador</span>
-      <span className="text-right">Quiz</span>
-      <span className="text-right">Fiab</span>
+      <span className="text-center">Quiz</span>
+      <span className="text-center">Fiab</span>
     </div>
   );
 }

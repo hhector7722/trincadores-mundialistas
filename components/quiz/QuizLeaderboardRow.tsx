@@ -31,10 +31,10 @@ export function QuizLeaderboardRow({
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
-      <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
+      <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.totalScore)}
       </span>
-      <span className="shrink-0 text-[10px] tabular-nums text-[var(--tm-muted)]">
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]">
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
     </div>
