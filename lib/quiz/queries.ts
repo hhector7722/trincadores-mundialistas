@@ -345,12 +345,14 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
     const stats = totals.get(member.profileId);
     const totalScore = stats?.totalScore ?? 0;
     const totalMaxPoints = stats?.totalMaxPoints ?? 0;
+    const hasParticipated = totalMaxPoints > 0;
     return {
       profileId: member.profileId,
       label: member.label,
       avatarUrl: member.avatarUrl,
       totalScore,
       reliabilityPct: computeQuizReliabilityPct(totalScore, totalMaxPoints),
+      hasParticipated,
     };
   });
 

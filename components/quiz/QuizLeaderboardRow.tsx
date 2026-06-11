@@ -1,7 +1,7 @@
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { QUIZ_RANKING_GRID } from "@/components/quiz/quiz-ranking-grid";
+import { formatQuizReliabilityPct, formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat } from "@/lib/ranking/format";
-import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { QuizLeaderboardRow } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +32,10 @@ export function QuizLeaderboardRow({
         )}
       />
       <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
-        {formatAggregateStat(row.totalScore)}
+        {formatQuizScore(row.totalScore, row.hasParticipated)}
       </span>
       <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]">
-        {formatReliabilityPct(row.reliabilityPct)}
+        {formatQuizReliabilityPct(row.reliabilityPct, row.hasParticipated)}
       </span>
     </div>
   );

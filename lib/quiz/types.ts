@@ -82,6 +82,7 @@ export type QuizLeaderboardRow = {
   avatarUrl: string | null;
   totalScore: number;
   reliabilityPct: number | null;
+  hasParticipated: boolean;
 };
 
 export type QuizResultResponse = {
