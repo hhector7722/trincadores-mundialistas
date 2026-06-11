@@ -139,7 +139,7 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "min-h-[2.65rem] w-[3.05rem] touch-manipulation"
+      ? "min-h-[3.4rem] w-[3.05rem] touch-manipulation"
       : isModal
         ? "w-[3rem] min-h-10"
         : "w-[4.75rem] min-h-12 sm:w-[5.5rem]",

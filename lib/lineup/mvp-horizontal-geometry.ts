@@ -22,9 +22,13 @@ export const AWAY_HALF_X = { MIN: 54, MAX: 92 } as const;
 const HOME_X_SPAN = HOME_HALF_X.MAX - HOME_HALF_X.MIN;
 const AWAY_X_SPAN = AWAY_HALF_X.MAX - AWAY_HALF_X.MIN;
 
-/** Rango vertical jugable (posición lateral de la plantilla maestra). */
-export const PLAYABLE_Y_MIN = 12;
-export const PLAYABLE_Y_MAX = 88;
+/**
+ * Rango vertical jugable (posición lateral de la plantilla maestra).
+ * Margen interior para que camiseta + nombre no sobresalgan del verde
+ * (anclaje centrado con translate -50%, -50%).
+ */
+export const PLAYABLE_Y_MIN = 20;
+export const PLAYABLE_Y_MAX = 78;
 
 function sourceDepth(y: number): number {
   return (SOURCE_Y_GK - y) / SOURCE_Y_SPAN;

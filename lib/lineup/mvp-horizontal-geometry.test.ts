@@ -6,11 +6,17 @@ import { layoutPredictedStarters } from "./predicted-slot-layout";
 import {
   AWAY_HALF_X,
   HOME_HALF_X,
+  PLAYABLE_Y_MAX,
+  PLAYABLE_Y_MIN,
   compressCoordToAwayRight,
   compressCoordToHomeLeft,
   mapSlotsToAwayRight,
   mapSlotsToHomeLeft,
 } from "./mvp-horizontal-geometry";
+
+function clampLateralY(y: number): number {
+  return Math.min(PLAYABLE_Y_MAX, Math.max(PLAYABLE_Y_MIN, y));
+}
 
 const SPAIN_4231 = [
   { slotKey: "GK", role: "GK" as const },
@@ -81,10 +87,25 @@ test("lateral del slot BSD se conserva al proyectar (LB arriba de RB)", () => {
   }
 });
 
+test("slots laterales no tocan el borde vertical del campo", () => {
+  const template = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
+  for (const mapFn of [mapSlotsToHomeLeft, mapSlotsToAwayRight] as const) {
+    const mapped = mapFn(template);
+    for (const slot of mapped) {
+      assert.ok(
+        slot.y >= PLAYABLE_Y_MIN && slot.y <= PLAYABLE_Y_MAX,
+        `${slot.slotKey} fuera de zona segura (y=${slot.y})`
+      );
+    }
+  }
+});
+
 test("proyección horizontal conserva spread lateral de la formación", () => {
   const template = getFormationTemplateCoordinates("4-2-3-1");
   const slots = layoutPredictedStarters(SPAIN_4231, "4-2-3-1");
-  const lateralSpread = template.map((coord) => coord.x).sort((a, b) => a - b);
+  const lateralSpread = template
+    .map((coord) => clampLateralY(coord.x))
+    .sort((a, b) => a - b);
 
   assert.deepEqual(
     mapSlotsToHomeLeft(slots)
