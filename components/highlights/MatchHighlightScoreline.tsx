@@ -19,41 +19,41 @@ export function MatchHighlightScoreline({
   className,
   scoreClassName,
 }: MatchHighlightScorelineProps) {
-  const homeDisplay = homeGoals === 0 ? " " : String(homeGoals);
-  const awayDisplay = awayGoals === 0 ? " " : String(awayGoals);
+  const homeDisplay = String(homeGoals);
+  const awayDisplay = String(awayGoals);
 
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 items-center justify-center gap-1.5 sm:gap-2",
+        "flex w-full min-w-0 items-center justify-center gap-1 sm:gap-1.5",
         className,
       )}
     >
-      <TeamFlagBadge name={homeTeam} size="xs" loading="eager" imageWidth={160} />
-      <span className="text-[clamp(9px,2.4cqw,11px)] font-bold uppercase tracking-wide text-white/85">
+      <TeamFlagBadge name={homeTeam} size="xxs" loading="eager" imageWidth={80} />
+      <span className="text-[clamp(7px,1.9cqw,9px)] font-bold uppercase tracking-wide text-white/85">
         {teamAbbr(homeTeam)}
       </span>
       <span
         className={cn(
-          "font-display text-[clamp(1.125rem,8cqw,1.5rem)] font-black tabular-nums text-white",
+          "font-display text-[clamp(0.75rem,5cqw,0.9375rem)] font-black tabular-nums leading-none text-white",
           scoreClassName,
         )}
       >
         {homeDisplay}
       </span>
-      <span className="font-display text-sm font-semibold text-white/50">-</span>
+      <span className="font-display text-[10px] font-semibold leading-none text-white/50">-</span>
       <span
         className={cn(
-          "font-display text-[clamp(1.125rem,8cqw,1.5rem)] font-black tabular-nums text-white",
+          "font-display text-[clamp(0.75rem,5cqw,0.9375rem)] font-black tabular-nums leading-none text-white",
           scoreClassName,
         )}
       >
         {awayDisplay}
       </span>
-      <span className="text-[clamp(9px,2.4cqw,11px)] font-bold uppercase tracking-wide text-white/85">
+      <span className="text-[clamp(7px,1.9cqw,9px)] font-bold uppercase tracking-wide text-white/85">
         {teamAbbr(awayTeam)}
       </span>
-      <TeamFlagBadge name={awayTeam} size="xs" loading="eager" imageWidth={160} />
+      <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" imageWidth={80} />
     </div>
   );
 }
