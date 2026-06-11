@@ -191,7 +191,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   }, [clearQuestionTimer, scheduleAdvance]);
 
   useEffect(() => {
-    if (!currentQuestion || phase !== "answering") {
+    if (!currentQuestion || phase !== "answering" || !contentVisible) {
       clearQuestionTimer();
       return;
     }
@@ -211,7 +211,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
     }, 1000);
 
     return clearQuestionTimer;
-  }, [clearQuestionTimer, currentQuestion?.id, handleTimeout, phase, step]);
+  }, [clearQuestionTimer, contentVisible, currentQuestion?.id, handleTimeout, phase, step]);
 
   useEffect(() => () => clearAllTimers(), [clearAllTimers]);
 
