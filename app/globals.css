@@ -455,6 +455,20 @@ html:has(.tm-app-frame) {
   scroll-snap-stop: always;
 }
 
+/* Pronósticos globales home: 5 filas reparten altura; «Ver todos» flota sin restar espacio */
+.tm-home-general-predictions__body {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.tm-home-general-predictions__body .tm-general-prediction-row {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
 .tm-accent-link {
   color: var(--tm-accent);
   font-weight: 500;

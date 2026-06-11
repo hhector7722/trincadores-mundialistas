@@ -103,16 +103,14 @@ export function HomeGeneralPredictionsCard({
 
   return (
     <>
-      <div className="tm-home-top-stat-card @container flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
-        <div className="mb-0.5 flex shrink-0 items-center justify-end">
-          <Link
-            href="/general-predictions"
-            className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-          >
-            Ver todos
-          </Link>
-        </div>
-        <div className="min-h-0 flex-1 space-y-0">
+      <div className="tm-home-top-stat-card @container relative flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
+        <Link
+          href="/general-predictions"
+          className="absolute right-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+        >
+          Ver todos
+        </Link>
+        <div className="tm-home-general-predictions__body">
           <GeneralPredictionRow
             label={labels.champion}
             value={formatChampionDisplay(predictions.championTeam)}

@@ -21,7 +21,7 @@ export function GeneralPredictionRow({
   const hasValue = Boolean(value);
 
   return (
-    <div className="grid min-h-6 grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)_1.25rem] items-center gap-1 py-0.5">
+    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)_1.25rem] items-center gap-1">
       <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
         {label}
       </span>
