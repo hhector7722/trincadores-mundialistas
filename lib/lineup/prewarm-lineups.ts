@@ -18,6 +18,7 @@ import {
   fetchPredictedLineup,
 } from "@/lib/lineup/resolve-lineup";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
+import { isFotmobLineupConfigured } from "@/lib/lineup/sources/fotmob-confirmed";
 import type { LineupPlayerInput } from "@/lib/lineup/types";
 import { maybeNotifyConfirmedLineup } from "@/lib/notifications/confirmed-lineup-notifications";
 import { getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
@@ -56,7 +57,7 @@ async function prewarmTeamLineup(
   teamName: string,
   players: LineupPlayerInput[]
 ): Promise<PrewarmTeamOutcome> {
-  if (!isBsdConfigured()) {
+  if (!isFotmobLineupConfigured() && !isBsdConfigured()) {
     return { status: "skipped", reason: "bsd_unconfigured" };
   }
 

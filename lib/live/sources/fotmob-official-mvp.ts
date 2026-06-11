@@ -141,17 +141,11 @@ export async function fetchOfficialMvpFromFotmob(
   fotmobMatchId: number,
   homeTeam: string,
 ): Promise<OfficialMvpFromFotmob | null> {
-  const response = await fetch(`${FOTMOB_API}/data/matchDetails?matchId=${fotmobMatchId}`, {
-    headers: { "user-agent": "TrincadoresMundialistas/1.0" },
-    signal: AbortSignal.timeout(25_000),
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`FotMob matchDetails ${fotmobMatchId}: HTTP ${response.status}`);
+  const { fetchFotmobMatchDetails } = await import("@/lib/lineup/sources/fotmob-client");
+  const payload = await fetchFotmobMatchDetails(fotmobMatchId);
+  if (!payload) {
+    throw new Error(`FotMob matchDetails ${fotmobMatchId}: sin respuesta`);
   }
-
-  const payload = await response.json();
   return parseOfficialMvpFromFotmobDetails(payload, homeTeam);
 }
 

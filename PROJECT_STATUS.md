@@ -28,7 +28,7 @@
 - [x] Quiz MVP Fase 5 play `/quiz/play`
 - [x] Quiz MVP Fase 5.5 result `/quiz/result` + leaderboard `/quiz/leaderboard`
 - [x] MVP partido: prediccion por partido, scoring +5 pts, modal reutilizable (home/calendario/pronostico)
-- [x] Alineaciones con capa de fuentes: confirmed (BSD/API-Football) > predicted (BSD) > fallback dorsal; BD `match_team_lineups` + badge UI
+- [x] Alineaciones con capa de fuentes: confirmed (FotMob → BSD → API-Football) > predicted (BSD) > fallback dorsal; BD `match_team_lineups` + badge UI
 - [x] Integración BSD (Bzzoiro): predicted lineups WC 2026 + confirmed ~1h antes del pitido
 
 ## Siguiente
@@ -66,3 +66,4 @@
 - [x] Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
 - [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin
+- [x] Alineaciones confirmadas: FotMob como fuente prioritaria (`matchDetails.lineup`, WC2026); script `db:map-fotmob-fixtures`

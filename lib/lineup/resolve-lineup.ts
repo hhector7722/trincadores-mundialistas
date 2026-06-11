@@ -10,6 +10,7 @@ import {
 } from "@/lib/lineup/lineup-queries";
 import { apiFootballConfirmedProvider } from "@/lib/lineup/sources/api-football";
 import { bsdConfirmedProvider } from "@/lib/lineup/sources/bsd-confirmed";
+import { fotmobConfirmedProvider } from "@/lib/lineup/sources/fotmob-confirmed";
 import { bsdPredictedProvider } from "@/lib/lineup/sources/bsd-predicted";
 import { maybeNotifyConfirmedLineup } from "@/lib/notifications/confirmed-lineup-notifications";
 import type { LineupBenchPlayer, LineupResolveContext, LineupSourceKind, ResolvedLineup } from "@/lib/lineup/types";
@@ -22,7 +23,11 @@ export type LineupSourceResolution = {
   fromCache: boolean;
 };
 
-const CONFIRMED_PROVIDERS = [bsdConfirmedProvider, apiFootballConfirmedProvider];
+const CONFIRMED_PROVIDERS = [
+  fotmobConfirmedProvider,
+  bsdConfirmedProvider,
+  apiFootballConfirmedProvider,
+];
 const PREDICTED_PROVIDERS = [bsdPredictedProvider];
 
 export async function fetchConfirmedLineup(
@@ -160,7 +165,7 @@ async function buildFallbackWithKnownFormation(
 
 /**
  * Resuelve la alineación con prioridad:
- * 1. confirmed (API-Football u otra fuente enchufada),
+ * 1. confirmed (FotMob → BSD → API-Football),
  * 2. predicted/probable,
  * 3. fallback dorsal+posición.
  */
