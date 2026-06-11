@@ -45,13 +45,15 @@ export function useGeneralPredictionsNameFontSize(
       return;
     }
 
+    const nameColumn = columnElement;
+
     function measure() {
-      setFontSize(measureNameFontSize(longestLabel, columnElement.clientWidth));
+      setFontSize(measureNameFontSize(longestLabel, nameColumn.clientWidth));
     }
 
     measure();
     const observer = new ResizeObserver(measure);
-    observer.observe(columnElement);
+    observer.observe(nameColumn);
     return () => observer.disconnect();
   }, [columnElement, longestLabel, labels.length]);
 
