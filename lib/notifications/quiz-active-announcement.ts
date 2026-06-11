@@ -1,4 +1,3 @@
-import "@/lib/push/server-only";
 import { NOTIFICATION_KIND_QUIZ_ACTIVE } from "@/lib/notifications/kinds";
 import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-copy";
 import { quizActiveNotificationUrl } from "@/lib/push/urls";

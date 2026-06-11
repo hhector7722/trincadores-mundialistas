@@ -1,4 +1,3 @@
-import "@/lib/push/server-only";
 import webpush from "web-push";
 import { assertVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
