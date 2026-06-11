@@ -19,6 +19,7 @@ type Slide = {
   description?: string;
   cta?: SlideCta;
   customBody?: React.ReactNode;
+  align?: "center" | "left";
 };
 
 type HomeHeroCarouselProps = {
@@ -39,7 +40,8 @@ function buildSlides(
   if (lastMatchHighlight) {
     slides.push({
       id: "last-match-highlight",
-      eyebrow: "ÚLTIMO PARTIDO",
+      eyebrow: "",
+      align: "left",
       customBody: (
         <MatchHighlightBlock
           variant="hero"
@@ -156,10 +158,17 @@ export function HomeHeroCarousel({
             className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
             aria-hidden={index !== activeIndex}
           >
-            <div className="flex w-full min-w-0 max-w-full flex-col items-center text-center">
-              <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
-                {slide.eyebrow}
-              </p>
+            <div
+              className={cn(
+                "flex w-full min-w-0 max-w-full flex-col",
+                slide.align === "left" ? "items-start text-left" : "items-center text-center",
+              )}
+            >
+              {slide.eyebrow ? (
+                <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
+                  {slide.eyebrow}
+                </p>
+              ) : null}
               {slide.customBody ? (
                 slide.customBody
               ) : (
@@ -198,7 +207,7 @@ export function HomeHeroCarousel({
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-label={`${slide.eyebrow}${isActive ? ", activo" : ""}`}
+              aria-label={`${slide.eyebrow || (slide.id === "last-match-highlight" ? "Last match" : slide.id)}${isActive ? ", activo" : ""}`}
               onClick={() => scrollToIndex(index)}
               className={cn(
                 "h-1.5 shrink-0 rounded-full transition-all duration-300 ease-out",
