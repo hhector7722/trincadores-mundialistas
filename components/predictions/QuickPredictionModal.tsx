@@ -22,6 +22,7 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import {
   MatchTeamsDisplay,
+  PREDICTION_MODAL_ACTIONS_ROW_CLASS,
   PREDICTION_MODAL_ACTIONS_STACKED_CLASS,
   PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
@@ -209,6 +210,7 @@ export function QuickPredictionModal({
   );
   const isLiveMatch = viewMatch.status === "live";
   const isFinishedMatch = viewMatch.status === "finished";
+  const hidePossibleLineupsForView = isFinishedMatch;
   const shouldLoadLiveSnapshot = open && (isLiveMatch || isFinishedMatch);
   const { snapshot: liveSnapshot } = useMatchLiveSnapshot(viewMatch.id, shouldLoadLiveSnapshot);
   const highlightVideoId = viewMatch.highlightYoutubeId;
@@ -246,7 +248,7 @@ export function QuickPredictionModal({
   }, [lineupTeamName, panelView.kind]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || hidePossibleLineupsForView) return;
     let cancelled = false;
     void fetchMatchLineupsStatusAction(
       viewMatch.id,
@@ -265,7 +267,7 @@ export function QuickPredictionModal({
     return () => {
       cancelled = true;
     };
-  }, [open, viewMatch.id, viewMatch.home_team, viewMatch.away_team, viewMatch.status]);
+  }, [hidePossibleLineupsForView, open, viewMatch.id, viewMatch.home_team, viewMatch.away_team, viewMatch.status]);
 
   const {
     activeIndex: teamCarouselIndex,
@@ -513,6 +515,10 @@ export function QuickPredictionModal({
   }
 
   function renderPanelView(view: QuickPanelView, targetMatch: MatchWithPrediction) {
+    const hidePossibleLineups = targetMatch.status === "finished";
+    const predictionModalActionsClass = hidePossibleLineups
+      ? PREDICTION_MODAL_ACTIONS_ROW_CLASS
+      : PREDICTION_MODAL_ACTIONS_STACKED_CLASS;
     const finishedHomeGoals =
       targetMatch.officialHome ?? liveSnapshot?.homeScore ?? null;
     const finishedAwayGoals =
@@ -554,7 +560,7 @@ export function QuickPredictionModal({
               />
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
+                className={cn("absolute inset-x-0 bottom-0", predictionModalActionsClass)}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
@@ -564,6 +570,7 @@ export function QuickPredictionModal({
                   awayAnchor="90%"
                   className="h-full"
                   centerSlot={renderMvpCenterSlot(targetMatch)}
+                  hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   possibleLineupsCaption={possibleLineupsCaption}
@@ -651,7 +658,7 @@ export function QuickPredictionModal({
               ) : null}
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
+                className={cn("absolute inset-x-0 bottom-0", predictionModalActionsClass)}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
@@ -661,6 +668,7 @@ export function QuickPredictionModal({
                   awayAnchor="90%"
                   className="h-full"
                   centerSlot={renderMvpCenterSlot(targetMatch)}
+                  hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   possibleLineupsCaption={liveLineupsCaption}
@@ -724,7 +732,7 @@ export function QuickPredictionModal({
               />
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
+                className={cn("absolute inset-x-0 bottom-0", predictionModalActionsClass)}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
@@ -734,6 +742,7 @@ export function QuickPredictionModal({
                   awayAnchor="90%"
                   className="h-full"
                   centerSlot={renderMvpCenterSlot(targetMatch)}
+                  hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                   possibleLineupsCaption={possibleLineupsCaption}

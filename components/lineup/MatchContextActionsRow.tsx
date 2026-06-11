@@ -28,6 +28,8 @@ type MatchContextActionsRowProps = {
   homeAnchor?: string;
   /** Ancla horizontal de plantilla visitante. */
   awayAnchor?: string;
+  /** Oculta el botón de posibles / confirmadas alineaciones (p. ej. partido finalizado). */
+  hidePossibleLineups?: boolean;
   className?: string;
 };
 
@@ -43,6 +45,7 @@ export function MatchContextActionsRow({
   awayAnchor = "90%",
   centerSlot,
   predictionSlot,
+  hidePossibleLineups = false,
   className,
 }: MatchContextActionsRowProps) {
   if (layout === "homeCardScheduledStacked") {
@@ -50,14 +53,16 @@ export function MatchContextActionsRow({
       <div className={cn("flex h-full flex-col items-center justify-start gap-1", className)}>
         <div className="flex shrink-0 items-center justify-center px-1">{centerSlot}</div>
         <div className="flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
-        <div className="flex shrink-0 items-center justify-center px-1">
-          <MatchContextActionButton
-            caption={possibleLineupsCaption}
-            hideCaption={compact}
-            showConfirmedBadge={possibleLineupsConfirmed}
-            onClick={onOpenPossibleLineups}
-          />
-        </div>
+        {hidePossibleLineups ? null : (
+          <div className="flex shrink-0 items-center justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -67,14 +72,16 @@ export function MatchContextActionsRow({
       <div className={cn("flex h-full flex-col items-center justify-start gap-1", className)}>
         <div className="flex shrink-0 items-center justify-center px-1">{centerSlot}</div>
         <div className="flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
-        <div className="flex shrink-0 items-center justify-center px-1">
-          <MatchContextActionButton
-            caption={possibleLineupsCaption}
-            hideCaption={compact}
-            showConfirmedBadge={possibleLineupsConfirmed}
-            onClick={onOpenPossibleLineups}
-          />
-        </div>
+        {hidePossibleLineups ? null : (
+          <div className="flex shrink-0 items-center justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -107,14 +114,16 @@ export function MatchContextActionsRow({
             />
           </div>
         </div>
-        <div className="flex h-8 w-full items-center justify-center px-1">
-          <MatchContextActionButton
-            caption={possibleLineupsCaption}
-            hideCaption={compact}
-            showConfirmedBadge={possibleLineupsConfirmed}
-            onClick={onOpenPossibleLineups}
-          />
-        </div>
+        {hidePossibleLineups ? null : (
+          <div className="flex h-8 w-full items-center justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -144,14 +153,16 @@ export function MatchContextActionsRow({
             />
           </div>
         </div>
-        <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
-          <MatchContextActionButton
-            caption={possibleLineupsCaption}
-            hideCaption={compact}
-            showConfirmedBadge={possibleLineupsConfirmed}
-            onClick={onOpenPossibleLineups}
-          />
-        </div>
+        {hidePossibleLineups ? null : (
+          <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -170,14 +181,16 @@ export function MatchContextActionsRow({
               onClick={onOpenHomeLineup}
             />
           </div>
-          <div className="absolute left-1/2 top-0 z-[1] w-max max-w-[44%] -translate-x-1/2 px-1">
-            <MatchContextActionButton
-              caption={possibleLineupsCaption}
-              hideCaption={compact}
-              showConfirmedBadge={possibleLineupsConfirmed}
-              onClick={onOpenPossibleLineups}
-            />
-          </div>
+          {hidePossibleLineups ? null : (
+            <div className="absolute left-1/2 top-0 z-[1] w-max max-w-[44%] -translate-x-1/2 px-1">
+              <MatchContextActionButton
+                caption={possibleLineupsCaption}
+                hideCaption={compact}
+                showConfirmedBadge={possibleLineupsConfirmed}
+                onClick={onOpenPossibleLineups}
+              />
+            </div>
+          )}
           <div
             className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
             style={{ left: awayAnchor }}
@@ -203,14 +216,18 @@ export function MatchContextActionsRow({
             onClick={onOpenHomeLineup}
           />
         </div>
-        <div className="flex justify-center px-1">
-          <MatchContextActionButton
-            caption={possibleLineupsCaption}
-            hideCaption={compact}
-            showConfirmedBadge={possibleLineupsConfirmed}
-            onClick={onOpenPossibleLineups}
-          />
-        </div>
+        {hidePossibleLineups ? (
+          <div className="flex justify-center px-1" />
+        ) : (
+          <div className="flex justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
         <div className="flex justify-center px-1">
           <MatchContextActionButton
             caption="Plantilla"
