@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
@@ -103,7 +104,15 @@ export function HomeGeneralPredictionsCard({
   return (
     <>
       <div className="tm-home-top-stat-card @container flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card">
-        <div className="space-y-0">
+        <div className="mb-0.5 flex shrink-0 items-center justify-end">
+          <Link
+            href="/general-predictions"
+            className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+          >
+            Ver todos
+          </Link>
+        </div>
+        <div className="min-h-0 flex-1 space-y-0">
           <GeneralPredictionRow
             label={labels.champion}
             value={formatChampionDisplay(predictions.championTeam)}

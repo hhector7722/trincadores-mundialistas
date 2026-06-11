@@ -30,3 +30,18 @@ export const TOURNAMENT_GENERAL_PREDICTION_LABELS: Record<
   tournament_mvp: "MVP",
   golden_glove: "Guante oro",
 };
+
+export type TournamentGeneralPredictionsBoardRow = {
+  profileId: string;
+  label: string;
+  avatarUrl: string | null;
+  championTeam: string | null;
+  finalistTeamA: string | null;
+  finalistTeamB: string | null;
+  topScorerPlayerName: string | null;
+  topScorerTeamName: string | null;
+  tournamentMvpPlayerName: string | null;
+  tournamentMvpTeamName: string | null;
+  goldenGlovePlayerName: string | null;
+  goldenGloveTeamName: string | null;
+};

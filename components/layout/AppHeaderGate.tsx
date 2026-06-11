@@ -10,6 +10,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
   const isHome = pathname === "/";
   const isRanking = pathname === "/ranking";
+  const isGeneralPredictions = pathname === "/general-predictions";
   const isQuizHub = pathname === "/quiz";
   const isProfile = pathname === "/profile";
 
@@ -25,7 +26,9 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
       title={
         isRanking
           ? "LA TABLA"
-          : isQuizHub
+          : isGeneralPredictions
+            ? "PRONÓSTICOS"
+            : isQuizHub
             ? "¿QUIEN SHANELA MÁS DE LOS MUNDIALES?"
             : isProfile
               ? "Perfil"

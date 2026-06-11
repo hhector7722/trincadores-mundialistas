@@ -7,6 +7,11 @@ export function formatChampionDisplay(team: string | null): string | null {
   return teamNameEs(team);
 }
 
+export function formatChampionDisplayCompact(team: string | null): string | null {
+  if (!team) return null;
+  return teamAbbr(team);
+}
+
 export function formatFinalistsDisplay(
   teamA: string | null,
   teamB: string | null
