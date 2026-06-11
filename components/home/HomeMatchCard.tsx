@@ -217,7 +217,7 @@ export function HomeMatchCard({
 
           <div
             className={cn(
-              "absolute inset-x-0 overflow-hidden",
+              "absolute inset-x-0",
               HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
               HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
             )}

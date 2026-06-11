@@ -85,7 +85,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
               "transition-opacity hover:opacity-90 active:opacity-80"
             )}
           >
-            {playCta?.entersPlay ? playCta.label : "Jugar"}
+            Jugar
           </button>
         </div>
       </div>

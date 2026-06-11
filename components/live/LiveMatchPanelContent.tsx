@@ -108,7 +108,7 @@ export function LiveMatchPanelContent({
         ) : null}
 
         <div
-          className={cn("absolute inset-x-0 bottom-0 overflow-hidden", actionsClassName)}
+          className={cn("absolute inset-x-0 bottom-0", actionsClassName)}
           onClick={(event) => event.stopPropagation()}
         >
           <MatchContextActionsRow
