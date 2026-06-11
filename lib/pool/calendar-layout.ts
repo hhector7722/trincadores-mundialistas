@@ -617,7 +617,8 @@ export function syncCalendarGuidePreview(previewCalendar: HTMLElement): void {
 
   const refCell = liveCalendar?.querySelector<HTMLElement>(".tm-cal-cell--matches");
   const refCard = liveCalendar?.querySelector<HTMLElement>(".tm-cal-match-card");
-  const cellWidth = refCell?.clientWidth ?? refCard?.clientWidth ?? GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX;
+  const cellWidth =
+    refCard?.clientWidth ?? refCell?.clientWidth ?? GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX;
 
   previewCalendar.style.setProperty("--tm-cal-guide-preview-w", `${cellWidth}px`);
 

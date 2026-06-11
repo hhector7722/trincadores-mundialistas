@@ -39,20 +39,16 @@ export function CalendarGuidePreviewCell({ entry, finishedState }: CalendarGuide
 
   return (
     <div ref={rootRef} className="tm-porra-calendar tm-cal-guide-preview shrink-0">
-      <div className="tm-cal-cell tm-cal-cell--matches tm-cal-cell-surface relative flex min-h-0 flex-col overflow-hidden">
-        <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-col justify-start">
-          <CalendarFinishedMatchCardVisual
-            homeTeam={entry.match.home_team}
-            awayTeam={entry.match.away_team}
-            groupCode={entry.match.group_code}
-            predictionHome={entry.match.prediction!.home_goals}
-            predictionAway={entry.match.prediction!.away_goals}
-            officialHome={entry.match.officialHome!}
-            officialAway={entry.match.officialAway!}
-            finishedState={finishedState}
-          />
-        </div>
-      </div>
+      <CalendarFinishedMatchCardVisual
+        homeTeam={entry.match.home_team}
+        awayTeam={entry.match.away_team}
+        groupCode={entry.match.group_code}
+        predictionHome={entry.match.prediction!.home_goals}
+        predictionAway={entry.match.prediction!.away_goals}
+        officialHome={entry.match.officialHome!}
+        officialAway={entry.match.officialAway!}
+        finishedState={finishedState}
+      />
     </div>
   );
 }

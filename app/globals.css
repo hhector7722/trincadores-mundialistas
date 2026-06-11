@@ -1685,12 +1685,8 @@ html:has(.tm-app-frame) {
   box-shadow: none;
 }
 
-.tm-porra-calendar.tm-cal-guide-preview .tm-cal-cell {
-  padding: calc(0.0625rem * var(--tm-cal-ui-scale, 1));
-}
-
-.tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-list {
-  display: flex;
+.tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card {
+  width: 100%;
 }
 
 .tm-porra-calendar .tm-cal-match-group-row {
