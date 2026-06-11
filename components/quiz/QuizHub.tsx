@@ -46,8 +46,24 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
 
   return (
     <div className="tm-quiz-hub">
-      <div className="tm-quiz-hub-content space-y-6">
-        <section className="space-y-3" aria-label="Jugar quiz diario">
+      <div className="tm-quiz-hub-content">
+        <section
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+          aria-label="Clasificacion del quiz"
+        >
+          <h2 className="shrink-0 px-3 pb-1 font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
+            Clasificacion del quiz
+          </h2>
+          <QuizLeaderboardTable
+            rows={leaderboardRows}
+            currentProfileId={currentProfileId}
+          />
+        </section>
+
+        <section
+          className="tm-quiz-hub-actions shrink-0 space-y-3 px-3 pt-3"
+          aria-label="Jugar quiz diario"
+        >
           <button
             type="button"
             onClick={handlePlay}
@@ -63,20 +79,9 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             </p>
           )}
 
-          <div className="space-y-1 text-center text-xs leading-relaxed text-[var(--tm-muted)]">
-            <p>Un intento por dia. Puntuan a partir del 11 de junio.</p>
-            <p>Los intentos previos son de entrenamiento.</p>
-          </div>
-        </section>
-
-        <section className="space-y-2" aria-label="Clasificacion del quiz">
-          <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
-            Clasificacion del quiz
-          </h2>
-          <QuizLeaderboardTable
-            rows={leaderboardRows}
-            currentProfileId={currentProfileId}
-          />
+          <p className="text-center text-xs text-[var(--tm-muted)]">
+            Un intento por día.
+          </p>
         </section>
       </div>
 

@@ -1,5 +1,7 @@
+import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
+import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
 import { isPoolOwner } from "@/lib/pool/admin";
 import { parseQuizOptions } from "@/lib/quiz/options";
 import { parseQuizStartSession } from "@/lib/quiz/parse-session";
@@ -14,18 +16,6 @@ import type {
   QuizStartSession,
 } from "@/lib/quiz/types";
 import { createClient } from "@/lib/supabase/server";
-
-type ProfileLabelRow = {
-  display_name: string | null;
-  username: string;
-};
-
-function pickJoinedProfile(profiles: unknown): ProfileLabelRow | null {
-  if (!profiles) return null;
-  const row = Array.isArray(profiles) ? profiles[0] : profiles;
-  if (!row || typeof row !== "object" || !("username" in row)) return null;
-  return row as ProfileLabelRow;
-}
 
 type QuizDbRow = {
   id: string;
@@ -264,12 +254,63 @@ export async function getQuizResult(
   };
 }
 
+type QuizMemberRow = {
+  profileId: string;
+  label: string;
+  avatarUrl: string | null;
+};
+
+async function loadQuizPoolMembers(poolId: string): Promise<QuizMemberRow[]> {
+  const supabase = await createClient();
+  const { data: memberships, error: memberError } = await supabase
+    .from("pool_members")
+    .select("profile_id")
+    .eq("pool_id", poolId);
+
+  if (memberError) throw new Error(memberError.message);
+  if (!memberships?.length) return [];
+
+  const profileIds = memberships.map((m) => m.profile_id as string);
+  const { data: profiles, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url, onboarding_completed_at")
+    .in("id", profileIds);
+
+  if (profileError) throw new Error(profileError.message);
+
+  const profileMap = new Map(
+    (profiles ?? [])
+      .filter((p) => isProfileOnboardingComplete(p))
+      .map((p) => [
+        p.id as string,
+        {
+          label: (p.display_name as string | null)?.trim() || (p.username as string),
+          avatarUrl: (p.avatar_url as string | null) ?? null,
+        },
+      ])
+  );
+
+  return memberships
+    .map((m) => {
+      const profile = profileMap.get(m.profile_id as string);
+      if (!profile) return null;
+      return {
+        profileId: m.profile_id as string,
+        label: profile.label,
+        avatarUrl: profile.avatarUrl,
+      };
+    })
+    .filter((row): row is QuizMemberRow => row !== null);
+}
+
 export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboardRow[]> {
   const supabase = await createClient();
+  const members = await loadQuizPoolMembers(poolId);
+  if (!members.length) return [];
 
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
-    .select("id")
+    .select("id, max_points")
     .eq("pool_id", poolId)
     .eq("kind", "official")
     .eq("scoring_mode", "competitive");
@@ -277,49 +318,52 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
   if (quizError) throw new Error(quizError.message);
 
   const quizIds = (quizzes ?? []).map((q) => q.id as string);
-  if (!quizIds.length) return [];
+  const maxPointsByQuiz = new Map(
+    (quizzes ?? []).map((q) => [q.id as string, (q.max_points as number) ?? 0])
+  );
 
-  const { data: scores, error: scoreError } = await supabase
-    .from("quiz_leaderboard")
-    .select("quiz_id, profile_id, best_score")
-    .in("quiz_id", quizIds);
+  const totals = new Map<string, { totalScore: number; totalMaxPoints: number }>();
 
-  if (scoreError) throw new Error(scoreError.message);
+  if (quizIds.length) {
+    const { data: scores, error: scoreError } = await supabase
+      .from("quiz_leaderboard")
+      .select("quiz_id, profile_id, best_score")
+      .in("quiz_id", quizIds);
 
-  const { data: members, error: memberError } = await supabase
-    .from("pool_members")
-    .select("profile_id, profiles(display_name, username)")
-    .eq("pool_id", poolId);
+    if (scoreError) throw new Error(scoreError.message);
 
-  if (memberError) throw new Error(memberError.message);
-
-  const labelByProfile = new Map<string, string>();
-  for (const member of members ?? []) {
-    const profile = pickJoinedProfile(member.profiles);
-    if (!profile) continue;
-    labelByProfile.set(
-      member.profile_id as string,
-      profile.display_name?.trim() || profile.username
-    );
+    for (const row of scores ?? []) {
+      const profileId = row.profile_id as string;
+      const current = totals.get(profileId) ?? { totalScore: 0, totalMaxPoints: 0 };
+      current.totalScore += (row.best_score as number) ?? 0;
+      current.totalMaxPoints += maxPointsByQuiz.get(row.quiz_id as string) ?? 0;
+      totals.set(profileId, current);
+    }
   }
 
-  const totals = new Map<string, { totalScore: number; daysPlayed: number }>();
-  for (const row of scores ?? []) {
-    const profileId = row.profile_id as string;
-    const current = totals.get(profileId) ?? { totalScore: 0, daysPlayed: 0 };
-    current.totalScore += (row.best_score as number) ?? 0;
-    current.daysPlayed += 1;
-    totals.set(profileId, current);
-  }
+  const merged = members.map((member) => {
+    const stats = totals.get(member.profileId);
+    const totalScore = stats?.totalScore ?? 0;
+    const totalMaxPoints = stats?.totalMaxPoints ?? 0;
+    return {
+      profileId: member.profileId,
+      label: member.label,
+      avatarUrl: member.avatarUrl,
+      totalScore,
+      reliabilityPct: computeQuizReliabilityPct(totalScore, totalMaxPoints),
+    };
+  });
 
-  return [...totals.entries()]
-    .map(([profileId, stats]) => ({
-      profileId,
-      label: labelByProfile.get(profileId) ?? profileId.slice(0, 8),
-      totalScore: stats.totalScore,
-      daysPlayed: stats.daysPlayed,
-    }))
-    .sort((a, b) => b.totalScore - a.totalScore || a.label.localeCompare(b.label, "es"));
+  merged.sort(
+    (a, b) =>
+      b.totalScore - a.totalScore ||
+      a.label.localeCompare(b.label, "es", { sensitivity: "base" })
+  );
+
+  return merged.map((row, index) => ({
+    ...row,
+    position: index + 1,
+  }));
 }
 
 export { getLatestSubmittedAttemptId } from "@/lib/quiz/slot-status";

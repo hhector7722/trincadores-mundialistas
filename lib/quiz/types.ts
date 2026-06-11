@@ -76,10 +76,12 @@ export type QuizDayHub = {
 };
 
 export type QuizLeaderboardRow = {
+  position: number;
   profileId: string;
   label: string;
+  avatarUrl: string | null;
   totalScore: number;
-  daysPlayed: number;
+  reliabilityPct: number | null;
 };
 
 export type QuizResultResponse = {

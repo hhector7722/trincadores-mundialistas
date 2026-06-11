@@ -802,14 +802,48 @@ html:has(.tm-app-frame) {
   min-height: 0;
   flex: 1 1 0%;
   flex-direction: column;
-  justify-content: center;
+  height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .tm-quiz-hub-content {
+  display: flex;
   width: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  height: 0;
+  min-height: 0;
+  min-width: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tm-quiz-hub-actions {
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-quiz-leaderboard-table {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  height: 0;
+  min-height: 0;
+  min-width: 0;
+}
+
+.tm-quiz-leaderboard-body {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tm-quiz-leaderboard-row {
+  flex: 1 1 0%;
+  min-height: 2.375rem;
+  line-height: 1.2;
 }
 
 .tm-quiz-page--play > * {

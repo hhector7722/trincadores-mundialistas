@@ -1,8 +1,26 @@
-import type { QuizLeaderboardRow } from "@/lib/quiz/types";
+import { QuizLeaderboardRow } from "@/components/quiz/QuizLeaderboardRow";
+import { QUIZ_RANKING_GRID } from "@/components/quiz/quiz-ranking-grid";
+import type { QuizLeaderboardRow as QuizLeaderboardRowType } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 
+function QuizLeaderboardHeader() {
+  return (
+    <div
+      className={cn(
+        QUIZ_RANKING_GRID,
+        "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
+      )}
+    >
+      <span>Pos</span>
+      <span className="text-center">Trincador</span>
+      <span className="text-right">Quiz</span>
+      <span className="text-right">Fiab</span>
+    </div>
+  );
+}
+
 type QuizLeaderboardTableProps = {
-  rows: QuizLeaderboardRow[];
+  rows: QuizLeaderboardRowType[];
   currentProfileId: string;
 };
 
@@ -10,43 +28,18 @@ export function QuizLeaderboardTable({
   rows,
   currentProfileId,
 }: QuizLeaderboardTableProps) {
-  if (!rows.length) {
-    return (
-      <p className="py-8 text-center text-sm text-[var(--tm-muted)]">
-        Aun no hay puntuacion competitiva en el quiz.
-      </p>
-    );
-  }
-
   return (
-    <ul className="divide-y divide-[var(--tm-border)]">
-      {rows.map((row, index) => {
-        const isSelf = row.profileId === currentProfileId;
-        return (
-          <li
+    <div className="tm-quiz-leaderboard-table">
+      <QuizLeaderboardHeader />
+      <div className="tm-quiz-leaderboard-body">
+        {rows.map((row) => (
+          <QuizLeaderboardRow
             key={row.profileId}
-            className={cn(
-              "flex min-h-12 items-center gap-3 px-4 py-3",
-              isSelf && "bg-[var(--tm-highlight)]"
-            )}
-          >
-            <span className="w-7 text-center font-display text-sm text-[var(--tm-fg)]">
-              {index + 1}
-            </span>
-            <span
-              className={cn(
-                "min-w-0 flex-1 truncate text-sm font-medium",
-                isSelf ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
-              )}
-            >
-              {row.label}
-            </span>
-            <span className="font-display text-sm text-[var(--tm-accent)]">
-              {row.totalScore}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
+            row={row}
+            isCurrentUser={row.profileId === currentProfileId}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
