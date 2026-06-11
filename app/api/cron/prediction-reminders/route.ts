@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { syncConfirmedLineupNotifications } from "@/lib/notifications/confirmed-lineup-notifications";
 import { sendPredictionReminders } from "@/lib/notifications/prediction-reminders";
 import { assertCronAuthorized } from "@/lib/quiz/cron";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
@@ -13,11 +14,15 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await sendPredictionReminders(admin);
+    const [predictionReminders, confirmedLineups] = await Promise.all([
+      sendPredictionReminders(admin),
+      syncConfirmedLineupNotifications(admin),
+    ]);
 
     return NextResponse.json({
       ok: true,
-      ...result,
+      predictionReminders,
+      confirmedLineups,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido";

@@ -1,8 +1,7 @@
 import { getLatestSubmittedAttemptId } from "@/lib/quiz/queries";
-import { QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF } from "@/lib/quiz/play-routes";
 import {
-  canReplayQuiz,
   formatQuizSlotStatusLabel,
+  getQuizPlayCta,
   getQuizSlotStatus,
   type QuizSlotStatus,
 } from "@/lib/quiz/slot-status";
@@ -18,26 +17,6 @@ export type HomeQuizSlide = {
   ctaLabel: string;
   ctaHref: string;
 };
-
-function ctaForStatus(
-  status: QuizSlotStatus,
-  resultHref: string | null,
-  replayable: boolean
-): { label: string; href: string } {
-  if (replayable) {
-    return { label: "Jugar de nuevo", href: QUIZ_PLAY_HREF };
-  }
-  if (status === "completed" && resultHref) {
-    return { label: "Ver resultado", href: resultHref };
-  }
-  if (status === "in_progress") {
-    return { label: "Continuar", href: QUIZ_PLAY_RESUME_HREF };
-  }
-  if (status === "expired") {
-    return { label: "Nuevo intento", href: QUIZ_PLAY_HREF };
-  }
-  return { label: "Jugar", href: QUIZ_PLAY_HREF };
-}
 
 function headlineForSlide(
   status: QuizSlotStatus,
@@ -64,11 +43,15 @@ function descriptionForSlide(scoringMode: QuizScoringMode, competitive: boolean)
 export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
   if (!hub.official) return null;
 
+  const access = { isOwner: hub.isOwner };
   const status = getQuizSlotStatus(hub.official);
   const resultId = getLatestSubmittedAttemptId(hub.official);
-  const resultHref = resultId ? `/quiz/result?attempt=${resultId}` : null;
-  const replayable = canReplayQuiz(hub.official, { isOwner: hub.isOwner });
-  const cta = ctaForStatus(status, resultHref, replayable);
+  const cta =
+    getQuizPlayCta(hub.official, {
+      ...access,
+      resultAttemptId: resultId,
+    }) ?? { label: "Ir al quiz", href: "/quiz", entersPlay: false };
+  const replayable = status === "completed" && cta.entersPlay;
   const score =
     hub.official.attempt?.status === "submitted"
       ? (hub.official.attempt.score ?? null)

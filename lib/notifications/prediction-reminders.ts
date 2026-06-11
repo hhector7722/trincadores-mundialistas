@@ -1,6 +1,7 @@
+import { NOTIFICATION_KIND_PREDICTION_REMINDER } from "@/lib/notifications/kinds";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
-export const PREDICTION_REMINDER_KIND = "prediction_reminder";
+export const PREDICTION_REMINDER_KIND = NOTIFICATION_KIND_PREDICTION_REMINDER;
 export const PREDICTION_REMINDER_MINUTES = 30;
 /** Debe coincidir con el intervalo del cron en vercel.json (cada 5 min). */
 export const PREDICTION_REMINDER_CRON_INTERVAL_MS = 5 * 60 * 1000;

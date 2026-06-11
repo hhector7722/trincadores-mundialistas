@@ -13,6 +13,7 @@ export type MvpModalFormations = {
 export type EntityModalTitleOptions = {
   mvpFormations?: MvpModalFormations;
   lineupFormation?: string;
+  possibleLineupsTitle?: string;
 };
 
 export function entityModalTitleContent(
@@ -47,7 +48,7 @@ export function entityModalTitleContent(
     case "mvp":
       return "MVP";
     case "possible-lineups":
-      return "POSIBLES ALINEACIONES";
+      return options?.possibleLineupsTitle ?? "POSIBLES ALINEACIONES";
     default:
       return "Detalle";
   }

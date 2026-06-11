@@ -7,6 +7,7 @@ import { Bell, Check, Loader2 } from "lucide-react";
 import { NotificationCountBadge } from "@/components/notifications/NotificationCountBadge";
 import { useUnreadNotifications } from "@/components/notifications/UnreadNotificationsContext";
 import { formatNotificationDateTimeLine } from "@/lib/notifications/format";
+import { notificationNavigationPath } from "@/lib/notifications/notification-navigation";
 import type { NotificationRow } from "@/lib/notifications/types";
 import { cn } from "@/lib/utils";
 
@@ -166,8 +167,9 @@ export function NotificationsBell() {
     async (row: NotificationRow) => {
       await markRead(row.id);
       setOpen(false);
-      if (row.match_id) {
-        router.push(`/predictions/${row.match_id}`);
+      const target = notificationNavigationPath(row);
+      if (target) {
+        router.push(target);
       }
     },
     [markRead, router],

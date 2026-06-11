@@ -7,6 +7,7 @@ type MatchContextActionsRowProps = {
   onOpenHomeLineup: () => void;
   onOpenAwayLineup: () => void;
   onOpenPossibleLineups: () => void;
+  possibleLineupsCaption?: string;
   /** Sin etiquetas grises ni borde superior. */
   compact?: boolean;
   /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
@@ -24,6 +25,7 @@ export function MatchContextActionsRow({
   onOpenHomeLineup,
   onOpenAwayLineup,
   onOpenPossibleLineups,
+  possibleLineupsCaption = "Posibles alineaciones",
   compact = false,
   layout = "grid",
   homeAnchor = "10%",
@@ -61,7 +63,7 @@ export function MatchContextActionsRow({
         </div>
         <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
           <MatchContextActionButton
-            caption="Posibles alineaciones"
+            caption={possibleLineupsCaption}
             hideCaption={compact}
             onClick={onOpenPossibleLineups}
           />
@@ -97,7 +99,7 @@ export function MatchContextActionsRow({
         </div>
         <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
           <MatchContextActionButton
-            caption="Posibles alineaciones"
+            caption={possibleLineupsCaption}
             hideCaption={compact}
             onClick={onOpenPossibleLineups}
           />
@@ -154,7 +156,7 @@ export function MatchContextActionsRow({
         </div>
         <div className="flex justify-center px-1">
           <MatchContextActionButton
-            caption="Posibles alineaciones"
+            caption={possibleLineupsCaption}
             hideCaption={compact}
             onClick={onOpenPossibleLineups}
           />

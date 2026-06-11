@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
 import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
-import { getQuizSlotStatus } from "@/lib/quiz/slot-status";
+import {
+  getLatestSubmittedAttemptId,
+  getQuizPlayCta,
+  shouldShowQuizAlreadyPlayedModal,
+} from "@/lib/quiz/slot-status";
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
 
 const playButtonClass =
@@ -16,35 +20,27 @@ type QuizHubProps = {
   currentProfileId: string;
 };
 
-function hasPlayedToday(hub: QuizDayHub): boolean {
-  const attempt = hub.official?.attempt;
-  return attempt?.status === "submitted";
-}
-
-function canStartQuiz(hub: QuizDayHub): boolean {
-  if (!hub.official) return false;
-  const status = getQuizSlotStatus(hub.official);
-  return status === "ready" || status === "in_progress" || status === "expired";
-}
-
 export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps) {
   const router = useRouter();
   const [waitModalOpen, setWaitModalOpen] = useState(false);
 
   const quizAvailable = Boolean(hub.official);
-  const playedToday = hasPlayedToday(hub);
-  const canPlay = canStartQuiz(hub);
+  const access = { isOwner: hub.isOwner };
+  const playCta = getQuizPlayCta(hub.official, {
+    ...access,
+    resultAttemptId: getLatestSubmittedAttemptId(hub.official),
+  });
 
   function handlePlay() {
-    if (!quizAvailable) return;
+    if (!quizAvailable || !hub.official) return;
 
-    if (playedToday) {
+    if (shouldShowQuizAlreadyPlayedModal(hub.official, access)) {
       setWaitModalOpen(true);
       return;
     }
 
-    if (canPlay) {
-      router.push("/quiz/play");
+    if (playCta?.entersPlay) {
+      router.push(playCta.href);
     }
   }
 
@@ -55,7 +51,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           <button
             type="button"
             onClick={handlePlay}
-            disabled={!quizAvailable}
+            disabled={!quizAvailable || !playCta?.entersPlay}
             className={playButtonClass}
           >
             JUGAR
@@ -87,7 +83,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
       <QuizWaitModal
         open={waitModalOpen}
         onClose={() => setWaitModalOpen(false)}
-        message="Espera hasta mañana para un nuevo intento crack."
+        message="Ya has jugado el quiz diario de hoy. Espera a mañana crack."
       />
     </div>
   );

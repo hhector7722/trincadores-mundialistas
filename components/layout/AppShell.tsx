@@ -1,5 +1,6 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
 import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotificationsShell";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
@@ -20,6 +21,7 @@ export function AppShell({
   return (
     <NavigationLoadingProvider>
       <UnreadNotificationsShell>
+        <LineupsNotificationOpener />
         <TabNavigationProvider>
           <div className="tm-app-frame">
             <div

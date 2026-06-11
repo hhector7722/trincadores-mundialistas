@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
 import { Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -51,6 +52,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
     open: boolean;
     view: EntityModalView;
   }>({ open: false, view: buildLineupView(match.home_team) });
+  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState("Posibles alineaciones");
 
   const displayMatch = useMemo(
     () => mergeMvpIntoMatch(match, mvpSnapshot),
@@ -60,6 +62,19 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
   useEffect(() => {
     setMvpSnapshot(mvpSnapshotFromMatch(match));
   }, [match.id, match.mvpPrediction?.player_name, match.mvpPrediction?.updated_at]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchMatchLineupsStatusAction(match.id, match.home_team, match.away_team).then((result) => {
+      if (cancelled || !result.ok) return;
+      setPossibleLineupsCaption(
+        result.data.bothConfirmed ? "Alineaciones oficiales" : "Posibles alineaciones",
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [match.id, match.home_team, match.away_team]);
 
   function handleMvpSaved(playerName: string, teamName: string, shirtNumber?: number | null) {
     setMvpSnapshot({
@@ -194,6 +209,7 @@ export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
                 onOpenAwayLineup={() =>
                   openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
                 }
+                possibleLineupsCaption={possibleLineupsCaption}
                 onOpenPossibleLineups={() =>
                   openEntityModal(buildPossibleLineupsView(displayMatch))
                 }

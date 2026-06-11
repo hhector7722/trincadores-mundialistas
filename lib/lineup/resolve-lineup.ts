@@ -11,7 +11,9 @@ import {
 import { apiFootballConfirmedProvider } from "@/lib/lineup/sources/api-football";
 import { bsdConfirmedProvider } from "@/lib/lineup/sources/bsd-confirmed";
 import { bsdPredictedProvider } from "@/lib/lineup/sources/bsd-predicted";
+import { maybeNotifyConfirmedLineup } from "@/lib/notifications/confirmed-lineup-notifications";
 import type { LineupBenchPlayer, LineupResolveContext, LineupSourceKind, ResolvedLineup } from "@/lib/lineup/types";
+import { createAdminClient } from "@/lib/scripts/supabase-admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type LineupSourceResolution = {
@@ -259,6 +261,26 @@ export function benchPlayersExcludingStarters(
   return benchFromResolved(lineup, { teamName: "", players });
 }
 
+function scheduleConfirmedLineupNotification(
+  matchId: string,
+  homeTeam: string,
+  awayTeam: string,
+): void {
+  void (async () => {
+    try {
+      const admin = createAdminClient();
+      await maybeNotifyConfirmedLineup(admin, {
+        id: matchId,
+        home_team: homeTeam,
+        away_team: awayTeam,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "notify confirmed lineup";
+      console.error("[lineup] confirmed notification failed", message);
+    }
+  })();
+}
+
 export async function resolveMatchLineups(
   supabase: SupabaseClient,
   matchId: string,
@@ -271,5 +293,8 @@ export async function resolveMatchLineups(
     resolveTeamLineup(supabase, { matchId, teamName: homeTeam, players: homePlayers }),
     resolveTeamLineup(supabase, { matchId, teamName: awayTeam, players: awayPlayers }),
   ]);
+
+  scheduleConfirmedLineupNotification(matchId, homeTeam, awayTeam);
+
   return { home, away };
 }

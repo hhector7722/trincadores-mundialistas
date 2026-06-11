@@ -2,6 +2,8 @@
 
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { getPlayerDetail, type PlayerDetail } from "@/lib/lineup/player-detail";
+import { loadCachedTeamLineup } from "@/lib/lineup/lineup-queries";
+import { areMatchLineupsFullyConfirmed } from "@/lib/lineup/lineups-modal-copy";
 import { resolveMatchLineups, resolveTeamLineup } from "@/lib/lineup/resolve-lineup";
 import type { FormationId, ResolvedLineup } from "@/lib/lineup/types";
 import { loadTeamKitHexBySlug } from "@/lib/lineup/team-kit-queries";
@@ -184,6 +186,29 @@ export async function fetchResolvedTeamLineupAction(
   const result = await fetchTeamLineupBundleAction(teamName, options);
   if (!result.ok) return result;
   return { ok: true, data: result.data.lineup };
+}
+
+export async function fetchMatchLineupsStatusAction(
+  matchId: string,
+  homeTeam: string,
+  awayTeam: string,
+): Promise<LineupActionResult<{ bothConfirmed: boolean }>> {
+  try {
+    const supabase = await createClient();
+    const [home, away] = await Promise.all([
+      loadCachedTeamLineup(supabase, matchId, homeTeam),
+      loadCachedTeamLineup(supabase, matchId, awayTeam),
+    ]);
+
+    return {
+      ok: true,
+      data: { bothConfirmed: areMatchLineupsFullyConfirmed(home, away) },
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudo comprobar el estado de las alineaciones.";
+    return { ok: false, error: message };
+  }
 }
 
 export async function fetchResolvedMatchLineupsAction(

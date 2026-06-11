@@ -1,4 +1,5 @@
 import { isQuizWindowOpen } from "@/lib/quiz/date";
+import { QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF } from "@/lib/quiz/play-routes";
 import type { QuizDaySlot, QuizScoringMode } from "@/lib/quiz/types";
 
 export type QuizSlotStatus =
@@ -40,6 +41,11 @@ export type QuizPlayAccessOptions = {
   isOwner?: boolean;
 };
 
+export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | null {
+  if (!slot?.attempt || slot.attempt.status !== "submitted") return null;
+  return slot.attempt.id;
+}
+
 export function canOpenQuizPlay(
   slot: QuizDaySlot | null,
   scoringMode?: QuizScoringMode,
@@ -65,8 +71,74 @@ export function canReplayQuiz(
 ): boolean {
   if (!slot) return false;
   if (getQuizSlotStatus(slot) !== "completed") return false;
-  if (slot.quiz.scoring_mode === "training") return true;
-  return options?.isOwner === true;
+  return canOpenQuizPlay(slot, undefined, options);
+}
+
+export type QuizPlayCta = {
+  label: string;
+  href: string;
+  entersPlay: boolean;
+};
+
+export function getQuizPlayCta(
+  slot: QuizDaySlot | null,
+  options?: QuizPlayAccessOptions & { resultAttemptId?: string | null }
+): QuizPlayCta | null {
+  if (!slot) return null;
+
+  const status = getQuizSlotStatus(slot);
+  const canPlay = canOpenQuizPlay(slot, undefined, options);
+
+  if (canPlay) {
+    if (status === "in_progress") {
+      return {
+        label: "Continuar",
+        href: QUIZ_PLAY_RESUME_HREF,
+        entersPlay: true,
+      };
+    }
+    if (status === "completed") {
+      return {
+        label: "Jugar de nuevo",
+        href: QUIZ_PLAY_HREF,
+        entersPlay: true,
+      };
+    }
+    if (status === "expired") {
+      return {
+        label: "Nuevo intento",
+        href: QUIZ_PLAY_HREF,
+        entersPlay: true,
+      };
+    }
+    return { label: "Jugar", href: QUIZ_PLAY_HREF, entersPlay: true };
+  }
+
+  if (status === "completed") {
+    const attemptId = options?.resultAttemptId?.trim();
+    if (attemptId) {
+      return {
+        label: "Ver resultado",
+        href: `/quiz/result?attempt=${attemptId}`,
+        entersPlay: false,
+      };
+    }
+    return { label: "Ya jugado", href: "/quiz", entersPlay: false };
+  }
+
+  return { label: "Ir al quiz", href: "/quiz", entersPlay: false };
+}
+
+/** Modal "ya jugado hoy" — competitivo completado sin rejugada (p. ej. no owner). */
+export function shouldShowQuizAlreadyPlayedModal(
+  slot: QuizDaySlot | null,
+  options?: QuizPlayAccessOptions
+): boolean {
+  if (!slot) return false;
+  return (
+    getQuizSlotStatus(slot) === "completed" &&
+    !canOpenQuizPlay(slot, undefined, options)
+  );
 }
 
 export function formatQuizSlotStatusLabel(status: QuizSlotStatus): string {

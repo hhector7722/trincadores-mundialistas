@@ -3,7 +3,7 @@ import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
 import { getLatestSubmittedAttemptId, getQuizDayHub } from "@/lib/quiz/queries";
 import { isQuizPlayResume } from "@/lib/quiz/play-routes";
-import { canOpenQuizPlay, getQuizSlotStatus } from "@/lib/quiz/slot-status";
+import { canOpenQuizPlay } from "@/lib/quiz/slot-status";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,16 +29,11 @@ export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) 
     redirect("/quiz");
   }
 
-  const status = getQuizSlotStatus(slot);
-  const isCompetitive = slot.quiz.scoring_mode === "competitive";
+  const access = { isOwner: hub.isOwner };
 
-  if (status === "completed" && isCompetitive && !hub.isOwner) {
+  if (!canOpenQuizPlay(slot, undefined, access)) {
     const attemptId = getLatestSubmittedAttemptId(slot);
     redirect(attemptId ? `/quiz/result?attempt=${attemptId}` : "/quiz");
-  }
-
-  if (!canOpenQuizPlay(slot, undefined, { isOwner: hub.isOwner })) {
-    redirect("/quiz");
   }
 
   return (

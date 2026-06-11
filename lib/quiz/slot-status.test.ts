@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { canOpenQuizPlay, canReplayQuiz } from "./slot-status";
+import {
+  canOpenQuizPlay,
+  canReplayQuiz,
+  getQuizPlayCta,
+  shouldShowQuizAlreadyPlayedModal,
+} from "./slot-status";
 import type { QuizDaySlot } from "./types";
 
 function slot(scoringMode: "training" | "competitive", status: "submitted" | "in_progress"): QuizDaySlot {
@@ -47,4 +52,23 @@ test("owner can replay competitive after submitted", () => {
   const access = { isOwner: true };
   assert.equal(canOpenQuizPlay(s, undefined, access), true);
   assert.equal(canReplayQuiz(s, access), true);
+});
+
+test("competitive completed blocks play from all ctas except owner", () => {
+  const s = slot("competitive", "submitted");
+  const blocked = getQuizPlayCta(s, { resultAttemptId: "a1" });
+  assert.equal(blocked?.entersPlay, false);
+  assert.equal(blocked?.href, "/quiz/result?attempt=a1");
+  assert.equal(shouldShowQuizAlreadyPlayedModal(s), true);
+
+  const ownerCta = getQuizPlayCta(s, { isOwner: true });
+  assert.equal(ownerCta?.entersPlay, true);
+  assert.equal(shouldShowQuizAlreadyPlayedModal(s, { isOwner: true }), false);
+});
+
+test("training completed still allows replay consistently", () => {
+  const s = slot("training", "submitted");
+  const cta = getQuizPlayCta(s);
+  assert.equal(cta?.entersPlay, true);
+  assert.equal(shouldShowQuizAlreadyPlayedModal(s), false);
 });

@@ -19,6 +19,7 @@ import {
 } from "@/lib/lineup/resolve-lineup";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
 import type { LineupPlayerInput } from "@/lib/lineup/types";
+import { maybeNotifyConfirmedLineup } from "@/lib/notifications/confirmed-lineup-notifications";
 import { getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -160,6 +161,18 @@ export async function prewarmUpcomingLineups(
           error instanceof Error ? error.message : "Error desconocido en precalentamiento";
         result.errors.push(`${match.id}/${teamName}: ${message}`);
       }
+    }
+
+    try {
+      await maybeNotifyConfirmedLineup(supabase, {
+        id: match.id,
+        home_team: match.home_team,
+        away_team: match.away_team,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Error al notificar alineaciones confirmadas";
+      result.errors.push(`${match.id}/notify: ${message}`);
     }
   }
 

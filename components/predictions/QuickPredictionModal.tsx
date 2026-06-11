@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
+import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
 import { fetchSavedMvpPlayerName } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
 import {
@@ -116,10 +117,14 @@ function MatchSwipeDots({ position }: { position: DotPosition }) {
   );
 }
 
-function quickPanelTitle(view: QuickPanelView, lineupFormation?: string): ReactNode {
+function quickPanelTitle(
+  view: QuickPanelView,
+  options?: { lineupFormation?: string; possibleLineupsTitle?: string },
+): ReactNode {
   if (view.kind === "prediction") return "Pronóstico";
   return entityModalTitleContent(view, {
-    lineupFormation: view.kind === "lineup" ? lineupFormation : undefined,
+    lineupFormation: view.kind === "lineup" ? options?.lineupFormation : undefined,
+    possibleLineupsTitle: view.kind === "possible-lineups" ? options?.possibleLineupsTitle : undefined,
   });
 }
 
@@ -142,6 +147,8 @@ export function QuickPredictionModal({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
+  const [possibleLineupsTitle, setPossibleLineupsTitle] = useState<string | undefined>();
+  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState("Posibles alineaciones");
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
@@ -185,7 +192,28 @@ export function QuickPredictionModal({
     if (panelView.kind === "lineup") {
       setLineupFormation(undefined);
     }
+    if (panelView.kind === "possible-lineups") {
+      setPossibleLineupsTitle(undefined);
+    }
   }, [lineupTeamName, panelView.kind]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    void fetchMatchLineupsStatusAction(
+      viewMatch.id,
+      viewMatch.home_team,
+      viewMatch.away_team,
+    ).then((result) => {
+      if (cancelled || !result.ok) return;
+      setPossibleLineupsCaption(
+        result.data.bothConfirmed ? "Alineaciones oficiales" : "Posibles alineaciones",
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, viewMatch.id, viewMatch.home_team, viewMatch.away_team]);
 
   const {
     activeIndex: teamCarouselIndex,
@@ -472,6 +500,7 @@ export function QuickPredictionModal({
                   }
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                   onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                  possibleLineupsCaption={possibleLineupsCaption}
                   onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
                 />
               </div>
@@ -539,6 +568,7 @@ export function QuickPredictionModal({
         matchId={view.matchId}
         homeTeam={view.homeTeam}
         awayTeam={view.awayTeam}
+        onTitleChange={setPossibleLineupsTitle}
       />
     );
   }
@@ -577,7 +607,7 @@ export function QuickPredictionModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={quickPanelTitle(panelView, lineupFormation)}
+      title={quickPanelTitle(panelView, { lineupFormation, possibleLineupsTitle })}
       hideTitle={atPredictionRoot}
       hideHeaderDivider
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}

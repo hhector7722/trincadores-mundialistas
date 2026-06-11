@@ -322,10 +322,7 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
     .sort((a, b) => b.totalScore - a.totalScore || a.label.localeCompare(b.label, "es"));
 }
 
-export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | null {
-  if (!slot?.attempt || slot.attempt.status !== "submitted") return null;
-  return slot.attempt.id;
-}
+export { getLatestSubmittedAttemptId } from "@/lib/quiz/slot-status";
 
 export function isQuizPlayable(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;

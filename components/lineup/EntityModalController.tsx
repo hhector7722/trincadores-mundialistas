@@ -51,6 +51,7 @@ function renderEntityView(
     onMvpSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
     onMvpFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
     onFormationResolved?: (formationLabel: string) => void;
+    onPossibleLineupsTitleChange?: (title: string) => void;
   },
   playerPickMode: PlayerPickMode
 ) {
@@ -102,6 +103,7 @@ function renderEntityView(
           matchId={view.matchId}
           homeTeam={view.homeTeam}
           awayTeam={view.awayTeam}
+          onTitleChange={handlers.onPossibleLineupsTitleChange}
         />
       );
     default:
@@ -124,6 +126,7 @@ export function EntityModalController({
 }: EntityModalControllerProps) {
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
+  const [possibleLineupsTitle, setPossibleLineupsTitle] = useState<string | undefined>();
   const { current, canGoBack, push, pop, reset, isSliding, buildPanelSlide } =
     usePanelSlideStack<EntityModalView>(initialView);
 
@@ -167,6 +170,7 @@ export function EntityModalController({
       reset(initialView);
       setMvpFormations({});
       setLineupFormation(undefined);
+      setPossibleLineupsTitle(undefined);
     }
   }, [open, initialView, reset]);
 
@@ -204,6 +208,7 @@ export function EntityModalController({
         onMvpSaved,
         onMvpFormationsChange: handleMvpFormationsChange,
         onFormationResolved: setLineupFormation,
+        onPossibleLineupsTitleChange: setPossibleLineupsTitle,
       },
       playerPickMode
     );
@@ -232,6 +237,7 @@ export function EntityModalController({
       title={entityModalTitleContent(current, {
         mvpFormations,
         lineupFormation: isLineupView ? lineupFormation : undefined,
+        possibleLineupsTitle: isPossibleLineupsView ? possibleLineupsTitle : undefined,
       })}
       hideHeaderDivider
       headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "center"}
