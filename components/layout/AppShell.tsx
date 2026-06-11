@@ -11,7 +11,6 @@ import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
-import { BOTTOM_CHROME_PLACEHOLDER_ID } from "@/lib/layout/bottom-chrome";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppShell({
@@ -43,11 +42,6 @@ export function AppShell({
                 <TabSwipeNavigator>{children}</TabSwipeNavigator>
               </main>
             </div>
-            <div
-              id={BOTTOM_CHROME_PLACEHOLDER_ID}
-              className="tm-bottom-chrome-placeholder pointer-events-none fixed bottom-0 left-0 right-0 z-[95] h-20 bg-[var(--tm-tabbar-bg-hex)] pb-safe"
-              aria-hidden
-            />
             <TabBarWrapper />
             <Suspense fallback={null}>
               <ViewportLayoutDebug />

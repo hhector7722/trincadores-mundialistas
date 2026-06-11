@@ -42,10 +42,12 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  /* Marbella: h-20 (5rem) + pb-safe en el nav; reserva de contenido en main */
+  /* h-20 + pb-safe (border-box): safe area ya incluida en los 5rem */
   --tm-tabbar-core: 5rem;
-  --tm-content-bottom: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tm-tab-indicators-bottom: var(--tm-content-bottom);
+  --tm-content-bottom: var(--tm-tabbar-core);
+  --tm-tab-indicators-bottom: var(--tm-tabbar-core);
+  --tm-vvh-height: 100dvh;
+  --tm-vvh-offset: 0px;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -114,13 +116,23 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell flex: min-h-dvh, sin cage 100dvh ni overflow global */
+html:has(.tm-app-frame),
+html:has(.tm-app-frame) body {
+  height: var(--tm-vvh-height, 100dvh);
+  max-height: var(--tm-vvh-height, 100dvh);
+  overflow: hidden;
+}
+
+/* Shell flex: altura real del visualViewport (script inline); TabBar fixed al pie */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 100dvh;
+  height: var(--tm-vvh-height, 100dvh);
+  min-height: var(--tm-vvh-height, 100dvh);
+  max-height: var(--tm-vvh-height, 100dvh);
   flex-direction: column;
+  overflow: hidden;
   isolation: isolate;
 }
 
@@ -342,7 +354,7 @@ html:has(.tm-app-frame) {
 .tm-nav-loading-overlay {
   position: fixed;
   inset: 0;
-  z-index: 30;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;

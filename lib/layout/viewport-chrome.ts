@@ -1,6 +1,15 @@
 const TAB_BAR_SELECTOR = 'nav[aria-label="Navegacion principal"]';
 export const VIEWPORT_CHROME_SYNC_EVENT = "tm:viewport-chrome-sync";
 
+function readTabBarCorePx(): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue("--tm-tabbar-core");
+  const parsed = parseFloat(raw);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return 80;
+}
+
 function readVisibleViewportBottom(): number {
   const vv = window.visualViewport;
   return vv ? vv.offsetTop + vv.height : window.innerHeight;
@@ -13,16 +22,8 @@ export function readTabBarTop(): number {
     return nav.getBoundingClientRect().top;
   }
 
-  const probe = document.getElementById("tm-safe-probe");
-  const safeBottom = probe
-    ? parseFloat(getComputedStyle(probe).paddingBottom) || 0
-    : 0;
-  const tabBarCore =
-    parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--tm-tabbar-core")
-    ) || 80;
-
-  return readVisibleViewportBottom() - tabBarCore - safeBottom;
+  // h-20 + pb-safe usa border-box: el safe area ya va dentro de --tm-tabbar-core.
+  return readVisibleViewportBottom() - readTabBarCorePx();
 }
 
 const INDICATOR_GAP_ABOVE_PX = 10;

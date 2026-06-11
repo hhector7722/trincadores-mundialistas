@@ -34,17 +34,32 @@ export function useLayoutAboveTabBar(
     sync();
     requestAnimationFrame(sync);
 
+    const observedNodes = new Set<Element>();
+
+    const observeNode = (node: Element | null | undefined) => {
+      if (!node || observedNodes.has(node)) return;
+      observedNodes.add(node);
+      observer.observe(node);
+    };
+
     const observer = new ResizeObserver(sync);
-    observer.observe(root);
-    if (root.parentElement) observer.observe(root.parentElement);
+    observeNode(root);
+    observeNode(root.parentElement);
 
-    const nav = document.querySelector('nav[aria-label="Navegacion principal"]');
-    if (nav) observer.observe(nav);
+    const observeChromeNodes = () => {
+      observeNode(document.querySelector('nav[aria-label="Navegacion principal"]'));
+      if (bottomAnchor === "indicators") {
+        observeNode(document.querySelector(".tm-tab-indicators-slot"));
+      }
+    };
 
-    if (bottomAnchor === "indicators") {
-      const indicators = document.querySelector(".tm-tab-indicators-slot");
-      if (indicators) observer.observe(indicators);
-    }
+    observeChromeNodes();
+
+    const mutationObserver = new MutationObserver(() => {
+      observeChromeNodes();
+      sync();
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     window.addEventListener("resize", sync);
     window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, sync);
@@ -55,6 +70,7 @@ export function useLayoutAboveTabBar(
     }
 
     return () => {
+      mutationObserver.disconnect();
       observer.disconnect();
       window.removeEventListener("resize", sync);
       window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, sync);
