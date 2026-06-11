@@ -5,6 +5,7 @@ import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighligh
 import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
 import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
+import { youtubeEmbedUrl } from "@/lib/youtube/constants";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +31,19 @@ export function MatchHighlightBlock({
   className,
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
+  const [embedSrc, setEmbedSrc] = useState<string | null>(null);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
+
+  function openPlayer() {
+    setEmbedSrc(youtubeEmbedUrl(youtubeVideoId, true));
+    setPlayerOpen(true);
+  }
+
+  function closePlayer() {
+    setPlayerOpen(false);
+    setEmbedSrc(null);
+  }
 
   return (
     <>
@@ -43,13 +55,14 @@ export function MatchHighlightBlock({
               awayTeam={awayTeam}
               homeGoals={homeGoals}
               awayGoals={awayGoals}
-              className="mt-1"
+              className="mt-0.5"
             />
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={() => setPlayerOpen(true)}
-              className="mt-2"
+              onPlay={openPlayer}
+              compact
+              className="mt-1"
             />
           </>
         ) : (
@@ -60,7 +73,7 @@ export function MatchHighlightBlock({
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={() => setPlayerOpen(true)}
+              onPlay={openPlayer}
               className="max-w-none"
             />
           </>
@@ -69,8 +82,8 @@ export function MatchHighlightBlock({
 
       <MatchHighlightPlayerModal
         open={playerOpen}
-        onClose={() => setPlayerOpen(false)}
-        videoId={youtubeVideoId}
+        onClose={closePlayer}
+        embedSrc={embedSrc}
         title={title}
       />
     </>

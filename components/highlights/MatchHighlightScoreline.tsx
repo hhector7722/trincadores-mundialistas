@@ -29,7 +29,7 @@ export function MatchHighlightScoreline({
         className,
       )}
     >
-      <TeamFlagBadge name={homeTeam} size="xs" loading="eager" />
+      <TeamFlagBadge name={homeTeam} size="xs" loading="eager" imageWidth={160} />
       <span className="text-[clamp(9px,2.4cqw,11px)] font-bold uppercase tracking-wide text-white/85">
         {teamAbbr(homeTeam)}
       </span>
@@ -53,7 +53,7 @@ export function MatchHighlightScoreline({
       <span className="text-[clamp(9px,2.4cqw,11px)] font-bold uppercase tracking-wide text-white/85">
         {teamAbbr(awayTeam)}
       </span>
-      <TeamFlagBadge name={awayTeam} size="xs" loading="eager" />
+      <TeamFlagBadge name={awayTeam} size="xs" loading="eager" imageWidth={160} />
     </div>
   );
 }

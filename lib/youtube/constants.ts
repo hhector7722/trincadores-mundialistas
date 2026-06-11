@@ -23,8 +23,13 @@ export const HIGHLIGHT_SOURCE_CODES = {
   teledeporte: "youtube_rtve_teledeporte",
 } as const satisfies Record<string, HighlightSourceCode>;
 
-export function youtubeThumbnailUrl(videoId: string): string {
-  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+export type YoutubeThumbnailQuality = "mqdefault" | "hqdefault" | "maxresdefault";
+
+export function youtubeThumbnailUrl(
+  videoId: string,
+  quality: YoutubeThumbnailQuality = "hqdefault",
+): string {
+  return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`;
 }
 
 export function youtubeEmbedUrl(videoId: string, autoplay = false): string {
@@ -33,6 +38,9 @@ export function youtubeEmbedUrl(videoId: string, autoplay = false): string {
     rel: "0",
     modestbranding: "1",
   });
-  if (autoplay) params.set("autoplay", "1");
+  if (autoplay) {
+    params.set("autoplay", "1");
+    params.set("mute", "0");
+  }
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 }

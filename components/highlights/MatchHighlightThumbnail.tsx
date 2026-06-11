@@ -9,6 +9,8 @@ type MatchHighlightThumbnailProps = {
   title: string;
   onPlay: () => void;
   className?: string;
+  /** Hero home: miniatura compacta para igualar altura del carrusel. */
+  compact?: boolean;
 };
 
 export function MatchHighlightThumbnail({
@@ -16,6 +18,7 @@ export function MatchHighlightThumbnail({
   title,
   onPlay,
   className,
+  compact = false,
 }: MatchHighlightThumbnailProps) {
   return (
     <button
@@ -25,25 +28,34 @@ export function MatchHighlightThumbnail({
         onPlay();
       }}
       className={cn(
-        "group relative mx-auto block w-full max-w-[13.5rem] overflow-hidden rounded-xl border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
+        "group relative mx-auto block w-full overflow-hidden rounded-lg border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.28)]",
+        compact ? "max-w-[7.25rem]" : "max-w-[13.5rem] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
         className,
       )}
       aria-label={`Reproducir resumen: ${title}`}
     >
       <img
-        src={youtubeThumbnailUrl(videoId)}
+        src={youtubeThumbnailUrl(videoId, compact ? "mqdefault" : "hqdefault")}
         alt=""
         className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
         loading="eager"
         decoding="async"
       />
       <span
-        className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10"
+        className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent"
         aria-hidden="true"
       />
       <span className="absolute inset-0 flex items-center justify-center">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#CCFF00] text-black shadow-[0_0_24px_rgba(204,255,0,0.45)] transition-transform group-hover:scale-105">
-          <Play className="ml-0.5 h-5 w-5 fill-current" aria-hidden="true" />
+        <span
+          className={cn(
+            "flex items-center justify-center rounded-full bg-zinc-600/85 text-white shadow-md transition-transform group-hover:scale-105",
+            compact ? "h-7 w-7" : "h-9 w-9",
+          )}
+        >
+          <Play
+            className={cn("fill-current", compact ? "ml-0.5 h-3.5 w-3.5" : "ml-0.5 h-4 w-4")}
+            aria-hidden="true"
+          />
         </span>
       </span>
     </button>

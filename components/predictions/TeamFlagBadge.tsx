@@ -6,6 +6,8 @@ type TeamFlagBadgeProps = {
   size?: "cal" | "ko" | "xxs" | "xs" | "sm" | "md" | "lg";
   className?: string;
   loading?: "lazy" | "eager";
+  /** Ancho fuente flagcdn (px). Por defecto según size. */
+  imageWidth?: number;
   /** Placeholder sin bandera: negro y negrita (cuadro eliminatoria). */
   placeholderStyle?: "default" | "knockout";
 };
@@ -15,6 +17,7 @@ export function TeamFlagBadge({
   size = "sm",
   className,
   loading = "lazy",
+  imageWidth,
   placeholderStyle = "default",
 }: TeamFlagBadgeProps) {
   const flagCode = teamFlagCode(name);
@@ -32,19 +35,20 @@ export function TeamFlagBadge({
             : size === "lg"
               ? "h-10 w-10 sm:h-11 sm:w-11"
               : "h-9 w-9";
-  const px = scaled
-    ? 40
-    : size === "ko"
+  const px = imageWidth ??
+    (scaled
       ? 40
-      : size === "xxs"
-        ? 28
-        : size === "xs"
-          ? 40
-          : size === "sm"
+      : size === "ko"
+        ? 40
+        : size === "xxs"
+          ? 28
+          : size === "xs"
             ? 80
-            : size === "lg"
-              ? 160
-              : 120;
+            : size === "sm"
+              ? 80
+              : size === "lg"
+                ? 160
+                : 120);
   const imgSize = scaled
     ? undefined
     : size === "ko"
