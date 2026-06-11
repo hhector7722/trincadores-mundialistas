@@ -1,29 +1,24 @@
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
-import { GENERAL_PREDICTIONS_GRID } from "@/components/tournament-predictions/general-predictions-grid";
 import {
-  formatChampionDisplayCompact,
-  formatFinalistsDisplay,
-  formatPlayerDisplayFull,
-} from "@/lib/tournament-predictions/display";
+  ChampionPredictionCell,
+  FinalistsPredictionCell,
+  PlayerPredictionCell,
+} from "@/components/tournament-predictions/GeneralPredictionsCells";
+import { GENERAL_PREDICTIONS_GRID } from "@/components/tournament-predictions/general-predictions-grid";
+import { formatPlayerDisplayFull } from "@/lib/tournament-predictions/display";
 import type { TournamentGeneralPredictionsBoardRow } from "@/lib/tournament-predictions/types";
 import { cn } from "@/lib/utils";
-
-function CellValue({ value, compact = false }: { value: string | null; compact?: boolean }) {
-  return (
-    <span className="flex h-full min-w-0 items-center justify-center px-0.5 text-center text-[10px] leading-snug text-[var(--tm-fg)]">
-      <span className={compact ? "whitespace-nowrap" : "break-words"}>{value ?? "—"}</span>
-    </span>
-  );
-}
 
 export function GeneralPredictionsRow({
   row,
   isCurrentUser,
   nameFontSize,
+  playerFontSize,
 }: {
   row: TournamentGeneralPredictionsBoardRow;
   isCurrentUser: boolean;
   nameFontSize: number;
+  playerFontSize: number;
 }) {
   return (
     <div
@@ -44,14 +39,20 @@ export function GeneralPredictionsRow({
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
-      <CellValue compact value={formatChampionDisplayCompact(row.championTeam)} />
-      <CellValue
-        compact
-        value={formatFinalistsDisplay(row.finalistTeamA, row.finalistTeamB)}
+      <ChampionPredictionCell team={row.championTeam} />
+      <FinalistsPredictionCell teamA={row.finalistTeamA} teamB={row.finalistTeamB} />
+      <PlayerPredictionCell
+        fontSize={playerFontSize}
+        value={formatPlayerDisplayFull(row.topScorerPlayerName)}
       />
-      <CellValue value={formatPlayerDisplayFull(row.topScorerPlayerName)} />
-      <CellValue value={formatPlayerDisplayFull(row.tournamentMvpPlayerName)} />
-      <CellValue value={formatPlayerDisplayFull(row.goldenGlovePlayerName)} />
+      <PlayerPredictionCell
+        fontSize={playerFontSize}
+        value={formatPlayerDisplayFull(row.tournamentMvpPlayerName)}
+      />
+      <PlayerPredictionCell
+        fontSize={playerFontSize}
+        value={formatPlayerDisplayFull(row.goldenGlovePlayerName)}
+      />
     </div>
   );
 }

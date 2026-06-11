@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GeneralPredictionsRow } from "@/components/tournament-predictions/GeneralPredictionsRow";
 import { GENERAL_PREDICTIONS_GRID } from "@/components/tournament-predictions/general-predictions-grid";
-import { useGeneralPredictionsNameFontSize } from "@/components/tournament-predictions/use-general-predictions-name-font-size";
+import { useGeneralPredictionsFontSizes } from "@/components/tournament-predictions/use-general-predictions-font-sizes";
 import type { TournamentGeneralPredictionsBoardRow } from "@/lib/tournament-predictions/types";
 import { cn } from "@/lib/utils";
 
@@ -11,8 +11,10 @@ const EMPTY_ROW_COUNT = 11;
 
 function GeneralPredictionsTableHeader({
   onTrincadorCol,
+  onPlayerCol,
 }: {
   onTrincadorCol: (node: HTMLSpanElement | null) => void;
+  onPlayerCol: (node: HTMLSpanElement | null) => void;
 }) {
   return (
     <div
@@ -26,14 +28,22 @@ function GeneralPredictionsTableHeader({
       </span>
       <span className="text-center">Cam</span>
       <span className="text-center">Fin</span>
-      <span className="text-center">Gol</span>
+      <span ref={onPlayerCol} className="min-w-0 text-center">
+        Gol
+      </span>
       <span className="text-center">Mvp</span>
       <span className="text-center">Por</span>
     </div>
   );
 }
 
-function GeneralPredictionsEmptyRow({ nameFontSize }: { nameFontSize: number }) {
+function GeneralPredictionsEmptyRow({
+  nameFontSize,
+  playerFontSize,
+}: {
+  nameFontSize: number;
+  playerFontSize: number;
+}) {
   return (
     <div
       className={cn(
@@ -53,7 +63,7 @@ function GeneralPredictionsEmptyRow({ nameFontSize }: { nameFontSize: number }) 
       </div>
       <span />
       <span />
-      <span />
+      <span style={{ fontSize: `${playerFontSize}px` }} />
       <span />
       <span />
     </div>
@@ -68,18 +78,26 @@ export function GeneralPredictionsTable({
   currentProfileId: string;
 }) {
   const [trincadorCol, setTrincadorCol] = useState<HTMLSpanElement | null>(null);
-  const nameFontSize = useGeneralPredictionsNameFontSize(
-    rows.map((row) => row.label),
-    trincadorCol
-  );
+  const [playerCol, setPlayerCol] = useState<HTMLSpanElement | null>(null);
+  const { nameFontSize, playerFontSize } = useGeneralPredictionsFontSizes(rows, {
+    name: trincadorCol,
+    player: playerCol,
+  });
 
   return (
     <div className="tm-general-predictions-table tm-ranking-table">
-      <GeneralPredictionsTableHeader onTrincadorCol={setTrincadorCol} />
+      <GeneralPredictionsTableHeader
+        onTrincadorCol={setTrincadorCol}
+        onPlayerCol={setPlayerCol}
+      />
       <div className="tm-ranking-body">
         {rows.length === 0
           ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
-              <GeneralPredictionsEmptyRow key={`empty-${index}`} nameFontSize={nameFontSize} />
+              <GeneralPredictionsEmptyRow
+                key={`empty-${index}`}
+                nameFontSize={nameFontSize}
+                playerFontSize={playerFontSize}
+              />
             ))
           : rows.map((row) => (
               <GeneralPredictionsRow
@@ -87,6 +105,7 @@ export function GeneralPredictionsTable({
                 row={row}
                 isCurrentUser={row.profileId === currentProfileId}
                 nameFontSize={nameFontSize}
+                playerFontSize={playerFontSize}
               />
             ))}
       </div>
