@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
-import { getContextualLeaderboardStartIndex } from "@/lib/ranking/context-rows";
+import {
+  getContextualLeaderboardStartIndex,
+  VISIBLE_ROW_COUNT,
+} from "@/lib/ranking/context-rows";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -16,12 +19,38 @@ type HomeMiniRankingTableProps = {
   currentProfileId?: string;
 };
 
+function getRowHeight(container: HTMLElement): number {
+  return container.clientHeight / VISIBLE_ROW_COUNT;
+}
+
+function getMaxStartIndex(rowCount: number): number {
+  return Math.max(0, rowCount - VISIBLE_ROW_COUNT);
+}
+
+function snapScrollTop(
+  container: HTMLElement,
+  rowCount: number,
+  behavior: ScrollBehavior = "auto"
+): void {
+  const rowHeight = getRowHeight(container);
+  if (rowHeight <= 0) return;
+
+  const maxStart = getMaxStartIndex(rowCount);
+  const rawIndex = Math.round(container.scrollTop / rowHeight);
+  const index = Math.min(maxStart, Math.max(0, rawIndex));
+  const target = index * rowHeight;
+
+  if (Math.abs(container.scrollTop - target) > 1) {
+    container.scrollTo({ top: target, behavior });
+  }
+}
+
 function MiniRankingHeader() {
   return (
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "shrink-0 border-b border-white/10 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[8px] font-semibold uppercase tracking-wide text-white/45"
+        "h-[var(--tm-home-mini-ranking-header-h)] shrink-0 border-b border-white/10 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[8px] font-semibold uppercase tracking-wide text-white/45"
       )}
     >
       <span aria-hidden="true" />
@@ -36,18 +65,15 @@ function MiniRankingHeader() {
 function MiniRankingDataRow({
   row,
   isCurrentUser,
-  rowRef,
 }: {
   row: LeaderboardRow;
   isCurrentUser: boolean;
-  rowRef?: (node: HTMLDivElement | null) => void;
 }) {
   return (
     <div
-      ref={rowRef}
       className={cn(
         MINI_RANKING_GRID,
-        "min-h-10 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
+        "tm-home-mini-ranking__row border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
@@ -77,21 +103,35 @@ function MiniRankingDataRow({
 
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const rowRefs = useRef(new Map<string, HTMLDivElement>());
+  const snapEnabled = rows.length > VISIBLE_ROW_COUNT;
 
-  useEffect(() => {
+  const scrollToContext = useCallback(
+    (behavior: ScrollBehavior = "auto") => {
+      const container = scrollRef.current;
+      if (!container || rows.length === 0) return;
+
+      const startIndex = getContextualLeaderboardStartIndex(rows, currentProfileId);
+      const rowHeight = getRowHeight(container);
+      if (rowHeight <= 0) return;
+
+      container.scrollTo({ top: startIndex * rowHeight, behavior });
+    },
+    [rows, currentProfileId]
+  );
+
+  useLayoutEffect(() => {
+    scrollToContext();
+  }, [scrollToContext]);
+
+  useLayoutEffect(() => {
     const container = scrollRef.current;
-    if (!container || rows.length === 0) return;
+    if (!container || !snapEnabled) return;
 
-    const startIndex = getContextualLeaderboardStartIndex(rows, currentProfileId);
-    const anchorRow = rows[startIndex];
-    if (!anchorRow) return;
+    const onScrollEnd = () => snapScrollTop(container, rows.length, "smooth");
 
-    const anchorEl = rowRefs.current.get(anchorRow.profileId);
-    if (!anchorEl) return;
-
-    container.scrollTop = anchorEl.offsetTop;
-  }, [rows, currentProfileId]);
+    container.addEventListener("scrollend", onScrollEnd);
+    return () => container.removeEventListener("scrollend", onScrollEnd);
+  }, [rows.length, snapEnabled]);
 
   return (
     <Link
@@ -103,13 +143,7 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
       )}
     >
       <MiniRankingHeader />
-      <div
-        ref={scrollRef}
-        className={cn(
-          "min-h-0 flex-1 overflow-y-auto overscroll-contain",
-          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        )}
-      >
+      <div ref={scrollRef} className="tm-home-mini-ranking__viewport">
         {rows.length === 0 ? (
           <p className="px-3 py-4 text-center text-[9px] text-white/35">Sin clasificación</p>
         ) : (
@@ -118,10 +152,6 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
               key={row.profileId}
               row={row}
               isCurrentUser={row.profileId === currentProfileId}
-              rowRef={(node) => {
-                if (node) rowRefs.current.set(row.profileId, node);
-                else rowRefs.current.delete(row.profileId);
-              }}
             />
           ))
         )}

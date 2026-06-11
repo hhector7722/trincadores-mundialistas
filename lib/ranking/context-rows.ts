@@ -1,6 +1,6 @@
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 
-const VISIBLE_ROW_COUNT = 3;
+export const VISIBLE_ROW_COUNT = 3;
 
 /** Índice de la primera fila visible por defecto (usuario centrado o anclado en extremos). */
 export function getContextualLeaderboardStartIndex(
