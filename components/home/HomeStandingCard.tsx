@@ -18,6 +18,7 @@ type HomeStandingCardProps = {
   generalPredictionsEditable: boolean;
   dailyFact: DailyFact | null;
   quizHub: QuizDayHub;
+  liveMatch: MatchWithPrediction | null;
   nextMatch: MatchWithPrediction | null;
 };
 
@@ -29,6 +30,7 @@ export function HomeStandingCard({
   generalPredictionsEditable,
   dailyFact,
   quizHub,
+  liveMatch,
   nextMatch,
 }: HomeStandingCardProps) {
   return (
@@ -41,9 +43,9 @@ export function HomeStandingCard({
           editable={generalPredictionsEditable}
         />
       </div>
-      {nextMatch ? (
+      {liveMatch || nextMatch ? (
         <div className="shrink-0">
-          <HomeNextMatch poolId={poolId} match={nextMatch} />
+          <HomeNextMatch poolId={poolId} liveMatch={liveMatch} nextMatch={nextMatch} />
         </div>
       ) : null}
       <div className="tm-home-secondary-row grid shrink-0 grid-cols-2 items-stretch gap-3">

@@ -42,6 +42,9 @@ type EntityModalControllerProps = {
   onCarouselTeamChange?: (teamName: string) => void;
   onMvpSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   opaque?: boolean;
+  possibleLineupsTitleOverride?: string;
+  possibleLineupsConfirmedOverride?: boolean;
+  matchIsLive?: boolean;
 };
 
 function renderEntityView(
@@ -53,6 +56,7 @@ function renderEntityView(
     onFormationResolved?: (formationLabel: string) => void;
     onPossibleLineupsTitleChange?: (title: string) => void;
     onPossibleLineupsConfirmedChange?: (confirmed: boolean) => void;
+    matchIsLive?: boolean;
   },
   playerPickMode: PlayerPickMode
 ) {
@@ -104,6 +108,7 @@ function renderEntityView(
           matchId={view.matchId}
           homeTeam={view.homeTeam}
           awayTeam={view.awayTeam}
+          isLive={handlers.matchIsLive ?? false}
           onTitleChange={handlers.onPossibleLineupsTitleChange}
           onConfirmedChange={handlers.onPossibleLineupsConfirmedChange}
         />
@@ -125,6 +130,9 @@ export function EntityModalController({
   onCarouselTeamChange,
   onMvpSaved,
   opaque = false,
+  possibleLineupsTitleOverride,
+  possibleLineupsConfirmedOverride,
+  matchIsLive = false,
 }: EntityModalControllerProps) {
   const [mvpFormations, setMvpFormations] = useState<MvpModalFormations>({});
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
@@ -214,6 +222,7 @@ export function EntityModalController({
         onFormationResolved: setLineupFormation,
         onPossibleLineupsTitleChange: setPossibleLineupsTitle,
         onPossibleLineupsConfirmedChange: setPossibleLineupsConfirmed,
+        matchIsLive,
       },
       playerPickMode
     );
@@ -242,8 +251,14 @@ export function EntityModalController({
       title={entityModalTitleContent(current, {
         mvpFormations,
         lineupFormation: isLineupView ? lineupFormation : undefined,
-        possibleLineupsTitle: isPossibleLineupsView ? possibleLineupsTitle : undefined,
-        possibleLineupsConfirmed: isPossibleLineupsView ? possibleLineupsConfirmed : undefined,
+        possibleLineupsTitle: isPossibleLineupsView
+          ? (possibleLineupsTitleOverride ?? possibleLineupsTitle)
+          : undefined,
+        possibleLineupsConfirmed: isPossibleLineupsView
+          ? matchIsLive
+            ? false
+            : (possibleLineupsConfirmedOverride ?? possibleLineupsConfirmed)
+          : undefined,
       })}
       hideHeaderDivider
       headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "center"}

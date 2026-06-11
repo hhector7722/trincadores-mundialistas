@@ -11,6 +11,7 @@ import {
   mvpSelectionKey,
   type MvpSelectablePlayer,
 } from "@/lib/lineup/mvp-selection-key";
+import type { SubstitutionMarkers } from "@/lib/live/types";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
@@ -34,6 +35,8 @@ type MvpTacticalFieldBodyProps = {
   disabled?: boolean;
   onSelect?: (key: string) => void;
   className?: string;
+  homeSubstitutionMarkers?: SubstitutionMarkers | null;
+  awaySubstitutionMarkers?: SubstitutionMarkers | null;
 };
 
 export function MvpTacticalFieldBody({
@@ -54,6 +57,8 @@ export function MvpTacticalFieldBody({
   disabled = false,
   onSelect,
   className,
+  homeSubstitutionMarkers = null,
+  awaySubstitutionMarkers = null,
 }: MvpTacticalFieldBodyProps) {
   const chipScale = useMemo(
     () =>
@@ -84,6 +89,7 @@ export function MvpTacticalFieldBody({
             <MvpBenchColumn
               teamName={homeTeam}
               players={homeBench}
+              substitutionMarkers={homeSubstitutionMarkers}
               selectedKey={selectedKey}
               selectedPlayer={selectedPlayer}
               disabled={pickDisabled}
@@ -116,6 +122,8 @@ export function MvpTacticalFieldBody({
           widthPx={layout.fieldWidthPx}
           heightPx={layout.fieldHeightPx}
           chipScale={chipScale}
+          homeSubstitutionMarkers={homeSubstitutionMarkers}
+          awaySubstitutionMarkers={awaySubstitutionMarkers}
         />
       </div>
 
@@ -130,6 +138,7 @@ export function MvpTacticalFieldBody({
             <MvpBenchColumn
               teamName={awayTeam}
               players={awayBench}
+              substitutionMarkers={awaySubstitutionMarkers}
               selectedKey={selectedKey}
               selectedPlayer={selectedPlayer}
               disabled={pickDisabled}

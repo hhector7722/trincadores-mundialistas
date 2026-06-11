@@ -27,10 +27,16 @@ import { PredictionDeadlineCountdown } from "@/components/predictions/Prediction
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
 import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
+import { LiveMatchPanelContent } from "@/components/live/LiveMatchPanelContent";
+import { MatchLiveStatsPanel } from "@/components/live/MatchLiveStatsPanel";
 import {
-  possibleLineupsActionCaptionFromConfirmed,
+  lineupsActionCaption,
+  lineupsModalTitle,
   POSSIBLE_LINEUPS_ACTION_CAPTION,
 } from "@/lib/lineup/lineups-modal-copy";
+import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
+import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
@@ -178,6 +184,8 @@ export function QuickPredictionModal({
     () => mergeMvpIntoMatch(baseViewMatch, mvpOverrides[baseViewMatch.id]),
     [baseViewMatch, mvpOverrides]
   );
+  const isLiveMatch = viewMatch.status === "live";
+  const { snapshot: liveSnapshot } = useMatchLiveSnapshot(viewMatch.id, isLiveMatch && open);
   const canSwipeMatches = orderedMatches.length > 1 && Boolean(onMatchChange);
   const dotPosition = resolveDotPosition(activeIndex, orderedMatches.length);
 
@@ -222,13 +230,16 @@ export function QuickPredictionModal({
       if (cancelled || !result.ok) return;
       setPossibleLineupsConfirmed(result.data.bothConfirmed);
       setPossibleLineupsCaption(
-        possibleLineupsActionCaptionFromConfirmed(result.data.bothConfirmed),
+        lineupsActionCaption({
+          bothConfirmed: result.data.bothConfirmed,
+          isLive: viewMatch.status === "live",
+        }),
       );
     });
     return () => {
       cancelled = true;
     };
-  }, [open, viewMatch.id, viewMatch.home_team, viewMatch.away_team]);
+  }, [open, viewMatch.id, viewMatch.home_team, viewMatch.away_team, viewMatch.status]);
 
   const {
     activeIndex: teamCarouselIndex,
@@ -437,6 +448,41 @@ export function QuickPredictionModal({
   }
 
   function renderPanelView(view: QuickPanelView, targetMatch: MatchWithPrediction) {
+    if (view.kind === "prediction" && targetMatch.status === "live") {
+      const predictionScoreText = formatListScore(
+        targetMatch.prediction?.home_goals ?? null,
+        targetMatch.prediction?.away_goals ?? null,
+      );
+      const liveLineupsCaption = lineupsActionCaption({
+        bothConfirmed: possibleLineupsConfirmed,
+        isLive: true,
+      });
+
+      return (
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="px-4 pb-0 pt-2">
+            <LiveMatchPanelContent
+              homeTeam={targetMatch.home_team}
+              awayTeam={targetMatch.away_team}
+              liveSnapshot={liveSnapshot}
+              predictionScoreText={
+                targetMatch.prediction?.home_goals != null ? predictionScoreText : null
+              }
+              lineupsCaption={liveLineupsCaption}
+              teamsBlockClassName={cn("relative mt-2 pb-1", PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS)}
+              actionsClassName={PREDICTION_MODAL_ACTIONS_STACKED_CLASS}
+              onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+              onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+              onOpenLineups={() => push(buildPossibleLineupsView(targetMatch))}
+            />
+          </div>
+          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            <MatchLiveStatsPanel stats={liveSnapshot?.stats ?? null} />
+          </div>
+        </div>
+      );
+    }
+
     if (view.kind === "prediction") {
       return (
         <div className="flex min-h-0 flex-1 flex-col">
@@ -584,6 +630,7 @@ export function QuickPredictionModal({
         matchId={view.matchId}
         homeTeam={view.homeTeam}
         awayTeam={view.awayTeam}
+        isLive={viewMatch.status === "live"}
         onTitleChange={setPossibleLineupsTitle}
         onConfirmedChange={setPossibleLineupsConfirmed}
       />
@@ -626,13 +673,22 @@ export function QuickPredictionModal({
       onClose={onClose}
       title={quickPanelTitle(panelView, {
         lineupFormation,
-        possibleLineupsTitle,
-        possibleLineupsConfirmed,
+        possibleLineupsTitle:
+          panelView.kind === "possible-lineups" && isLiveMatch
+            ? lineupsModalTitle({ bothConfirmed: possibleLineupsConfirmed, isLive: true })
+            : possibleLineupsTitle,
+        possibleLineupsConfirmed: isLiveMatch ? false : possibleLineupsConfirmed,
       })}
       hideTitle={atPredictionRoot}
       hideHeaderDivider
       ariaLabel={atPredictionRoot ? "Pronóstico del partido" : undefined}
-      headerCenter={atPredictionRoot ? formatKickoff(viewMatch.kickoff_at) : undefined}
+      headerCenter={
+        atPredictionRoot
+          ? isLiveMatch
+            ? <LiveMatchHeaderLabel size="modal" />
+            : formatKickoff(viewMatch.kickoff_at)
+          : undefined
+      }
       headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "default"}
       headerCompact={isCompactModal}
       scrollContent={!isCompactModal}

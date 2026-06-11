@@ -1,3 +1,4 @@
+import { SubstitutionMarkerIcon } from "@/components/live/SubstitutionMarkerIcon";
 import { getTeamKitColors } from "@/lib/lineup/team-kit-colors";
 import {
   displayNameInSquad,
@@ -18,6 +19,7 @@ type LineupPlayerChipProps = {
   awayKitClashBorder?: boolean;
   /** Nombres completos de la plantilla para desambiguar apellidos repetidos. */
   squadPlayerNames?: string[];
+  substitutionMarker?: "in" | "out" | null;
 };
 
 export function LineupPlayerChip({
@@ -29,6 +31,7 @@ export function LineupPlayerChip({
   disabled = false,
   awayKitClashBorder = false,
   squadPlayerNames,
+  substitutionMarker = null,
 }: LineupPlayerChipProps) {
   const isModal = variant === "modal";
   const isMatch = variant === "match";
@@ -112,7 +115,7 @@ export function LineupPlayerChip({
       >
         <p
           className={cn(
-            "whitespace-normal text-center",
+            "flex items-center justify-center gap-0.5 whitespace-normal text-center",
             isMatch && selected
               ? "text-[9.5px] font-bold leading-none tracking-tight text-[var(--tm-primary-fg)]"
               : cn(
@@ -125,7 +128,8 @@ export function LineupPlayerChip({
                 )
           )}
         >
-          {displayName}
+          <span>{displayName}</span>
+          {substitutionMarker ? <SubstitutionMarkerIcon kind={substitutionMarker} /> : null}
         </p>
         {!isModal && !isMatch ? (
           <p className="text-[8px] font-medium uppercase tracking-wide text-white/55 sm:text-[9px]">

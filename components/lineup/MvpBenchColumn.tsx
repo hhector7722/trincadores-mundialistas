@@ -1,5 +1,8 @@
 "use client";
 
+import { SubstitutionMarkerIcon } from "@/components/live/SubstitutionMarkerIcon";
+import { substitutionMarkerForPlayer } from "@/lib/live/substitution-markers";
+import type { SubstitutionMarkers } from "@/lib/live/types";
 import {
   mvpPlayersMatch,
   mvpSelectionKey,
@@ -20,6 +23,7 @@ type MvpBenchColumnProps = {
   readOnly?: boolean;
   align?: "left" | "right";
   gridLayout?: BenchLayoutConfig;
+  substitutionMarkers?: SubstitutionMarkers | null;
   className?: string;
 };
 
@@ -33,6 +37,7 @@ export function MvpBenchColumn({
   readOnly = false,
   align = "left",
   gridLayout,
+  substitutionMarkers = null,
   className,
 }: MvpBenchColumnProps) {
   if (players.length === 0) return null;
@@ -62,6 +67,9 @@ export function MvpBenchColumn({
             ? mvpPlayersMatch(teamName, player, selectedPlayer)
             : selectedKey === key;
           const dorsal = player.shirtNumber ?? "—";
+          const subMarker = substitutionMarkers
+            ? substitutionMarkerForPlayer(player.name, player.shirtNumber, substitutionMarkers)
+            : null;
 
           return (
             <span key={key} className="inline">
@@ -88,6 +96,12 @@ export function MvpBenchColumn({
                     {labels[index]}
                   </span>
                 )}
+                {subMarker ? (
+                  <>
+                    {" "}
+                    <SubstitutionMarkerIcon kind={subMarker} />
+                  </>
+                ) : null}
               </button>
               {index < players.length - 1 ? (
                 <span className="text-[var(--tm-muted)]" aria-hidden>

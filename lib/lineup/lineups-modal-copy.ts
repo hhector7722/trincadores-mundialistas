@@ -33,3 +33,23 @@ export function possibleLineupsActionCaption(
 export function possibleLineupsActionCaptionFromConfirmed(bothConfirmed: boolean): string {
   return bothConfirmed ? CONFIRMED_LINEUPS_ACTION_CAPTION : POSSIBLE_LINEUPS_ACTION_CAPTION;
 }
+
+export const LIVE_LINEUPS_MODAL_TITLE = "ALINEACIONES";
+export const LIVE_LINEUPS_ACTION_CAPTION = "ALINEACIONES";
+
+export function lineupsActionCaption(options: {
+  bothConfirmed: boolean;
+  isLive: boolean;
+}): string {
+  if (options.isLive) return LIVE_LINEUPS_ACTION_CAPTION;
+  return possibleLineupsActionCaptionFromConfirmed(options.bothConfirmed);
+}
+
+export function lineupsModalTitle(options: {
+  bothConfirmed: boolean;
+  isLive: boolean;
+}): string {
+  if (options.isLive) return LIVE_LINEUPS_MODAL_TITLE;
+  if (options.bothConfirmed) return CONFIRMED_LINEUPS_MODAL_TITLE;
+  return POSSIBLE_LINEUPS_MODAL_TITLE;
+}

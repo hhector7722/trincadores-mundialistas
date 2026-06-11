@@ -1,250 +1,94 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
-import { Pencil, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  buildLineupView,
-  buildMvpView,
-  buildPossibleLineupsView,
-  EntityModalController,
-} from "@/components/lineup/EntityModalController";
-import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
-import type { EntityModalView } from "@/components/lineup/entity-modal-types";
-import {
-  HOME_CARD_ACTIONS_STACKED_CLASS,
-  MatchTeamsDisplay,
-} from "@/components/matches/MatchTeamsDisplay";
-import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
-import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
-import { formatListScore } from "@/lib/predictions/edit-state";
-import {
-  mergeMvpIntoMatch,
-  mvpSnapshotFromMatch,
-  type MvpSnapshot,
-} from "@/lib/predictions/mvp-match-state";
-import {
-  possibleLineupsActionCaptionFromConfirmed,
-  POSSIBLE_LINEUPS_ACTION_CAPTION,
-} from "@/lib/lineup/lineups-modal-copy";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HomeMatchCard } from "@/components/home/HomeMatchCard";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { cn } from "@/lib/utils";
 
 type HomeNextMatchProps = {
   poolId: string;
+  liveMatch: MatchWithPrediction | null;
+  nextMatch: MatchWithPrediction | null;
+};
+
+type SlideItem = {
+  id: string;
+  mode: "live" | "scheduled";
   match: MatchWithPrediction;
 };
 
-function hasSavedPrediction(match: MatchWithPrediction): boolean {
-  const home = match.prediction?.home_goals ?? null;
-  const away = match.prediction?.away_goals ?? null;
-  return (
-    home !== null &&
-    away !== null &&
-    Number.isInteger(home) &&
-    Number.isInteger(away)
-  );
-}
+export function HomeNextMatch({ poolId, liveMatch, nextMatch }: HomeNextMatchProps) {
+  const slides = useMemo(() => {
+    const items: SlideItem[] = [];
+    if (liveMatch) items.push({ id: `live-${liveMatch.id}`, mode: "live", match: liveMatch });
+    if (nextMatch && nextMatch.id !== liveMatch?.id) {
+      items.push({ id: `next-${nextMatch.id}`, mode: "scheduled", match: nextMatch });
+    }
+    return items;
+  }, [liveMatch, nextMatch]);
 
-export function HomeNextMatch({ poolId, match }: HomeNextMatchProps) {
-  const [scoreModalOpen, setScoreModalOpen] = useState(false);
-  const [mvpSnapshot, setMvpSnapshot] = useState<MvpSnapshot | null>(() =>
-    mvpSnapshotFromMatch(match)
-  );
-  const [entityModal, setEntityModal] = useState<{
-    open: boolean;
-    view: EntityModalView;
-  }>({ open: false, view: buildLineupView(match.home_team) });
-  const [possibleLineupsCaption, setPossibleLineupsCaption] = useState(
-    POSSIBLE_LINEUPS_ACTION_CAPTION,
-  );
-  const [possibleLineupsConfirmed, setPossibleLineupsConfirmed] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const displayMatch = useMemo(
-    () => mergeMvpIntoMatch(match, mvpSnapshot),
-    [match, mvpSnapshot]
-  );
+  const updateActiveIndex = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), slides.length - 1));
+  }, [slides.length]);
 
   useEffect(() => {
-    setMvpSnapshot(mvpSnapshotFromMatch(match));
-  }, [match.id, match.mvpPrediction?.player_name, match.mvpPrediction?.updated_at]);
+    const el = scrollRef.current;
+    if (!el) return;
+    updateActiveIndex();
+    el.addEventListener("scroll", updateActiveIndex, { passive: true });
+    return () => el.removeEventListener("scroll", updateActiveIndex);
+  }, [updateActiveIndex]);
 
-  useEffect(() => {
-    let cancelled = false;
-    void fetchMatchLineupsStatusAction(match.id, match.home_team, match.away_team).then((result) => {
-      if (cancelled || !result.ok) return;
-      setPossibleLineupsConfirmed(result.data.bothConfirmed);
-      setPossibleLineupsCaption(
-        possibleLineupsActionCaptionFromConfirmed(result.data.bothConfirmed),
-      );
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [match.id, match.home_team, match.away_team]);
+  if (!slides.length) return null;
 
-  function handleMvpSaved(playerName: string, teamName: string, shirtNumber?: number | null) {
-    setMvpSnapshot({
-      player_name: playerName,
-      team_name: teamName,
-      shirt_number: shirtNumber ?? null,
-    });
-  }
-
-  const isLive = displayMatch.status === "live";
-  const saved = hasSavedPrediction(displayMatch);
-  const scoreText = formatListScore(
-    displayMatch.prediction?.home_goals ?? null,
-    displayMatch.prediction?.away_goals ?? null
-  );
-
-  function openEntityModal(view: EntityModalView) {
-    setScoreModalOpen(false);
-    setEntityModal({ open: true, view });
-  }
-
-  function openScoreModal() {
-    setEntityModal((current) => ({ ...current, open: false }));
-    setScoreModalOpen(true);
-  }
-
-  return (
-    <>
-      <section
-        className="tm-glass-card cursor-pointer overflow-hidden p-0"
-        onClick={() => openScoreModal()}
-      >
+  if (slides.length === 1) {
+    const slide = slides[0]!;
+    return (
+      <section className="tm-glass-card overflow-hidden p-0">
         <div className="px-4 pb-2 pt-2">
-          <div className="flex items-center justify-between">
-            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
-              {isLive ? "En juego" : "Proximo partido"}
-            </p>
-            <Link
-              href="/predictions"
-              onClick={(event) => event.stopPropagation()}
-              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-            >
-              Ver todos
-            </Link>
-          </div>
-          <div className="relative mt-2 min-h-[8.25rem]">
-            <MatchTeamsDisplay
-              homeTeam={displayMatch.home_team}
-              awayTeam={displayMatch.away_team}
-              kickoffAt={displayMatch.kickoff_at}
-              isLive={isLive}
-              teamBlocksTopClass="top-1.5"
-              onHomeTeamClick={() =>
-                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-              }
-              onAwayTeamClick={() =>
-                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-              }
-              centerSlotAlign={saved ? "default" : "teamNames"}
-              centerSlot={
-                saved ? (
-                  <div className="inline-block">
-                    <p className="text-center text-[9px] font-semibold uppercase tracking-wider text-white/60">
-                      Mi pronóstico
-                    </p>
-                    <div className="relative w-0 min-w-full">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openScoreModal();
-                        }}
-                        className="block w-full text-center font-display text-sm font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                      >
-                        {scoreText}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openScoreModal();
-                        }}
-                        aria-label="Editar pronóstico"
-                        className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                      >
-                        <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openScoreModal();
-                    }}
-                    className={cn(
-                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
-                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                      "transition-opacity hover:opacity-90 active:opacity-80"
-                    )}
-                  >
-                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                    Añadir
-                  </button>
-                )
-              }
-            />
-
-            <div
-              className={cn("absolute inset-x-0 bottom-0", HOME_CARD_ACTIONS_STACKED_CLASS)}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <MatchContextActionsRow
-                compact
-                layout="homeCardStacked"
-                homeAnchor="15%"
-                awayAnchor="85%"
-                className="h-full"
-                centerSlot={
-                  <MvpPredictionButton
-                    savedPlayerName={displayMatch.mvpPrediction?.player_name}
-                    onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
-                    variant="compact"
-                    className="w-full"
-                  />
-                }
-                onOpenHomeLineup={() =>
-                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-                }
-                onOpenAwayLineup={() =>
-                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-                }
-                possibleLineupsCaption={possibleLineupsCaption}
-                possibleLineupsConfirmed={possibleLineupsConfirmed}
-                onOpenPossibleLineups={() =>
-                  openEntityModal(buildPossibleLineupsView(displayMatch))
-                }
-              />
-            </div>
-          </div>
+          <HomeMatchCard poolId={poolId} match={slide.match} mode={slide.mode} />
         </div>
       </section>
+    );
+  }
 
-      <QuickPredictionModal
-        open={scoreModalOpen}
-        onClose={() => setScoreModalOpen(false)}
-        poolId={poolId}
-        match={displayMatch}
-        onMvpSaved={(_matchId, playerName, teamName, shirtNumber) =>
-          handleMvpSaved(playerName, teamName, shirtNumber)
-        }
-      />
+  return (
+    <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe>
+      <div className="px-4 pb-2 pt-2">
+        <div
+          ref={scrollRef}
+          className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-roledescription="carrusel"
+        >
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
+              aria-hidden={index !== activeIndex}
+            >
+              <HomeMatchCard poolId={poolId} match={slide.match} mode={slide.mode} />
+            </div>
+          ))}
+        </div>
 
-      <EntityModalController
-        open={entityModal.open}
-        onClose={() => setEntityModal((current) => ({ ...current, open: false }))}
-        initialView={entityModal.view}
-        carouselTeams={[displayMatch.home_team, displayMatch.away_team]}
-        onMvpSaved={handleMvpSaved}
-      />
-    </>
+        <div className="mt-2 flex items-center justify-center gap-1.5" aria-hidden>
+          {slides.map((slide, index) => (
+            <span
+              key={slide.id}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
+              )}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

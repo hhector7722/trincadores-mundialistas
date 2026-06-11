@@ -9,6 +9,8 @@ import {
   mvpSelectionKey,
   type MvpSelectablePlayer,
 } from "@/lib/lineup/mvp-selection-key";
+import { substitutionMarkerForPlayer } from "@/lib/live/substitution-markers";
+import type { SubstitutionMarkers } from "@/lib/live/types";
 import { teamKitColorsClash } from "@/lib/lineup/team-kit-colors";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -30,6 +32,8 @@ type MvpHorizontalFieldGraphicProps = {
   widthPx?: number;
   heightPx?: number;
   chipScale?: number;
+  homeSubstitutionMarkers?: SubstitutionMarkers | null;
+  awaySubstitutionMarkers?: SubstitutionMarkers | null;
 };
 
 export function MvpHorizontalFieldGraphic({
@@ -49,6 +53,8 @@ export function MvpHorizontalFieldGraphic({
   widthPx,
   heightPx,
   chipScale = 1,
+  homeSubstitutionMarkers = null,
+  awaySubstitutionMarkers = null,
 }: MvpHorizontalFieldGraphicProps) {
   const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
 
@@ -71,7 +77,8 @@ export function MvpHorizontalFieldGraphic({
     teamName: string,
     slot: MvpHorizontalSlot,
     isAway: boolean,
-    squadPlayerNames?: string[]
+    squadPlayerNames?: string[],
+    markers?: SubstitutionMarkers | null,
   ) {
     const key = mvpSelectionKey(teamName, slot);
     const active = selectedPlayer
@@ -97,6 +104,11 @@ export function MvpHorizontalFieldGraphic({
           selected={active}
           disabled={disabled}
           awayKitClashBorder={isAway && awayKitClash}
+          substitutionMarker={
+            markers
+              ? substitutionMarkerForPlayer(slot.name, slot.shirtNumber, markers)
+              : null
+          }
           onClick={
             !readOnly && !disabled && !slot.isPlaceholder ? () => onSelect(key) : undefined
           }
@@ -121,8 +133,12 @@ export function MvpHorizontalFieldGraphic({
         <HorizontalPitchSurface onReady={onFieldReady} />
       </div>
 
-      {homeSlots.map((slot) => renderSlot(homeTeam, slot, false, homeSquadPlayerNames))}
-      {awaySlots.map((slot) => renderSlot(awayTeam, slot, true, awaySquadPlayerNames))}
+      {homeSlots.map((slot) =>
+        renderSlot(homeTeam, slot, false, homeSquadPlayerNames, homeSubstitutionMarkers),
+      )}
+      {awaySlots.map((slot) =>
+        renderSlot(awayTeam, slot, true, awaySquadPlayerNames, awaySubstitutionMarkers),
+      )}
     </div>
   );
 }

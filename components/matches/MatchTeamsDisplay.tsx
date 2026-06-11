@@ -112,6 +112,7 @@ type MatchTeamsDisplayProps = {
   awayTeam: string;
   kickoffAt: string;
   isLive: boolean;
+  hideKickoff?: boolean;
   groupCode?: string | null;
   showSectionLabel?: boolean;
   centerKickoff?: boolean;
@@ -136,6 +137,7 @@ export function MatchTeamsDisplay({
   awayTeam,
   kickoffAt,
   isLive,
+  hideKickoff = false,
   groupCode,
   showSectionLabel = false,
   centerKickoff = false,
@@ -223,19 +225,21 @@ export function MatchTeamsDisplay({
             centerKickoff ? "top-1/2 -translate-y-1/2" : "top-0 pt-0.5"
           )}
         >
-          <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
-            {formatKickoff(kickoffAt)}
-          </p>
+          {!hideKickoff ? (
+            <p className="text-center font-display text-xs font-semibold leading-tight text-[var(--tm-accent)] sm:text-sm">
+              {formatKickoff(kickoffAt)}
+            </p>
+          ) : null}
           {groupCode && (
             <p className="text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-muted)] sm:text-[10px]">
               GRUPO &apos;{groupCode.toUpperCase()}&apos;
             </p>
           )}
-          {isLive && (
+          {isLive && !hideKickoff ? (
             <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--tm-live)]">
               Live
             </span>
-          )}
+          ) : null}
           {centerSlotAlign === "default" ? centerSlot : null}
         </div>
         {centerSlot && centerSlotAlign === "teamNames" ? (

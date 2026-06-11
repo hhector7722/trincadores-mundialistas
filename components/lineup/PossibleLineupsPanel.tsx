@@ -3,8 +3,10 @@
 import { useEffect, useMemo } from "react";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
 import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
+import { buildSubstitutionMarkers } from "@/lib/live/substitution-markers";
+import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import {
-  areMatchLineupsFullyConfirmed,
+  lineupsModalTitle,
   possibleLineupsModalTitle,
 } from "@/lib/lineup/lineups-modal-copy";
 import { buildTacticalModalLayout } from "@/lib/lineup/tactical-modal-layout";
@@ -15,6 +17,7 @@ type PossibleLineupsPanelProps = {
   matchId: string;
   homeTeam: string;
   awayTeam: string;
+  isLive?: boolean;
   onTitleChange?: (title: string) => void;
   onConfirmedChange?: (confirmed: boolean) => void;
 };
@@ -23,6 +26,7 @@ export function PossibleLineupsPanel({
   matchId,
   homeTeam,
   awayTeam,
+  isLive = false,
   onTitleChange,
   onConfirmedChange,
 }: PossibleLineupsPanelProps) {
@@ -41,17 +45,31 @@ export function PossibleLineupsPanel({
     ready,
   } = useMatchTacticalLineupData(matchId, homeTeam, awayTeam);
 
+  const { snapshot: liveSnapshot } = useMatchLiveSnapshot(matchId, isLive);
+
   const layout = useMemo(
     () => buildTacticalModalLayout(homeBench.length, awayBench.length),
     [homeBench.length, awayBench.length],
   );
 
-  const modalTitle = useMemo(
-    () => possibleLineupsModalTitle(resolvedHomeLineup, resolvedAwayLineup),
-    [resolvedHomeLineup, resolvedAwayLineup],
+  const bothConfirmed =
+    resolvedHomeLineup?.sourceKind === "confirmed" &&
+    resolvedAwayLineup?.sourceKind === "confirmed";
+
+  const modalTitle = useMemo(() => {
+    if (isLive) return lineupsModalTitle({ bothConfirmed, isLive: true });
+    return possibleLineupsModalTitle(resolvedHomeLineup, resolvedAwayLineup);
+  }, [isLive, bothConfirmed, resolvedHomeLineup, resolvedAwayLineup]);
+
+  const homeSubstitutionMarkers = useMemo(
+    () => buildSubstitutionMarkers(liveSnapshot?.substitutions ?? [], "home"),
+    [liveSnapshot?.substitutions],
   );
 
-  const bothConfirmed = areMatchLineupsFullyConfirmed(resolvedHomeLineup, resolvedAwayLineup);
+  const awaySubstitutionMarkers = useMemo(
+    () => buildSubstitutionMarkers(liveSnapshot?.substitutions ?? [], "away"),
+    [liveSnapshot?.substitutions],
+  );
 
   useEffect(() => {
     if (!ready) return;
@@ -86,6 +104,8 @@ export function PossibleLineupsPanel({
         homeSquad={homeSquad}
         layout={layout}
         interactive={false}
+        homeSubstitutionMarkers={isLive ? homeSubstitutionMarkers : null}
+        awaySubstitutionMarkers={isLive ? awaySubstitutionMarkers : null}
       />
       {showSourceMeta ? (
         <p className="sr-only">

@@ -32,11 +32,17 @@ export default async function HomePage() {
 
   const live = matches.filter((m) => m.status === "live");
   const scheduled = matches.filter((m) => m.status === "scheduled");
-  const focus = live[0] ?? scheduled[0] ?? null;
+  const liveFocus = live[0] ?? null;
+  const nextScheduled = scheduled[0] ?? null;
 
-  const focusMatch = focus
-    ? await getMatchPredictionDetail(ctx.activePoolId, user!.id, focus.id)
-    : null;
+  const [liveMatch, nextMatch] = await Promise.all([
+    liveFocus
+      ? getMatchPredictionDetail(ctx.activePoolId, user!.id, liveFocus.id)
+      : Promise.resolve(null),
+    nextScheduled
+      ? getMatchPredictionDetail(ctx.activePoolId, user!.id, nextScheduled.id)
+      : Promise.resolve(null),
+  ]);
 
   const dailyFact = getDailyFactForToday();
 
@@ -52,7 +58,8 @@ export default async function HomePage() {
           generalPredictionsEditable={generalPredictionsBundle.editable}
           dailyFact={dailyFact}
           quizHub={quizHub}
-          nextMatch={focusMatch}
+          liveMatch={liveMatch}
+          nextMatch={nextMatch}
         />
       }
     />
