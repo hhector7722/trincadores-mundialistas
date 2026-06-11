@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
-import { HOME_CARD_BODY_MIN_H_CLASS } from "@/components/matches/MatchTeamsDisplay";
+import {
+  HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS,
+  HOME_CARD_BODY_MIN_H_CLASS,
+  HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS,
+  HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS,
+  HOME_CARD_TEAMS_BLOCK_CLASS,
+} from "@/components/matches/MatchTeamsDisplay";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +42,13 @@ export function HomeNextMatch({
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const hasCarousel = slides.length > 1;
+  const teamsBlockClassName = hasCarousel
+    ? HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS
+    : HOME_CARD_TEAMS_BLOCK_CLASS;
+  const slideBodyClassName = hasCarousel
+    ? HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS
+    : HOME_CARD_BODY_MIN_H_CLASS;
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
@@ -54,60 +67,64 @@ export function HomeNextMatch({
 
   if (!slides.length) return null;
 
-  if (slides.length === 1) {
-    const slide = slides[0]!;
+  function renderSlide(slide: SlideItem) {
     return (
-      <section className="tm-glass-card overflow-hidden p-0">
-        <div className="px-4 pb-2 pt-2">
-          <HomeMatchCard
-            poolId={poolId}
-            match={slide.match}
-            mode={slide.mode}
-            currentProfileId={currentProfileId}
-          />
-        </div>
-      </section>
+      <HomeMatchCard
+        poolId={poolId}
+        match={slide.match}
+        mode={slide.mode}
+        currentProfileId={currentProfileId}
+        teamsBlockClassName={teamsBlockClassName}
+      />
     );
   }
 
   return (
-    <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe>
+    <section
+      className="tm-glass-card overflow-hidden p-0"
+      {...(hasCarousel ? { "data-block-tab-swipe": true } : {})}
+    >
       <div className="px-4 pb-2 pt-2">
-        <div
-          ref={scrollRef}
-          className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          aria-roledescription="carrusel"
-        >
-          {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={cn(
-                "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
-                HOME_CARD_BODY_MIN_H_CLASS,
-              )}
-              aria-hidden={index !== activeIndex}
-            >
-              <HomeMatchCard
-                poolId={poolId}
-                match={slide.match}
-                mode={slide.mode}
-                currentProfileId={currentProfileId}
-              />
-            </div>
-          ))}
-        </div>
+        {hasCarousel ? (
+          <div
+            ref={scrollRef}
+            className={cn(
+              "flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain",
+              slideBodyClassName,
+              "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            )}
+            aria-roledescription="carrusel"
+          >
+            {slides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className={cn(
+                  "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
+                  slideBodyClassName,
+                )}
+                aria-hidden={index !== activeIndex}
+              >
+                {renderSlide(slide)}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={slideBodyClassName}>{renderSlide(slides[0]!)}</div>
+        )}
 
-        <div className="mt-2 flex items-center justify-center gap-1.5" aria-hidden>
-          {slides.map((slide, index) => (
-            <span
-              key={slide.id}
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300",
-                index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
-              )}
-            />
-          ))}
-        </div>
+        {hasCarousel ? (
+          <div className={HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS} aria-hidden>
+            {slides.map((slide, index) => (
+              <span
+                key={slide.id}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
+                )}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

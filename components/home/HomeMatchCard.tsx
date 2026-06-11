@@ -16,6 +16,7 @@ import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
+  HOME_CARD_HEADER_CLASS,
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
@@ -42,6 +43,7 @@ type HomeMatchCardProps = {
   mode: "live" | "scheduled";
   currentProfileId: string;
   onOpenChange?: (open: boolean) => void;
+  teamsBlockClassName?: string;
 };
 
 function hasSavedPrediction(match: MatchWithPrediction): boolean {
@@ -56,6 +58,7 @@ export function HomeMatchCard({
   mode,
   currentProfileId,
   onOpenChange,
+  teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
 }: HomeMatchCardProps) {
   const isLive = mode === "live";
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
@@ -126,7 +129,7 @@ export function HomeMatchCard({
 
   return (
     <>
-      <div className="relative flex min-h-6 items-center justify-between">
+      <div className={HOME_CARD_HEADER_CLASS}>
         {isLive ? (
           <LiveMatchHeaderLabel className="relative z-10" />
         ) : (
@@ -165,7 +168,7 @@ export function HomeMatchCard({
             mvpPlayerName={displayMatch.mvpPrediction?.player_name ?? null}
             mvpTeamName={displayMatch.mvpPrediction?.team_name ?? null}
             lineupsCaption={lineupsCaption}
-            teamsBlockClassName={HOME_CARD_TEAMS_BLOCK_CLASS}
+            teamsBlockClassName={teamsBlockClassName}
             onOpenHomeLineup={() =>
               openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
             }
@@ -175,7 +178,7 @@ export function HomeMatchCard({
             onOpenLineups={() => openEntityModal(buildPossibleLineupsView(displayMatch))}
           />
         ) : (
-        <div className={HOME_CARD_TEAMS_BLOCK_CLASS}>
+        <div className={teamsBlockClassName}>
           <MatchTeamsDisplay
             homeTeam={displayMatch.home_team}
             awayTeam={displayMatch.away_team}
