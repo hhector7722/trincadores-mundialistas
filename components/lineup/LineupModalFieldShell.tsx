@@ -22,7 +22,7 @@ export function LineupModalFieldShell({
   benchAbove,
 }: LineupModalFieldShellProps) {
   return (
-    <div className={cn("flex w-full flex-col", className)}>
+    <div className={cn("flex w-full flex-col items-center", className)}>
       <div
         className={cn(
           "flex w-full shrink-0 flex-col items-stretch",
@@ -30,7 +30,7 @@ export function LineupModalFieldShell({
         )}
         style={{
           transform: `scale(${MODAL_FIELD_WRAPPER_SCALE})`,
-          transformOrigin: "top left",
+          transformOrigin: "top center",
           marginBottom: modalFieldScaleBottomTrim(),
         }}
       >

@@ -76,7 +76,7 @@ export function LineupModalPanel({
 
   if (loading) {
     return (
-      <div className="flex w-full flex-col px-1 pt-0.5 pb-2.5 sm:px-1.5">
+      <div className="flex w-full flex-col pt-0.5 pb-2.5">
         <LineupModalFieldShell>
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <FootballPitchSurface />
@@ -133,7 +133,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex flex-col">
         {(markFieldReady) => (
-          <div className="flex w-full flex-col px-1 pt-0.5 pb-2.5 sm:px-1.5">
+          <div className="flex w-full flex-col pt-0.5 pb-2.5">
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}
