@@ -8,6 +8,7 @@ import { NavigationLoadingProvider } from "@/components/layout/NavigationLoading
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
+import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import { BOTTOM_CHROME_PLACEHOLDER_ID } from "@/lib/layout/bottom-chrome";
@@ -28,6 +29,7 @@ export function AppShell({
         <QuizActiveNotificationProvider>
           <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
           <LineupsNotificationOpener />
+          <PullToRefresh />
           <TabNavigationProvider>
             <div className="tm-app-frame">
               <div

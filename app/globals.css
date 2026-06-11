@@ -327,6 +327,18 @@ html:has(.tm-app-frame) {
   }
 }
 
+.tm-pull-refresh {
+  will-change: transform, opacity;
+}
+
+.tm-pull-refresh__ring--active {
+  border-color: rgba(217, 255, 0, 0.35);
+}
+
+.tm-pull-refresh__spinner--spin {
+  animation: tm-spin 0.7s linear infinite;
+}
+
 .tm-nav-loading-overlay {
   position: fixed;
   inset: 0;
