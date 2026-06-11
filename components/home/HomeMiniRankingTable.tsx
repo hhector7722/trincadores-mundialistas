@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { getContextualLeaderboardStartIndex } from "@/lib/ranking/context-rows";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
@@ -32,12 +36,15 @@ function MiniRankingHeader() {
 function MiniRankingDataRow({
   row,
   isCurrentUser,
+  rowRef,
 }: {
   row: LeaderboardRow;
   isCurrentUser: boolean;
+  rowRef?: (node: HTMLDivElement | null) => void;
 }) {
   return (
     <div
+      ref={rowRef}
       className={cn(
         MINI_RANKING_GRID,
         "min-h-10 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
@@ -69,6 +76,23 @@ function MiniRankingDataRow({
 }
 
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef(new Map<string, HTMLDivElement>());
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || rows.length === 0) return;
+
+    const startIndex = getContextualLeaderboardStartIndex(rows, currentProfileId);
+    const anchorRow = rows[startIndex];
+    if (!anchorRow) return;
+
+    const anchorEl = rowRefs.current.get(anchorRow.profileId);
+    if (!anchorEl) return;
+
+    container.scrollTop = anchorEl.offsetTop;
+  }, [rows, currentProfileId]);
+
   return (
     <Link
       href="/ranking"
@@ -80,6 +104,7 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
     >
       <MiniRankingHeader />
       <div
+        ref={scrollRef}
         className={cn(
           "min-h-0 flex-1 overflow-y-auto overscroll-contain",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -93,6 +118,10 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
               key={row.profileId}
               row={row}
               isCurrentUser={row.profileId === currentProfileId}
+              rowRef={(node) => {
+                if (node) rowRefs.current.set(row.profileId, node);
+                else rowRefs.current.delete(row.profileId);
+              }}
             />
           ))
         )}
