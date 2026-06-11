@@ -207,7 +207,7 @@ export function HomeHeroCarousel({
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-label={`${slide.eyebrow || (slide.id === "last-match-highlight" ? "Last match" : slide.id)}${isActive ? ", activo" : ""}`}
+              aria-label={`${slide.eyebrow || (slide.id === "last-match-highlight" ? "Highlights" : slide.id)}${isActive ? ", activo" : ""}`}
               onClick={() => scrollToIndex(index)}
               className={cn(
                 "h-1.5 shrink-0 rounded-full transition-all duration-300 ease-out",
