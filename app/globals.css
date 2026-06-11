@@ -1250,8 +1250,8 @@ html:has(.tm-app-frame) {
   --tm-cal-grid-line-width: 0.75px;
   --tm-cal-dock-bg: rgba(26, 8, 56, 0.9);
   --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
-  --tm-cal-match-card-bg: #7a6e9e;
-  --tm-cal-match-card-border: #7a6e9e;
+  --tm-cal-match-card-bg: #5b537d;
+  --tm-cal-match-card-border: #5b537d;
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
   --tm-cal-sidebar-border: rgba(217, 255, 0, 0.18);
   --tm-cal-sidebar-heading-fs: clamp(6px, 1.6cqw, 8px);
@@ -1584,11 +1584,11 @@ html:has(.tm-app-frame) {
 .tm-porra-calendar .tm-cal-cell-surface {
   min-width: 0;
   overflow: hidden;
-  background: #fff;
+  background: #f5f5f7;
 }
 
 .tm-porra-calendar .tm-cal-cell--matches {
-  background: #fff;
+  background: #f5f5f7;
 }
 
 .tm-porra-calendar .tm-cal-match-card {
