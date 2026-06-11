@@ -4,11 +4,8 @@ import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
-import { pickContextualLeaderboardRows } from "@/lib/ranking/context-rows";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
-
-const EMPTY_ROW_COUNT = 3;
 
 type HomeMiniRankingTableProps = {
   rows: LeaderboardRow[];
@@ -71,31 +68,7 @@ function MiniRankingDataRow({
   );
 }
 
-function MiniRankingEmptyRow() {
-  return (
-    <div
-      className={cn(
-        MINI_RANKING_GRID,
-        "min-h-10 border-b border-white/5 px-[clamp(0.375rem,2.5cqw,0.5rem)] py-1 text-[9px] last:border-0"
-      )}
-      aria-hidden="true"
-    >
-      <span />
-      <span />
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="size-6 shrink-0 rounded-full bg-white/10" />
-        <span className="min-w-0 flex-1 truncate text-white/20">&nbsp;</span>
-      </div>
-      <span />
-      <span />
-    </div>
-  );
-}
-
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
-  const displayRows = pickContextualLeaderboardRows(rows, currentProfileId);
-  const emptyRowCount = Math.max(0, EMPTY_ROW_COUNT - displayRows.length);
-
   return (
     <Link
       href="/ranking"
@@ -105,22 +78,24 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
         "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
       )}
     >
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-h-full min-w-max flex-1 flex-col">
-          <MiniRankingHeader />
-          <div className="flex min-h-0 flex-1 flex-col">
-            {displayRows.map((row) => (
-              <MiniRankingDataRow
-                key={row.profileId}
-                row={row}
-                isCurrentUser={row.profileId === currentProfileId}
-              />
-            ))}
-            {Array.from({ length: emptyRowCount }, (_, index) => (
-              <MiniRankingEmptyRow key={`empty-${index}`} />
-            ))}
-          </div>
-        </div>
+      <MiniRankingHeader />
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        )}
+      >
+        {rows.length === 0 ? (
+          <p className="px-3 py-4 text-center text-[9px] text-white/35">Sin clasificación</p>
+        ) : (
+          rows.map((row) => (
+            <MiniRankingDataRow
+              key={row.profileId}
+              row={row}
+              isCurrentUser={row.profileId === currentProfileId}
+            />
+          ))
+        )}
       </div>
     </Link>
   );
