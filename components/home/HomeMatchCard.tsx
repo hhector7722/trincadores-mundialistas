@@ -18,6 +18,7 @@ import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
+import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -31,13 +32,15 @@ import {
   mvpSnapshotFromMatch,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
-import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import type { MatchPredictionsBoard, MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
 type HomeMatchCardProps = {
   poolId: string;
   match: MatchWithPrediction;
   mode: "live" | "scheduled";
+  currentProfileId: string;
+  livePredictionsBoard?: MatchPredictionsBoard | null;
   onOpenChange?: (open: boolean) => void;
 };
 
@@ -47,9 +50,17 @@ function hasSavedPrediction(match: MatchWithPrediction): boolean {
   return home !== null && away !== null && Number.isInteger(home) && Number.isInteger(away);
 }
 
-export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCardProps) {
+export function HomeMatchCard({
+  poolId,
+  match,
+  mode,
+  currentProfileId,
+  livePredictionsBoard = null,
+  onOpenChange,
+}: HomeMatchCardProps) {
   const isLive = mode === "live";
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
+  const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
   const [mvpSnapshot, setMvpSnapshot] = useState<MvpSnapshot | null>(() => mvpSnapshotFromMatch(match));
   const [entityModal, setEntityModal] = useState<{ open: boolean; view: EntityModalView }>({
     open: false,
@@ -82,8 +93,8 @@ export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCa
   }, [match.id, match.home_team, match.away_team]);
 
   useEffect(() => {
-    onOpenChange?.(scoreModalOpen || entityModal.open);
-  }, [scoreModalOpen, entityModal.open, onOpenChange]);
+    onOpenChange?.(scoreModalOpen || entityModal.open || predictionsBoardOpen);
+  }, [scoreModalOpen, entityModal.open, predictionsBoardOpen, onOpenChange]);
 
   const saved = hasSavedPrediction(displayMatch);
   const scoreText = formatListScore(
@@ -117,9 +128,9 @@ export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCa
   return (
     <>
       <div className="cursor-pointer" onClick={() => openScoreModal()}>
-        <div className="flex items-center justify-between">
+        <div className="relative flex items-center justify-between">
           {isLive ? (
-            <LiveMatchHeaderLabel />
+            <LiveMatchHeaderLabel className="relative z-10" />
           ) : (
             <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
               Proximo partido
@@ -128,10 +139,26 @@ export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCa
           <Link
             href="/predictions"
             onClick={(event) => event.stopPropagation()}
-            className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            className="relative z-10 text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
           >
             Ver todos
           </Link>
+          {isLive && livePredictionsBoard ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setPredictionsBoardOpen(true);
+              }}
+              className={cn(
+                "absolute inset-x-0 z-20 mx-auto w-max",
+                "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
+                "text-[8px] transition-opacity hover:opacity-80",
+              )}
+            >
+              Ver pronósticos
+            </button>
+          ) : null}
         </div>
 
         {isLive ? (
@@ -273,6 +300,15 @@ export function HomeMatchCard({ poolId, match, mode, onOpenChange }: HomeMatchCa
         possibleLineupsConfirmedOverride={!isLive && bothConfirmed}
         matchIsLive={isLive}
       />
+
+      {isLive && livePredictionsBoard ? (
+        <MatchPredictionsBoardModal
+          open={predictionsBoardOpen}
+          onClose={() => setPredictionsBoardOpen(false)}
+          board={livePredictionsBoard}
+          currentProfileId={currentProfileId}
+        />
+      ) : null}
     </>
   );
 }

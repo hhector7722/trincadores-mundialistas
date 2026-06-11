@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
-import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import type { MatchPredictionsBoard, MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
 type HomeNextMatchProps = {
   poolId: string;
+  currentProfileId: string;
   liveMatch: MatchWithPrediction | null;
   nextMatch: MatchWithPrediction | null;
+  livePredictionsBoard: MatchPredictionsBoard | null;
 };
 
 type SlideItem = {
@@ -17,7 +19,13 @@ type SlideItem = {
   match: MatchWithPrediction;
 };
 
-export function HomeNextMatch({ poolId, liveMatch, nextMatch }: HomeNextMatchProps) {
+export function HomeNextMatch({
+  poolId,
+  currentProfileId,
+  liveMatch,
+  nextMatch,
+  livePredictionsBoard,
+}: HomeNextMatchProps) {
   const slides = useMemo(() => {
     const items: SlideItem[] = [];
     if (liveMatch) items.push({ id: `live-${liveMatch.id}`, mode: "live", match: liveMatch });
@@ -52,7 +60,13 @@ export function HomeNextMatch({ poolId, liveMatch, nextMatch }: HomeNextMatchPro
     return (
       <section className="tm-glass-card overflow-hidden p-0">
         <div className="px-4 pb-2 pt-2">
-          <HomeMatchCard poolId={poolId} match={slide.match} mode={slide.mode} />
+          <HomeMatchCard
+            poolId={poolId}
+            match={slide.match}
+            mode={slide.mode}
+            currentProfileId={currentProfileId}
+            livePredictionsBoard={slide.mode === "live" ? livePredictionsBoard : null}
+          />
         </div>
       </section>
     );
@@ -72,7 +86,13 @@ export function HomeNextMatch({ poolId, liveMatch, nextMatch }: HomeNextMatchPro
               className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
               aria-hidden={index !== activeIndex}
             >
-              <HomeMatchCard poolId={poolId} match={slide.match} mode={slide.mode} />
+              <HomeMatchCard
+            poolId={poolId}
+            match={slide.match}
+            mode={slide.mode}
+            currentProfileId={currentProfileId}
+            livePredictionsBoard={slide.mode === "live" ? livePredictionsBoard : null}
+          />
             </div>
           ))}
         </div>

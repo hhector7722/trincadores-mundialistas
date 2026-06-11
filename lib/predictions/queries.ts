@@ -1,3 +1,4 @@
+import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { createClient } from "@/lib/supabase/server";
 import { fetchMvpPredictionsForMatches, getMvpPredictionForMatch, type MvpPrediction } from "@/lib/predictions/mvp-queries";
 import {
@@ -325,6 +326,104 @@ export type PeerPredictionRow = {
   awayGoals: number;
   pointsAwarded: number | null;
 };
+
+export type MatchPredictionsBoardRow = {
+  profileId: string;
+  label: string;
+  avatarUrl: string | null;
+  homeGoals: number | null;
+  awayGoals: number | null;
+  mvpPlayerName: string | null;
+};
+
+export type MatchPredictionsBoard = {
+  homeTeam: string;
+  awayTeam: string;
+  rows: MatchPredictionsBoardRow[];
+};
+
+export async function getMatchPredictionsBoard(
+  poolId: string,
+  matchId: string
+): Promise<MatchPredictionsBoard | null> {
+  const supabase = await createClient();
+
+  const { data: match, error: matchError } = await supabase
+    .from("matches")
+    .select("id, home_team, away_team")
+    .eq("id", matchId)
+    .maybeSingle();
+
+  if (matchError) throw new Error(matchError.message);
+  if (!match) return null;
+
+  const { data: memberships, error: membersError } = await supabase
+    .from("pool_members")
+    .select("profile_id")
+    .eq("pool_id", poolId);
+
+  if (membersError) throw new Error(membersError.message);
+  if (!memberships?.length) {
+    return { homeTeam: match.home_team, awayTeam: match.away_team, rows: [] };
+  }
+
+  const profileIds = memberships.map((m) => m.profile_id);
+
+  const [profilesResult, predictionsResult, mvpResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, username, display_name, avatar_url, onboarding_completed_at")
+      .in("id", profileIds),
+    supabase
+      .from("predictions")
+      .select("profile_id, home_goals, away_goals")
+      .eq("pool_id", poolId)
+      .eq("match_id", matchId)
+      .in("profile_id", profileIds),
+    supabase
+      .from("match_mvp_predictions")
+      .select("profile_id, player_name")
+      .eq("pool_id", poolId)
+      .eq("match_id", matchId)
+      .in("profile_id", profileIds),
+  ]);
+
+  if (profilesResult.error) throw new Error(profilesResult.error.message);
+  if (predictionsResult.error) throw new Error(predictionsResult.error.message);
+  if (mvpResult.error) throw new Error(mvpResult.error.message);
+
+  const predictionsByProfile = new Map(
+    (predictionsResult.data ?? []).map((row) => [row.profile_id, row])
+  );
+  const mvpByProfile = new Map(
+    (mvpResult.data ?? []).map((row) => [row.profile_id, row.player_name])
+  );
+
+  const rows: MatchPredictionsBoardRow[] = [];
+
+  for (const profile of profilesResult.data ?? []) {
+    if (!isProfileOnboardingComplete(profile)) continue;
+
+    const prediction = predictionsByProfile.get(profile.id);
+
+    rows.push({
+      profileId: profile.id,
+      label: profile.display_name ?? profile.username,
+      avatarUrl: profile.avatar_url,
+      homeGoals: prediction?.home_goals ?? null,
+      awayGoals: prediction?.away_goals ?? null,
+      mvpPlayerName: mvpByProfile.get(profile.id) ?? null,
+    });
+  }
+
+  rows.sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
+
+  return {
+    homeTeam: match.home_team,
+    awayTeam: match.away_team,
+    rows,
+  };
+}
 
 export function arePeerPredictionsLikelyVisible(
   status: MatchStatus,

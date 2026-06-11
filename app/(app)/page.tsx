@@ -5,7 +5,11 @@ import { getLatestMatchHighlightForPool } from "@/lib/highlights/queries";
 import { getDailyFactForToday } from "@/lib/home/daily-fact";
 import { homeQuizSlideFromHub } from "@/lib/quiz/home-teaser";
 import { getQuizDayHub } from "@/lib/quiz/queries";
-import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
+import {
+  countPendingPredictions,
+  getMatchPredictionDetail,
+  getMatchPredictionsBoard,
+} from "@/lib/predictions/queries";
 import { getPoolMatches } from "@/lib/pool/queries";
 import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import { getTournamentGeneralPredictions } from "@/lib/tournament-predictions/queries";
@@ -38,12 +42,15 @@ export default async function HomePage() {
   const liveFocus = live[0] ?? null;
   const nextScheduled = scheduled[0] ?? null;
 
-  const [liveMatch, nextMatch] = await Promise.all([
+  const [liveMatch, nextMatch, livePredictionsBoard] = await Promise.all([
     liveFocus
       ? getMatchPredictionDetail(ctx.activePoolId, user!.id, liveFocus.id)
       : Promise.resolve(null),
     nextScheduled
       ? getMatchPredictionDetail(ctx.activePoolId, user!.id, nextScheduled.id)
+      : Promise.resolve(null),
+    liveFocus
+      ? getMatchPredictionsBoard(ctx.activePoolId, liveFocus.id)
       : Promise.resolve(null),
   ]);
 
@@ -69,6 +76,7 @@ export default async function HomePage() {
           quizHub={quizHub}
           liveMatch={liveMatch}
           nextMatch={nextMatch}
+          livePredictionsBoard={livePredictionsBoard}
         />
       }
     />

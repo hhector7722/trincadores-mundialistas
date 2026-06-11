@@ -5,7 +5,7 @@ import { HomeMiniRankingTable } from "@/components/home/HomeMiniRankingTable";
 import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import type { DailyFact } from "@/lib/home/daily-fact";
-import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import type { MatchPredictionsBoard, MatchWithPrediction } from "@/lib/predictions/queries";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
@@ -20,6 +20,7 @@ type HomeStandingCardProps = {
   quizHub: QuizDayHub;
   liveMatch: MatchWithPrediction | null;
   nextMatch: MatchWithPrediction | null;
+  livePredictionsBoard: MatchPredictionsBoard | null;
 };
 
 export function HomeStandingCard({
@@ -32,6 +33,7 @@ export function HomeStandingCard({
   quizHub,
   liveMatch,
   nextMatch,
+  livePredictionsBoard,
 }: HomeStandingCardProps) {
   return (
     <div className="flex min-h-0 flex-col gap-3 pb-2">
@@ -45,7 +47,13 @@ export function HomeStandingCard({
       </div>
       {liveMatch || nextMatch ? (
         <div className="shrink-0">
-          <HomeNextMatch poolId={poolId} liveMatch={liveMatch} nextMatch={nextMatch} />
+          <HomeNextMatch
+            poolId={poolId}
+            currentProfileId={currentProfileId}
+            liveMatch={liveMatch}
+            nextMatch={nextMatch}
+            livePredictionsBoard={livePredictionsBoard}
+          />
         </div>
       ) : null}
       <div className="tm-home-secondary-row grid shrink-0 grid-cols-2 items-stretch gap-3">
