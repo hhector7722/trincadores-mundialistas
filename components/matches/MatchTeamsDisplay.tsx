@@ -24,6 +24,12 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-16";
 
+/** Card inicio: bloque equipos + acciones apiladas (altura fija, igual live / próximo). */
+export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 h-[8.25rem] overflow-hidden";
+
+/** Card inicio: altura mínima del cuerpo (cabecera + bloque equipos) para carrusel live/próximo. */
+export const HOME_CARD_BODY_MIN_H_CLASS = "min-h-[calc(1.5rem+8.25rem)]";
+
 function TeamFlagCircle({
   name,
   placeholderStyle,

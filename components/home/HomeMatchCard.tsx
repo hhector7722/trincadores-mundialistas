@@ -16,6 +16,7 @@ import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
+  HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
@@ -164,7 +165,7 @@ export function HomeMatchCard({
             mvpPlayerName={displayMatch.mvpPrediction?.player_name ?? null}
             mvpTeamName={displayMatch.mvpPrediction?.team_name ?? null}
             lineupsCaption={lineupsCaption}
-            teamsBlockClassName="relative mt-2 min-h-[8.25rem]"
+            teamsBlockClassName={HOME_CARD_TEAMS_BLOCK_CLASS}
             onOpenHomeLineup={() =>
               openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
             }
@@ -174,7 +175,7 @@ export function HomeMatchCard({
             onOpenLineups={() => openEntityModal(buildPossibleLineupsView(displayMatch))}
           />
         ) : (
-        <div className="relative mt-2 min-h-[8.25rem]">
+        <div className={HOME_CARD_TEAMS_BLOCK_CLASS}>
           <MatchTeamsDisplay
             homeTeam={displayMatch.home_team}
             awayTeam={displayMatch.away_team}
@@ -240,7 +241,10 @@ export function HomeMatchCard({
           />
 
           <div
-            className={cn("absolute inset-x-0 bottom-0", HOME_CARD_ACTIONS_STACKED_CLASS)}
+            className={cn(
+              "absolute inset-x-0 bottom-0 overflow-hidden",
+              HOME_CARD_ACTIONS_STACKED_CLASS,
+            )}
             onClick={(event) => event.stopPropagation()}
           >
             <MatchContextActionsRow

@@ -38,7 +38,7 @@ export function MatchContextActionsRow({
   if (layout === "homeCardStacked") {
     return (
       <div className={className}>
-        <div className="relative min-h-[2rem] w-full">
+        <div className="relative h-8 w-full">
           <div
             className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
             style={{ left: homeAnchor }}
@@ -63,7 +63,7 @@ export function MatchContextActionsRow({
             />
           </div>
         </div>
-        <div className="flex min-h-[2rem] w-full items-center justify-center px-1">
+        <div className="flex h-8 w-full items-center justify-center px-1">
           <MatchContextActionButton
             caption={possibleLineupsCaption}
             hideCaption={compact}

@@ -10,7 +10,9 @@ export function LiveMatchHeaderLabel({ className, size = "card" }: LiveMatchHead
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
+        "inline-flex items-center gap-1 rounded-full bg-[#CCFF00]",
+        "px-[clamp(6px,2cqw,8px)] py-[clamp(2px,0.8cqw,3px)]",
+        "font-bold uppercase tracking-[0.12em] text-black",
         size === "card" ? "text-[8px]" : "text-[10px]",
         className,
       )}

@@ -5,6 +5,7 @@ import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsR
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
   HOME_CARD_ACTIONS_STACKED_CLASS,
+  HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
 import type { MatchLiveSnapshot } from "@/lib/live/types";
@@ -36,7 +37,7 @@ export function LiveMatchPanelContent({
   mvpPlayerName,
   mvpTeamName,
   lineupsCaption,
-  teamsBlockClassName = "relative mt-2 min-h-[8.25rem]",
+  teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
   actionsClassName = HOME_CARD_ACTIONS_STACKED_CLASS,
   onOpenHomeLineup,
   onOpenAwayLineup,
@@ -102,7 +103,7 @@ export function LiveMatchPanelContent({
         ) : null}
 
         <div
-          className={cn("absolute inset-x-0 bottom-0", actionsClassName)}
+          className={cn("absolute inset-x-0 bottom-0 overflow-hidden", actionsClassName)}
           onClick={(event) => event.stopPropagation()}
         >
           <MatchContextActionsRow

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
+import { HOME_CARD_BODY_MIN_H_CLASS } from "@/components/matches/MatchTeamsDisplay";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
@@ -80,7 +81,10 @@ export function HomeNextMatch({
           {slides.map((slide, index) => (
             <div
               key={slide.id}
-              className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
+              className={cn(
+                "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
+                HOME_CARD_BODY_MIN_H_CLASS,
+              )}
               aria-hidden={index !== activeIndex}
             >
               <HomeMatchCard
