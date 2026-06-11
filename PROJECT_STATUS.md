@@ -65,4 +65,4 @@
 - [x] Resúmenes FIFA YouTube: cron RSS `@fifa`, slide hero «Último partido», reproductor in-app, modal partido finalizado
 - [x] Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
-- [x] MVP oficial automático: cron `live-matches` consulta FIFA (timeline/campos explícitos) y BSD (incidente dedicado); persiste `match_results.mvp_*` sin pisar admin ni inferir por stats
+- [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin

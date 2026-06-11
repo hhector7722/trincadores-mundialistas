@@ -1,5 +1,11 @@
 import { fetchOfficialMvpFromBsd } from "@/lib/live/sources/bsd-official-mvp";
 import {
+  fetchOfficialMvpFromFotmob,
+  fetchOfficialMvpFromFotmobByTeams,
+  loadFotmobMatchesForDate,
+  type FotMobMatchListItem,
+} from "@/lib/live/sources/fotmob-official-mvp";
+import {
   fetchOfficialMvpFromFifa,
   loadFifaCalendarLookup,
   resolveFifaMatchFromCalendar,
@@ -33,6 +39,12 @@ export async function loadMatchesMissingOfficialMvp(
   return (data ?? []) as MatchMvpCandidate[];
 }
 
+function kickoffDateKey(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toISOString().slice(0, 10);
+}
+
 async function loadBsdEventMap(
   admin: AdminClient,
   matchIds: string[],
@@ -48,6 +60,25 @@ async function loadBsdEventMap(
     .in("internal_id", matchIds);
 
   if (error) throw new Error(`external_id_map bsd: ${error.message}`);
+
+  return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
+}
+
+async function loadFotmobEventMap(
+  admin: AdminClient,
+  matchIds: string[],
+): Promise<Map<string, string>> {
+  if (!matchIds.length) return new Map();
+
+  const { data, error } = await admin
+    .from("external_id_map")
+    .select("internal_id, external_key")
+    .eq("source_code", "fotmob")
+    .eq("entity_type", "match")
+    .eq("match_status", "mapped")
+    .in("internal_id", matchIds);
+
+  if (error) throw new Error(`external_id_map fotmob: ${error.message}`);
 
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
 }
@@ -93,11 +124,43 @@ async function persistOfficialMvp(
   return true;
 }
 
+/** Prioridad: FotMob → FIFA → BSD (solo señales explícitas, sin inferir por rating). */
 async function resolveOfficialMvp(
   match: MatchMvpCandidate,
   fifaLookup: Map<string, FifaResolvedMatch>,
+  fotmobEventId: string | undefined,
+  fotmobByDate: Map<string, FotMobMatchListItem[]>,
   bsdEventId: string | undefined,
 ): Promise<{ playerName: string; teamName: string } | null> {
+  if (fotmobEventId) {
+    const fotmobId = Number(fotmobEventId);
+    if (Number.isFinite(fotmobId)) {
+      const fotmobMvp = await fetchOfficialMvpFromFotmob(fotmobId, match.home_team);
+      if (fotmobMvp) {
+        return { playerName: fotmobMvp.playerName, teamName: fotmobMvp.teamName };
+      }
+    }
+  }
+
+  const dateKey = kickoffDateKey(match.kickoff_at);
+  if (dateKey) {
+    let rows = fotmobByDate.get(dateKey);
+    if (!rows) {
+      rows = await loadFotmobMatchesForDate(dateKey);
+      fotmobByDate.set(dateKey, rows);
+    }
+
+    const fotmobMvp = await fetchOfficialMvpFromFotmobByTeams(
+      match.home_team,
+      match.away_team,
+      match.kickoff_at,
+      rows,
+    );
+    if (fotmobMvp) {
+      return { playerName: fotmobMvp.playerName, teamName: fotmobMvp.teamName };
+    }
+  }
+
   const fifaMatch = resolveFifaMatchFromCalendar(
     fifaLookup,
     match.home_team,
@@ -136,14 +199,22 @@ export async function syncOfficialMvps(
   if (!matches.length) return;
 
   const fifaLookup = await loadFifaCalendarLookup();
-  const bsdMap = await loadBsdEventMap(
-    admin,
-    matches.map((match) => match.id),
-  );
+  const matchIds = matches.map((match) => match.id);
+  const [bsdMap, fotmobMap] = await Promise.all([
+    loadBsdEventMap(admin, matchIds),
+    loadFotmobEventMap(admin, matchIds),
+  ]);
+  const fotmobByDate = new Map<string, FotMobMatchListItem[]>();
 
   for (const match of matches) {
     try {
-      const official = await resolveOfficialMvp(match, fifaLookup, bsdMap.get(match.id));
+      const official = await resolveOfficialMvp(
+        match,
+        fifaLookup,
+        fotmobMap.get(match.id),
+        fotmobByDate,
+        bsdMap.get(match.id),
+      );
       if (!official) continue;
 
       const written = await persistOfficialMvp(
