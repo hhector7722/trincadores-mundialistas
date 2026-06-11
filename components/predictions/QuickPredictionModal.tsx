@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
 import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
-import { LiveMatchPanelContent } from "@/components/live/LiveMatchPanelContent";
+import { LiveMatchScoreOverlay } from "@/components/live/LiveMatchScorePair";
 import { MatchLiveStatsPanel } from "@/components/live/MatchLiveStatsPanel";
 import {
   lineupsActionCaption,
@@ -584,23 +584,63 @@ export function QuickPredictionModal({
       return (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pb-0 pt-2">
-            <LiveMatchPanelContent
-              homeTeam={targetMatch.home_team}
-              awayTeam={targetMatch.away_team}
-              liveSnapshot={liveSnapshot}
-              teamsLayout="predictionModal"
-              predictionScoreText={
-                targetMatch.prediction?.home_goals != null ? predictionScoreText : null
-              }
-              mvpPlayerName={mvpPlayerName}
-              mvpTeamName={targetMatch.mvpPrediction?.team_name ?? null}
-              lineupsCaption={liveLineupsCaption}
-              teamsBlockClassName={cn("relative mt-2 pb-1", PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS)}
-              actionsClassName={PREDICTION_MODAL_ACTIONS_STACKED_CLASS}
-              onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-              onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
-              onOpenLineups={() => push(buildPossibleLineupsView(targetMatch))}
-            />
+            <div
+              className={cn(
+                "relative mt-2 pb-1",
+                PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS,
+              )}
+            >
+              <MatchTeamsDisplay
+                layout="predictionModal"
+                hidePredictionLabel
+                flagPlaceholderStyle={flagPlaceholderStyle}
+                homeTeam={targetMatch.home_team}
+                awayTeam={targetMatch.away_team}
+                kickoffAt={targetMatch.kickoff_at}
+                isLive
+                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                centerSlotAlign="teamNames"
+                centerSlot={
+                  targetMatch.prediction?.home_goals != null ? (
+                    <div className="inline-block text-center">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                        Mi pronóstico
+                      </p>
+                      <p className="font-display text-sm font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
+                        {predictionScoreText}
+                      </p>
+                    </div>
+                  ) : null
+                }
+              />
+
+              {liveSnapshot ? (
+                <LiveMatchScoreOverlay
+                  homeScore={liveSnapshot.homeScore}
+                  awayScore={liveSnapshot.awayScore}
+                  variant="modal"
+                />
+              ) : null}
+
+              <div
+                className={cn("absolute inset-x-0 bottom-0", PREDICTION_MODAL_ACTIONS_STACKED_CLASS)}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <MatchContextActionsRow
+                  compact
+                  layout="homeCardStacked"
+                  homeAnchor="10%"
+                  awayAnchor="90%"
+                  className="h-full"
+                  centerSlot={renderMvpCenterSlot(targetMatch)}
+                  onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
+                  onOpenAwayLineup={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                  possibleLineupsCaption={liveLineupsCaption}
+                  onOpenPossibleLineups={() => push(buildPossibleLineupsView(targetMatch))}
+                />
+              </div>
+            </div>
           </div>
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
             <MatchLiveStatsPanel stats={liveSnapshot?.stats ?? null} />
