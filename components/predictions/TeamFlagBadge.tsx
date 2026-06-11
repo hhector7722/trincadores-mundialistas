@@ -27,7 +27,7 @@ export function TeamFlagBadge({
     : size === "ko"
       ? "tm-ko-flag-dim"
       : size === "text"
-        ? "h-[1em] w-[1em]"
+        ? "h-[1cap] w-[1cap]"
         : size === "xxs"
           ? "h-3.5 w-3.5"
           : size === "xs"
@@ -72,7 +72,10 @@ export function TeamFlagBadge({
   return (
     <div
       className={cn(
-        "tm-circle-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        size === "text"
+          ? "border border-white/30 bg-white"
+          : "tm-circle-depth",
         dim,
         className
       )}
@@ -95,7 +98,7 @@ export function TeamFlagBadge({
               ? "font-extrabold text-black"
               : "text-[var(--tm-accent)]",
             scaled || size === "ko" || size === "text" || size === "xxs"
-              ? size === "text" ? "text-[0.55em] leading-none" : "text-[6px]"
+              ? size === "text" ? "text-[0.55cap] leading-none" : "text-[6px]"
               : size === "xs"
                 ? "text-[8px]"
                 : size === "lg"
