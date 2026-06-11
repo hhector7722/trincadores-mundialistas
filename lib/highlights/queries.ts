@@ -1,19 +1,5 @@
-import { canViewMatchHighlights } from "@/lib/highlights/preview-access";
 import { createClient } from "@/lib/supabase/server";
 import type { MatchHighlightView } from "@/lib/highlights/types";
-
-export async function resolveHighlightsVisibleForProfile(
-  profileId: string,
-): Promise<boolean> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", profileId)
-    .maybeSingle();
-
-  return canViewMatchHighlights(data?.username);
-}
 
 type HighlightRow = {
   id: string;
@@ -60,14 +46,10 @@ async function getMatchdayIdsForPool(poolId: string): Promise<string[]> {
   return (data ?? []).map((row) => row.id);
 }
 
-/** Último partido de la porra con resumen FIFA disponible (para hero home). */
+/** Último partido finalizado de la porra con resumen FIFA (para hero home). */
 export async function getLatestMatchHighlightForPool(
   poolId: string,
-  profileId: string,
 ): Promise<MatchHighlightView | null> {
-  const visible = await resolveHighlightsVisibleForProfile(profileId);
-  if (!visible) return null;
-
   const dayIds = await getMatchdayIdsForPool(poolId);
   if (!dayIds.length) return null;
 
@@ -86,6 +68,7 @@ export async function getLatestMatchHighlightForPool(
     `,
     )
     .in("matchday_id", dayIds)
+    .eq("status", "finished")
     .not("highlight_youtube_id", "is", null)
     .order("highlight_published_at", { ascending: false })
     .limit(1)

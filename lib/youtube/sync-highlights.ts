@@ -43,7 +43,8 @@ async function loadProcessedVideoIds(admin: SupabaseClient): Promise<Set<string>
 async function loadMatchCandidates(admin: SupabaseClient) {
   const { data: matches, error } = await admin
     .from("matches")
-    .select("id, home_team, away_team, kickoff_at, highlight_youtube_id")
+    .select("id, home_team, away_team, kickoff_at, highlight_youtube_id, status")
+    .eq("status", "finished")
     .order("kickoff_at", { ascending: true });
 
   if (error) throw new Error(error.message);
@@ -71,11 +72,11 @@ async function attachHighlightToMatch(
 ): Promise<boolean> {
   const { data: existing, error: readError } = await admin
     .from("matches")
-    .select("id, highlight_youtube_id, highlight_published_at")
+    .select("id, highlight_youtube_id, highlight_published_at, status")
     .eq("id", matchId)
     .maybeSingle();
 
-  if (readError || !existing) return false;
+  if (readError || !existing || existing.status !== "finished") return false;
 
   const publishedAt = new Date(video.publishedAt).toISOString();
   const shouldReplace =

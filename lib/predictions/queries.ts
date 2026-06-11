@@ -1,4 +1,3 @@
-import { resolveHighlightsVisibleForProfile } from "@/lib/highlights/queries";
 import { createClient } from "@/lib/supabase/server";
 import { fetchMvpPredictionsForMatches, getMvpPredictionForMatch, type MvpPrediction } from "@/lib/predictions/mvp-queries";
 import {
@@ -73,8 +72,6 @@ async function fetchPoolMatchesWithPredictions(
   );
   if (!filteredDayIds.length) return [];
 
-  const highlightsVisible = await resolveHighlightsVisibleForProfile(profileId);
-
   const { data: matches } = await supabase
     .from("matches")
     .select(
@@ -122,8 +119,10 @@ async function fetchPoolMatchesWithPredictions(
       officialAway: result?.away_goals ?? null,
       officialMvpPlayerName: result?.mvp_player_name ?? null,
       officialMvpTeamName: result?.mvp_team_name ?? null,
-      highlightYoutubeId: highlightsVisible ? (m.highlight_youtube_id ?? null) : null,
-      highlightPublishedAt: highlightsVisible ? (m.highlight_published_at ?? null) : null,
+      highlightYoutubeId:
+        status === "finished" ? (m.highlight_youtube_id ?? null) : null,
+      highlightPublishedAt:
+        status === "finished" ? (m.highlight_published_at ?? null) : null,
       prediction: pred
         ? {
             id: pred.id,
@@ -230,10 +229,9 @@ export async function getMatchPredictionDetail(
     .eq("match_id", matchId)
     .maybeSingle();
 
-  const [serverEditable, mvpPrediction, highlightsVisible] = await Promise.all([
+  const [serverEditable, mvpPrediction] = await Promise.all([
     fetchMatchEditableFromDb(matchId),
     getMvpPredictionForMatch(poolId, profileId, matchId),
-    resolveHighlightsVisibleForProfile(profileId),
   ]);
 
   return {
@@ -263,8 +261,10 @@ export async function getMatchPredictionDetail(
     officialAway: result?.away_goals ?? null,
     officialMvpPlayerName: result?.mvp_player_name ?? null,
     officialMvpTeamName: result?.mvp_team_name ?? null,
-    highlightYoutubeId: highlightsVisible ? (match.highlight_youtube_id ?? null) : null,
-    highlightPublishedAt: highlightsVisible ? (match.highlight_published_at ?? null) : null,
+    highlightYoutubeId:
+      match.status === "finished" ? (match.highlight_youtube_id ?? null) : null,
+    highlightPublishedAt:
+      match.status === "finished" ? (match.highlight_published_at ?? null) : null,
   };
 }
 

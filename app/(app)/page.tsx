@@ -28,7 +28,7 @@ export default async function HomePage() {
       getPoolLeaderboard(ctx.activePoolId),
       getQuizDayHub(ctx.activePoolId, user!.id),
       getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
-      getLatestMatchHighlightForPool(ctx.activePoolId, user!.id),
+      getLatestMatchHighlightForPool(ctx.activePoolId),
     ]);
 
   const quizSlide = homeQuizSlideFromHub(quizHub);
