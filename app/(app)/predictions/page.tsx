@@ -26,7 +26,11 @@ export default async function PredictionsPage() {
       </div>
 
       <div className="tm-porra-calendar-wrap">
-        <PredictionsCalendar poolId={ctx.activePoolId} matches={matches} />
+        <PredictionsCalendar
+          poolId={ctx.activePoolId}
+          matches={matches}
+          currentProfileId={user!.id}
+        />
       </div>
     </div>
   );

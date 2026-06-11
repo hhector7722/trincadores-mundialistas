@@ -15,6 +15,7 @@ import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsR
 import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
 import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
 import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
+import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
@@ -81,6 +82,8 @@ type QuickPredictionModalProps = {
   opaque?: boolean;
   /** Círculo de bandera sin imagen: negro y negrita (eliminatoria). */
   flagPlaceholderStyle?: "default" | "knockout";
+  /** Necesario para abrir el tablero de pronósticos rivales (live/finalizado). */
+  currentProfileId?: string;
 };
 
 type DotPosition = "start" | "middle" | "end";
@@ -104,6 +107,22 @@ function resolveDotPosition(index: number, total: number): DotPosition {
   if (total <= 1 || index <= 0) return "start";
   if (index >= total - 1) return "end";
   return "middle";
+}
+
+function PredictionsBoardOpenButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex min-h-12 w-full items-center justify-center",
+        "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
+        "text-[10px] transition-opacity hover:opacity-80 active:opacity-70",
+      )}
+    >
+      Ver pronósticos
+    </button>
+  );
 }
 
 function MatchSwipeDots({ position }: { position: DotPosition }) {
@@ -156,6 +175,7 @@ export function QuickPredictionModal({
   onMvpSaved,
   opaque = false,
   flagPlaceholderStyle = "default",
+  currentProfileId,
 }: QuickPredictionModalProps) {
   const router = useRouter();
   const orderedMatches = useMemo(
@@ -172,6 +192,7 @@ export function QuickPredictionModal({
   );
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
+  const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -362,6 +383,7 @@ export function QuickPredictionModal({
       setMatchSlide(null);
       setMvpOverrides({});
       setMvpPlayerName(null);
+      setPredictionsBoardOpen(false);
       return;
     }
 
@@ -553,6 +575,9 @@ export function QuickPredictionModal({
           </div>
 
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            {currentProfileId ? (
+              <PredictionsBoardOpenButton onClick={() => setPredictionsBoardOpen(true)} />
+            ) : null}
             {highlightVideoId ? (
               <MatchHighlightBlock
                 homeTeam={targetMatch.home_team}
@@ -560,11 +585,12 @@ export function QuickPredictionModal({
                 homeGoals={finishedHomeGoals}
                 awayGoals={finishedAwayGoals}
                 youtubeVideoId={highlightVideoId}
+                className={currentProfileId ? "mt-3" : undefined}
               />
             ) : null}
             <MatchLiveStatsPanel
               stats={liveSnapshot?.stats ?? null}
-              className={highlightVideoId ? "mt-3" : undefined}
+              className={highlightVideoId || currentProfileId ? "mt-3" : undefined}
             />
           </div>
         </div>
@@ -643,7 +669,13 @@ export function QuickPredictionModal({
             </div>
           </div>
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-            <MatchLiveStatsPanel stats={liveSnapshot?.stats ?? null} />
+            {currentProfileId ? (
+              <PredictionsBoardOpenButton onClick={() => setPredictionsBoardOpen(true)} />
+            ) : null}
+            <MatchLiveStatsPanel
+              stats={liveSnapshot?.stats ?? null}
+              className={currentProfileId ? "mt-3" : undefined}
+            />
           </div>
         </div>
       );
@@ -808,8 +840,8 @@ export function QuickPredictionModal({
   const isPlayerView = panelView.kind === "player";
   const isFieldView = isLineupView || isMvpView || isPossibleLineupsView;
   const isCompactModal = isFieldView || isPlayerView;
-
   return (
+    <>
     <Modal
       open={open}
       onClose={onClose}
@@ -882,5 +914,18 @@ export function QuickPredictionModal({
     >
       {renderPanelView(panelView, viewMatch)}
     </Modal>
+
+    {currentProfileId ? (
+      <MatchPredictionsBoardModal
+        open={predictionsBoardOpen}
+        onClose={() => setPredictionsBoardOpen(false)}
+        poolId={poolId}
+        matchId={viewMatch.id}
+        homeTeam={viewMatch.home_team}
+        awayTeam={viewMatch.away_team}
+        currentProfileId={currentProfileId}
+      />
+    ) : null}
+    </>
   );
 }

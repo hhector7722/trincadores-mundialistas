@@ -58,6 +58,7 @@ const GROUP_STAGE_VIEW: MonthYear = GROUP_STAGE_CALENDAR_MONTH;
 type PredictionsCalendarProps = {
   poolId: string;
   matches: MatchWithPrediction[];
+  currentProfileId: string;
 };
 
 function isSidebarCardAnchorMatch(match: MatchWithPrediction): boolean {
@@ -340,7 +341,11 @@ function useCalendarViewportLayout(
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
 
-export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProps) {
+export function PredictionsCalendar({
+  poolId,
+  matches,
+  currentProfileId,
+}: PredictionsCalendarProps) {
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
     items: matches,
@@ -556,6 +561,7 @@ export function PredictionsCalendar({ poolId, matches }: PredictionsCalendarProp
           poolId={poolId}
           match={activeMatch}
           matches={localMatches}
+          currentProfileId={currentProfileId}
           onMatchChange={setActiveMatch}
           onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>

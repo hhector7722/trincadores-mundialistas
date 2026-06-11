@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 type KnockoutBracketProps = {
   poolId: string;
   matches: MatchWithPrediction[];
+  currentProfileId: string;
 };
 
 const BRACKET_GEOMETRY = buildBracketGeometry();
@@ -203,7 +204,7 @@ function BracketMatchNode({
   );
 }
 
-export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
+export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
@@ -321,6 +322,7 @@ export function KnockoutBracket({ poolId, matches }: KnockoutBracketProps) {
           onClose={() => setActiveMatch(null)}
           poolId={poolId}
           match={activeMatch}
+          currentProfileId={currentProfileId}
           flagPlaceholderStyle="knockout"
           onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>

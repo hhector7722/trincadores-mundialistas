@@ -92,17 +92,38 @@ async function getMatchdayPair(poolId: string): Promise<{
   previous: ReferenceMatchday | null;
 }> {
   const supabase = await createClient();
-  const { data: matchdays } = await supabase
-    .from("matchdays")
-    .select("id, name, sequence, created_at")
-    .eq("pool_id", poolId)
-    .order("sequence", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(2);
+  const { data: finishedMatches, error } = await supabase
+    .from("matches")
+    .select("matchday_id, matchdays!inner(id, name, sequence, created_at, pool_id)")
+    .eq("status", "finished")
+    .eq("matchdays.pool_id", poolId);
+
+  if (error) throw new Error(error.message);
+
+  const matchdayById = new Map<
+    string,
+    { id: string; name: string; sequence: number; created_at: string }
+  >();
+
+  for (const row of finishedMatches ?? []) {
+    const matchday = Array.isArray(row.matchdays) ? row.matchdays[0] : row.matchdays;
+    if (!matchday?.id) continue;
+    matchdayById.set(matchday.id, {
+      id: matchday.id,
+      name: matchday.name,
+      sequence: matchday.sequence,
+      created_at: matchday.created_at,
+    });
+  }
+
+  const playedMatchdays = [...matchdayById.values()].sort((a, b) => {
+    if (b.sequence !== a.sequence) return b.sequence - a.sequence;
+    return b.created_at.localeCompare(a.created_at);
+  });
 
   return {
-    current: toReferenceMatchday(matchdays?.[0]),
-    previous: toReferenceMatchday(matchdays?.[1]),
+    current: toReferenceMatchday(playedMatchdays[0]),
+    previous: toReferenceMatchday(playedMatchdays[1]),
   };
 }
 

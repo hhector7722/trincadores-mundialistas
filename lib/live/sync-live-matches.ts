@@ -30,8 +30,9 @@ export type SyncLiveMatchesResult = {
 async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<MatchRow[]> {
   const fromIso = new Date(nowMs - 4 * 60 * 60 * 1000).toISOString();
   const toIso = new Date(nowMs + 30 * 60 * 1000).toISOString();
+  const finishedFromIso = new Date(nowMs - 24 * 60 * 60 * 1000).toISOString();
 
-  const [windowed, liveOngoing] = await Promise.all([
+  const [windowed, liveOngoing, recentlyFinished] = await Promise.all([
     admin
       .from("matches")
       .select("id, home_team, away_team, kickoff_at, status")
@@ -42,13 +43,25 @@ async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<
       .from("matches")
       .select("id, home_team, away_team, kickoff_at, status")
       .eq("status", "live"),
+    admin
+      .from("matches")
+      .select("id, home_team, away_team, kickoff_at, status")
+      .eq("status", "finished")
+      .gte("kickoff_at", finishedFromIso),
   ]);
 
   if (windowed.error) throw new Error(`matches: ${windowed.error.message}`);
   if (liveOngoing.error) throw new Error(`matches live: ${liveOngoing.error.message}`);
+  if (recentlyFinished.error) {
+    throw new Error(`matches finished: ${recentlyFinished.error.message}`);
+  }
 
   const byId = new Map<string, MatchRow>();
-  for (const row of [...(windowed.data ?? []), ...(liveOngoing.data ?? [])]) {
+  for (const row of [
+    ...(windowed.data ?? []),
+    ...(liveOngoing.data ?? []),
+    ...(recentlyFinished.data ?? []),
+  ]) {
     byId.set(row.id, row as MatchRow);
   }
   return [...byId.values()];
@@ -71,6 +84,33 @@ async function loadBsdEventMap(
   if (error) throw new Error(`external_id_map: ${error.message}`);
 
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
+}
+
+async function ensureFinishedMatchScoring(
+  admin: AdminClient,
+  matchId: string,
+  result: SyncLiveMatchesResult,
+  poolsToRebuild: Set<string>,
+): Promise<void> {
+  const { data: officialResult } = await admin
+    .from("match_results")
+    .select("match_id")
+    .eq("match_id", matchId)
+    .maybeSingle();
+
+  if (!officialResult) return;
+
+  const { error: recalcError } = await admin.rpc("recalculate_match_scores", {
+    p_match_id: matchId,
+  });
+  if (recalcError) {
+    result.errors.push(`${matchId}/recalc: ${recalcError.message}`);
+    return;
+  }
+  result.scoresRecalculated += 1;
+
+  const poolId = await loadPoolIdForMatch(admin, matchId);
+  if (poolId) poolsToRebuild.add(poolId);
 }
 
 async function loadPoolIdForMatch(admin: AdminClient, matchId: string): Promise<string | null> {
@@ -153,7 +193,12 @@ export async function syncLiveMatches(
   for (const match of matches) {
     try {
       const externalKey = eventMap.get(match.id);
-      if (!externalKey) continue;
+      if (!externalKey) {
+        if (match.status === "finished") {
+          await ensureFinishedMatchScoring(admin, match.id, result, poolsToRebuild);
+        }
+        continue;
+      }
 
       const eventId = Number(externalKey);
       if (!Number.isFinite(eventId)) continue;
@@ -220,19 +265,7 @@ export async function syncLiveMatches(
           if (!finishError) result.markedFinished += 1;
         }
 
-        if (resultWritten || match.status !== "finished") {
-          const { error: recalcError } = await admin.rpc("recalculate_match_scores", {
-            p_match_id: match.id,
-          });
-          if (recalcError) {
-            result.errors.push(`${match.id}/recalc: ${recalcError.message}`);
-          } else {
-            result.scoresRecalculated += 1;
-          }
-
-          const poolId = await loadPoolIdForMatch(admin, match.id);
-          if (poolId) poolsToRebuild.add(poolId);
-        }
+        await ensureFinishedMatchScoring(admin, match.id, result, poolsToRebuild);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "sync live match";
