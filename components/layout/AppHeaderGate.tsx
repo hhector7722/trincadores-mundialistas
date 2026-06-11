@@ -21,6 +21,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     <AppHeader
       ctx={ctx}
       stackedTitle={isHome}
+      showNotificationsBell={isHome}
       title={
         isRanking
           ? "LA TABLA"

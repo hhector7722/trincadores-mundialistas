@@ -90,11 +90,26 @@ export async function submitMatchResult(
     };
   }
 
+  const { error: quizBonusError } = await supabase.rpc("recalculate_quiz_final_ranking_scores", {
+    p_pool_id: poolId,
+  });
+
+  if (quizBonusError) {
+    return {
+      ok: false,
+      error:
+        quizBonusError.message ||
+        "Ranking actualizado, pero fallo el bonus final del quiz.",
+    };
+  }
+
   revalidatePath("/admin");
   revalidatePath("/predictions");
   revalidatePath(`/predictions/${matchId}`);
   revalidatePath("/");
   revalidatePath("/ranking");
+  revalidatePath("/quiz");
+  revalidatePath("/quiz/leaderboard");
   return { ok: true };
 }
 

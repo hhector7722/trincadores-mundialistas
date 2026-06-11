@@ -1,5 +1,6 @@
 import { MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS } from "@/lib/predictions/scoring";
 import { PREDICTION_LOCK_MINUTES } from "@/lib/predictions/deadline";
+import { QUIZ_FINAL_RANKING_TOP_N, quizFinalRankingBonusForPosition } from "@/lib/quiz/scoring";
 import { TOURNAMENT_GENERAL_SCORE_POINTS } from "@/lib/tournament-predictions/scoring";
 
 const { exact, sign } = MATCH_SCORE_POINTS;
@@ -53,6 +54,19 @@ export const SCORING_RULES_MODAL_SECTIONS: ScoringRulesSection[] = [
       `MVP: +${MVP_PREDICTION_POINTS} pt.`,
       "marcador exacto y el signo no se suman en el mismo partido.",
       `Máximo teórico por partido: +${maxPerMatch} pts (exacto + MVP).`,
+    ],
+  },
+  {
+    id: "quiz",
+    title: "Quiz (competición paralela)",
+    body: [
+      "El quiz diario tiene su propia clasificación acumulada durante el Mundial.",
+      "Solo cuentan los quizzes oficiales en modo competitivo.",
+      "Al finalizar el torneo, los cinco primeros de esa clasificación suman puntos a la porra principal:",
+      ...Array.from({ length: QUIZ_FINAL_RANKING_TOP_N }, (_, index) => {
+        const position = index + 1;
+        return `${position}.º: +${quizFinalRankingBonusForPosition(position)} pts.`;
+      }),
     ],
   },
   {

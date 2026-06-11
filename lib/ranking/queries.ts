@@ -1,5 +1,6 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { computeReliabilityPct } from "@/lib/ranking/reliability";
+import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,6 +25,7 @@ export type LeaderboardRow = {
   matchPoints: number;
   generalPoints: number;
   quizPoints: number;
+  quizFinalBonus: number;
   reliabilityPct: number | null;
 };
 
@@ -286,6 +288,7 @@ function buildLeaderboardRows(
   reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
   generalPoints: Map<string, number>,
   quizPoints: Map<string, number>,
+  quizFinalBonus: Map<string, number>,
   previousPositions: Map<string, number> | null
 ): Omit<LeaderboardRow, "position">[] {
   const merged = members.map((m) => {
@@ -293,17 +296,19 @@ function buildLeaderboardRows(
     const rel = reliability.get(m.profileId);
     const general = generalPoints.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
+    const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
     return {
       profileId: m.profileId,
       label: m.label,
       username: m.username,
       avatarUrl: m.avatarUrl,
-      cumulativePoints: matchCumulative + general,
+      cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
       matchPoints: s?.match_points ?? 0,
       generalPoints: general,
       quizPoints: quizPoints.get(m.profileId) ?? 0,
+      quizFinalBonus: quizBonus,
       reliabilityPct: computeReliabilityPct(
         rel?.resolvedCount ?? 0,
         rel?.totalPoints ?? 0
@@ -335,13 +340,19 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     return { matchday, rows: [] };
   }
 
-  const [scores, previousScores, reliability, generalScoreRows, quizPoints] = await Promise.all([
-    matchday ? loadScoresForMatchday(poolId, matchday.id) : Promise.resolve(new Map<string, ScoreRow>()),
-    previous ? loadScoresForMatchday(poolId, previous.id) : Promise.resolve(new Map<string, ScoreRow>()),
-    loadResolvedPredictionStats(poolId),
-    loadTournamentGeneralScoresByProfile(poolId),
-    loadQuizPointsByProfile(poolId),
-  ]);
+  const [scores, previousScores, reliability, generalScoreRows, quizPoints, quizFinalBonus] =
+    await Promise.all([
+      matchday
+        ? loadScoresForMatchday(poolId, matchday.id)
+        : Promise.resolve(new Map<string, ScoreRow>()),
+      previous
+        ? loadScoresForMatchday(poolId, previous.id)
+        : Promise.resolve(new Map<string, ScoreRow>()),
+      loadResolvedPredictionStats(poolId),
+      loadTournamentGeneralScoresByProfile(poolId),
+      loadQuizPointsByProfile(poolId),
+      loadQuizFinalRankingBonusesByProfile(poolId),
+    ]);
 
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
@@ -354,6 +365,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     reliability,
     generalPoints,
     quizPoints,
+    quizFinalBonus,
     previousPositions
   );
 
