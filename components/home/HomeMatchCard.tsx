@@ -225,7 +225,7 @@ export function HomeMatchCard({
           >
             <MatchContextActionsRow
               compact
-              layout="homeCardCompactStacked"
+              layout="homeCardScheduledStacked"
               homeAnchor="15%"
               awayAnchor="85%"
               className="h-full"

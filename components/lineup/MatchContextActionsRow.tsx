@@ -13,7 +13,13 @@ type MatchContextActionsRowProps = {
   /** Sin etiquetas grises ni borde superior. */
   compact?: boolean;
   /** Alineado a anclas de equipo / centro / equipo (modal, card inicio…). */
-  layout?: "grid" | "teamAnchors" | "predictionModalStacked" | "homeCardStacked" | "homeCardCompactStacked";
+  layout?:
+    | "grid"
+    | "teamAnchors"
+    | "predictionModalStacked"
+    | "homeCardStacked"
+    | "homeCardCompactStacked"
+    | "homeCardScheduledStacked";
   /** Centro de la fila superior (p. ej. MVP en card inicio). */
   centerSlot?: ReactNode;
   /** Fila central: pronóstico de marcador (entre MVP y alineaciones). */
@@ -39,6 +45,23 @@ export function MatchContextActionsRow({
   predictionSlot,
   className,
 }: MatchContextActionsRowProps) {
+  if (layout === "homeCardScheduledStacked") {
+    return (
+      <div className={cn("flex h-full flex-col items-center justify-start gap-1.5", className)}>
+        <div className="flex shrink-0 items-center justify-center px-1">{centerSlot}</div>
+        <div className="flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
+        <div className="flex shrink-0 items-center justify-center px-1">
+          <MatchContextActionButton
+            caption={possibleLineupsCaption}
+            hideCaption={compact}
+            showConfirmedBadge={possibleLineupsConfirmed}
+            onClick={onOpenPossibleLineups}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (layout === "homeCardCompactStacked") {
     return (
       <div className={cn("grid h-full grid-rows-3 gap-0", className)}>
