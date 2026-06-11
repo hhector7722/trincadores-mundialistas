@@ -14,11 +14,9 @@ export function ChampionPredictionCell({ team }: { team: string | null }) {
   if (!team) return <EmptyCell />;
 
   return (
-    <span className="flex h-full min-w-0 items-center justify-center gap-0.5 px-0.5">
-      <TeamFlagBadge name={team} size="xxs" loading="eager" className="shrink-0" />
-      <span className="whitespace-nowrap text-[10px] font-medium text-[var(--tm-fg)]">
-        {teamAbbr(team)}
-      </span>
+    <span className="flex h-full min-w-0 items-center justify-center gap-0.5 px-0.5 text-[10px] font-medium leading-none">
+      <TeamFlagBadge name={team} size="text" loading="eager" className="shrink-0" />
+      <span className="whitespace-nowrap text-[var(--tm-fg)]">{teamAbbr(team)}</span>
     </span>
   );
 }

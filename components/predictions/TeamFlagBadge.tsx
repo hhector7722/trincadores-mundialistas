@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 type TeamFlagBadgeProps = {
   name: string;
-  size?: "cal" | "ko" | "xxs" | "xs" | "sm" | "md" | "lg";
+  size?: "cal" | "ko" | "text" | "xxs" | "xs" | "sm" | "md" | "lg";
   className?: string;
   loading?: "lazy" | "eager";
   /** Ancho fuente flagcdn (px). Por defecto según size. */
@@ -26,9 +26,11 @@ export function TeamFlagBadge({
     ? "tm-cal-flag-dim"
     : size === "ko"
       ? "tm-ko-flag-dim"
-      : size === "xxs"
-        ? "h-3.5 w-3.5"
-        : size === "xs"
+      : size === "text"
+        ? "h-[1em] w-[1em]"
+        : size === "xxs"
+          ? "h-3.5 w-3.5"
+          : size === "xs"
           ? "h-5 w-5"
           : size === "sm"
             ? "h-7 w-7"
@@ -40,9 +42,11 @@ export function TeamFlagBadge({
       ? 40
       : size === "ko"
         ? 40
-        : size === "xxs"
-          ? 28
-          : size === "xs"
+        : size === "text"
+          ? 20
+          : size === "xxs"
+            ? 28
+            : size === "xs"
             ? 80
             : size === "sm"
               ? 80
@@ -53,9 +57,11 @@ export function TeamFlagBadge({
     ? undefined
     : size === "ko"
       ? 18
-      : size === "xxs"
-        ? 14
-        : size === "xs"
+      : size === "text"
+        ? undefined
+        : size === "xxs"
+          ? 14
+          : size === "xs"
           ? 20
           : size === "sm"
             ? 28
@@ -88,8 +94,8 @@ export function TeamFlagBadge({
             placeholderStyle === "knockout"
               ? "font-extrabold text-black"
               : "text-[var(--tm-accent)]",
-            scaled || size === "ko" || size === "xxs"
-              ? "text-[6px]"
+            scaled || size === "ko" || size === "text" || size === "xxs"
+              ? size === "text" ? "text-[0.55em] leading-none" : "text-[6px]"
               : size === "xs"
                 ? "text-[8px]"
                 : size === "lg"
