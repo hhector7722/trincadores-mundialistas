@@ -13,6 +13,10 @@ import {
 } from "@/actions/tournament-general-predictions";
 import { GeneralPredictionRow } from "@/components/home/GeneralPredictionRow";
 import {
+  HomeChampionTeamValue,
+  HomeFinalistsTeamValue,
+} from "@/components/home/GeneralPredictionTeamValue";
+import {
   buildLineupView,
   EntityModalController,
   type PlayerPickMode,
@@ -20,8 +24,6 @@ import {
 import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamsPickerModal } from "@/components/predictions/TeamsPickerModal";
 import {
-  formatChampionDisplay,
-  formatFinalistsDisplay,
   formatPlayerDisplay,
 } from "@/lib/tournament-predictions/display";
 import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
@@ -118,17 +120,25 @@ export function HomeGeneralPredictionsCard({
         <div className="tm-home-general-predictions__body">
           <GeneralPredictionRow
             label={labels.champion}
-            value={formatChampionDisplay(predictions.championTeam)}
+            valueNode={
+              predictions.championTeam ? (
+                <HomeChampionTeamValue team={predictions.championTeam} />
+              ) : null
+            }
             editable={editable}
             onAdd={openChampionFlow}
             onEdit={openChampionFlow}
           />
           <GeneralPredictionRow
             label={labels.finalists}
-            value={formatFinalistsDisplay(
-              predictions.finalistTeamA,
-              predictions.finalistTeamB
-            )}
+            valueNode={
+              predictions.finalistTeamA && predictions.finalistTeamB ? (
+                <HomeFinalistsTeamValue
+                  teamA={predictions.finalistTeamA}
+                  teamB={predictions.finalistTeamB}
+                />
+              ) : null
+            }
             editable={editable}
             onAdd={openFinalistsFlow}
             onEdit={openFinalistsFlow}

@@ -1,12 +1,13 @@
 "use client";
 
 import { Pencil, Plus } from "lucide-react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type GeneralPredictionRowProps = {
   label: string;
-  value: string | null;
+  value?: string | null;
+  valueNode?: ReactNode;
   editable: boolean;
   onAdd: () => void;
   onEdit: () => void;
@@ -14,12 +15,13 @@ type GeneralPredictionRowProps = {
 
 export function GeneralPredictionRow({
   label,
-  value,
+  value = null,
+  valueNode,
   editable,
   onAdd,
   onEdit,
 }: GeneralPredictionRowProps) {
-  const hasValue = Boolean(value);
+  const hasValue = Boolean(valueNode ?? value);
 
   function stopCardNavigation(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -33,9 +35,11 @@ export function GeneralPredictionRow({
       </span>
       <div className="flex min-w-0 items-center justify-center overflow-visible">
         {hasValue ? (
-          <span className="max-w-full truncate text-center text-[10px] font-medium text-[#CCFF00]">
-            {value}
-          </span>
+          valueNode ?? (
+            <span className="max-w-full truncate text-center text-[10px] font-medium text-[#CCFF00]">
+              {value}
+            </span>
+          )
         ) : editable ? (
           <button
             type="button"
