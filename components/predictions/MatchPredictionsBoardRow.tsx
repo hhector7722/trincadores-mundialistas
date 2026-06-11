@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 
 function formatGoalCell(value: number | null): string {
   if (value === null) return "—";
-  if (value === 0) return " ";
   return String(value);
 }
 
