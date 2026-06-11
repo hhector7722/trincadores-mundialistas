@@ -10,6 +10,7 @@
  * `playerOfTheMatch`.
  */
 
+import type { FotMobMatchDetailsPayload } from "@/lib/lineup/sources/fotmob-client";
 import { titleCasePlayerName } from "@/lib/worldcup2026/fifa-squads";
 import { openFootballTeamName } from "@/lib/worldcup2026/squad-team-names";
 
@@ -27,15 +28,6 @@ export type FotMobMatchListItem = {
   home?: FotMobSide;
   away?: FotMobSide;
   status?: { utcTime?: string };
-};
-
-type FotMobPlayerOfTheMatch = {
-  name?: {
-    firstName?: string;
-    lastName?: string;
-    fullName?: string;
-  };
-  teamName?: string;
 };
 
 export type OfficialMvpFromFotmob = {
@@ -114,7 +106,7 @@ export async function loadFotmobMatchesForDate(dateKey: string): Promise<FotMobM
 }
 
 export function parseOfficialMvpFromFotmobDetails(
-  payload: { content?: { matchFacts?: { playerOfTheMatch?: FotMobPlayerOfTheMatch } } },
+  payload: FotMobMatchDetailsPayload,
   fallbackHomeTeam: string,
 ): OfficialMvpFromFotmob | null {
   const potm = payload.content?.matchFacts?.playerOfTheMatch;

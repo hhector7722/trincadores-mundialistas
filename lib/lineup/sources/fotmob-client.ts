@@ -39,6 +39,15 @@ export type FotMobLineupTeam = {
   subs?: FotMobLineupPlayer[];
 };
 
+export type FotMobPlayerOfTheMatch = {
+  name?: {
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
+  };
+  teamName?: string;
+};
+
 export type FotMobMatchDetailsPayload = {
   content?: {
     lineup?: {
@@ -46,6 +55,9 @@ export type FotMobMatchDetailsPayload = {
       source?: string;
       homeTeam?: FotMobLineupTeam;
       awayTeam?: FotMobLineupTeam;
+    };
+    matchFacts?: {
+      playerOfTheMatch?: FotMobPlayerOfTheMatch;
     };
   };
 };
