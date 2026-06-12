@@ -416,11 +416,14 @@ html:has(.tm-app-frame) {
 /* Altura de referencia: card de pronósticos globales (padding + 5 filas) */
 :root {
   --tm-home-top-stat-height: calc(0.75rem * 2 + 5 * 1.5rem);
-  --tm-home-mini-ranking-header-h: 1.75rem;
+  --tm-home-mini-ranking-header-h: 1.375rem;
   --tm-home-mini-ranking-viewport-h: calc(
     var(--tm-home-top-stat-height) - var(--tm-home-mini-ranking-header-h)
   );
-  --tm-home-mini-ranking-row-h: calc(var(--tm-home-mini-ranking-viewport-h) / 3);
+  --tm-home-mini-ranking-visible-rows: 11;
+  --tm-home-mini-ranking-row-h: calc(
+    var(--tm-home-mini-ranking-viewport-h) / var(--tm-home-mini-ranking-visible-rows)
+  );
 }
 
 .tm-home-top-stat-card,
@@ -428,21 +431,12 @@ html:has(.tm-app-frame) {
   height: var(--tm-home-top-stat-height);
 }
 
-/* Home mini ranking: viewport = 3 filas enteras con snap */
+/* Home mini ranking: todas las filas visibles, altura repartida sin scroll */
 
 .tm-home-mini-ranking__viewport {
   height: var(--tm-home-mini-ranking-viewport-h);
   flex: none;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.tm-home-mini-ranking__viewport::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
 
 .tm-home-mini-ranking__row {
@@ -451,8 +445,6 @@ html:has(.tm-app-frame) {
   min-height: var(--tm-home-mini-ranking-row-h);
   max-height: var(--tm-home-mini-ranking-row-h);
   flex-shrink: 0;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 /* Pronósticos globales home: 5 filas reparten altura; «Ver todos» flota sin restar espacio */
