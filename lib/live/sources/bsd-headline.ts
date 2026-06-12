@@ -1,11 +1,12 @@
 /**
  * Titulares cortos de partido vía BSD:
- * 1) Social del evento (`/events/{id}/social/`) — texto del tweet
- * 2) Incidentes (`/events/{id}/incidents/`) — titular compuesto en español
+ * 1) Social del evento (`/events/{id}/social/`) — frase del tweet
+ * 2) Incidentes + resultado — titular compuesto en español (estilo prensa)
  */
 
+import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
-import { teamAbbr } from "@/lib/teams/display";
+import { teamNameEs } from "@/lib/teams/display";
 
 const BSD_API_BASE = "https://sports.bzzoiro.com";
 const BSD_FETCH_TIMEOUT_MS = 12_000;
@@ -81,9 +82,14 @@ function normalizeSocialText(raw: string): string {
     .trim();
 }
 
+function looksLikeStatLine(text: string): boolean {
+  return /\d+\s*[-–]\s*\d+/.test(text) && text.length < 40;
+}
+
 function isUsableSocialHeadline(text: string): boolean {
-  if (text.length < 12 || text.length > 140) return false;
+  if (text.length < 16 || text.length > 140) return false;
   if (/^[\W\d]+$/.test(text)) return false;
+  if (looksLikeStatLine(text)) return false;
   return true;
 }
 
@@ -116,9 +122,30 @@ function goalScorerName(incident: BsdIncident): string | null {
   return name || null;
 }
 
-function goalMinuteLabel(incident: BsdIncident): string | null {
-  if (incident.minute == null || incident.minute === "") return null;
-  return `${incident.minute}'`;
+function countGoalsByScorer(incidents: BsdIncident[]): Map<string, number> {
+  const counts = new Map<string, number>();
+
+  for (const incident of incidents) {
+    if (incident.type !== "goal") continue;
+    const raw = goalScorerName(incident);
+    if (!raw) continue;
+    const label = shirtPlayerName(raw);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+
+  return counts;
+}
+
+function topScorer(counts: Map<string, number>): { name: string; goals: number } | null {
+  let best: { name: string; goals: number } | null = null;
+
+  for (const [name, goals] of counts) {
+    if (!best || goals > best.goals) {
+      best = { name, goals };
+    }
+  }
+
+  return best;
 }
 
 export function composeHeadlineFromBsdIncidents(
@@ -126,29 +153,48 @@ export function composeHeadlineFromBsdIncidents(
   context: BsdHeadlineContext,
 ): string | null {
   const { homeTeam, awayTeam, homeGoals, awayGoals } = context;
-  const homeAbbr = teamAbbr(homeTeam);
-  const awayAbbr = teamAbbr(awayTeam);
-  const score = `${homeGoals}-${awayGoals}`;
+  const homeEs = teamNameEs(homeTeam);
+  const awayEs = teamNameEs(awayTeam);
 
   if (homeGoals === awayGoals) {
-    return truncateHeadline(`Empate ${homeAbbr} ${score} ${awayAbbr}`);
+    if (homeGoals === 0) {
+      return truncateHeadline(`Tablas en blanco entre ${homeEs} y ${awayEs}`);
+    }
+    return truncateHeadline(`Empate entre ${homeEs} y ${awayEs}`);
   }
 
-  const winnerAbbr = homeGoals > awayGoals ? homeAbbr : awayAbbr;
-  const goals = incidents.filter((incident) => incident.type === "goal");
-  const lastGoal = goals.at(-1);
-  const scorer = lastGoal ? goalScorerName(lastGoal) : null;
-  const minute = lastGoal ? goalMinuteLabel(lastGoal) : null;
+  const homeWin = homeGoals > awayGoals;
+  const winnerEs = homeWin ? homeEs : awayEs;
+  const loserEs = homeWin ? awayEs : homeEs;
+  const margin = Math.abs(homeGoals - awayGoals);
+  const goalCounts = countGoalsByScorer(incidents);
+  const star = topScorer(goalCounts);
+  const scorerCount = goalCounts.size;
 
-  if (scorer && minute) {
-    return truncateHeadline(`${scorer} ${minute} · ${winnerAbbr} ${score}`);
+  if (star?.goals && star.goals >= 3) {
+    return truncateHeadline(`Hat-trick de ${star.name} y victoria de ${winnerEs}`);
   }
 
-  if (scorer) {
-    return truncateHeadline(`${scorer} decide · ${winnerAbbr} ${score}`);
+  if (star?.goals === 2) {
+    return truncateHeadline(`${star.name} firma un doblete y ${winnerEs} gana`);
   }
 
-  return truncateHeadline(`${winnerAbbr} gana ${score}`);
+  if (margin >= 3) {
+    return truncateHeadline(`Goleada de ${winnerEs} ante ${loserEs}`);
+  }
+
+  if (margin === 1) {
+    if (star?.goals === 1 && scorerCount === 1) {
+      return truncateHeadline(`${star.name} decide el triunfo ajustado de ${winnerEs}`);
+    }
+    return truncateHeadline(`${winnerEs} se impone por la mínima ante ${loserEs}`);
+  }
+
+  if (star?.goals === 1 && scorerCount === 1) {
+    return truncateHeadline(`${star.name} impulsa la victoria de ${winnerEs}`);
+  }
+
+  return truncateHeadline(`${winnerEs} se impone con solvencia ante ${loserEs}`);
 }
 
 export async function fetchBsdHeadline(
