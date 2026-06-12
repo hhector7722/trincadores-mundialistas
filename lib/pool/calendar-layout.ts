@@ -595,51 +595,72 @@ export function fitCalendarLayout(
 const GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX = 52;
 const GUIDE_PREVIEW_FALLBACK_CARD_HEIGHT_PX = 28;
 
-/** Réplica en guía modal: copia métricas del calendario visible y ajusta pronósticos. */
-export function syncCalendarGuidePreview(previewCalendar: HTMLElement): void {
+type GuidePreviewMetrics = {
+  matchCardH: string;
+  uiScale: string | null;
+  matchGap: string | null;
+  previewW: string;
+  sidebarHeadingFs: string;
+};
+
+function readGuidePreviewMetrics(): GuidePreviewMetrics {
   const liveCalendar = document.querySelector<HTMLElement>(
     ".tm-porra-calendar:not(.tm-cal-guide-preview)"
   );
   const liveComputed = liveCalendar ? getComputedStyle(liveCalendar) : null;
 
-  for (const varName of [
-    "--tm-cal-match-card-h",
-    "--tm-cal-ui-scale",
-    "--tm-cal-match-gap",
-  ] as const) {
-    const inline =
-      varName === "--tm-cal-match-card-h"
-        ? liveCalendar?.style.getPropertyValue(varName)
-        : "";
-    const value = inline?.trim() || liveComputed?.getPropertyValue(varName).trim();
-    if (value) previewCalendar.style.setProperty(varName, value);
-  }
+  const inlineCardH = liveCalendar?.style.getPropertyValue("--tm-cal-match-card-h").trim();
+  const computedCardH = liveComputed?.getPropertyValue("--tm-cal-match-card-h").trim();
+  const matchCardH = inlineCardH || computedCardH || `${GUIDE_PREVIEW_FALLBACK_CARD_HEIGHT_PX}px`;
 
   const refCell = liveCalendar?.querySelector<HTMLElement>(".tm-cal-cell--matches");
   const refCard = liveCalendar?.querySelector<HTMLElement>(".tm-cal-match-card");
   const cellWidth =
     refCard?.clientWidth ?? refCell?.clientWidth ?? GUIDE_PREVIEW_FALLBACK_CELL_WIDTH_PX;
 
-  previewCalendar.style.setProperty("--tm-cal-guide-preview-w", `${cellWidth}px`);
-
-  if (!previewCalendar.style.getPropertyValue("--tm-cal-match-card-h").trim()) {
-    previewCalendar.style.setProperty(
-      "--tm-cal-match-card-h",
-      `${GUIDE_PREVIEW_FALLBACK_CARD_HEIGHT_PX}px`
-    );
-  }
-
   const liveHeadingFs = liveComputed?.getPropertyValue("--tm-cal-sidebar-heading-fs").trim();
-  if (liveHeadingFs && refCell && Math.abs(refCell.clientWidth - cellWidth) < 2) {
-    previewCalendar.style.setProperty("--tm-cal-sidebar-heading-fs", liveHeadingFs);
-  } else {
-    const headingFs = Math.max(6, Math.min(8, cellWidth * 0.016));
-    previewCalendar.style.setProperty("--tm-cal-sidebar-heading-fs", `${headingFs}px`);
+  const sidebarHeadingFs =
+    liveHeadingFs && refCell && Math.abs(refCell.clientWidth - cellWidth) < 2
+      ? liveHeadingFs
+      : `${Math.max(6, Math.min(8, cellWidth * 0.016))}px`;
+
+  return {
+    matchCardH,
+    uiScale: liveComputed?.getPropertyValue("--tm-cal-ui-scale").trim() || null,
+    matchGap: liveComputed?.getPropertyValue("--tm-cal-match-gap").trim() || null,
+    previewW: `${cellWidth}px`,
+    sidebarHeadingFs,
+  };
+}
+
+function applyGuidePreviewMetrics(previewCalendar: HTMLElement, metrics: GuidePreviewMetrics): void {
+  previewCalendar.style.setProperty("--tm-cal-match-card-h", metrics.matchCardH);
+  previewCalendar.style.setProperty("--tm-cal-guide-preview-w", metrics.previewW);
+  previewCalendar.style.setProperty("--tm-cal-sidebar-heading-fs", metrics.sidebarHeadingFs);
+
+  if (metrics.uiScale) {
+    previewCalendar.style.setProperty("--tm-cal-ui-scale", metrics.uiScale);
+  }
+  if (metrics.matchGap) {
+    previewCalendar.style.setProperty("--tm-cal-match-gap", metrics.matchGap);
   }
 
   resetPredictionLabelMetrics(previewCalendar);
   for (const label of previewCalendar.querySelectorAll<HTMLElement>(".tm-cal-prediction")) {
     fitPredictionLabel(label);
+  }
+}
+
+/** Réplica en guía modal: copia métricas del calendario visible y ajusta pronósticos. */
+export function syncCalendarGuidePreview(previewCalendar: HTMLElement): void {
+  applyGuidePreviewMetrics(previewCalendar, readGuidePreviewMetrics());
+}
+
+/** Sincroniza todas las miniaturas de la guía (cada una necesita su propio fit de marcador). */
+export function syncAllCalendarGuidePreviews(root: ParentNode): void {
+  const metrics = readGuidePreviewMetrics();
+  for (const preview of root.querySelectorAll<HTMLElement>(".tm-cal-guide-preview")) {
+    applyGuidePreviewMetrics(preview, metrics);
   }
 }
 

@@ -1683,6 +1683,22 @@ html:has(.tm-app-frame) {
   border-color: var(--tm-cal-match-card-border);
 }
 
+/* Guía modal: pronóstico superior y estrella MVP alineados como en la primera fila */
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-kickoff {
+  overflow: visible;
+  line-height: 1.1;
+}
+
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card-body {
+  justify-content: flex-end;
+  gap: 1px;
+}
+
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card > svg {
+  right: 1px;
+  top: 1px;
+}
+
 .tm-porra-calendar .tm-cal-match-group-row {
   min-height: 1em;
 }

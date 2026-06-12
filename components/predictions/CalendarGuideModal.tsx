@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, type RefObject } from "react";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { Modal } from "@/components/ui/modal";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
-import { syncCalendarGuidePreview } from "@/lib/pool/calendar-layout";
+import { syncAllCalendarGuidePreviews } from "@/lib/pool/calendar-layout";
 import {
   CAL_FINISHED_OUTER_MUTED_CLASS,
   resolveCalendarFinishedCard,
@@ -59,11 +59,12 @@ function useSyncGuidePreviewMetrics(listRef: RefObject<HTMLUListElement | null>,
     const list = listRef.current;
     if (!list) return;
 
-    const probe = list.querySelector<HTMLElement>(".tm-cal-guide-preview");
-    if (!probe) return;
-
     const applyMetrics = () => {
-      syncCalendarGuidePreview(probe);
+      syncAllCalendarGuidePreviews(list);
+
+      const probe = list.querySelector<HTMLElement>(".tm-cal-guide-preview");
+      if (!probe) return;
+
       for (const varName of GUIDE_PREVIEW_METRIC_VARS) {
         const value = probe.style.getPropertyValue(varName).trim();
         if (value) list.style.setProperty(varName, value);
