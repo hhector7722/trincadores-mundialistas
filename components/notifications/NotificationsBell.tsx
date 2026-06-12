@@ -3,14 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Check, Loader2 } from "lucide-react";
+import { Bell, Check, Loader2, Play } from "lucide-react";
 import { NotificationCountBadge } from "@/components/notifications/NotificationCountBadge";
 import { useUnreadNotifications } from "@/components/notifications/UnreadNotificationsContext";
 import { formatNotificationDateTimeLine } from "@/lib/notifications/format";
+import { NOTIFICATION_KIND_MATCH_HIGHLIGHT } from "@/lib/notifications/kinds";
 import { useQuizActiveNotificationModal } from "@/components/notifications/QuizActiveNotificationProvider";
 import { resolveNotificationAction } from "@/lib/notifications/notification-action";
 import type { NotificationRow } from "@/lib/notifications/types";
 import { cn } from "@/lib/utils";
+import { youtubeThumbnailUrl } from "@/lib/youtube/constants";
 
 const PANEL_GAP_PX = 6;
 const PANEL_WIDTH_PX = 288;
@@ -40,11 +42,15 @@ function NotificationsEmptyState() {
 function NotificationCard({
   row,
   onOpen,
+  highlightVideoId,
 }: {
   row: NotificationRow;
   onOpen: (row: NotificationRow) => void;
+  highlightVideoId?: string | null;
 }) {
   const dateTimeLine = formatNotificationDateTimeLine(row.created_at);
+  const showHighlightThumb =
+    row.kind === NOTIFICATION_KIND_MATCH_HIGHLIGHT && highlightVideoId;
 
   return (
     <li>
@@ -59,12 +65,30 @@ function NotificationCard({
           "min-h-[56px]",
         )}
       >
-        <div className="flex gap-2">
-          <Bell
-            className="mt-0.5 size-4 shrink-0 text-[#2F5D6A]/45"
-            strokeWidth={1.25}
-            aria-hidden
-          />
+        <div className="flex gap-2.5">
+          {showHighlightThumb ? (
+            <span className="relative mt-0.5 block h-14 w-[4.5rem] shrink-0 overflow-hidden rounded-lg border border-black/[0.06]">
+              <img
+                src={youtubeThumbnailUrl(highlightVideoId, "mqdefault")}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-600/85 text-white shadow-md">
+                  <Play className="ml-0.5 h-3.5 w-3.5 fill-current" aria-hidden />
+                </span>
+              </span>
+            </span>
+          ) : (
+            <Bell
+              className="mt-0.5 size-4 shrink-0 text-[#2F5D6A]/45"
+              strokeWidth={1.25}
+              aria-hidden
+            />
+          )}
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold leading-snug tracking-tight text-[#2F5D6A]">
               {row.title}
@@ -95,6 +119,9 @@ export function NotificationsBell() {
   const [portalMounted, setPortalMounted] = useState(false);
   const [clearingAll, setClearingAll] = useState(false);
   const [panelAnchor, setPanelAnchor] = useState<PanelAnchor | null>(null);
+  const [highlightVideoByMatchId, setHighlightVideoByMatchId] = useState<Record<string, string>>(
+    {},
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -145,6 +172,46 @@ export function NotificationsBell() {
   useEffect(() => {
     if (open && profileId) void refresh();
   }, [open, profileId, refresh]);
+
+  useEffect(() => {
+    if (!open || !profileId) return;
+
+    const matchIds = [
+      ...new Set(
+        items
+          .filter((row) => row.kind === NOTIFICATION_KIND_MATCH_HIGHLIGHT && row.match_id)
+          .map((row) => row.match_id as string),
+      ),
+    ];
+
+    if (!matchIds.length) {
+      setHighlightVideoByMatchId({});
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      const { data, error } = await supabase
+        .from("matches")
+        .select("id, highlight_youtube_id")
+        .in("id", matchIds);
+
+      if (cancelled || error) return;
+
+      const next: Record<string, string> = {};
+      for (const row of data ?? []) {
+        if (row.highlight_youtube_id) {
+          next[row.id as string] = row.highlight_youtube_id as string;
+        }
+      }
+      setHighlightVideoByMatchId(next);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, profileId, items, supabase]);
 
   const markRead = useCallback(
     async (id: string) => {
@@ -281,6 +348,9 @@ export function NotificationsBell() {
                         <NotificationCard
                           key={row.id}
                           row={row}
+                          highlightVideoId={
+                            row.match_id ? (highlightVideoByMatchId[row.match_id] ?? null) : null
+                          }
                           onOpen={(r) => void handleOpenItem(r)}
                         />
                       ))}

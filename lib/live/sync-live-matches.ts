@@ -205,6 +205,7 @@ async function persistOfficialResultFromLive(
 export async function syncLiveMatches(
   admin: AdminClient,
   nowMs: number = Date.now(),
+  siteOrigin?: string,
 ): Promise<SyncLiveMatchesResult> {
   const result: SyncLiveMatchesResult = {
     scanned: 0,
@@ -343,7 +344,7 @@ export async function syncLiveMatches(
   }
 
   try {
-    await syncAllMatchHighlights(admin);
+    await syncAllMatchHighlights(admin, siteOrigin);
   } catch (error) {
     const message = error instanceof Error ? error.message : "youtube highlights sync failed";
     result.errors.push(`highlights: ${message}`);

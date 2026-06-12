@@ -11,6 +11,7 @@ import {
   type HighlightSourceCode,
 } from "@/lib/youtube/highlight-priority";
 import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
+import { maybeNotifyMatchHighlight } from "@/lib/notifications/match-highlight-notifications";
 import { parseYoutubeChannelFeed } from "@/lib/youtube/parse-feed";
 import {
   buildTeamAliasIndex,
@@ -162,6 +163,7 @@ async function attachHighlightToMatch(
   video: YoutubeFeedVideo,
   matchId: string,
   sourceCode: HighlightSourceCode,
+  siteOrigin?: string,
 ): Promise<"attached" | "skipped" | "skipped_priority"> {
   const { data: existing, error: readError } = await admin
     .from("matches")
@@ -192,6 +194,14 @@ async function attachHighlightToMatch(
     return "skipped";
   }
 
+  const { data: matchMeta, error: metaError } = await admin
+    .from("matches")
+    .select("home_team, away_team")
+    .eq("id", matchId)
+    .maybeSingle();
+
+  if (metaError || !matchMeta) return "skipped";
+
   const { error: updateError } = await admin
     .from("matches")
     .update({
@@ -205,6 +215,15 @@ async function attachHighlightToMatch(
 
   await recordMappedVideo(admin, video, sourceCode, matchId, "mapped");
   await syncBsdHeadlineForMatch(admin, matchId);
+  await maybeNotifyMatchHighlight(
+    admin,
+    {
+      id: matchId,
+      home_team: matchMeta.home_team,
+      away_team: matchMeta.away_team,
+    },
+    siteOrigin,
+  );
   return "attached";
 }
 
@@ -213,6 +232,7 @@ async function syncChannelHighlights(
   config: ChannelSyncConfig,
   candidates: MatchHighlightRow[],
   aliasIndex: ReturnType<typeof buildTeamAliasIndex>,
+  siteOrigin?: string,
 ): Promise<SyncYoutubeHighlightsResult> {
   const result: SyncYoutubeHighlightsResult = {
     scanned: 0,
@@ -266,7 +286,13 @@ async function syncChannelHighlights(
     }
 
     try {
-      const outcome = await attachHighlightToMatch(admin, video, hit.matchId, config.sourceCode);
+      const outcome = await attachHighlightToMatch(
+        admin,
+        video,
+        hit.matchId,
+        config.sourceCode,
+        siteOrigin,
+      );
       if (outcome === "attached") {
         result.matched += 1;
         processed.add(video.videoId);
@@ -295,6 +321,7 @@ async function syncChannelHighlights(
 /** Sincroniza DAZN ES (prioridad), FIFA y Teledeporte RTVE (fallback). */
 export async function syncAllMatchHighlights(
   admin: SupabaseClient,
+  siteOrigin?: string,
 ): Promise<SyncAllMatchHighlightsResult> {
   const candidates = await loadMatchCandidates(admin);
   const teamNames = [
@@ -302,13 +329,26 @@ export async function syncAllMatchHighlights(
   ];
   const aliasIndex = buildTeamAliasIndex(teamNames);
 
-  const dazn = await syncChannelHighlights(admin, CHANNEL_CONFIGS[0]!, candidates, aliasIndex);
-  const fifa = await syncChannelHighlights(admin, CHANNEL_CONFIGS[1]!, candidates, aliasIndex);
+  const dazn = await syncChannelHighlights(
+    admin,
+    CHANNEL_CONFIGS[0]!,
+    candidates,
+    aliasIndex,
+    siteOrigin,
+  );
+  const fifa = await syncChannelHighlights(
+    admin,
+    CHANNEL_CONFIGS[1]!,
+    candidates,
+    aliasIndex,
+    siteOrigin,
+  );
   const teledeporte = await syncChannelHighlights(
     admin,
     CHANNEL_CONFIGS[2]!,
     candidates,
     aliasIndex,
+    siteOrigin,
   );
 
   const { data: missingHeadlines } = await admin

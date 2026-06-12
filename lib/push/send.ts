@@ -7,6 +7,7 @@ export type PushPayload = {
   body: string;
   url: string;
   tag?: string;
+  image?: string;
 };
 
 export type SendPushResult = {
@@ -51,6 +52,7 @@ export async function sendPushToProfile(
   const body = JSON.stringify({
     title: payload.title,
     body: payload.body,
+    image: payload.image ?? null,
     data: { url: payload.url, tag: payload.tag ?? null },
   });
 

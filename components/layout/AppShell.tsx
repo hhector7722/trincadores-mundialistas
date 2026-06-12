@@ -1,6 +1,7 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
+import { HighlightNotificationOpener } from "@/components/notifications/HighlightNotificationOpener";
 import { QuizActiveNotificationProvider } from "@/components/notifications/QuizActiveNotificationProvider";
 import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotificationsShell";
 import { PushNotificationProvider } from "@/components/push/PushNotificationProvider";
@@ -34,6 +35,7 @@ export function AppShell({
               initialVisible={ctx.heroHighlightScorelineVisible}
             >
               <LineupsNotificationOpener />
+              <HighlightNotificationOpener />
               <PullToRefresh />
               <TabNavigationProvider>
                 <div className="tm-app-frame">

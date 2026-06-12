@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertCronAuthorized } from "@/lib/quiz/cron";
+import { getSiteUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
 import { syncAllMatchHighlights } from "@/lib/youtube/sync-highlights";
 
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await syncAllMatchHighlights(admin);
+    const result = await syncAllMatchHighlights(admin, getSiteUrl().origin);
 
     return NextResponse.json({
       ok: true,

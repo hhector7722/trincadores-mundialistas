@@ -1,5 +1,6 @@
 import {
   NOTIFICATION_KIND_CONFIRMED_LINEUP,
+  NOTIFICATION_KIND_MATCH_HIGHLIGHT,
   NOTIFICATION_KIND_PREDICTION_REMINDER,
   NOTIFICATION_KIND_QUIZ_ACTIVE,
   NOTIFICATION_KIND_QUIZ_DAILY_REMINDER,
@@ -7,6 +8,12 @@ import {
 
 export const QUIZ_ACTIVE_NOTIFICATION_QUERY = "quiz-active";
 export const LINEUPS_NOTIFICATION_QUERY = "lineups";
+export const HIGHLIGHT_NOTIFICATION_QUERY = "highlight";
+
+export function highlightThumbNotificationUrl(videoId: string, origin = ""): string {
+  const base = origin || "";
+  return `${base}/push/highlight-thumb/${videoId}`;
+}
 
 export function quizActiveNotificationUrl(origin = ""): string {
   const base = origin || "";
@@ -21,6 +28,11 @@ export function confirmedLineupNotificationUrl(matchId: string, origin = ""): st
 export function predictionReminderNotificationUrl(matchId: string, origin = ""): string {
   const base = origin || "";
   return `${base}/predictions/${matchId}`;
+}
+
+export function matchHighlightNotificationUrl(matchId: string, origin = ""): string {
+  const base = origin || "";
+  return `${base}/predictions?${HIGHLIGHT_NOTIFICATION_QUERY}=${matchId}`;
 }
 
 export function quizDailyReminderNotificationUrl(origin = ""): string {
@@ -43,6 +55,9 @@ export function pushUrlForNotificationKind(
   }
   if (kind === NOTIFICATION_KIND_PREDICTION_REMINDER && matchId) {
     return predictionReminderNotificationUrl(matchId);
+  }
+  if (kind === NOTIFICATION_KIND_MATCH_HIGHLIGHT && matchId) {
+    return matchHighlightNotificationUrl(matchId);
   }
   return null;
 }

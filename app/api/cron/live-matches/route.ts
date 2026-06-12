@@ -1,7 +1,7 @@
+import { NextResponse } from "next/server";
+import { getSiteUrl } from "@/lib/site-url";
 import { syncLiveMatches } from "@/lib/live/sync-live-matches";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
-import { NextResponse } from "next/server";
-
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await syncLiveMatches(admin);
+    const result = await syncLiveMatches(admin, Date.now(), getSiteUrl().origin);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : "live-matches cron failed";
