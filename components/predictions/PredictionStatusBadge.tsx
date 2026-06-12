@@ -16,13 +16,20 @@ const OUTCOME_BORDER_CLASS: Record<ScoreOutcome, string> = {
   miss: "bg-[var(--tm-cal-outcome-miss)]",
 };
 
+/** Clases del contenedor interior de cards del calendario (marcador/hora). */
+export const calendarMatchCardBodyClass =
+  "tm-cal-match-card-body relative overflow-hidden rounded-[2px] bg-white/10";
+
 /** Badge textual para formularios y listas de predicción (estado de edición). */
 export function PredictionEditStateBadge({ state }: { state: PredictionUiState }) {
   const variant = state === "locked" ? "muted" : state === "saved" ? "default" : "muted";
   return <Badge variant={variant}>{EDIT_LABELS[state]}</Badge>;
 }
 
-/** Borde izquierdo de 4px en cards del calendario: exacto / signo / fallo. */
+/**
+ * Capa primaria de resultado en cards del calendario: barra izquierda de 4px.
+ * Debe renderizarse dentro de `calendarMatchCardBodyClass`, nunca en el wrapper exterior.
+ */
 export function PredictionStatusBadge({
   outcome,
   className,
@@ -35,7 +42,7 @@ export function PredictionStatusBadge({
   return (
     <span
       className={cn(
-        "pointer-events-none absolute inset-y-0 left-0 z-[5] w-1 rounded-l-[2px]",
+        "pointer-events-none absolute inset-y-0 left-0 z-[5] w-[4px]",
         OUTCOME_BORDER_CLASS[outcome],
         className,
       )}
