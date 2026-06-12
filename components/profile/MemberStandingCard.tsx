@@ -54,7 +54,7 @@ export function MemberStandingCard({
           <p className="text-sm text-[var(--tm-muted)]">
             {standing.exactHits > 0 || standing.cumulativePoints > 0
               ? "Rival activo en la clasificacion."
-              : "Aun sin puntos en la jornada de referencia."}
+              : "Aun sin puntos tras el ultimo partido resuelto."}
           </p>
         )}
       </Card>

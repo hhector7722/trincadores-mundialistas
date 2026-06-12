@@ -1,9 +1,19 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
+import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
 import { computeReliabilityPct } from "@/lib/ranking/reliability";
 import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
 import { createClient } from "@/lib/supabase/server";
 
+export type ReferenceMatch = {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffAt: string;
+  matchdayId: string;
+};
+
+/** @deprecated Usar ReferenceMatch. Se mantiene para compatibilidad interna. */
 export type ReferenceMatchday = {
   id: string;
   name: string;
@@ -53,11 +63,14 @@ type MemberRow = {
   avatarUrl: string | null;
 };
 
-type ScoreRow = {
+type MatchStatsRow = {
   profile_id: string;
   match_points: number;
   exact_hits: number;
   sign_hits: number;
+};
+
+type ScoreRow = MatchStatsRow & {
   cumulative_points: number;
 };
 
@@ -80,58 +93,164 @@ function compareRows(
   return ka[2].localeCompare(kb[2], "es");
 }
 
-function toReferenceMatchday(
-  row: { id: string; name: string; sequence: number } | undefined
-): ReferenceMatchday | null {
-  if (!row) return null;
-  return { id: row.id, name: row.name, sequence: row.sequence };
+function mapReferenceMatch(row: {
+  id: string;
+  home_team: string;
+  away_team: string;
+  kickoff_at: string;
+  matchday_id: string;
+}): ReferenceMatch {
+  return {
+    id: row.id,
+    homeTeam: row.home_team,
+    awayTeam: row.away_team,
+    kickoffAt: row.kickoff_at,
+    matchdayId: row.matchday_id,
+  };
 }
 
-async function getMatchdayPair(poolId: string): Promise<{
-  current: ReferenceMatchday | null;
-  previous: ReferenceMatchday | null;
+async function getFinishedMatchPair(poolId: string): Promise<{
+  current: ReferenceMatch | null;
+  previous: ReferenceMatch | null;
 }> {
   const supabase = await createClient();
-  const { data: finishedMatches, error } = await supabase
+  const { data, error } = await supabase
     .from("matches")
-    .select("matchday_id, matchdays!inner(id, name, sequence, created_at, pool_id)")
+    .select("id, home_team, away_team, kickoff_at, matchday_id, matchdays!inner(pool_id)")
     .eq("status", "finished")
-    .eq("matchdays.pool_id", poolId);
+    .eq("matchdays.pool_id", poolId)
+    .order("kickoff_at", { ascending: false })
+    .limit(2);
 
   if (error) throw new Error(error.message);
 
-  const matchdayById = new Map<
-    string,
-    { id: string; name: string; sequence: number; created_at: string }
-  >();
-
-  for (const row of finishedMatches ?? []) {
-    const matchday = Array.isArray(row.matchdays) ? row.matchdays[0] : row.matchdays;
-    if (!matchday?.id) continue;
-    matchdayById.set(matchday.id, {
-      id: matchday.id,
-      name: matchday.name,
-      sequence: matchday.sequence,
-      created_at: matchday.created_at,
-    });
-  }
-
-  const playedMatchdays = [...matchdayById.values()].sort((a, b) => {
-    if (b.sequence !== a.sequence) return b.sequence - a.sequence;
-    return b.created_at.localeCompare(a.created_at);
-  });
+  const matches = (data ?? []).map((row) =>
+    mapReferenceMatch({
+      id: row.id,
+      home_team: row.home_team,
+      away_team: row.away_team,
+      kickoff_at: row.kickoff_at,
+      matchday_id: row.matchday_id,
+    })
+  );
 
   return {
-    current: toReferenceMatchday(playedMatchdays[0]),
-    previous: toReferenceMatchday(playedMatchdays[1]),
+    current: matches[0] ?? null,
+    previous: matches[1] ?? null,
   };
+}
+
+async function getFinishedMatchIdsThroughKickoff(
+  poolId: string,
+  throughKickoffAt: string | null
+): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("matches")
+    .select("id, kickoff_at, matchdays!inner(pool_id)")
+    .eq("status", "finished")
+    .eq("matchdays.pool_id", poolId)
+    .order("kickoff_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? [])
+    .filter((row) => !throughKickoffAt || row.kickoff_at <= throughKickoffAt)
+    .map((row) => row.id as string);
+}
+
+function ingestMatchPoints(
+  stats: Map<string, MatchStatsRow>,
+  profileId: string,
+  points: number
+) {
+  const current = stats.get(profileId) ?? {
+    profile_id: profileId,
+    match_points: 0,
+    exact_hits: 0,
+    sign_hits: 0,
+  };
+  current.match_points += points;
+  if (points === MATCH_SCORE_POINTS.exact) current.exact_hits += 1;
+  if (points === MATCH_SCORE_POINTS.sign) current.sign_hits += 1;
+  stats.set(profileId, current);
+}
+
+async function loadMatchStatsForMatchIds(
+  poolId: string,
+  matchIds: string[]
+): Promise<Map<string, MatchStatsRow>> {
+  if (!matchIds.length) return new Map();
+
+  const supabase = await createClient();
+  const [{ data: predictions, error: predictionError }, { data: mvps, error: mvpError }] =
+    await Promise.all([
+      supabase
+        .from("predictions")
+        .select("profile_id, points_awarded")
+        .eq("pool_id", poolId)
+        .in("match_id", matchIds)
+        .not("points_awarded", "is", null),
+      supabase
+        .from("match_mvp_predictions")
+        .select("profile_id, points_awarded")
+        .eq("pool_id", poolId)
+        .in("match_id", matchIds)
+        .not("points_awarded", "is", null),
+    ]);
+
+  if (predictionError) throw new Error(predictionError.message);
+  if (mvpError) throw new Error(mvpError.message);
+
+  const stats = new Map<string, MatchStatsRow>();
+  for (const row of predictions ?? []) {
+    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0);
+  }
+  for (const row of mvps ?? []) {
+    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0);
+  }
+
+  return stats;
+}
+
+function toScoreRowMap(stats: Map<string, MatchStatsRow>): Map<string, ScoreRow> {
+  return new Map(
+    [...stats.entries()].map(([profileId, row]) => [
+      profileId,
+      {
+        ...row,
+        cumulative_points: row.match_points,
+      },
+    ])
+  );
+}
+
+export async function getReferenceMatch(poolId: string): Promise<ReferenceMatch | null> {
+  const { current } = await getFinishedMatchPair(poolId);
+  return current;
 }
 
 export async function getReferenceMatchday(
   poolId: string
 ): Promise<ReferenceMatchday | null> {
-  const { current } = await getMatchdayPair(poolId);
-  return current;
+  const referenceMatch = await getReferenceMatch(poolId);
+  if (!referenceMatch) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("matchdays")
+    .select("id, name, sequence")
+    .eq("id", referenceMatch.matchdayId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    name: data.name,
+    sequence: data.sequence,
+  };
 }
 
 export async function getReferenceMatchdayId(
@@ -160,13 +279,13 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
     (profiles ?? [])
       .filter((p) => isProfileOnboardingComplete(p))
       .map((p) => [
-      p.id,
-      {
-        label: p.display_name ?? p.username,
-        username: p.username,
-        avatarUrl: p.avatar_url,
-      },
-    ])
+        p.id,
+        {
+          label: p.display_name ?? p.username,
+          username: p.username,
+          avatarUrl: p.avatar_url,
+        },
+      ])
   );
 
   return memberships
@@ -247,106 +366,21 @@ async function loadQuizStatsByProfile(
   return stats;
 }
 
-type ScoreRowWithMatchday = ScoreRow & { matchdayId: string; sequence: number };
-
-async function loadAllPoolMemberScores(
-  poolId: string
-): Promise<ScoreRowWithMatchday[]> {
-  const supabase = await createClient();
-  const { data: scores, error } = await supabase
-    .from("pool_member_scores")
-    .select(
-      "profile_id, matchday_id, match_points, exact_hits, sign_hits, cumulative_points, matchdays!inner(sequence)"
-    )
-    .eq("pool_id", poolId);
-
-  if (error) throw new Error(error.message);
-
-  return (scores ?? []).map((row) => {
-    const matchday = Array.isArray(row.matchdays)
-      ? row.matchdays[0]
-      : row.matchdays;
-    return {
-      profile_id: row.profile_id,
-      matchdayId: row.matchday_id as string,
-      sequence: matchday?.sequence ?? 0,
-      match_points: row.match_points ?? 0,
-      exact_hits: row.exact_hits ?? 0,
-      sign_hits: row.sign_hits ?? 0,
-      cumulative_points: row.cumulative_points ?? 0,
-    };
-  });
-}
-
-function pickLatestScoresBeforeSequence(
-  rows: ScoreRowWithMatchday[],
-  targetSequence: number
-): Map<string, ScoreRow> {
-  const best = new Map<string, ScoreRowWithMatchday>();
-
-  for (const row of rows) {
-    if (row.sequence >= targetSequence) continue;
-    const current = best.get(row.profile_id);
-    if (!current || row.sequence > current.sequence) {
-      best.set(row.profile_id, row);
-    }
-  }
-
-  return new Map(
-    [...best.entries()].map(([profileId, row]) => [
-      profileId,
-      {
-        profile_id: row.profile_id,
-        match_points: 0,
-        exact_hits: 0,
-        sign_hits: 0,
-        cumulative_points: row.cumulative_points,
-      },
-    ])
-  );
-}
-
-function loadScoresForMatchdayFromCache(
-  matchdayId: string,
-  allScores: ScoreRowWithMatchday[]
-): Map<string, ScoreRow> {
-  const result = new Map<string, ScoreRow>();
-  let targetSequence = -1;
-
-  for (const row of allScores) {
-    if (row.matchdayId !== matchdayId) continue;
-    targetSequence = row.sequence;
-    result.set(row.profile_id, {
-      profile_id: row.profile_id,
-      match_points: row.match_points,
-      exact_hits: row.exact_hits,
-      sign_hits: row.sign_hits,
-      cumulative_points: row.cumulative_points,
-    });
-  }
-
-  if (targetSequence < 0) return result;
-
-  const carried = pickLatestScoresBeforeSequence(allScores, targetSequence);
-  for (const [profileId, row] of carried) {
-    if (!result.has(profileId)) {
-      result.set(profileId, row);
-    }
-  }
-
-  return result;
-}
-
 function buildPositionMap(
   members: MemberRow[],
-  scores: Map<string, ScoreRow>
+  scores: Map<string, ScoreRow>,
+  generalPoints: Map<string, number>,
+  quizFinalBonus: Map<string, number>
 ): Map<string, number> {
   const merged = members.map((m) => {
     const s = scores.get(m.profileId);
+    const general = generalPoints.get(m.profileId) ?? 0;
+    const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
+    const matchCumulative = s?.cumulative_points ?? 0;
     return {
       profileId: m.profileId,
       label: m.label,
-      cumulativePoints: s?.cumulative_points ?? 0,
+      cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
     };
   });
@@ -382,6 +416,7 @@ function computePositionTrend(
 function buildLeaderboardRows(
   members: MemberRow[],
   scores: Map<string, ScoreRow>,
+  lastMatchScores: Map<string, MatchStatsRow>,
   reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
   generalPoints: Map<string, number>,
   quizStats: Map<string, QuizProfileStats>,
@@ -390,6 +425,7 @@ function buildLeaderboardRows(
 ): Omit<LeaderboardRow, "position">[] {
   const merged = members.map((m) => {
     const s = scores.get(m.profileId);
+    const lastMatch = lastMatchScores.get(m.profileId);
     const rel = reliability.get(m.profileId);
     const general = generalPoints.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
@@ -403,7 +439,7 @@ function buildLeaderboardRows(
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
-      matchPoints: s?.match_points ?? 0,
+      matchPoints: lastMatch?.match_points ?? 0,
       generalPoints: general,
       quizPoints: quiz?.points ?? 0,
       hasQuizParticipated: quiz?.hasParticipated ?? false,
@@ -429,40 +465,59 @@ function buildLeaderboardRows(
 }
 
 export async function getPoolLeaderboard(poolId: string): Promise<{
-  matchday: ReferenceMatchday | null;
+  referenceMatch: ReferenceMatch | null;
+  previousReferenceMatch: ReferenceMatch | null;
   rows: LeaderboardRow[];
 }> {
-  const { current: matchday, previous } = await getMatchdayPair(poolId);
+  const { current: referenceMatch, previous: previousReferenceMatch } =
+    await getFinishedMatchPair(poolId);
   const members = await loadMembers(poolId);
 
   if (!members.length) {
-    return { matchday, rows: [] };
+    return { referenceMatch, previousReferenceMatch, rows: [] };
   }
 
-  const [allScores, reliability, generalScoreRows, quizStats, quizFinalBonus] =
-    await Promise.all([
-      loadAllPoolMemberScores(poolId),
-      loadResolvedPredictionStats(poolId),
-      loadTournamentGeneralScoresByProfile(poolId),
-      loadQuizStatsByProfile(poolId),
-      loadQuizFinalRankingBonusesByProfile(poolId),
-    ]);
+  const [
+    currentMatchIds,
+    previousMatchIds,
+    lastMatchStats,
+    reliability,
+    generalScoreRows,
+    quizStats,
+    quizFinalBonus,
+  ] = await Promise.all([
+    getFinishedMatchIdsThroughKickoff(poolId, referenceMatch?.kickoffAt ?? null),
+    previousReferenceMatch
+      ? getFinishedMatchIdsThroughKickoff(poolId, previousReferenceMatch.kickoffAt)
+      : Promise.resolve([]),
+    referenceMatch
+      ? loadMatchStatsForMatchIds(poolId, [referenceMatch.id])
+      : Promise.resolve(new Map<string, MatchStatsRow>()),
+    loadResolvedPredictionStats(poolId),
+    loadTournamentGeneralScoresByProfile(poolId),
+    loadQuizStatsByProfile(poolId),
+    loadQuizFinalRankingBonusesByProfile(poolId),
+  ]);
 
-  const scores = matchday
-    ? loadScoresForMatchdayFromCache(matchday.id, allScores)
-    : new Map<string, ScoreRow>();
-  const previousScores = previous
-    ? loadScoresForMatchdayFromCache(previous.id, allScores)
-    : new Map<string, ScoreRow>();
+  const [currentMatchStats, previousMatchStats] = await Promise.all([
+    loadMatchStatsForMatchIds(poolId, currentMatchIds),
+    loadMatchStatsForMatchIds(poolId, previousMatchIds),
+  ]);
+
+  const scores = toScoreRowMap(currentMatchStats);
+  const previousScores = toScoreRowMap(previousMatchStats);
 
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
   );
 
-  const previousPositions = previous ? buildPositionMap(members, previousScores) : null;
+  const previousPositions = previousReferenceMatch
+    ? buildPositionMap(members, previousScores, generalPoints, quizFinalBonus)
+    : null;
   const sorted = buildLeaderboardRows(
     members,
     scores,
+    lastMatchStats,
     reliability,
     generalPoints,
     quizStats,
@@ -471,7 +526,8 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
   );
 
   return {
-    matchday,
+    referenceMatch,
+    previousReferenceMatch,
     rows: sorted.map((row, index) => ({
       ...row,
       position: index + 1,
@@ -506,6 +562,7 @@ export async function getMemberStanding(
     behind: index < rows.length - 1 ? rows[index + 1] : null,
   };
 }
+
 export function memberStandingFromLeaderboard(
   rows: LeaderboardRow[],
   profileId: string

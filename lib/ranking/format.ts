@@ -7,3 +7,15 @@ export function formatAggregateStat(value: number): string {
 export function formatPoints(value: number): string {
   return String(value);
 }
+
+export function formatReferenceMatchDate(kickoffAt: string): string {
+  const d = new Date(kickoffAt);
+  return d.toLocaleString("es-ES", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+export function formatReferenceMatchLabel(homeTeam: string, awayTeam: string): string {
+  return `${homeTeam} — ${awayTeam}`;
+}

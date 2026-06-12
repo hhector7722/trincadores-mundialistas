@@ -10,7 +10,11 @@ export function PositionTrendIndicator({ trend }: { trend: PositionTrend }) {
   return (
     <span
       className="flex w-3 shrink-0 items-center justify-center"
-      aria-label={trend === "up" ? "Ha subido de posicion" : "Ha bajado de posicion"}
+      aria-label={
+        trend === "up"
+          ? "Ha subido respecto al partido anterior"
+          : "Ha bajado respecto al partido anterior"
+      }
     >
       <Triangle
         className={cn(
