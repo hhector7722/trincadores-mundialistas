@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { CalendarDataAccessModal } from "@/components/predictions/CalendarDataAccessModal";
-import { CalendarGuideModal } from "@/components/predictions/CalendarGuideModal";
 import type { CalendarModalOpener } from "@/lib/predictions/calendar-data-access";
 import { cn } from "@/lib/utils";
 
@@ -37,16 +36,6 @@ export function CalendarSidebarAccessDock({
   className,
 }: CalendarSidebarAccessDockProps) {
   const [dataAccessOpen, setDataAccessOpen] = useState(false);
-  const [guideOpen, setGuideOpen] = useState(false);
-  const [guideDataAccessBack, setGuideDataAccessBack] = useState<(() => void) | null>(null);
-
-  function openGuideFromDataAccess() {
-    setDataAccessOpen(false);
-    queueMicrotask(() => {
-      setGuideDataAccessBack(() => () => setDataAccessOpen(true));
-      setGuideOpen(true);
-    });
-  }
 
   return (
     <>
@@ -68,25 +57,6 @@ export function CalendarSidebarAccessDock({
         onOpenAllGroups={wrapDataAccessOpen(setDataAccessOpen, onOpenAllGroups)}
         onOpenStats={wrapDataAccessOpen(setDataAccessOpen, onOpenStats)}
         onOpenSquads={wrapDataAccessOpen(setDataAccessOpen, onOpenSquads)}
-        onOpenGuide={openGuideFromDataAccess}
-      />
-
-      <CalendarGuideModal
-        open={guideOpen}
-        stackElevated
-        onClose={() => {
-          setGuideOpen(false);
-          setGuideDataAccessBack(null);
-        }}
-        onBack={
-          guideDataAccessBack
-            ? () => {
-                setGuideOpen(false);
-                guideDataAccessBack();
-                setGuideDataAccessBack(null);
-              }
-            : undefined
-        }
       />
     </>
   );

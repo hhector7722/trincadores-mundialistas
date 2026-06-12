@@ -28,7 +28,7 @@ const ACCESS_DOCK_GRID_GAP_PX = 9;
 const ACCESS_DOCK_COLS = 1;
 const ACCESS_DOCK_ROWS = 1;
 const ACCESS_DOCK_GRID_WIDTH_RATIO = 0.92;
-const ACCESS_DOCK_LONGEST_LABEL = "VER DATOS";
+const ACCESS_DOCK_LONGEST_LABEL = "GUÍA CALENDARIO";
 const ACCESS_CARD_INSET_PX = 4;
 const ACCESS_CARD_EXTRA_VPAD_PX = 2;
 const ACCESS_BTN_PAD_Y_PX = 2;
@@ -75,7 +75,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
     if (elementOverflows(cell)) return true;
 
     const inner = cell.querySelectorAll(
-      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-block, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
+      ".tm-cal-day-num, .tm-cal-match-list, .tm-cal-match-card, .tm-cal-sidebar-slot, .tm-cal-sidebar-card, .tm-cal-groups-block, .tm-cal-groups-panel, .tm-cal-groups-list, .tm-cal-group-card, .tm-cal-prediction, .tm-cal-guide-access, .tm-cal-guide-btn, .tm-cal-sidebar-access-dock, .tm-cal-sidebar-access-btn"
     );
     for (const node of inner) {
       if (node instanceof HTMLElement && elementOverflows(node)) return true;
@@ -278,7 +278,9 @@ function syncSidebarAccessDockMetrics(
   calendar.style.setProperty("--tm-cal-sidebar-access-grid-w", `${gridW}px`);
 
   void slot.offsetHeight;
-  const buttons = slot.querySelectorAll<HTMLElement>(".tm-cal-sidebar-access-btn");
+  const buttons = slot.querySelectorAll<HTMLElement>(
+    ".tm-cal-sidebar-access-btn, .tm-cal-guide-btn"
+  );
   while (btnFs > 7 && buttons.length > 0) {
     let clipped = false;
     for (const btn of buttons) {
@@ -309,12 +311,13 @@ function syncSidebarAccessSpacing(calendar: HTMLElement, grid: HTMLElement): voi
   calendar.style.setProperty("--tm-cal-sidebar-card-offset-bottom", "0px");
 }
 
-/** Reserva mínima para el botón centrado bajo los grupos. */
-function getMinAccessDockReserve(): number {
+/** Reserva mínima para guía + acceso bajo el panel de grupos. */
+function getMinSidebarFooterReserve(): number {
   const cellW = 48;
   const { btnFs, btnPadX, btnPy, gridGap } = resolveAccessDockButtonMetrics(cellW, 18);
   void btnPadX;
-  return computeAccessDockHeight(btnFs, btnPy, gridGap);
+  const dockH = computeAccessDockHeight(btnFs, btnPy, gridGap);
+  return dockH * 2;
 }
 
 function findSidebarAnchorMatchCard(grid: HTMLElement): HTMLElement | null {
@@ -387,7 +390,7 @@ function syncGroupsPanelMetrics(calendar: HTMLElement, grid: HTMLElement): void 
     } else {
       const body = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-body");
       const title = sidebarSlot.querySelector<HTMLElement>(".tm-cal-groups-title");
-      const minDockReserve = getMinAccessDockReserve();
+      const minDockReserve = getMinSidebarFooterReserve();
       const titleH = title?.offsetHeight ?? 0;
       const card = sidebarSlot.querySelector<HTMLElement>(".tm-cal-sidebar-card");
       const cardH = card?.clientHeight ?? body?.clientHeight ?? 0;
