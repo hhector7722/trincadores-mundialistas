@@ -1295,7 +1295,7 @@ html:has(.tm-app-frame) {
   --tm-cal-match-card-bg: #5b537d;
   --tm-cal-match-card-border: #5b537d;
   --tm-cal-outcome-exact: #22c55e;
-  --tm-cal-outcome-sign: #3b82f6;
+  --tm-cal-outcome-sign: #f97316;
   --tm-cal-outcome-miss: var(--tm-danger);
   --tm-cal-sidebar-bg: rgba(80, 48, 168, 0.88);
   --tm-cal-sidebar-border: rgba(217, 255, 0, 0.18);

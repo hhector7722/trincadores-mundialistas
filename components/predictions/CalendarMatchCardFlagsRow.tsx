@@ -27,7 +27,7 @@ export function CalendarMatchCardFlagsRow({
         <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
           {centerLabel}
           {groupCode ? (
-            <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 uppercase text-[var(--tm-accent)]">
+            <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 -translate-y-0.5 uppercase text-[var(--tm-accent)]">
               {groupCode.toUpperCase()}
             </span>
           ) : null}
