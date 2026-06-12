@@ -1,5 +1,6 @@
 "use client";
 
+import { Play } from "lucide-react";
 import { useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
@@ -56,7 +57,13 @@ export function MatchHighlightBlock({
         {variant === "hero" ? (
           <div className="flex w-full min-w-0 flex-col gap-1">
             <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden">
-              <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[0.55em] py-[0.18em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
+              <span className="inline-flex shrink-0 items-center gap-[0.35em] whitespace-nowrap rounded-full bg-[#CCFF00] py-[0.18em] pl-[0.22em] pr-[0.55em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
+                <span
+                  className="inline-flex h-[1.65em] w-[1.65em] shrink-0 items-center justify-center rounded-full bg-red-600"
+                  aria-hidden="true"
+                >
+                  <Play className="ml-[0.08em] h-[0.85em] w-[0.85em] fill-white text-white" />
+                </span>
                 HIGHLIGHTS
               </span>
               <p className="min-w-0 flex-1 truncate text-[clamp(7px,2cqw,8px)] font-bold uppercase tracking-wide text-white/85">
