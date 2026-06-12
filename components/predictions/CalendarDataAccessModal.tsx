@@ -53,16 +53,25 @@ export function CalendarDataAccessModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Datos del torneo" ariaLabel="Datos del torneo" opaque>
-      <div className="flex flex-col gap-2 p-4">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Datos del torneo"
+      ariaLabel="Datos del torneo"
+      opaque
+      className="max-w-xs"
+      panelHostClassName="max-w-xs"
+    >
+      <div className="flex flex-col gap-1.5 px-3 py-3">
         {ACCESS_ACTIONS.map((action) => (
           <button
             key={action.id}
             type="button"
             onClick={() => handleAction(action.id)}
             className={cn(
-              "flex min-h-12 w-full items-center justify-center rounded-xl px-4 text-sm font-bold uppercase tracking-wide",
-              "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] transition-colors hover:brightness-110"
+              "flex h-10 w-full items-center justify-center rounded-lg px-2.5",
+              "text-[11px] font-semibold uppercase leading-none tracking-wide",
+              "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] transition-colors hover:brightness-105"
             )}
           >
             {action.label}
