@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
 import { Pencil, Plus } from "lucide-react";
 import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
@@ -49,6 +49,78 @@ type HomeMatchCardProps = {
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
 };
+
+const SCHEDULED_SCORE_EDIT_GAP_PX = 10;
+
+/** Marcador centrado en el ancho de la card; el lápiz no desplaza el centro. */
+function HomeScheduledPredictionScore({
+  scoreText,
+  onEdit,
+}: {
+  scoreText: string;
+  onEdit: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const [editIconPos, setEditIconPos] = useState<{ left: number; top: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const label = labelRef.current;
+      const container = containerRef.current;
+      if (!label || !container) return;
+
+      const labelRect = label.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      setEditIconPos({
+        left: labelRect.right - containerRect.left + SCHEDULED_SCORE_EDIT_GAP_PX,
+        top: labelRect.top - containerRect.top + labelRect.height / 2,
+      });
+    };
+
+    update();
+
+    const label = labelRef.current;
+    if (!label) return;
+
+    const observer = new ResizeObserver(update);
+    observer.observe(label);
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, [scoreText]);
+
+  return (
+    <div ref={containerRef} className="relative w-full leading-none">
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onEdit();
+        }}
+        className="block w-full text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+      >
+        <span ref={labelRef} className="inline-block whitespace-nowrap">
+          {scoreText}
+        </span>
+      </button>
+      {editIconPos != null ? (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onEdit();
+          }}
+          aria-label="Editar pronóstico"
+          className="absolute flex -translate-y-1/2 items-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+          style={{ left: editIconPos.left, top: editIconPos.top }}
+        >
+          <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+        </button>
+      ) : null}
+    </div>
+  );
+}
 
 function hasSavedPrediction(match: MatchWithPrediction): boolean {
   const home = match.prediction?.home_goals ?? null;
@@ -230,51 +302,34 @@ export function HomeMatchCard({
               layout="homeCardScheduledStacked"
               homeAnchor="15%"
               awayAnchor="85%"
-              className="h-full"
+              className="h-full w-full"
               centerSlot={
                 saved ? (
-                  <div className="inline-flex max-w-full items-center justify-center gap-1 leading-none">
+                  <HomeScheduledPredictionScore
+                    scoreText={scoreText}
+                    onEdit={openScoreModal}
+                  />
+                ) : (
+                  <div className="flex w-full justify-center">
                     <button
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();
                         openScoreModal();
                       }}
-                      className="shrink-0 whitespace-nowrap text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                      className={cn(
+                        "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+                        "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+                        "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+                        "transition-opacity hover:opacity-90 active:opacity-80",
+                      )}
                     >
-                      {scoreText}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openScoreModal();
-                      }}
-                      aria-label="Editar pronóstico"
-                      className="shrink-0 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                    >
-                      <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                      <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                      Añadir
                     </button>
                   </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openScoreModal();
-                    }}
-                    className={cn(
-                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
-                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                      "transition-opacity hover:opacity-90 active:opacity-80",
-                    )}
-                  >
-                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                    Añadir
-                  </button>
                 )
-                }
+              }
                 predictionSlot={
                   <MvpPredictionButton
                     savedPlayerName={displayMatch.mvpPrediction?.player_name}
