@@ -217,87 +217,89 @@ export function HomeMatchCard({
 
           <div
             className={cn(
-              "absolute inset-x-0",
+              "absolute inset-x-0 overflow-hidden",
               HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
               HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
             )}
             onClick={(event) => event.stopPropagation()}
           >
-            <MatchContextActionsRow
-              compact
-              layout="homeCardScheduledStacked"
-              homeAnchor="15%"
-              awayAnchor="85%"
-              className="h-full"
-              centerSlot={
-                saved ? (
-                  <div className="inline-block">
-                    <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
-                      Mi pronóstico
-                    </p>
-                    <div className="relative w-0 min-w-full">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openScoreModal();
-                        }}
-                        className="block w-full text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                      >
-                        {scoreText}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openScoreModal();
-                        }}
-                        aria-label="Editar pronóstico"
-                        className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                      >
-                        <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                      </button>
+            <div className="h-1/2 w-full origin-top scale-[2]">
+              <MatchContextActionsRow
+                compact
+                layout="homeCardScheduledStacked"
+                homeAnchor="15%"
+                awayAnchor="85%"
+                className="h-full leading-none"
+                centerSlot={
+                  saved ? (
+                    <div className="inline-block leading-none">
+                      <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
+                        Mi pronóstico
+                      </p>
+                      <div className="relative w-0 min-w-full">
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openScoreModal();
+                          }}
+                          className="block w-full text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                        >
+                          {scoreText}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openScoreModal();
+                          }}
+                          aria-label="Editar pronóstico"
+                          className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                        >
+                          <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openScoreModal();
-                    }}
-                    className={cn(
-                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
-                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                      "transition-opacity hover:opacity-90 active:opacity-80",
-                    )}
-                  >
-                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                    Añadir
-                  </button>
-                )
-              }
-              predictionSlot={
-                <MvpPredictionButton
-                  savedPlayerName={displayMatch.mvpPrediction?.player_name}
-                  onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
-                  variant="compact"
-                  className="w-full"
-                />
-              }
-              onOpenHomeLineup={() =>
-                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-              }
-              onOpenAwayLineup={() =>
-                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-              }
-              possibleLineupsCaption={lineupsCaption}
-              possibleLineupsConfirmed={bothConfirmed}
-              onOpenPossibleLineups={() =>
-                openEntityModal(buildPossibleLineupsView(displayMatch))
-              }
-            />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openScoreModal();
+                      }}
+                      className={cn(
+                        "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+                        "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+                        "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+                        "transition-opacity hover:opacity-90 active:opacity-80",
+                      )}
+                    >
+                      <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                      Añadir
+                    </button>
+                  )
+                }
+                predictionSlot={
+                  <MvpPredictionButton
+                    savedPlayerName={displayMatch.mvpPrediction?.player_name}
+                    onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                    variant="compact"
+                    className="w-full"
+                  />
+                }
+                onOpenHomeLineup={() =>
+                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+                }
+                onOpenAwayLineup={() =>
+                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+                }
+                possibleLineupsCaption={lineupsCaption}
+                possibleLineupsConfirmed={bothConfirmed}
+                onOpenPossibleLineups={() =>
+                  openEntityModal(buildPossibleLineupsView(displayMatch))
+                }
+              />
+            </div>
           </div>
         </div>
         )}
