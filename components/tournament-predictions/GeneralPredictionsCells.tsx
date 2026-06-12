@@ -1,4 +1,4 @@
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { HomeChampionTeamValue } from "@/components/home/GeneralPredictionTeamValue";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +14,8 @@ export function ChampionPredictionCell({ team }: { team: string | null }) {
   if (!team) return <EmptyCell />;
 
   return (
-    <span className="inline-flex h-full min-w-0 items-center justify-center gap-0.5 px-0.5 text-[10px] font-medium leading-none">
-      <TeamFlagBadge name={team} size="text" loading="eager" className="shrink-0" />
-      <span className="whitespace-nowrap text-[var(--tm-fg)]">{teamAbbr(team)}</span>
+    <span className="flex h-full min-w-0 items-center justify-center px-0.5">
+      <HomeChampionTeamValue team={team} />
     </span>
   );
 }
