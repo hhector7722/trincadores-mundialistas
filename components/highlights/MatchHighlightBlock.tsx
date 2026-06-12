@@ -62,7 +62,7 @@ export function MatchHighlightBlock({
                   className="inline-flex h-[1.65em] w-[1.65em] shrink-0 items-center justify-center rounded-full bg-red-600"
                   aria-hidden="true"
                 >
-                  <Play className="ml-[0.08em] h-[0.85em] w-[0.85em] fill-white text-white" />
+                  <Play className="ml-[0.06em] h-[0.58em] w-[0.58em] fill-white text-white" />
                 </span>
                 HIGHLIGHTS
               </span>
