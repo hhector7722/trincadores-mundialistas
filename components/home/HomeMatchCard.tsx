@@ -217,22 +217,21 @@ export function HomeMatchCard({
 
           <div
             className={cn(
-              "absolute inset-x-0 overflow-hidden",
+              "absolute inset-x-0",
               HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
               HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
             )}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="h-1/2 w-full origin-top scale-[2]">
-              <MatchContextActionsRow
-                compact
-                layout="homeCardScheduledStacked"
-                homeAnchor="15%"
-                awayAnchor="85%"
-                className="h-full leading-none"
-                centerSlot={
-                  saved ? (
-                    <div className="inline-block leading-none">
+            <MatchContextActionsRow
+              compact
+              layout="homeCardScheduledStacked"
+              homeAnchor="15%"
+              awayAnchor="85%"
+              className="h-full"
+              centerSlot={
+                saved ? (
+                  <div className="inline-block">
                       <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
                         Mi pronóstico
                       </p>
@@ -295,11 +294,10 @@ export function HomeMatchCard({
                 }
                 possibleLineupsCaption={lineupsCaption}
                 possibleLineupsConfirmed={bothConfirmed}
-                onOpenPossibleLineups={() =>
-                  openEntityModal(buildPossibleLineupsView(displayMatch))
-                }
-              />
-            </div>
+              onOpenPossibleLineups={() =>
+                openEntityModal(buildPossibleLineupsView(displayMatch))
+              }
+            />
           </div>
         </div>
         )}
