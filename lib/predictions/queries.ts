@@ -7,6 +7,11 @@ import {
   isKnockoutMatchdayKey,
 } from "@/lib/predictions/stage-filter";
 import type { MatchLivePayload, MatchPlayerIncident } from "@/lib/live/types";
+import {
+  isMvpPredictionCorrect,
+  resolveScoreOutcome,
+  type ScoreOutcome,
+} from "@/lib/predictions/prediction-outcome";
 import type { MatchStatus, Prediction } from "@/types/database";
 
 export type MatchWithPrediction = {
@@ -364,13 +369,40 @@ export type MatchPredictionsBoardRow = {
   homeGoals: number | null;
   awayGoals: number | null;
   mvpPlayerName: string | null;
+  scoreOutcome: ScoreOutcome | null;
+  mvpCorrect: boolean;
 };
 
 export type MatchPredictionsBoard = {
   homeTeam: string;
   awayTeam: string;
+  showOutcomes: boolean;
   rows: MatchPredictionsBoardRow[];
 };
+
+function hasOfficialScore(
+  homeGoals: number | null | undefined,
+  awayGoals: number | null | undefined,
+): homeGoals is number {
+  return (
+    homeGoals != null &&
+    awayGoals != null &&
+    Number.isInteger(homeGoals) &&
+    Number.isInteger(awayGoals)
+  );
+}
+
+function hasSavedScorePrediction(
+  homeGoals: number | null,
+  awayGoals: number | null,
+): homeGoals is number {
+  return (
+    homeGoals !== null &&
+    awayGoals !== null &&
+    Number.isInteger(homeGoals) &&
+    Number.isInteger(awayGoals)
+  );
+}
 
 export async function getMatchPredictionsBoard(
   poolId: string,
@@ -397,14 +429,27 @@ export async function getMatchPredictionsBoard(
 
   const admin = createAdminClient();
 
-  const { data: match, error: matchError } = await admin
-    .from("matches")
-    .select("id, home_team, away_team")
-    .eq("id", matchId)
-    .maybeSingle();
+  const [{ data: match, error: matchError }, { data: result, error: resultError }] =
+    await Promise.all([
+      admin
+        .from("matches")
+        .select("id, home_team, away_team, status")
+        .eq("id", matchId)
+        .maybeSingle(),
+      admin
+        .from("match_results")
+        .select("home_goals, away_goals, mvp_player_name, mvp_team_name")
+        .eq("match_id", matchId)
+        .maybeSingle(),
+    ]);
 
   if (matchError) throw new Error(matchError.message);
+  if (resultError) throw new Error(resultError.message);
   if (!match) return null;
+
+  const showOutcomes =
+    match.status === "finished" &&
+    hasOfficialScore(result?.home_goals, result?.away_goals);
 
   const { data: memberships, error: membersError } = await admin
     .from("pool_members")
@@ -413,7 +458,12 @@ export async function getMatchPredictionsBoard(
 
   if (membersError) throw new Error(membersError.message);
   if (!memberships?.length) {
-    return { homeTeam: match.home_team, awayTeam: match.away_team, rows: [] };
+    return {
+      homeTeam: match.home_team,
+      awayTeam: match.away_team,
+      showOutcomes,
+      rows: [],
+    };
   }
 
   const profileIds = memberships.map((m) => m.profile_id);
@@ -430,7 +480,7 @@ export async function getMatchPredictionsBoard(
       .eq("match_id", matchId),
     admin
       .from("match_mvp_predictions")
-      .select("profile_id, player_name")
+      .select("profile_id, player_name, team_name")
       .eq("pool_id", poolId)
       .eq("match_id", matchId),
   ]);
@@ -443,7 +493,7 @@ export async function getMatchPredictionsBoard(
     (predictionsResult.data ?? []).map((row) => [row.profile_id, row])
   );
   const mvpByProfile = new Map(
-    (mvpResult.data ?? []).map((row) => [row.profile_id, row.player_name])
+    (mvpResult.data ?? []).map((row) => [row.profile_id, row])
   );
 
   const rows: MatchPredictionsBoardRow[] = [];
@@ -452,14 +502,39 @@ export async function getMatchPredictionsBoard(
     if (!isProfileOnboardingComplete(profile)) continue;
 
     const prediction = predictionsByProfile.get(profile.id);
+    const mvpPrediction = mvpByProfile.get(profile.id);
+    const homeGoals = prediction?.home_goals ?? null;
+    const awayGoals = prediction?.away_goals ?? null;
+
+    const scoreOutcome =
+      showOutcomes && hasSavedScorePrediction(homeGoals, awayGoals)
+        ? resolveScoreOutcome({
+            predictedHome: homeGoals,
+            predictedAway: awayGoals,
+            resultHome: result!.home_goals,
+            resultAway: result!.away_goals,
+          })
+        : null;
+
+    const mvpCorrect =
+      showOutcomes &&
+      !!mvpPrediction?.player_name &&
+      isMvpPredictionCorrect(
+        mvpPrediction.player_name,
+        mvpPrediction.team_name,
+        result?.mvp_player_name,
+        result?.mvp_team_name,
+      );
 
     rows.push({
       profileId: profile.id,
       label: profile.display_name ?? profile.username,
       avatarUrl: profile.avatar_url,
-      homeGoals: prediction?.home_goals ?? null,
-      awayGoals: prediction?.away_goals ?? null,
-      mvpPlayerName: mvpByProfile.get(profile.id) ?? null,
+      homeGoals,
+      awayGoals,
+      mvpPlayerName: mvpPrediction?.player_name ?? null,
+      scoreOutcome,
+      mvpCorrect,
     });
   }
 
@@ -468,6 +543,7 @@ export async function getMatchPredictionsBoard(
   return {
     homeTeam: match.home_team,
     awayTeam: match.away_team,
+    showOutcomes,
     rows,
   };
 }

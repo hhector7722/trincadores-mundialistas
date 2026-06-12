@@ -94,6 +94,7 @@ export function MatchPredictionsBoardModal({
             currentProfileId={currentProfileId}
             homeTeam={tableHomeTeam}
             awayTeam={tableAwayTeam}
+            showOutcomes={board?.showOutcomes ?? false}
           />
         )}
       </div>

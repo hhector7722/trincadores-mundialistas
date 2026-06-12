@@ -3,6 +3,7 @@
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { MatchPredictionsBoardOutcomeIcons } from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
 import { MATCH_PREDICTIONS_SUBGRID_ROW } from "@/components/predictions/match-predictions-grid";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
@@ -30,9 +31,11 @@ function CellValue({ value }: { value: string }) {
 export function MatchPredictionsBoardRow({
   row,
   isCurrentUser,
+  showOutcomes,
 }: {
   row: MatchPredictionsBoardRowType;
   isCurrentUser: boolean;
+  showOutcomes: boolean;
 }) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const canPreview = Boolean(row.avatarUrl);
@@ -70,14 +73,22 @@ export function MatchPredictionsBoardRow({
             />
           </button>
         </div>
-        <span
-          className={cn(
-            "min-w-0 truncate text-xs font-medium",
-            isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
-          )}
-        >
-          {row.label}
-        </span>
+        <div className="flex min-w-0 items-center gap-0.5">
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-xs font-medium",
+              isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
+            )}
+          >
+            {row.label}
+          </span>
+          {showOutcomes ? (
+            <MatchPredictionsBoardOutcomeIcons
+              scoreOutcome={row.scoreOutcome}
+              mvpCorrect={row.mvpCorrect}
+            />
+          ) : null}
+        </div>
         <CellValue value={formatGoalCell(row.homeGoals)} />
         <CellValue value={formatGoalCell(row.awayGoals)} />
         <CellValue value={formatMvpCell(row.mvpPlayerName)} />
