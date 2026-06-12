@@ -1591,7 +1591,6 @@ html:has(.tm-app-frame) {
   flex-shrink: 0;
   background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
   border-top: 1px solid #ffffff;
-  border-bottom: 1px solid #ffffff;
 }
 
 .tm-porra-calendar .tm-cal-body {
@@ -1603,7 +1602,6 @@ html:has(.tm-app-frame) {
   min-width: 0;
   overflow: hidden;
   background: var(--tm-cal-cell-bg);
-  border-top: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
   border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 
