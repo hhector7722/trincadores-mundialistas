@@ -50,7 +50,7 @@ export function MatchHighlightBlock({
         {variant === "hero" ? (
           <>
             <div className="mt-0.5 flex w-full min-w-0 items-center gap-1.5 overflow-hidden">
-              <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[clamp(6px,2cqw,8px)] py-px text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
+              <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[0.55em] py-[0.18em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
                 HIGHLIGHTS
               </span>
               <p className="min-w-0 truncate text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-white/85">
