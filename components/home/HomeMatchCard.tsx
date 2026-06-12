@@ -19,6 +19,7 @@ import {
   HOME_CARD_HEADER_CLASS,
   HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
   HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
+  HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS,
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
@@ -132,6 +133,7 @@ export function HomeMatchCard({
 
   return (
     <>
+      <div className={cn(!isLive && "relative")}>
       <div className={HOME_CARD_HEADER_CLASS}>
         {isLive ? (
           <LiveMatchHeaderLabel className="relative z-10" />
@@ -232,9 +234,6 @@ export function HomeMatchCard({
               centerSlot={
                 saved ? (
                   <div className="inline-block leading-none">
-                      <p className="text-center text-[8px] font-semibold uppercase leading-none tracking-wider text-white/60">
-                        Mi pronóstico
-                      </p>
                       <div className="relative w-0 min-w-full">
                         <button
                           type="button"
@@ -301,6 +300,18 @@ export function HomeMatchCard({
           </div>
         </div>
         )}
+      </div>
+      {!isLive && saved ? (
+        <p
+          className={cn(
+            "pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 -translate-y-1/2",
+            "text-center text-[8px] font-semibold uppercase leading-none tracking-wider text-white/60",
+            HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS,
+          )}
+        >
+          Mi pronóstico
+        </p>
+      ) : null}
       </div>
 
       <QuickPredictionModal
