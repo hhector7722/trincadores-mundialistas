@@ -247,29 +247,94 @@ async function loadQuizStatsByProfile(
   return stats;
 }
 
-async function loadScoresForMatchday(
-  poolId: string,
-  matchdayId: string
-): Promise<Map<string, ScoreRow>> {
+type ScoreRowWithMatchday = ScoreRow & { matchdayId: string; sequence: number };
+
+async function loadAllPoolMemberScores(
+  poolId: string
+): Promise<ScoreRowWithMatchday[]> {
   const supabase = await createClient();
-  const { data: scores } = await supabase
+  const { data: scores, error } = await supabase
     .from("pool_member_scores")
-    .select("profile_id, match_points, exact_hits, sign_hits, cumulative_points")
-    .eq("pool_id", poolId)
-    .eq("matchday_id", matchdayId);
+    .select(
+      "profile_id, matchday_id, match_points, exact_hits, sign_hits, cumulative_points, matchdays!inner(sequence)"
+    )
+    .eq("pool_id", poolId);
+
+  if (error) throw new Error(error.message);
+
+  return (scores ?? []).map((row) => {
+    const matchday = Array.isArray(row.matchdays)
+      ? row.matchdays[0]
+      : row.matchdays;
+    return {
+      profile_id: row.profile_id,
+      matchdayId: row.matchday_id as string,
+      sequence: matchday?.sequence ?? 0,
+      match_points: row.match_points ?? 0,
+      exact_hits: row.exact_hits ?? 0,
+      sign_hits: row.sign_hits ?? 0,
+      cumulative_points: row.cumulative_points ?? 0,
+    };
+  });
+}
+
+function pickLatestScoresBeforeSequence(
+  rows: ScoreRowWithMatchday[],
+  targetSequence: number
+): Map<string, ScoreRow> {
+  const best = new Map<string, ScoreRowWithMatchday>();
+
+  for (const row of rows) {
+    if (row.sequence >= targetSequence) continue;
+    const current = best.get(row.profile_id);
+    if (!current || row.sequence > current.sequence) {
+      best.set(row.profile_id, row);
+    }
+  }
 
   return new Map(
-    (scores ?? []).map((s) => [
-      s.profile_id,
+    [...best.entries()].map(([profileId, row]) => [
+      profileId,
       {
-        profile_id: s.profile_id,
-        match_points: s.match_points ?? 0,
-        exact_hits: s.exact_hits ?? 0,
-        sign_hits: s.sign_hits ?? 0,
-        cumulative_points: s.cumulative_points ?? 0,
+        profile_id: row.profile_id,
+        match_points: 0,
+        exact_hits: 0,
+        sign_hits: 0,
+        cumulative_points: row.cumulative_points,
       },
     ])
   );
+}
+
+function loadScoresForMatchdayFromCache(
+  matchdayId: string,
+  allScores: ScoreRowWithMatchday[]
+): Map<string, ScoreRow> {
+  const result = new Map<string, ScoreRow>();
+  let targetSequence = -1;
+
+  for (const row of allScores) {
+    if (row.matchdayId !== matchdayId) continue;
+    targetSequence = row.sequence;
+    result.set(row.profile_id, {
+      profile_id: row.profile_id,
+      match_points: row.match_points,
+      exact_hits: row.exact_hits,
+      sign_hits: row.sign_hits,
+      cumulative_points: row.cumulative_points,
+    });
+  }
+
+  if (targetSequence < 0) return result;
+
+  const carried = pickLatestScoresBeforeSequence(allScores, targetSequence);
+  for (const [profileId, row] of carried) {
+    if (!result.has(profileId)) {
+      result.set(profileId, row);
+    }
+  }
+
+  return result;
 }
 
 function buildPositionMap(
@@ -374,19 +439,21 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     return { matchday, rows: [] };
   }
 
-  const [scores, previousScores, reliability, generalScoreRows, quizStats, quizFinalBonus] =
+  const [allScores, reliability, generalScoreRows, quizStats, quizFinalBonus] =
     await Promise.all([
-      matchday
-        ? loadScoresForMatchday(poolId, matchday.id)
-        : Promise.resolve(new Map<string, ScoreRow>()),
-      previous
-        ? loadScoresForMatchday(poolId, previous.id)
-        : Promise.resolve(new Map<string, ScoreRow>()),
+      loadAllPoolMemberScores(poolId),
       loadResolvedPredictionStats(poolId),
       loadTournamentGeneralScoresByProfile(poolId),
       loadQuizStatsByProfile(poolId),
       loadQuizFinalRankingBonusesByProfile(poolId),
     ]);
+
+  const scores = matchday
+    ? loadScoresForMatchdayFromCache(matchday.id, allScores)
+    : new Map<string, ScoreRow>();
+  const previousScores = previous
+    ? loadScoresForMatchdayFromCache(previous.id, allScores)
+    : new Map<string, ScoreRow>();
 
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
