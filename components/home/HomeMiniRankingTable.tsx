@@ -1,10 +1,17 @@
+"use client";
+
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { useLayoutEffect, useRef } from "react";
+import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
+import {
+  getContextualLeaderboardStartIndex,
+  VISIBLE_ROW_COUNT,
+} from "@/lib/ranking/context-rows";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -22,11 +29,10 @@ function MiniRankingHeader() {
       )}
     >
       <span aria-hidden="true" />
-      <span>Pos</span>
-      <span className="truncate">Trincador</span>
-      <span className="text-right">Pts</span>
-      <span className="text-right">Fiab</span>
-      <span className="text-right">Quiz</span>
+      <span className="col-span-3 text-left">Trincador</span>
+      <span className="text-center">Pts</span>
+      <span className="text-center">Fiab</span>
+      <span className="text-center">Quiz</span>
     </div>
   );
 }
@@ -46,24 +52,25 @@ function MiniRankingDataRow({
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
-      <span className="shrink-0 font-display tabular-nums text-white/85">
+      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
+      <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       <span
         className={cn(
-          "min-w-0 truncate font-medium",
+          "min-w-0 truncate text-left font-medium",
           isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
         )}
       >
         {row.label}
       </span>
-      <span className="shrink-0 text-right font-display tabular-nums text-white/85">
+      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
         {formatAggregateStat(row.cumulativePoints)}
       </span>
-      <span className="shrink-0 text-right tabular-nums text-white/45">
+      <span className="shrink-0 text-center tabular-nums text-white/45">
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
-      <span className="shrink-0 text-right font-display tabular-nums text-white/85">
+      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
         {formatQuizScore(row.quizPoints, row.hasQuizParticipated)}
       </span>
     </div>
@@ -71,23 +78,28 @@ function MiniRankingDataRow({
 }
 
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
-  const rowCountStyle =
-    rows.length > 0
-      ? ({ "--tm-home-mini-ranking-visible-rows": rows.length } as CSSProperties)
-      : undefined;
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || rows.length === 0) return;
+
+    const startIndex = getContextualLeaderboardStartIndex(rows, currentProfileId);
+    const rowHeight = viewport.clientHeight / VISIBLE_ROW_COUNT;
+    viewport.scrollTop = startIndex * rowHeight;
+  }, [rows, currentProfileId]);
 
   return (
     <Link
       href="/ranking"
       aria-label="Ver tabla de clasificación"
-      style={rowCountStyle}
       className={cn(
         "tm-home-top-stat-card @container flex min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card",
         "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
       )}
     >
       <MiniRankingHeader />
-      <div className="tm-home-mini-ranking__viewport">
+      <div ref={viewportRef} className="tm-home-mini-ranking__viewport">
         {rows.length === 0 ? (
           <p className="px-3 py-4 text-center text-[8px] text-white/35">Sin clasificación</p>
         ) : (

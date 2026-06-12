@@ -420,7 +420,7 @@ html:has(.tm-app-frame) {
   --tm-home-mini-ranking-viewport-h: calc(
     var(--tm-home-top-stat-height) - var(--tm-home-mini-ranking-header-h)
   );
-  --tm-home-mini-ranking-visible-rows: 11;
+  --tm-home-mini-ranking-visible-rows: 3;
   --tm-home-mini-ranking-row-h: calc(
     var(--tm-home-mini-ranking-viewport-h) / var(--tm-home-mini-ranking-visible-rows)
   );
@@ -431,12 +431,17 @@ html:has(.tm-app-frame) {
   height: var(--tm-home-top-stat-height);
 }
 
-/* Home mini ranking: todas las filas visibles, altura repartida sin scroll */
+/* Home mini ranking: 3 filas visibles, scroll vertical con snap */
 
 .tm-home-mini-ranking__viewport {
   height: var(--tm-home-mini-ranking-viewport-h);
   flex: none;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tm-home-mini-ranking__row {
@@ -445,6 +450,8 @@ html:has(.tm-app-frame) {
   min-height: var(--tm-home-mini-ranking-row-h);
   max-height: var(--tm-home-mini-ranking-row-h);
   flex-shrink: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* Pronósticos globales home: 5 filas reparten altura; «Ver todos» flota sin restar espacio */
