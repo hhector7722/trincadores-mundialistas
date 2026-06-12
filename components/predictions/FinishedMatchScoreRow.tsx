@@ -14,7 +14,7 @@ type FinishedMatchScoreRowProps = {
 };
 
 function formatGoal(value: number): string {
-  return value === 0 ? " " : String(value);
+  return String(value);
 }
 
 export function FinishedMatchScoreRow({
@@ -75,14 +75,9 @@ export function FinishedMatchScoreRow({
             variant === "modal" ? "top-[calc(100%+0.25rem)]" : "top-1/2 -translate-y-1/2",
           )}
         >
-          <div
-            className={cn(
-              "relative overflow-hidden rounded-md bg-white/[0.06] px-3 py-1",
-              variant === "modal" ? "min-w-[5.5rem]" : "min-w-[4.5rem]",
-            )}
-          >
+          <div className="relative pl-1">
             <PredictionStatusBadge outcome={outcome} />
-            <p className="text-center text-xs text-white/50">tu pronóstico</p>
+            <p className="text-center text-xs uppercase tracking-wide text-white/50">Tu pronóstico</p>
             <p
               className={cn(
                 "text-center font-display font-semibold tabular-nums text-[var(--tm-accent)]",

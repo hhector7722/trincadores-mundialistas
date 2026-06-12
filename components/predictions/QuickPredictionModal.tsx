@@ -113,9 +113,15 @@ function resolveDotPosition(index: number, total: number): DotPosition {
 
 function PredictionsBoardOpenButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button type="button" className="w-full uppercase tracking-[0.12em] text-[10px]" onClick={onClick}>
-      Ver pronósticos
-    </Button>
+    <div className="flex justify-center">
+      <Button
+        type="button"
+        className="h-auto min-h-0 w-auto px-4 py-2 text-[10px] uppercase tracking-[0.12em]"
+        onClick={onClick}
+      >
+        Ver pronósticos
+      </Button>
+    </div>
   );
 }
 
