@@ -9,7 +9,7 @@ type CalendarMatchCardFlagsRowProps = {
   centerClassName?: string;
 };
 
-/** Fila de banderas + marcador centrado; la letra de grupo va bajo el guión del marcador. */
+/** Fila de banderas alineadas al guión del marcador; la letra de grupo cuelga bajo el marcador. */
 export function CalendarMatchCardFlagsRow({
   homeTeam,
   awayTeam,
@@ -23,13 +23,15 @@ export function CalendarMatchCardFlagsRow({
         <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center leading-none">
-        <span className={cn("tm-cal-prediction tabular-nums", centerClassName)}>{centerLabel}</span>
-        {groupCode ? (
-          <span className="tm-cal-match-group tm-cal-match-group--under-score uppercase text-[var(--tm-accent)]">
-            {groupCode.toUpperCase()}
-          </span>
-        ) : null}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2">
+        <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
+          {centerLabel}
+          {groupCode ? (
+            <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 uppercase text-[var(--tm-accent)]">
+              {groupCode.toUpperCase()}
+            </span>
+          ) : null}
+        </span>
       </div>
 
       <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">

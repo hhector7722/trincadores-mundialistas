@@ -57,11 +57,11 @@ export function CalendarFinishedMatchCardVisual({
 
       <div className="tm-cal-match-card-body">
         {finishedState.hasPrediction ? (
-          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
+          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none !text-[#facc15]">
             {predictionLabel}
           </span>
         ) : (
-          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white" aria-hidden>
+          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none !text-[#facc15]" aria-hidden>
             {" "}
           </span>
         )}
@@ -71,6 +71,7 @@ export function CalendarFinishedMatchCardVisual({
           awayTeam={awayTeam}
           centerLabel={officialLabel}
           groupCode={groupCode}
+          centerClassName="!text-white"
         />
       </div>
     </>
