@@ -8,6 +8,7 @@ type HighlightRow = {
   highlight_youtube_id: string;
   highlight_published_at: string;
   highlight_source: "youtube_fifa" | "youtube_rtve_teledeporte";
+  highlight_headline: string | null;
   match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
 };
@@ -35,6 +36,7 @@ function rowToHighlightView(row: HighlightRow): MatchHighlightView | null {
     youtubeVideoId: row.highlight_youtube_id,
     publishedAt: row.highlight_published_at,
     source: row.highlight_source,
+    headline: row.highlight_headline?.trim() || null,
   };
 }
 
@@ -66,6 +68,7 @@ export async function getLatestMatchHighlightForPool(
       highlight_youtube_id,
       highlight_published_at,
       highlight_source,
+      highlight_headline,
       match_results ( home_goals, away_goals ),
       match_live_state ( home_score, away_score )
     `,

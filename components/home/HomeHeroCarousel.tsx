@@ -51,6 +51,7 @@ function buildSlides(
           awayGoals={lastMatchHighlight.awayGoals}
           youtubeVideoId={lastMatchHighlight.youtubeVideoId}
           highlightSource={lastMatchHighlight.source}
+          headline={lastMatchHighlight.headline}
         />
       ),
     });

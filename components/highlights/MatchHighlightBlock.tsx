@@ -15,6 +15,7 @@ type MatchHighlightBlockProps = {
   awayGoals: number;
   youtubeVideoId: string;
   highlightSource?: HighlightSourceCode | null;
+  headline?: string | null;
   variant?: "hero" | "modal";
   className?: string;
 };
@@ -26,6 +27,7 @@ export function MatchHighlightBlock({
   awayGoals,
   youtubeVideoId,
   highlightSource = null,
+  headline = null,
   variant = "modal",
   className,
 }: MatchHighlightBlockProps) {
@@ -33,6 +35,8 @@ export function MatchHighlightBlock({
   const [embedSrc, setEmbedSrc] = useState<string | null>(null);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
+  const scoreLine = `${teamAbbr(homeTeam)} ${homeGoals} - ${awayGoals} ${teamAbbr(awayTeam)}`;
+  const heroLine = headline?.trim() || scoreLine;
 
   function openPlayer() {
     setEmbedSrc(youtubeEmbedUrl(youtubeVideoId, true));
@@ -53,8 +57,13 @@ export function MatchHighlightBlock({
               <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[0.55em] py-[0.18em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
                 HIGHLIGHTS
               </span>
-              <p className="min-w-0 truncate text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-white/85">
-                {teamAbbr(homeTeam)} {homeGoals} - {awayGoals} {teamAbbr(awayTeam)}
+              <p
+                className={cn(
+                  "min-w-0 truncate text-[clamp(9px,2.4cqw,10px)] font-bold tracking-wide text-white/85",
+                  !headline?.trim() && "uppercase",
+                )}
+              >
+                {heroLine}
               </p>
             </div>
             <MatchHighlightThumbnail

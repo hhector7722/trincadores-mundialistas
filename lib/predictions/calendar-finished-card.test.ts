@@ -31,7 +31,11 @@ function finishedMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithP
 
 describe("resolveCalendarFinishedCard", () => {
   it("marcador exacto", () => {
-    assert.equal(resolveCalendarFinishedCard(finishedMatch())?.variant, "exact");
+    const state = resolveCalendarFinishedCard(finishedMatch());
+    assert.equal(state?.variant, "exact");
+    assert.equal(state?.scoreOutcome, "exact");
+    assert.equal(state?.mvpCorrect, false);
+    assert.equal(state?.showPredictedInKickoffSlot, false);
   });
 
   it("marcador exacto y mvp", () => {
@@ -48,7 +52,8 @@ describe("resolveCalendarFinishedCard", () => {
       }),
     );
     assert.equal(state?.variant, "exact-mvp");
-    assert.equal(state?.groupRowMvpLabel, true);
+    assert.equal(state?.scoreOutcome, "exact");
+    assert.equal(state?.mvpCorrect, true);
   });
 
   it("solo signo", () => {
@@ -58,7 +63,9 @@ describe("resolveCalendarFinishedCard", () => {
       }),
     );
     assert.equal(state?.variant, "sign");
-    assert.equal(state?.groupRowIcon, "tick");
+    assert.equal(state?.scoreOutcome, "sign");
+    assert.equal(state?.mvpCorrect, false);
+    assert.equal(state?.showPredictedInKickoffSlot, true);
   });
 
   it("signo y mvp", () => {
@@ -76,7 +83,8 @@ describe("resolveCalendarFinishedCard", () => {
       }),
     );
     assert.equal(state?.variant, "sign-mvp");
-    assert.equal(state?.showSignMvpDoubleBorder, true);
+    assert.equal(state?.scoreOutcome, "sign");
+    assert.equal(state?.mvpCorrect, true);
   });
 
   it("solo mvp", () => {
@@ -94,9 +102,29 @@ describe("resolveCalendarFinishedCard", () => {
       }),
     );
     assert.equal(state?.variant, "mvp-only");
+    assert.equal(state?.scoreOutcome, "miss");
+    assert.equal(state?.mvpCorrect, true);
     assert.equal(state?.showPredictedInKickoffSlot, true);
-    assert.equal(state?.showMvpOnlyDoubleBorder, true);
-    assert.equal(state?.groupRowMvpLabel, true);
-    assert.equal(state?.groupRowIcon, null);
+  });
+
+  it("fallo total", () => {
+    const state = resolveCalendarFinishedCard(
+      finishedMatch({
+        prediction: { id: "p1", home_goals: 0, away_goals: 0, points_awarded: 0, updated_at: "" },
+      }),
+    );
+    assert.equal(state?.variant, "miss");
+    assert.equal(state?.scoreOutcome, "miss");
+    assert.equal(state?.mvpCorrect, false);
+  });
+
+  it("sin predicción guardada", () => {
+    const state = resolveCalendarFinishedCard(
+      finishedMatch({
+        prediction: null,
+      }),
+    );
+    assert.equal(state?.scoreOutcome, null);
+    assert.equal(state?.hasPrediction, false);
   });
 });

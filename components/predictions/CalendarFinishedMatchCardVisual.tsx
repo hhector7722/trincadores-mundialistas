@@ -1,4 +1,6 @@
 import { CalendarGroupRowBadge } from "@/components/predictions/CalendarGroupRowBadge";
+import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
+import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
@@ -41,20 +43,21 @@ export function CalendarFinishedMatchCardVisual({
 
   const cardClassName = cn(
     "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
-    finishedState.showGreenFill && "tm-cal-match-card--exact",
-    finishedState.showSignMvpDoubleBorder && "tm-cal-match-card--sign-mvp",
-    finishedState.showMvpOnlyDoubleBorder && "tm-cal-match-card--mvp-only",
-    className
+    className,
   );
 
   const body = (
     <>
-      <CalendarGroupRowBadge
-        groupCode={groupCode}
-        showGroupLetterBadge={finishedState.showGroupLetterBadge}
-        icon={finishedState.groupRowIcon}
-        showMvpLabel={finishedState.groupRowMvpLabel}
-      />
+      <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
+
+      {finishedState.mvpCorrect ? (
+        <PredictionOutcomeIcon
+          variant="mvp"
+          className="pointer-events-none absolute right-0.5 top-0 z-[6]"
+        />
+      ) : null}
+
+      <CalendarGroupRowBadge groupCode={groupCode} />
 
       <div className="tm-cal-match-card-body">
         {kickoffSlotLabel ? (
@@ -67,12 +70,7 @@ export function CalendarFinishedMatchCardVisual({
           <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
             <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
           </div>
-          <span
-            className={cn(
-              "tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums",
-              finishedState.showExactScoreStyle ? "tm-cal-prediction--exact" : "text-white"
-            )}
-          >
+          <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums text-white">
             {officialLabel}
           </span>
           <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">

@@ -109,10 +109,13 @@ function CalendarMatchCard({
   const isSidebarAnchor = isSidebarCardAnchorMatch(match);
 
   const title = finishedState
-    ? `${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${officialLabel}`
+    ? `${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · Real ${officialLabel} · Tu ${predictionLabel}`
     : `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
 
   if (finishedState) {
+    const predictionHome = match.prediction?.home_goals ?? 0;
+    const predictionAway = match.prediction?.away_goals ?? 0;
+
     return (
       <CalendarFinishedMatchCardVisual
         interactive
@@ -122,8 +125,8 @@ function CalendarMatchCard({
         homeTeam={match.home_team}
         awayTeam={match.away_team}
         groupCode={match.group_code}
-        predictionHome={match.prediction!.home_goals}
-        predictionAway={match.prediction!.away_goals}
+        predictionHome={predictionHome}
+        predictionAway={predictionAway}
         officialHome={match.officialHome!}
         officialAway={match.officialAway!}
         finishedState={finishedState}

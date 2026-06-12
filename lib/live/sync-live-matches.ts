@@ -1,3 +1,4 @@
+import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
 import {
@@ -25,6 +26,7 @@ export type SyncLiveMatchesResult = {
   resultsPersisted: number;
   scoresRecalculated: number;
   mvpsPersisted: number;
+  headlinesPersisted: number;
   poolsRebuilt: number;
   errors: string[];
 };
@@ -175,6 +177,7 @@ export async function syncLiveMatches(
     resultsPersisted: 0,
     scoresRecalculated: 0,
     mvpsPersisted: 0,
+    headlinesPersisted: 0,
     poolsRebuilt: 0,
     errors: [],
   };
@@ -269,6 +272,9 @@ export async function syncLiveMatches(
         }
 
         await ensureFinishedMatchScoring(admin, match.id, result, poolsToRebuild);
+
+        const headlineWritten = await syncBsdHeadlineForMatch(admin, match.id);
+        if (headlineWritten) result.headlinesPersisted += 1;
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "sync live match";

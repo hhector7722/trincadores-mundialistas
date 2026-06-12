@@ -67,3 +67,4 @@
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
 - [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin
 - [x] Alineaciones confirmadas: FotMob como fuente prioritaria (`matchDetails.lineup`, WC2026); script `db:map-fotmob-fixtures`
+- [x] Titulares BSD en highlights: columnas `matches.highlight_headline` / `highlight_headline_source`; sync social → incidentes vía cron `live-matches` y `youtube-highlights`; UI hero con titular corto

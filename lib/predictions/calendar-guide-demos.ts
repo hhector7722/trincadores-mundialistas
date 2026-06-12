@@ -62,6 +62,7 @@ const MVP_MISS = {
   updated_at: DEMO_KICKOFF,
 };
 
+/** Orden: exacto+MVP → exacto → signo+MVP → signo → solo MVP → fallo. */
 export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
   {
     variant: "exact-mvp",
@@ -84,18 +85,8 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     }),
   },
   {
-    variant: "sign",
-    label: "Signo del partido",
-    pointsLabel: `+${MATCH_SCORE_POINTS.sign} pts`,
-    match: baseDemoMatch({
-      ...OFFICIAL,
-      prediction: { id: "p3", home_goals: 3, away_goals: 0, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
-      mvpPrediction: MVP_MISS,
-    }),
-  },
-  {
     variant: "sign-mvp",
-    label: "Signo del partido + MVP",
+    label: "Signo acertado + MVP",
     pointsLabel: `+${MATCH_SCORE_POINTS.sign + MVP_PREDICTION_POINTS} pts`,
     match: baseDemoMatch({
       ...OFFICIAL,
@@ -104,8 +95,18 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     }),
   },
   {
+    variant: "sign",
+    label: "Signo acertado",
+    pointsLabel: `+${MATCH_SCORE_POINTS.sign} pts`,
+    match: baseDemoMatch({
+      ...OFFICIAL,
+      prediction: { id: "p3", home_goals: 3, away_goals: 0, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
+      mvpPrediction: MVP_MISS,
+    }),
+  },
+  {
     variant: "mvp-only",
-    label: "MVP",
+    label: "Solo MVP",
     pointsLabel: `+${MVP_PREDICTION_POINTS} pt`,
     match: baseDemoMatch({
       ...OFFICIAL,
@@ -115,7 +116,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
   },
   {
     variant: "miss",
-    label: "Ningún acierto",
+    label: "Sin acierto",
     pointsLabel: "0 pts",
     match: baseDemoMatch({
       ...OFFICIAL,

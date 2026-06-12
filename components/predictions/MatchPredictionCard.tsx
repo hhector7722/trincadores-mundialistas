@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
+import { PredictionEditStateBadge } from "@/components/predictions/PredictionStatusBadge";
 import { formatListScore, resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -36,7 +36,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
       </div>
       <div className="flex shrink-0 items-center gap-2">
         <div className="text-right">
-          <PredictionStatusBadge state={state} />
+          <PredictionEditStateBadge state={state} />
           <p className="mt-1 font-display text-sm text-[var(--tm-fg)]">{scoreText}</p>
         </div>
         <ChevronRight className="h-5 w-5 text-[var(--tm-muted)]" />

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { savePrediction } from "@/actions/predictions";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
-import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
+import { PredictionEditStateBadge } from "@/components/predictions/PredictionStatusBadge";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/spinner";
 import {
@@ -85,7 +85,7 @@ export function PredictionForm({
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <PredictionStatusBadge state={uiState} />
+          <PredictionEditStateBadge state={uiState} />
           {match.hasOfficialResult && (
             <p className="text-xs text-[var(--tm-muted)]">
               Resultado oficial: {displayGoals(match.officialHome ?? 0, match.officialAway ?? 0)}

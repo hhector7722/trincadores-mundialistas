@@ -1,13 +1,23 @@
-import { Check, X } from "lucide-react";
+import { Check, Star, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type PredictionOutcomeIconProps = {
-  variant: "success" | "error";
+  variant: "mvp" | "success" | "error";
   className?: string;
 };
 
-/** Icono circular que escala con el `font-size` del contenedor padre (p. ej. marcador). */
+/** Icono compacto de resultado: estrella MVP (12px) o tick/cruz escalables con el contenedor. */
 export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeIconProps) {
+  if (variant === "mvp") {
+    return (
+      <Star
+        className={cn("h-3 w-3 shrink-0 fill-[#facc15] text-[#facc15]", className)}
+        strokeWidth={2}
+        aria-hidden
+      />
+    );
+  }
+
   const isSuccess = variant === "success";
 
   return (

@@ -19,13 +19,6 @@ export type CalendarFinishedCardState = {
   mvpCorrect: boolean;
   hasPrediction: boolean;
   showPredictedInKickoffSlot: boolean;
-  showGreenFill: boolean;
-  showSignMvpDoubleBorder: boolean;
-  showMvpOnlyDoubleBorder: boolean;
-  showExactScoreStyle: boolean;
-  showGroupLetterBadge: boolean;
-  groupRowIcon: "tick" | "cross" | null;
-  groupRowMvpLabel: boolean;
 };
 
 function hasOfficialScore(match: MatchWithPrediction): boolean {
@@ -75,21 +68,11 @@ export function resolveCalendarFinishedCard(
   else if (mvpCorrect) variant = "mvp-only";
   else variant = "miss";
 
-  const isExact = variant === "exact" || variant === "exact-mvp";
-
   return {
     variant,
     scoreOutcome,
     mvpCorrect,
     hasPrediction,
-    showPredictedInKickoffSlot: !isExact,
-    showGreenFill: isExact,
-    showSignMvpDoubleBorder: variant === "sign-mvp",
-    showMvpOnlyDoubleBorder: variant === "mvp-only",
-    showExactScoreStyle: isExact,
-    showGroupLetterBadge: isExact,
-    groupRowIcon: variant === "sign" ? "tick" : variant === "miss" ? "cross" : null,
-    groupRowMvpLabel:
-      variant === "exact-mvp" || variant === "sign-mvp" || variant === "mvp-only",
+    showPredictedInKickoffSlot: hasPrediction && scoreOutcome !== "exact",
   };
 }

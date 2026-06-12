@@ -7,4 +7,5 @@ export type MatchHighlightView = {
   youtubeVideoId: string;
   publishedAt: string;
   source: "youtube_fifa" | "youtube_rtve_teledeporte";
+  headline: string | null;
 };

@@ -8,6 +8,7 @@ import {
   shouldReplaceMatchHighlight,
   type HighlightSourceCode,
 } from "@/lib/youtube/highlight-priority";
+import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
 import { parseYoutubeChannelFeed } from "@/lib/youtube/parse-feed";
 import {
   buildTeamAliasIndex,
@@ -193,6 +194,7 @@ async function attachHighlightToMatch(
   if (updateError) return "skipped";
 
   await recordMappedVideo(admin, video, sourceCode, matchId, "mapped");
+  await syncBsdHeadlineForMatch(admin, matchId);
   return "attached";
 }
 
@@ -297,6 +299,17 @@ export async function syncAllMatchHighlights(
     candidates,
     aliasIndex,
   );
+
+  const { data: missingHeadlines } = await admin
+    .from("matches")
+    .select("id")
+    .eq("status", "finished")
+    .not("highlight_youtube_id", "is", null)
+    .is("highlight_headline", null);
+
+  for (const row of missingHeadlines ?? []) {
+    await syncBsdHeadlineForMatch(admin, row.id as string);
+  }
 
   return { fifa, teledeporte };
 }
