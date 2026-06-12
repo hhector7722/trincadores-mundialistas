@@ -114,9 +114,16 @@ export function HomeGeneralPredictionsCard({
           "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
         )}
       >
-        <span className="pointer-events-none absolute right-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
-          Ver todos
-        </span>
+        <div
+          className="pointer-events-none absolute inset-x-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 flex items-center justify-between"
+        >
+          <span className="text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+            Mis predicciones
+          </span>
+          <span className="text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+            Ver todos
+          </span>
+        </div>
         <div className="tm-home-general-predictions__body">
           <GeneralPredictionRow
             label={labels.champion}
