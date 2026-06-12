@@ -28,13 +28,23 @@ export function MatchHighlightScoreline({
           loading="eager"
           className="tm-hero-highlight-flag"
         />
-        <span className="whitespace-nowrap">{teamAbbr(homeTeam)}</span>
-        <span className="tabular-nums whitespace-nowrap">{homeGoals}</span>
+        <span className="tm-hero-highlight-scoreline-text whitespace-nowrap">
+          {teamAbbr(homeTeam)}
+        </span>
+        <span className="tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
+          {homeGoals}
+        </span>
       </span>
-      <span className="tm-hero-highlight-scoreline-group shrink-0">-</span>
+      <span className="tm-hero-highlight-scoreline-group shrink-0">
+        <span className="tm-hero-highlight-scoreline-text">-</span>
+      </span>
       <span className="tm-hero-highlight-scoreline-group">
-        <span className="tabular-nums whitespace-nowrap">{awayGoals}</span>
-        <span className="whitespace-nowrap">{teamAbbr(awayTeam)}</span>
+        <span className="tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
+          {awayGoals}
+        </span>
+        <span className="tm-hero-highlight-scoreline-text whitespace-nowrap">
+          {teamAbbr(awayTeam)}
+        </span>
         <TeamFlagBadge
           name={awayTeam}
           size="text"

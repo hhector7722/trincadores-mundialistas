@@ -344,6 +344,11 @@ html:has(.tm-app-frame) {
 .tm-hero-highlight-pill-label {
   display: block;
   line-height: 1;
+  transform: translateY(0.1em);
+}
+
+.tm-hero-highlight-scoreline-text {
+  transform: translateY(0.1em);
 }
 
 .tm-hero-highlight-scoreline {
