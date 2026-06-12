@@ -82,7 +82,11 @@ export function MatchPredictionsBoardTable({
   loading = false,
 }: MatchPredictionsBoardTableProps) {
   const dataRows = loading ? [] : rows;
-  const slotCount = Math.max(dataRows.length, MATCH_PREDICTIONS_ROW_COUNT);
+  const slotCount = loading
+    ? MATCH_PREDICTIONS_ROW_COUNT
+    : showOutcomes
+      ? dataRows.length
+      : Math.max(dataRows.length, MATCH_PREDICTIONS_ROW_COUNT);
 
   return (
     <div className="tm-match-predictions-board">

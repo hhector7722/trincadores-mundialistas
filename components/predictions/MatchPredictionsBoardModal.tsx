@@ -117,18 +117,18 @@ export function MatchPredictionsBoardModal({
           </div>
         ) : (
           <>
-            <div className="min-h-0 flex-1">
-              <MatchPredictionsBoardTable
-                loading={loading}
-                rows={board?.rows ?? []}
-                currentProfileId={currentProfileId}
-                homeTeam={tableHomeTeam}
-                awayTeam={tableAwayTeam}
-                showOutcomes={showOutcomes}
-              />
-            </div>
+            <MatchPredictionsBoardTable
+              loading={loading}
+              rows={board?.rows ?? []}
+              currentProfileId={currentProfileId}
+              homeTeam={tableHomeTeam}
+              awayTeam={tableAwayTeam}
+              showOutcomes={showOutcomes}
+            />
             {!loading && showOutcomes ? (
-              <MatchPredictionsBoardLegend className="mt-auto" />
+              <div className="flex min-h-0 flex-1 items-center justify-center">
+                <MatchPredictionsBoardLegend />
+              </div>
             ) : null}
           </>
         )}
