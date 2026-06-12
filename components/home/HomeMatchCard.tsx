@@ -228,7 +228,7 @@ export function HomeMatchCard({
               layout="homeCardScheduledStacked"
               homeAnchor="15%"
               awayAnchor="85%"
-              className="h-full -translate-y-1"
+              className="h-full"
               centerSlot={
                 saved ? (
                   <div className="inline-block leading-none">

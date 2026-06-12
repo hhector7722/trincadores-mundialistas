@@ -24,14 +24,11 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-[4.5rem]";
 
-/** Card próximo partido: columna central (pronóstico/MVP/alineaciones) anclada bajo banderas. */
-export const HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS = "top-[1.75rem]";
+/** Card próximo partido: columna central a todo el alto del bloque equipos. */
+export const HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS = "top-0";
 
-/**
- * Card próximo partido: 3 filas de acciones + 2 huecos gap-1.
- * 1.25rem + 0.25rem + 1rem + 0.25rem + 1.25rem ≈ 4rem (sin slack inferior).
- */
-export const HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS = "h-[4rem]";
+/** Card próximo partido: pronóstico / MVP / alineaciones repartidos con justify-evenly. */
+export const HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS = "bottom-0";
 
 /** Card inicio con carrusel: compensa mt-2 + h-1.5 de los indicadores inferiores. */
 export const HOME_CARD_CAROUSEL_INDICATORS_OFFSET = "0.875rem";
