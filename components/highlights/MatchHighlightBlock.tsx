@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useHighlightScorelineVisibility } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
@@ -37,6 +38,7 @@ export function MatchHighlightBlock({
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
   const [embedSrc, setEmbedSrc] = useState<string | null>(null);
+  const { visible: scorelineVisible } = useHighlightScorelineVisibility();
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
   function openPlayer() {
@@ -67,12 +69,14 @@ export function MatchHighlightBlock({
                 />
                 <span className="tm-hero-highlight-pill-label">HIGHLIGHTS</span>
               </span>
-              <MatchHighlightScoreline
-                homeTeam={homeTeam}
-                awayTeam={awayTeam}
-                homeGoals={homeGoals}
-                awayGoals={awayGoals}
-              />
+              {scorelineVisible ? (
+                <MatchHighlightScoreline
+                  homeTeam={homeTeam}
+                  awayTeam={awayTeam}
+                  homeGoals={homeGoals}
+                  awayGoals={awayGoals}
+                />
+              ) : null}
             </div>
             {headline?.trim() ? (
               <p className="line-clamp-2 text-left text-[clamp(8px,2.2cqw,9px)] font-medium leading-snug text-white/75">

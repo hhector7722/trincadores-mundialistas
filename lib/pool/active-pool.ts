@@ -9,6 +9,7 @@ export type UserPool = {
 
 export type AppShellContext = {
   profileLabel: string;
+  username: string | null;
   pools: UserPool[];
   activePoolId: string;
   activePoolName: string;
@@ -47,6 +48,7 @@ export async function loadAppShellContext(userId: string): Promise<AppShellConte
 
   return {
     profileLabel,
+    username: profile?.username ?? null,
     pools: pools.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
     activePoolId: activePool.id,
     activePoolName: activePool.name,

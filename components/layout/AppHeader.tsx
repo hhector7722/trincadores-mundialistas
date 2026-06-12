@@ -1,4 +1,5 @@
-﻿import { AppBrandTitle } from "@/components/layout/AppBrandTitle";
+﻿import { HighlightScorelineToggle } from "@/components/highlights/HighlightScorelineToggle";
+import { AppBrandTitle } from "@/components/layout/AppBrandTitle";
 import { NotificationsBell } from "@/components/notifications/NotificationsBell";
 import { PoolSwitcher } from "@/components/layout/PoolSwitcher";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,12 @@ export function AppHeader({
           <AppBrandTitle homeHeader={stackedTitle} title={title} />
         </h1>
         <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-0.5">
-          {showNotificationsBell ? <NotificationsBell /> : null}
+          {showNotificationsBell ? (
+            <>
+              <HighlightScorelineToggle />
+              <NotificationsBell />
+            </>
+          ) : null}
           <PoolSwitcher pools={ctx.pools} activePoolId={ctx.activePoolId} />
         </div>
       </div>

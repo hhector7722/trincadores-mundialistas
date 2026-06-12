@@ -10,6 +10,7 @@ import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
+import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -27,26 +28,28 @@ export function AppShell({
       <UnreadNotificationsShell>
         <QuizActiveNotificationProvider>
           <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
-          <LineupsNotificationOpener />
-          <PullToRefresh />
-          <TabNavigationProvider>
-            <div className="tm-app-frame">
-              <div
-                id="tm-safe-probe"
-                className="pointer-events-none fixed left-0 top-0 -z-50 h-0 w-0 overflow-hidden pb-safe"
-                aria-hidden
-              />
-              <HomeAtmosphere />
-              <AppHeaderGate ctx={ctx} />
-              <main className="tm-app-main">
-                <TabSwipeNavigator>{children}</TabSwipeNavigator>
-              </main>
-            </div>
-            <TabBarWrapper />
-            <Suspense fallback={null}>
-              <ViewportLayoutDebug />
-            </Suspense>
-          </TabNavigationProvider>
+            <HighlightScorelineVisibilityProvider username={ctx.username}>
+              <LineupsNotificationOpener />
+              <PullToRefresh />
+              <TabNavigationProvider>
+                <div className="tm-app-frame">
+                  <div
+                    id="tm-safe-probe"
+                    className="pointer-events-none fixed left-0 top-0 -z-50 h-0 w-0 overflow-hidden pb-safe"
+                    aria-hidden
+                  />
+                  <HomeAtmosphere />
+                  <AppHeaderGate ctx={ctx} />
+                  <main className="tm-app-main">
+                    <TabSwipeNavigator>{children}</TabSwipeNavigator>
+                  </main>
+                </div>
+                <TabBarWrapper />
+                <Suspense fallback={null}>
+                  <ViewportLayoutDebug />
+                </Suspense>
+              </TabNavigationProvider>
+            </HighlightScorelineVisibilityProvider>
           </PushNotificationProvider>
         </QuizActiveNotificationProvider>
       </UnreadNotificationsShell>
