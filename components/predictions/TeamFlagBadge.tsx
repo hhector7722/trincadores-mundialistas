@@ -31,7 +31,7 @@ export function TeamFlagBadge({
       ? "tm-ko-flag-dim"
       : size === "text"
         ? shape === "rect"
-          ? "h-[1em] w-[1.4em]"
+          ? "h-[1cap] w-[1.4cap]"
           : "h-[1cap] w-[1cap]"
         : size === "xxs"
           ? "h-3.5 w-3.5"

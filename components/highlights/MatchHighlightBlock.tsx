@@ -55,23 +55,24 @@ export function MatchHighlightBlock({
       <div className={cn("flex flex-col", className)}>
         {variant === "hero" ? (
           <div className="flex w-full min-w-0 flex-col gap-1">
-            <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden leading-none">
-              <span className="inline-flex h-[1.35em] shrink-0 items-center gap-[0.35em] whitespace-nowrap rounded-full bg-[#CCFF00] pl-[0.22em] pr-[0.55em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
+            <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden text-[clamp(7px,2cqw,8px)] font-bold uppercase leading-none tracking-wide">
+              <span className="inline-flex shrink-0 items-center gap-[0.35em] whitespace-nowrap rounded-full bg-[#CCFF00] py-[0.14em] pl-[0.22em] pr-[0.55em] text-black">
                 <Image
                   src="/icons/youtube-play.png"
                   alt=""
                   width={633}
                   height={452}
                   aria-hidden="true"
-                  className="block h-[1em] w-auto shrink-0 self-center"
+                  className="block h-[1cap] w-auto shrink-0"
                 />
-                <span className="self-center">HIGHLIGHTS</span>
+                HIGHLIGHTS
               </span>
               <MatchHighlightScoreline
                 homeTeam={homeTeam}
                 awayTeam={awayTeam}
                 homeGoals={homeGoals}
                 awayGoals={awayGoals}
+                className="text-white/85"
               />
             </div>
             {headline?.trim() ? (
