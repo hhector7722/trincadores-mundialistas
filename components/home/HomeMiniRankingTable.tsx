@@ -25,7 +25,7 @@ function MiniRankingHeader() {
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "h-[var(--tm-home-mini-ranking-header-h)] shrink-0 border-b border-white/10 px-[clamp(0.25rem,2cqw,0.375rem)] py-0.5 text-[7px] font-semibold uppercase leading-none tracking-wide text-white/45"
+        "h-[var(--tm-home-mini-ranking-header-h)] shrink-0 border-b border-white/10 px-1 py-0.5 text-[7px] font-semibold uppercase leading-none text-white/45"
       )}
     >
       <span aria-hidden="true" />
@@ -48,7 +48,7 @@ function MiniRankingDataRow({
     <div
       className={cn(
         MINI_RANKING_GRID,
-        "tm-home-mini-ranking__row border-b border-white/5 px-[clamp(0.25rem,2cqw,0.375rem)] py-0 text-[8px] leading-none last:border-0"
+        "tm-home-mini-ranking__row border-b border-white/5 px-1 py-0 text-[8px] leading-none last:border-0"
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
@@ -58,7 +58,7 @@ function MiniRankingDataRow({
       <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       <span
         className={cn(
-          "min-w-0 truncate text-left font-medium",
+          "min-w-0 text-left font-medium",
           isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
         )}
       >
