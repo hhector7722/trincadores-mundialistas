@@ -61,6 +61,7 @@ function buildSlides(
   slides.push(
     {
       id: "mundial",
+      align: "center",
       eyebrow: "Mundial 2026",
       headline: (
         <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
@@ -72,6 +73,7 @@ function buildSlides(
     },
     {
       id: "pending",
+      align: "center",
       eyebrow: "Resultados pendientes",
       headline: (
         <p
@@ -90,6 +92,7 @@ function buildSlides(
     const training = quizSlide.scoringMode === "training" || !quizSlide.competitive;
     slides.push({
       id: "quiz",
+      align: "center",
       eyebrow: training ? "Quiz del dia · entrenamiento" : "Quiz del dia · competitivo",
       headline: (
         <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
@@ -103,6 +106,7 @@ function buildSlides(
 
   slides.push({
     id: "ranking",
+    align: "center",
     eyebrow: "Clasificación",
     headline: (
       <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
@@ -147,23 +151,33 @@ export function HomeHeroCarousel({
     el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
   }
 
+  const slideContentMinH = "min-h-[11.5rem]";
+
   return (
     <div className="flex min-w-0 flex-col" data-block-tab-swipe>
       <div
         ref={scrollRef}
-        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className={cn(
+          "flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          slideContentMinH,
+        )}
         aria-roledescription="carrusel"
       >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className="w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
+            className={cn(
+              "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
+              slideContentMinH,
+            )}
             aria-hidden={index !== activeIndex}
           >
             <div
               className={cn(
-                "flex w-full min-w-0 max-w-full flex-col",
-                slide.align === "left" ? "items-stretch text-left" : "items-center text-center",
+                "flex h-full w-full min-w-0 max-w-full flex-col",
+                slide.align === "left"
+                  ? "items-stretch justify-start text-left"
+                  : "items-center justify-center text-center",
               )}
             >
               {slide.eyebrow ? (

@@ -368,12 +368,12 @@ html:has(.tm-app-frame) {
 
 .tm-hero-card-gradient {
   background:
-    radial-gradient(ellipse 100% 80% at 30% 0%, rgba(130, 70, 220, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 75% at 50% 0%, rgba(130, 70, 220, 0.18) 0%, transparent 58%),
     linear-gradient(
-      165deg,
-      rgba(80, 35, 160, 0.18) 0%,
-      rgba(60, 25, 120, 0.28) 45%,
-      rgba(40, 15, 90, 0.15) 100%
+      180deg,
+      rgba(80, 35, 160, 0.14) 0%,
+      rgba(60, 25, 120, 0.2) 50%,
+      rgba(60, 25, 120, 0.2) 100%
     );
 }
 
