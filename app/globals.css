@@ -308,7 +308,7 @@ html:has(.tm-app-frame) {
     0 0 0 0.25px rgba(0, 0, 0, 0.08);
 }
 
-/* Hero highlights: pastilla + marcador en un solo eje vertical (1cap). */
+/* Hero highlights: un solo eje vertical (flex + 1em). */
 .tm-hero-highlight-meta-row {
   display: flex;
   align-items: center;
@@ -316,7 +316,7 @@ html:has(.tm-app-frame) {
   overflow: hidden;
   font-size: clamp(7px, 2cqw, 8px);
   font-weight: 700;
-  line-height: 1cap;
+  line-height: 1;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -326,25 +326,24 @@ html:has(.tm-app-frame) {
   flex-shrink: 0;
   align-items: center;
   gap: 0.35em;
-  height: calc(1cap + 0.28em);
-  padding-inline: 0.55em;
-  padding-inline-start: 0.22em;
+  padding: 0.16em 0.55em 0.16em 0.22em;
   border-radius: 9999px;
   background: #ccff00;
   color: #000;
+  line-height: 1;
 }
 
 .tm-hero-highlight-pill-logo {
   display: block;
   flex-shrink: 0;
-  height: 1cap;
+  height: 1em;
   width: auto;
+  margin: 0;
 }
 
 .tm-hero-highlight-pill-label {
   display: block;
-  height: 1cap;
-  line-height: 1cap;
+  line-height: 1;
 }
 
 .tm-hero-highlight-scoreline {
@@ -354,6 +353,7 @@ html:has(.tm-app-frame) {
   gap: 0.3em;
   min-width: 0;
   overflow: hidden;
+  line-height: 1;
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -361,14 +361,15 @@ html:has(.tm-app-frame) {
   display: inline-flex;
   align-items: center;
   gap: 0.2em;
-  height: 1cap;
-  line-height: 1cap;
+  line-height: 1;
 }
 
 .tm-hero-highlight-flag {
-  height: 1cap !important;
-  width: 1.4cap !important;
+  height: 1em !important;
+  width: 1.4em !important;
   flex-shrink: 0;
+  border: 0.25px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: none !important;
 }
 
 .tm-spinner {
