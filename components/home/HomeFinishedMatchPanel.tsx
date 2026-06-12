@@ -9,7 +9,9 @@ import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { displayGoals, formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
+import type { MouseEvent } from "react";
 
 type HomeFinishedMatchPanelProps = {
   match: MatchWithPrediction;
@@ -20,25 +22,69 @@ type HomeFinishedMatchPanelProps = {
   onOpenDetail: () => void;
 };
 
+function openLineup(event: MouseEvent, onOpen: () => void) {
+  event.stopPropagation();
+  onOpen();
+}
+
+function HomeFinishedTeamColumn({
+  team,
+  side,
+  onOpenLineup,
+}: {
+  team: string;
+  side: "home" | "away";
+  onOpenLineup: () => void;
+}) {
+  const anchor = side === "home" ? "15%" : "85%";
+
+  return (
+    <div
+      className="absolute top-1/2 z-[2] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
+      style={{ left: anchor }}
+    >
+      <button
+        type="button"
+        onClick={(event) => openLineup(event, onOpenLineup)}
+        className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
+        aria-label={`Ver plantilla de ${teamNameEs(team)}`}
+      >
+        <TeamFlagBadge name={team} size="sm" loading="eager" />
+      </button>
+      <button
+        type="button"
+        onClick={(event) => openLineup(event, onOpenLineup)}
+        className="max-w-[4.5rem] truncate text-center text-[8px] font-semibold leading-tight text-[var(--tm-fg)] transition-opacity hover:opacity-80 active:opacity-70"
+        aria-label={`Ver plantilla de ${teamNameEs(team)}`}
+      >
+        {teamNameEs(team)}
+      </button>
+    </div>
+  );
+}
+
 /** Marcador oficial centrado entre banderas a la misma altura (slide «Último partido»). */
 function HomeFinishedFlagsScoreRow({
   homeTeam,
   awayTeam,
   scoreLabel,
   groupCode,
+  onOpenHomeLineup,
+  onOpenAwayLineup,
 }: {
   homeTeam: string;
   awayTeam: string;
   scoreLabel: string;
   groupCode?: string | null;
+  onOpenHomeLineup: () => void;
+  onOpenAwayLineup: () => void;
 }) {
   return (
-    <div className="relative h-[1.625rem] w-full shrink-0">
-      <div className="absolute left-[15%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-        <TeamFlagBadge name={homeTeam} size="sm" loading="eager" />
-      </div>
+    <div className="relative h-[2.75rem] w-full shrink-0">
+      <HomeFinishedTeamColumn team={homeTeam} side="home" onOpenLineup={onOpenHomeLineup} />
+      <HomeFinishedTeamColumn team={awayTeam} side="away" onOpenLineup={onOpenAwayLineup} />
 
-      <div className="absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2 text-center">
+      <div className="pointer-events-none absolute left-1/2 top-[38%] z-[1] -translate-x-1/2 -translate-y-1/2 text-center">
         <span className="block font-display text-[1.15rem] font-semibold tabular-nums leading-none text-white/95 sm:text-xl">
           {scoreLabel}
         </span>
@@ -47,10 +93,6 @@ function HomeFinishedFlagsScoreRow({
             {groupCode.toUpperCase()}
           </span>
         ) : null}
-      </div>
-
-      <div className="absolute left-[85%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-        <TeamFlagBadge name={awayTeam} size="sm" loading="eager" />
       </div>
     </div>
   );
@@ -76,7 +118,7 @@ function HomeFinishedPredictionSummary({
   const predictedText = formatListScore(predictedHome, predictedAway);
 
   return (
-    <div className="relative mt-1 flex w-full justify-center pl-1">
+    <div className="relative mt-0.5 flex w-full justify-center pl-1">
       <PredictionStatusBadge outcome={outcome} />
       <div className="flex flex-col items-center gap-0 leading-none">
         <p className="text-center text-[6px] font-medium uppercase tracking-wide text-white/40">
@@ -120,25 +162,29 @@ export function HomeFinishedMatchPanel({
 
   return (
     <div className={cn(teamsBlockClassName, "flex min-h-0 flex-col justify-between gap-1")}>
-      <button type="button" className="min-h-0 shrink-0 text-left" onClick={onOpenDetail}>
+      <div className="min-h-0 shrink-0">
         <HomeFinishedFlagsScoreRow
           homeTeam={match.home_team}
           awayTeam={match.away_team}
           scoreLabel={scoreLabel}
           groupCode={match.group_code}
+          onOpenHomeLineup={onOpenHomeLineup}
+          onOpenAwayLineup={onOpenAwayLineup}
         />
 
         {hasScore && hasPrediction ? (
-          <HomeFinishedPredictionSummary
-            predictedHome={predictedHome}
-            predictedAway={predictedAway}
-            homeGoals={homeGoals}
-            awayGoals={awayGoals}
-          />
+          <button type="button" className="w-full text-left" onClick={onOpenDetail}>
+            <HomeFinishedPredictionSummary
+              predictedHome={predictedHome}
+              predictedAway={predictedAway}
+              homeGoals={homeGoals}
+              awayGoals={awayGoals}
+            />
+          </button>
         ) : null}
-      </button>
+      </div>
 
-      <div className="shrink-0">
+      <div className="shrink-0" onClick={(event) => event.stopPropagation()}>
         <MatchContextActionsRow
           compact
           layout="homeCardStacked"

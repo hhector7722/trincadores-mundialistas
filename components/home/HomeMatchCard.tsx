@@ -323,6 +323,12 @@ export function HomeMatchCard({
                 }
               />
             }
+            onHomeTeamClick={() =>
+              openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+            }
+            onAwayTeamClick={() =>
+              openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+            }
           />
 
           <div

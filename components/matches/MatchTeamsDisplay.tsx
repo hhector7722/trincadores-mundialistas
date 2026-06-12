@@ -109,15 +109,17 @@ function TeamFlagButton({
   name,
   onClick,
   placeholderStyle,
+  size = "lg",
 }: {
   name: string;
   onClick?: () => void;
   placeholderStyle?: "default" | "knockout";
+  size?: "sm" | "md" | "lg";
 }) {
   const displayName = teamNameEs(name);
 
   if (!onClick) {
-    return <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} />;
+    return <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} size={size} />;
   }
 
   return (
@@ -130,7 +132,33 @@ function TeamFlagButton({
       className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} />
+      <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} size={size} />
+    </button>
+  );
+}
+
+function TeamNameButton({
+  name,
+  onClick,
+  compact,
+}: {
+  name: string;
+  onClick: () => void;
+  compact?: boolean;
+}) {
+  const displayName = teamNameEs(name);
+
+  return (
+    <button
+      type="button"
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className="max-w-full transition-opacity hover:opacity-80 active:opacity-70"
+      aria-label={`Ver plantilla de ${displayName}`}
+    >
+      <TeamNameLabel name={name} compact={compact} />
     </button>
   );
 }
@@ -151,10 +179,20 @@ function TeamBlock({
   const displayName = teamNameEs(name);
 
   if (footerSlot) {
+    if (!onClick) {
+      return (
+        <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
+          <TeamFlagCircle name={name} size={flagSize} />
+          <TeamNameLabel name={name} compact={compactName} />
+          {footerSlot}
+        </div>
+      );
+    }
+
     return (
       <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
-        <TeamFlagCircle name={name} size={flagSize} />
-        <TeamNameLabel name={name} compact={compactName} />
+        <TeamFlagButton name={name} onClick={onClick} size={flagSize} />
+        <TeamNameButton name={name} onClick={onClick} compact={compactName} />
         {footerSlot}
       </div>
     );
@@ -262,7 +300,11 @@ export function MatchTeamsDisplay({
             onClick={onHomeTeamClick}
             placeholderStyle={flagPlaceholderStyle}
           />
-          <TeamNameLabel name={homeTeam} />
+          {onHomeTeamClick ? (
+            <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
+          ) : (
+            <TeamNameLabel name={homeTeam} />
+          )}
         </div>
 
         {homeScoreSlot ? (
@@ -283,7 +325,11 @@ export function MatchTeamsDisplay({
             onClick={onAwayTeamClick}
             placeholderStyle={flagPlaceholderStyle}
           />
-          <TeamNameLabel name={awayTeam} />
+          {onAwayTeamClick ? (
+            <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
+          ) : (
+            <TeamNameLabel name={awayTeam} />
+          )}
         </div>
 
         {centerSlot ? (
@@ -317,7 +363,7 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={homeTeam}
-            onClick={homeFooterSlot ? undefined : onHomeTeamClick}
+            onClick={onHomeTeamClick}
             footerSlot={homeFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}
@@ -330,7 +376,7 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={awayTeam}
-            onClick={awayFooterSlot ? undefined : onAwayTeamClick}
+            onClick={onAwayTeamClick}
             footerSlot={awayFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}

@@ -41,7 +41,14 @@ export function MatchContextTextActionButton({
       type="button"
       title={title}
       aria-disabled={inactive || undefined}
-      onClick={inactive ? undefined : onClick}
+      onClick={
+        inactive
+          ? undefined
+          : (event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              onClick?.();
+            }
+      }
       className={cn(
         MATCH_CONTEXT_ACTION_BUTTON_CLASS,
         inactive && "cursor-default",
@@ -148,6 +155,11 @@ export function MatchContextActionButton({
     return () => observer.disconnect();
   }, [saved, showEdit, savedValue]);
 
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick();
+  };
+
   return (
     <div className={cn("w-full min-w-0", className)}>
       {!hideCaption ? (
@@ -159,7 +171,7 @@ export function MatchContextActionButton({
         <div ref={containerRef} className="relative w-full">
           <button
             type="button"
-            onClick={onClick}
+            onClick={handleClick}
             className={cn(actionButtonClass, "min-w-0")}
           >
             <span
@@ -178,7 +190,7 @@ export function MatchContextActionButton({
           {showEdit && editIconPos != null ? (
             <button
               type="button"
-              onClick={onClick}
+              onClick={handleClick}
               aria-label={`Editar ${caption}: ${savedValue}`}
               className="absolute flex -translate-y-1/2 items-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
               style={{ left: editIconPos.left, top: editIconPos.top }}

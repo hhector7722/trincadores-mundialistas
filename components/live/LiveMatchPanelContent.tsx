@@ -74,6 +74,8 @@ export function LiveMatchPanelContent({
               <HomeSquadFooterLink onClick={onOpenAwayLineup} />
             ) : undefined
           }
+          onHomeTeamClick={onOpenHomeLineup}
+          onAwayTeamClick={onOpenAwayLineup}
           homeScoreSlot={
             !isModalLayout && liveSnapshot ? (
               <LiveScoreDisplay score={liveSnapshot.homeScore} />
