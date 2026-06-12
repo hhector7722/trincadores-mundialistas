@@ -48,16 +48,16 @@ test("getTournamentStatRows agrega goles, tarjetas y mvp", () => {
   ];
 
   assert.deepEqual(getTournamentStatRows("scorers", matches), [
-    { label: "J. Quinones", value: 2 },
-    { label: "L. Sone", value: 1 },
+    { label: "J. Quinones", teamName: "Mexico", value: 2 },
+    { label: "L. Sone", teamName: "Mexico", value: 1 },
   ]);
   assert.deepEqual(getTournamentStatRows("assists", matches), [
-    { label: "L. Sone", value: 1 },
+    { label: "L. Sone", teamName: "Mexico", value: 1 },
   ]);
   assert.deepEqual(getTournamentStatRows("yellow_cards", matches), [
-    { label: "D. Sugioka", value: 1 },
+    { label: "D. Sugioka", teamName: "South Africa", value: 1 },
   ]);
   assert.deepEqual(getTournamentStatRows("mvp", matches), [
-    { label: "J. Quinones", value: 2 },
+    { label: "J. Quinones", teamName: "Mexico", value: 2 },
   ]);
 });

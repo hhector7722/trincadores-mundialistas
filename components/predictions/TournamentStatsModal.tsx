@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PlayerSearchBar } from "@/components/players/PlayerSearchBar";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { Modal } from "@/components/ui/modal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { searchPlayers, type SearchablePlayer } from "@/lib/players/search-players";
@@ -33,7 +34,7 @@ function filterStatRowsByQuery(
 
   const searchable: SearchablePlayer[] = rows.map((row) => ({
     playerName: row.label,
-    teamName: "",
+    teamName: row.teamName,
     position: null,
     shirtNumber: null,
   }));
@@ -156,9 +157,14 @@ export function TournamentStatsModal({
                 <span className="w-6 shrink-0 text-center text-xs tabular-nums text-[var(--tm-muted)]">
                   {index + 1}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--tm-fg)]">
-                  {row.label}
-                </span>
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  {row.teamName ? (
+                    <TeamFlagBadge name={row.teamName} size="xxs" className="shrink-0" />
+                  ) : null}
+                  <span className="min-w-0 truncate text-sm font-medium text-[var(--tm-fg)]">
+                    {row.label}
+                  </span>
+                </div>
                 <span className="shrink-0 font-display text-sm tabular-nums text-[var(--tm-accent)]">
                   {row.value}
                 </span>
