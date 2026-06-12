@@ -94,6 +94,29 @@ test("parseTeamsFromTeledeporteTitle extrae equipos con marcador embebido", () =
   );
 });
 
+test("pickMatchForHighlightVideo resuelve titulos DAZN con alias de medios", () => {
+  const index = buildTeamAliasIndex(["South Korea", "Czech Republic"]);
+  assert.equal(resolveTeamLabel("República de Corea", index), "South Korea");
+  assert.equal(resolveTeamLabel("Chequia", index), "Czech Republic");
+
+  const hit = pickMatchForHighlightVideo(
+    "República de Corea",
+    "Chequia",
+    "2026-06-12T10:00:00.000Z",
+    [
+      {
+        matchId: "match-kor-cze",
+        homeTeam: "South Korea",
+        awayTeam: "Czech Republic",
+        kickoffAt: "2026-06-12T02:00:00.000Z",
+      },
+    ],
+    index,
+  );
+
+  assert.equal(hit?.matchId, "match-kor-cze");
+});
+
 test("pickMatchForHighlightVideo resuelve nombres en español de Teledeporte", () => {
   const index = buildTeamAliasIndex(["Mexico", "South Africa"]);
   assert.equal(resolveTeamLabel("México", index), "Mexico");

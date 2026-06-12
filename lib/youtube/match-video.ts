@@ -96,6 +96,20 @@ function normalizeLabel(value: string): string {
 
 export type TeamAliasIndex = Map<string, string>;
 
+/** Etiquetas usadas por DAZN/Teledeporte que no coinciden con `teamNameEs`. */
+const MEDIA_TEAM_ALIASES_BY_SLUG: Record<string, string[]> = {
+  "bosnia-and-herzegovina": ["bosnia y herzegovina"],
+  "cape-verde": ["cabo verde"],
+  "czech-republic": ["chequia", "republica checa"],
+  "dr-congo": ["congo dr", "rd congo", "republica democratica del congo"],
+  "ivory-coast": ["cote d'ivoire", "côte d'ivoire", "costa de marfil"],
+  "new-zealand": ["nueva zelanda"],
+  "saudi-arabia": ["arabia saudi", "arabia saudita"],
+  "south-africa": ["sudafrica"],
+  "south-korea": ["korea republic", "republic of korea", "republica de corea", "corea del sur"],
+  usa: ["united states", "u.s.a.", "estados unidos"],
+};
+
 /** Índice etiqueta → nombre OpenFootball (`matches.home_team`). */
 export function buildTeamAliasIndex(teamNames: string[]): TeamAliasIndex {
   const index = new Map<string, string>();
@@ -110,20 +124,8 @@ export function buildTeamAliasIndex(teamNames: string[]): TeamAliasIndex {
     index.set(normalizeLabel(teamAbbr(trimmed)), trimmed);
     index.set(normalizeLabel(teamNameEs(trimmed)), trimmed);
 
-    if (slug === "usa") {
-      index.set("united states", trimmed);
-      index.set("u.s.a.", trimmed);
-    }
-    if (slug === "south-korea") {
-      index.set("korea republic", trimmed);
-      index.set("republic of korea", trimmed);
-    }
-    if (slug === "ivory-coast") {
-      index.set("cote d'ivoire", trimmed);
-      index.set("côte d'ivoire", trimmed);
-    }
-    if (slug === "dr-congo") {
-      index.set("congo dr", trimmed);
+    for (const alias of MEDIA_TEAM_ALIASES_BY_SLUG[slug] ?? []) {
+      index.set(normalizeLabel(alias), trimmed);
     }
   }
 

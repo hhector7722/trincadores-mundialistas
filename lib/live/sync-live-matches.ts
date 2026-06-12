@@ -1,4 +1,5 @@
 import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
+import { syncAllMatchHighlights } from "@/lib/youtube/sync-highlights";
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
 import {
@@ -339,6 +340,13 @@ export async function syncLiveMatches(
       continue;
     }
     result.poolsRebuilt += 1;
+  }
+
+  try {
+    await syncAllMatchHighlights(admin);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "youtube highlights sync failed";
+    result.errors.push(`highlights: ${message}`);
   }
 
   return result;
