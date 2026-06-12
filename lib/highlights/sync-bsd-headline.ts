@@ -37,10 +37,8 @@ function shouldReplaceHeadline(
   incomingSource: BsdHeadlineSource,
 ): boolean {
   if (!existingSource) return true;
-  if (existingSource === "bsd_incidents") return true;
-  if (existingSource === "bsd_social" && incomingSource === "bsd_social") return false;
-  if (existingSource === "bsd_social" && incomingSource === "bsd_incidents") return false;
-  return incomingSource === "bsd_social";
+  if (existingSource === "bsd_incidents" && incomingSource === "bsd_social") return true;
+  return false;
 }
 
 export async function syncBsdHeadlineForMatch(
