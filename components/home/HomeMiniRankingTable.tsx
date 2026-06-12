@@ -37,7 +37,7 @@ function MiniRankingHeader() {
       <span aria-hidden="true" />
       <span aria-hidden="true" />
       <span aria-hidden="true" />
-      <span className="text-left">Trincador</span>
+      <span aria-hidden="true" />
       <span aria-hidden="true" />
       <span className={MINI_RANKING_STAT_COL}>Pts</span>
       <span className={MINI_RANKING_STAT_COL}>Fiab</span>
