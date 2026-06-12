@@ -8,7 +8,10 @@ import { getQuizDayHub } from "@/lib/quiz/queries";
 import { countPendingPredictions, getMatchPredictionDetail } from "@/lib/predictions/queries";
 import { getPoolMatches } from "@/lib/pool/queries";
 import { getPoolLeaderboard } from "@/lib/ranking/queries";
-import { getTournamentGeneralPredictions } from "@/lib/tournament-predictions/queries";
+import {
+  getPoolTournamentGeneralPredictionsBoard,
+  getTournamentGeneralPredictions,
+} from "@/lib/tournament-predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,15 +24,23 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [matches, pending, leaderboard, quizHub, generalPredictionsBundle, lastMatchHighlight] =
-    await Promise.all([
-      getPoolMatches(ctx.activePoolId),
-      countPendingPredictions(ctx.activePoolId, user!.id),
-      getPoolLeaderboard(ctx.activePoolId),
-      getQuizDayHub(ctx.activePoolId, user!.id),
-      getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
-      getLatestMatchHighlightForPool(ctx.activePoolId),
-    ]);
+  const [
+    matches,
+    pending,
+    leaderboard,
+    quizHub,
+    generalPredictionsBundle,
+    generalPredictionsBoard,
+    lastMatchHighlight,
+  ] = await Promise.all([
+    getPoolMatches(ctx.activePoolId),
+    countPendingPredictions(ctx.activePoolId, user!.id),
+    getPoolLeaderboard(ctx.activePoolId),
+    getQuizDayHub(ctx.activePoolId, user!.id),
+    getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
+    getPoolTournamentGeneralPredictionsBoard(ctx.activePoolId),
+    getLatestMatchHighlightForPool(ctx.activePoolId),
+  ]);
 
   const quizSlide = homeQuizSlideFromHub(quizHub);
 
@@ -74,6 +85,7 @@ export default async function HomePage() {
           poolId={ctx.activePoolId}
           generalPredictions={generalPredictionsBundle.predictions}
           generalPredictionsEditable={generalPredictionsBundle.editable}
+          generalPredictionsBoard={generalPredictionsBoard}
           dailyFact={dailyFact}
           quizHub={quizHub}
           lastMatch={lastMatch}

@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import {
   saveTournamentChampion,
   saveTournamentFinalists,
@@ -23,10 +31,11 @@ import {
 } from "@/components/lineup/EntityModalController";
 import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamsPickerModal } from "@/components/predictions/TeamsPickerModal";
-import {
-  formatPlayerDisplay,
-} from "@/lib/tournament-predictions/display";
-import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
+import { formatPlayerDisplay } from "@/lib/tournament-predictions/display";
+import type {
+  TournamentGeneralPredictions,
+  TournamentGeneralPredictionsBoardRow,
+} from "@/lib/tournament-predictions/types";
 import { TOURNAMENT_GENERAL_PREDICTION_LABELS } from "@/lib/tournament-predictions/types";
 import { getAllWorldCupTeamsAlphabetically } from "@/lib/predictions/teams-picker-data";
 
@@ -38,18 +47,131 @@ type ActiveFlow =
   | { kind: "golden_glove" }
   | null;
 
+type GeneralPredictionsCarouselSlide = {
+  profileId: string;
+  headerLabel: string;
+  isOwn: boolean;
+  slidePredictions: TournamentGeneralPredictions;
+};
+
 type HomeGeneralPredictionsCardProps = {
   poolId: string;
+  currentProfileId: string;
   predictions: TournamentGeneralPredictions;
   editable: boolean;
+  boardRows: TournamentGeneralPredictionsBoardRow[];
 };
+
+function boardRowToPredictions(
+  poolId: string,
+  row: TournamentGeneralPredictionsBoardRow
+): TournamentGeneralPredictions {
+  return {
+    poolId,
+    profileId: row.profileId,
+    championTeam: row.championTeam,
+    finalistTeamA: row.finalistTeamA,
+    finalistTeamB: row.finalistTeamB,
+    topScorerPlayerName: row.topScorerPlayerName,
+    topScorerTeamName: row.topScorerTeamName,
+    tournamentMvpPlayerName: row.tournamentMvpPlayerName,
+    tournamentMvpTeamName: row.tournamentMvpTeamName,
+    goldenGlovePlayerName: row.goldenGlovePlayerName,
+    goldenGloveTeamName: row.goldenGloveTeamName,
+    updatedAt: null,
+  };
+}
+
+function GeneralPredictionsSlideBody({
+  slidePredictions,
+  editable,
+  onChampion,
+  onFinalists,
+  onTopScorer,
+  onTournamentMvp,
+  onGoldenGlove,
+}: {
+  slidePredictions: TournamentGeneralPredictions;
+  editable: boolean;
+  onChampion: () => void;
+  onFinalists: () => void;
+  onTopScorer: () => void;
+  onTournamentMvp: () => void;
+  onGoldenGlove: () => void;
+}) {
+  const labels = TOURNAMENT_GENERAL_PREDICTION_LABELS;
+
+  return (
+    <div className="tm-home-general-predictions__body">
+      <GeneralPredictionRow
+        label={labels.champion}
+        valueNode={
+          slidePredictions.championTeam ? (
+            <HomeChampionTeamValue team={slidePredictions.championTeam} />
+          ) : null
+        }
+        editable={editable}
+        onAdd={onChampion}
+        onEdit={onChampion}
+      />
+      <GeneralPredictionRow
+        label={labels.finalists}
+        valueNode={
+          slidePredictions.finalistTeamA && slidePredictions.finalistTeamB ? (
+            <HomeFinalistsTeamValue
+              teamA={slidePredictions.finalistTeamA}
+              teamB={slidePredictions.finalistTeamB}
+            />
+          ) : null
+        }
+        editable={editable}
+        onAdd={onFinalists}
+        onEdit={onFinalists}
+      />
+      <GeneralPredictionRow
+        label={labels.top_scorer}
+        value={formatPlayerDisplay(
+          slidePredictions.topScorerPlayerName,
+          slidePredictions.topScorerTeamName
+        )}
+        editable={editable}
+        onAdd={onTopScorer}
+        onEdit={onTopScorer}
+      />
+      <GeneralPredictionRow
+        label={labels.tournament_mvp}
+        value={formatPlayerDisplay(
+          slidePredictions.tournamentMvpPlayerName,
+          slidePredictions.tournamentMvpTeamName
+        )}
+        editable={editable}
+        onAdd={onTournamentMvp}
+        onEdit={onTournamentMvp}
+      />
+      <GeneralPredictionRow
+        label={labels.golden_glove}
+        value={formatPlayerDisplay(
+          slidePredictions.goldenGlovePlayerName,
+          slidePredictions.goldenGloveTeamName
+        )}
+        editable={editable}
+        onAdd={onGoldenGlove}
+        onEdit={onGoldenGlove}
+      />
+    </div>
+  );
+}
 
 export function HomeGeneralPredictionsCard({
   poolId,
+  currentProfileId,
   predictions: initialPredictions,
   editable: initialEditable,
+  boardRows,
 }: HomeGeneralPredictionsCardProps) {
   const router = useRouter();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [predictions, setPredictions] = useState(initialPredictions);
   const [editable, setEditable] = useState(initialEditable);
 
@@ -57,12 +179,57 @@ export function HomeGeneralPredictionsCard({
     setPredictions(initialPredictions);
     setEditable(initialEditable);
   }, [initialPredictions, initialEditable]);
+
   const [activeFlow, setActiveFlow] = useState<ActiveFlow>(null);
   const [lineupTeam, setLineupTeam] = useState<string | null>(null);
   const [playerPickMode, setPlayerPickMode] = useState<PlayerPickMode>("any");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const allTeams = useMemo(() => getAllWorldCupTeamsAlphabetically(), []);
+
+  const carouselSlides = useMemo<GeneralPredictionsCarouselSlide[]>(() => {
+    const peers = boardRows
+      .filter((row) => row.profileId !== currentProfileId)
+      .sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
+
+    const ownSlide: GeneralPredictionsCarouselSlide = {
+      profileId: currentProfileId,
+      headerLabel: "Mis predicciones",
+      isOwn: true,
+      slidePredictions: predictions,
+    };
+
+    const peerSlides = peers.map((row) => ({
+      profileId: row.profileId,
+      headerLabel: row.label,
+      isOwn: false,
+      slidePredictions: boardRowToPredictions(poolId, row),
+    }));
+
+    return [ownSlide, ...peerSlides];
+  }, [boardRows, currentProfileId, predictions, poolId]);
+
+  const updateActiveIndex = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), carouselSlides.length - 1));
+  }, [carouselSlides.length]);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el || carouselSlides.length === 0) return;
+    el.scrollLeft = 0;
+    setActiveIndex(0);
+  }, [carouselSlides.length, currentProfileId]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateActiveIndex();
+    el.addEventListener("scroll", updateActiveIndex, { passive: true });
+    return () => el.removeEventListener("scroll", updateActiveIndex);
+  }, [updateActiveIndex]);
 
   function closeAll() {
     setActiveFlow(null);
@@ -110,79 +277,44 @@ export function HomeGeneralPredictionsCard({
         href="/general-predictions"
         aria-label="Ver pronósticos globales de todos los trincadores"
         className={cn(
-          "tm-home-top-stat-card @container relative flex min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card",
+          "tm-home-top-stat-card @container relative flex min-h-0 min-w-0 flex-col rounded-2xl p-[clamp(0.5rem,3cqw,0.75rem)] tm-stat-card",
           "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
         )}
+        data-block-tab-swipe={true}
       >
         <div
-          className="pointer-events-none absolute inset-x-[clamp(0.5rem,3cqw,0.75rem)] top-[clamp(0.375rem,2.5cqw,0.5rem)] z-10 flex items-center justify-between"
+          ref={scrollRef}
+          className="tm-home-general-predictions__carousel"
+          aria-roledescription="carrusel"
         >
-          <span className="text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
-            Mis predicciones
-          </span>
-          <span className="text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
-            Ver todos
-          </span>
-        </div>
-        <div className="tm-home-general-predictions__body">
-          <GeneralPredictionRow
-            label={labels.champion}
-            valueNode={
-              predictions.championTeam ? (
-                <HomeChampionTeamValue team={predictions.championTeam} />
-              ) : null
-            }
-            editable={editable}
-            onAdd={openChampionFlow}
-            onEdit={openChampionFlow}
-          />
-          <GeneralPredictionRow
-            label={labels.finalists}
-            valueNode={
-              predictions.finalistTeamA && predictions.finalistTeamB ? (
-                <HomeFinalistsTeamValue
-                  teamA={predictions.finalistTeamA}
-                  teamB={predictions.finalistTeamB}
-                />
-              ) : null
-            }
-            editable={editable}
-            onAdd={openFinalistsFlow}
-            onEdit={openFinalistsFlow}
-          />
-          <GeneralPredictionRow
-            label={labels.top_scorer}
-            value={formatPlayerDisplay(
-              predictions.topScorerPlayerName,
-              predictions.topScorerTeamName
-            )}
-            editable={editable}
-            onAdd={() => openPlayerFlow("top_scorer", "any")}
-            onEdit={() => openPlayerFlow("top_scorer", "any")}
-          />
-          <GeneralPredictionRow
-            label={labels.tournament_mvp}
-            value={formatPlayerDisplay(
-              predictions.tournamentMvpPlayerName,
-              predictions.tournamentMvpTeamName
-            )}
-            editable={editable}
-            onAdd={() => openPlayerFlow("tournament_mvp", "any")}
-            onEdit={() => openPlayerFlow("tournament_mvp", "any")}
-          />
-          <GeneralPredictionRow
-            label={labels.golden_glove}
-            value={formatPlayerDisplay(
-              predictions.goldenGlovePlayerName,
-              predictions.goldenGloveTeamName
-            )}
-            editable={editable}
-            onAdd={() => openPlayerFlow("golden_glove", "goalkeeper")}
-            onEdit={() => openPlayerFlow("golden_glove", "goalkeeper")}
-          />
+          {carouselSlides.map((slide, index) => (
+            <div
+              key={slide.profileId}
+              className="tm-home-general-predictions__slide"
+              aria-hidden={index !== activeIndex}
+            >
+              <div className="tm-home-general-predictions__header">
+                <span className="min-w-0 truncate text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+                  {slide.headerLabel}
+                </span>
+                <span className="shrink-0 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+                  Ver todos
+                </span>
+              </div>
+              <GeneralPredictionsSlideBody
+                slidePredictions={slide.slidePredictions}
+                editable={editable && slide.isOwn}
+                onChampion={openChampionFlow}
+                onFinalists={openFinalistsFlow}
+                onTopScorer={() => openPlayerFlow("top_scorer", "any")}
+                onTournamentMvp={() => openPlayerFlow("tournament_mvp", "any")}
+                onGoldenGlove={() => openPlayerFlow("golden_glove", "goalkeeper")}
+              />
+            </div>
+          ))}
         </div>
         {error ? (
-          <p className="mt-2 text-[10px] text-[var(--tm-danger)]" role="alert">
+          <p className="mt-1 shrink-0 text-[10px] text-[var(--tm-danger)]" role="alert">
             {error}
           </p>
         ) : null}

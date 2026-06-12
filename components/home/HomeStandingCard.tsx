@@ -8,7 +8,10 @@ import type { DailyFact } from "@/lib/home/daily-fact";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
-import type { TournamentGeneralPredictions } from "@/lib/tournament-predictions/types";
+import type {
+  TournamentGeneralPredictions,
+  TournamentGeneralPredictionsBoardRow,
+} from "@/lib/tournament-predictions/types";
 
 type HomeStandingCardProps = {
   leaderboardRows: LeaderboardRow[];
@@ -16,6 +19,7 @@ type HomeStandingCardProps = {
   poolId: string;
   generalPredictions: TournamentGeneralPredictions;
   generalPredictionsEditable: boolean;
+  generalPredictionsBoard: TournamentGeneralPredictionsBoardRow[];
   dailyFact: DailyFact | null;
   quizHub: QuizDayHub;
   lastMatch: MatchWithPrediction | null;
@@ -30,6 +34,7 @@ export function HomeStandingCard({
   poolId,
   generalPredictions,
   generalPredictionsEditable,
+  generalPredictionsBoard,
   dailyFact,
   quizHub,
   lastMatch,
@@ -43,8 +48,10 @@ export function HomeStandingCard({
         <HomeMiniRankingTable rows={leaderboardRows} currentProfileId={currentProfileId} />
         <HomeGeneralPredictionsCard
           poolId={poolId}
+          currentProfileId={currentProfileId}
           predictions={generalPredictions}
           editable={generalPredictionsEditable}
+          boardRows={generalPredictionsBoard}
         />
       </div>
       {lastMatch || liveMatch || nextMatch ? (

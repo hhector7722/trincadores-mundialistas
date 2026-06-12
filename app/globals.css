@@ -497,6 +497,7 @@ html:has(.tm-app-frame) {
 /* Altura de referencia: card de pronósticos globales (padding + 5 filas) */
 :root {
   --tm-home-top-stat-height: calc(0.75rem * 2 + 5 * 1.5rem);
+  --tm-home-general-predictions-header-h: 0.75rem;
   --tm-home-mini-ranking-header-h: 1.375rem;
   --tm-home-mini-ranking-viewport-h: calc(
     var(--tm-home-top-stat-height) - var(--tm-home-mini-ranking-header-h)
@@ -535,7 +536,50 @@ html:has(.tm-app-frame) {
   scroll-snap-stop: always;
 }
 
-/* Pronósticos globales home: 5 filas reparten altura; «Ver todos» flota sin restar espacio */
+/* Pronósticos globales home: carrusel horizontal + 5 filas repartiendo altura */
+.tm-home-general-predictions__carousel {
+  display: flex;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tm-home-general-predictions__carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.tm-home-general-predictions__slide {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  width: 100%;
+}
+
+.tm-home-general-predictions__header {
+  align-items: center;
+  display: flex;
+  flex: none;
+  flex-shrink: 0;
+  height: var(--tm-home-general-predictions-header-h);
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.125rem;
+  min-height: var(--tm-home-general-predictions-header-h);
+}
+
 .tm-home-general-predictions__body {
   display: flex;
   flex: 1 1 0%;
