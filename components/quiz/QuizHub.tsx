@@ -83,7 +83,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
       <QuizWaitModal
         open={waitModalOpen}
         onClose={() => setWaitModalOpen(false)}
-        message="Ya has jugado el quiz diario de hoy. Espera a mañana crack."
+        message="Hoy ya has jugado al quiz diario crack."
       />
     </div>
   );

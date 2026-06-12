@@ -91,7 +91,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
       <QuizWaitModal
         open={alreadyPlayedOpen}
         onClose={() => setAlreadyPlayedOpen(false)}
-        message="Ya has jugado el quiz diario de hoy. Espera a mañana crack"
+        message="Hoy ya has jugado al quiz diario crack."
       />
     </>
   );
