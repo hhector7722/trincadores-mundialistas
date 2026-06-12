@@ -15,6 +15,7 @@ import {
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
+import { HomeFinishedMatchPanel } from "@/components/home/HomeFinishedMatchPanel";
 import {
   HOME_CARD_HEADER_CLASS,
   HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
@@ -23,7 +24,6 @@ import {
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
-import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
@@ -265,8 +265,8 @@ export function HomeMatchCard({
         )}
       </div>
 
+      {isLive ? (
       <div className="cursor-pointer" onClick={() => openScoreModal()}>
-        {isLive ? (
           <LiveMatchPanelContent
             homeTeam={displayMatch.home_team}
             awayTeam={displayMatch.away_team}
@@ -284,28 +284,22 @@ export function HomeMatchCard({
             }
             onOpenLineups={() => openEntityModal(buildPossibleLineupsView(displayMatch))}
           />
+      </div>
         ) : isFinished ? (
-          <div className={teamsBlockClassName}>
-            <MatchTeamsDisplay
-              homeTeam={displayMatch.home_team}
-              awayTeam={displayMatch.away_team}
-              kickoffAt={displayMatch.kickoff_at}
-              isLive={false}
-              hideKickoff
-              compactTeamColumn
-              teamBlocksTopClass="top-0"
-            />
-            {displayMatch.officialHome != null && displayMatch.officialAway != null ? (
-              <FinishedMatchScoreRow
-                variant="card"
-                homeGoals={displayMatch.officialHome}
-                awayGoals={displayMatch.officialAway}
-                predictedHome={displayMatch.prediction?.home_goals ?? null}
-                predictedAway={displayMatch.prediction?.away_goals ?? null}
-              />
-            ) : null}
-          </div>
+          <HomeFinishedMatchPanel
+            match={displayMatch}
+            teamsBlockClassName={teamsBlockClassName}
+            onOpenHomeLineup={() =>
+              openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+            }
+            onOpenAwayLineup={() =>
+              openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+            }
+            onOpenPredictionsBoard={() => setPredictionsBoardOpen(true)}
+            onOpenDetail={openScoreModal}
+          />
         ) : (
+      <div className="cursor-pointer" onClick={() => openScoreModal()}>
         <div className={teamsBlockClassName}>
           <MatchTeamsDisplay
             homeTeam={displayMatch.home_team}
@@ -394,8 +388,8 @@ export function HomeMatchCard({
             />
           </div>
         </div>
-        )}
       </div>
+        )}
       {!isLive && !isFinished && saved ? (
         <p
           className={cn(
@@ -414,6 +408,7 @@ export function HomeMatchCard({
         onClose={() => setScoreModalOpen(false)}
         poolId={poolId}
         match={displayMatch}
+        currentProfileId={currentProfileId}
         onMvpSaved={(_matchId, playerName, teamName, shirtNumber) =>
           handleMvpSaved(playerName, teamName, shirtNumber)
         }
@@ -430,7 +425,7 @@ export function HomeMatchCard({
         matchIsLive={isLive}
       />
 
-      {isLive ? (
+      {isLive || isFinished ? (
         <MatchPredictionsBoardModal
           open={predictionsBoardOpen}
           onClose={() => setPredictionsBoardOpen(false)}
