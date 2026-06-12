@@ -48,43 +48,45 @@ export function CalendarFinishedMatchCardVisual({
   );
 
   const body = (
-    <div className="tm-cal-match-card-body">
-      {showTopRow ? (
-        <div className="tm-cal-finished-meta-row relative flex min-h-[1em] shrink-0 items-center gap-0.5 px-0.5">
-          {groupCode ? (
-            <span className="tm-cal-match-group pointer-events-none z-[3] shrink-0 uppercase leading-none text-[var(--tm-accent)]">
-              {groupCode.toUpperCase()}
-            </span>
-          ) : null}
+    <>
+      <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
 
-          {finishedState.hasPrediction ? (
-            <span className="tm-cal-kickoff min-w-0 flex-1 text-center font-medium leading-none text-white">
-              {predictionLabel}
-            </span>
-          ) : (
-            <span className="min-w-0 flex-1" aria-hidden />
-          )}
+      <div className="tm-cal-match-card-body">
+        {showTopRow ? (
+          <div className="tm-cal-finished-meta-row relative flex min-h-[1em] shrink-0 items-center gap-0.5 px-0.5">
+            {groupCode ? (
+              <span className="tm-cal-match-group pointer-events-none z-[3] shrink-0 uppercase leading-none text-[var(--tm-accent)]">
+                {groupCode.toUpperCase()}
+              </span>
+            ) : null}
 
-          {finishedState.mvpCorrect ? (
-            <PredictionOutcomeIcon variant="mvp" className="relative z-[3] shrink-0" />
-          ) : null}
-        </div>
-      ) : null}
+            {finishedState.hasPrediction ? (
+              <span className="tm-cal-kickoff min-w-0 flex-1 text-center font-medium leading-none text-white">
+                {predictionLabel}
+              </span>
+            ) : (
+              <span className="min-w-0 flex-1" aria-hidden />
+            )}
 
-      <div className="tm-cal-flags relative w-full shrink-0">
-        <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
+            {finishedState.mvpCorrect ? (
+              <PredictionOutcomeIcon variant="mvp" className="relative z-[3] shrink-0" />
+            ) : null}
+          </div>
+        ) : null}
 
-        <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-          <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
-        </div>
-        <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums">
-          {officialLabel}
-        </span>
-        <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-          <TeamFlagBadge name={awayTeam} size="cal" className="tm-cal-flag" />
+        <div className="tm-cal-flags relative w-full shrink-0">
+          <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+            <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
+          </div>
+          <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums">
+            {officialLabel}
+          </span>
+          <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+            <TeamFlagBadge name={awayTeam} size="cal" className="tm-cal-flag" />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 
   if (interactive) {

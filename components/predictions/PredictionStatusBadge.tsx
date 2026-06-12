@@ -35,7 +35,7 @@ export function PredictionStatusBadge({
   return (
     <span
       className={cn(
-        "pointer-events-none absolute inset-y-0 left-0 z-[1] w-[4px]",
+        "pointer-events-none absolute inset-y-0 left-0 z-[1] w-[4px] rounded-l-[2px]",
         OUTCOME_BORDER_CLASS[outcome],
         className,
       )}
