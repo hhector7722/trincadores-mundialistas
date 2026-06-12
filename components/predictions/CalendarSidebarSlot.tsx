@@ -102,8 +102,6 @@ export function CalendarSidebarSlot({
 
             </div>
 
-            <CalendarGuideAccess />
-
             <CalendarSidebarAccessDock
 
               onOpenAllGroups={(options) => onOpenAllGroups?.(options)}
@@ -113,6 +111,8 @@ export function CalendarSidebarSlot({
               onOpenSquads={(options) => onOpenSquads?.(options)}
 
             />
+
+            <CalendarGuideAccess />
 
           </div>
 
