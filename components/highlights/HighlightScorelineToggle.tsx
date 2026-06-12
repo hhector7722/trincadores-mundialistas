@@ -4,7 +4,7 @@ import { useHighlightScorelineVisibility } from "@/components/highlights/Highlig
 import { cn } from "@/lib/utils";
 
 export function HighlightScorelineToggle() {
-  const { visible, toggleVisible, canControl } = useHighlightScorelineVisibility();
+  const { visible, toggleVisible, canControl, pending } = useHighlightScorelineVisibility();
 
   if (!canControl) return null;
 
@@ -18,8 +18,9 @@ export function HighlightScorelineToggle() {
           ? "Ocultar marcador en highlights del hero"
           : "Mostrar marcador en highlights del hero"
       }
-      onClick={toggleVisible}
-      className="flex h-12 w-10 shrink-0 items-center justify-center"
+      onClick={() => void toggleVisible()}
+      disabled={pending}
+      className="flex h-12 w-10 shrink-0 items-center justify-center disabled:opacity-60"
     >
       <span
         className={cn(

@@ -28,7 +28,11 @@ export function AppShell({
       <UnreadNotificationsShell>
         <QuizActiveNotificationProvider>
           <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
-            <HighlightScorelineVisibilityProvider username={ctx.username}>
+            <HighlightScorelineVisibilityProvider
+              poolId={ctx.activePoolId}
+              username={ctx.username}
+              initialVisible={ctx.heroHighlightScorelineVisible}
+            >
               <LineupsNotificationOpener />
               <PullToRefresh />
               <TabNavigationProvider>

@@ -1,4 +1,5 @@
 ﻿import { getActivePoolIdFromCookie } from "@/lib/auth/session";
+import { readHeroHighlightScorelineVisible } from "@/lib/highlights/hero-scoreline-visibility";
 import { createClient } from "@/lib/supabase/server";
 
 export type UserPool = {
@@ -10,6 +11,7 @@ export type UserPool = {
 export type AppShellContext = {
   profileLabel: string;
   username: string | null;
+  heroHighlightScorelineVisible: boolean;
   pools: UserPool[];
   activePoolId: string;
   activePoolName: string;
@@ -35,7 +37,7 @@ export async function loadAppShellContext(userId: string): Promise<AppShellConte
   const poolIds = memberships.map((m) => m.pool_id);
   const { data: pools, error: poolError } = await supabase
     .from("pools")
-    .select("id, name, slug")
+    .select("id, name, slug, settings_json")
     .in("id", poolIds);
 
   if (poolError || !pools?.length) return null;
@@ -45,10 +47,14 @@ export async function loadAppShellContext(userId: string): Promise<AppShellConte
   const activePoolId = validCookie ? cookiePoolId! : pools[0].id;
   const activePool = pools.find((p) => p.id === activePoolId) ?? pools[0];
   const profileLabel = profile?.display_name ?? profile?.username ?? "Jugador";
+  const heroHighlightScorelineVisible = readHeroHighlightScorelineVisible(
+    activePool.settings_json,
+  );
 
   return {
     profileLabel,
     username: profile?.username ?? null,
+    heroHighlightScorelineVisible,
     pools: pools.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
     activePoolId: activePool.id,
     activePoolName: activePool.name,

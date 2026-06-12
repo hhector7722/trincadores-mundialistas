@@ -9,57 +9,61 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  canControlHighlightScorelineVisibility,
-  readHighlightScorelineVisible,
-  writeHighlightScorelineVisible,
-} from "@/lib/highlights/hero-scoreline-visibility";
+import { setHeroHighlightScorelineVisible } from "@/actions/highlights";
+import { canControlHighlightScorelineVisibility } from "@/lib/highlights/hero-scoreline-visibility";
 
 type HighlightScorelineVisibilityContextValue = {
   visible: boolean;
-  setVisible: (visible: boolean) => void;
   toggleVisible: () => void;
   canControl: boolean;
+  pending: boolean;
 };
 
 const HighlightScorelineVisibilityContext =
   createContext<HighlightScorelineVisibilityContextValue | null>(null);
 
 export function HighlightScorelineVisibilityProvider({
+  poolId,
   username,
+  initialVisible,
   children,
 }: {
+  poolId: string;
   username: string | null;
+  initialVisible: boolean;
   children: ReactNode;
 }) {
   const canControl = canControlHighlightScorelineVisibility(username);
-  const [visible, setVisibleState] = useState(true);
+  const [visible, setVisible] = useState(initialVisible);
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    setVisibleState(readHighlightScorelineVisible());
-  }, []);
+    setVisible(initialVisible);
+  }, [initialVisible]);
 
-  const setVisible = useCallback((next: boolean) => {
-    setVisibleState(next);
-    writeHighlightScorelineVisible(next);
-  }, []);
+  const toggleVisible = useCallback(async () => {
+    if (!canControl || pending) return;
 
-  const toggleVisible = useCallback(() => {
-    setVisibleState((current) => {
-      const next = !current;
-      writeHighlightScorelineVisible(next);
-      return next;
-    });
-  }, []);
+    const next = !visible;
+    setVisible(next);
+    setPending(true);
+
+    const result = await setHeroHighlightScorelineVisible(poolId, next);
+    setPending(false);
+
+    if (!result.ok) {
+      setVisible(visible);
+    }
+  }, [canControl, pending, poolId, visible]);
 
   const value = useMemo(
     () => ({
-      visible: canControl ? visible : true,
-      setVisible,
+      visible,
       toggleVisible,
       canControl,
+      pending,
     }),
-    [canControl, setVisible, toggleVisible, visible],
+    [canControl, pending, toggleVisible, visible],
   );
 
   return (
@@ -74,9 +78,9 @@ export function useHighlightScorelineVisibility(): HighlightScorelineVisibilityC
   if (!ctx) {
     return {
       visible: true,
-      setVisible: () => {},
       toggleVisible: () => {},
       canControl: false,
+      pending: false,
     };
   }
   return ctx;
