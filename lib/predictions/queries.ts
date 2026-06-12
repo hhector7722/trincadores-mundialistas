@@ -462,20 +462,15 @@ export async function getMatchPredictionsBoard(
   } else if (match.status === "live") {
     const { data: liveState, error: liveStateError } = await admin
       .from("match_live_state")
-      .select("live_payload")
+      .select("home_score, away_score")
       .eq("match_id", matchId)
       .maybeSingle();
 
     if (liveStateError) throw new Error(liveStateError.message);
 
-    const payload = (liveState?.live_payload ?? null) as MatchLivePayload | null;
-    if (
-      payload &&
-      Number.isInteger(payload.homeScore) &&
-      Number.isInteger(payload.awayScore)
-    ) {
-      officialHome = payload.homeScore;
-      officialAway = payload.awayScore;
+    if (hasOfficialScore(liveState?.home_score, liveState?.away_score)) {
+      officialHome = liveState!.home_score;
+      officialAway = liveState!.away_score;
     }
   }
 
