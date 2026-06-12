@@ -17,7 +17,7 @@ import { QuickPredictionModal } from "@/components/predictions/QuickPredictionMo
 import { TournamentStatsModal } from "@/components/predictions/TournamentStatsModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { teamNameEs } from "@/lib/teams/display";
 import {
   CALENDAR_SIDEBAR_CARD_ANCHOR,
@@ -146,26 +146,16 @@ function CalendarMatchCard({
         match.status === "live" && "ring-1 ring-[var(--tm-live)]",
       )}
     >
-      {match.group_code ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] uppercase leading-none text-[var(--tm-accent)]">
-          {match.group_code.toUpperCase()}
-        </span>
-      ) : null}
       <div className="tm-cal-match-card-body">
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}
         </span>
-        <div className="tm-cal-flags relative w-full shrink-0">
-          <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={match.home_team} size="cal" className="tm-cal-flag" />
-          </div>
-          <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums">
-            {predictionLabel}
-          </span>
-          <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={match.away_team} size="cal" className="tm-cal-flag" />
-          </div>
-        </div>
+        <CalendarMatchCardFlagsRow
+          homeTeam={match.home_team}
+          awayTeam={match.away_team}
+          centerLabel={predictionLabel}
+          groupCode={match.group_code}
+        />
       </div>
     </button>
   );

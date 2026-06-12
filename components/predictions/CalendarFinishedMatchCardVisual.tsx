@@ -1,6 +1,6 @@
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
+import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
 import { cn } from "@/lib/utils";
@@ -48,12 +48,6 @@ export function CalendarFinishedMatchCardVisual({
     <>
       <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
 
-      {groupCode ? (
-        <span className="tm-cal-match-group pointer-events-none absolute left-0 top-0 z-[3] uppercase leading-none text-[var(--tm-accent)]">
-          {groupCode.toUpperCase()}
-        </span>
-      ) : null}
-
       {finishedState.mvpCorrect ? (
         <PredictionOutcomeIcon
           variant="mvp"
@@ -72,17 +66,12 @@ export function CalendarFinishedMatchCardVisual({
           </span>
         )}
 
-        <div className="tm-cal-flags relative w-full shrink-0">
-          <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
-          </div>
-          <span className="tm-cal-prediction pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 tabular-nums">
-            {officialLabel}
-          </span>
-          <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-            <TeamFlagBadge name={awayTeam} size="cal" className="tm-cal-flag" />
-          </div>
-        </div>
+        <CalendarMatchCardFlagsRow
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
+          centerLabel={officialLabel}
+          groupCode={groupCode}
+        />
       </div>
     </>
   );

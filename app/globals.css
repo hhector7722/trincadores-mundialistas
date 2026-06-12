@@ -1685,6 +1685,12 @@ html:has(.tm-app-frame) {
   padding: 1px 2px 0 1px;
 }
 
+.tm-porra-calendar .tm-cal-match-group--under-score {
+  margin-top: 0;
+  padding: 0;
+  line-height: 1;
+}
+
 .tm-porra-calendar .tm-cal-match-card-body {
   display: flex;
   width: 100%;
