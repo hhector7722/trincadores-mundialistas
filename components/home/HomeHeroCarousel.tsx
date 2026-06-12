@@ -45,7 +45,7 @@ function buildSlides(
       customBody: (
         <MatchHighlightBlock
           variant="hero"
-          className="h-full w-full"
+          className="w-full"
           homeTeam={lastMatchHighlight.homeTeam}
           awayTeam={lastMatchHighlight.awayTeam}
           homeGoals={lastMatchHighlight.homeGoals}
@@ -148,7 +148,7 @@ export function HomeHeroCarousel({
   }
 
   return (
-    <div className="flex h-full min-w-0 flex-1 flex-col" data-block-tab-swipe>
+    <div className="flex min-w-0 flex-col" data-block-tab-swipe>
       <div
         ref={scrollRef}
         className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -162,8 +162,8 @@ export function HomeHeroCarousel({
           >
             <div
               className={cn(
-                "flex h-full w-full min-w-0 max-w-full flex-col",
-                slide.align === "left" ? "items-stretch justify-center text-left" : "items-center text-center",
+                "flex w-full min-w-0 max-w-full flex-col",
+                slide.align === "left" ? "items-stretch text-left" : "items-center text-center",
               )}
             >
               {slide.eyebrow ? (

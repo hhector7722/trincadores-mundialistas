@@ -51,7 +51,7 @@ export function MatchHighlightBlock({
     <>
       <div className={cn("flex flex-col", className)}>
         {variant === "hero" ? (
-          <div className="flex h-full w-full min-w-0 flex-col justify-center gap-1.5">
+          <div className="mt-0.5 flex w-full min-w-0 flex-col gap-1.5">
             <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden">
               <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[0.55em] py-[0.18em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
                 HIGHLIGHTS
