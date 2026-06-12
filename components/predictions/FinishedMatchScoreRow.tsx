@@ -1,4 +1,4 @@
-import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
+import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
 import { cn } from "@/lib/utils";
@@ -40,67 +40,58 @@ export function FinishedMatchScoreRow({
       })
     : null;
 
-  const isExact = outcome === "exact";
-  const showPredictedBelow = outcome === "sign" || outcome === "miss";
   const predictedText = hasPrediction ? formatListScore(predictedHome, predictedAway) : null;
 
   const scoreClass =
     variant === "modal"
-      ? "font-display text-2xl font-semibold tabular-nums leading-none"
-      : "font-display text-[2.5rem] font-semibold tabular-nums leading-none sm:text-[2.75rem]";
+      ? "font-display text-2xl font-semibold tabular-nums leading-none text-white/95"
+      : "font-display text-[2.5rem] font-semibold tabular-nums leading-none text-white/95 sm:text-[2.75rem]";
 
   const homeLeft = variant === "modal" ? "34%" : "15%";
   const awayLeft = variant === "modal" ? "66%" : "85%";
   const topClass = variant === "modal" ? "top-[1.15rem]" : "top-[2.125rem]";
   const rowHeight = variant === "modal" ? "h-10 sm:h-11" : "";
 
-  const goalColorClass = isExact
-    ? "text-emerald-400 [-webkit-text-stroke:1.5px_white] [paint-order:stroke_fill]"
-    : "text-white/95";
-
   return (
     <div className={cn("pointer-events-none absolute inset-x-0", topClass, rowHeight, className)}>
       <div
-        className={cn(
-          "absolute -translate-x-1/2 text-center",
-          scoreClass,
-          goalColorClass,
-        )}
+        className={cn("absolute -translate-x-1/2 text-center", scoreClass)}
         style={{ left: homeLeft }}
       >
         {formatGoal(homeGoals)}
       </div>
 
       <div
-        className={cn(
-          "absolute -translate-x-1/2 text-center",
-          scoreClass,
-          goalColorClass,
-        )}
+        className={cn("absolute -translate-x-1/2 text-center", scoreClass)}
         style={{ left: awayLeft }}
       >
         {formatGoal(awayGoals)}
       </div>
 
-      {outcome ? (
+      {hasPrediction && outcome && predictedText ? (
         <div
           className={cn(
-            "absolute left-1/2 flex -translate-x-1/2 flex-col items-center",
-            variant === "modal" ? "top-1/2 -translate-y-1/2" : "top-1/2 -translate-y-1/2",
+            "absolute left-1/2 -translate-x-1/2",
+            variant === "modal" ? "top-[calc(100%+0.25rem)]" : "top-1/2 -translate-y-1/2",
           )}
-          style={{ fontSize: variant === "modal" ? "1.5rem" : "2.5rem" }}
         >
-          <PredictionOutcomeIcon variant={isExact || outcome === "sign" ? "success" : "error"} />
-          {showPredictedBelow && predictedText ? (
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-md bg-white/[0.06] px-3 py-1",
+              variant === "modal" ? "min-w-[5.5rem]" : "min-w-[4.5rem]",
+            )}
+          >
+            <PredictionStatusBadge outcome={outcome} />
+            <p className="text-center text-xs text-white/50">tu pronóstico</p>
             <p
               className={cn(
-                "mt-0.5 text-center font-display font-semibold tabular-nums text-[var(--tm-accent)]",
-                variant === "modal" ? "text-sm" : "text-xs",
+                "text-center font-display font-semibold tabular-nums text-[var(--tm-accent)]",
+                variant === "modal" ? "text-sm leading-tight" : "text-xs leading-tight",
               )}
             >
               {predictedText}
             </p>
-          ) : null}
+          </div>
         </div>
       ) : null}
     </div>

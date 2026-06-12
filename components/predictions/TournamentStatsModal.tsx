@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PlayerSearchBar } from "@/components/players/PlayerSearchBar";
 import { Modal } from "@/components/ui/modal";
@@ -50,12 +51,23 @@ export function TournamentStatsModal({
   stackElevated = false,
   matches,
 }: TournamentStatsModalProps) {
+  const router = useRouter();
   const [activeStat, setActiveStat] = useState<TournamentStatKind>("scorers");
   const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (!open) setQuery("");
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      router.refresh();
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [open, router]);
 
   const rows = useMemo(
     () => getTournamentStatRows(activeStat, matches),

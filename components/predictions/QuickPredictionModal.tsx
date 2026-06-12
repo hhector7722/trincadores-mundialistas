@@ -113,17 +113,35 @@ function resolveDotPosition(index: number, total: number): DotPosition {
 
 function PredictionsBoardOpenButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex min-h-12 w-full items-center justify-center",
-        "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
-        "text-[10px] transition-opacity hover:opacity-80 active:opacity-70",
-      )}
-    >
+    <Button type="button" className="w-full uppercase tracking-[0.12em] text-[10px]" onClick={onClick}>
       Ver pronósticos
-    </button>
+    </Button>
+  );
+}
+
+function FinishedModalFooterActions({
+  currentProfileId,
+  onOpenPredictionsBoard,
+  onOpenStats,
+  highlight,
+}: {
+  currentProfileId?: string;
+  onOpenPredictionsBoard: () => void;
+  onOpenStats: () => void;
+  highlight?: ReactNode;
+}) {
+  return (
+    <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+      {currentProfileId ? (
+        <PredictionsBoardOpenButton onClick={onOpenPredictionsBoard} />
+      ) : null}
+      <MatchStatsOpenButton
+        onClick={onOpenStats}
+        tone="muted"
+        className={currentProfileId ? "mt-1" : undefined}
+      />
+      {highlight}
+    </div>
   );
 }
 
@@ -571,6 +589,7 @@ export function QuickPredictionModal({
                   layout="homeCardStacked"
                   homeAnchor="10%"
                   awayAnchor="90%"
+                  lineupActionTone="muted"
                   className="h-full"
                   centerSlot={renderMvpCenterSlot(targetMatch)}
                   hidePossibleLineups={hidePossibleLineups}
@@ -584,26 +603,25 @@ export function QuickPredictionModal({
             </div>
           </div>
 
-          <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-            {currentProfileId ? (
-              <PredictionsBoardOpenButton onClick={() => setPredictionsBoardOpen(true)} />
-            ) : null}
-            <MatchStatsOpenButton
-              onClick={() => setStatsModalOpen(true)}
-              className={currentProfileId ? "mt-3" : undefined}
-            />
-            {highlightVideoId ? (
-              <MatchHighlightBlock
-                homeTeam={targetMatch.home_team}
-                awayTeam={targetMatch.away_team}
-                homeGoals={finishedHomeGoals}
-                awayGoals={finishedAwayGoals}
-                youtubeVideoId={highlightVideoId}
-                highlightSource={targetMatch.highlightSource}
-                className="mt-3"
-              />
-            ) : null}
-          </div>
+          <FinishedModalFooterActions
+            currentProfileId={currentProfileId}
+            onOpenPredictionsBoard={() => setPredictionsBoardOpen(true)}
+            onOpenStats={() => setStatsModalOpen(true)}
+            highlight={
+              highlightVideoId ? (
+                <MatchHighlightBlock
+                  homeTeam={targetMatch.home_team}
+                  awayTeam={targetMatch.away_team}
+                  homeGoals={finishedHomeGoals}
+                  awayGoals={finishedAwayGoals}
+                  youtubeVideoId={highlightVideoId}
+                  highlightSource={targetMatch.highlightSource}
+                  compactThumbnail
+                  className="mt-3"
+                />
+              ) : null
+            }
+          />
         </div>
       );
     }
@@ -669,6 +687,7 @@ export function QuickPredictionModal({
                   layout="homeCardStacked"
                   homeAnchor="10%"
                   awayAnchor="90%"
+                  lineupActionTone="muted"
                   className="h-full"
                   centerSlot={renderMvpCenterSlot(targetMatch)}
                   hidePossibleLineups={hidePossibleLineups}

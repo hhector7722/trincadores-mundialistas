@@ -3,6 +3,13 @@ import {
   BSD_WC_LEAGUE_ID,
 } from "@/lib/lineup/sources/bsd-constants";
 import { getBsdApiKey, isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
+import {
+  mergePlayerIncidents,
+  parseBsdIncidentsPlayerEvents,
+  parseBsdPlayerStatsIncidents,
+  type BsdPlayerIncidentRaw,
+  type BsdPlayerStatsResponse,
+} from "@/lib/live/sources/bsd-player-incidents";
 import type { MatchLivePayload, MatchLiveStats, MatchSubstitution } from "@/lib/live/types";
 
 const BSD_API_BASE = "https://sports.bzzoiro.com";
@@ -26,6 +33,8 @@ type BsdLiveEventsResponse = {
 
 type BsdEventDetail = BsdLiveEventRow & {
   event_date?: string;
+  home_team_id?: number;
+  away_team_id?: number;
 };
 
 type BsdStatValue = number | { value?: number; total?: number; pct?: number } | { actual?: number };
@@ -37,13 +46,9 @@ type BsdStatsResponse = {
   };
 };
 
-type BsdIncident = {
-  type?: string;
-  minute?: number | string | null;
-  is_home?: boolean;
+type BsdIncident = BsdPlayerIncidentRaw & {
   player_in?: string;
   player_out?: string;
-  card_type?: string;
 };
 
 type BsdIncidentsResponse = {
@@ -178,20 +183,33 @@ export async function fetchBsdEventIncidents(eventId: number): Promise<BsdIncide
   return bsdLiveFetch<BsdIncidentsResponse>(`/api/v2/events/${eventId}/incidents/`);
 }
 
+export async function fetchBsdEventPlayerStats(eventId: number): Promise<BsdPlayerStatsResponse | null> {
+  return bsdLiveFetch<BsdPlayerStatsResponse>(`/api/v2/events/${eventId}/player-stats/`);
+}
+
 export async function fetchBsdLiveBundle(eventId: number, homeTeam: string, awayTeam: string) {
-  const [detail, stats, incidents] = await Promise.all([
+  const [detail, stats, incidents, playerStats] = await Promise.all([
     fetchBsdEventDetail(eventId),
     fetchBsdEventStats(eventId),
     fetchBsdEventIncidents(eventId),
+    fetchBsdEventPlayerStats(eventId),
   ]);
 
   const parsedStats = parseBsdStats(stats);
   const substitutions = parseBsdSubstitutions(incidents, homeTeam, awayTeam);
+  const fromIncidents = parseBsdIncidentsPlayerEvents(incidents?.incidents ?? [], homeTeam, awayTeam);
+  const fromPlayerStats = parseBsdPlayerStatsIncidents(
+    playerStats,
+    detail?.home_team_id ?? null,
+    detail?.away_team_id ?? null,
+  );
+  const playerIncidents = mergePlayerIncidents(fromIncidents, fromPlayerStats);
   const payload: MatchLivePayload = {
     period: detail?.period ?? null,
     currentMinute: detail?.current_minute ?? null,
     stats: parsedStats,
     substitutions,
+    playerIncidents,
   };
 
   return {

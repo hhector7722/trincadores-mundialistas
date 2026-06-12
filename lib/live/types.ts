@@ -20,11 +20,18 @@ export type MatchLiveStats = {
   redCardsAway: number | null;
 };
 
+export type MatchPlayerIncident = {
+  kind: "goal" | "assist" | "yellow_card" | "red_card";
+  playerName: string;
+  teamSide: "home" | "away";
+};
+
 export type MatchLivePayload = {
   period?: string | null;
   currentMinute?: number | null;
   stats?: MatchLiveStats | null;
   substitutions?: MatchSubstitution[];
+  playerIncidents?: MatchPlayerIncident[];
 };
 
 export type MatchLiveSnapshot = {

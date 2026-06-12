@@ -40,6 +40,7 @@ function baseDemoMatch(
     highlightSource: null,
     prediction: overrides.prediction,
     mvpPrediction: overrides.mvpPrediction,
+    playerIncidents: [],
     serverEditable: false,
   };
 }

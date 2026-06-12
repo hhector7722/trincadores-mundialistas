@@ -30,6 +30,8 @@ type MatchContextActionsRowProps = {
   awayAnchor?: string;
   /** Oculta el botón de posibles / confirmadas alineaciones (p. ej. partido finalizado). */
   hidePossibleLineups?: boolean;
+  /** `muted` = plantilla como enlace secundario (modal detalle). */
+  lineupActionTone?: "accent" | "muted";
   className?: string;
 };
 
@@ -46,6 +48,7 @@ export function MatchContextActionsRow({
   centerSlot,
   predictionSlot,
   hidePossibleLineups = false,
+  lineupActionTone = "accent",
   className,
 }: MatchContextActionsRowProps) {
   if (layout === "homeCardScheduledStacked") {
@@ -97,6 +100,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenHomeLineup}
             />
           </div>
@@ -110,6 +114,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenAwayLineup}
             />
           </div>
@@ -139,6 +144,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenHomeLineup}
             />
           </div>
@@ -149,6 +155,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenAwayLineup}
             />
           </div>
@@ -178,6 +185,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenHomeLineup}
             />
           </div>
@@ -198,6 +206,7 @@ export function MatchContextActionsRow({
             <MatchContextActionButton
               caption="Plantilla"
               hideCaption={compact}
+              tone={lineupActionTone}
               onClick={onOpenAwayLineup}
             />
           </div>

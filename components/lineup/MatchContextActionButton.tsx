@@ -87,6 +87,8 @@ type MatchContextActionButtonProps = {
   showConfirmedBadge?: boolean;
   hideCaption?: boolean;
   emptyLabel?: string;
+  /** `muted` = enlace secundario (modal detalle partido). */
+  tone?: "accent" | "muted";
   className?: string;
 };
 
@@ -99,8 +101,16 @@ export function MatchContextActionButton({
   showConfirmedBadge = false,
   hideCaption = false,
   emptyLabel,
+  tone = "accent",
   className,
 }: MatchContextActionButtonProps) {
+  const muted = tone === "muted";
+  const actionTextClass = muted
+    ? "text-[9px] font-semibold uppercase tracking-wider text-white/50 transition-opacity hover:text-white/70 hover:opacity-100"
+    : MATCH_CONTEXT_ACTION_TEXT_CLASS;
+  const actionButtonClass = muted
+    ? "block w-full text-center text-white/50 transition-opacity hover:text-white/70 hover:opacity-100"
+    : MATCH_CONTEXT_ACTION_BUTTON_CLASS;
   const saved = Boolean(savedValue);
   const emptyText = emptyLabel ?? caption;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -150,7 +160,7 @@ export function MatchContextActionButton({
           <button
             type="button"
             onClick={onClick}
-            className="block w-full min-w-0 text-center text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            className={cn(actionButtonClass, "min-w-0")}
           >
             <span
               ref={labelRef}
@@ -158,7 +168,8 @@ export function MatchContextActionButton({
                 "inline-block max-w-full truncate text-center text-[10px] font-semibold sm:text-xs",
                 hideCaption
                   ? "uppercase tracking-wide"
-                  : "font-display normal-case"
+                  : "font-display normal-case",
+                muted && "!text-white/50",
               )}
             >
               {savedValue}
@@ -181,12 +192,17 @@ export function MatchContextActionButton({
           ) : null}
         </div>
       ) : (
-        <MatchContextTextActionButton onClick={onClick}>
-          {addIcon ? (
-            <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-          ) : null}
-          {emptyText}
-          {showConfirmedBadge ? <ConfirmedLineupCheckIcon /> : null}
+        <MatchContextTextActionButton
+          onClick={onClick}
+          className={muted ? actionButtonClass : undefined}
+        >
+          <span className={cn("inline-flex items-center justify-center gap-1", actionTextClass)}>
+            {addIcon ? (
+              <Plus className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+            ) : null}
+            {emptyText}
+            {showConfirmedBadge ? <ConfirmedLineupCheckIcon /> : null}
+          </span>
         </MatchContextTextActionButton>
       )}
     </div>

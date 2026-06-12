@@ -17,6 +17,8 @@ type MatchHighlightBlockProps = {
   highlightSource?: HighlightSourceCode | null;
   headline?: string | null;
   variant?: "hero" | "modal";
+  /** Reduce altura del thumbnail ~22 % en modal detalle. */
+  compactThumbnail?: boolean;
   className?: string;
 };
 
@@ -29,6 +31,7 @@ export function MatchHighlightBlock({
   highlightSource = null,
   headline = null,
   variant = "modal",
+  compactThumbnail = false,
   className,
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
@@ -82,6 +85,7 @@ export function MatchHighlightBlock({
               videoId={youtubeVideoId}
               title={title}
               onPlay={openPlayer}
+              reduced={compactThumbnail}
               className="max-w-none"
             />
           </>

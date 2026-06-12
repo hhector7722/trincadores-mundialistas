@@ -1,3 +1,4 @@
+import type { MatchPlayerIncident } from "@/lib/live/types";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 
 export type TournamentScorerRow = {
@@ -28,9 +29,44 @@ export const TOURNAMENT_STAT_TABS: ReadonlyArray<{
   { id: "mvp", label: "MVP" },
 ];
 
-const PLACEHOLDER_SCORERS: TournamentScorerRow[] = [
-  { player: "C Ronaldo", goals: 973 },
-];
+const KIND_BY_STAT: Record<Exclude<TournamentStatKind, "mvp">, MatchPlayerIncident["kind"]> = {
+  scorers: "goal",
+  assists: "assist",
+  yellow_cards: "yellow_card",
+  red_cards: "red_card",
+};
+
+function aggregateIncidents(
+  matches: MatchWithPrediction[],
+  kind: MatchPlayerIncident["kind"],
+): TournamentStatRow[] {
+  const totals = new Map<string, number>();
+
+  for (const match of matches) {
+    for (const incident of match.playerIncidents ?? []) {
+      if (incident.kind !== kind) continue;
+      totals.set(incident.playerName, (totals.get(incident.playerName) ?? 0) + 1);
+    }
+  }
+
+  return [...totals.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((left, right) => right.value - left.value || left.label.localeCompare(right.label, "es"));
+}
+
+function aggregateMvps(matches: MatchWithPrediction[]): TournamentStatRow[] {
+  const totals = new Map<string, number>();
+
+  for (const match of matches) {
+    const player = match.officialMvpPlayerName?.trim();
+    if (!player) continue;
+    totals.set(player, (totals.get(player) ?? 0) + 1);
+  }
+
+  return [...totals.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((left, right) => right.value - left.value || left.label.localeCompare(right.label, "es"));
+}
 
 export function tournamentHasGoals(matches: MatchWithPrediction[]): boolean {
   return matches.some(
@@ -41,29 +77,20 @@ export function tournamentHasGoals(matches: MatchWithPrediction[]): boolean {
   );
 }
 
-export function getTournamentTopScorers(
-  matches: MatchWithPrediction[]
-): TournamentScorerRow[] {
-  if (!tournamentHasGoals(matches)) {
-    return PLACEHOLDER_SCORERS;
-  }
-
-  // Sin datos de jugadores todavía: vacío hasta integrar fuente real.
-  void matches;
-  return [];
+export function getTournamentTopScorers(matches: MatchWithPrediction[]): TournamentScorerRow[] {
+  return aggregateIncidents(matches, "goal").map((row) => ({
+    player: row.label,
+    goals: row.value,
+  }));
 }
 
 export function getTournamentStatRows(
   kind: TournamentStatKind,
   matches: MatchWithPrediction[]
 ): TournamentStatRow[] {
-  if (kind === "scorers") {
-    return getTournamentTopScorers(matches).map((row) => ({
-      label: row.player,
-      value: row.goals,
-    }));
+  if (kind === "mvp") {
+    return aggregateMvps(matches);
   }
 
-  void matches;
-  return [];
+  return aggregateIncidents(matches, KIND_BY_STAT[kind]);
 }

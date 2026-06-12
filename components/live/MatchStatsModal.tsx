@@ -12,17 +12,22 @@ import { cn } from "@/lib/utils";
 type MatchStatsOpenButtonProps = {
   onClick: () => void;
   className?: string;
+  /** `muted` = enlace secundario bajo el CTA principal. */
+  tone?: "live" | "muted";
 };
 
-export function MatchStatsOpenButton({ onClick, className }: MatchStatsOpenButtonProps) {
+export function MatchStatsOpenButton({ onClick, className, tone = "live" }: MatchStatsOpenButtonProps) {
+  const muted = tone === "muted";
+
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "flex min-h-12 w-full items-center justify-center",
-        "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
-        "text-[10px] transition-opacity hover:opacity-80 active:opacity-70",
+        "flex min-h-12 w-full items-center justify-center transition-opacity hover:opacity-80 active:opacity-70",
+        muted
+          ? "min-h-10 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50 hover:text-white/70"
+          : "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)] text-[10px]",
         className,
       )}
     >

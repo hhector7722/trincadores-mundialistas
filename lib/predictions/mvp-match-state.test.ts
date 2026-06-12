@@ -27,6 +27,7 @@ function baseMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithPredi
     highlightSource: null,
     prediction: null,
     mvpPrediction: null,
+    playerIncidents: [],
     serverEditable: true,
     ...overrides,
   };

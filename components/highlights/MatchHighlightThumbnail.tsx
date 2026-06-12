@@ -11,6 +11,8 @@ type MatchHighlightThumbnailProps = {
   className?: string;
   /** Hero home: miniatura compacta para igualar altura del carrusel. */
   compact?: boolean;
+  /** Modal detalle: ~22 % más baja que el tamaño modal estándar. */
+  reduced?: boolean;
 };
 
 export function MatchHighlightThumbnail({
@@ -19,6 +21,7 @@ export function MatchHighlightThumbnail({
   onPlay,
   className,
   compact = false,
+  reduced = false,
 }: MatchHighlightThumbnailProps) {
   return (
     <button
@@ -29,7 +32,11 @@ export function MatchHighlightThumbnail({
       }}
       className={cn(
         "group relative mx-auto block w-full overflow-hidden rounded-lg border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.28)]",
-        compact ? "max-w-[7.25rem]" : "max-w-[13.5rem] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
+        compact
+          ? "max-w-[7.25rem]"
+          : reduced
+            ? "max-w-[10.5rem] rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.32)]"
+            : "max-w-[13.5rem] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
         className,
       )}
       aria-label={`Reproducir resumen: ${title}`}
@@ -49,11 +56,14 @@ export function MatchHighlightThumbnail({
         <span
           className={cn(
             "flex items-center justify-center rounded-full bg-zinc-600/85 text-white shadow-md transition-transform group-hover:scale-105",
-            compact ? "h-7 w-7" : "h-9 w-9",
+            compact ? "h-7 w-7" : reduced ? "h-7 w-7" : "h-9 w-9",
           )}
         >
           <Play
-            className={cn("fill-current", compact ? "ml-0.5 h-3.5 w-3.5" : "ml-0.5 h-4 w-4")}
+            className={cn(
+              "fill-current",
+              compact || reduced ? "ml-0.5 h-3.5 w-3.5" : "ml-0.5 h-4 w-4",
+            )}
             aria-hidden="true"
           />
         </span>

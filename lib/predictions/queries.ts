@@ -6,6 +6,7 @@ import {
   isGroupStageMatchdayKey,
   isKnockoutMatchdayKey,
 } from "@/lib/predictions/stage-filter";
+import type { MatchLivePayload, MatchPlayerIncident } from "@/lib/live/types";
 import type { MatchStatus, Prediction } from "@/types/database";
 
 export type MatchWithPrediction = {
@@ -33,6 +34,7 @@ export type MatchWithPrediction = {
       >
     | null;
   mvpPrediction: MvpPrediction | null;
+  playerIncidents: MatchPlayerIncident[];
   serverEditable: boolean;
 };
 
@@ -103,6 +105,17 @@ async function fetchPoolMatchesWithPredictions(
 
   const resultByMatch = new Map((results ?? []).map((r) => [r.match_id, r]));
 
+  const { data: liveStates } = await supabase
+    .from("match_live_state")
+    .select("match_id, live_payload")
+    .in("match_id", matchIds);
+
+  const incidentsByMatch = new Map<string, MatchPlayerIncident[]>();
+  for (const row of liveStates ?? []) {
+    const payload = (row.live_payload ?? {}) as MatchLivePayload;
+    incidentsByMatch.set(row.match_id as string, payload.playerIncidents ?? []);
+  }
+
   return matches.map((m) => {
     const pred = predByMatch.get(m.id);
     const result = resultByMatch.get(m.id);
@@ -138,6 +151,7 @@ async function fetchPoolMatchesWithPredictions(
           }
         : null,
       mvpPrediction: mvpByMatch.get(m.id) ?? null,
+      playerIncidents: incidentsByMatch.get(m.id) ?? [],
       serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
     };
   });
@@ -234,10 +248,17 @@ export async function getMatchPredictionDetail(
     .eq("match_id", matchId)
     .maybeSingle();
 
-  const [serverEditable, mvpPrediction] = await Promise.all([
+  const [serverEditable, mvpPrediction, liveState] = await Promise.all([
     fetchMatchEditableFromDb(matchId),
     getMvpPredictionForMatch(poolId, profileId, matchId),
+    supabase
+      .from("match_live_state")
+      .select("live_payload")
+      .eq("match_id", matchId)
+      .maybeSingle(),
   ]);
+
+  const livePayload = (liveState.data?.live_payload ?? {}) as MatchLivePayload;
 
   return {
     id: match.id,
@@ -274,6 +295,7 @@ export async function getMatchPredictionDetail(
       match.status === "finished"
         ? (match.highlight_source as MatchWithPrediction["highlightSource"])
         : null,
+    playerIncidents: livePayload.playerIncidents ?? [],
   };
 }
 

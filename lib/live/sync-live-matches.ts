@@ -7,6 +7,7 @@ import {
   isBsdEventFinished,
   isBsdEventLive,
 } from "@/lib/live/sources/bsd-live";
+import type { MatchLivePayload } from "@/lib/live/types";
 import { syncOfficialMvps } from "@/lib/live/sync-official-mvp";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
@@ -69,6 +70,41 @@ async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<
     byId.set(row.id, row as MatchRow);
   }
   return [...byId.values()];
+}
+
+async function loadFinishedMatchesNeedingIncidentBackfill(
+  admin: AdminClient,
+  limit: number,
+): Promise<MatchRow[]> {
+  const { data, error } = await admin
+    .from("matches")
+    .select("id, home_team, away_team, kickoff_at, status, match_live_state(live_payload)")
+    .eq("status", "finished")
+    .order("kickoff_at", { ascending: false })
+    .limit(limit * 4);
+
+  if (error) throw new Error(`matches backfill: ${error.message}`);
+
+  const rows: MatchRow[] = [];
+  for (const row of data ?? []) {
+    const liveState = (row as {
+      match_live_state: { live_payload: MatchLivePayload | null } | { live_payload: MatchLivePayload | null }[] | null;
+    }).match_live_state;
+    const payload = Array.isArray(liveState) ? liveState[0]?.live_payload : liveState?.live_payload;
+    const incidents = (payload ?? {}).playerIncidents;
+    if (incidents?.length) continue;
+
+    rows.push({
+      id: row.id as string,
+      home_team: row.home_team as string,
+      away_team: row.away_team as string,
+      kickoff_at: row.kickoff_at as string,
+      status: row.status as string,
+    });
+    if (rows.length >= limit) break;
+  }
+
+  return rows;
 }
 
 async function loadBsdEventMap(
@@ -184,7 +220,17 @@ export async function syncLiveMatches(
 
   if (!isBsdConfigured()) return result;
 
-  const matches = await loadCandidateMatches(admin, nowMs);
+  const [windowMatches, backfillMatches] = await Promise.all([
+    loadCandidateMatches(admin, nowMs),
+    loadFinishedMatchesNeedingIncidentBackfill(admin, 12),
+  ]);
+
+  const matchesById = new Map<string, MatchRow>();
+  for (const match of [...windowMatches, ...backfillMatches]) {
+    matchesById.set(match.id, match);
+  }
+  const matches = [...matchesById.values()];
+
   result.scanned = matches.length;
   if (!matches.length) return result;
 
