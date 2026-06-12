@@ -23,6 +23,7 @@ import {
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
+import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
@@ -41,14 +42,27 @@ import {
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
+type HomeMatchCardMode = "live" | "scheduled" | "finished";
+type HomeMatchSlidePosition = "last" | "center" | "right";
+
 type HomeMatchCardProps = {
   poolId: string;
   match: MatchWithPrediction;
-  mode: "live" | "scheduled";
+  mode: HomeMatchCardMode;
+  slidePosition: HomeMatchSlidePosition;
+  hasLiveInCarousel: boolean;
   currentProfileId: string;
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
 };
+
+function scheduledHeaderLabel(
+  slidePosition: HomeMatchSlidePosition,
+  hasLiveInCarousel: boolean,
+): string {
+  if (slidePosition === "center") return "Proximo partido";
+  return hasLiveInCarousel ? "Próximo partido" : "Próximos partidos";
+}
 
 const SCHEDULED_SCORE_EDIT_GAP_PX = 10;
 
@@ -132,11 +146,14 @@ export function HomeMatchCard({
   poolId,
   match,
   mode,
+  slidePosition,
+  hasLiveInCarousel,
   currentProfileId,
   onOpenChange,
   teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
 }: HomeMatchCardProps) {
   const isLive = mode === "live";
+  const isFinished = mode === "finished";
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
   const [mvpSnapshot, setMvpSnapshot] = useState<MvpSnapshot | null>(() => mvpSnapshotFromMatch(match));
@@ -205,13 +222,17 @@ export function HomeMatchCard({
 
   return (
     <>
-      <div className={cn(!isLive && "relative")}>
+      <div className={cn(!isLive && !isFinished && "relative")}>
       <div className={HOME_CARD_HEADER_CLASS}>
         {isLive ? (
           <LiveMatchHeaderLabel className="relative z-10" />
+        ) : isFinished ? (
+          <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
+            Último partido
+          </p>
         ) : (
           <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
-            Proximo partido
+            {scheduledHeaderLabel(slidePosition, hasLiveInCarousel)}
           </p>
         )}
         <Link
@@ -263,6 +284,27 @@ export function HomeMatchCard({
             }
             onOpenLineups={() => openEntityModal(buildPossibleLineupsView(displayMatch))}
           />
+        ) : isFinished ? (
+          <div className={teamsBlockClassName}>
+            <MatchTeamsDisplay
+              homeTeam={displayMatch.home_team}
+              awayTeam={displayMatch.away_team}
+              kickoffAt={displayMatch.kickoff_at}
+              isLive={false}
+              hideKickoff
+              compactTeamColumn
+              teamBlocksTopClass="top-0"
+            />
+            {displayMatch.officialHome != null && displayMatch.officialAway != null ? (
+              <FinishedMatchScoreRow
+                variant="card"
+                homeGoals={displayMatch.officialHome}
+                awayGoals={displayMatch.officialAway}
+                predictedHome={displayMatch.prediction?.home_goals ?? null}
+                predictedAway={displayMatch.prediction?.away_goals ?? null}
+              />
+            ) : null}
+          </div>
         ) : (
         <div className={teamsBlockClassName}>
           <MatchTeamsDisplay
@@ -354,7 +396,7 @@ export function HomeMatchCard({
         </div>
         )}
       </div>
-      {!isLive && saved ? (
+      {!isLive && !isFinished && saved ? (
         <p
           className={cn(
             "pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 -translate-y-1/2",

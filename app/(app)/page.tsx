@@ -33,17 +33,26 @@ export default async function HomePage() {
 
   const quizSlide = homeQuizSlideFromHub(quizHub);
 
+  const finished = matches.filter((m) => m.status === "finished");
   const live = matches.filter((m) => m.status === "live");
   const scheduled = matches.filter((m) => m.status === "scheduled");
+  const lastFinished = finished.at(-1) ?? null;
   const liveFocus = live[0] ?? null;
   const nextScheduled = scheduled[0] ?? null;
+  const upcomingScheduled = scheduled[1] ?? null;
 
-  const [liveMatch, nextMatch] = await Promise.all([
+  const [lastMatch, liveMatch, nextMatch, upcomingMatch] = await Promise.all([
+    lastFinished
+      ? getMatchPredictionDetail(ctx.activePoolId, user!.id, lastFinished.id)
+      : Promise.resolve(null),
     liveFocus
       ? getMatchPredictionDetail(ctx.activePoolId, user!.id, liveFocus.id)
       : Promise.resolve(null),
     nextScheduled
       ? getMatchPredictionDetail(ctx.activePoolId, user!.id, nextScheduled.id)
+      : Promise.resolve(null),
+    upcomingScheduled
+      ? getMatchPredictionDetail(ctx.activePoolId, user!.id, upcomingScheduled.id)
       : Promise.resolve(null),
   ]);
 
@@ -67,8 +76,10 @@ export default async function HomePage() {
           generalPredictionsEditable={generalPredictionsBundle.editable}
           dailyFact={dailyFact}
           quizHub={quizHub}
+          lastMatch={lastMatch}
           liveMatch={liveMatch}
           nextMatch={nextMatch}
+          upcomingMatch={upcomingMatch}
         />
       }
     />
