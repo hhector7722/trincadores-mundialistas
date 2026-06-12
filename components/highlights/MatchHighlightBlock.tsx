@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
@@ -55,24 +54,24 @@ export function MatchHighlightBlock({
       <div className={cn("flex flex-col", className)}>
         {variant === "hero" ? (
           <div className="flex w-full min-w-0 flex-col gap-1">
-            <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden text-[clamp(7px,2cqw,8px)] font-bold uppercase leading-none tracking-wide">
-              <span className="inline-flex shrink-0 items-center gap-[0.35em] whitespace-nowrap rounded-full bg-[#CCFF00] py-[0.14em] pl-[0.22em] pr-[0.55em] text-black">
-                <Image
+            <div className="tm-hero-highlight-meta-row w-full min-w-0">
+              <span className="tm-hero-highlight-pill whitespace-nowrap">
+                <img
                   src="/icons/youtube-play.png"
                   alt=""
                   width={633}
                   height={452}
                   aria-hidden="true"
-                  className="block h-[1cap] w-auto shrink-0"
+                  className="tm-hero-highlight-pill-logo"
+                  decoding="async"
                 />
-                HIGHLIGHTS
+                <span className="tm-hero-highlight-pill-label">HIGHLIGHTS</span>
               </span>
               <MatchHighlightScoreline
                 homeTeam={homeTeam}
                 awayTeam={awayTeam}
                 homeGoals={homeGoals}
                 awayGoals={awayGoals}
-                className="text-white/85"
               />
             </div>
             {headline?.trim() ? (

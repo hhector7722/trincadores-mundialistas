@@ -19,23 +19,29 @@ export function MatchHighlightScoreline({
   className,
 }: MatchHighlightScorelineProps) {
   return (
-    <div
-      role="text"
-      className={cn(
-        "m-0 flex min-w-0 flex-1 items-center gap-[0.3em] overflow-hidden text-inherit",
-        className,
-      )}
-    >
-      <span className="inline-flex items-center gap-[0.2em]">
-        <TeamFlagBadge name={homeTeam} size="text" shape="rect" loading="eager" className="shrink-0" />
+    <div role="text" className={cn("tm-hero-highlight-scoreline", className)}>
+      <span className="tm-hero-highlight-scoreline-group">
+        <TeamFlagBadge
+          name={homeTeam}
+          size="text"
+          shape="rect"
+          loading="eager"
+          className="tm-hero-highlight-flag"
+        />
         <span className="whitespace-nowrap">{teamAbbr(homeTeam)}</span>
         <span className="tabular-nums whitespace-nowrap">{homeGoals}</span>
       </span>
-      <span className="shrink-0">-</span>
-      <span className="inline-flex items-center gap-[0.2em]">
+      <span className="tm-hero-highlight-scoreline-group shrink-0">-</span>
+      <span className="tm-hero-highlight-scoreline-group">
         <span className="tabular-nums whitespace-nowrap">{awayGoals}</span>
         <span className="whitespace-nowrap">{teamAbbr(awayTeam)}</span>
-        <TeamFlagBadge name={awayTeam} size="text" shape="rect" loading="eager" className="shrink-0" />
+        <TeamFlagBadge
+          name={awayTeam}
+          size="text"
+          shape="rect"
+          loading="eager"
+          className="tm-hero-highlight-flag"
+        />
       </span>
     </div>
   );
