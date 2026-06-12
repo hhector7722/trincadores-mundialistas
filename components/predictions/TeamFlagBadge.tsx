@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 type TeamFlagBadgeProps = {
   name: string;
   size?: "cal" | "ko" | "text" | "xxs" | "xs" | "sm" | "md" | "lg";
+  /** Circular (defecto) o rectangular con la misma profundidad tm-circle-depth. */
+  shape?: "circle" | "rect";
   className?: string;
   loading?: "lazy" | "eager";
   /** Ancho fuente flagcdn (px). Por defecto según size. */
@@ -15,6 +17,7 @@ type TeamFlagBadgeProps = {
 export function TeamFlagBadge({
   name,
   size = "sm",
+  shape = "circle",
   className,
   loading = "lazy",
   imageWidth,
@@ -27,7 +30,9 @@ export function TeamFlagBadge({
     : size === "ko"
       ? "tm-ko-flag-dim"
       : size === "text"
-        ? "h-[1cap] w-[1cap]"
+        ? shape === "rect"
+          ? "h-[1em] w-[1.4em]"
+          : "h-[1cap] w-[1cap]"
         : size === "xxs"
           ? "h-3.5 w-3.5"
           : size === "xs"
@@ -72,8 +77,9 @@ export function TeamFlagBadge({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-full",
-        size === "text"
+        "flex shrink-0 items-center justify-center overflow-hidden",
+        shape === "rect" ? "rounded-[2px]" : "rounded-full",
+        size === "text" && shape === "circle"
           ? "border border-white/30 bg-white"
           : "tm-circle-depth",
         dim,

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
+import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
 import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 import { youtubeEmbedUrl } from "@/lib/youtube/constants";
@@ -39,8 +40,6 @@ export function MatchHighlightBlock({
   const [embedSrc, setEmbedSrc] = useState<string | null>(null);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
-  const scoreLine = `${teamAbbr(homeTeam)} ${homeGoals} - ${awayGoals} ${teamAbbr(awayTeam)}`;
-
   function openPlayer() {
     setEmbedSrc(youtubeEmbedUrl(youtubeVideoId, true));
     setPlayerOpen(true);
@@ -61,16 +60,19 @@ export function MatchHighlightBlock({
                 <Image
                   src="/icons/youtube-play.png"
                   alt=""
-                  width={120}
-                  height={84}
+                  width={633}
+                  height={452}
                   aria-hidden="true"
                   className="h-[1em] w-auto shrink-0"
                 />
                 HIGHLIGHTS
               </span>
-              <p className="min-w-0 flex-1 truncate text-[clamp(7px,2cqw,8px)] font-bold uppercase tracking-wide text-white/85">
-                {scoreLine}
-              </p>
+              <MatchHighlightScoreline
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+                homeGoals={homeGoals}
+                awayGoals={awayGoals}
+              />
             </div>
             {headline?.trim() ? (
               <p className="line-clamp-2 text-left text-[clamp(8px,2.2cqw,9px)] font-medium leading-snug text-white/75">

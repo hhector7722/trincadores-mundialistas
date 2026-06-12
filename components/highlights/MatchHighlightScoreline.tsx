@@ -8,52 +8,46 @@ type MatchHighlightScorelineProps = {
   homeGoals: number;
   awayGoals: number;
   className?: string;
-  scoreClassName?: string;
 };
 
+/** Marcador compacto hero: bandera + abbr + gol | gol + abbr + bandera (banderas rectangulares). */
 export function MatchHighlightScoreline({
   homeTeam,
   awayTeam,
   homeGoals,
   awayGoals,
   className,
-  scoreClassName,
 }: MatchHighlightScorelineProps) {
-  const homeDisplay = String(homeGoals);
-  const awayDisplay = String(awayGoals);
-
   return (
-    <div
+    <p
       className={cn(
-        "flex w-full min-w-0 items-center justify-center gap-1 sm:gap-1.5",
+        "flex min-w-0 flex-1 items-center gap-[0.3em] overflow-hidden text-[clamp(7px,2cqw,8px)] font-bold uppercase leading-none tracking-wide text-white/85",
         className,
       )}
     >
-      <span className="inline-flex items-center gap-0.5 text-[clamp(7px,1.9cqw,9px)] font-bold uppercase leading-none tracking-wide text-white/85">
-        <TeamFlagBadge name={homeTeam} size="text" loading="eager" className="shrink-0" />
+      <span className="inline-flex min-w-0 items-center gap-[0.2em]">
+        <TeamFlagBadge
+          name={homeTeam}
+          size="text"
+          shape="rect"
+          loading="eager"
+          className="shrink-0"
+        />
         <span className="whitespace-nowrap">{teamAbbr(homeTeam)}</span>
+        <span className="tabular-nums whitespace-nowrap">{homeGoals}</span>
       </span>
-      <span
-        className={cn(
-          "font-display text-[clamp(0.75rem,5cqw,0.9375rem)] font-black tabular-nums leading-none text-white",
-          scoreClassName,
-        )}
-      >
-        {homeDisplay}
-      </span>
-      <span className="font-display text-[10px] font-semibold leading-none text-white/50">-</span>
-      <span
-        className={cn(
-          "font-display text-[clamp(0.75rem,5cqw,0.9375rem)] font-black tabular-nums leading-none text-white",
-          scoreClassName,
-        )}
-      >
-        {awayDisplay}
-      </span>
-      <span className="inline-flex items-center gap-0.5 text-[clamp(7px,1.9cqw,9px)] font-bold uppercase leading-none tracking-wide text-white/85">
+      <span className="shrink-0">-</span>
+      <span className="inline-flex min-w-0 items-center gap-[0.2em]">
+        <span className="tabular-nums whitespace-nowrap">{awayGoals}</span>
         <span className="whitespace-nowrap">{teamAbbr(awayTeam)}</span>
-        <TeamFlagBadge name={awayTeam} size="text" loading="eager" className="shrink-0" />
+        <TeamFlagBadge
+          name={awayTeam}
+          size="text"
+          shape="rect"
+          loading="eager"
+          className="shrink-0"
+        />
       </span>
-    </div>
+    </p>
   );
 }
