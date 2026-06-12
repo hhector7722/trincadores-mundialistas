@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchMatchPredictionsBoardAction } from "@/actions/predictions";
+import { MatchPredictionsBoardLegend } from "@/components/predictions/MatchPredictionsBoardLegend";
 import { MatchPredictionsBoardTable } from "@/components/predictions/MatchPredictionsBoardTable";
 import { Modal } from "@/components/ui/modal";
 import type { MatchPredictionsBoard } from "@/lib/predictions/queries";
@@ -70,6 +71,7 @@ export function MatchPredictionsBoardModal({
   const title = `${teamNameEs(homeTeam)} vs ${teamNameEs(awayTeam)}`;
   const tableHomeTeam = board?.homeTeam ?? homeTeam;
   const tableAwayTeam = board?.awayTeam ?? awayTeam;
+  const showOutcomes = board?.showOutcomes ?? false;
 
   return (
     <Modal
@@ -81,6 +83,7 @@ export function MatchPredictionsBoardModal({
       loading={loading}
     >
       <div className="flex min-h-0 flex-1 flex-col px-1 pb-2">
+        {!error && !loading && showOutcomes ? <MatchPredictionsBoardLegend /> : null}
         {error ? (
           <div className="flex flex-1 items-center justify-center px-3">
             <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
@@ -94,7 +97,7 @@ export function MatchPredictionsBoardModal({
             currentProfileId={currentProfileId}
             homeTeam={tableHomeTeam}
             awayTeam={tableAwayTeam}
-            showOutcomes={board?.showOutcomes ?? false}
+            showOutcomes={showOutcomes}
           />
         )}
       </div>
