@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/live-matches",
       "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/cron/fotmob-map-fixtures",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
