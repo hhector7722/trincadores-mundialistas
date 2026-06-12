@@ -4,4 +4,6 @@ export const RANKING_GRID =
 
 /** Card inicio: tendencia | pos | avatar | nombre | pts | fiab | quiz */
 export const MINI_RANKING_GRID =
-  "grid grid-cols-[0.75rem_0.875rem_1.5rem_minmax(0,1fr)_max-content_max-content_max-content] items-center gap-x-[0.125rem]";
+  "grid w-full grid-cols-[auto_auto_auto_max-content_1.125rem_1.375rem_1rem] items-center justify-evenly gap-x-0.5";
+
+export const MINI_RANKING_STAT_COL = "w-full text-center whitespace-nowrap tabular-nums";

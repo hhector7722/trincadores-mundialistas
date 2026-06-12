@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLayoutEffect, useRef } from "react";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { MINI_RANKING_GRID, MINI_RANKING_STAT_COL } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
@@ -29,10 +29,12 @@ function MiniRankingHeader() {
       )}
     >
       <span aria-hidden="true" />
-      <span className="col-span-3 text-left">Trincador</span>
-      <span className="text-center">Pts</span>
-      <span className="text-center">Fiab</span>
-      <span className="text-center">Quiz</span>
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+      <span className="text-left">Trincador</span>
+      <span className={MINI_RANKING_STAT_COL}>Pts</span>
+      <span className={MINI_RANKING_STAT_COL}>Fiab</span>
+      <span className={MINI_RANKING_STAT_COL}>Quiz</span>
     </div>
   );
 }
@@ -58,19 +60,19 @@ function MiniRankingDataRow({
       <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       <span
         className={cn(
-          "min-w-0 text-left font-medium",
+          "whitespace-nowrap text-left font-medium",
           isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
         )}
       >
         {row.label}
       </span>
-      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
+      <span className={cn(MINI_RANKING_STAT_COL, "font-display text-white/85")}>
         {formatPoints(row.cumulativePoints)}
       </span>
-      <span className="shrink-0 text-center tabular-nums text-white/45">
+      <span className={cn(MINI_RANKING_STAT_COL, "text-white/45")}>
         {formatReliabilityPct(row.reliabilityPct)}
       </span>
-      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
+      <span className={cn(MINI_RANKING_STAT_COL, "font-display text-white/85")}>
         {formatQuizScore(row.quizPoints, row.hasQuizParticipated)}
       </span>
     </div>
