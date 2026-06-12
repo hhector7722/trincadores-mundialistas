@@ -151,25 +151,33 @@ export function HomeHeroCarousel({
     el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
   }
 
-  const slideContentMinH = "min-h-[11.5rem]";
-
   return (
     <div className="flex min-w-0 flex-col" data-block-tab-swipe>
-      <div
-        ref={scrollRef}
-        className={cn(
-          "flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          slideContentMinH,
-        )}
-        aria-roledescription="carrusel"
-      >
+      <div className="grid min-w-0 [&>*]:col-start-1 [&>*]:row-start-1">
+        {lastMatchHighlight ? (
+          <div className="invisible pointer-events-none min-w-0" aria-hidden="true">
+            <MatchHighlightBlock
+              variant="hero"
+              className="w-full"
+              homeTeam={lastMatchHighlight.homeTeam}
+              awayTeam={lastMatchHighlight.awayTeam}
+              homeGoals={lastMatchHighlight.homeGoals}
+              awayGoals={lastMatchHighlight.awayGoals}
+              youtubeVideoId={lastMatchHighlight.youtubeVideoId}
+              highlightSource={lastMatchHighlight.source}
+              headline={lastMatchHighlight.headline}
+            />
+          </div>
+        ) : null}
+        <div
+          ref={scrollRef}
+          className="flex h-full min-h-0 w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-roledescription="carrusel"
+        >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={cn(
-              "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
-              slideContentMinH,
-            )}
+            className="flex h-full min-h-full w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
             aria-hidden={index !== activeIndex}
           >
             <div
@@ -208,6 +216,7 @@ export function HomeHeroCarousel({
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       <div
