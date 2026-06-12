@@ -116,7 +116,7 @@ function PredictionsBoardOpenButton({ onClick }: { onClick: () => void }) {
     <div className="flex justify-center">
       <Button
         type="button"
-        className="h-auto min-h-0 w-auto px-4 py-2 text-[10px] uppercase tracking-[0.12em]"
+        className="!min-h-0 h-auto w-auto px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]"
         onClick={onClick}
       >
         Ver pronósticos
