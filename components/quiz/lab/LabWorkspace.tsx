@@ -11,6 +11,7 @@ import { createLabQuestion } from "@/lib/quiz/lab/defaults";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
+  isLabPlayerCropFormat,
   LAB_FORMAT_DESCRIPTIONS,
   LAB_FORMAT_LABELS,
   LAB_QUESTION_FORMATS,
@@ -454,6 +455,77 @@ export function LabWorkspace() {
                         </div>
                       ))}
                     </div>
+                  </>
+                ) : null}
+
+                {isLabPlayerCropFormat(activeQuestion.format) ? (
+                  <>
+                    <label className="block space-y-1">
+                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                        URL imagen (recorte)
+                      </span>
+                      <input
+                        value={activeQuestion.imageUrl}
+                        onChange={(e) => patchActive({ imageUrl: e.target.value })}
+                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                      />
+                    </label>
+                    <label className="block space-y-1">
+                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                        Contexto (opcional)
+                      </span>
+                      <input
+                        value={activeQuestion.sceneHint ?? ""}
+                        onChange={(e) =>
+                          patchActive({
+                            sceneHint: e.target.value.trim() || null,
+                          } as Partial<LabQuestion>)
+                        }
+                        placeholder="Mundial 2002, Champions..."
+                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                      />
+                    </label>
+                  </>
+                ) : null}
+
+                {activeQuestion.format === "guess_player_silhouette" ? (
+                  <>
+                    <label className="block space-y-1">
+                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                        URL foto con silueta
+                      </span>
+                      <input
+                        value={activeQuestion.imageUrl}
+                        onChange={(e) => patchActive({ imageUrl: e.target.value })}
+                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                      />
+                    </label>
+                    <label className="block space-y-1">
+                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                        URL foto revelada (opcional)
+                      </span>
+                      <input
+                        value={activeQuestion.revealImageUrl ?? ""}
+                        onChange={(e) =>
+                          patchActive({
+                            revealImageUrl: e.target.value.trim() || null,
+                          } as Partial<LabQuestion>)
+                        }
+                        placeholder="Sin silueta, al resolver"
+                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                      />
+                    </label>
+                    <label className="block space-y-1">
+                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                        Escena / momento
+                      </span>
+                      <input
+                        value={activeQuestion.sceneLabel}
+                        onChange={(e) => patchActive({ sceneLabel: e.target.value })}
+                        placeholder="Euro 2008 — España"
+                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                      />
+                    </label>
                   </>
                 ) : null}
 

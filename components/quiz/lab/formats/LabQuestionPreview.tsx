@@ -1,9 +1,11 @@
 "use client";
 
 import { LabGuessImageStage } from "@/components/quiz/lab/formats/LabGuessImageStage";
+import { LabGuessPlayerCropStage } from "@/components/quiz/lab/formats/LabGuessPlayerCropStage";
+import { LabGuessPlayerSilhouetteStage } from "@/components/quiz/lab/formats/LabGuessPlayerSilhouetteStage";
 import { LabGuessSelectionStage } from "@/components/quiz/lab/formats/LabGuessSelectionStage";
 import { LabVideoPlayEndStage } from "@/components/quiz/lab/formats/LabVideoPlayEndStage";
-import type { LabQuestion } from "@/lib/quiz/lab/types";
+import { isLabPlayerCropFormat, type LabQuestion } from "@/lib/quiz/lab/types";
 import { cn } from "@/lib/utils";
 
 type LabQuestionPreviewProps = {
@@ -24,6 +26,8 @@ export function LabQuestionPreview({
   onSelect,
 }: LabQuestionPreviewProps) {
   const playing = mode === "play";
+  const correctLabel =
+    question.options.find((option) => option.id === question.correctOptionId)?.label ?? null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -60,6 +64,25 @@ export function LabQuestionPreview({
         />
       ) : null}
 
+      {isLabPlayerCropFormat(question.format) ? (
+        <LabGuessPlayerCropStage
+          prompt={question.prompt}
+          imageUrl={question.imageUrl}
+          cropLabel={question.format === "guess_player_hair" ? "PEINADO" : "OJOS"}
+          sceneHint={question.sceneHint}
+          revealed={showFeedback}
+          revealedPlayerName={showFeedback ? correctLabel : null}
+        />
+      ) : null}
+
+      {question.format === "guess_player_silhouette" ? (
+        <LabGuessPlayerSilhouetteStage
+          question={question}
+          revealed={showFeedback}
+          revealedPlayerName={showFeedback ? correctLabel : null}
+        />
+      ) : null}
+
       {question.format === "video_play_end" ? (
         <>
           <LabVideoPlayEndStage question={question} playing={playing} />
@@ -76,9 +99,18 @@ export function LabQuestionPreview({
       ) : null}
 
       <div className="grid gap-2">
-        {question.format !== "multiple_choice" ? (
+        {question.format !== "multiple_choice" &&
+        !isLabPlayerCropFormat(question.format) &&
+        question.format !== "guess_player_silhouette" ? (
           <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
             Elige una respuesta
+          </p>
+        ) : null}
+        {(isLabPlayerCropFormat(question.format) ||
+          question.format === "guess_player_silhouette") &&
+        !showFeedback ? (
+          <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
+            Elige al jugador
           </p>
         ) : null}
         {question.options.map((option) => {
