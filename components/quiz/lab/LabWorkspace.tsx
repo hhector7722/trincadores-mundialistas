@@ -11,7 +11,8 @@ import { createLabQuestion } from "@/lib/quiz/lab/defaults";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
-  isLabPlayerCropFormat,
+  isLabPlayerCropQuestion,
+  isLabPlayerSilhouetteQuestion,
   LAB_FORMAT_DESCRIPTIONS,
   LAB_FORMAT_LABELS,
   LAB_QUESTION_FORMATS,
@@ -458,7 +459,7 @@ export function LabWorkspace() {
                   </>
                 ) : null}
 
-                {isLabPlayerCropFormat(activeQuestion.format) ? (
+                {isLabPlayerCropQuestion(activeQuestion) ? (
                   <>
                     <label className="block space-y-1">
                       <span className="text-[10px] uppercase text-[var(--lab-muted)]">
@@ -488,7 +489,7 @@ export function LabWorkspace() {
                   </>
                 ) : null}
 
-                {activeQuestion.format === "guess_player_silhouette" ? (
+                {isLabPlayerSilhouetteQuestion(activeQuestion) ? (
                   <>
                     <label className="block space-y-1">
                       <span className="text-[10px] uppercase text-[var(--lab-muted)]">

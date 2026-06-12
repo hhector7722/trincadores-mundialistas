@@ -5,7 +5,12 @@ import { LabGuessPlayerCropStage } from "@/components/quiz/lab/formats/LabGuessP
 import { LabGuessPlayerSilhouetteStage } from "@/components/quiz/lab/formats/LabGuessPlayerSilhouetteStage";
 import { LabGuessSelectionStage } from "@/components/quiz/lab/formats/LabGuessSelectionStage";
 import { LabVideoPlayEndStage } from "@/components/quiz/lab/formats/LabVideoPlayEndStage";
-import { isLabPlayerCropFormat, type LabQuestion } from "@/lib/quiz/lab/types";
+import {
+  isLabPlayerCropFormat,
+  isLabPlayerCropQuestion,
+  isLabPlayerSilhouetteQuestion,
+  type LabQuestion,
+} from "@/lib/quiz/lab/types";
 import { cn } from "@/lib/utils";
 
 type LabQuestionPreviewProps = {
@@ -64,7 +69,7 @@ export function LabQuestionPreview({
         />
       ) : null}
 
-      {isLabPlayerCropFormat(question.format) ? (
+      {isLabPlayerCropQuestion(question) ? (
         <LabGuessPlayerCropStage
           prompt={question.prompt}
           imageUrl={question.imageUrl}
@@ -75,7 +80,7 @@ export function LabQuestionPreview({
         />
       ) : null}
 
-      {question.format === "guess_player_silhouette" ? (
+      {isLabPlayerSilhouetteQuestion(question) ? (
         <LabGuessPlayerSilhouetteStage
           question={question}
           revealed={showFeedback}
