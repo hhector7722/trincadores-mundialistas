@@ -26,7 +26,7 @@ export function LabShell({ children, title = "LABORATORIO", subtitle, className 
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <FlaskConical className="h-4 w-4 shrink-0 text-[var(--lab-fg)]" />
+            <FlaskConical className="h-4 w-4 shrink-0 text-[var(--lab-accent)]" />
             <h1 className="truncate font-display text-sm uppercase tracking-[0.2em] text-[var(--lab-fg)]">
               {title}
             </h1>

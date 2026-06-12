@@ -152,7 +152,7 @@ export function LabWorkspace() {
           className={cn(
             "min-h-10 flex-1 rounded-lg border text-xs font-semibold uppercase tracking-wider",
             mode === "edit"
-              ? "border-[var(--lab-fg)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
+              ? "border-[var(--lab-accent)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
               : "border-[var(--lab-border)] text-[var(--lab-muted)]"
           )}
         >
@@ -165,7 +165,7 @@ export function LabWorkspace() {
           className={cn(
             "flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wider",
             mode === "preview"
-              ? "border-[var(--lab-fg)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
+              ? "border-[var(--lab-accent)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
               : "border-[var(--lab-border)] text-[var(--lab-muted)]",
             draft.questions.length === 0 && "opacity-40"
           )}
@@ -184,13 +184,13 @@ export function LabWorkspace() {
             <input
               value={draft.title}
               onChange={(e) => persist({ ...draft, title: e.target.value })}
-              className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)] outline-none focus:border-[var(--lab-fg)]"
+              className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)] outline-none focus:border-[var(--lab-accent)]"
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handleSave}
-                className="flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--lab-fg)] text-xs font-semibold uppercase text-[var(--lab-fg)]"
+                className="flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--lab-accent)] text-xs font-semibold uppercase text-[var(--lab-fg)]"
               >
                 <Save className="h-3.5 w-3.5" />
                 {savedFlash ? "Guardado" : "Guardar"}
@@ -216,7 +216,7 @@ export function LabWorkspace() {
                   className={cn(
                     "flex items-center gap-2 rounded-xl border p-2",
                     activeQuestionId === q.id
-                      ? "border-[var(--lab-fg)] bg-[var(--lab-surface)]"
+                      ? "border-[var(--lab-accent)] bg-[var(--lab-surface)]"
                       : "border-[var(--lab-border)]"
                   )}
                 >
@@ -493,7 +493,7 @@ export function LabWorkspace() {
                         className={cn(
                           "min-h-10 shrink-0 rounded-lg border px-3 text-[10px] font-bold uppercase",
                           activeQuestion.correctOptionId === option.id
-                            ? "border-[var(--lab-fg)] text-[var(--lab-fg)]"
+                            ? "border-[var(--lab-accent)] text-[var(--lab-fg)]"
                             : "border-[var(--lab-border)] text-[var(--lab-muted)]"
                         )}
                       >
@@ -535,7 +535,7 @@ export function LabWorkspace() {
                 <button
                   type="button"
                   onClick={nextPlayQuestion}
-                  className="mt-4 min-h-12 shrink-0 rounded-xl border border-[var(--lab-fg)] bg-[var(--lab-surface)] font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]"
+                  className="mt-4 min-h-12 shrink-0 rounded-xl border border-[var(--lab-accent)] bg-[var(--lab-surface)] font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]"
                 >
                   {playIndex + 1 >= draft.questions.length ? "Volver al editor" : "Siguiente"}
                 </button>

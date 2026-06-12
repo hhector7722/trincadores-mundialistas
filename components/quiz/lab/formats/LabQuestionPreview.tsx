@@ -73,8 +73,8 @@ export function LabQuestionPreview({
               className={cn(
                 "min-h-12 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors",
                 "border-[var(--lab-border)] text-[var(--lab-fg)]",
-                selected && !showFeedback && "border-[var(--lab-fg)] bg-[var(--lab-surface)]",
-                correct && "border-[var(--lab-fg)] bg-[rgba(0,255,65,0.2)]",
+                selected && !showFeedback && "border-[var(--lab-accent)] bg-[var(--lab-surface)]",
+                correct && "border-[var(--lab-accent)] bg-[rgba(0,255,65,0.2)]",
                 wrong && "border-red-500 bg-red-950/40 text-red-300",
                 mode === "editor" && "opacity-70"
               )}

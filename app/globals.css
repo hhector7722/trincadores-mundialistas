@@ -2200,8 +2200,9 @@ html:has(.tm-app-frame) {
 .tm-lab-root {
   --lab-bg: #020a04;
   --lab-bg-elevated: #041408;
-  --lab-fg: #00ff41;
-  --lab-muted: #1a6b32;
+  --lab-fg: #ffffff;
+  --lab-accent: #00ff41;
+  --lab-muted: #6b9b78;
   --lab-border: rgba(0, 255, 65, 0.28);
   --lab-surface: rgba(0, 255, 65, 0.08);
   background-color: var(--lab-bg);
@@ -2237,5 +2238,5 @@ html:has(.tm-app-frame) {
 
 .tm-lab-root select option {
   background: #041408;
-  color: var(--lab-fg);
+  color: #ffffff;
 }

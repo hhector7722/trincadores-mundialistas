@@ -48,7 +48,7 @@ export function LabVideoPlayEndStage({
       />
       {frozen ? (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <span className="rounded-xl border border-[var(--lab-fg)] bg-black/80 px-4 py-2 font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]">
+          <span className="rounded-xl border border-[var(--lab-accent)] bg-black/80 px-4 py-2 font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]">
             ¿Cómo acabó?
           </span>
         </div>

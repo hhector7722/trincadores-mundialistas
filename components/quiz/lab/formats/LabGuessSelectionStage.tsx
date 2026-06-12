@@ -48,7 +48,7 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
             >
               <div
                 className={cn(
-                  "flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--lab-fg)] bg-[#041a0a] shadow-[0_0_12px_rgba(0,255,65,0.35)]",
+                  "flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--lab-accent)] bg-[#041a0a] shadow-[0_0_12px_rgba(0,255,65,0.35)]",
                   compact ? "h-9 w-9 text-[8px]" : "h-11 w-11 text-[9px]"
                 )}
               >
