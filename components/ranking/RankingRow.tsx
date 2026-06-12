@@ -2,7 +2,7 @@ import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndica
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
-import { formatAggregateStat } from "@/lib/ranking/format";
+import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function RankingRow({
         )}
       />
       <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
-        {formatAggregateStat(row.cumulativePoints)}
+        {formatPoints(row.cumulativePoints)}
       </span>
       <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]">
         {formatReliabilityPct(row.reliabilityPct)}

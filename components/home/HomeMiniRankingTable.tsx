@@ -6,7 +6,7 @@ import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { MINI_RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
-import { formatAggregateStat } from "@/lib/ranking/format";
+import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import {
   getContextualLeaderboardStartIndex,
@@ -65,7 +65,7 @@ function MiniRankingDataRow({
         {row.label}
       </span>
       <span className="shrink-0 text-center font-display tabular-nums text-white/85">
-        {formatAggregateStat(row.cumulativePoints)}
+        {formatPoints(row.cumulativePoints)}
       </span>
       <span className="shrink-0 text-center tabular-nums text-white/45">
         {formatReliabilityPct(row.reliabilityPct)}

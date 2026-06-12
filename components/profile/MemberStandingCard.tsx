@@ -1,7 +1,7 @@
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { Card } from "@/components/ui/card";
 import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
-import { formatAggregateStat } from "@/lib/ranking/format";
+import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import type { MemberStanding } from "@/lib/ranking/queries";
 
 export function MemberStandingCard({
@@ -32,7 +32,7 @@ export function MemberStandingCard({
           <div>
             <p className="text-xs text-[var(--tm-muted)]">Puntos</p>
             <p className="font-display text-3xl text-[var(--tm-fg)]">
-              {formatAggregateStat(standing.cumulativePoints)}
+              {formatPoints(standing.cumulativePoints)}
             </p>
           </div>
           <div>

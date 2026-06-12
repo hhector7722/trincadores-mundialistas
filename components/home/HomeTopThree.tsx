@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatAggregateStat } from "@/lib/ranking/format";
+import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ export function HomeTopThree({ rows }: { rows: LeaderboardRow[] }) {
                 {row.label}
               </span>
               <span className="font-display text-sm text-[var(--tm-accent)]">
-                {formatAggregateStat(row.cumulativePoints)}
+                {formatPoints(row.cumulativePoints)}
               </span>
             </Link>
           </li>
