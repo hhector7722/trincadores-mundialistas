@@ -27,6 +27,7 @@ import {
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
+import { Button } from "@/components/ui/button";
 import {
   lineupsActionCaption,
   lineupsModalTitle,
@@ -254,17 +255,16 @@ export function HomeMatchCard({
             Ver pronósticos
           </button>
         ) : isFinished ? (
-          <button
+          <Button
             type="button"
             onClick={() => setPredictionsBoardOpen(true)}
             className={cn(
-              "absolute inset-x-0 z-20 mx-auto flex min-h-12 w-max items-center justify-center",
-              "font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]",
-              "text-[8px] transition-opacity hover:opacity-80",
+              "absolute inset-x-0 z-20 mx-auto flex !min-h-0 h-auto w-max items-center justify-center",
+              "px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]",
             )}
           >
             Ver pronósticos
-          </button>
+          </Button>
         ) : (
           <p
             className={cn(

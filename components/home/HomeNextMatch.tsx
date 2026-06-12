@@ -125,7 +125,7 @@ export function HomeNextMatch({
 
   return (
     <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe={true}>
-      <div className="px-4 pb-2 pt-2">
+      <div className="px-4 pb-1 pt-1">
         <div
           ref={scrollRef}
           className={cn(

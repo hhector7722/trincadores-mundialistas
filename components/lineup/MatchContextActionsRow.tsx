@@ -24,6 +24,8 @@ type MatchContextActionsRowProps = {
   centerSlot?: ReactNode;
   /** Fila central: pronóstico de marcador (entre MVP y alineaciones). */
   predictionSlot?: ReactNode;
+  /** Fila inferior opcional (p. ej. MVP en último partido). */
+  bottomSlot?: ReactNode;
   /** Ancla horizontal de plantilla local (debe coincidir con `MatchTeamsDisplay`). */
   homeAnchor?: string;
   /** Ancla horizontal de plantilla visitante. */
@@ -47,6 +49,7 @@ export function MatchContextActionsRow({
   awayAnchor = "90%",
   centerSlot,
   predictionSlot,
+  bottomSlot,
   hidePossibleLineups = false,
   lineupActionTone = "accent",
   className,
@@ -56,7 +59,9 @@ export function MatchContextActionsRow({
       <div className={cn("flex h-full w-full flex-col items-center justify-evenly gap-0 leading-none", className)}>
         <div className="flex h-max w-full shrink-0 items-center justify-center px-1">{centerSlot}</div>
         <div className="flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
-        {hidePossibleLineups ? null : (
+        {bottomSlot ? (
+          <div className="flex shrink-0 items-center justify-center px-1">{bottomSlot}</div>
+        ) : hidePossibleLineups ? null : (
           <div className="flex shrink-0 items-center justify-center px-1">
             <MatchContextActionButton
               caption={possibleLineupsCaption}
