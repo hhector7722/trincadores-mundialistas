@@ -24,15 +24,23 @@ export function LabQuestionPreview({
   onSelect,
 }: LabQuestionPreviewProps) {
   const playing = mode === "play";
-  const videoFrozen =
-    playing && question.format === "video_play_end" && selectedOptionId === null;
 
   return (
     <div className="flex flex-col gap-4">
-      {question.format === "multiple_choice" && question.imageUrl ? (
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[var(--lab-border)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={question.imageUrl} alt="" className="h-full w-full object-cover" />
+      {question.format === "multiple_choice" ? (
+        <div className="rounded-2xl border border-[var(--lab-border)] bg-[var(--lab-surface)] px-4 py-5 text-center">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--lab-muted)]">
+            Pregunta tipo test
+          </p>
+          <p className="mt-2 font-display text-xl leading-snug text-[var(--lab-fg)]">
+            {question.prompt}
+          </p>
+          {question.imageUrl ? (
+            <div className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-xl border border-[var(--lab-border)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={question.imageUrl} alt="" className="h-full w-full object-cover" />
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -49,16 +57,26 @@ export function LabQuestionPreview({
       ) : null}
 
       {question.format === "video_play_end" ? (
-        <LabVideoPlayEndStage question={question} playing={playing} frozen={videoFrozen} />
+        <>
+          <LabVideoPlayEndStage question={question} playing={playing} />
+          <p className="font-display text-base leading-snug text-[var(--lab-fg)]">
+            {question.prompt}
+          </p>
+        </>
       ) : null}
 
-      {question.format !== "guess_selection" ? (
+      {question.format === "guess_image" ? (
         <p className="font-display text-base leading-snug text-[var(--lab-fg)]">
           {question.prompt}
         </p>
       ) : null}
 
       <div className="grid gap-2">
+        {question.format !== "multiple_choice" ? (
+          <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
+            Elige una respuesta
+          </p>
+        ) : null}
         {question.options.map((option) => {
           const selected = selectedOptionId === option.id;
           const correct = showFeedback && option.id === question.correctOptionId;

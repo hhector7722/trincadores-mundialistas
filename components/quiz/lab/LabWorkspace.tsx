@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Play, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
 import { LabShell } from "@/components/quiz/lab/LabShell";
-import { FORMATION_SLOT_ANCHORS } from "@/lib/lineup/formation-coordinates";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
+import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { createLabQuestion } from "@/lib/quiz/lab/defaults";
+import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
   LAB_FORMAT_DESCRIPTIONS,
@@ -391,16 +392,10 @@ export function LabWorkspace() {
                         value={activeQuestion.formation}
                         onChange={(e) => {
                           const formation = e.target.value as typeof activeQuestion.formation;
-                          const anchors = FORMATION_SLOT_ANCHORS[formation];
-                          const slots = anchors.map((anchor, index) => {
-                            const prev = activeQuestion.slots[index];
-                            return {
-                              slotKey: anchor.key,
-                              clubLabel: prev?.clubLabel ?? `Club ${index + 1}`,
-                              clubImageUrl: prev?.clubImageUrl ?? null,
-                            };
+                          patchActive({
+                            formation,
+                            slots: selectionSlotsForFormation(formation),
                           });
-                          patchActive({ formation, slots });
                         }}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       >
@@ -417,8 +412,13 @@ export function LabWorkspace() {
                           <input
                             value={slot.clubLabel}
                             onChange={(e) => {
+                              const clubLabel = e.target.value;
                               const slots = [...activeQuestion.slots];
-                              slots[index] = { ...slot, clubLabel: e.target.value };
+                              slots[index] = {
+                                ...slot,
+                                clubLabel,
+                                clubImageUrl: resolveClubCrestUrl(clubLabel) ?? slot.clubImageUrl,
+                              };
                               patchActive({ slots });
                             }}
                             placeholder={`Club ${slot.slotKey}`}
@@ -434,7 +434,7 @@ export function LabWorkspace() {
                               };
                               patchActive({ slots });
                             }}
-                            placeholder="URL escudo (opc.)"
+                            placeholder="URL escudo (auto si reconoce el club)"
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-xs text-[var(--lab-fg)]"
                           />
                         </div>

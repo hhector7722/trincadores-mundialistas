@@ -1,4 +1,5 @@
 import { createDefaultLabDraft } from "@/lib/quiz/lab/defaults";
+import { hydrateLabDraft } from "@/lib/quiz/lab/hydrate";
 import type { LabDraft } from "@/lib/quiz/lab/types";
 
 const STORAGE_KEY = "tm-quiz-lab-draft-v1";
@@ -19,7 +20,11 @@ export function readLabDraft(): LabDraft {
     if (!raw) return createDefaultLabDraft();
     const parsed: unknown = JSON.parse(raw);
     if (!isLabDraft(parsed)) return createDefaultLabDraft();
-    return parsed;
+    const hydrated = hydrateLabDraft(parsed);
+    if (JSON.stringify(hydrated) !== JSON.stringify(parsed)) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(hydrated));
+    }
+    return hydrated;
   } catch {
     return createDefaultLabDraft();
   }

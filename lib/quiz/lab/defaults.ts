@@ -1,6 +1,5 @@
-import { FORMATION_SLOT_ANCHORS } from "@/lib/lineup/formation-coordinates";
-import type { FormationId } from "@/lib/lineup/types";
 import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
+import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 
 function uid(): string {
   return crypto.randomUUID();
@@ -10,29 +9,6 @@ function defaultOptions(labels: string[]) {
   return labels.map((label, index) => ({
     id: `opt_${index + 1}`,
     label,
-  }));
-}
-
-function selectionSlotsForFormation(formation: FormationId) {
-  const demoClubs = [
-    "Athletic",
-    "Chelsea",
-    "Bournemouth",
-    "Atlético",
-    "Tottenham",
-    "PSG",
-    "Barcelona",
-    "Real Sociedad",
-    "AC Milan",
-    "Arsenal",
-    "Inter",
-    "Bayern",
-  ];
-
-  return FORMATION_SLOT_ANCHORS[formation].map((anchor, index) => ({
-    slotKey: anchor.key,
-    clubLabel: demoClubs[index % demoClubs.length] ?? `Club ${index + 1}`,
-    clubImageUrl: null,
   }));
 }
 
@@ -52,6 +28,8 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
         format,
         prompt: "¿En qué año ganó España su primer Mundial?",
         imageUrl: null,
+        options: defaultOptions(["2010", "2006", "1998", "1982"]),
+        correctOptionId: "opt_1",
       };
     case "guess_image":
       return {
@@ -62,7 +40,7 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
           "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
         blurStartPx: 24,
         revealSeconds: 8,
-        options: defaultOptions(["Balón Nike", "Balón Adidas", "Balón Puma", "Balón molten"]),
+        options: defaultOptions(["Balón Nike", "Balón Adidas", "Balón Puma", "Balón Molten"]),
       };
     case "guess_selection":
       return {
@@ -72,6 +50,7 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
         formation: "4-2-3-1",
         slots: selectionSlotsForFormation("4-2-3-1"),
         options: defaultOptions(["España", "Francia", "Inglaterra", "Portugal"]),
+        correctOptionId: "opt_1",
       };
     case "video_play_end":
       return {
@@ -79,8 +58,8 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
         format,
         prompt: "¿Cómo acabó la jugada?",
         videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        stopAtSeconds: 3,
+          "https://assets.mixkit.co/videos/preview/mixkit-football-player-dribbling-3268-large.mp4",
+        stopAtSeconds: 2.5,
         options: defaultOptions(["Gol", "Palo", "Fuera de juego", "Parada del portero"]),
       };
   }

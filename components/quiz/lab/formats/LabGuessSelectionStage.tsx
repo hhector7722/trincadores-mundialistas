@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { FORMATION_SLOT_ANCHORS } from "@/lib/lineup/formation-coordinates";
+import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import type { LabQuestionGuessSelection } from "@/lib/quiz/lab/types";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,9 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
         const slot = slotByKey[anchor.key];
         if (!slot) return null;
 
+        const crestUrl =
+          slot.clubImageUrl ?? resolveClubCrestUrl(slot.clubLabel) ?? null;
+
         return (
           <div
             key={anchor.key}
@@ -48,22 +51,24 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
             >
               <div
                 className={cn(
-                  "flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--lab-accent)] bg-[#041a0a] shadow-[0_0_12px_rgba(0,255,65,0.35)]",
-                  compact ? "h-9 w-9 text-[8px]" : "h-11 w-11 text-[9px]"
+                  "flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--lab-accent)] bg-white p-0.5 shadow-[0_0_12px_rgba(0,255,65,0.35)]",
+                  compact ? "h-9 w-9" : "h-11 w-11"
                 )}
               >
-                {slot.clubImageUrl ? (
-                  <Image
-                    src={slot.clubImageUrl}
+                {crestUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={crestUrl}
                     alt={slot.clubLabel}
-                    width={44}
-                    height={44}
-                    className="h-full w-full object-cover"
-                    unoptimized
+                    className="h-full w-full rounded-full object-contain"
+                    loading="lazy"
                   />
                 ) : (
-                  <span className="px-1 text-center font-bold uppercase leading-none text-[var(--lab-fg)]">
-                    {slot.clubLabel.slice(0, 3)}
+                  <span
+                    className="px-0.5 text-center text-[7px] font-bold uppercase leading-none text-red-300"
+                    title={`Falta escudo: ${slot.clubLabel}`}
+                  >
+                    ?
                   </span>
                 )}
               </div>
