@@ -4,7 +4,6 @@ import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsR
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
-import { Button } from "@/components/ui/button";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { displayGoals, formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
@@ -18,7 +17,6 @@ type HomeFinishedMatchPanelProps = {
   teamsBlockClassName: string;
   onOpenHomeLineup: () => void;
   onOpenAwayLineup: () => void;
-  onOpenPredictionsBoard: () => void;
   onOpenDetail: () => void;
 };
 
@@ -63,36 +61,28 @@ function HomeFinishedTeamColumn({
   );
 }
 
-/** Marcador oficial centrado entre banderas a la misma altura (slide «Último partido»). */
 function HomeFinishedFlagsScoreRow({
   homeTeam,
   awayTeam,
   scoreLabel,
-  groupCode,
   onOpenHomeLineup,
   onOpenAwayLineup,
 }: {
   homeTeam: string;
   awayTeam: string;
   scoreLabel: string;
-  groupCode?: string | null;
   onOpenHomeLineup: () => void;
   onOpenAwayLineup: () => void;
 }) {
   return (
-    <div className="relative h-[2.75rem] w-full shrink-0">
+    <div className="relative h-[2.25rem] w-full shrink-0">
       <HomeFinishedTeamColumn team={homeTeam} side="home" onOpenLineup={onOpenHomeLineup} />
       <HomeFinishedTeamColumn team={awayTeam} side="away" onOpenLineup={onOpenAwayLineup} />
 
-      <div className="pointer-events-none absolute left-1/2 top-[38%] z-[1] -translate-x-1/2 -translate-y-1/2 text-center">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 text-center">
         <span className="block font-display text-[1.15rem] font-semibold tabular-nums leading-none text-white/95 sm:text-xl">
           {scoreLabel}
         </span>
-        {groupCode ? (
-          <span className="mt-0.5 block text-[7px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--tm-muted)]">
-            {groupCode.toUpperCase()}
-          </span>
-        ) : null}
       </div>
     </div>
   );
@@ -118,16 +108,11 @@ function HomeFinishedPredictionSummary({
   const predictedText = formatListScore(predictedHome, predictedAway);
 
   return (
-    <div className="relative mt-0.5 flex w-full justify-center pl-1">
+    <div className="relative mt-0.5 flex w-full items-center justify-center gap-1 pl-1">
       <PredictionStatusBadge outcome={outcome} />
-      <div className="flex flex-col items-center gap-0 leading-none">
-        <p className="text-center text-[6px] font-medium uppercase tracking-wide text-white/40">
-          Tu pronóstico
-        </p>
-        <p className="text-center font-display text-[8px] font-semibold tabular-nums text-[var(--tm-accent)]">
-          {predictedText}
-        </p>
-      </div>
+      <p className="text-center font-display text-[8px] font-semibold tabular-nums leading-none text-[var(--tm-accent)]">
+        {predictedText}
+      </p>
     </div>
   );
 }
@@ -137,7 +122,6 @@ export function HomeFinishedMatchPanel({
   teamsBlockClassName,
   onOpenHomeLineup,
   onOpenAwayLineup,
-  onOpenPredictionsBoard,
   onOpenDetail,
 }: HomeFinishedMatchPanelProps) {
   const { snapshot: liveSnapshot } = useMatchLiveSnapshot(match.id, match.status === "finished");
@@ -161,13 +145,12 @@ export function HomeFinishedMatchPanel({
   const scoreLabel = hasScore ? displayGoals(homeGoals, awayGoals) : "—";
 
   return (
-    <div className={cn(teamsBlockClassName, "flex min-h-0 flex-col justify-between gap-1")}>
+    <div className={cn(teamsBlockClassName, "flex min-h-0 flex-col justify-between")}>
       <div className="min-h-0 shrink-0">
         <HomeFinishedFlagsScoreRow
           homeTeam={match.home_team}
           awayTeam={match.away_team}
           scoreLabel={scoreLabel}
-          groupCode={match.group_code}
           onOpenHomeLineup={onOpenHomeLineup}
           onOpenAwayLineup={onOpenAwayLineup}
         />
@@ -184,7 +167,7 @@ export function HomeFinishedMatchPanel({
         ) : null}
       </div>
 
-      <div className="shrink-0" onClick={(event) => event.stopPropagation()}>
+      <div className="mt-auto shrink-0 pt-0.5" onClick={(event) => event.stopPropagation()}>
         <MatchContextActionsRow
           compact
           layout="homeCardStacked"
@@ -201,6 +184,7 @@ export function HomeFinishedMatchPanel({
               officialPlayerName={match.officialMvpPlayerName}
               officialTeamName={match.officialMvpTeamName}
               variant="compact"
+              finishedInline
               className="w-full"
             />
           }
@@ -208,16 +192,6 @@ export function HomeFinishedMatchPanel({
           onOpenAwayLineup={onOpenAwayLineup}
           onOpenPossibleLineups={() => {}}
         />
-      </div>
-
-      <div className="flex shrink-0 justify-center pb-0.5">
-        <Button
-          type="button"
-          className="!min-h-0 h-auto w-auto px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]"
-          onClick={onOpenPredictionsBoard}
-        >
-          Ver pronósticos
-        </Button>
       </div>
     </div>
   );

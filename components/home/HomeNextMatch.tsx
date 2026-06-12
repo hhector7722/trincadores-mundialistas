@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
 import {
-  HOME_CARD_BODY_H_CAROUSEL_CLASS,
   HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS,
+  HOME_CARD_SCHEDULED_BODY_H_CLASS,
   HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS,
-  HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
@@ -82,11 +81,8 @@ export function HomeNextMatch({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
-  function teamsBlockClassNameFor(slide: SlideItem) {
-    if (slide.mode === "scheduled") {
-      return HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
-    }
-    return HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS;
+  function teamsBlockClassNameFor(_slide: SlideItem) {
+    return HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
   }
 
   const updateActiveIndex = useCallback(() => {
@@ -134,7 +130,7 @@ export function HomeNextMatch({
           ref={scrollRef}
           className={cn(
             "flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
-            HOME_CARD_BODY_H_CAROUSEL_CLASS,
+            HOME_CARD_SCHEDULED_BODY_H_CLASS,
             "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           )}
           aria-roledescription="carrusel"
@@ -144,7 +140,7 @@ export function HomeNextMatch({
               key={slide.id}
               className={cn(
                 "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
-                HOME_CARD_BODY_H_CAROUSEL_CLASS,
+                HOME_CARD_SCHEDULED_BODY_H_CLASS,
               )}
               aria-hidden={index !== activeIndex}
             >

@@ -253,6 +253,18 @@ export function HomeMatchCard({
           >
             Ver pronósticos
           </button>
+        ) : isFinished ? (
+          <button
+            type="button"
+            onClick={() => setPredictionsBoardOpen(true)}
+            className={cn(
+              "absolute inset-x-0 z-20 mx-auto flex min-h-12 w-max items-center justify-center",
+              "font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]",
+              "text-[8px] transition-opacity hover:opacity-80",
+            )}
+          >
+            Ver pronósticos
+          </button>
         ) : (
           <p
             className={cn(
@@ -295,7 +307,6 @@ export function HomeMatchCard({
             onOpenAwayLineup={() =>
               openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
             }
-            onOpenPredictionsBoard={() => setPredictionsBoardOpen(true)}
             onOpenDetail={openScoreModal}
           />
         ) : (

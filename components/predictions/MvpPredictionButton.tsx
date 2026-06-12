@@ -18,6 +18,8 @@ type MvpPredictionButtonProps = {
   /** Resultado oficial al finalizar el partido. */
   officialPlayerName?: string | null;
   officialTeamName?: string | null;
+  /** Partido finalizado en card compacta: MVP pronosticado y real en la misma fila. */
+  finishedInline?: boolean;
 };
 
 /** Selector o visualización del MVP pronosticado del partido. */
@@ -30,6 +32,7 @@ export function MvpPredictionButton({
   readOnly = false,
   officialPlayerName,
   officialTeamName,
+  finishedInline = false,
 }: MvpPredictionButtonProps) {
   const compact = variant === "compact";
   const savedLabel =
@@ -47,6 +50,23 @@ export function MvpPredictionButton({
     const officialLabel = compact
       ? shirtPlayerName(officialPlayerName!)
       : officialPlayerName;
+
+    if (finishedInline && !correct) {
+      return (
+        <div
+          className={cn(
+            "flex w-full min-w-0 items-center justify-center gap-1 text-[9px] font-semibold leading-none",
+            className,
+          )}
+        >
+          <span className="max-w-[42%] truncate text-center text-[var(--tm-accent)] line-through">
+            {savedLabel}
+          </span>
+          <PredictionOutcomeIcon variant="error" className="shrink-0" />
+          <span className="max-w-[42%] truncate text-center text-white">{officialLabel}</span>
+        </div>
+      );
+    }
 
     return (
       <div className={cn("w-full min-w-0", className)}>
