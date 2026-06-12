@@ -46,8 +46,6 @@
   --tm-tabbar-core: 5rem;
   --tm-content-bottom: var(--tm-tabbar-core);
   --tm-tab-indicators-bottom: var(--tm-tabbar-core);
-  --tm-vvh-height: 100dvh;
-  --tm-vvh-offset: 0px;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -116,23 +114,13 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-html:has(.tm-app-frame),
-html:has(.tm-app-frame) body {
-  height: var(--tm-vvh-height, 100dvh);
-  max-height: var(--tm-vvh-height, 100dvh);
-  overflow: hidden;
-}
-
-/* Shell flex: altura real del visualViewport (script inline); TabBar fixed al pie */
+/* Shell flex: min-h-dvh; sin cage de altura en html/body (rompe fixed en iOS WebKit) */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  height: var(--tm-vvh-height, 100dvh);
-  min-height: var(--tm-vvh-height, 100dvh);
-  max-height: var(--tm-vvh-height, 100dvh);
+  min-height: 100dvh;
   flex-direction: column;
-  overflow: hidden;
   isolation: isolate;
 }
 

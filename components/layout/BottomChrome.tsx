@@ -7,7 +7,6 @@ import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
 import { useTabIndicatorsPosition } from "@/components/layout/useTabIndicatorsPosition";
 import { shouldShowTabPageIndicators } from "@/lib/layout/main-tabs";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
-import { syncViewportMetrics } from "@/lib/layout/viewport-metrics";
 
 /** Chrome inferior en portal: indicadores fijos sobre la TabBar. */
 export function BottomChrome() {
@@ -17,10 +16,7 @@ export function BottomChrome() {
   useTabIndicatorsPosition(showIndicators);
 
   useLayoutEffect(() => {
-    const sync = () => {
-      syncViewportMetrics();
-      window.dispatchEvent(new Event(VIEWPORT_CHROME_SYNC_EVENT));
-    };
+    const sync = () => window.dispatchEvent(new Event(VIEWPORT_CHROME_SYNC_EVENT));
     sync();
     const frame = requestAnimationFrame(sync);
 

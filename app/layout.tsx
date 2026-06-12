@@ -1,7 +1,6 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
 import { AppUpdateNotifier } from "@/components/pwa/AppUpdateNotifier";
-import { ViewportMetricsInlineScript } from "@/components/layout/ViewportMetricsInlineScript";
 import { getSiteUrl } from "@/lib/site-url";
 import { getDeploymentVersion } from "@/lib/pwa/deployment-version";
 import "./globals.css";
@@ -82,7 +81,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${archivoBlack.variable} ${brandFont.variable}`}>
       <body className="antialiased touch-manipulation">
-        <ViewportMetricsInlineScript />
         <AppUpdateNotifier deploymentVersion={deploymentVersion} />
         {children}
       </body>
