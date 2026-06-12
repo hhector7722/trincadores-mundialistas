@@ -35,7 +35,7 @@ export const HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS = "bottom-0";
  * y el centro de la 1ª fila del stack (header + mt-2 + ~1.5rem en bloque 7rem).
  */
 export const HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS =
-  "top-[calc((0.75rem+2rem+1.5rem)/2)]";
+  "top-[calc((0.75rem+2rem+1.5rem)/2-0.125rem)]";
 
 /** Card inicio con carrusel: compensa mt-2 + h-1.5 de los indicadores inferiores. */
 export const HOME_CARD_CAROUSEL_INDICATORS_OFFSET = "0.875rem";
