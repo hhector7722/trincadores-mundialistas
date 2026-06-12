@@ -1,11 +1,18 @@
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamAbbr } from "@/lib/teams/display";
+import { cn } from "@/lib/utils";
 
-export function HomeChampionTeamValue({ team }: { team: string }) {
+export function HomeChampionTeamValue({
+  team,
+  abbrClassName = "text-[#CCFF00]",
+}: {
+  team: string;
+  abbrClassName?: string;
+}) {
   return (
     <span className="inline-flex max-w-full items-center justify-center gap-0.5">
       <TeamFlagBadge name={team} size="xxs" loading="eager" className="shrink-0" />
-      <span className="truncate text-[10px] font-medium text-[#CCFF00]">{teamAbbr(team)}</span>
+      <span className={cn("truncate text-[10px] font-medium", abbrClassName)}>{teamAbbr(team)}</span>
     </span>
   );
 }

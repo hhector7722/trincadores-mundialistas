@@ -15,7 +15,7 @@ export function ChampionPredictionCell({ team }: { team: string | null }) {
 
   return (
     <span className="flex h-full min-w-0 items-center justify-center px-0.5">
-      <HomeChampionTeamValue team={team} />
+      <HomeChampionTeamValue team={team} abbrClassName="text-white" />
     </span>
   );
 }
