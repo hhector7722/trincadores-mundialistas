@@ -233,49 +233,47 @@ export function HomeMatchCard({
               className="h-full"
               centerSlot={
                 saved ? (
-                  <div className="inline-block leading-none">
-                      <div className="relative w-0 min-w-full">
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            openScoreModal();
-                          }}
-                          className="block w-full text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                        >
-                          {scoreText}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            openScoreModal();
-                          }}
-                          aria-label="Editar pronóstico"
-                          className="absolute left-full top-1/2 -ml-1.5 -translate-y-1/2 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-                        >
-                          <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
+                  <div className="inline-flex max-w-full items-center justify-center gap-1 leading-none">
                     <button
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();
                         openScoreModal();
                       }}
-                      className={cn(
-                        "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                        "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
-                        "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                        "transition-opacity hover:opacity-90 active:opacity-80",
-                      )}
+                      className="shrink-0 whitespace-nowrap text-center font-display text-[11px] font-semibold normal-case text-[var(--tm-accent)] transition-opacity hover:opacity-80"
                     >
-                      <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                      Añadir
+                      {scoreText}
                     </button>
-                  )
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openScoreModal();
+                      }}
+                      aria-label="Editar pronóstico"
+                      className="shrink-0 text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+                    >
+                      <Pencil className="h-3 w-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openScoreModal();
+                    }}
+                    className={cn(
+                      "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+                      "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+                      "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+                      "transition-opacity hover:opacity-90 active:opacity-80",
+                    )}
+                  >
+                    <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                    Añadir
+                  </button>
+                )
                 }
                 predictionSlot={
                   <MvpPredictionButton
