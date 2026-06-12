@@ -373,7 +373,7 @@ html:has(.tm-app-frame) {
   height: 1em !important;
   width: 1.4em !important;
   flex-shrink: 0;
-  border: 0.25px solid rgba(255, 255, 255, 0.28) !important;
+  border: 0.25px solid #000 !important;
   box-shadow: none !important;
 }
 
