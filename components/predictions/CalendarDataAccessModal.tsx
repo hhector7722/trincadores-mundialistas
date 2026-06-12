@@ -63,20 +63,26 @@ export function CalendarDataAccessModal({
       panelHostClassName="max-w-xs"
     >
       <div className="flex flex-col gap-4 px-3 py-4">
-        {ACCESS_ACTIONS.map((action) => (
-          <button
-            key={action.id}
-            type="button"
-            onClick={() => handleAction(action.id)}
-            className={cn(
-              "flex h-10 w-full items-center justify-center rounded-lg px-2.5",
-              "text-[11px] font-semibold uppercase leading-none tracking-wide",
-              "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] transition-colors hover:brightness-105"
-            )}
-          >
-            {action.label}
-          </button>
-        ))}
+        {ACCESS_ACTIONS.map((action) => {
+          const isGuide = action.id === "guide";
+
+          return (
+            <button
+              key={action.id}
+              type="button"
+              onClick={() => handleAction(action.id)}
+              className={cn(
+                "flex h-10 w-full items-center justify-center rounded-lg px-2.5",
+                "text-[11px] font-semibold uppercase leading-none tracking-wide transition-colors",
+                isGuide
+                  ? "border border-[var(--tm-accent)] bg-[var(--tm-bg-elevated)] text-[var(--tm-accent)] hover:bg-[var(--tm-accent-soft)]"
+                  : "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)] hover:brightness-105"
+              )}
+            >
+              {action.label}
+            </button>
+          );
+        })}
       </div>
     </Modal>
   );
