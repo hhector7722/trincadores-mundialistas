@@ -50,7 +50,6 @@ import {
   type MonthYear,
 } from "@/lib/pool/match-calendar";
 import type { CalendarModalOpener } from "@/lib/predictions/calendar-data-access";
-import { calendarMatchCardBodyClass } from "@/components/predictions/PredictionStatusBadge";
 import { cn } from "@/lib/utils";
 
 const WEEKDAY_LABELS_MOBILE = ["L", "M", "X", "J", "V", "S", "D"] as const;
@@ -152,7 +151,7 @@ function CalendarMatchCard({
           {match.group_code.toUpperCase()}
         </span>
       ) : null}
-      <div className={calendarMatchCardBodyClass}>
+      <div className="tm-cal-match-card-body">
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}
         </span>

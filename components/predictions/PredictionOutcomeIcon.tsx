@@ -6,18 +6,12 @@ type PredictionOutcomeIconProps = {
   className?: string;
 };
 
-/**
- * Capa secundaria MVP en cards del calendario: estrella amarilla 12px (esquina superior derecha del body).
- * Variantes success/error se usan fuera del calendario (filas de marcador, botón MVP).
- */
+/** Icono compacto de resultado: estrella MVP (12px) o tick/cruz escalables con el contenedor. */
 export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeIconProps) {
   if (variant === "mvp") {
     return (
       <Star
-        className={cn(
-          "pointer-events-none absolute right-0.5 top-0.5 z-[6] h-3 w-3 shrink-0 fill-[#facc15] text-[#facc15]",
-          className,
-        )}
+        className={cn("h-3 w-3 shrink-0 fill-[#facc15] text-[#facc15]", className)}
         strokeWidth={2}
         aria-hidden
       />

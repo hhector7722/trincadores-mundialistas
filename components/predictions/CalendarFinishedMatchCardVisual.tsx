@@ -1,9 +1,6 @@
 import { CalendarGroupRowBadge } from "@/components/predictions/CalendarGroupRowBadge";
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
-import {
-  calendarMatchCardBodyClass,
-  PredictionStatusBadge,
-} from "@/components/predictions/PredictionStatusBadge";
+import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
@@ -51,13 +48,18 @@ export function CalendarFinishedMatchCardVisual({
 
   const body = (
     <>
+      <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
+
+      {finishedState.mvpCorrect ? (
+        <PredictionOutcomeIcon
+          variant="mvp"
+          className="pointer-events-none absolute right-0.5 top-0 z-[6]"
+        />
+      ) : null}
+
       <CalendarGroupRowBadge groupCode={groupCode} />
 
-      <div className={calendarMatchCardBodyClass}>
-        <PredictionStatusBadge outcome={finishedState.scoreOutcome} />
-
-        {finishedState.mvpCorrect ? <PredictionOutcomeIcon variant="mvp" /> : null}
-
+      <div className="tm-cal-match-card-body">
         {kickoffSlotLabel ? (
           <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-[var(--tm-accent)]">
             {kickoffSlotLabel}
