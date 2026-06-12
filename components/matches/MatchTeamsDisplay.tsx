@@ -24,8 +24,8 @@ export const HOME_CARD_NAMES_BOTTOM_CLASS =
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-[4.5rem]";
 
-/** Card próximo partido: acciones justo bajo plantilla (sin hueco central como en live). */
-export const HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS = "top-[3rem]";
+/** Card próximo partido: columna central (pronóstico/MVP/alineaciones) anclada bajo banderas. */
+export const HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS = "top-[2.5rem]";
 
 /**
  * Card próximo partido: 3 filas de acciones + 2 huecos gap-1.
