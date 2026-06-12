@@ -1674,8 +1674,7 @@ html:has(.tm-app-frame) {
   width: 100%;
 }
 
-.tm-porra-calendar .tm-cal-match-group-row,
-.tm-porra-calendar .tm-cal-finished-meta-row {
+.tm-porra-calendar .tm-cal-match-group-row {
   min-height: 1em;
 }
 
