@@ -57,7 +57,7 @@ function MiniRankingDataRow({
       <span className="flex w-full justify-start font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <span className="flex w-full justify-center">
+      <span className="justify-self-center">
         <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       </span>
       <span
