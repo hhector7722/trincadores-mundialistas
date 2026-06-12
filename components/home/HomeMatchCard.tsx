@@ -228,11 +228,11 @@ export function HomeMatchCard({
               layout="homeCardScheduledStacked"
               homeAnchor="15%"
               awayAnchor="85%"
-              className="h-full"
+              className="h-full -translate-y-1"
               centerSlot={
                 saved ? (
-                  <div className="inline-block">
-                      <p className="text-center text-[8px] font-semibold uppercase tracking-wider text-white/60">
+                  <div className="inline-block leading-none">
+                      <p className="text-center text-[8px] font-semibold uppercase leading-none tracking-wider text-white/60">
                         Mi pronóstico
                       </p>
                       <div className="relative w-0 min-w-full">
