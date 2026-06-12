@@ -6,6 +6,11 @@ import {
   resolveClubCrestUrl,
   SPAIN_DEMO_CLUB_SLOTS,
 } from "@/lib/quiz/lab/club-crests";
+import {
+  isExternalLabVideoUrl,
+  LAB_DEMO_VIDEO_SRC,
+  LAB_DEMO_VIDEO_STOP_AT_SECONDS,
+} from "@/lib/quiz/lab/demo-video";
 import type { LabDraft, LabQuestion, LabQuestionGuessSelection } from "@/lib/quiz/lab/types";
 
 const GENERIC_OPTION_LABELS = new Set(["opción a", "opción b", "opción c", "opción d"]);
@@ -82,15 +87,13 @@ function hydrateMultipleChoice(question: LabQuestion): LabQuestion {
 function hydrateVideo(question: LabQuestion): LabQuestion {
   if (question.format !== "video_play_end") return question;
 
-  const isSampleBlaze = question.videoUrl.includes("ForBiggerBlazes");
-  if (!isSampleBlaze) return question;
+  if (!isExternalLabVideoUrl(question.videoUrl)) return question;
 
   return {
     ...question,
-    videoUrl:
-      "https://assets.mixkit.co/videos/preview/mixkit-football-player-dribbling-3268-large.mp4",
-    stopAtSeconds: 2.5,
-    prompt: "¿Cómo acabó la jugada?",
+    videoUrl: LAB_DEMO_VIDEO_SRC,
+    stopAtSeconds: question.stopAtSeconds || LAB_DEMO_VIDEO_STOP_AT_SECONDS,
+    prompt: question.prompt || "¿Cómo acabó la jugada?",
   };
 }
 

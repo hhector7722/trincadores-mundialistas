@@ -6,6 +6,7 @@ import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPre
 import { LabShell } from "@/components/quiz/lab/LabShell";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
+import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
 import { createLabQuestion } from "@/lib/quiz/lab/defaults";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
@@ -465,8 +466,12 @@ export function LabWorkspace() {
                       <input
                         value={activeQuestion.videoUrl}
                         onChange={(e) => patchActive({ videoUrl: e.target.value })}
+                        placeholder={LAB_DEMO_VIDEO_SRC}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
+                      <p className="text-[10px] text-[var(--lab-muted)]">
+                        Recomendado: vídeo local en /public (p. ej. {LAB_DEMO_VIDEO_SRC})
+                      </p>
                     </label>
                     <label className="block space-y-1">
                       <span className="text-[10px] uppercase text-[var(--lab-muted)]">

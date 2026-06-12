@@ -1,3 +1,7 @@
+import {
+  LAB_DEMO_VIDEO_SRC,
+  LAB_DEMO_VIDEO_STOP_AT_SECONDS,
+} from "@/lib/quiz/lab/demo-video";
 import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 
@@ -57,9 +61,8 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
         ...base,
         format,
         prompt: "¿Cómo acabó la jugada?",
-        videoUrl:
-          "https://assets.mixkit.co/videos/preview/mixkit-football-player-dribbling-3268-large.mp4",
-        stopAtSeconds: 2.5,
+        videoUrl: LAB_DEMO_VIDEO_SRC,
+        stopAtSeconds: LAB_DEMO_VIDEO_STOP_AT_SECONDS,
         options: defaultOptions(["Gol", "Palo", "Fuera de juego", "Parada del portero"]),
       };
   }
