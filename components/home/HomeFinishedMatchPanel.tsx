@@ -13,6 +13,7 @@ import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { displayGoals, formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type HomeFinishedMatchPanelProps = {
@@ -22,6 +23,11 @@ type HomeFinishedMatchPanelProps = {
   onOpenAwayLineup: () => void;
   onOpenDetail: () => void;
 };
+
+/** Centra el contenido en el ancho completo de la card. */
+function HomeFinishedCardCenter({ children }: { children: ReactNode }) {
+  return <div className="flex w-full justify-center overflow-visible">{children}</div>;
+}
 
 function HomeFinishedOfficialScore({
   scoreLabel,
@@ -37,7 +43,7 @@ function HomeFinishedOfficialScore({
         event.stopPropagation();
         onOpenDetail();
       }}
-      className="block w-full text-center font-display text-[11px] font-semibold normal-case tabular-nums text-white/95 transition-opacity hover:opacity-80"
+      className="pointer-events-auto font-display text-[11px] font-semibold normal-case tabular-nums text-white/95 transition-opacity hover:opacity-80"
     >
       {scoreLabel}
     </button>
@@ -72,9 +78,12 @@ function HomeFinishedPredictedScore({
         event.stopPropagation();
         onOpenDetail();
       }}
-      className="relative w-full pl-1 text-center transition-opacity hover:opacity-80"
+      className="pointer-events-auto relative inline-block transition-opacity hover:opacity-80"
     >
-      <PredictionStatusBadge outcome={outcome} />
+      <PredictionStatusBadge
+        outcome={outcome}
+        className="!left-auto !right-full mr-1 rounded-l-[2px]"
+      />
       <span className="font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
         {predictedText}
       </span>
@@ -141,30 +150,36 @@ export function HomeFinishedMatchPanel({
           className="h-full w-full"
           hidePossibleLineups
           centerSlot={
-            <HomeFinishedOfficialScore scoreLabel={scoreLabel} onOpenDetail={onOpenDetail} />
+            <HomeFinishedCardCenter>
+              <HomeFinishedOfficialScore scoreLabel={scoreLabel} onOpenDetail={onOpenDetail} />
+            </HomeFinishedCardCenter>
           }
           predictionSlot={
             hasScore && hasPrediction ? (
-              <HomeFinishedPredictedScore
-                predictedHome={predictedHome}
-                predictedAway={predictedAway}
-                homeGoals={homeGoals}
-                awayGoals={awayGoals}
-                onOpenDetail={onOpenDetail}
-              />
+              <HomeFinishedCardCenter>
+                <HomeFinishedPredictedScore
+                  predictedHome={predictedHome}
+                  predictedAway={predictedAway}
+                  homeGoals={homeGoals}
+                  awayGoals={awayGoals}
+                  onOpenDetail={onOpenDetail}
+                />
+              </HomeFinishedCardCenter>
             ) : null
           }
           bottomSlot={
-            <MvpPredictionButton
-              savedPlayerName={match.mvpPrediction?.player_name}
-              savedTeamName={match.mvpPrediction?.team_name}
-              readOnly
-              officialPlayerName={match.officialMvpPlayerName}
-              officialTeamName={match.officialMvpTeamName}
-              variant="compact"
-              finishedInline
-              className="w-full"
-            />
+            <HomeFinishedCardCenter>
+              <MvpPredictionButton
+                savedPlayerName={match.mvpPrediction?.player_name}
+                savedTeamName={match.mvpPrediction?.team_name}
+                readOnly
+                officialPlayerName={match.officialMvpPlayerName}
+                officialTeamName={match.officialMvpTeamName}
+                variant="compact"
+                finishedInline
+                className="pointer-events-auto w-max"
+              />
+            </HomeFinishedCardCenter>
           }
           onOpenHomeLineup={onOpenHomeLineup}
           onOpenAwayLineup={onOpenAwayLineup}

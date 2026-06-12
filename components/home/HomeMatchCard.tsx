@@ -259,8 +259,8 @@ export function HomeMatchCard({
             type="button"
             onClick={() => setPredictionsBoardOpen(true)}
             className={cn(
-              "absolute inset-x-0 z-20 mx-auto flex !min-h-0 h-auto w-max items-center justify-center",
-              "px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]",
+              "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
+              "!min-h-0 h-auto w-max px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]",
             )}
           >
             Ver pronósticos

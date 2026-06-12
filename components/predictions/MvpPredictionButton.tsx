@@ -55,15 +55,29 @@ export function MvpPredictionButton({
       return (
         <div
           className={cn(
-            "flex w-full min-w-0 items-center justify-center gap-1 text-[9px] font-semibold leading-none",
+            "inline-flex min-w-0 max-w-full items-center justify-center gap-1 text-[9px] font-semibold leading-none",
             className,
           )}
         >
-          <span className="max-w-[42%] truncate text-center text-[var(--tm-accent)] line-through">
+          <span className="max-w-[5rem] truncate text-center text-[var(--tm-accent)] line-through">
             {savedLabel}
           </span>
           <PredictionOutcomeIcon variant="error" className="shrink-0" />
-          <span className="max-w-[42%] truncate text-center text-white">{officialLabel}</span>
+          <span className="max-w-[5rem] truncate text-center text-white">{officialLabel}</span>
+        </div>
+      );
+    }
+
+    if (finishedInline && correct) {
+      return (
+        <div
+          className={cn(
+            "inline-flex min-w-0 max-w-full items-center justify-center gap-1 text-[9px] font-semibold leading-none",
+            className,
+          )}
+        >
+          <span className="max-w-full truncate text-center text-white">{savedLabel}</span>
+          <ConfirmedLineupCheckIcon />
         </div>
       );
     }
