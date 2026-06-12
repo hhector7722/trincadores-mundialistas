@@ -40,10 +40,10 @@ export const HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS =
 /** Card inicio con carrusel: compensa mt-2 + h-1.5 de los indicadores inferiores. */
 export const HOME_CARD_CAROUSEL_INDICATORS_OFFSET = "0.875rem";
 
-/** Card próximo partido: bloque equipos ajustado al contenido (3rem + 4rem). */
-export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = "relative mt-2 h-[7rem] overflow-hidden";
-
+/** Card próximo partido: bloque equipos compacto (igual en carrusel y sin carrusel). */
 export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-2 h-[calc(7rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-hidden`;
+
+export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
 
 /** Card inicio: bloque equipos + acciones apiladas (altura fija, igual live / próximo). */
 export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 h-[8.5rem] overflow-hidden";
@@ -64,8 +64,8 @@ export const HOME_CARD_BODY_MIN_H_CLASS = "min-h-[calc(1.5rem+0.5rem+8.5rem)]";
 /** Card inicio: altura fija del cuerpo (evita que el slide crezca con el contenido). */
 export const HOME_CARD_BODY_H_CLASS = "h-[calc(1.5rem+0.5rem+8.5rem)]";
 
-/** Card próximo partido (sin carrusel): cuerpo ajustado al contenido compacto. */
-export const HOME_CARD_SCHEDULED_BODY_H_CLASS = "h-[calc(1.5rem+0.5rem+7rem)]";
+/** Card próximo partido (sin carrusel): misma altura compacta que la slide programada del carrusel. */
+export const HOME_CARD_SCHEDULED_BODY_H_CLASS = `h-[calc(1.5rem+0.5rem+7rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
 
 /** Card inicio en carrusel: cabecera + bloque equipos compacto (indicadores fuera del slide). */
 export const HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS = `min-h-[calc(1.5rem+0.5rem+8.5rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;

@@ -6,8 +6,8 @@ import {
   HOME_CARD_BODY_H_CAROUSEL_CLASS,
   HOME_CARD_BODY_H_CLASS,
   HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS,
+  HOME_CARD_SCHEDULED_BODY_H_CLASS,
   HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS,
-  HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS,
   HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS,
   HOME_CARD_TEAMS_BLOCK_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
@@ -45,19 +45,20 @@ export function HomeNextMatch({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasCarousel = slides.length > 1;
+  const scheduledOnly = !hasCarousel && slides[0]?.mode === "scheduled";
 
   function teamsBlockClassNameFor(slide: SlideItem) {
-    if (hasCarousel) {
-      return slide.mode === "scheduled"
-        ? HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS
-        : HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS;
+    if (slide.mode === "scheduled") {
+      return HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
     }
-    return slide.mode === "scheduled"
-      ? HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS
-      : HOME_CARD_TEAMS_BLOCK_CLASS;
+    return hasCarousel ? HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS : HOME_CARD_TEAMS_BLOCK_CLASS;
   }
 
-  const slideBodyClassName = hasCarousel ? HOME_CARD_BODY_H_CAROUSEL_CLASS : HOME_CARD_BODY_H_CLASS;
+  const slideBodyClassName = hasCarousel
+    ? HOME_CARD_BODY_H_CAROUSEL_CLASS
+    : scheduledOnly
+      ? HOME_CARD_SCHEDULED_BODY_H_CLASS
+      : HOME_CARD_BODY_H_CLASS;
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
