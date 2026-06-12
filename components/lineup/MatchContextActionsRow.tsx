@@ -52,9 +52,9 @@ export function MatchContextActionsRow({
     return (
       <div className={cn("flex h-full flex-col items-center justify-start gap-0", className)}>
         <div className="flex shrink-0 items-center justify-center px-1">{centerSlot}</div>
-        <div className="-mt-0.5 flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
+        <div className="-mt-1 flex shrink-0 items-center justify-center px-1">{predictionSlot}</div>
         {hidePossibleLineups ? null : (
-          <div className="-mt-1 flex shrink-0 items-center justify-center px-1">
+          <div className="-mt-1.5 flex shrink-0 items-center justify-center px-1">
             <MatchContextActionButton
               caption={possibleLineupsCaption}
               hideCaption={compact}
