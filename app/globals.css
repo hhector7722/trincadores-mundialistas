@@ -1582,15 +1582,12 @@ html:has(.tm-app-frame) {
   background: var(--tm-glass);
   flex-shrink: 0;
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
-  border-bottom-width: var(--tm-cal-grid-line-width);
-  border-bottom-color: var(--tm-cal-grid-line);
 }
 
 /* Fila L-M-X… — mismo rojo que calendarios de asistencia (marbella-app: red-500 → red-600) */
 .tm-porra-calendar .tm-cal-weekdays {
   flex-shrink: 0;
   background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
-  border-top: 1px solid #ffffff;
 }
 
 .tm-porra-calendar .tm-cal-body {

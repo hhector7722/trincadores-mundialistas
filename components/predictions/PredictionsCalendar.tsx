@@ -437,7 +437,7 @@ export function PredictionsCalendar({
         style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
         className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0"
       >
-        <div className="tm-cal-header flex shrink-0 items-center justify-center border-b border-[var(--tm-border)] px-2 py-1 sm:px-3">
+        <div className="tm-cal-header flex shrink-0 items-center justify-center px-2 py-1 sm:px-3">
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
             {monthLabel}
           </h2>
