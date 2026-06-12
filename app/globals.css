@@ -2195,3 +2195,47 @@ html:has(.tm-app-frame) {
   font-size: calc(var(--tm-cal-groups-flag, 0.875rem) * 0.42);
   line-height: 1;
 }
+
+/* Quiz laboratorio — sandbox Matrix (solo hector) */
+.tm-lab-root {
+  --lab-bg: #020a04;
+  --lab-bg-elevated: #041408;
+  --lab-fg: #00ff41;
+  --lab-muted: #1a6b32;
+  --lab-border: rgba(0, 255, 65, 0.28);
+  --lab-surface: rgba(0, 255, 65, 0.08);
+  background-color: var(--lab-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 255, 65, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #031208 0%, var(--lab-bg) 40%, #010502 100%);
+  color: var(--lab-fg);
+  font-family: var(--font-ui);
+}
+
+.tm-lab-header {
+  background: rgba(2, 10, 4, 0.92);
+  border-color: var(--lab-border);
+  backdrop-filter: blur(8px);
+}
+
+.tm-lab-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, 0.03) 2px,
+    rgba(0, 255, 65, 0.03) 4px
+  );
+  opacity: 0.6;
+}
+
+.tm-lab-root select,
+.tm-lab-root input,
+.tm-lab-root textarea {
+  color-scheme: dark;
+}
+
+.tm-lab-root select option {
+  background: #041408;
+  color: var(--lab-fg);
+}

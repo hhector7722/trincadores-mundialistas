@@ -6,12 +6,14 @@ import { TabBar } from "@/components/layout/TabBar";
 import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
 import { useTabIndicatorsPosition } from "@/components/layout/useTabIndicatorsPosition";
 import { shouldShowTabPageIndicators } from "@/lib/layout/main-tabs";
+import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 
 /** Chrome inferior en portal: indicadores fijos sobre la TabBar. */
 export function BottomChrome() {
   const pathname = usePathname();
-  const showIndicators = shouldShowTabPageIndicators(pathname);
+  const hideChrome = isQuizLabPath(pathname);
+  const showIndicators = !hideChrome && shouldShowTabPageIndicators(pathname);
 
   useTabIndicatorsPosition(showIndicators);
 
@@ -41,7 +43,7 @@ export function BottomChrome() {
           <TabPageIndicators />
         </div>
       ) : null}
-      <TabBar />
+      {!hideChrome ? <TabBar /> : null}
     </>
   );
 }

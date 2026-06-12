@@ -1,4 +1,15 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { isQuizLabPath } from "@/lib/quiz/lab-access";
+
 export function HomeAtmosphere() {
+  const pathname = usePathname();
+
+  if (isQuizLabPath(pathname)) {
+    return null;
+  }
+
   return (
     <div className="tm-home-atmosphere" aria-hidden="true">
       <div className="tm-home-layer-radial" />

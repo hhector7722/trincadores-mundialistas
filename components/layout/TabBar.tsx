@@ -10,6 +10,7 @@ import {
   MAIN_TAB_HREFS,
   MAIN_TABS,
 } from "@/lib/layout/main-tabs";
+import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import { cn } from "@/lib/utils";
 
 const TAB_ICONS = {
@@ -37,6 +38,10 @@ export function TabBar() {
   }, [pathname]);
 
   const displayPath = optimisticHref ?? pathname;
+
+  if (isQuizLabPath(pathname)) {
+    return null;
+  }
 
   function handleTabClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
     if (isMainTabActive(pathname, href)) {

@@ -2,10 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
   const pathname = usePathname();
+
+  if (isQuizLabPath(pathname)) {
+    return null;
+  }
+
   const hideBrandTitle =
     pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
   const isHome = pathname === "/";
