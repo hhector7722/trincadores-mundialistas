@@ -222,7 +222,7 @@ export function HomeMatchCard({
 
   return (
     <>
-      <div className={cn(!isLive && !isFinished && "relative")}>
+      <div className="relative">
       <div className={HOME_CARD_HEADER_CLASS}>
         {isLive ? (
           <LiveMatchHeaderLabel className="relative z-10" />

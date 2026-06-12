@@ -5,6 +5,7 @@ import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButto
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { Button } from "@/components/ui/button";
+import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { displayGoals, formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -23,14 +24,12 @@ type HomeFinishedMatchPanelProps = {
 function HomeFinishedFlagsScoreRow({
   homeTeam,
   awayTeam,
-  homeGoals,
-  awayGoals,
+  scoreLabel,
   groupCode,
 }: {
   homeTeam: string;
   awayTeam: string;
-  homeGoals: number;
-  awayGoals: number;
+  scoreLabel: string;
   groupCode?: string | null;
 }) {
   return (
@@ -39,9 +38,9 @@ function HomeFinishedFlagsScoreRow({
         <TeamFlagBadge name={homeTeam} size="sm" loading="eager" />
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2 text-center">
+      <div className="absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2 text-center">
         <span className="block font-display text-[1.15rem] font-semibold tabular-nums leading-none text-white/95 sm:text-xl">
-          {displayGoals(homeGoals, awayGoals)}
+          {scoreLabel}
         </span>
         {groupCode ? (
           <span className="mt-0.5 block text-[7px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--tm-muted)]">
@@ -77,7 +76,7 @@ function HomeFinishedPredictionSummary({
   const predictedText = formatListScore(predictedHome, predictedAway);
 
   return (
-    <div className="relative flex w-full justify-center pl-1">
+    <div className="relative mt-1 flex w-full justify-center pl-1">
       <PredictionStatusBadge outcome={outcome} />
       <div className="flex flex-col items-center gap-0 leading-none">
         <p className="text-center text-[6px] font-medium uppercase tracking-wide text-white/40">
@@ -99,9 +98,16 @@ export function HomeFinishedMatchPanel({
   onOpenPredictionsBoard,
   onOpenDetail,
 }: HomeFinishedMatchPanelProps) {
-  const homeGoals = match.officialHome;
-  const awayGoals = match.officialAway;
-  const hasScore = homeGoals != null && awayGoals != null;
+  const { snapshot: liveSnapshot } = useMatchLiveSnapshot(match.id, match.status === "finished");
+
+  const homeGoals = match.officialHome ?? liveSnapshot?.homeScore ?? null;
+  const awayGoals = match.officialAway ?? liveSnapshot?.awayScore ?? null;
+  const hasScore =
+    homeGoals != null &&
+    awayGoals != null &&
+    Number.isInteger(homeGoals) &&
+    Number.isInteger(awayGoals);
+
   const predictedHome = match.prediction?.home_goals ?? null;
   const predictedAway = match.prediction?.away_goals ?? null;
   const hasPrediction =
@@ -110,41 +116,29 @@ export function HomeFinishedMatchPanel({
     Number.isInteger(predictedHome) &&
     Number.isInteger(predictedAway);
 
-  return (
-    <div className={cn(teamsBlockClassName, "relative overflow-hidden")}>
-      <button
-        type="button"
-        className={cn(
-          "absolute inset-x-0 top-0 w-full text-left",
-          hasPrediction ? "h-[3rem]" : "h-[1.875rem]",
-        )}
-        onClick={onOpenDetail}
-      >
-        {hasScore ? (
-          <>
-            <HomeFinishedFlagsScoreRow
-              homeTeam={match.home_team}
-              awayTeam={match.away_team}
-              homeGoals={homeGoals}
-              awayGoals={awayGoals}
-              groupCode={match.group_code}
-            />
+  const scoreLabel = hasScore ? displayGoals(homeGoals, awayGoals) : "—";
 
-            {hasPrediction ? (
-              <div className="mt-1">
-                <HomeFinishedPredictionSummary
-                  predictedHome={predictedHome}
-                  predictedAway={predictedAway}
-                  homeGoals={homeGoals}
-                  awayGoals={awayGoals}
-                />
-              </div>
-            ) : null}
-          </>
+  return (
+    <div className={cn(teamsBlockClassName, "flex min-h-0 flex-col justify-between gap-1")}>
+      <button type="button" className="min-h-0 shrink-0 text-left" onClick={onOpenDetail}>
+        <HomeFinishedFlagsScoreRow
+          homeTeam={match.home_team}
+          awayTeam={match.away_team}
+          scoreLabel={scoreLabel}
+          groupCode={match.group_code}
+        />
+
+        {hasScore && hasPrediction ? (
+          <HomeFinishedPredictionSummary
+            predictedHome={predictedHome}
+            predictedAway={predictedAway}
+            homeGoals={homeGoals}
+            awayGoals={awayGoals}
+          />
         ) : null}
       </button>
 
-      <div className="absolute inset-x-0 bottom-[1.75rem] h-8">
+      <div className="shrink-0">
         <MatchContextActionsRow
           compact
           layout="homeCardStacked"
@@ -152,7 +146,7 @@ export function HomeFinishedMatchPanel({
           awayAnchor="85%"
           lineupActionTone="muted"
           hidePossibleLineups
-          className="h-full w-full"
+          className="w-full"
           centerSlot={
             <MvpPredictionButton
               savedPlayerName={match.mvpPrediction?.player_name}
@@ -170,7 +164,7 @@ export function HomeFinishedMatchPanel({
         />
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex justify-center">
+      <div className="flex shrink-0 justify-center pb-0.5">
         <Button
           type="button"
           className="!min-h-0 h-auto w-auto px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]"

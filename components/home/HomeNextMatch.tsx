@@ -83,7 +83,7 @@ export function HomeNextMatch({
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
   function teamsBlockClassNameFor(slide: SlideItem) {
-    if (slide.mode === "scheduled" || slide.mode === "finished") {
+    if (slide.mode === "scheduled") {
       return HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
     }
     return HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS;
