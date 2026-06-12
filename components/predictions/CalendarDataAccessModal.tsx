@@ -62,7 +62,7 @@ export function CalendarDataAccessModal({
       className="max-w-xs"
       panelHostClassName="max-w-xs"
     >
-      <div className="flex flex-col gap-1.5 px-3 py-3">
+      <div className="flex flex-col gap-4 px-3 py-4">
         {ACCESS_ACTIONS.map((action) => (
           <button
             key={action.id}
