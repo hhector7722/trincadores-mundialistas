@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
+import { cn } from "@/lib/utils";
 
 function LegendItem({ icons, label }: { icons: ReactNode; label: string }) {
   return (
@@ -13,9 +14,9 @@ function LegendItem({ icons, label }: { icons: ReactNode; label: string }) {
 }
 
 /** Leyenda compacta de iconos de acierto en partidos finalizados. */
-export function MatchPredictionsBoardLegend() {
+export function MatchPredictionsBoardLegend({ className }: { className?: string }) {
   return (
-    <div className="shrink-0 px-3 pb-2 pt-0.5">
+    <div className={cn("shrink-0 px-3 pb-1 pt-2", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] leading-tight text-[var(--tm-muted)]">
         <LegendItem
           icons={<PredictionOutcomeIcon variant="success" className="text-[10px]" />}

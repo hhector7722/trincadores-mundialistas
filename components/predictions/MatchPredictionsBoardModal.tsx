@@ -87,12 +87,13 @@ export function MatchPredictionsBoardModal({
     <Modal
       open={open}
       onClose={onClose}
+      hideHeaderDivider
       title={
         <>
           <span className="sr-only">{ariaTitle}</span>
           <span
             aria-hidden
-            className="flex w-full justify-center normal-case tracking-normal"
+            className="flex w-full min-w-0 justify-center normal-case tracking-normal"
           >
             <MatchPredictionsBoardHeaderTitle
               homeTeam={tableHomeTeam}
@@ -108,7 +109,6 @@ export function MatchPredictionsBoardModal({
       loading={loading}
     >
       <div className="flex min-h-0 flex-1 flex-col px-1 pb-2">
-        {!error && !loading && showOutcomes ? <MatchPredictionsBoardLegend /> : null}
         {error ? (
           <div className="flex flex-1 items-center justify-center px-3">
             <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
@@ -116,14 +116,21 @@ export function MatchPredictionsBoardModal({
             </p>
           </div>
         ) : (
-          <MatchPredictionsBoardTable
-            loading={loading}
-            rows={board?.rows ?? []}
-            currentProfileId={currentProfileId}
-            homeTeam={tableHomeTeam}
-            awayTeam={tableAwayTeam}
-            showOutcomes={showOutcomes}
-          />
+          <>
+            <div className="min-h-0 flex-1">
+              <MatchPredictionsBoardTable
+                loading={loading}
+                rows={board?.rows ?? []}
+                currentProfileId={currentProfileId}
+                homeTeam={tableHomeTeam}
+                awayTeam={tableAwayTeam}
+                showOutcomes={showOutcomes}
+              />
+            </div>
+            {!loading && showOutcomes ? (
+              <MatchPredictionsBoardLegend className="mt-auto" />
+            ) : null}
+          </>
         )}
       </div>
     </Modal>
