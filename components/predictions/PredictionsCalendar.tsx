@@ -447,7 +447,7 @@ export function PredictionsCalendar({
           {WEEKDAY_LABELS.map((label, index) => (
             <div
               key={label}
-              className="tm-cal-weekday text-center font-semibold uppercase tracking-wide text-[var(--tm-fg)]"
+              className="tm-cal-weekday text-center uppercase tracking-wide"
             >
               <span className="sm:hidden">{WEEKDAY_LABELS_MOBILE[index]}</span>
               <span className="hidden sm:inline">{label}</span>

@@ -1578,19 +1578,19 @@ html:has(.tm-app-frame) {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
 }
 
-.tm-porra-calendar .tm-cal-header,
-.tm-porra-calendar .tm-cal-weekdays {
+.tm-porra-calendar .tm-cal-header {
   background: var(--tm-glass);
   flex-shrink: 0;
-}
-
-.tm-porra-calendar .tm-cal-header {
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
   border-bottom-width: var(--tm-cal-grid-line-width);
   border-bottom-color: var(--tm-cal-grid-line);
 }
 
+/* Fila L-M-X… — mismo rojo que calendarios de asistencia (marbella-app: red-500 → red-600) */
 .tm-porra-calendar .tm-cal-weekdays {
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
   border-bottom-width: var(--tm-cal-grid-line-width);
   border-bottom-color: var(--tm-cal-grid-line);
 }
@@ -1737,10 +1737,21 @@ html:has(.tm-app-frame) {
 }
 
 .tm-porra-calendar .tm-cal-weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding-top: 0.0625rem;
   padding-bottom: 0.0625rem;
   font-size: 0.375rem;
+  font-weight: 700;
   line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.tm-porra-calendar .tm-cal-weekday:last-child {
+  border-right: none;
 }
 
 .tm-porra-calendar .tm-cal-cell {
