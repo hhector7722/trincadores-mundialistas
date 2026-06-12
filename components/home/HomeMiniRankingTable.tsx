@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useLayoutEffect, useRef } from "react";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
-import { MINI_RANKING_GRID, MINI_RANKING_STAT_COL } from "@/components/ranking/ranking-grid";
+import {
+  MINI_RANKING_AVATAR_COL,
+  MINI_RANKING_GRID,
+  MINI_RANKING_NAME_COL,
+  MINI_RANKING_POS_COL,
+  MINI_RANKING_STAT_COL,
+} from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
@@ -32,6 +38,7 @@ function MiniRankingHeader() {
       <span aria-hidden="true" />
       <span aria-hidden="true" />
       <span className="text-left">Trincador</span>
+      <span aria-hidden="true" />
       <span className={MINI_RANKING_STAT_COL}>Pts</span>
       <span className={MINI_RANKING_STAT_COL}>Fiab</span>
       <span className={MINI_RANKING_STAT_COL}>Quiz</span>
@@ -54,20 +61,21 @@ function MiniRankingDataRow({
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
-      <span className="flex w-full justify-start font-display tabular-nums text-white/85">
+      <span className={cn(MINI_RANKING_POS_COL, "text-white/85")}>
         {formatAggregateStat(row.position)}
       </span>
-      <span className="justify-self-center">
+      <span className={MINI_RANKING_AVATAR_COL}>
         <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
       </span>
       <span
         className={cn(
-          "whitespace-nowrap text-left font-medium",
+          MINI_RANKING_NAME_COL,
           isCurrentUser ? "text-[#CCFF00]" : "text-white/85"
         )}
       >
         {row.label}
       </span>
+      <span aria-hidden="true" />
       <span className={cn(MINI_RANKING_STAT_COL, "font-display text-white/85")}>
         {formatPoints(row.cumulativePoints)}
       </span>
