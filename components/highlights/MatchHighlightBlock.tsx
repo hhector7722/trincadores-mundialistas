@@ -36,7 +36,6 @@ export function MatchHighlightBlock({
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
   const scoreLine = `${teamAbbr(homeTeam)} ${homeGoals} - ${awayGoals} ${teamAbbr(awayTeam)}`;
-  const heroLine = headline?.trim() || scoreLine;
 
   function openPlayer() {
     setEmbedSrc(youtubeEmbedUrl(youtubeVideoId, true));
@@ -57,22 +56,24 @@ export function MatchHighlightBlock({
               <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[0.55em] py-[0.18em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
                 HIGHLIGHTS
               </span>
-              <p
-                className={cn(
-                  "min-w-0 truncate text-[clamp(9px,2.4cqw,10px)] font-bold tracking-wide text-white/85",
-                  !headline?.trim() && "uppercase",
-                )}
-              >
-                {heroLine}
+              <p className="min-w-0 truncate text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-white/85">
+                {scoreLine}
               </p>
             </div>
-            <MatchHighlightThumbnail
-              videoId={youtubeVideoId}
-              title={title}
-              onPlay={openPlayer}
-              compact
-              className="mt-1 w-full"
-            />
+            <div className="mt-1 w-full max-w-[7.25rem]">
+              {headline?.trim() ? (
+                <p className="mb-1 line-clamp-2 text-center text-[clamp(8px,2.2cqw,9px)] font-medium leading-snug text-white/75">
+                  {headline.trim()}
+                </p>
+              ) : null}
+              <MatchHighlightThumbnail
+                videoId={youtubeVideoId}
+                title={title}
+                onPlay={openPlayer}
+                compact
+                className="mx-0 w-full max-w-none"
+              />
+            </div>
           </>
         ) : (
           <>
