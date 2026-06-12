@@ -63,7 +63,7 @@ function buildSlides(
       id: "mundial",
       eyebrow: "Mundial 2026",
       headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
+        <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
           104 partidos
         </p>
       ),
@@ -75,7 +75,7 @@ function buildSlides(
       eyebrow: "Resultados pendientes",
       headline: (
         <p
-          className="mt-0.5 max-w-full font-display text-[clamp(1.5rem,20cqw,2.75rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)]"
+          className="max-w-full font-display text-[clamp(1.5rem,20cqw,2.75rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)]"
           aria-label={pendingCount > 0 ? `${pendingCount} resultados pendientes` : undefined}
         >
           {pendingDisplay}
@@ -92,7 +92,7 @@ function buildSlides(
       id: "quiz",
       eyebrow: training ? "Quiz del dia · entrenamiento" : "Quiz del dia · competitivo",
       headline: (
-        <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
+        <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
           {quizSlide.headline}
         </p>
       ),
@@ -105,7 +105,7 @@ function buildSlides(
     id: "ranking",
     eyebrow: "Clasificación",
     headline: (
-      <p className="mt-0.5 max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
+      <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
         ¿Quién manda?
       </p>
     ),
@@ -177,7 +177,7 @@ export function HomeHeroCarousel({
                 <>
                   {slide.headline}
                   {slide.description ? (
-                    <p className="mt-1.5 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
+                    <p className="mt-1 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
                       {slide.description}
                     </p>
                   ) : null}
@@ -186,7 +186,7 @@ export function HomeHeroCarousel({
               {slide.cta && (
                 <Link
                   href={slide.cta.href}
-                  className="mt-2 inline-flex w-fit max-w-full items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)] text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
+                  className="mt-1.5 inline-flex w-fit max-w-full items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)] text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
                 >
                   {slide.cta.label}
                 </Link>
@@ -197,7 +197,7 @@ export function HomeHeroCarousel({
       </div>
 
       <div
-        className="mt-2 flex items-center justify-center gap-1.5"
+        className="mt-1.5 flex items-center justify-center gap-1.5"
         role="tablist"
         aria-label="Contenido del hero"
       >
