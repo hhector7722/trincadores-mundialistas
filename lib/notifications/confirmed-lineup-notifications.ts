@@ -6,6 +6,7 @@ import { confirmedLineupNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
 import { isVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
+import { teamAbbr } from "@/lib/teams/display";
 import { teamFlagEmoji } from "@/lib/teams/flags";
 
 type MatchRef = {
@@ -38,9 +39,11 @@ export function buildConfirmedLineupNotificationCopy(
 ): { title: string; body: string } {
   const homeFlag = teamFlagEmoji(homeTeam);
   const awayFlag = teamFlagEmoji(awayTeam);
+  const homeCode = teamAbbr(homeTeam);
+  const awayCode = teamAbbr(awayTeam);
   return {
     title: "Alineaciones confirmadas ✅",
-    body: `${homeFlag} vs ${awayFlag}`,
+    body: `${homeFlag} ${homeCode} - ${awayCode} ${awayFlag}`,
   };
 }
 
