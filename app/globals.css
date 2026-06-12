@@ -300,6 +300,14 @@ html:has(.tm-app-frame) {
     0 0 0 0.5px rgba(0, 0, 0, 0.14);
 }
 
+.tm-rect-flag-depth {
+  border: 0.25px solid rgba(255, 255, 255, 0.34);
+  background: #ffffff;
+  box-shadow:
+    0 0.5px 1px rgba(0, 0, 0, 0.18),
+    0 0 0 0.25px rgba(0, 0, 0, 0.08);
+}
+
 .tm-spinner {
   width: 2.5rem;
   height: 2.5rem;

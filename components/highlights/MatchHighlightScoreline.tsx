@@ -19,35 +19,36 @@ export function MatchHighlightScoreline({
   className,
 }: MatchHighlightScorelineProps) {
   return (
-    <p
+    <div
+      role="text"
       className={cn(
-        "flex min-w-0 flex-1 items-center gap-[0.3em] overflow-hidden text-[clamp(7px,2cqw,8px)] font-bold uppercase leading-none tracking-wide text-white/85",
+        "m-0 flex min-h-[1.35em] min-w-0 flex-1 items-center gap-[0.3em] overflow-hidden text-[clamp(7px,2cqw,8px)] font-bold uppercase leading-none tracking-wide text-white/85",
         className,
       )}
     >
-      <span className="inline-flex min-w-0 items-center gap-[0.2em]">
+      <span className="inline-flex min-w-0 items-center gap-[0.2em] self-center">
         <TeamFlagBadge
           name={homeTeam}
           size="text"
           shape="rect"
           loading="eager"
-          className="shrink-0"
+          className="shrink-0 self-center"
         />
-        <span className="whitespace-nowrap">{teamAbbr(homeTeam)}</span>
-        <span className="tabular-nums whitespace-nowrap">{homeGoals}</span>
+        <span className="self-center whitespace-nowrap">{teamAbbr(homeTeam)}</span>
+        <span className="self-center tabular-nums whitespace-nowrap">{homeGoals}</span>
       </span>
-      <span className="shrink-0">-</span>
-      <span className="inline-flex min-w-0 items-center gap-[0.2em]">
-        <span className="tabular-nums whitespace-nowrap">{awayGoals}</span>
-        <span className="whitespace-nowrap">{teamAbbr(awayTeam)}</span>
+      <span className="shrink-0 self-center">-</span>
+      <span className="inline-flex min-w-0 items-center gap-[0.2em] self-center">
+        <span className="self-center tabular-nums whitespace-nowrap">{awayGoals}</span>
+        <span className="self-center whitespace-nowrap">{teamAbbr(awayTeam)}</span>
         <TeamFlagBadge
           name={awayTeam}
           size="text"
           shape="rect"
           loading="eager"
-          className="shrink-0"
+          className="shrink-0 self-center"
         />
       </span>
-    </p>
+    </div>
   );
 }
