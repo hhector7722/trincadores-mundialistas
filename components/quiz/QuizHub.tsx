@@ -25,16 +25,14 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
   const [waitModalOpen, setWaitModalOpen] = useState(false);
 
   const quizAvailable = Boolean(hub.official);
-  const access = { isOwner: hub.isOwner };
   const playCta = getQuizPlayCta(hub.official, {
-    ...access,
     resultAttemptId: getLatestSubmittedAttemptId(hub.official),
   });
 
   function handlePlay() {
     if (!quizAvailable || !hub.official) return;
 
-    if (shouldShowQuizAlreadyPlayedModal(hub.official, access)) {
+    if (shouldShowQuizAlreadyPlayedModal(hub.official)) {
       setWaitModalOpen(true);
       return;
     }

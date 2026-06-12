@@ -37,10 +37,6 @@ export function getQuizSlotStatus(slot: QuizDaySlot | null): QuizSlotStatus {
   return "ready";
 }
 
-export type QuizPlayAccessOptions = {
-  isOwner?: boolean;
-};
-
 export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | null {
   if (!slot?.attempt || slot.attempt.status !== "submitted") return null;
   return slot.attempt.id;
@@ -48,30 +44,23 @@ export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | 
 
 export function canOpenQuizPlay(
   slot: QuizDaySlot | null,
-  scoringMode?: QuizScoringMode,
-  options?: QuizPlayAccessOptions
+  scoringMode?: QuizScoringMode
 ): boolean {
   if (!slot) return false;
   const mode = scoringMode ?? slot.quiz.scoring_mode;
   const status = getQuizSlotStatus(slot);
-  const isOwner = options?.isOwner === true;
 
   if (status === "completed") {
-    if (mode === "training") return true;
-    if (isOwner) return true;
-    return false;
+    return mode === "training";
   }
 
   return status === "ready" || status === "in_progress" || status === "expired";
 }
 
-export function canReplayQuiz(
-  slot: QuizDaySlot | null,
-  options?: QuizPlayAccessOptions
-): boolean {
+export function canReplayQuiz(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
   if (getQuizSlotStatus(slot) !== "completed") return false;
-  return canOpenQuizPlay(slot, undefined, options);
+  return canOpenQuizPlay(slot);
 }
 
 export type QuizPlayCta = {
@@ -82,12 +71,12 @@ export type QuizPlayCta = {
 
 export function getQuizPlayCta(
   slot: QuizDaySlot | null,
-  options?: QuizPlayAccessOptions & { resultAttemptId?: string | null }
+  options?: { resultAttemptId?: string | null }
 ): QuizPlayCta | null {
   if (!slot) return null;
 
   const status = getQuizSlotStatus(slot);
-  const canPlay = canOpenQuizPlay(slot, undefined, options);
+  const canPlay = canOpenQuizPlay(slot);
 
   if (canPlay) {
     if (status === "in_progress") {
@@ -129,16 +118,10 @@ export function getQuizPlayCta(
   return { label: "Ir al quiz", href: "/quiz", entersPlay: false };
 }
 
-/** Modal "ya jugado hoy" — competitivo completado sin rejugada (p. ej. no owner). */
-export function shouldShowQuizAlreadyPlayedModal(
-  slot: QuizDaySlot | null,
-  options?: QuizPlayAccessOptions
-): boolean {
+/** Modal "ya jugado hoy" — competitivo completado sin rejugada. */
+export function shouldShowQuizAlreadyPlayedModal(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
-  return (
-    getQuizSlotStatus(slot) === "completed" &&
-    !canOpenQuizPlay(slot, undefined, options)
-  );
+  return getQuizSlotStatus(slot) === "completed" && !canOpenQuizPlay(slot);
 }
 
 export function formatQuizSlotStatusLabel(status: QuizSlotStatus): string {

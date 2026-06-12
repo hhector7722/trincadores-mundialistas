@@ -35,7 +35,7 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
     notFound();
   }
 
-  const canReplay = canReplayQuiz(hub.official, { isOwner: hub.isOwner });
+  const canReplay = canReplayQuiz(hub.official);
 
   return (
     <QuizPageShell>

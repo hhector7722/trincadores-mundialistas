@@ -2,7 +2,6 @@ import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
-import { isPoolOwner } from "@/lib/pool/admin";
 import { parseQuizOptions } from "@/lib/quiz/options";
 import { parseQuizStartSession } from "@/lib/quiz/parse-session";
 import type {
@@ -123,10 +122,9 @@ export async function getQuizDayHub(
   profileId: string,
   quizDate = todayQuizDate()
 ): Promise<QuizDayHub> {
-  const [quizzes, competitive, isOwner] = await Promise.all([
+  const [quizzes, competitive] = await Promise.all([
     getQuizzesForDate(poolId, quizDate),
     isPoolCompetitive(poolId),
-    isPoolOwner(poolId, profileId),
   ]);
 
   const attempts = await getQuizAttemptsForProfile(
@@ -139,7 +137,6 @@ export async function getQuizDayHub(
   return {
     quizDate,
     competitive,
-    isOwner,
     official: slotFrom(officialQuiz, attempts),
     bonus: null,
   };

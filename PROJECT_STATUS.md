@@ -53,7 +53,8 @@
 - [x] Quiz training rejugable (migracion RPC/índice)
 - [x] Bonus deprecado en UI/seed
 - [x] Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo
-- [x] Quiz generador: distractores semanticos + owner replay ilimitado
+- [x] Quiz generador: distractores semanticos
+- [x] Quiz competitivo: un solo intento por dia (sin excepcion owner)
 - [x] Quiz cron diario 00:00 abrir / 23:59 cerrar Madrid (`/api/cron/quiz-daily` + `publishQuizDay` + `closeQuizDay`)
 - [x] Quiz competitivo oficial desde 2026-06-11 (fecha civil Madrid)
 - [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play

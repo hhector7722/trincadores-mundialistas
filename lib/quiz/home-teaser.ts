@@ -43,12 +43,10 @@ function descriptionForSlide(scoringMode: QuizScoringMode, competitive: boolean)
 export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
   if (!hub.official) return null;
 
-  const access = { isOwner: hub.isOwner };
   const status = getQuizSlotStatus(hub.official);
   const resultId = getLatestSubmittedAttemptId(hub.official);
   const cta =
     getQuizPlayCta(hub.official, {
-      ...access,
       resultAttemptId: resultId,
     }) ?? { label: "Ir al quiz", href: "/quiz", entersPlay: false };
   const replayable = status === "completed" && cta.entersPlay;

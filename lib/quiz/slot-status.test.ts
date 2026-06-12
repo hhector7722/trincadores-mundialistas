@@ -47,23 +47,14 @@ test("competitive blocks replay after submitted", () => {
   assert.equal(canReplayQuiz(s), false);
 });
 
-test("owner can replay competitive after submitted", () => {
-  const s = slot("competitive", "submitted");
-  const access = { isOwner: true };
-  assert.equal(canOpenQuizPlay(s, undefined, access), true);
-  assert.equal(canReplayQuiz(s, access), true);
-});
-
-test("competitive completed blocks play from all ctas except owner", () => {
+test("competitive completed blocks replay and shows result cta", () => {
   const s = slot("competitive", "submitted");
   const blocked = getQuizPlayCta(s, { resultAttemptId: "a1" });
   assert.equal(blocked?.entersPlay, false);
   assert.equal(blocked?.href, "/quiz/result?attempt=a1");
   assert.equal(shouldShowQuizAlreadyPlayedModal(s), true);
-
-  const ownerCta = getQuizPlayCta(s, { isOwner: true });
-  assert.equal(ownerCta?.entersPlay, true);
-  assert.equal(shouldShowQuizAlreadyPlayedModal(s, { isOwner: true }), false);
+  assert.equal(canOpenQuizPlay(s), false);
+  assert.equal(canReplayQuiz(s), false);
 });
 
 test("training completed still allows replay consistently", () => {

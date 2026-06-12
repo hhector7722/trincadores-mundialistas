@@ -20,9 +20,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
   const router = useRouter();
   const [alreadyPlayedOpen, setAlreadyPlayedOpen] = useState(false);
 
-  const access = { isOwner: quizHub.isOwner };
   const playCta = getQuizPlayCta(quizHub.official, {
-    ...access,
     resultAttemptId: getLatestSubmittedAttemptId(quizHub.official),
   });
 
@@ -39,7 +37,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
       return;
     }
 
-    if (shouldShowQuizAlreadyPlayedModal(slot, access)) {
+    if (shouldShowQuizAlreadyPlayedModal(slot)) {
       setAlreadyPlayedOpen(true);
       return;
     }

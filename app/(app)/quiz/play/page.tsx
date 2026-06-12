@@ -29,9 +29,7 @@ export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) 
     redirect("/quiz");
   }
 
-  const access = { isOwner: hub.isOwner };
-
-  if (!canOpenQuizPlay(slot, undefined, access)) {
+  if (!canOpenQuizPlay(slot)) {
     const attemptId = getLatestSubmittedAttemptId(slot);
     redirect(attemptId ? `/quiz/result?attempt=${attemptId}` : "/quiz");
   }

@@ -70,7 +70,6 @@ export type QuizDaySlot = {
 export type QuizDayHub = {
   quizDate: string;
   competitive: boolean;
-  isOwner: boolean;
   official: QuizDaySlot | null;
   bonus: QuizDaySlot | null;
 };
