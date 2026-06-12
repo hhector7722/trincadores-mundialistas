@@ -443,7 +443,7 @@ export function PredictionsCalendar({
           </h2>
         </div>
 
-        <div className="tm-cal-weekdays grid shrink-0 grid-cols-7 border-b border-[var(--tm-border)]">
+        <div className="tm-cal-weekdays grid shrink-0 grid-cols-7">
           {WEEKDAY_LABELS.map((label, index) => (
             <div
               key={label}
