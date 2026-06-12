@@ -11,7 +11,6 @@ import {
   type CalendarFinishedCardState,
 } from "@/lib/predictions/calendar-finished-card";
 import { CALENDAR_GUIDE_ENTRIES, type CalendarGuideEntry } from "@/lib/predictions/calendar-guide-demos";
-import { cn } from "@/lib/utils";
 
 type CalendarGuideModalProps = {
   open: boolean;
@@ -118,13 +117,7 @@ export function CalendarGuideModal({
           if (!finishedState) return null;
 
           return (
-            <li
-              key={entry.variant}
-              className={cn(
-                "flex min-h-12 items-center gap-3 rounded-xl border border-[var(--tm-border)]",
-                "bg-[var(--tm-surface-elevated)]/40 px-2.5 py-2",
-              )}
-            >
+            <li key={entry.variant} className="flex min-h-12 items-center gap-3">
               <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--tm-fg)]">
                 {entry.label}
               </p>
