@@ -54,7 +54,7 @@ function MiniRankingDataRow({
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
-      <span className="flex w-full justify-center font-display tabular-nums text-white/85">
+      <span className="flex w-full justify-start font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
       <span className="flex w-full justify-center">
