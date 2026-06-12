@@ -1,10 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  daznEsRssUrl,
   fifaChannelRssUrl,
   HIGHLIGHT_SOURCE_CODES,
   teledeporteRssUrl,
 } from "@/lib/youtube/constants";
 import {
+  hasLowerHighlightPriority,
   shouldReplaceMatchHighlight,
   type HighlightSourceCode,
 } from "@/lib/youtube/highlight-priority";
@@ -12,8 +14,10 @@ import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
 import { parseYoutubeChannelFeed } from "@/lib/youtube/parse-feed";
 import {
   buildTeamAliasIndex,
+  isDaznHighlightTitle,
   isFifaHighlightTitle,
   isTeledeporteHighlightTitle,
+  parseTeamsFromDaznTitle,
   parseTeamsFromHighlightTitle,
   parseTeamsFromTeledeporteTitle,
   pickMatchForHighlightVideo,
@@ -28,6 +32,7 @@ export type SyncYoutubeHighlightsResult = {
 };
 
 export type SyncAllMatchHighlightsResult = {
+  dazn: SyncYoutubeHighlightsResult;
   fifa: SyncYoutubeHighlightsResult;
   teledeporte: SyncYoutubeHighlightsResult;
 };
@@ -52,6 +57,13 @@ type ChannelSyncConfig = {
 };
 
 const CHANNEL_CONFIGS: ChannelSyncConfig[] = [
+  {
+    sourceCode: HIGHLIGHT_SOURCE_CODES.dazn,
+    feedUrl: daznEsRssUrl(),
+    channelLabel: "DAZN ES",
+    isHighlightTitle: isDaznHighlightTitle,
+    parseTeams: parseTeamsFromDaznTitle,
+  },
   {
     sourceCode: HIGHLIGHT_SOURCE_CODES.fifa,
     feedUrl: fifaChannelRssUrl(),
@@ -170,12 +182,10 @@ async function attachHighlightToMatch(
       publishedAt,
     )
   ) {
-    if (
-      existingSource === HIGHLIGHT_SOURCE_CODES.fifa &&
-      sourceCode === HIGHLIGHT_SOURCE_CODES.teledeporte
-    ) {
+    if (existingSource && hasLowerHighlightPriority(sourceCode, existingSource)) {
       await recordMappedVideo(admin, video, sourceCode, matchId, "skipped", {
-        reason: "fifa_priority",
+        reason: "lower_priority",
+        existing_source: existingSource,
       });
       return "skipped_priority";
     }
@@ -282,7 +292,7 @@ async function syncChannelHighlights(
   return result;
 }
 
-/** Sincroniza FIFA (prioridad) y Teledeporte RTVE (fallback). */
+/** Sincroniza DAZN ES (prioridad), FIFA y Teledeporte RTVE (fallback). */
 export async function syncAllMatchHighlights(
   admin: SupabaseClient,
 ): Promise<SyncAllMatchHighlightsResult> {
@@ -292,10 +302,11 @@ export async function syncAllMatchHighlights(
   ];
   const aliasIndex = buildTeamAliasIndex(teamNames);
 
-  const fifa = await syncChannelHighlights(admin, CHANNEL_CONFIGS[0]!, candidates, aliasIndex);
+  const dazn = await syncChannelHighlights(admin, CHANNEL_CONFIGS[0]!, candidates, aliasIndex);
+  const fifa = await syncChannelHighlights(admin, CHANNEL_CONFIGS[1]!, candidates, aliasIndex);
   const teledeporte = await syncChannelHighlights(
     admin,
-    CHANNEL_CONFIGS[1]!,
+    CHANNEL_CONFIGS[2]!,
     candidates,
     aliasIndex,
   );
@@ -311,7 +322,7 @@ export async function syncAllMatchHighlights(
     await syncBsdHeadlineForMatch(admin, row.id as string);
   }
 
-  return { fifa, teledeporte };
+  return { dazn, fifa, teledeporte };
 }
 
 /** @deprecated Usar syncAllMatchHighlights. Mantiene compatibilidad con scripts existentes. */
@@ -322,9 +333,9 @@ export async function syncYoutubeFifaHighlights(
   const result = await syncAllMatchHighlights(admin);
   void feedUrl;
   return {
-    scanned: result.fifa.scanned + result.teledeporte.scanned,
-    matched: result.fifa.matched + result.teledeporte.matched,
-    skipped: result.fifa.skipped + result.teledeporte.skipped,
-    errors: [...result.fifa.errors, ...result.teledeporte.errors],
+    scanned: result.dazn.scanned + result.fifa.scanned + result.teledeporte.scanned,
+    matched: result.dazn.matched + result.fifa.matched + result.teledeporte.matched,
+    skipped: result.dazn.skipped + result.fifa.skipped + result.teledeporte.skipped,
+    errors: [...result.dazn.errors, ...result.fifa.errors, ...result.teledeporte.errors],
   };
 }

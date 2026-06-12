@@ -1,11 +1,15 @@
-export type HighlightSourceCode = "youtube_fifa" | "youtube_rtve_teledeporte";
+export type HighlightSourceCode =
+  | "youtube_dazn_es"
+  | "youtube_fifa"
+  | "youtube_rtve_teledeporte";
 
 const SOURCE_PRIORITY: Record<HighlightSourceCode, number> = {
+  youtube_dazn_es: 3,
   youtube_fifa: 2,
   youtube_rtve_teledeporte: 1,
 };
 
-/** FIFA sustituye Teledeporte; misma fuente solo si la fecha de publicación es igual o posterior. */
+/** DAZN ES > FIFA > Teledeporte; misma fuente solo si la fecha de publicación es igual o posterior. */
 export function shouldReplaceMatchHighlight(
   existingSource: HighlightSourceCode | null,
   existingPublishedAt: string | null,
@@ -24,7 +28,15 @@ export function shouldReplaceMatchHighlight(
   return new Date(incomingPublishedAt).getTime() >= new Date(existingPublishedAt).getTime();
 }
 
+export function hasLowerHighlightPriority(
+  incomingSource: HighlightSourceCode,
+  existingSource: HighlightSourceCode,
+): boolean {
+  return SOURCE_PRIORITY[incomingSource] < SOURCE_PRIORITY[existingSource];
+}
+
 export function highlightSourceLabel(source: HighlightSourceCode | null | undefined): string {
+  if (source === "youtube_dazn_es") return "Resumen DAZN";
   if (source === "youtube_fifa") return "Resumen FIFA";
   if (source === "youtube_rtve_teledeporte") return "Resumen Teledeporte";
   return "Resumen del partido";

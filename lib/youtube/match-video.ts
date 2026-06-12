@@ -9,7 +9,7 @@ const HIGHLIGHT_TITLE_KEYWORDS = [
   "highlights",
 ] as const;
 
-const TELEDEPORTE_WC_MARKERS = [
+const WC_MARKERS = [
   "copa mundial",
   "fifa world cup",
   "world cup 2026",
@@ -36,10 +36,18 @@ export function isFifaHighlightTitle(title: string): boolean {
   return HIGHLIGHT_TITLE_KEYWORDS.some((word) => lower.includes(word));
 }
 
+export function isDaznHighlightTitle(title: string): boolean {
+  const lower = normalizeText(title);
+  if (!lower.includes("resumen") && !lower.includes("highlights")) return false;
+  if (!WC_MARKERS.some((marker) => lower.includes(marker))) return false;
+  if (EXCLUDED_TITLE_KEYWORDS.some((word) => lower.includes(word))) return false;
+  return true;
+}
+
 export function isTeledeporteHighlightTitle(title: string): boolean {
   const lower = normalizeText(title);
   if (!lower.startsWith("resumen")) return false;
-  if (!TELEDEPORTE_WC_MARKERS.some((marker) => lower.includes(marker))) return false;
+  if (!WC_MARKERS.some((marker) => lower.includes(marker))) return false;
   if (EXCLUDED_TITLE_KEYWORDS.some((word) => lower.includes(word))) return false;
   return true;
 }
@@ -47,6 +55,19 @@ export function isTeledeporteHighlightTitle(title: string): boolean {
 export function parseTeamsFromHighlightTitle(title: string): { home: string; away: string } | null {
   const head = title.split("|")[0]?.trim() ?? title.trim();
   const match = head.match(/^(.+?)\s+v\s+(.+)$/i);
+  if (!match) return null;
+
+  const home = match[1]?.trim() ?? "";
+  const away = match[2]?.trim() ?? "";
+  if (!home || !away) return null;
+
+  return { home, away };
+}
+
+/** Ej.: «México vs Sudáfrica (2-0) | Resumen y goles | Highlights Copa Mundial…». */
+export function parseTeamsFromDaznTitle(title: string): { home: string; away: string } | null {
+  const head = title.split("|")[0]?.trim() ?? title.trim();
+  const match = head.match(/^(.+?)\s+vs\.?\s+(.+?)\s*\(\s*\d+\s*-\s*\d+\s*\)\s*$/i);
   if (!match) return null;
 
   const home = match[1]?.trim() ?? "";

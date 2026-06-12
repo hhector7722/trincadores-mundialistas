@@ -1,21 +1,50 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { FIFA_YOUTUBE_CHANNEL_ID, fifaChannelRssUrl } from "@/lib/youtube/constants";
+import { FIFA_YOUTUBE_CHANNEL_ID, DAZN_ES_YOUTUBE_CHANNEL_ID, daznEsRssUrl, fifaChannelRssUrl } from "@/lib/youtube/constants";
 import {
   buildTeamAliasIndex,
+  isDaznHighlightTitle,
   isFifaHighlightTitle,
   isTeledeporteHighlightTitle,
+  parseTeamsFromDaznTitle,
   parseTeamsFromHighlightTitle,
   parseTeamsFromTeledeporteTitle,
   pickMatchForHighlightVideo,
   resolveTeamLabel,
 } from "@/lib/youtube/match-video";
 
+test("daznEsRssUrl usa el channel ID oficial @DAZNES", () => {
+  assert.equal(DAZN_ES_YOUTUBE_CHANNEL_ID, "UCz9FiMLz6SOgR_4VEFvjeIA");
+  assert.equal(
+    daznEsRssUrl(),
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCz9FiMLz6SOgR_4VEFvjeIA",
+  );
+});
+
 test("fifaChannelRssUrl usa el channel ID oficial @fifa", () => {
   assert.equal(FIFA_YOUTUBE_CHANNEL_ID, "UCpcTrCXblq78GZrTUTLWeBw");
   assert.equal(
     fifaChannelRssUrl(),
     "https://www.youtube.com/feeds/videos.xml?channel_id=UCpcTrCXblq78GZrTUTLWeBw",
+  );
+});
+
+test("isDaznHighlightTitle acepta resumenes del mundial", () => {
+  assert.equal(
+    isDaznHighlightTitle(
+      "México vs Sudáfrica (2-0) | Resumen y goles | Highlights Copa Mundial de la FIFA 2026T",
+    ),
+    true,
+  );
+  assert.equal(isDaznHighlightTitle("ESTO ES UN MOMENTAZO 🔥"), false);
+});
+
+test("parseTeamsFromDaznTitle extrae equipos con marcador embebido", () => {
+  assert.deepEqual(
+    parseTeamsFromDaznTitle(
+      "México vs Sudáfrica (2-0) | Resumen y goles | Highlights Copa Mundial de la FIFA 2026T",
+    ),
+    { home: "México", away: "Sudáfrica" },
   );
 });
 

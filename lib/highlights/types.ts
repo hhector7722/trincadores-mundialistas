@@ -6,6 +6,6 @@ export type MatchHighlightView = {
   awayGoals: number;
   youtubeVideoId: string;
   publishedAt: string;
-  source: "youtube_fifa" | "youtube_rtve_teledeporte";
+  source: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte";
   headline: string | null;
 };

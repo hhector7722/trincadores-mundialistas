@@ -62,7 +62,7 @@
 - [x] MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px
 - [x] Sistema táctico unificado: `formation-coordinates` (6 formaciones incl. 4-1-4-1) + espejo vertical MVP + UI compacta (reservas arriba, meta abajo, sin pastilla de formación)
 - [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, cada 5 min, XI confirmado T-90, horizonte 48h)
-- [x] Resúmenes FIFA YouTube: cron RSS `@fifa`, slide hero «Último partido», reproductor in-app, modal partido finalizado
+- [x] Resúmenes YouTube: cron RSS `@fifa` + `@TeledeporteRTVE` + `@DAZNES` (prioridad DAZN > FIFA > Teledeporte), slide hero «Último partido», reproductor in-app, modal partido finalizado
 - [x] Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
 - [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin

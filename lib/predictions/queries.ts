@@ -26,7 +26,7 @@ export type MatchWithPrediction = {
   officialMvpTeamName: string | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
-  highlightSource: "youtube_fifa" | "youtube_rtve_teledeporte" | null;
+  highlightSource: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte" | null;
   prediction:
     | Pick<
         Prediction,

@@ -7,7 +7,7 @@ type HighlightRow = {
   away_team: string;
   highlight_youtube_id: string;
   highlight_published_at: string;
-  highlight_source: "youtube_fifa" | "youtube_rtve_teledeporte";
+  highlight_source: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte";
   highlight_headline: string | null;
   match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
