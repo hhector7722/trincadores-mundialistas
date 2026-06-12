@@ -1,6 +1,6 @@
 "use client";
 
-import { Play } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
@@ -58,12 +58,14 @@ export function MatchHighlightBlock({
           <div className="flex w-full min-w-0 flex-col gap-1">
             <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden">
               <span className="inline-flex shrink-0 items-center gap-[0.35em] whitespace-nowrap rounded-full bg-[#CCFF00] py-[0.18em] pl-[0.22em] pr-[0.55em] text-[clamp(7px,2cqw,8px)] font-bold leading-none tracking-wide text-black">
-                <span
-                  className="inline-flex h-[1.65em] w-[1.65em] shrink-0 items-center justify-center rounded-full bg-red-600"
+                <Image
+                  src="/icons/youtube-play.png"
+                  alt=""
+                  width={120}
+                  height={84}
                   aria-hidden="true"
-                >
-                  <Play className="ml-[0.06em] h-[0.58em] w-[0.58em] fill-white text-white" />
-                </span>
+                  className="h-[1em] w-auto shrink-0"
+                />
                 HIGHLIGHTS
               </span>
               <p className="min-w-0 flex-1 truncate text-[clamp(7px,2cqw,8px)] font-bold uppercase tracking-wide text-white/85">
