@@ -73,6 +73,6 @@ export function resolveCalendarFinishedCard(
     scoreOutcome,
     mvpCorrect,
     hasPrediction,
-    showPredictedInKickoffSlot: hasPrediction && scoreOutcome !== "exact",
+    showPredictedInKickoffSlot: hasPrediction,
   };
 }

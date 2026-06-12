@@ -35,7 +35,7 @@ describe("resolveCalendarFinishedCard", () => {
     assert.equal(state?.variant, "exact");
     assert.equal(state?.scoreOutcome, "exact");
     assert.equal(state?.mvpCorrect, false);
-    assert.equal(state?.showPredictedInKickoffSlot, false);
+    assert.equal(state?.showPredictedInKickoffSlot, true);
   });
 
   it("marcador exacto y mvp", () => {
