@@ -54,10 +54,12 @@ function MiniRankingDataRow({
       )}
     >
       <PositionTrendIndicator trend={row.positionTrend} />
-      <span className="shrink-0 text-center font-display tabular-nums text-white/85">
+      <span className="flex w-full justify-center font-display tabular-nums text-white/85">
         {formatAggregateStat(row.position)}
       </span>
-      <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
+      <span className="flex w-full justify-center">
+        <AvatarDisplay avatarUrl={row.avatarUrl} label={row.label} size="mini" />
+      </span>
       <span
         className={cn(
           "whitespace-nowrap text-left font-medium",
