@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { fetchMatchPredictionsBoardAction } from "@/actions/predictions";
+import {
+  MatchPredictionsBoardHeaderTitle,
+  matchPredictionsBoardAriaTitle,
+} from "@/components/predictions/MatchPredictionsBoardHeaderTitle";
 import { MatchPredictionsBoardLegend } from "@/components/predictions/MatchPredictionsBoardLegend";
 import { MatchPredictionsBoardTable } from "@/components/predictions/MatchPredictionsBoardTable";
 import { Modal } from "@/components/ui/modal";
 import type { MatchPredictionsBoard } from "@/lib/predictions/queries";
-import { teamNameEs } from "@/lib/teams/display";
 
 type MatchPredictionsBoardModalProps = {
   open: boolean;
@@ -68,16 +71,38 @@ export function MatchPredictionsBoardModal({
     };
   }, [open, poolId, matchId]);
 
-  const title = `${teamNameEs(homeTeam)} vs ${teamNameEs(awayTeam)}`;
   const tableHomeTeam = board?.homeTeam ?? homeTeam;
   const tableAwayTeam = board?.awayTeam ?? awayTeam;
+  const officialHome = board?.officialHome ?? null;
+  const officialAway = board?.officialAway ?? null;
   const showOutcomes = board?.showOutcomes ?? false;
+  const ariaTitle = matchPredictionsBoardAriaTitle(
+    tableHomeTeam,
+    tableAwayTeam,
+    officialHome,
+    officialAway,
+  );
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={title}
+      title={
+        <>
+          <span className="sr-only">{ariaTitle}</span>
+          <span
+            aria-hidden
+            className="flex w-full justify-center normal-case tracking-normal"
+          >
+            <MatchPredictionsBoardHeaderTitle
+              homeTeam={tableHomeTeam}
+              awayTeam={tableAwayTeam}
+              homeGoals={officialHome}
+              awayGoals={officialAway}
+            />
+          </span>
+        </>
+      }
       className={MODAL_PANEL_CLASS}
       scrollContent={false}
       loading={loading}

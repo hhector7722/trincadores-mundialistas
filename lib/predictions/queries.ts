@@ -376,6 +376,8 @@ export type MatchPredictionsBoardRow = {
 export type MatchPredictionsBoard = {
   homeTeam: string;
   awayTeam: string;
+  officialHome: number | null;
+  officialAway: number | null;
   showOutcomes: boolean;
   rows: MatchPredictionsBoardRow[];
 };
@@ -451,6 +453,32 @@ export async function getMatchPredictionsBoard(
     match.status === "finished" &&
     hasOfficialScore(result?.home_goals, result?.away_goals);
 
+  let officialHome: number | null = null;
+  let officialAway: number | null = null;
+
+  if (hasOfficialScore(result?.home_goals, result?.away_goals)) {
+    officialHome = result!.home_goals;
+    officialAway = result!.away_goals;
+  } else if (match.status === "live") {
+    const { data: liveState, error: liveStateError } = await admin
+      .from("match_live_state")
+      .select("live_payload")
+      .eq("match_id", matchId)
+      .maybeSingle();
+
+    if (liveStateError) throw new Error(liveStateError.message);
+
+    const payload = (liveState?.live_payload ?? null) as MatchLivePayload | null;
+    if (
+      payload &&
+      Number.isInteger(payload.homeScore) &&
+      Number.isInteger(payload.awayScore)
+    ) {
+      officialHome = payload.homeScore;
+      officialAway = payload.awayScore;
+    }
+  }
+
   const { data: memberships, error: membersError } = await admin
     .from("pool_members")
     .select("profile_id")
@@ -461,6 +489,8 @@ export async function getMatchPredictionsBoard(
     return {
       homeTeam: match.home_team,
       awayTeam: match.away_team,
+      officialHome,
+      officialAway,
       showOutcomes,
       rows: [],
     };
@@ -543,6 +573,8 @@ export async function getMatchPredictionsBoard(
   return {
     homeTeam: match.home_team,
     awayTeam: match.away_team,
+    officialHome,
+    officialAway,
     showOutcomes,
     rows,
   };
