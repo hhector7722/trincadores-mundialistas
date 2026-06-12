@@ -1,4 +1,9 @@
-import { fetchBsdHeadline, type BsdHeadlineContext, type BsdHeadlineSource } from "@/lib/live/sources/bsd-headline";
+import {
+  fetchBsdHeadline,
+  isScoreStyleHeadline,
+  type BsdHeadlineContext,
+  type BsdHeadlineSource,
+} from "@/lib/live/sources/bsd-headline";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type MatchHeadlineRow = {
@@ -67,7 +72,15 @@ export async function syncBsdHeadlineForMatch(
   const row = data as MatchHeadlineRow;
   const existingSource = (row.highlight_headline_source as BsdHeadlineSource | null) ?? null;
 
-  if (row.highlight_headline && existingSource === "bsd_social" && !options?.force) {
+  const existingLooksLikeScore =
+    row.highlight_headline != null && isScoreStyleHeadline(row.highlight_headline);
+
+  if (
+    row.highlight_headline &&
+    existingSource === "bsd_social" &&
+    !existingLooksLikeScore &&
+    !options?.force
+  ) {
     return false;
   }
 
@@ -94,6 +107,7 @@ export async function syncBsdHeadlineForMatch(
   if (
     row.highlight_headline &&
     !options?.force &&
+    !existingLooksLikeScore &&
     !shouldReplaceHeadline(existingSource, headline.source)
   ) {
     return false;

@@ -1,11 +1,11 @@
 /**
  * Titulares cortos de partido vía BSD:
- * 1) Social del evento (`/events/{id}/social/`) — texto del tweet
- * 2) Incidentes (`/events/{id}/incidents/`) — titular compuesto en español
+ * 1) Social del evento (`/events/{id}/social/`) — frase editorial del tweet
+ * 2) Incidentes (`/events/{id}/incidents/`) — frase corta sin marcador ni minutos
  */
 
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
-import { teamAbbr } from "@/lib/teams/display";
+import { teamNameEs } from "@/lib/teams/display";
 
 const BSD_API_BASE = "https://sports.bzzoiro.com";
 const BSD_FETCH_TIMEOUT_MS = 12_000;
@@ -81,9 +81,21 @@ function normalizeSocialText(raw: string): string {
     .trim();
 }
 
+/** Rechaza titulares con marcador, minuto o formato deportivo tipo «Gol 59' · KOR 2-1». */
+export function isScoreStyleHeadline(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (/\d+\s*[-–]\s*\d+/.test(t)) return true;
+  if (/\d+'/.test(t)) return true;
+  if (/·/.test(t) && /\d/.test(t)) return true;
+  if (/\b(gana|empate|vence)\b/i.test(t) && /\d+\s*[-–]\s*\d+/.test(t)) return true;
+  return false;
+}
+
 function isUsableSocialHeadline(text: string): boolean {
   if (text.length < 12 || text.length > 140) return false;
   if (/^[\W\d]+$/.test(text)) return false;
+  if (isScoreStyleHeadline(text)) return false;
   return true;
 }
 
@@ -116,39 +128,31 @@ function goalScorerName(incident: BsdIncident): string | null {
   return name || null;
 }
 
-function goalMinuteLabel(incident: BsdIncident): string | null {
-  if (incident.minute == null || incident.minute === "") return null;
-  return `${incident.minute}'`;
-}
-
 export function composeHeadlineFromBsdIncidents(
   incidents: BsdIncident[],
   context: BsdHeadlineContext,
 ): string | null {
   const { homeTeam, awayTeam, homeGoals, awayGoals } = context;
-  const homeAbbr = teamAbbr(homeTeam);
-  const awayAbbr = teamAbbr(awayTeam);
-  const score = `${homeGoals}-${awayGoals}`;
+  const homeEs = teamNameEs(homeTeam);
+  const awayEs = teamNameEs(awayTeam);
 
   if (homeGoals === awayGoals) {
-    return truncateHeadline(`Empate ${homeAbbr} ${score} ${awayAbbr}`);
+    return truncateHeadline(`Empate entre ${homeEs} y ${awayEs}`);
   }
 
-  const winnerAbbr = homeGoals > awayGoals ? homeAbbr : awayAbbr;
+  const homeWins = homeGoals > awayGoals;
+  const winnerEs = homeWins ? homeEs : awayEs;
+  const loserEs = homeWins ? awayEs : homeEs;
+
   const goals = incidents.filter((incident) => incident.type === "goal");
   const lastGoal = goals.at(-1);
   const scorer = lastGoal ? goalScorerName(lastGoal) : null;
-  const minute = lastGoal ? goalMinuteLabel(lastGoal) : null;
-
-  if (scorer && minute) {
-    return truncateHeadline(`${scorer} ${minute} · ${winnerAbbr} ${score}`);
-  }
 
   if (scorer) {
-    return truncateHeadline(`${scorer} decide · ${winnerAbbr} ${score}`);
+    return truncateHeadline(`${scorer} decide la victoria de ${winnerEs}`);
   }
 
-  return truncateHeadline(`${winnerAbbr} gana ${score}`);
+  return truncateHeadline(`${winnerEs} se impone ante ${loserEs}`);
 }
 
 export async function fetchBsdHeadline(
