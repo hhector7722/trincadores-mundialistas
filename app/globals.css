@@ -351,6 +351,10 @@ html:has(.tm-app-frame) {
   transform: translateY(0.1em);
 }
 
+.tm-hero-highlight-scoreline-goals {
+  color: var(--tm-accent);
+}
+
 .tm-hero-highlight-scoreline {
   display: flex;
   flex: 1 1 0%;

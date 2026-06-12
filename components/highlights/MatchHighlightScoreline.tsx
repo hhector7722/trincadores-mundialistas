@@ -31,7 +31,7 @@ export function MatchHighlightScoreline({
         <span className="tm-hero-highlight-scoreline-text whitespace-nowrap">
           {teamAbbr(homeTeam)}
         </span>
-        <span className="tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
+        <span className="tm-hero-highlight-scoreline-goals tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
           {homeGoals}
         </span>
       </span>
@@ -39,7 +39,7 @@ export function MatchHighlightScoreline({
         <span className="tm-hero-highlight-scoreline-text">-</span>
       </span>
       <span className="tm-hero-highlight-scoreline-group">
-        <span className="tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
+        <span className="tm-hero-highlight-scoreline-goals tm-hero-highlight-scoreline-text tabular-nums whitespace-nowrap">
           {awayGoals}
         </span>
         <span className="tm-hero-highlight-scoreline-text whitespace-nowrap">
