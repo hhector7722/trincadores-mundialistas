@@ -63,7 +63,7 @@ function MatchPredictionsEmptyRow() {
       aria-hidden="true"
     >
       <span className="flex justify-center">
-        <span className="size-8 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
+        <span className="size-6 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
       </span>
       <span className="whitespace-nowrap">&nbsp;</span>
       <span />

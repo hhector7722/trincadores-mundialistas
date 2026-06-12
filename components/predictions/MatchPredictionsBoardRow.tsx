@@ -69,7 +69,7 @@ export function MatchPredictionsBoardRow({
               avatarUrl={row.avatarUrl}
               label={row.label}
               variant="badge"
-              className="size-8 shrink-0"
+              className="size-6 shrink-0"
             />
           </button>
         </div>
