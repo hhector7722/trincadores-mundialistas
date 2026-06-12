@@ -1674,6 +1674,21 @@ html:has(.tm-app-frame) {
   width: 100%;
 }
 
+.tm-cal-guide-entries {
+  --tm-cal-guide-preview-w: 3.25rem;
+  --tm-cal-match-card-h: 1.75rem;
+}
+
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview {
+  width: var(--tm-cal-guide-preview-w);
+  max-width: var(--tm-cal-guide-preview-w);
+}
+
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card {
+  background: var(--tm-cal-match-card-bg);
+  border-color: var(--tm-cal-match-card-border);
+}
+
 .tm-porra-calendar .tm-cal-match-group-row {
   min-height: 1em;
 }
