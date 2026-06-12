@@ -39,6 +39,7 @@ export type LabSelectionSlot = {
   slotKey: string;
   clubLabel: string;
   clubImageUrl: string | null;
+  playerName: string;
 };
 
 export type LabQuestionGuessSelection = LabQuestionBase & {

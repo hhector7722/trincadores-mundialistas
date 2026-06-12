@@ -53,7 +53,11 @@ export function LabQuestionPreview({
       ) : null}
 
       {question.format === "guess_selection" ? (
-        <LabGuessSelectionStage question={question} compact={mode === "play"} />
+        <LabGuessSelectionStage
+          question={question}
+          compact={mode === "play"}
+          revealed={showFeedback}
+        />
       ) : null}
 
       {question.format === "video_play_end" ? (

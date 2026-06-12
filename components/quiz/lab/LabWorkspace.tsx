@@ -408,7 +408,7 @@ export function LabWorkspace() {
                     </label>
                     <div className="space-y-2">
                       {activeQuestion.slots.map((slot, index) => (
-                        <div key={slot.slotKey} className="grid grid-cols-2 gap-2">
+                        <div key={slot.slotKey} className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                           <input
                             value={slot.clubLabel}
                             onChange={(e) => {
@@ -425,6 +425,19 @@ export function LabWorkspace() {
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                           />
                           <input
+                            value={slot.playerName ?? ""}
+                            onChange={(e) => {
+                              const slots = [...activeQuestion.slots];
+                              slots[index] = {
+                                ...slot,
+                                playerName: e.target.value,
+                              };
+                              patchActive({ slots });
+                            }}
+                            placeholder={`Jugador ${slot.slotKey}`}
+                            className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                          />
+                          <input
                             value={slot.clubImageUrl ?? ""}
                             onChange={(e) => {
                               const slots = [...activeQuestion.slots];
@@ -434,7 +447,7 @@ export function LabWorkspace() {
                               };
                               patchActive({ slots });
                             }}
-                            placeholder="URL escudo (auto si reconoce el club)"
+                            placeholder="URL escudo (auto)"
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-xs text-[var(--lab-fg)]"
                           />
                         </div>

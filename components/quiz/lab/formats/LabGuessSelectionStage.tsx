@@ -8,11 +8,20 @@ import { cn } from "@/lib/utils";
 type LabGuessSelectionStageProps = {
   question: LabQuestionGuessSelection;
   compact?: boolean;
+  /** Tras responder: muestra el nombre de cada jugador bajo su escudo. */
+  revealed?: boolean;
 };
 
-export function LabGuessSelectionStage({ question, compact = false }: LabGuessSelectionStageProps) {
+export function LabGuessSelectionStage({
+  question,
+  compact = false,
+  revealed = false,
+}: LabGuessSelectionStageProps) {
   const anchors = FORMATION_SLOT_ANCHORS[question.formation];
   const slotByKey = Object.fromEntries(question.slots.map((slot) => [slot.slotKey, slot]));
+
+  const correctLabel =
+    question.options.find((option) => option.id === question.correctOptionId)?.label ?? null;
 
   return (
     <div
@@ -46,12 +55,13 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
             <div
               className={cn(
                 "flex flex-col items-center gap-0.5",
-                compact ? "w-10" : "w-12"
+                compact ? "w-14" : "w-16"
               )}
             >
               <div
                 className={cn(
-                  "flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--lab-accent)] bg-white p-0.5 shadow-[0_0_12px_rgba(0,255,65,0.35)]",
+                  "flex items-center justify-center overflow-hidden rounded-full border-2 bg-white p-0.5 shadow-[0_0_12px_rgba(0,255,65,0.35)]",
+                  revealed ? "border-white" : "border-[var(--lab-accent)]",
                   compact ? "h-9 w-9" : "h-11 w-11"
                 )}
               >
@@ -72,6 +82,16 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
                   </span>
                 )}
               </div>
+              {revealed && slot.playerName ? (
+                <span
+                  className={cn(
+                    "max-w-full truncate rounded bg-black/65 px-1 py-0.5 text-center font-medium leading-tight text-white",
+                    compact ? "text-[7px]" : "text-[9px]"
+                  )}
+                >
+                  {slot.playerName}
+                </span>
+              ) : null}
             </div>
           </div>
         );
@@ -79,7 +99,9 @@ export function LabGuessSelectionStage({ question, compact = false }: LabGuessSe
 
       <div className="absolute inset-x-0 top-3 text-center">
         <span className="font-display text-sm uppercase tracking-[0.15em] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-          {question.prompt || "ADIVINA LA SELECCIÓN"}
+          {revealed && correctLabel
+            ? correctLabel
+            : question.prompt || "ADIVINA LA SELECCIÓN"}
         </span>
       </div>
     </div>

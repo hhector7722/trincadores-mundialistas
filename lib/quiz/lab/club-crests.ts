@@ -55,21 +55,22 @@ export function resolveClubCrestUrl(clubLabel: string): string | null {
 export type ClubSlotSeed = {
   slotKey: string;
   clubLabel: string;
+  playerName: string;
 };
 
-/** Alineación demo España 4-2-3-1 (referencia visual del laboratorio). */
+/** Demo España 4-2-3-1: clubes del puzzle + jugadores revelados al resolver. */
 export const SPAIN_DEMO_CLUB_SLOTS: ClubSlotSeed[] = [
-  { slotKey: "GK", clubLabel: "Athletic Club" },
-  { slotKey: "LB", clubLabel: "Chelsea" },
-  { slotKey: "LCB", clubLabel: "Bournemouth" },
-  { slotKey: "RCB", clubLabel: "Atlético Madrid" },
-  { slotKey: "RB", clubLabel: "Tottenham" },
-  { slotKey: "LDM", clubLabel: "PSG" },
-  { slotKey: "RDM", clubLabel: "Barcelona" },
-  { slotKey: "LW", clubLabel: "Athletic Club" },
-  { slotKey: "AM", clubLabel: "Real Sociedad" },
-  { slotKey: "RW", clubLabel: "Barcelona" },
-  { slotKey: "ST", clubLabel: "AC Milan" },
+  { slotKey: "GK", clubLabel: "Athletic Club", playerName: "Unai Simón" },
+  { slotKey: "LB", clubLabel: "Chelsea", playerName: "Marc Cucurella" },
+  { slotKey: "LCB", clubLabel: "Bournemouth", playerName: "Robin Le Normand" },
+  { slotKey: "RCB", clubLabel: "Atlético Madrid", playerName: "José Gayà" },
+  { slotKey: "RB", clubLabel: "Tottenham", playerName: "Pedro Porro" },
+  { slotKey: "LDM", clubLabel: "PSG", playerName: "Fabián Ruiz" },
+  { slotKey: "RDM", clubLabel: "Barcelona", playerName: "Pedri" },
+  { slotKey: "LW", clubLabel: "Athletic Club", playerName: "Nico Williams" },
+  { slotKey: "AM", clubLabel: "Real Sociedad", playerName: "Mikel Oyarzabal" },
+  { slotKey: "RW", clubLabel: "Barcelona", playerName: "Lamine Yamal" },
+  { slotKey: "ST", clubLabel: "AC Milan", playerName: "Álvaro Morata" },
 ];
 
 export function clubSlotWithCrest(slot: ClubSlotSeed) {
@@ -81,5 +82,10 @@ export function clubSlotWithCrest(slot: ClubSlotSeed) {
     slotKey: slot.slotKey,
     clubLabel: slot.clubLabel,
     clubImageUrl: crestUrl,
+    playerName: slot.playerName,
   };
+}
+
+export function demoPlayerNameForSlot(slotKey: string): string {
+  return SPAIN_DEMO_CLUB_SLOTS.find((slot) => slot.slotKey === slotKey)?.playerName ?? "";
 }

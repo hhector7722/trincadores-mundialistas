@@ -1,6 +1,11 @@
 import { FORMATION_SLOT_ANCHORS } from "@/lib/lineup/formation-coordinates";
 import type { FormationId } from "@/lib/lineup/types";
-import { clubSlotWithCrest, resolveClubCrestUrl, SPAIN_DEMO_CLUB_SLOTS } from "@/lib/quiz/lab/club-crests";
+import {
+  clubSlotWithCrest,
+  demoPlayerNameForSlot,
+  resolveClubCrestUrl,
+  SPAIN_DEMO_CLUB_SLOTS,
+} from "@/lib/quiz/lab/club-crests";
 import type { LabDraft, LabQuestion, LabQuestionGuessSelection } from "@/lib/quiz/lab/types";
 
 const GENERIC_OPTION_LABELS = new Set(["opción a", "opción b", "opción c", "opción d"]);
@@ -19,16 +24,24 @@ function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestion
     : question.slots.map((slot) => ({
         slotKey: slot.slotKey,
         clubLabel: slot.clubLabel,
+        playerName:
+          ("playerName" in slot ? slot.playerName : "") ||
+          demoPlayerNameForSlot(slot.slotKey),
       }));
 
   const slots = seeds.map((seed, index) => {
     const existing = question.slots[index];
     const crestUrl =
       resolveClubCrestUrl(seed.clubLabel) ?? existing?.clubImageUrl ?? null;
+    const playerName =
+      seed.playerName ||
+      existing?.playerName ||
+      demoPlayerNameForSlot(seed.slotKey);
     return {
       slotKey: seed.slotKey,
       clubLabel: seed.clubLabel,
       clubImageUrl: crestUrl,
+      playerName,
     };
   });
 
@@ -108,6 +121,7 @@ export function selectionSlotsForFormation(formation: FormationId) {
     return clubSlotWithCrest({
       slotKey: anchor.key,
       clubLabel: seed?.clubLabel ?? `Club ${index + 1}`,
+      playerName: seed?.playerName ?? `Jugador ${index + 1}`,
     });
   });
 }
