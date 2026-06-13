@@ -93,7 +93,7 @@ export function MatchPredictionsBoardModal({
           <span className="sr-only">{ariaTitle}</span>
           <span
             aria-hidden
-            className="flex w-full min-w-0 justify-center normal-case tracking-normal"
+            className="flex w-full min-w-0 normal-case tracking-normal"
           >
             <MatchPredictionsBoardHeaderTitle
               homeTeam={tableHomeTeam}

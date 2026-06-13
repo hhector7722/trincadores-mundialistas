@@ -30,7 +30,7 @@ export function matchPredictionsBoardAriaTitle(
   return `${teamNameEs(homeTeam)} ${formatGoal(homeGoals)} - ${formatGoal(awayGoals)} ${teamNameEs(awayTeam)}`;
 }
 
-/** Cabecera del modal: bandera · nombre · goles · goles · nombre · bandera (una sola fila). */
+/** Cabecera del modal: mitad local | «-» centrado | mitad visitante. */
 export function MatchPredictionsBoardHeaderTitle({
   homeTeam,
   awayTeam,
@@ -56,7 +56,10 @@ export function MatchPredictionsBoardHeaderTitle({
         nameNodes.forEach((node) => {
           node.style.fontSize = `${size}px`;
         });
-        if (row.scrollWidth <= row.clientWidth) break;
+        const nameOverflows = Array.from(nameNodes).some(
+          (node) => node.scrollWidth > node.clientWidth,
+        );
+        if (!nameOverflows && row.scrollWidth <= row.clientWidth) break;
         size -= 0.5;
       }
 
@@ -74,33 +77,37 @@ export function MatchPredictionsBoardHeaderTitle({
     <div
       ref={rowRef}
       className={cn(
-        "flex w-full min-w-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap",
+        "grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center overflow-hidden",
         className,
       )}
     >
-      <TeamFlagBadge name={homeTeam} size="xxs" loading="eager" className="shrink-0" />
-      <span
-        data-team-name
-        className="shrink-0 font-semibold leading-none"
-        style={{ fontSize: `${nameFontPx}px` }}
-      >
-        {homeName}
-      </span>
-      <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
-        {formatGoal(homeGoals)}
-      </span>
-      <span className="shrink-0 text-xs leading-none text-[var(--tm-muted)]">-</span>
-      <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
-        {formatGoal(awayGoals)}
-      </span>
-      <span
-        data-team-name
-        className="shrink-0 font-semibold leading-none"
-        style={{ fontSize: `${nameFontPx}px` }}
-      >
-        {awayName}
-      </span>
-      <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" className="shrink-0" />
+      <div className="flex min-w-0 items-center justify-end gap-1 overflow-hidden whitespace-nowrap pr-0.5">
+        <TeamFlagBadge name={homeTeam} size="xxs" loading="eager" className="shrink-0" />
+        <span
+          data-team-name
+          className="min-w-0 truncate font-semibold leading-none"
+          style={{ fontSize: `${nameFontPx}px` }}
+        >
+          {homeName}
+        </span>
+        <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+          {formatGoal(homeGoals)}
+        </span>
+      </div>
+      <span className="shrink-0 px-0.5 text-xs leading-none text-[var(--tm-muted)]">-</span>
+      <div className="flex min-w-0 items-center justify-start gap-1 overflow-hidden whitespace-nowrap pl-0.5">
+        <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+          {formatGoal(awayGoals)}
+        </span>
+        <span
+          data-team-name
+          className="min-w-0 truncate font-semibold leading-none"
+          style={{ fontSize: `${nameFontPx}px` }}
+        >
+          {awayName}
+        </span>
+        <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" className="shrink-0" />
+      </div>
     </div>
   );
 }
