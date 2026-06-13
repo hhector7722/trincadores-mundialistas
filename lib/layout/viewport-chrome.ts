@@ -63,7 +63,7 @@ function readTabBarCorePx(): number {
   if (Number.isFinite(parsed) && parsed > 0) {
     return parsed;
   }
-  return 44;
+  return 80;
 }
 
 function readVisibleViewportBottom(): number {
