@@ -4,11 +4,21 @@ import { cn } from "@/lib/utils";
 
 type HomeStatCardScrollHintProps = {
   activeSlot: 0 | 1;
+  orientation?: "horizontal" | "vertical";
 };
 
-export function HomeStatCardScrollHint({ activeSlot }: HomeStatCardScrollHintProps) {
+export function HomeStatCardScrollHint({
+  activeSlot,
+  orientation = "horizontal",
+}: HomeStatCardScrollHintProps) {
   return (
-    <div className="tm-home-stat-card__scroll-hint" aria-hidden>
+    <div
+      className={cn(
+        "tm-home-stat-card__scroll-hint",
+        orientation === "vertical" && "tm-home-stat-card__scroll-hint--vertical"
+      )}
+      aria-hidden
+    >
       <span
         className={cn(
           "tm-home-stat-card__scroll-hint-dot",

@@ -137,20 +137,24 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
       )}
     >
       <MiniRankingHeader />
-      <div ref={viewportRef} className="tm-home-mini-ranking__viewport">
-        {rows.length === 0 ? (
-          <p className="px-3 py-4 text-center text-[8px] text-white/35">Sin clasificación</p>
-        ) : (
-          rows.map((row) => (
-            <MiniRankingDataRow
-              key={row.profileId}
-              row={row}
-              isCurrentUser={row.profileId === currentProfileId}
-            />
-          ))
-        )}
+      <div className="tm-home-mini-ranking__body">
+        <div ref={viewportRef} className="tm-home-mini-ranking__viewport">
+          {rows.length === 0 ? (
+            <p className="px-3 py-4 text-center text-[8px] text-white/35">Sin clasificación</p>
+          ) : (
+            rows.map((row) => (
+              <MiniRankingDataRow
+                key={row.profileId}
+                row={row}
+                isCurrentUser={row.profileId === currentProfileId}
+              />
+            ))
+          )}
+        </div>
+        {canScroll ? (
+          <HomeStatCardScrollHint activeSlot={scrollHint} orientation="vertical" />
+        ) : null}
       </div>
-      {canScroll ? <HomeStatCardScrollHint activeSlot={scrollHint} /> : null}
     </Link>
   );
 }

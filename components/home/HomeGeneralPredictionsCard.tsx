@@ -283,6 +283,14 @@ export function HomeGeneralPredictionsCard({
         )}
         data-block-tab-swipe={true}
       >
+        <div className="tm-home-general-predictions__header">
+          <span className="min-w-0 truncate text-[9px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
+            {carouselSlides[activeIndex]?.headerLabel ?? "Mis predicciones"}
+          </span>
+          <span className="shrink-0 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+            Ver todos
+          </span>
+        </div>
         <div
           ref={scrollRef}
           className="tm-home-general-predictions__carousel"
@@ -294,14 +302,6 @@ export function HomeGeneralPredictionsCard({
               className="tm-home-general-predictions__slide"
               aria-hidden={index !== activeIndex}
             >
-              <div className="tm-home-general-predictions__header">
-                <span className="min-w-0 truncate text-[9px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
-                  {slide.headerLabel}
-                </span>
-                <span className="shrink-0 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
-                  Ver todos
-                </span>
-              </div>
               <GeneralPredictionsSlideBody
                 slidePredictions={slide.slidePredictions}
                 editable={editable && slide.isOwn}

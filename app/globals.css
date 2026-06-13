@@ -501,10 +501,7 @@ html:has(.tm-app-frame) {
   --tm-home-stat-card-scroll-hint-h: 0.375rem;
   --tm-home-mini-ranking-header-h: 1.375rem;
   --tm-home-mini-ranking-viewport-h: calc(
-    var(--tm-home-top-stat-height) -
-      var(--tm-home-mini-ranking-header-h) -
-      var(--tm-home-stat-card-scroll-hint-h) -
-      var(--tm-home-stat-card-scroll-hint-gap)
+    var(--tm-home-top-stat-height) - var(--tm-home-mini-ranking-header-h)
   );
   --tm-home-mini-ranking-visible-rows: 3;
   --tm-home-mini-ranking-row-h: calc(
@@ -519,6 +516,13 @@ html:has(.tm-app-frame) {
 }
 
 /* Home mini ranking: 3 filas visibles, scroll vertical con snap */
+
+.tm-home-mini-ranking__body {
+  display: flex;
+  flex: 1 1 0%;
+  min-height: 0;
+  align-items: stretch;
+}
 
 .tm-home-mini-ranking__viewport {
   flex: 1 1 0%;
@@ -581,7 +585,8 @@ html:has(.tm-app-frame) {
   height: var(--tm-home-general-predictions-header-h);
   justify-content: space-between;
   gap: 0.25rem;
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.0625rem;
+  margin-top: -0.125rem;
   min-height: var(--tm-home-general-predictions-header-h);
 }
 
@@ -603,11 +608,23 @@ html:has(.tm-app-frame) {
   display: flex;
   flex: none;
   flex-shrink: 0;
+  flex-direction: row;
   gap: 0.375rem;
   height: var(--tm-home-stat-card-scroll-hint-h);
   justify-content: center;
   margin-top: var(--tm-home-stat-card-scroll-hint-gap);
   min-height: var(--tm-home-stat-card-scroll-hint-h);
+}
+
+.tm-home-stat-card__scroll-hint--vertical {
+  align-self: center;
+  flex-direction: column;
+  height: auto;
+  justify-content: center;
+  margin-top: 0;
+  min-height: 0;
+  padding-left: 0.125rem;
+  width: var(--tm-home-stat-card-scroll-hint-h);
 }
 
 .tm-home-stat-card__scroll-hint-dot {
@@ -617,12 +634,21 @@ html:has(.tm-app-frame) {
   width: 0.25rem;
   transition:
     width 200ms ease,
+    height 200ms ease,
     background-color 200ms ease;
 }
 
 .tm-home-stat-card__scroll-hint-dot--active {
   background: rgb(255 255 255 / 0.5);
+}
+
+.tm-home-stat-card__scroll-hint:not(.tm-home-stat-card__scroll-hint--vertical)
+  .tm-home-stat-card__scroll-hint-dot--active {
   width: 0.625rem;
+}
+
+.tm-home-stat-card__scroll-hint--vertical .tm-home-stat-card__scroll-hint-dot--active {
+  height: 0.625rem;
 }
 
 .tm-accent-link {
