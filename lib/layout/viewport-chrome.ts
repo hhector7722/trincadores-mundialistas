@@ -74,11 +74,12 @@ export function readTabBarTop(): number {
 const INDICATOR_GAP_ABOVE_PX = 10;
 const INDICATOR_ZONE_FALLBACK_PX = 34;
 
-/** Borde inferior del contenido: justo encima de los indicadores de pestaña. */
+/** Borde inferior del contenido: justo encima de los indicadores (dentro de la TabBar). */
 export function readLayoutBottomAboveIndicators(): number {
-  const slot = document.querySelector<HTMLElement>(".tm-tab-indicators-slot");
-  if (slot?.firstElementChild) {
-    const indicatorTop = slot.getBoundingClientRect().top;
+  const nav = document.querySelector<HTMLElement>(TAB_BAR_SELECTOR);
+  const indicators = nav?.querySelector<HTMLElement>(".tm-tabbar-indicators-row");
+  if (indicators) {
+    const indicatorTop = indicators.getBoundingClientRect().top;
     if (indicatorTop > 0) {
       return indicatorTop - INDICATOR_GAP_ABOVE_PX;
     }

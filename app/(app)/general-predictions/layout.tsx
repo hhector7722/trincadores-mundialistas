@@ -6,10 +6,7 @@ export default function GeneralPredictionsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ViewportLayoutRoot
-      className="tm-ranking-layout flex flex-col"
-      bottomAnchor="indicators"
-    >
+    <ViewportLayoutRoot className="tm-ranking-layout flex flex-col">
       {children}
     </ViewportLayoutRoot>
   );

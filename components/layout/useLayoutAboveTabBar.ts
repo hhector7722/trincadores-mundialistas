@@ -48,9 +48,6 @@ export function useLayoutAboveTabBar(
 
     const observeChromeNodes = () => {
       observeNode(document.querySelector('nav[aria-label="Navegacion principal"]'));
-      if (bottomAnchor === "indicators") {
-        observeNode(document.querySelector(".tm-tab-indicators-slot"));
-      }
     };
 
     observeChromeNodes();

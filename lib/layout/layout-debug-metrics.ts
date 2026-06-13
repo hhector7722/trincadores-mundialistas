@@ -48,7 +48,7 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
   const frame = document.querySelector<HTMLElement>(".tm-app-frame");
   const main = document.querySelector<HTMLElement>(".tm-app-main");
   const nav = document.querySelector<HTMLElement>("nav[aria-label='Navegacion principal']");
-  const indicators = document.querySelector<HTMLElement>(".tm-tab-indicators-slot");
+  const indicators = nav?.querySelector<HTMLElement>(".tm-tabbar-indicators-row");
   const home = document.querySelector<HTMLElement>(".tm-home-layout");
   const swipeRoot = document.querySelector<HTMLElement>(".tm-tab-swipe-root");
   const swipeTrack = swipeRoot?.querySelector<HTMLElement>("[class*='will-change-transform']");

@@ -5,10 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
+import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
 import {
   isMainTabActive,
   MAIN_TAB_HREFS,
   MAIN_TABS,
+  shouldShowTabPageIndicators,
 } from "@/lib/layout/main-tabs";
 import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import { cn } from "@/lib/utils";
@@ -43,6 +45,8 @@ export function TabBar() {
     return null;
   }
 
+  const showIndicators = shouldShowTabPageIndicators(pathname);
+
   function handleTabClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
     if (isMainTabActive(pathname, href)) {
       event.preventDefault();
@@ -58,12 +62,24 @@ export function TabBar() {
     <nav
       className={cn(
         "tm-fixed-bottombar fixed bottom-0 left-0 right-0 z-[95]",
-        "flex h-20 items-end justify-around border-t border-[var(--tm-border)] px-1 pb-safe",
+        "flex flex-col border-t border-[var(--tm-border)] pb-safe",
         "bg-[var(--tm-tabbar-bg-hex)]",
-        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md"
+        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
+        showIndicators ? "tm-fixed-bottombar--with-indicators" : "h-20 justify-end"
       )}
       aria-label="Navegacion principal"
     >
+      {showIndicators ? (
+        <div className="tm-tabbar-indicators-row flex shrink-0 items-center justify-center">
+          <TabPageIndicators />
+        </div>
+      ) : null}
+      <div
+        className={cn(
+          "tm-tabbar-tabs-row flex w-full min-h-12 shrink-0 justify-around px-1",
+          showIndicators ? "items-end pb-0.5" : "flex-1 items-end"
+        )}
+      >
       {MAIN_TABS.map(({ href, label }) => {
         const Icon = TAB_ICONS[href];
         const active = isMainTabActive(displayPath, href);
@@ -88,6 +104,7 @@ export function TabBar() {
           </Link>
         );
       })}
+      </div>
     </nav>
   );
 }

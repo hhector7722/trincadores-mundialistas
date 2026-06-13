@@ -3,19 +3,16 @@
 import { usePathname } from "next/navigation";
 import { useLayoutEffect } from "react";
 import { TabBar } from "@/components/layout/TabBar";
-import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
 import { useTabIndicatorsPosition } from "@/components/layout/useTabIndicatorsPosition";
-import { shouldShowTabPageIndicators } from "@/lib/layout/main-tabs";
 import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 
-/** Chrome inferior en portal: indicadores fijos sobre la TabBar. */
+/** Chrome inferior en portal: TabBar con indicadores integrados. */
 export function BottomChrome() {
   const pathname = usePathname();
   const hideChrome = isQuizLabPath(pathname);
-  const showIndicators = !hideChrome && shouldShowTabPageIndicators(pathname);
 
-  useTabIndicatorsPosition(showIndicators);
+  useTabIndicatorsPosition();
 
   useLayoutEffect(() => {
     const sync = () => window.dispatchEvent(new Event(VIEWPORT_CHROME_SYNC_EVENT));
@@ -34,16 +31,7 @@ export function BottomChrome() {
       window.removeEventListener("resize", sync);
       window.removeEventListener("orientationchange", sync);
     };
-  }, [pathname, showIndicators]);
+  }, [pathname]);
 
-  return (
-    <>
-      {showIndicators ? (
-        <div className="tm-tab-indicators-slot">
-          <TabPageIndicators />
-        </div>
-      ) : null}
-      {!hideChrome ? <TabBar /> : null}
-    </>
-  );
+  return hideChrome ? null : <TabBar />;
 }
