@@ -61,7 +61,7 @@ export function TabBar() {
   return (
     <nav
       className={cn(
-        "tm-app-tabbar z-[90] box-border w-full shrink-0 border-t border-[var(--tm-border)] pb-safe",
+        "tm-app-tabbar shrink-0 border-t border-[var(--tm-border)]",
         "bg-[var(--tm-tabbar-bg-hex)]",
         "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
         showIndicators && "tm-app-tabbar--with-indicators",
@@ -73,7 +73,7 @@ export function TabBar() {
           <TabPageIndicators />
         </div>
       ) : null}
-      <div className="tm-tabbar-tabs-row w-full shrink-0 justify-around px-1">
+      <div className="tm-tabbar-tabs-row">
         {MAIN_TABS.map(({ href, label }) => {
           const Icon = TAB_ICONS[href];
           const active = isMainTabActive(displayPath, href);
@@ -88,7 +88,7 @@ export function TabBar() {
               onClick={(event) => handleTabClick(event, href)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex h-full min-h-0 min-w-12 flex-1 touch-manipulation flex-col items-center justify-end gap-0 px-0.5 pb-px",
+                "tm-tabbar-tab-link",
                 "text-[9px] font-medium leading-none transition-colors duration-150 active:opacity-80",
                 active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
                 navigating && "opacity-90",

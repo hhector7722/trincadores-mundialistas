@@ -8,20 +8,27 @@ import {
   VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 
-/**
- * TabBar fija al borde inferior del viewport (portal a body).
- * Evita huecos por overflow/transform del shell y garantiza bottom: 0 real.
- */
+/** TabBar pegada al borde inferior del viewport (portal a body). */
 export function TabBarWrapper() {
   const [mounted, setMounted] = useState(false);
 
   useLayoutEffect(() => {
-    applyVisualViewportChrome();
+    const sync = () => {
+      applyVisualViewportChrome();
+      window.dispatchEvent(new Event(VIEWPORT_CHROME_SYNC_EVENT));
+    };
+
+    sync();
     setMounted(true);
-    window.dispatchEvent(new Event(VIEWPORT_CHROME_SYNC_EVENT));
+
+    window.visualViewport?.addEventListener("resize", sync);
+    window.visualViewport?.addEventListener("scroll", sync);
+    window.addEventListener("resize", sync);
 
     return () => {
-      document.documentElement.style.removeProperty("--tm-chrome-bottom");
+      window.visualViewport?.removeEventListener("resize", sync);
+      window.visualViewport?.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
     };
   }, []);
 
