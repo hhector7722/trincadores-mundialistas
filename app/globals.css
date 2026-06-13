@@ -1450,6 +1450,8 @@ html:has(.tm-app-frame) {
 
 .tm-match-predictions-board .tm-ranking-row {
   min-height: 0;
+  height: 100%;
+  align-content: center;
 }
 
 /* ── Porra: calendario a pantalla completa ── */

@@ -43,15 +43,15 @@ function MatchPredictionsBoardTableHeader({
         "shrink-0 border-b border-[var(--tm-border)] py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
-      <span className="col-span-2 text-left">Trincador</span>
-      {showOutcomes ? <span aria-hidden="true" /> : null}
-      <span className="text-center">
+      <span className="col-span-2 flex h-full items-center text-left">Trincador</span>
+      {showOutcomes ? <span aria-hidden="true" className="h-full" /> : null}
+      <span className="flex h-full items-center justify-center">
         <TeamHeader team={homeTeam} />
       </span>
-      <span className="text-center">
+      <span className="flex h-full items-center justify-center">
         <TeamHeader team={awayTeam} />
       </span>
-      <span className="text-center">Mvp</span>
+      <span className="flex h-full items-center justify-center">Mvp</span>
     </div>
   );
 }
@@ -65,14 +65,14 @@ function MatchPredictionsEmptyRow({ showOutcomes }: { showOutcomes: boolean }) {
       )}
       aria-hidden="true"
     >
-      <span className="flex justify-center">
-        <span className="size-6 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
+      <span className="flex h-full items-center justify-center">
+        <span className="size-5 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
       </span>
-      <span className="whitespace-nowrap">&nbsp;</span>
-      {showOutcomes ? <span aria-hidden="true" /> : null}
-      <span />
-      <span />
-      <span />
+      <span className="flex h-full items-center whitespace-nowrap">&nbsp;</span>
+      {showOutcomes ? <span aria-hidden="true" className="h-full" /> : null}
+      <span className="h-full" />
+      <span className="h-full" />
+      <span className="h-full" />
     </div>
   );
 }

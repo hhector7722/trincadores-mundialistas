@@ -22,7 +22,7 @@ function formatMvpCell(name: string | null): string {
 
 function CellValue({ value }: { value: string }) {
   return (
-    <span className="flex w-full items-center justify-center whitespace-nowrap text-center text-[10px] text-[var(--tm-fg)]">
+    <span className="flex h-full w-full items-center justify-center whitespace-nowrap text-center text-[10px] leading-none text-[var(--tm-fg)]">
       {value}
     </span>
   );
@@ -54,7 +54,7 @@ export function MatchPredictionsBoardRow({
           "tm-ranking-row border-b border-[var(--tm-border)] px-3 text-left last:border-0"
         )}
       >
-        <div className="flex justify-center">
+        <div className="flex h-full items-center justify-center">
           <button
             type="button"
             disabled={!canPreview}
@@ -69,20 +69,20 @@ export function MatchPredictionsBoardRow({
               avatarUrl={row.avatarUrl}
               label={row.label}
               variant="badge"
-              className="size-6 shrink-0"
+              className="size-5 shrink-0"
             />
           </button>
         </div>
         <span
           className={cn(
-            "min-w-0 truncate text-xs font-medium",
+            "flex h-full min-w-0 items-center truncate text-xs font-medium leading-none",
             isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
           )}
         >
           {row.label}
         </span>
         {showOutcomes ? (
-          <div className="flex items-center justify-start">
+          <div className="flex h-full items-center justify-start">
             <MatchPredictionsBoardOutcomeIcons
               scoreOutcome={row.scoreOutcome}
               mvpCorrect={row.mvpCorrect}

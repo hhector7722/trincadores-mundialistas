@@ -16,10 +16,10 @@ export function matchPredictionsGrid(showOutcomes: boolean): string {
 }
 
 export const MATCH_PREDICTIONS_SUBGRID_ROW =
-  "col-span-5 grid grid-cols-subgrid items-center px-2 min-h-0";
+  "col-span-5 grid h-full grid-cols-subgrid items-center px-2 min-h-0";
 
 export const MATCH_PREDICTIONS_SUBGRID_ROW_WITH_OUTCOMES =
-  "col-span-6 grid grid-cols-subgrid items-center px-2 min-h-0";
+  "col-span-6 grid h-full grid-cols-subgrid items-center px-2 min-h-0";
 
 export function matchPredictionsSubgridRow(showOutcomes: boolean): string {
   return showOutcomes
