@@ -5,11 +5,21 @@ export function isFullscreenPath(pathname: string): boolean {
   return isQuizLabPath(pathname);
 }
 
+/** Cabecera oculta: calendario y quiz play (sin pt de header en main). */
+export function isAppHeaderHidden(pathname: string): boolean {
+  if (isFullscreenPath(pathname)) return true;
+  return pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
+}
+
 /** Rutas con scroll en contenedor interno: el main no añade padding inferior extra. */
 export function isInternalScrollPath(pathname: string): boolean {
   if (isFullscreenPath(pathname)) return true;
 
   if (pathname === "/predictions" || pathname.startsWith("/predictions/")) {
+    return true;
+  }
+
+  if (pathname === "/quiz" || pathname === "/quiz/leaderboard") {
     return true;
   }
 

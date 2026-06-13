@@ -45,6 +45,7 @@
   --tm-tabbar-height: 5rem;
   --tm-tabbar-height-md: 4rem;
   --tm-tabbar-indicators-row: 0.375rem;
+  --tm-tabbar-indicators-gap: 0.625rem;
   --tm-tabbar-core: var(--tm-tabbar-height);
   /* Solo 5rem: pb-safe ya vive dentro del h-20 (border-box). Sumar safe otra vez duplica la zona inferior. */
   --tm-tabbar-shell: var(--tm-tabbar-height);
@@ -198,8 +199,13 @@ html:has(.tm-app-header--compact) {
 
 .tm-app-main--internal-scroll {
   box-sizing: border-box;
-  min-height: calc(100dvh - var(--tm-app-header-block));
-  max-height: calc(100dvh - var(--tm-app-header-block));
+  height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
+}
+
+.tm-app-main--internal-scroll.tm-app-main--no-header {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .tm-app-main--internal-scroll .tm-tab-swipe-root {
@@ -210,25 +216,12 @@ html:has(.tm-app-header--compact) {
   height: 100%;
 }
 
-/* Viewports full-bleed: llenan main internal-scroll; clearance vía scroll-padding */
+/* Layout roots full-bleed: llenan el main internal-scroll */
 .tm-porra-layout,
 .tm-ranking-layout,
 .tm-tab-scroll-layout,
 .tm-quiz-page--viewport,
-.tm-quiz-page--play {
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  min-width: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
-}
-
+.tm-quiz-page--play,
 .tm-quiz-page--hub {
   box-sizing: border-box;
   display: flex;
@@ -236,7 +229,13 @@ html:has(.tm-app-header--compact) {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
+}
+
+.tm-quiz-page--hub {
+  overflow: hidden;
+  padding-bottom: 0;
 }
 
 .tm-app-tabbar {
@@ -247,7 +246,7 @@ html:has(.tm-app-header--compact) {
   position: absolute;
   right: 0;
   left: 0;
-  bottom: 100%;
+  bottom: calc(100% + var(--tm-tabbar-indicators-gap));
   display: flex;
   height: var(--tm-tabbar-indicators-row);
   align-items: center;
@@ -1078,9 +1077,9 @@ html:has(.tm-app-shell) body {
 .tm-quiz-page--viewport,
 .tm-quiz-page--hub {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   padding-bottom: 0;
 }
@@ -1100,9 +1099,9 @@ html:has(.tm-app-shell) body {
 .tm-quiz-page--hub > .tm-quiz-hub {
   display: flex;
   min-height: 0;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-width: 0;
   overflow: hidden;
 }
@@ -1110,10 +1109,10 @@ html:has(.tm-app-shell) body {
 .tm-quiz-hub-content {
   display: flex;
   width: 100%;
-  height: 0;
+  height: 100%;
   min-height: 0;
   min-width: 0;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
   overflow: hidden;
 }
@@ -1124,18 +1123,18 @@ html:has(.tm-app-shell) body {
 
 .tm-quiz-leaderboard-table {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   min-width: 0;
 }
 
 .tm-quiz-leaderboard-body {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
@@ -1421,9 +1420,9 @@ html:has(.tm-app-shell) body {
 .tm-ranking-layout {
   box-sizing: border-box;
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -1431,9 +1430,9 @@ html:has(.tm-app-shell) body {
 
 .tm-ranking-page {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   min-width: 0;
   padding: 0.25rem 0.75rem 0;
@@ -1441,18 +1440,18 @@ html:has(.tm-app-shell) body {
 
 .tm-ranking-table {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   min-width: 0;
 }
 
 .tm-ranking-body {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   flex-direction: column;
-  height: 0;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
