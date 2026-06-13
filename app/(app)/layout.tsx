@@ -1,6 +1,8 @@
 ﻿import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
+import { PredictorFab } from "@/components/laboratorio/PredictorFab";
 import { Button } from "@/components/ui/button";
+import { canAccessQuizLab } from "@/lib/quiz/lab-access";
 import { getCachedAppShellContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/actions/auth";
@@ -32,5 +34,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return <AppShell ctx={ctx}>{children}</AppShell>;
+  const predictorEnabled = canAccessQuizLab(ctx.username);
+
+  return (
+    <>
+      <AppShell ctx={ctx}>{children}</AppShell>
+      {predictorEnabled ? <PredictorFab enabled={predictorEnabled} /> : null}
+    </>
+  );
 }

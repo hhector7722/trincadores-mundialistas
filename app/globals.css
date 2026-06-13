@@ -44,6 +44,7 @@
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
   /* h-20 + pb-safe (border-box): safe area ya incluida en los 5rem */
   --tm-tabbar-core: 5rem;
+  --tab-bar-height: var(--tm-tabbar-core);
   --tm-content-bottom: var(--tm-tabbar-core);
   --tm-tab-indicators-bottom: var(--tm-tabbar-core);
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
