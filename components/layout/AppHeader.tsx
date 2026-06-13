@@ -29,7 +29,7 @@ export function AppHeader({
         pinned && "tm-app-header--pinned",
       )}
     >
-      <div className={cn("relative flex items-center justify-center", pinned && "min-h-[var(--tm-app-header-inner)]")}>
+      <div className="relative flex items-center justify-center">
         <h1
           className={cn(
             "font-display tracking-wider",
