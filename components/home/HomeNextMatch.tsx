@@ -7,6 +7,7 @@ import {
   HOME_CARD_SCHEDULED_BODY_H_CLASS,
   HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
+import { buildFinishedMatchesForBoardCarousel } from "@/lib/predictions/board-carousel";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,11 @@ function modeForMatch(match: MatchWithPrediction): SlideItem["mode"] {
 export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMatchProps) {
   const hasLive = matches.some((match) => match.status === "live");
   const focusIndex = useMemo(() => resolveFocusIndex(matches), [matches]);
+
+  const finishedMatchesForBoard = useMemo(
+    () => buildFinishedMatchesForBoardCarousel(matches),
+    [matches],
+  );
 
   const slides = useMemo(() => {
     return matches.map((match, index) => ({
@@ -104,6 +110,7 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
         hasLiveInCarousel={hasLive}
         isLatestFinished={slide.isLatestFinished}
         currentProfileId={currentProfileId}
+        finishedMatchesForBoard={finishedMatchesForBoard}
         teamsBlockClassName={HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS}
       />
     );

@@ -39,6 +39,7 @@ import {
   mvpSnapshotFromMatch,
   type MvpSnapshot,
 } from "@/lib/predictions/mvp-match-state";
+import type { MatchPredictionsBoardCarouselMatch } from "@/lib/predictions/board-carousel";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,7 @@ type HomeMatchCardProps = {
   hasLiveInCarousel: boolean;
   isLatestFinished?: boolean;
   currentProfileId: string;
+  finishedMatchesForBoard?: MatchPredictionsBoardCarouselMatch[];
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
 };
@@ -159,6 +161,7 @@ export function HomeMatchCard({
   hasLiveInCarousel,
   isLatestFinished = true,
   currentProfileId,
+  finishedMatchesForBoard = [],
   onOpenChange,
   teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
 }: HomeMatchCardProps) {
@@ -452,6 +455,7 @@ export function HomeMatchCard({
           homeTeam={displayMatch.home_team}
           awayTeam={displayMatch.away_team}
           currentProfileId={currentProfileId}
+          finishedMatches={finishedMatchesForBoard}
         />
       ) : null}
     </>
