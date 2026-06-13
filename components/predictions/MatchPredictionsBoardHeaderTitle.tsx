@@ -34,7 +34,7 @@ export function matchPredictionsBoardAriaTitle(
   return `${teamNameEs(homeTeam)} ${formatGoal(homeGoals)} - ${formatGoal(awayGoals)} ${teamNameEs(awayTeam)}`;
 }
 
-/** Cabecera del modal: fila fija de equipos + filas de goleadores que empujan la tabla. */
+/** Cabecera del modal: 3 columnas (local | «-» centrado | visitante). */
 export function MatchPredictionsBoardHeaderTitle({
   homeTeam,
   awayTeam,
@@ -43,7 +43,7 @@ export function MatchPredictionsBoardHeaderTitle({
   playerIncidents = [],
   className,
 }: MatchPredictionsBoardHeaderTitleProps) {
-  const teamsRowRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const [nameFontPx, setNameFontPx] = useState(MAX_NAME_FONT_PX);
 
   const homeName = teamNameEs(homeTeam);
@@ -53,11 +53,11 @@ export function MatchPredictionsBoardHeaderTitle({
   const awayScorerLines = buildBoardGoalScorerLines(goalScorers.away);
 
   useLayoutEffect(() => {
-    const row = teamsRowRef.current;
-    if (!row) return;
+    const header = headerRef.current;
+    if (!header) return;
 
     const fitTeamNameSizes = () => {
-      const nameNodes = row.querySelectorAll<HTMLElement>("[data-team-name]");
+      const nameNodes = header.querySelectorAll<HTMLElement>("[data-team-name]");
       let size = MAX_NAME_FONT_PX;
 
       while (size >= MIN_NAME_FONT_PX) {
@@ -67,7 +67,7 @@ export function MatchPredictionsBoardHeaderTitle({
         const nameOverflows = Array.from(nameNodes).some(
           (node) => node.scrollWidth > node.clientWidth,
         );
-        if (!nameOverflows && row.scrollWidth <= row.clientWidth) break;
+        if (!nameOverflows && header.scrollWidth <= header.clientWidth) break;
         size -= 0.5;
       }
 
@@ -77,60 +77,59 @@ export function MatchPredictionsBoardHeaderTitle({
     fitTeamNameSizes();
 
     const observer = new ResizeObserver(fitTeamNameSizes);
-    observer.observe(row);
+    observer.observe(header);
     return () => observer.disconnect();
   }, [homeName, awayName, homeGoals, awayGoals]);
 
   return (
     <div
-      ref={teamsRowRef}
-      className={cn("grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-start gap-y-0.5", className)}
+      ref={headerRef}
+      className={cn(
+        "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start",
+        className,
+      )}
     >
-      <div className="flex min-w-0 justify-end pr-0.5">
-        <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1 gap-y-px">
+      <div className="col-start-1 flex min-w-0 flex-col items-end gap-px pr-1">
+        <div className="inline-flex max-w-full items-center gap-1 whitespace-nowrap">
           <TeamFlagBadge
             name={homeTeam}
             size="xxs"
             loading="eager"
-            className="col-start-1 row-start-1 shrink-0"
+            className="shrink-0"
           />
           <span
             data-team-name
-            className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
+            className="min-w-0 truncate font-semibold leading-none"
             style={{ fontSize: `${nameFontPx}px` }}
           >
             {homeName}
           </span>
-          <span className="col-start-3 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+          <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
             {formatGoal(homeGoals)}
           </span>
-          {homeScorerLines.map((line, index) => (
-            <span
-              key={`home-scorer-${index}`}
-              className={cn(
-                GOAL_SCORER_TEXT_CLASS,
-                "col-start-1 col-end-3 justify-self-start whitespace-nowrap text-left",
-              )}
-              style={{ gridRow: index + 2 }}
-            >
-              {line}
-            </span>
-          ))}
         </div>
+        {homeScorerLines.map((line, index) => (
+          <span
+            key={`home-scorer-${index}`}
+            className={cn(GOAL_SCORER_TEXT_CLASS, "max-w-full whitespace-nowrap text-left")}
+          >
+            {line}
+          </span>
+        ))}
       </div>
 
-      <span className="row-start-1 shrink-0 self-center px-0.5 text-xs leading-none text-[var(--tm-muted)]">
-        -
-      </span>
+      <div className="col-start-2 row-start-1 flex shrink-0 items-center justify-center self-start px-1">
+        <span className="text-xs leading-none text-[var(--tm-muted)]">-</span>
+      </div>
 
-      <div className="flex min-w-0 justify-start pl-0.5">
-        <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1 gap-y-px">
-          <span className="col-start-1 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+      <div className="col-start-3 flex min-w-0 flex-col items-start gap-px pl-1">
+        <div className="inline-flex max-w-full items-center gap-1 whitespace-nowrap">
+          <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
             {formatGoal(awayGoals)}
           </span>
           <span
             data-team-name
-            className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
+            className="min-w-0 truncate font-semibold leading-none"
             style={{ fontSize: `${nameFontPx}px` }}
           >
             {awayName}
@@ -139,21 +138,17 @@ export function MatchPredictionsBoardHeaderTitle({
             name={awayTeam}
             size="xxs"
             loading="eager"
-            className="col-start-3 row-start-1 shrink-0"
+            className="shrink-0"
           />
-          {awayScorerLines.map((line, index) => (
-            <span
-              key={`away-scorer-${index}`}
-              className={cn(
-                GOAL_SCORER_TEXT_CLASS,
-                "col-start-2 col-end-4 justify-self-end whitespace-nowrap text-right",
-              )}
-              style={{ gridRow: index + 2 }}
-            >
-              {line}
-            </span>
-          ))}
         </div>
+        {awayScorerLines.map((line, index) => (
+          <span
+            key={`away-scorer-${index}`}
+            className={cn(GOAL_SCORER_TEXT_CLASS, "max-w-full whitespace-nowrap text-right")}
+          >
+            {line}
+          </span>
+        ))}
       </div>
     </div>
   );
