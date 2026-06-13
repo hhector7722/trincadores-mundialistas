@@ -73,7 +73,7 @@ export function TabBar() {
           <TabPageIndicators />
         </div>
       ) : null}
-      <div className="tm-tabbar-tabs-row w-full shrink-0 justify-around px-0.5">
+      <div className="tm-tabbar-tabs-row w-full shrink-0 justify-around px-1">
         {MAIN_TABS.map(({ href, label }) => {
           const Icon = TAB_ICONS[href];
           const active = isMainTabActive(displayPath, href);
@@ -88,14 +88,14 @@ export function TabBar() {
               onClick={(event) => handleTabClick(event, href)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex h-full min-h-0 min-w-9 flex-1 touch-manipulation flex-col items-center justify-center gap-0 px-0.5",
-                "text-[7px] font-medium leading-none transition-colors duration-150 active:opacity-80",
+                "flex h-full min-h-0 min-w-12 flex-1 touch-manipulation flex-col items-center justify-end gap-0 px-0.5 pb-px",
+                "text-[9px] font-medium leading-none transition-colors duration-150 active:opacity-80",
                 active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
                 navigating && "opacity-90",
               )}
             >
-              <Icon className="h-3 w-3 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
-              <span className="mt-px max-w-full truncate">{label}</span>
+              <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
+              <span className="mt-0.5 max-w-full truncate">{label}</span>
             </Link>
           );
         })}

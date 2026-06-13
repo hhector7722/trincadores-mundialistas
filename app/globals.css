@@ -42,14 +42,9 @@
   --tm-shadow: 0 4px 24px rgba(60, 20, 120, 0.25);
   --tm-shadow-soft: 0 8px 36px rgba(80, 35, 160, 0.3);
   --tm-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tm-tabbar-chrome-block: var(--tm-app-header-inner-pinned);
-  --tm-tabbar-indicators-row: 0.375rem;
-  --tm-tabbar-tabs-row: var(--tm-tabbar-chrome-block);
-  --tm-tabbar-tabs-row-with-indicators: calc(
-    var(--tm-tabbar-chrome-block) - var(--tm-tabbar-indicators-row)
-  );
-  /* Misma altura de fila que la cabecera compacta (3rem) + safe area inferior */
-  --tm-tabbar-core: var(--tm-tabbar-chrome-block);
+  --tm-tabbar-indicators-row: 0.5rem;
+  --tm-tabbar-tabs-row: 2.75rem;
+  --tm-tabbar-core: var(--tm-tabbar-tabs-row);
   --tm-tabbar-shell: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tm-chrome-bottom: 0px;
   --tab-bar-height: var(--tm-tabbar-shell);
@@ -235,12 +230,16 @@ html:has(.tm-app-header--compact) {
   flex-direction: column;
   justify-content: flex-end;
   width: 100%;
-  height: var(--tm-tabbar-shell);
-  min-height: var(--tm-tabbar-shell);
-  max-height: var(--tm-tabbar-shell);
+  height: auto;
+  min-height: 0;
   margin: 0;
+  padding-top: 0;
   padding-left: 0;
   padding-right: 0;
+}
+
+.tm-app-tabbar--with-indicators {
+  --tm-tabbar-core: calc(var(--tm-tabbar-indicators-row) + var(--tm-tabbar-tabs-row));
 }
 
 /* Viewports a pantalla completa: scroll interno en main */
@@ -317,15 +316,11 @@ html:has(.tm-app-header--compact) {
   box-sizing: border-box;
   flex: none;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  height: var(--tm-tabbar-tabs-row);
   min-height: var(--tm-tabbar-tabs-row);
   max-height: var(--tm-tabbar-tabs-row);
   padding: 0;
-}
-
-.tm-app-tabbar--with-indicators .tm-tabbar-tabs-row {
-  min-height: var(--tm-tabbar-tabs-row-with-indicators);
-  max-height: var(--tm-tabbar-tabs-row-with-indicators);
 }
 
 html[data-modal-open] .tm-app-tabbar {
