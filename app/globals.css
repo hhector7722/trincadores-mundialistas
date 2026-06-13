@@ -658,11 +658,15 @@ html:has(.tm-app-frame) {
   align-items: center;
 }
 
-/* Mismo color que el valor de «Campeón» en pronósticos globales (#CCFF00). */
+/* Color fijo del valor «Campeón» en pronósticos globales — no usar --tm-accent. */
+:root {
+  --tm-general-prediction-value: #ccff00;
+}
+
 .tm-goal-scorer-text {
-  color: #ccff00;
+  color: var(--tm-general-prediction-value) !important;
   font-size: 8px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.25;
 }
 

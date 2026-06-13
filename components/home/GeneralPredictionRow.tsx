@@ -2,6 +2,7 @@
 
 import { Pencil, Plus } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
+import { GENERAL_PREDICTION_VALUE_HEX } from "@/lib/ui/general-prediction-value-style";
 import { cn } from "@/lib/utils";
 
 type GeneralPredictionRowProps = {
@@ -36,7 +37,10 @@ export function GeneralPredictionRow({
       <div className="flex min-w-0 items-center justify-center overflow-visible px-0.5">
         {hasValue ? (
           valueNode ?? (
-            <span className="line-clamp-2 max-w-full break-words text-center text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight text-[#CCFF00]">
+            <span
+              className="line-clamp-2 max-w-full break-words text-center text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight"
+              style={{ color: GENERAL_PREDICTION_VALUE_HEX }}
+            >
               {value}
             </span>
           )

@@ -1,4 +1,8 @@
 import { buildCardGoalScorerLines, type MatchGoalScorer } from "@/lib/live/goal-scorers";
+import {
+  GOAL_SCORER_TEXT_CLASS,
+  goalScorerTextStyle,
+} from "@/lib/ui/general-prediction-value-style";
 import { cn } from "@/lib/utils";
 
 type MatchGoalScorersListProps = {
@@ -7,8 +11,7 @@ type MatchGoalScorersListProps = {
   className?: string;
 };
 
-/** Clase compartida: color #CCFF00 del valor «Campeón» en pronósticos globales. */
-export const GOAL_SCORER_TEXT_CLASS = "tm-goal-scorer-text";
+export { GOAL_SCORER_TEXT_CLASS } from "@/lib/ui/general-prediction-value-style";
 
 export function MatchGoalScorersList({
   goals,
@@ -31,6 +34,7 @@ export function MatchGoalScorersList({
         <p
           key={`${line}-${index}`}
           className={cn(GOAL_SCORER_TEXT_CLASS, "w-full whitespace-nowrap")}
+          style={goalScorerTextStyle}
         >
           {line}
         </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { GOAL_SCORER_TEXT_CLASS } from "@/components/live/MatchGoalScorersList";
+import { GOAL_SCORER_TEXT_CLASS, goalScorerTextStyle } from "@/lib/ui/general-prediction-value-style";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { buildBoardGoalScorerLines, extractGoalScorersByTeam } from "@/lib/live/goal-scorers";
 import type { MatchPlayerIncident } from "@/lib/live/types";
@@ -112,6 +112,7 @@ export function MatchPredictionsBoardHeaderTitle({
           <span
             key={`home-scorer-${index}`}
             className={cn(GOAL_SCORER_TEXT_CLASS, "max-w-full whitespace-nowrap text-left")}
+            style={goalScorerTextStyle}
           >
             {line}
           </span>
@@ -145,6 +146,7 @@ export function MatchPredictionsBoardHeaderTitle({
           <span
             key={`away-scorer-${index}`}
             className={cn(GOAL_SCORER_TEXT_CLASS, "max-w-full whitespace-nowrap text-right")}
+            style={goalScorerTextStyle}
           >
             {line}
           </span>
