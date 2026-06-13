@@ -12,18 +12,11 @@ export default async function RankingPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { rows, referenceMatch, previousReferenceMatch } = await getPoolLeaderboard(
-    ctx.activePoolId
-  );
+  const { rows } = await getPoolLeaderboard(ctx.activePoolId);
 
   return (
     <div className="tm-ranking-page">
-      <RankingTable
-        rows={rows}
-        currentProfileId={user!.id}
-        referenceMatch={referenceMatch}
-        previousReferenceMatch={previousReferenceMatch}
-      />
+      <RankingTable rows={rows} currentProfileId={user!.id} />
     </div>
   );
 }

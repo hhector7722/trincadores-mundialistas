@@ -1,41 +1,9 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
-import {
-  formatReferenceMatchDate,
-  formatReferenceMatchLabel,
-} from "@/lib/ranking/format";
-import type { LeaderboardRow, ReferenceMatch } from "@/lib/ranking/queries";
+import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
 const EMPTY_ROW_COUNT = 11;
-
-function RankingReferenceCaption({
-  referenceMatch,
-  previousReferenceMatch,
-}: {
-  referenceMatch: ReferenceMatch | null;
-  previousReferenceMatch: ReferenceMatch | null;
-}) {
-  if (!referenceMatch) return null;
-
-  return (
-    <div className="shrink-0 border-b border-[var(--tm-border)] px-3 py-2">
-      <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--tm-muted)]">
-        Tras {formatReferenceMatchDate(referenceMatch.kickoffAt)} ·{" "}
-        {formatReferenceMatchLabel(referenceMatch.homeTeam, referenceMatch.awayTeam)}
-      </p>
-      {previousReferenceMatch ? (
-        <p className="mt-0.5 text-[10px] text-[var(--tm-subtle)]">
-          Flechas vs {formatReferenceMatchDate(previousReferenceMatch.kickoffAt)} ·{" "}
-          {formatReferenceMatchLabel(
-            previousReferenceMatch.homeTeam,
-            previousReferenceMatch.awayTeam
-          )}
-        </p>
-      ) : null}
-    </div>
-  );
-}
 
 function RankingTableHeader() {
   return (
@@ -80,20 +48,12 @@ function RankingEmptyRow() {
 export function RankingTable({
   rows,
   currentProfileId,
-  referenceMatch = null,
-  previousReferenceMatch = null,
 }: {
   rows: LeaderboardRow[];
   currentProfileId: string;
-  referenceMatch?: ReferenceMatch | null;
-  previousReferenceMatch?: ReferenceMatch | null;
 }) {
   return (
     <div className="tm-ranking-table">
-      <RankingReferenceCaption
-        referenceMatch={referenceMatch}
-        previousReferenceMatch={previousReferenceMatch}
-      />
       <RankingTableHeader />
       <div className="tm-ranking-body">
         {rows.length === 0
