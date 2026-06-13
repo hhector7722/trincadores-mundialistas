@@ -29,6 +29,8 @@ const archivoBlack = Archivo_Black({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   themeColor: "#2E1260",
 };

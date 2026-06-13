@@ -81,6 +81,15 @@ body {
 
 html {
   background-color: var(--tm-purple-deep);
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
 }
 
 html[data-modal-open],
