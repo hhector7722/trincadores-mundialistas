@@ -52,6 +52,15 @@ export function isTeledeporteHighlightTitle(title: string): boolean {
   return true;
 }
 
+export function isReplayHighlightTitle(title: string): boolean {
+  const lower = normalizeText(title);
+  if (lower.includes("#shorts")) return false;
+  if (!lower.includes("resumen")) return false;
+  if (!WC_MARKERS.some((marker) => lower.includes(marker))) return false;
+  if (EXCLUDED_TITLE_KEYWORDS.some((word) => lower.includes(word))) return false;
+  return parseTeamsFromReplayTitle(title) !== null;
+}
+
 export function parseTeamsFromHighlightTitle(title: string): { home: string; away: string } | null {
   const head = title.split("|")[0]?.trim() ?? title.trim();
   const match = head.match(/^(.+?)\s+v\s+(.+)$/i);
@@ -72,6 +81,19 @@ export function parseTeamsFromDaznTitle(title: string): { home: string; away: st
 
   const home = match[1]?.trim() ?? "";
   const away = match[2]?.trim() ?? "";
+  if (!home || !away) return null;
+
+  return { home, away };
+}
+
+/** Ej.: «Estados Unidos 4 – 1 Paraguay | Resumen Copa Mundial de la FIFA 2026™». */
+export function parseTeamsFromReplayTitle(title: string): { home: string; away: string } | null {
+  const head = title.split("|")[0]?.trim() ?? title.trim();
+  const match = head.match(/^(.+?) (\d+) [–-] (\d+) (.+)$/);
+  if (!match) return null;
+
+  const home = match[1]?.trim() ?? "";
+  const away = match[4]?.trim() ?? "";
   if (!home || !away) return null;
 
   return { home, away };

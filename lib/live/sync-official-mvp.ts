@@ -1,11 +1,5 @@
 import { fetchOfficialMvpFromBsd } from "@/lib/live/sources/bsd-official-mvp";
 import {
-  fetchOfficialMvpFromFotmob,
-  fetchOfficialMvpFromFotmobByTeams,
-  loadFotmobMatchesForDate,
-  type FotMobMatchListItem,
-} from "@/lib/live/sources/fotmob-official-mvp";
-import {
   fetchOfficialMvpFromFifa,
   loadFifaCalendarLookup,
   resolveFifaMatchFromCalendar,
@@ -39,12 +33,6 @@ export async function loadMatchesMissingOfficialMvp(
   return (data ?? []) as MatchMvpCandidate[];
 }
 
-function kickoffDateKey(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toISOString().slice(0, 10);
-}
-
 async function loadBsdEventMap(
   admin: AdminClient,
   matchIds: string[],
@@ -64,23 +52,40 @@ async function loadBsdEventMap(
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
 }
 
-async function loadFotmobEventMap(
+async function loadFinishedMatchesWithOfficialMvp(
   admin: AdminClient,
-  matchIds: string[],
-): Promise<Map<string, string>> {
-  if (!matchIds.length) return new Map();
+  nowMs: number,
+): Promise<MatchMvpCandidate[]> {
+  const fromIso = new Date(nowMs - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await admin
-    .from("external_id_map")
-    .select("internal_id, external_key")
-    .eq("source_code", "fotmob")
-    .eq("entity_type", "match")
-    .eq("match_status", "mapped")
-    .in("internal_id", matchIds);
+    .from("matches")
+    .select("id, home_team, away_team, kickoff_at, status, match_results!inner(mvp_player_name)")
+    .eq("status", "finished")
+    .gte("kickoff_at", fromIso)
+    .not("match_results.mvp_player_name", "is", null);
 
-  if (error) throw new Error(`external_id_map fotmob: ${error.message}`);
+  if (error) throw new Error(`matches with mvp: ${error.message}`);
+  return (data ?? []) as MatchMvpCandidate[];
+}
 
-  return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
+function normalizeMvpToken(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .trim()
+    .toLowerCase();
+}
+
+function officialMvpMatchesStored(
+  official: { playerName: string; teamName: string },
+  storedPlayer: string,
+  storedTeam: string,
+): boolean {
+  return (
+    normalizeMvpToken(official.playerName) === normalizeMvpToken(storedPlayer) &&
+    normalizeMvpToken(official.teamName) === normalizeMvpToken(storedTeam)
+  );
 }
 
 async function loadPoolIdForMatch(admin: AdminClient, matchId: string): Promise<string | null> {
@@ -102,14 +107,28 @@ async function persistOfficialMvp(
   matchId: string,
   playerName: string,
   teamName: string,
-): Promise<boolean> {
+  options?: { overwrite?: boolean },
+): Promise<"written" | "unchanged" | "skipped"> {
   const { data: existing } = await admin
     .from("match_results")
-    .select("mvp_player_name")
+    .select("mvp_player_name, mvp_team_name")
     .eq("match_id", matchId)
     .maybeSingle();
 
-  if (!existing || existing.mvp_player_name) return false;
+  if (!existing) return "skipped";
+
+  if (existing.mvp_player_name) {
+    if (
+      !options?.overwrite ||
+      officialMvpMatchesStored(
+        { playerName, teamName },
+        existing.mvp_player_name,
+        existing.mvp_team_name ?? "",
+      )
+    ) {
+      return "unchanged";
+    }
+  }
 
   const { error } = await admin
     .from("match_results")
@@ -121,46 +140,15 @@ async function persistOfficialMvp(
     .eq("match_id", matchId);
 
   if (error) throw new Error(`match_results mvp: ${error.message}`);
-  return true;
+  return "written";
 }
 
-/** Prioridad: FotMob → FIFA → BSD (solo señales explícitas, sin inferir por rating). */
+/** Prioridad: FIFA → BSD (señales explícitas). FotMob excluido: usa mejor nota, no POTM FIFA. */
 async function resolveOfficialMvp(
   match: MatchMvpCandidate,
   fifaLookup: Map<string, FifaResolvedMatch>,
-  fotmobEventId: string | undefined,
-  fotmobByDate: Map<string, FotMobMatchListItem[]>,
   bsdEventId: string | undefined,
 ): Promise<{ playerName: string; teamName: string } | null> {
-  if (fotmobEventId) {
-    const fotmobId = Number(fotmobEventId);
-    if (Number.isFinite(fotmobId)) {
-      const fotmobMvp = await fetchOfficialMvpFromFotmob(fotmobId, match.home_team);
-      if (fotmobMvp) {
-        return { playerName: fotmobMvp.playerName, teamName: fotmobMvp.teamName };
-      }
-    }
-  }
-
-  const dateKey = kickoffDateKey(match.kickoff_at);
-  if (dateKey) {
-    let rows = fotmobByDate.get(dateKey);
-    if (!rows) {
-      rows = await loadFotmobMatchesForDate(dateKey);
-      fotmobByDate.set(dateKey, rows);
-    }
-
-    const fotmobMvp = await fetchOfficialMvpFromFotmobByTeams(
-      match.home_team,
-      match.away_team,
-      match.kickoff_at,
-      rows,
-    );
-    if (fotmobMvp) {
-      return { playerName: fotmobMvp.playerName, teamName: fotmobMvp.teamName };
-    }
-  }
-
   const fifaMatch = resolveFifaMatchFromCalendar(
     fifaLookup,
     match.home_team,
@@ -188,6 +176,38 @@ async function resolveOfficialMvp(
   return null;
 }
 
+async function applyOfficialMvp(
+  admin: AdminClient,
+  match: MatchMvpCandidate,
+  official: { playerName: string; teamName: string },
+  result: SyncLiveMatchesResult,
+  poolsToRebuild: Set<string>,
+  options?: { overwrite?: boolean },
+): Promise<void> {
+  const outcome = await persistOfficialMvp(
+    admin,
+    match.id,
+    official.playerName,
+    official.teamName,
+    options,
+  );
+  if (outcome !== "written") return;
+
+  result.mvpsPersisted += 1;
+
+  const { error: recalcError } = await admin.rpc("recalculate_match_scores", {
+    p_match_id: match.id,
+  });
+  if (recalcError) {
+    result.errors.push(`${match.id}/mvp-recalc: ${recalcError.message}`);
+    return;
+  }
+  result.scoresRecalculated += 1;
+
+  const poolId = await loadPoolIdForMatch(admin, match.id);
+  if (poolId) poolsToRebuild.add(poolId);
+}
+
 export async function syncOfficialMvps(
   admin: AdminClient,
   result: SyncLiveMatchesResult,
@@ -195,52 +215,94 @@ export async function syncOfficialMvps(
   nowMs: number = Date.now(),
   prefetchedMatches?: MatchMvpCandidate[],
 ): Promise<void> {
-  const matches = prefetchedMatches ?? (await loadMatchesMissingOfficialMvp(admin, nowMs));
+  const [missing, stored] = await Promise.all([
+    prefetchedMatches ? Promise.resolve(prefetchedMatches) : loadMatchesMissingOfficialMvp(admin, nowMs),
+    loadFinishedMatchesWithOfficialMvp(admin, nowMs),
+  ]);
+
+  const matches = [...missing, ...stored];
   if (!matches.length) return;
 
   const fifaLookup = await loadFifaCalendarLookup();
-  const matchIds = matches.map((match) => match.id);
-  const [bsdMap, fotmobMap] = await Promise.all([
-    loadBsdEventMap(admin, matchIds),
-    loadFotmobEventMap(admin, matchIds),
-  ]);
-  const fotmobByDate = new Map<string, FotMobMatchListItem[]>();
+  const matchIds = [...new Set(matches.map((match) => match.id))];
+  const bsdMap = await loadBsdEventMap(admin, matchIds);
+  const missingIds = new Set(missing.map((match) => match.id));
 
   for (const match of matches) {
     try {
-      const official = await resolveOfficialMvp(
-        match,
-        fifaLookup,
-        fotmobMap.get(match.id),
-        fotmobByDate,
-        bsdMap.get(match.id),
-      );
+      const official = await resolveOfficialMvp(match, fifaLookup, bsdMap.get(match.id));
       if (!official) continue;
 
-      const written = await persistOfficialMvp(
-        admin,
-        match.id,
-        official.playerName,
-        official.teamName,
-      );
-      if (!written) continue;
-
-      result.mvpsPersisted += 1;
-
-      const { error: recalcError } = await admin.rpc("recalculate_match_scores", {
-        p_match_id: match.id,
+      await applyOfficialMvp(admin, match, official, result, poolsToRebuild, {
+        overwrite: !missingIds.has(match.id),
       });
-      if (recalcError) {
-        result.errors.push(`${match.id}/mvp-recalc: ${recalcError.message}`);
-        continue;
-      }
-      result.scoresRecalculated += 1;
-
-      const poolId = await loadPoolIdForMatch(admin, match.id);
-      if (poolId) poolsToRebuild.add(poolId);
     } catch (error) {
       const message = error instanceof Error ? error.message : "sync official mvp";
       result.errors.push(`${match.id}/mvp: ${message}`);
     }
   }
+}
+
+/** Corrección manual cuando FIFA/operación confirman el MVP antes de que la API lo publique. */
+export async function correctOfficialMvpForMatch(
+  admin: AdminClient,
+  matchId: string,
+  playerName: string,
+  teamName: string,
+): Promise<{ ok: true; poolIds: string[] } | { ok: false; error: string }> {
+  const { data: match, error: matchError } = await admin
+    .from("matches")
+    .select("id, home_team, away_team, kickoff_at, status")
+    .eq("id", matchId)
+    .maybeSingle();
+
+  if (matchError || !match) {
+    return { ok: false, error: matchError?.message ?? "Partido no encontrado." };
+  }
+
+  const result: SyncLiveMatchesResult = {
+    scanned: 0,
+    updated: 0,
+    markedLive: 0,
+    markedFinished: 0,
+    resultsPersisted: 0,
+    scoresRecalculated: 0,
+    mvpsPersisted: 0,
+    headlinesPersisted: 0,
+    poolsRebuilt: 0,
+    errors: [],
+  };
+  const poolsToRebuild = new Set<string>();
+
+  try {
+    await applyOfficialMvp(
+      admin,
+      match as MatchMvpCandidate,
+      { playerName, teamName },
+      result,
+      poolsToRebuild,
+      { overwrite: true },
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "correct official mvp";
+    return { ok: false, error: message };
+  }
+
+  if (result.errors.length) {
+    return { ok: false, error: result.errors.join("; ") };
+  }
+  if (result.mvpsPersisted === 0) {
+    return { ok: false, error: "El MVP ya coincide con el valor indicado." };
+  }
+
+  for (const poolId of poolsToRebuild) {
+    const { error: rebuildError } = await admin.rpc("rebuild_pool_member_scores", {
+      p_pool_id: poolId,
+    });
+    if (rebuildError) {
+      return { ok: false, error: rebuildError.message };
+    }
+  }
+
+  return { ok: true, poolIds: [...poolsToRebuild] };
 }

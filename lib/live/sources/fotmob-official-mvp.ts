@@ -1,13 +1,12 @@
 /**
- * MVP de partido vía FotMob (`content.matchFacts.playerOfTheMatch`).
+ * Lectura auxiliar de FotMob (`content.matchFacts.playerOfTheMatch`).
  *
- * Alcance: en partidos del Mundial, FotMob publica aquí el Player of the Match
- * de FIFA (no el jugador con mejor nota). En otras competiciones FotMob puede
- * usar lógica distinta; esta porra solo consume Mundiales, donde el campo es
- * fiable cuando está poblado.
+ * Ojo: en el Mundial 2026 este campo refleja el jugador con mejor nota FotMob
+ * (`rating.isTop.isTopRating`), no necesariamente el Player/Superior Player of
+ * the Match oficial de FIFA. Ej.: CAN 1-1 BIH (2026-06-12) FotMob → Katic,
+ * FIFA → Ismael Kone.
  *
- * No se infiere por rating ni por `topPlayers`: solo el objeto dedicado
- * `playerOfTheMatch`.
+ * No usar como fuente automática de MVP oficial; reservado para diagnóstico.
  */
 
 import type { FotMobMatchDetailsPayload } from "@/lib/lineup/sources/fotmob-client";

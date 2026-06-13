@@ -47,7 +47,7 @@ export function LabQuestionPreview({
           {question.imageUrl ? (
             <div className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-xl border border-[var(--lab-border)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={question.imageUrl} alt="" className="h-full w-full object-cover" />
+              <img src={question.imageUrl} alt="" className="h-full w-full object-contain" />
             </div>
           ) : null}
         </div>

@@ -1,7 +1,5 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-
 type LabGuessPlayerCropStageProps = {
   prompt: string;
   imageUrl: string;
@@ -36,10 +34,7 @@ export function LabGuessPlayerCropStage({
         <img
           src={imageUrl}
           alt=""
-          className={cn(
-            "h-full w-full object-cover object-center",
-            cropLabel === "OJOS" && "scale-110"
-          )}
+          className="h-full w-full object-contain object-center"
         />
         {!revealed ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-8">

@@ -33,7 +33,7 @@ export function LabGuessPlayerSilhouetteStage({
           src={displaySrc}
           alt=""
           className={cn(
-            "h-full w-full object-cover object-center transition-opacity duration-500",
+            "h-full w-full object-contain object-center transition-opacity duration-500",
             revealed && "opacity-95"
           )}
         />

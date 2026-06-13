@@ -1,17 +1,75 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { FIFA_YOUTUBE_CHANNEL_ID, DAZN_ES_YOUTUBE_CHANNEL_ID, daznEsRssUrl, fifaChannelRssUrl } from "@/lib/youtube/constants";
+import { FIFA_YOUTUBE_CHANNEL_ID, DAZN_ES_YOUTUBE_CHANNEL_ID, REPLAY_YOUTUBE_CHANNEL_ID, daznEsRssUrl, fifaChannelRssUrl, replayRssUrl } from "@/lib/youtube/constants";
 import {
   buildTeamAliasIndex,
   isDaznHighlightTitle,
   isFifaHighlightTitle,
+  isReplayHighlightTitle,
   isTeledeporteHighlightTitle,
   parseTeamsFromDaznTitle,
   parseTeamsFromHighlightTitle,
+  parseTeamsFromReplayTitle,
   parseTeamsFromTeledeporteTitle,
   pickMatchForHighlightVideo,
   resolveTeamLabel,
 } from "@/lib/youtube/match-video";
+
+test("replayRssUrl usa el channel ID oficial @Replay", () => {
+  assert.equal(REPLAY_YOUTUBE_CHANNEL_ID, "UCM2DAYhfMPkGi7o6erYXiHg");
+  assert.equal(
+    replayRssUrl(),
+    "https://www.youtube.com/feeds/videos.xml?channel_id=UCM2DAYhfMPkGi7o6erYXiHg",
+  );
+});
+
+test("isReplayHighlightTitle acepta resumenes del mundial", () => {
+  assert.equal(
+    isReplayHighlightTitle(
+      "Estados Unidos 4 – 1 Paraguay | Resumen Copa Mundial de la FIFA 2026™",
+    ),
+    true,
+  );
+  assert.equal(
+    isReplayHighlightTitle("🔥 ¡Cyle Larin acude al rescate de Canadá nada más entrar! #FIFAWorldCupOnYT #shorts"),
+    false,
+  );
+});
+
+test("parseTeamsFromReplayTitle extrae equipos con marcador embebido", () => {
+  assert.deepEqual(
+    parseTeamsFromReplayTitle(
+      "Estados Unidos 4 – 1 Paraguay | Resumen Copa Mundial de la FIFA 2026™",
+    ),
+    { home: "Estados Unidos", away: "Paraguay" },
+  );
+  assert.deepEqual(
+    parseTeamsFromReplayTitle("México 2 – 0 Sudáfrica | Resumen Copa Mundial de la FIFA 2026™"),
+    { home: "México", away: "Sudáfrica" },
+  );
+});
+
+test("pickMatchForHighlightVideo resuelve titulos Replay con alias de medios", () => {
+  const index = buildTeamAliasIndex(["USA", "Paraguay"]);
+  assert.equal(resolveTeamLabel("Estados Unidos", index), "USA");
+
+  const hit = pickMatchForHighlightVideo(
+    "Estados Unidos",
+    "Paraguay",
+    "2026-06-13T04:00:00.000Z",
+    [
+      {
+        matchId: "match-usa-par",
+        homeTeam: "USA",
+        awayTeam: "Paraguay",
+        kickoffAt: "2026-06-13T01:00:00.000Z",
+      },
+    ],
+    index,
+  );
+
+  assert.equal(hit?.matchId, "match-usa-par");
+});
 
 test("daznEsRssUrl usa el channel ID oficial @DAZNES", () => {
   assert.equal(DAZN_ES_YOUTUBE_CHANNEL_ID, "UCz9FiMLz6SOgR_4VEFvjeIA");

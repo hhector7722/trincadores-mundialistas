@@ -97,7 +97,7 @@ export function LabVideoPlayEndStage({
         ref={videoRef}
         key={question.videoUrl}
         src={question.videoUrl}
-        className={cn("h-full w-full object-cover", frozen && "opacity-95")}
+        className={cn("h-full w-full object-contain", frozen && "opacity-95")}
         playsInline
         muted
         preload="auto"

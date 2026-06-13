@@ -61,11 +61,11 @@ export function TabBar() {
   return (
     <nav
       className={cn(
-        "tm-app-tabbar relative z-20 w-full shrink-0",
-        "flex flex-col border-t border-[var(--tm-border)] pb-safe",
+        "tm-app-tabbar relative z-20 box-border w-full shrink-0",
+        "flex min-h-[var(--tm-tabbar-shell)] flex-col border-t border-[var(--tm-border)] pb-safe",
         "bg-[var(--tm-tabbar-bg-hex)]",
         "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
-        showIndicators ? "tm-app-tabbar--with-indicators" : "h-20 justify-end"
+        showIndicators ? null : "justify-end"
       )}
       aria-label="Navegacion principal"
     >

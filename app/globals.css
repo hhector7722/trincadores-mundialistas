@@ -139,7 +139,10 @@ html[data-modal-open] .tm-app-main {
 
 /* Shell: altura sincronizada vía --tm-vv-height (applyVisualViewportChrome) */
 .tm-app-frame {
-  position: relative;
+  position: fixed;
+  top: var(--tm-vv-offset-top, 0px);
+  right: 0;
+  left: 0;
   display: flex;
   width: 100%;
   min-height: var(--tm-vv-height, 100dvh);
@@ -198,12 +201,10 @@ html:has(.tm-app-header--compact) {
 }
 
 .tm-app-main:has(.tm-home-layout) {
-  display: block;
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  max-height: calc(
-    var(--tm-vv-height, 100dvh) - var(--tm-app-header-block) - var(--tm-tabbar-shell)
-  );
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -278,13 +279,6 @@ html:has(.tm-app-header--compact) {
   width: 100%;
 }
 
-.tm-home-tabbar-buffer__row {
-  width: 100%;
-  border-radius: var(--tm-radius-lg);
-  opacity: 0;
-  pointer-events: none;
-}
-
 .tm-home-layout__hero {
   flex: 0 0 auto;
 }
@@ -299,10 +293,6 @@ html:has(.tm-app-header--compact) {
 .tm-tabbar-tabs-row {
   box-sizing: border-box;
   min-height: var(--tm-tabbar-tabs-row);
-}
-
-.tm-app-tabbar--with-indicators {
-  min-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
 }
 
 html[data-modal-open] .tm-app-tabbar {

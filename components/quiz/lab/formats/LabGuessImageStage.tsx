@@ -36,7 +36,7 @@ export function LabGuessImageStage({
         src={question.imageUrl}
         alt=""
         fill
-        className="object-cover"
+        className="object-contain"
         style={{ filter: `blur(${blurPx}px)` }}
         sizes="(max-width: 640px) 100vw, 480px"
         unoptimized

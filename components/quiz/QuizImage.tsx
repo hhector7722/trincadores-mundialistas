@@ -19,7 +19,7 @@ export function QuizImage({ src, alt, className }: QuizImageProps) {
         className
       )}
     >
-      <Image src={src} alt={alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 480px" />
+      <Image src={src} alt={alt} fill className="object-contain" sizes="(max-width: 640px) 100vw, 480px" />
     </div>
   );
 }
