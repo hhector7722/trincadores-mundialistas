@@ -1,8 +1,4 @@
-import {
-  readMainContentBottom,
-  resetLayoutAboveTabBar,
-  syncLayoutAboveTabBar,
-} from "@/lib/layout/viewport-chrome";
+import { readMainContentBottom } from "@/lib/layout/viewport-chrome";
 
 const MIN_UI_SCALE = 0.15;
 const MAX_UI_SCALE = 2.75;
@@ -518,7 +514,7 @@ export function syncCalendarGridHeight(
   grid: HTMLElement,
   layoutRoot: HTMLElement
 ): number {
-  syncLayoutAboveTabBar(layoutRoot);
+  void layoutRoot;
   prepareCalendarGridFlex(grid);
   void calendar.offsetHeight;
   void grid.offsetHeight;
@@ -540,10 +536,10 @@ export function syncCalendarGridHeight(
 }
 
 export function resetCalendarGridHeight(grid: HTMLElement, layoutRoot?: HTMLElement | null): void {
+  void layoutRoot;
   grid.style.removeProperty("height");
   grid.style.removeProperty("flex");
   grid.style.removeProperty("min-height");
-  if (layoutRoot) resetLayoutAboveTabBar(layoutRoot);
 }
 
 /** Filas iguales vía CSS grid 1fr; tarjetas compartidas según el día más cargado. */

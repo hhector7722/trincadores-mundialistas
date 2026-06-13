@@ -1,14 +1,11 @@
-import {
-  readMainContentBottom,
-  syncLayoutAboveTabBar,
-} from "@/lib/layout/viewport-chrome";
+import { readMainContentBottom } from "@/lib/layout/viewport-chrome";
 
 /** Ancla el cuadro KO al borde inferior del layout (justo encima de la TabBar). */
 export function syncKnockoutViewportHeight(
   pageRoot: HTMLElement,
   layoutRoot: HTMLElement
 ): number {
-  syncLayoutAboveTabBar(layoutRoot);
+  void layoutRoot;
   const top = pageRoot.getBoundingClientRect().top;
   const height = Math.max(0, Math.floor(readMainContentBottom() - top));
 

@@ -1,5 +1,4 @@
 const TAB_BAR_SELECTOR = 'nav[aria-label="Navegacion principal"]';
-const APP_FRAME_SELECTOR = ".tm-app-frame";
 
 export const VIEWPORT_CHROME_SYNC_EVENT = "tm:viewport-chrome-sync";
 
@@ -11,7 +10,7 @@ export function measureChromeBottomLift(): number {
   return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
 }
 
-/** Ancla el shell y la TabBar al visual viewport visible (iOS PWA). */
+/** Variables vv para debug/calendario; ya no ancla frame fixed. */
 export function applyVisualViewportChrome(): void {
   if (typeof document === "undefined") return;
 
@@ -24,14 +23,6 @@ export function applyVisualViewportChrome(): void {
   root.style.setProperty("--tm-vv-height", `${height}px`);
   root.style.setProperty("--tm-vv-offset-top", `${offsetTop}px`);
   root.style.setProperty("--tm-chrome-bottom", `${chromeBottom}px`);
-
-  const frame = document.querySelector<HTMLElement>(APP_FRAME_SELECTOR);
-  if (frame) {
-    frame.style.height = `${height}px`;
-    frame.style.minHeight = `${height}px`;
-    frame.style.maxHeight = `${height}px`;
-    frame.style.top = `${offsetTop}px`;
-  }
 }
 
 export function resetVisualViewportChrome(): void {
@@ -41,12 +32,6 @@ export function resetVisualViewportChrome(): void {
   root.style.removeProperty("--tm-vv-height");
   root.style.removeProperty("--tm-vv-offset-top");
   root.style.removeProperty("--tm-chrome-bottom");
-
-  const frame = document.querySelector<HTMLElement>(APP_FRAME_SELECTOR);
-  frame?.style.removeProperty("height");
-  frame?.style.removeProperty("min-height");
-  frame?.style.removeProperty("max-height");
-  frame?.style.removeProperty("top");
 }
 
 function readTabBarCorePx(): number {

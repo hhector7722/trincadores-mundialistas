@@ -140,24 +140,14 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell: altura sincronizada vía --tm-vv-height (applyVisualViewportChrome) */
-.tm-app-frame {
-  position: fixed;
-  top: var(--tm-vv-offset-top, 0px);
-  right: 0;
-  left: 0;
-  display: flex;
-  width: 100%;
-  min-height: var(--tm-vv-height, 100dvh);
-  max-height: var(--tm-vv-height, 100dvh);
-  flex-direction: column;
+/* Shell Marbella: documento normal + chrome fixed (sin frame vv) */
+.tm-app-shell {
+  position: relative;
   isolation: isolate;
-  overflow: hidden;
+  min-height: 100dvh;
 }
 
-/* Degradado fijo: mismo tono en cabecera y contenido */
-.tm-app-frame::before {
-  content: "";
+.tm-app-shell-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
@@ -168,6 +158,13 @@ html[data-modal-open] .tm-app-main {
 
 .tm-app-header {
   background: transparent;
+}
+
+html[data-modal-open="true"] .tm-app-header-fixed,
+html[data-modal-open] .tm-app-header-fixed {
+  filter: blur(6px);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .tm-app-header__row--compact {
@@ -195,40 +192,51 @@ html:has(.tm-app-header--compact) {
 
 .tm-app-main {
   box-sizing: border-box;
-  position: relative;
-  z-index: 10;
-  flex: 1 1 auto;
-  min-height: 0;
   width: 100%;
-  padding-bottom: 0;
   overflow-x: hidden;
 }
 
-.tm-app-main:has(.tm-home-layout) {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+.tm-app-main--internal-scroll {
+  box-sizing: border-box;
+  min-height: calc(100dvh - var(--tm-app-header-block));
+  max-height: calc(100dvh - var(--tm-app-header-block));
 }
 
-.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-root {
+.tm-app-main--internal-scroll .tm-tab-swipe-root {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  height: 100%;
 }
 
-.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-track {
+/* Viewports full-bleed: llenan main internal-scroll; clearance vía scroll-padding */
+.tm-porra-layout,
+.tm-ranking-layout,
+.tm-tab-scroll-layout,
+.tm-quiz-page--viewport,
+.tm-quiz-page--play {
+  box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding-bottom: var(--tm-tabbar-shell);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+}
+
+.tm-quiz-page--hub {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .tm-app-tabbar {
@@ -252,63 +260,15 @@ html:has(.tm-app-header--compact) {
   flex: none;
 }
 
-/* Viewports a pantalla completa: scroll interno en main */
-.tm-app-main:has(.tm-porra-layout),
-.tm-app-main:has(.tm-ranking-layout),
-.tm-app-main:has(.tm-tab-scroll-layout),
-.tm-app-main:has(.tm-quiz-page) {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1 1 auto;
-  padding-bottom: 0;
-  overflow: hidden;
-}
-
-.tm-app-main:has(.tm-porra-layout) .tm-tab-swipe-root,
-.tm-app-main:has(.tm-ranking-layout) .tm-tab-swipe-root,
-.tm-app-main:has(.tm-tab-scroll-layout) .tm-tab-swipe-root,
-.tm-app-main:has(.tm-quiz-page) .tm-tab-swipe-root {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-  height: 100%;
-}
-
-.tm-app-main .tm-porra-layout,
-.tm-app-main .tm-ranking-layout {
-  height: 100%;
-  min-height: 0;
-}
-
-.tm-tab-scroll-layout {
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 0%;
-  flex-direction: column;
-  height: 0;
-  min-height: 0;
-  min-width: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
-}
-
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;
-  min-height: 100%;
-  flex: 1 1 auto;
   overflow: visible;
 }
 
 .tm-home-cards-stack {
   box-sizing: border-box;
-  flex: 1 1 auto;
   width: 100%;
-  min-height: 0;
 }
 
 .tm-home-layout__hero {
@@ -345,18 +305,12 @@ html:has(.tm-tab-swipe-root) {
     12px 0 32px rgba(0, 0, 0, 0.22);
 }
 
-/* Overscroll: arriba tono cabecera; abajo mismo tono que TabBar (sin franja ajena) */
-html:has(.tm-app-frame) {
+/* Overscroll: tono TabBar en el chin inferior */
+html:has(.tm-app-shell) {
   background-color: var(--tm-tabbar-bg-hex);
-  overflow: hidden;
-  overscroll-behavior: none;
 }
 
-html:has(.tm-app-frame) body {
-  overflow: hidden;
-  overscroll-behavior: none;
-  min-height: var(--tm-vv-height, 100dvh);
-  max-height: var(--tm-vv-height, 100dvh);
+html:has(.tm-app-shell) body {
   background-color: var(--tm-tabbar-bg-hex);
 }
 
@@ -768,7 +722,7 @@ html:has(.tm-app-frame) body {
 
 /* ── Home: atmósfera multicapa ── */
 .tm-home-atmosphere {
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;

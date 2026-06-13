@@ -1,5 +1,6 @@
 ﻿import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
+import { AppMainWrapper } from "@/components/layout/AppMainWrapper";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
 import { HighlightNotificationOpener } from "@/components/notifications/HighlightNotificationOpener";
 import { QuizActiveNotificationProvider } from "@/components/notifications/QuizActiveNotificationProvider";
@@ -7,7 +8,6 @@ import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotif
 import { PushNotificationProvider } from "@/components/push/PushNotificationProvider";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
-import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
@@ -37,10 +37,9 @@ export function AppShell({
             >
               <LineupsNotificationOpener />
               <HighlightNotificationOpener />
-              <PullToRefresh />
               <TabNavigationProvider>
-                <VisualViewportSync />
-                <div className="tm-app-frame">
+                <div className="tm-app-shell relative min-h-screen">
+                  <div className="tm-app-shell-bg" aria-hidden="true" />
                   <div
                     id="tm-safe-probe"
                     className="pointer-events-none fixed left-0 top-0 -z-50 h-0 w-0 overflow-hidden pb-safe"
@@ -48,10 +47,11 @@ export function AppShell({
                   />
                   <HomeAtmosphere />
                   <AppHeaderGate ctx={ctx} />
-                  <main className="tm-app-main">
+                  <AppMainWrapper>
                     <TabSwipeNavigator>{children}</TabSwipeNavigator>
-                  </main>
+                  </AppMainWrapper>
                 </div>
+                <PullToRefresh />
                 <TabBarWrapper />
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />

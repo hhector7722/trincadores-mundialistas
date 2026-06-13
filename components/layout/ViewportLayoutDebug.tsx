@@ -21,7 +21,7 @@ export function ViewportLayoutDebug() {
     const refresh = () => {
       const snapshot = collectExtendedLayoutMetrics(pathname);
       setMetrics(snapshot);
-      emitLayoutDebugLog(snapshot, "marbella-fixed", "marbella-fix");
+      emitLayoutDebugLog(snapshot, "marbella-shell", "marbella-parity");
     };
 
     refresh();
@@ -30,25 +30,19 @@ export function ViewportLayoutDebug() {
     window.visualViewport?.addEventListener("resize", refresh);
     window.visualViewport?.addEventListener("scroll", refresh);
     window.addEventListener("resize", refresh);
-
-    const home = document.querySelector<HTMLElement>(".tm-home-layout");
-    home?.addEventListener("scroll", refresh);
+    window.addEventListener("scroll", refresh);
 
     return () => {
       window.visualViewport?.removeEventListener("resize", refresh);
       window.visualViewport?.removeEventListener("scroll", refresh);
       window.removeEventListener("resize", refresh);
-      home?.removeEventListener("scroll", refresh);
+      window.removeEventListener("scroll", refresh);
     };
   }, [enabled, pathname]);
 
   if (!enabled || !metrics) return null;
 
   const chinGap = metrics.gapBelowVisual > 2 || metrics.gapBelowShell > 2 || metrics.gapBelowNav > 2;
-  const scrollIssue =
-    metrics.pathname === "/" &&
-    metrics.homeCanScroll &&
-    metrics.homeContentOverflow > 0;
 
   return (
     <>
@@ -57,28 +51,22 @@ export function ViewportLayoutDebug() {
         style={{ textShadow: "0 0 4px #000" }}
       >
         <div className="mx-2 mb-2 max-h-[45vh] overflow-y-auto rounded-md border border-lime-400/40 bg-black/85 p-2">
-          <p className="text-lime-200">debug 95c535 · {metrics.pathname}</p>
+          <p className="text-lime-200">debug marbella · {metrics.pathname}</p>
           <p>standalone={String(metrics.standalone)} innerH={metrics.innerHeight} vv.h={metrics.vvHeight}</p>
-          <p>safeBottom={metrics.safeBottom}px css frame={metrics.frameCssHeight} body={metrics.bodyCssHeight}</p>
           <p>
-            frame {metrics.frameTop}→{metrics.frameBottom} (h={metrics.frameHeight})
+            safeBottom={metrics.safeBottom}px mainPb={metrics.mainPaddingBottom} body={metrics.bodyCssHeight}
+          </p>
+          <p>
+            shell {metrics.shellTop}→{metrics.shellBottom} (h={metrics.shellHeight})
           </p>
           <p className={chinGap ? "font-bold text-red-400" : ""}>
-            gapShell={metrics.gapBelowShell}px gapVisual={metrics.gapBelowVisual}px gapBelowNav=
-            {metrics.gapBelowNav}px
+            gapShell={metrics.gapBelowShell}px gapBelowNav={metrics.gapBelowNav}px
           </p>
           <p>
             main↓{metrics.mainBottom} chrome↑{metrics.chromeTop} gap={metrics.gapMainToChrome}px
           </p>
           <p>
-            indicators {metrics.indicatorTop}→{metrics.indicatorBottom} nav↓{metrics.navBottom}
-          </p>
-          <p className={scrollIssue ? "font-bold text-amber-300" : ""}>
-            home scroll {metrics.homeScrollTop}/{metrics.homeContentOverflow}px overflow=
-            {metrics.homeOverflowY} canScroll={String(metrics.homeCanScroll)}
-          </p>
-          <p>
-            swipe overflow={metrics.swipeRootOverflow} trackH={metrics.swipeTrackHeight} nav=
+            docScroll={metrics.docScrollTop} docCanScroll={String(metrics.docCanScroll)} nav=
             {metrics.navPosition}
           </p>
         </div>
@@ -86,7 +74,7 @@ export function ViewportLayoutDebug() {
       {chinGap ? (
         <div
           className="pointer-events-none fixed left-0 right-0 z-[9998] bg-red-500/35"
-          style={{ top: metrics.frameBottom, bottom: 0 }}
+          style={{ top: metrics.shellBottom, bottom: 0 }}
           aria-hidden
         />
       ) : null}
