@@ -7,6 +7,7 @@ import {
   isKnockoutMatchdayKey,
 } from "@/lib/predictions/stage-filter";
 import type { MatchLivePayload, MatchPlayerIncident } from "@/lib/live/types";
+import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 import {
   isMvpPredictionCorrect,
   resolveScoreOutcome,
@@ -31,7 +32,7 @@ export type MatchWithPrediction = {
   officialMvpTeamName: string | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
-  highlightSource: "youtube_dazn_es" | "youtube_fifa" | "youtube_replay" | "youtube_rtve_teledeporte" | null;
+  highlightSource: HighlightSourceCode | null;
   prediction:
     | Pick<
         Prediction,

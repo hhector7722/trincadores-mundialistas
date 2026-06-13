@@ -9,6 +9,9 @@ export const TELEDEPORTE_RTVE_YOUTUBE_CHANNEL_ID = "UC4SBVYTpqOh-exr7BShLAPw";
 /** Canal DAZN España (@DAZNES). */
 export const DAZN_ES_YOUTUBE_CHANNEL_ID = "UCz9FiMLz6SOgR_4VEFvjeIA";
 
+/** Canal Replay FIFA (@Replay). */
+export const REPLAY_YOUTUBE_CHANNEL_ID = "UCM2DAYhfMPkGi7o6erYXiHg";
+
 export function youtubeChannelRssUrl(channelId: string): string {
   return `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 }
@@ -25,9 +28,14 @@ export function daznEsRssUrl(channelId = DAZN_ES_YOUTUBE_CHANNEL_ID): string {
   return youtubeChannelRssUrl(channelId);
 }
 
+export function replayRssUrl(channelId = REPLAY_YOUTUBE_CHANNEL_ID): string {
+  return youtubeChannelRssUrl(channelId);
+}
+
 export const HIGHLIGHT_SOURCE_CODES = {
   dazn: "youtube_dazn_es",
   fifa: "youtube_fifa",
+  replay: "youtube_replay",
   teledeporte: "youtube_rtve_teledeporte",
 } as const satisfies Record<string, HighlightSourceCode>;
 
