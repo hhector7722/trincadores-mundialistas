@@ -136,14 +136,16 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell flex: min-h-dvh; sin cage de altura en html/body (rompe fixed en iOS WebKit) */
+/* Shell: altura sincronizada vía --tm-vv-height (applyVisualViewportChrome) */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 100dvh;
+  min-height: var(--tm-vv-height, 100dvh);
+  max-height: var(--tm-vv-height, 100dvh);
   flex-direction: column;
   isolation: isolate;
+  overflow: hidden;
 }
 
 /* Degradado fijo: mismo tono en cabecera y contenido */
@@ -306,6 +308,19 @@ html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
 
 .tm-fixed-bottombar {
   box-sizing: border-box;
+  bottom: var(--tm-chrome-bottom, 0px);
+}
+
+html[data-tab-chrome-ready] .tm-fixed-bottombar::after {
+  content: "";
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 94;
+  height: var(--tm-chrome-bottom, 0px);
+  pointer-events: none;
+  background: var(--tm-tabbar-bg-hex);
 }
 
 html[data-modal-open] .tm-fixed-bottombar,
@@ -342,6 +357,15 @@ html:has(.tm-tab-swipe-root) {
 /* Overscroll: arriba tono cabecera */
 html:has(.tm-app-frame) {
   background-color: var(--tm-bg-top);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html:has(.tm-app-frame) body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  min-height: var(--tm-vv-height, 100dvh);
+  max-height: var(--tm-vv-height, 100dvh);
 }
 
 .font-display {
@@ -687,15 +711,10 @@ html:has(.tm-app-frame) {
   align-items: center;
 }
 
-/* Color fijo del valor «Campeón» en pronósticos globales — no usar --tm-accent. */
-:root {
-  --tm-general-prediction-value: #ccff00;
-}
-
 .tm-goal-scorer-text {
-  color: var(--tm-general-prediction-value) !important;
+  color: rgb(255 255 255 / 0.5);
   font-size: 8px;
-  font-weight: 500;
+  font-weight: 400 !important;
   line-height: 1.25;
 }
 

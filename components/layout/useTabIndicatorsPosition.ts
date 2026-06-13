@@ -6,24 +6,26 @@ import {
   applyTabIndicatorsBottom,
   resetTabIndicatorsBottom,
 } from "@/lib/layout/tab-indicators-position";
+import { applyVisualViewportChrome } from "@/lib/layout/viewport-chrome";
 
 const TAB_BAR_SELECTOR = 'nav[aria-label="Navegacion principal"]';
 
-/** Sincroniza --tm-tab-indicators-bottom justo encima de la TabBar (fixed overlay). */
+/** Sincroniza visual viewport + --tm-tab-indicators-bottom sobre la TabBar. */
 export function useTabIndicatorsPosition(enabled = true) {
   const pathname = usePathname();
 
   useLayoutEffect(() => {
-    if (!enabled) {
-      resetTabIndicatorsBottom();
-      return;
-    }
     let frame = 0;
 
     const sync = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        applyTabIndicatorsBottom();
+        applyVisualViewportChrome();
+        if (enabled) {
+          applyTabIndicatorsBottom();
+        } else {
+          resetTabIndicatorsBottom();
+        }
       });
     };
 
