@@ -247,9 +247,11 @@ export function HomeMatchCard({
             type="button"
             onClick={() => setPredictionsBoardOpen(true)}
             className={cn(
-              "absolute inset-x-0 z-20 mx-auto flex min-h-12 w-max items-center justify-center",
-              "font-semibold uppercase tracking-[0.12em] text-[var(--tm-live)]",
-              "text-[8px] transition-opacity hover:opacity-80",
+              "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
+              "inline-flex h-auto w-max shrink-0 items-center justify-center",
+              "rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+              "text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black",
+              "transition-opacity hover:opacity-90 active:opacity-80",
             )}
           >
             Ver pronósticos
