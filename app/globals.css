@@ -47,7 +47,7 @@
   --tab-bar-height: var(--tm-tabbar-core);
   --tm-content-bottom: var(--tm-tabbar-core);
   --tm-tab-indicators-bottom: var(--tm-tabbar-core);
-  --tm-app-header-inner: 3.25rem;
+  --tm-app-header-inner: 3.5rem;
   --tm-app-header-pt: max(0.75rem, env(safe-area-inset-top, 0px));
   --tm-app-header-pb: 0.5rem;
   --tm-app-header-block: calc(
@@ -160,18 +160,59 @@ html[data-modal-open] .tm-app-main {
   top: 0;
   right: 0;
   left: 0;
-  z-index: 90;
+  z-index: 100;
   box-sizing: border-box;
+  min-height: var(--tm-app-header-block);
   padding-top: var(--tm-app-header-pt);
   padding-bottom: var(--tm-app-header-pb);
+  background: linear-gradient(
+    180deg,
+    var(--tm-bg-top) 0%,
+    color-mix(in srgb, var(--tm-bg-top) 88%, var(--tm-bg-light)) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07);
   transform: translateZ(0);
+  pointer-events: auto;
 }
 
 .tm-app-header-spacer {
   box-sizing: border-box;
   width: 100%;
   height: var(--tm-app-header-block);
+  min-height: var(--tm-app-header-block);
   flex-shrink: 0;
+}
+
+/* Home: el scroll vive solo bajo la cabecera fija; nada puede pintarse encima */
+.tm-app-frame:has(.tm-app-header--pinned) {
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.tm-app-frame:has(.tm-app-header--pinned) .tm-app-main {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: calc(100dvh - var(--tm-app-header-block));
+  overflow: hidden;
+  contain: layout paint;
+}
+
+.tm-app-frame:has(.tm-app-header--pinned) .tm-home-layout {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tm-app-main {
