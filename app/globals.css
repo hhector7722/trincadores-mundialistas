@@ -252,7 +252,7 @@ html[data-modal-open] .tm-app-main {
   flex: 0 0 auto;
 }
 
-/* Indicadores swipe: fixed sobre la TabBar (portal en body) */
+/* Indicadores swipe: fixed sobre contenido y TabBar (portal en body) */
 .tm-tab-indicators-slot {
   position: fixed;
   right: 0;
@@ -263,7 +263,7 @@ html[data-modal-open] .tm-app-main {
   align-items: flex-end;
   justify-content: center;
   pointer-events: none;
-  /* Flotan sobre el fondo/contenido; no reservan hueco en el layout */
+  background: transparent;
   transform: translateZ(0);
 }
 

@@ -10,13 +10,12 @@ type HomeViewportShellProps = {
 };
 
 /**
- * Inicio: el conjunto de cards se centra en Y (margin auto) dentro del hueco
- * cabecera fija → indicadores, sin spacers que inflen la altura del scroll.
+ * Inicio: cards centradas en Y; indicadores flotan sobre el fondo (fixed, sin reservar hueco).
  */
 export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
   return (
     <ViewportLayoutRoot
-      bottomAnchor="indicators"
+      bottomAnchor="tabbar"
       className={cn(
         "tm-home-layout relative z-10 flex min-h-0 w-full flex-col overflow-x-hidden overflow-y-auto p-4 pb-0",
       )}
