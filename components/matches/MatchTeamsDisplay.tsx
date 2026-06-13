@@ -40,8 +40,12 @@ export const HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS =
 /** Card inicio con carrusel: compensa mt-1.5 + h-1.5 de los indicadores inferiores. */
 export const HOME_CARD_CAROUSEL_INDICATORS_OFFSET = "0.875rem";
 
-/** Card próximo partido: bloque equipos compacto (carrusel home). */
+/** Card próximo partido: bloque equipos compacto (carrusel home, altura fija legacy). */
 export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-1 h-[calc(6.25rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-hidden`;
+
+/** Card próximo partido en home viewport: bloque equipos elástico. */
+export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_VIEWPORT_CLASS =
+  "relative mt-1 min-h-0 flex-1 overflow-hidden";
 
 /** Card próximo partido (sin carrusel): altura estándar fuera del carrusel. */
 export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = "relative mt-2 h-[calc(7rem-0.875rem)] overflow-hidden";

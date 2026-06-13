@@ -8,14 +8,14 @@ type HomeHeroProps = {
 
 export function HomeHero({ matchHighlights }: HomeHeroProps) {
   return (
-    <section className="tm-hero-card relative grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2 overflow-hidden rounded-3xl px-5 pt-2 pb-1.5">
+    <section className="tm-hero-card relative grid h-full min-h-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2 overflow-hidden rounded-3xl px-5 pt-2 pb-1.5">
       <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_15%,rgba(120,60,220,0.2)_0%,transparent_55%)]"
         aria-hidden="true"
       />
 
-      <div className="@container/hero relative z-10 min-w-0 overflow-hidden">
+      <div className="@container/hero relative z-10 flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
         <HomeHeroCarousel matchHighlights={matchHighlights} />
       </div>
 

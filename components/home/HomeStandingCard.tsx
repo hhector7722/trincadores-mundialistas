@@ -37,8 +37,8 @@ export function HomeStandingCard({
   matchCarouselMatches,
 }: HomeStandingCardProps) {
   return (
-    <div className="flex min-h-0 flex-col gap-3 pb-2">
-      <div className="grid shrink-0 grid-cols-2 gap-3">
+    <div className="tm-home-body-inner flex min-h-0 flex-col gap-[var(--tm-home-row-gap)]">
+      <div className="tm-home-row tm-home-row--stats grid min-h-0 grid-cols-2 gap-[var(--tm-home-row-gap)]">
         <HomeMiniRankingTable rows={leaderboardRows} currentProfileId={currentProfileId} />
         <HomeGeneralPredictionsCard
           poolId={poolId}
@@ -49,7 +49,7 @@ export function HomeStandingCard({
         />
       </div>
       {matchCarouselMatches.length > 0 ? (
-        <div className="shrink-0">
+        <div className="tm-home-row tm-home-row--match min-h-0">
           <HomeNextMatch
             poolId={poolId}
             currentProfileId={currentProfileId}
@@ -57,14 +57,13 @@ export function HomeStandingCard({
           />
         </div>
       ) : null}
-      <div className="tm-home-secondary-row grid shrink-0 grid-cols-2 items-stretch gap-3">
-        <div className="flex h-full min-h-0 min-w-0 flex-col gap-1">
+      <div className="tm-home-row tm-home-secondary-row grid min-h-0 grid-cols-2 items-stretch gap-[var(--tm-home-row-gap)]">
+        <div className="flex h-full min-h-0 flex-col gap-1">
           <HomeScoringRulesCard className="min-h-0 flex-1" />
-          <HomeDailyQuizCard quizHub={quizHub} className="shrink-0" />
+          <HomeDailyQuizCard quizHub={quizHub} className="min-h-0 flex-1" />
         </div>
         <HomeDailyFactCard fact={dailyFact} />
       </div>
-      <div className="scroll-end-touch" aria-hidden />
     </div>
   );
 }

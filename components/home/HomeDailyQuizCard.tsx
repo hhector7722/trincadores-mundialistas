@@ -63,7 +63,7 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
           }
         }}
         className={cn(
-          "@container shrink-0 cursor-pointer rounded-2xl p-2 tm-stat-card",
+          "@container flex min-h-0 cursor-pointer flex-col justify-center rounded-2xl p-2 tm-stat-card",
           className
         )}
         data-tm-indicators-anchor="quiz-daily"
