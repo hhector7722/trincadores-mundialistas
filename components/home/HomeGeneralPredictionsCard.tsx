@@ -294,7 +294,7 @@ export function HomeGeneralPredictionsCard({
               aria-hidden={index !== activeIndex}
             >
               <div className="tm-home-general-predictions__header">
-                <span className="min-w-0 truncate text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
+                <span className="min-w-0 truncate text-[9px] font-semibold uppercase tracking-wide text-[var(--tm-accent)]">
                   {slide.headerLabel}
                 </span>
                 <span className="shrink-0 text-[6px] font-medium uppercase tracking-[0.08em] text-[var(--tm-accent)]">
@@ -313,6 +313,19 @@ export function HomeGeneralPredictionsCard({
             </div>
           ))}
         </div>
+        {carouselSlides.length > 1 ? (
+          <div className="tm-home-general-predictions__indicators" aria-hidden>
+            {carouselSlides.map((slide, index) => (
+              <span
+                key={slide.profileId}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35"
+                )}
+              />
+            ))}
+          </div>
+        ) : null}
         {error ? (
           <p className="mt-1 shrink-0 text-[10px] text-[var(--tm-danger)]" role="alert">
             {error}

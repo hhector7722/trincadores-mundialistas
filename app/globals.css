@@ -497,7 +497,8 @@ html:has(.tm-app-frame) {
 /* Altura de referencia: card de pronósticos globales (padding + 5 filas) */
 :root {
   --tm-home-top-stat-height: calc(0.75rem * 2 + 5 * 1.5rem);
-  --tm-home-general-predictions-header-h: 0.75rem;
+  --tm-home-general-predictions-header-h: 0.875rem;
+  --tm-home-general-predictions-indicators-h: 0.375rem;
   --tm-home-mini-ranking-header-h: 1.375rem;
   --tm-home-mini-ranking-viewport-h: calc(
     var(--tm-home-top-stat-height) - var(--tm-home-mini-ranking-header-h)
@@ -591,6 +592,18 @@ html:has(.tm-app-frame) {
 .tm-home-general-predictions__body .tm-general-prediction-row {
   flex: 1 1 0%;
   min-height: 0;
+}
+
+.tm-home-general-predictions__indicators {
+  align-items: center;
+  display: flex;
+  flex: none;
+  flex-shrink: 0;
+  gap: 0.375rem;
+  height: var(--tm-home-general-predictions-indicators-h);
+  justify-content: center;
+  margin-top: 0.25rem;
+  min-height: var(--tm-home-general-predictions-indicators-h);
 }
 
 .tm-accent-link {
