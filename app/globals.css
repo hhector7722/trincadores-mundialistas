@@ -2393,11 +2393,3 @@ html:has(.tm-app-frame) {
   transform: scale(0.78) translateX(10px);
   pointer-events: none;
 }
-
-.tm-predictor-fab--dragging {
-  transition: none;
-  cursor: grabbing;
-  touch-action: none;
-  transform: scale(1.04);
-  box-shadow: -4px 0 20px rgba(217, 255, 0, 0.18);
-}
