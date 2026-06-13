@@ -286,6 +286,7 @@ export function HomeMatchCard({
             homeTeam={displayMatch.home_team}
             awayTeam={displayMatch.away_team}
             liveSnapshot={liveSnapshot}
+            playerIncidents={displayMatch.playerIncidents}
             predictionScoreText={saved ? scoreText : null}
             mvpPlayerName={displayMatch.mvpPrediction?.player_name ?? null}
             mvpTeamName={displayMatch.mvpPrediction?.team_name ?? null}

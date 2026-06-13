@@ -35,6 +35,7 @@ export function rowToMatchLiveSnapshot(row: LiveStateRow): MatchLiveSnapshot {
     finished: row.finished,
     stats: payload.stats ?? null,
     substitutions: payload.substitutions ?? [],
+    playerIncidents: payload.playerIncidents ?? [],
     syncedAt: row.synced_at,
   };
 }

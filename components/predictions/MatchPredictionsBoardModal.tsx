@@ -223,6 +223,7 @@ export function MatchPredictionsBoardModal({
               awayTeam={tableAwayTeam}
               homeGoals={officialHome}
               awayGoals={officialAway}
+              playerIncidents={headerBoard?.playerIncidents}
             />
           </span>
         </>

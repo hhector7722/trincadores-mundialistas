@@ -52,6 +52,12 @@ function teamSideFromIncident(incident: BsdPlayerIncidentRaw): "home" | "away" {
   return incident.is_home === false ? "away" : "home";
 }
 
+function parseIncidentMinute(raw: number | string | null | undefined): number | null {
+  if (raw == null || raw === "") return null;
+  const parsed = typeof raw === "number" ? raw : Number.parseInt(String(raw), 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function statPlayerName(row: BsdPlayerStatRow): string | null {
   const name = row.player_name?.trim() || row.player?.trim() || row.name?.trim() || row.short_name?.trim();
   return name ? normalizePlayerName(name) : null;
@@ -83,7 +89,12 @@ export function parseBsdIncidentsPlayerEvents(
     if (type === "goal") {
       const scorer = incidentPlayerName(incident);
       if (scorer) {
-        rows.push({ kind: "goal", playerName: scorer, teamSide: teamSideFromIncident(incident) });
+        rows.push({
+          kind: "goal",
+          playerName: scorer,
+          teamSide: teamSideFromIncident(incident),
+          minute: parseIncidentMinute(incident.minute),
+        });
       }
 
       const assist = incidentAssistName(incident);

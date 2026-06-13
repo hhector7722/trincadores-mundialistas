@@ -1,8 +1,8 @@
 "use client";
 
-import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
+import { MatchGoalScorersList } from "@/components/live/MatchGoalScorersList";
 import {
   HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
   HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
@@ -10,6 +10,7 @@ import {
 } from "@/components/matches/MatchTeamsDisplay";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
+import { resolveMatchGoalScorers } from "@/lib/live/goal-scorers";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
@@ -116,6 +117,11 @@ export function HomeFinishedMatchPanel({
     Number.isInteger(predictedHome) &&
     Number.isInteger(predictedAway);
 
+  const goalScorers = resolveMatchGoalScorers(
+    match.playerIncidents,
+    liveSnapshot?.playerIncidents,
+  );
+
   return (
     <div className={teamsBlockClassName}>
       <MatchTeamsDisplay
@@ -126,8 +132,8 @@ export function HomeFinishedMatchPanel({
         hideKickoff
         compactTeamColumn
         teamBlocksTopClass="top-0"
-        homeFooterSlot={<HomeSquadFooterLink onClick={onOpenHomeLineup} />}
-        awayFooterSlot={<HomeSquadFooterLink onClick={onOpenAwayLineup} />}
+        homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} />}
+        awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} />}
         onHomeTeamClick={onOpenHomeLineup}
         onAwayTeamClick={onOpenAwayLineup}
         homeScoreSlot={

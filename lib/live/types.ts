@@ -24,6 +24,7 @@ export type MatchPlayerIncident = {
   kind: "goal" | "assist" | "yellow_card" | "red_card";
   playerName: string;
   teamSide: "home" | "away";
+  minute?: number | null;
 };
 
 export type MatchLivePayload = {
@@ -42,6 +43,7 @@ export type MatchLiveSnapshot = {
   finished: boolean;
   stats: MatchLiveStats | null;
   substitutions: MatchSubstitution[];
+  playerIncidents: MatchPlayerIncident[];
   syncedAt: string | null;
 };
 

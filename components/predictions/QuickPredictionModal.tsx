@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
 import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
 import { LiveMatchHeaderLabel } from "@/components/live/LiveMatchHeaderLabel";
+import { MatchGoalScorersList } from "@/components/live/MatchGoalScorersList";
 import { LiveMatchScoreOverlay } from "@/components/live/LiveMatchScorePair";
 import { MatchLiveStatsPanel } from "@/components/live/MatchLiveStatsPanel";
 import { MatchStatsModal, MatchStatsOpenButton } from "@/components/live/MatchStatsModal";
@@ -41,6 +42,7 @@ import {
   POSSIBLE_LINEUPS_ACTION_CAPTION,
 } from "@/lib/lineup/lineups-modal-copy";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
+import { resolveMatchGoalScorers } from "@/lib/live/goal-scorers";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
@@ -557,6 +559,10 @@ export function QuickPredictionModal({
       targetMatch.officialAway ?? liveSnapshot?.awayScore ?? null;
     const hasFinishedScore =
       finishedHomeGoals != null && finishedAwayGoals != null;
+    const goalScorers = resolveMatchGoalScorers(
+      targetMatch.playerIncidents,
+      liveSnapshot?.playerIncidents,
+    );
 
     if (
       view.kind === "prediction" &&
@@ -582,6 +588,8 @@ export function QuickPredictionModal({
                 isLive={false}
                 onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                 onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
+                awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
 
               <FinishedMatchScoreRow
@@ -602,6 +610,7 @@ export function QuickPredictionModal({
                   awayAnchor="90%"
                   lineupActionTone="muted"
                   className="h-full"
+                  hideLineupButtons
                   centerSlot={renderMvpCenterSlot(targetMatch)}
                   hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
@@ -666,6 +675,8 @@ export function QuickPredictionModal({
                 isLive
                 onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
                 onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
+                homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
+                awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
                 centerSlotAlign="teamNames"
                 centerSlot={
                   targetMatch.prediction?.home_goals != null ? (
@@ -700,6 +711,7 @@ export function QuickPredictionModal({
                   awayAnchor="90%"
                   lineupActionTone="muted"
                   className="h-full"
+                  hideLineupButtons
                   centerSlot={renderMvpCenterSlot(targetMatch)}
                   hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}

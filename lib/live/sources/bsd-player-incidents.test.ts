@@ -42,6 +42,7 @@ test("parseBsdIncidentsPlayerEvents extrae goles, asistencias y tarjetas", () =>
   );
 
   assert.equal(rows.filter((row) => row.kind === "goal").length, 2);
+  assert.equal(rows.find((row) => row.kind === "goal" && row.playerName === "L. Sone")?.minute, 12);
   assert.equal(rows.filter((row) => row.kind === "assist").length, 1);
   assert.equal(rows.filter((row) => row.kind === "yellow_card").length, 2);
   assert.equal(rows.filter((row) => row.kind === "red_card").length, 1);

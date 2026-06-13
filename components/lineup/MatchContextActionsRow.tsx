@@ -32,6 +32,8 @@ type MatchContextActionsRowProps = {
   awayAnchor?: string;
   /** Oculta el botón de posibles / confirmadas alineaciones (p. ej. partido finalizado). */
   hidePossibleLineups?: boolean;
+  /** Oculta los botones «Plantilla» laterales (p. ej. cuando hay goleadores bajo el nombre). */
+  hideLineupButtons?: boolean;
   /** `muted` = plantilla como enlace secundario (modal detalle). */
   lineupActionTone?: "accent" | "muted";
   className?: string;
@@ -51,6 +53,7 @@ export function MatchContextActionsRow({
   predictionSlot,
   bottomSlot,
   hidePossibleLineups = false,
+  hideLineupButtons = false,
   lineupActionTone = "accent",
   className,
 }: MatchContextActionsRowProps) {
@@ -97,31 +100,35 @@ export function MatchContextActionsRow({
   if (layout === "homeCardStacked") {
     return (
       <div className={className}>
-        <div className="relative h-8 w-full">
-          <div
-            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
-            style={{ left: homeAnchor }}
-          >
-            <MatchContextActionButton
-              caption="Plantilla"
-              hideCaption={compact}
-              tone={lineupActionTone}
-              onClick={onOpenHomeLineup}
-            />
-          </div>
+        <div className={cn("relative w-full", hideLineupButtons ? "min-h-0" : "h-8")}>
+          {hideLineupButtons ? null : (
+            <>
+              <div
+                className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
+                style={{ left: homeAnchor }}
+              >
+                <MatchContextActionButton
+                  caption="Plantilla"
+                  hideCaption={compact}
+                  tone={lineupActionTone}
+                  onClick={onOpenHomeLineup}
+                />
+              </div>
+              <div
+                className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
+                style={{ left: awayAnchor }}
+              >
+                <MatchContextActionButton
+                  caption="Plantilla"
+                  hideCaption={compact}
+                  tone={lineupActionTone}
+                  onClick={onOpenAwayLineup}
+                />
+              </div>
+            </>
+          )}
           <div className="absolute left-1/2 top-0 z-[1] w-max max-w-[44%] -translate-x-1/2 px-1">
             {centerSlot}
-          </div>
-          <div
-            className="absolute top-0 z-[2] w-max max-w-[38%] -translate-x-1/2"
-            style={{ left: awayAnchor }}
-          >
-            <MatchContextActionButton
-              caption="Plantilla"
-              hideCaption={compact}
-              tone={lineupActionTone}
-              onClick={onOpenAwayLineup}
-            />
           </div>
         </div>
         {hidePossibleLineups ? null : (

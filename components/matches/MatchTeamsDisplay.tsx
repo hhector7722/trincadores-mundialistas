@@ -46,10 +46,10 @@ export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-1 h-[
 /** Card próximo partido (sin carrusel): altura estándar fuera del carrusel. */
 export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = "relative mt-2 h-[calc(7rem-0.875rem)] overflow-hidden";
 
-/** Card inicio: bloque equipos + acciones apiladas (altura fija, igual live / próximo). */
-export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 h-[8.5rem] overflow-hidden";
+/** Card inicio: bloque equipos + acciones apiladas (altura mínima, crece con goleadores). */
+export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 min-h-[8.5rem] overflow-visible";
 
-export const HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-2 h-[calc(8.5rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-hidden`;
+export const HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-2 min-h-[calc(8.5rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-visible`;
 
 /** Card inicio: cabecera fija (badge EN JUEGO / Próximo partido). */
 export const HOME_CARD_HEADER_CLASS =
@@ -306,6 +306,7 @@ export function MatchTeamsDisplay({
           ) : (
             <TeamNameLabel name={homeTeam} />
           )}
+          {homeFooterSlot}
         </div>
 
         {homeScoreSlot ? (
@@ -331,6 +332,7 @@ export function MatchTeamsDisplay({
           ) : (
             <TeamNameLabel name={awayTeam} />
           )}
+          {awayFooterSlot}
         </div>
 
         {centerSlot ? (

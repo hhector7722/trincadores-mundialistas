@@ -31,7 +31,7 @@ export type MatchWithPrediction = {
   officialMvpTeamName: string | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
-  highlightSource: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte" | null;
+  highlightSource: "youtube_dazn_es" | "youtube_fifa" | "youtube_replay" | "youtube_rtve_teledeporte" | null;
   prediction:
     | Pick<
         Prediction,
@@ -379,6 +379,7 @@ export type MatchPredictionsBoard = {
   officialHome: number | null;
   officialAway: number | null;
   showOutcomes: boolean;
+  playerIncidents: MatchPlayerIncident[];
   rows: MatchPredictionsBoardRow[];
 };
 
@@ -455,20 +456,26 @@ export async function getMatchPredictionsBoard(
 
   let officialHome: number | null = null;
   let officialAway: number | null = null;
+  let playerIncidents: MatchPlayerIncident[] = [];
 
   if (hasOfficialScore(result?.home_goals, result?.away_goals)) {
     officialHome = result!.home_goals;
     officialAway = result!.away_goals;
-  } else if (match.status === "live") {
+  }
+
+  if (match.status === "live" || match.status === "finished") {
     const { data: liveState, error: liveStateError } = await admin
       .from("match_live_state")
-      .select("home_score, away_score")
+      .select("home_score, away_score, live_payload")
       .eq("match_id", matchId)
       .maybeSingle();
 
     if (liveStateError) throw new Error(liveStateError.message);
 
-    if (hasOfficialScore(liveState?.home_score, liveState?.away_score)) {
+    const livePayload = (liveState?.live_payload ?? {}) as MatchLivePayload;
+    playerIncidents = livePayload.playerIncidents ?? [];
+
+    if (officialHome == null && hasOfficialScore(liveState?.home_score, liveState?.away_score)) {
       officialHome = liveState!.home_score;
       officialAway = liveState!.away_score;
     }
@@ -487,6 +494,7 @@ export async function getMatchPredictionsBoard(
       officialHome,
       officialAway,
       showOutcomes,
+      playerIncidents,
       rows: [],
     };
   }
@@ -571,6 +579,7 @@ export async function getMatchPredictionsBoard(
     officialHome,
     officialAway,
     showOutcomes,
+    playerIncidents,
     rows,
   };
 }

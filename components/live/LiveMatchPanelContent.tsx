@@ -1,7 +1,7 @@
 "use client";
 
 import { LiveMatchScoreOverlay, LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
-import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
+import { MatchGoalScorersList } from "@/components/live/MatchGoalScorersList";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import {
@@ -9,13 +9,15 @@ import {
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
-import type { MatchLiveSnapshot } from "@/lib/live/types";
+import { resolveMatchGoalScorers } from "@/lib/live/goal-scorers";
+import type { MatchLiveSnapshot, MatchPlayerIncident } from "@/lib/live/types";
 import { cn } from "@/lib/utils";
 
 type LiveMatchPanelContentProps = {
   homeTeam: string;
   awayTeam: string;
   liveSnapshot: MatchLiveSnapshot | null;
+  playerIncidents?: MatchPlayerIncident[];
   predictionScoreText?: string | null;
   mvpPlayerName?: string | null;
   mvpTeamName?: string | null;
@@ -34,6 +36,7 @@ export function LiveMatchPanelContent({
   homeTeam,
   awayTeam,
   liveSnapshot,
+  playerIncidents = [],
   predictionScoreText,
   mvpPlayerName,
   mvpTeamName,
@@ -50,6 +53,10 @@ export function LiveMatchPanelContent({
   const actionsHomeAnchor = isModalLayout ? "10%" : "15%";
   const actionsAwayAnchor = isModalLayout ? "90%" : "85%";
   const useHomeCompactLayout = !isModalLayout;
+  const goalScorers = resolveMatchGoalScorers(
+    playerIncidents,
+    liveSnapshot?.playerIncidents,
+  );
 
   return (
     <div className={className}>
@@ -65,14 +72,10 @@ export function LiveMatchPanelContent({
           compactTeamColumn={useHomeCompactLayout}
           teamBlocksTopClass={useHomeCompactLayout ? "top-0" : "top-1.5"}
           homeFooterSlot={
-            useHomeCompactLayout ? (
-              <HomeSquadFooterLink onClick={onOpenHomeLineup} />
-            ) : undefined
+            <MatchGoalScorersList goals={goalScorers.home} align={isModalLayout ? "left" : "center"} />
           }
           awayFooterSlot={
-            useHomeCompactLayout ? (
-              <HomeSquadFooterLink onClick={onOpenAwayLineup} />
-            ) : undefined
+            <MatchGoalScorersList goals={goalScorers.away} align={isModalLayout ? "right" : "center"} />
           }
           onHomeTeamClick={onOpenHomeLineup}
           onAwayTeamClick={onOpenAwayLineup}
