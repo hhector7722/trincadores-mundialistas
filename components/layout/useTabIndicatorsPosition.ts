@@ -7,9 +7,9 @@ import {
   resetTabIndicatorsBottom,
 } from "@/lib/layout/tab-indicators-position";
 
-const QUIZ_ANCHOR_SELECTOR = '[data-tm-indicators-anchor="quiz-daily"]';
+const TAB_BAR_SELECTOR = 'nav[aria-label="Navegacion principal"]';
 
-/** Sincroniza --tm-tab-indicators-bottom al eje Y entre Quiz diario y la TabBar. */
+/** Sincroniza --tm-tab-indicators-bottom justo encima de la TabBar (fixed overlay). */
 export function useTabIndicatorsPosition(enabled = true) {
   const pathname = usePathname();
 
@@ -29,19 +29,12 @@ export function useTabIndicatorsPosition(enabled = true) {
 
     sync();
 
-    const anchor = document.querySelector(QUIZ_ANCHOR_SELECTOR);
+    const tabBar = document.querySelector(TAB_BAR_SELECTOR);
     const resizeObserver =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(sync)
-        : null;
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(sync) : null;
 
-    if (anchor && resizeObserver) {
-      resizeObserver.observe(anchor);
-    }
-
-    const homeLayout = document.querySelector(".tm-home-layout");
-    if (homeLayout && resizeObserver) {
-      resizeObserver.observe(homeLayout);
+    if (tabBar && resizeObserver) {
+      resizeObserver.observe(tabBar);
     }
 
     window.addEventListener("resize", sync);

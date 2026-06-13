@@ -232,6 +232,8 @@ html[data-modal-open] .tm-app-main {
   align-items: flex-end;
   justify-content: center;
   pointer-events: none;
+  /* Flotan sobre el fondo/contenido; no reservan hueco en el layout */
+  transform: translateZ(0);
 }
 
 .tm-bottom-chrome-placeholder {
