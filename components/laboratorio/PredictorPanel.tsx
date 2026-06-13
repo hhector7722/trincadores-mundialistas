@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
-import { Loader2, Send, X } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { sanitizePredictorOutput } from "@/lib/laboratorio/sanitize-predictor-output";
 import { cn } from "@/lib/utils";
 
@@ -236,37 +236,24 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
         aria-labelledby="predictor-panel-title"
         className={cn(
           "tm-predictor-panel relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--tm-border)]",
-          "bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] backdrop-blur-xl",
+          "bg-[var(--tm-bg-elevated)] shadow-[var(--tm-shadow-soft)]",
           "max-h-[min(72dvh,calc(100dvh-var(--tab-bar-height,72px)-2.5rem))]",
           visible && "tm-predictor-panel--visible"
         )}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--tm-border)] px-4 py-3">
-          <div className="min-w-0">
-            <p
-              id="predictor-panel-title"
-              className="truncate text-sm font-semibold text-[var(--tm-fg)]"
-            >
-              Asistente de predicciones
-            </p>
-            <p className="truncate text-xs text-[var(--tm-muted)]">
-              Marcador, MVP y probabilidades con datos actuales
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar panel"
-            className="flex size-12 shrink-0 items-center justify-center rounded-xl text-[var(--tm-muted)] transition-colors hover:bg-white/5 hover:text-[var(--tm-fg)]"
+        <header className="shrink-0 border-b border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-4 py-3.5">
+          <p
+            id="predictor-panel-title"
+            className="truncate text-sm font-semibold text-[var(--tm-fg)]"
           >
-            <X className="size-5" />
-          </button>
+            Crack pronosticador
+          </p>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-white px-4 py-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#221045] px-4 py-4">
             {messages.length === 0 && !streamingText ? (
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-relaxed text-zinc-600">
+              <div className="rounded-xl border border-[var(--tm-border-subtle)] bg-[var(--tm-bg-mid)] px-4 py-3 text-sm leading-relaxed text-[var(--tm-muted)]">
                 Pregunta por un partido concreto o deja que interprete el choque mas relevante de hoy.
                 Siempre te devuelvo marcador, MVP y probabilidades.
               </div>
@@ -284,8 +271,8 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
                   className={cn(
                     "max-w-[88%] rounded-xl px-3 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
                     message.role === "user"
-                      ? "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)]"
-                      : "border border-zinc-200 bg-zinc-50 text-zinc-900"
+                      ? "bg-[var(--tm-bg-light)] text-[var(--tm-fg)]"
+                      : "border border-[var(--tm-border-subtle)] bg-[var(--tm-bg-elevated)] text-[var(--tm-fg)]"
                   )}
                 >
                   {message.role === "assistant"
@@ -297,7 +284,7 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
 
             {streamingText ? (
               <div className="flex justify-start">
-                <div className="max-w-[88%] rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-zinc-900">
+                <div className="max-w-[88%] rounded-xl border border-[var(--tm-border-subtle)] bg-[var(--tm-bg-elevated)] px-3 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-[var(--tm-fg)]">
                   {streamingText}
                   <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-[var(--tm-accent)] align-middle" />
                 </div>
@@ -318,43 +305,42 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
 
           <form
             onSubmit={handleSubmit}
-            className="shrink-0 border-t border-[var(--tm-border)] p-3"
+            className="relative shrink-0 border-t border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] p-3"
           >
-            <div className="flex items-end gap-2">
-              <label className="sr-only" htmlFor="predictor-chat-input">
-                Escribe tu pregunta
-              </label>
-              <textarea
-                id="predictor-chat-input"
-                ref={inputRef}
-                rows={2}
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                disabled={isStreaming}
-                placeholder="Ej.: ¿Quién gana esta noche?"
-                className={cn(
-                  "min-h-12 flex-1 resize-none rounded-xl border border-[var(--tm-border)] bg-[#2a1058]/55 px-3 py-3 text-sm text-[var(--tm-fg)]",
-                  "placeholder:text-[var(--tm-muted)] focus:border-[var(--tm-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--tm-accent)]/40",
-                  "disabled:cursor-not-allowed disabled:opacity-60"
-                )}
-              />
-              <button
-                type="submit"
-                disabled={isStreaming || !draft.trim()}
-                aria-label="Enviar pregunta"
-                className={cn(
-                  "flex size-12 shrink-0 items-center justify-center rounded-xl bg-[var(--tm-accent)] text-[var(--tm-primary-fg)]",
-                  "transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
-                )}
-              >
-                {isStreaming ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <Send className="size-5" />
-                )}
-              </button>
-            </div>
+            <label className="sr-only" htmlFor="predictor-chat-input">
+              Escribe tu pregunta
+            </label>
+            <textarea
+              id="predictor-chat-input"
+              ref={inputRef}
+              rows={2}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              disabled={isStreaming}
+              placeholder="Ej.: ¿Quién gana esta noche?"
+              className={cn(
+                "min-h-12 w-full resize-none rounded-xl border border-white/90 bg-[#221045] px-3 py-3 pr-12 text-sm text-[var(--tm-fg)]",
+                "placeholder:text-[var(--tm-muted)] focus:border-white focus:outline-none focus:ring-1 focus:ring-white/35",
+                "disabled:cursor-not-allowed disabled:opacity-60"
+              )}
+            />
+            <button
+              type="submit"
+              disabled={isStreaming || !draft.trim()}
+              aria-label="Enviar pregunta"
+              className={cn(
+                "absolute bottom-5 right-5 flex size-12 items-center justify-center",
+                "bg-transparent text-[var(--tm-accent)]",
+                "transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-35"
+              )}
+            >
+              {isStreaming ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : (
+                <Send className="size-5" />
+              )}
+            </button>
           </form>
         </div>
       </section>
