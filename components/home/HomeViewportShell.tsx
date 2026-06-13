@@ -10,14 +10,15 @@ type HomeViewportShellProps = {
 };
 
 /**
- * Inicio: cards centradas en Y; indicadores flotan sobre el fondo (fixed, sin reservar hueco).
+ * Inicio: altura ajustada al contenido (hero → quiz/dato); scroll solo si desborda.
  */
 export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
   return (
     <ViewportLayoutRoot
       bottomAnchor="tabbar"
+      heightMode="content"
       className={cn(
-        "tm-home-layout relative z-10 flex min-h-0 w-full flex-col overflow-x-hidden overflow-y-auto p-4 pb-0",
+        "tm-home-layout relative z-10 flex w-full flex-col overflow-x-hidden overflow-y-auto px-4 pt-2 pb-0",
       )}
     >
       <div className="tm-home-cards-stack flex w-full shrink-0 flex-col gap-3">

@@ -100,6 +100,18 @@ export function syncLayoutAboveTabBar(root: HTMLElement): number {
   return height;
 }
 
+/** Altura según contenido; solo limita max-height hasta la TabBar (sin hueco scrollable). */
+export function syncLayoutFitAboveTabBar(root: HTMLElement): number {
+  const top = root.getBoundingClientRect().top;
+  const maxHeight = Math.max(0, Math.floor(readTabBarTop() - top));
+
+  root.style.height = "auto";
+  root.style.maxHeight = `${maxHeight}px`;
+  root.style.flex = "0 0 auto";
+
+  return maxHeight;
+}
+
 /** Fija la altura del contenedor hasta encima de los indicadores swipe. */
 export function syncLayoutAboveIndicators(root: HTMLElement): number {
   const top = root.getBoundingClientRect().top;

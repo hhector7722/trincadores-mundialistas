@@ -264,9 +264,9 @@ html:has(.tm-app-header--pinned) {
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -277,7 +277,6 @@ html:has(.tm-app-header--pinned) {
   box-sizing: border-box;
   flex: 0 0 auto;
   width: 100%;
-  margin-block: auto;
 }
 
 .tm-home-layout__hero {
