@@ -10,8 +10,8 @@ type HomeViewportShellProps = {
 };
 
 /**
- * Inicio: el conjunto de cards se centra en Y dentro del hueco
- * cabecera fija → indicadores de página (encima de la TabBar).
+ * Inicio: el conjunto de cards se centra en Y (margin auto) dentro del hueco
+ * cabecera fija → indicadores, sin spacers que inflen la altura del scroll.
  */
 export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
   return (
@@ -21,12 +21,10 @@ export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
         "tm-home-layout relative z-10 flex min-h-0 w-full flex-col overflow-x-hidden overflow-y-auto p-4 pb-0",
       )}
     >
-      <div className="tm-home-layout__spacer shrink-0" aria-hidden />
       <div className="tm-home-cards-stack flex w-full shrink-0 flex-col gap-3">
         <div className="tm-home-layout__hero shrink-0">{hero}</div>
         {body}
       </div>
-      <div className="tm-home-layout__spacer shrink-0" aria-hidden />
     </ViewportLayoutRoot>
   );
 }
