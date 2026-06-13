@@ -294,12 +294,20 @@ function useCalendarViewportLayout(
   rootRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
-  rowCount: number
+  rowCount: number,
+  onLayoutReady?: () => void
 ) {
   useLayoutEffect(() => {
     const calendar = calendarRef.current;
     const grid = gridRef.current;
     if (!calendar || !grid || rowCount === 0) return;
+
+    let ready = false;
+    const markReady = () => {
+      if (ready) return;
+      ready = true;
+      onLayoutReady?.();
+    };
 
     const layout =
       rootRef.current?.closest(".tm-porra-layout") ??
@@ -314,6 +322,7 @@ function useCalendarViewportLayout(
       resetCalendarLayout(calendar, grid, layoutEl);
       void calendar.offsetHeight;
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
+      markReady();
     };
 
     const syncFrameRef = { current: null as number | null };
@@ -356,7 +365,7 @@ function useCalendarViewportLayout(
       const layoutEl = layout instanceof HTMLElement ? layout : null;
       resetCalendarLayout(calendar, grid, layoutEl);
     };
-  }, [rootRef, calendarRef, gridRef, rowCount]);
+  }, [rootRef, calendarRef, gridRef, rowCount, onLayoutReady]);
 }
 
 export function PredictionsCalendar({
@@ -438,7 +447,15 @@ export function PredictionsCalendar({
     [groupMatchRows]
   );
 
-  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
+  const [calendarPaintReady, setCalendarPaintReady] = useState(false);
+
+  useLayoutEffect(() => {
+    setCalendarPaintReady(false);
+  }, [weeks.length, localMatches.length]);
+
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length, () => {
+    setCalendarPaintReady(true);
+  });
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
@@ -456,7 +473,10 @@ export function PredictionsCalendar({
       <section
         ref={calendarRef}
         style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
-        className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0"
+        className={cn(
+          "tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0",
+          !calendarPaintReady && "invisible"
+        )}
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center px-2 py-1 sm:px-3">
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">

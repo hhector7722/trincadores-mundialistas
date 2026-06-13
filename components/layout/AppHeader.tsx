@@ -24,7 +24,7 @@ export function AppHeader({
   return (
     <header
       className={cn(
-        "tm-app-header tm-app-header-fixed fixed top-0 right-0 left-0 z-[100] shrink-0 border-b border-[var(--tm-border)] bg-[var(--tm-bg)]/80 px-4 backdrop-blur-md",
+        "tm-app-header tm-app-header-fixed fixed top-0 right-0 left-0 z-[100] shrink-0 border-b border-[var(--tm-border)] bg-transparent px-4 backdrop-blur-md",
         compact
           ? "tm-app-header--compact pb-0.5 pt-[max(0.375rem,env(safe-area-inset-top))]"
           : "pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]",

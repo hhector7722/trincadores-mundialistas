@@ -216,6 +216,30 @@ html:has(.tm-app-header--compact) {
   height: 100%;
 }
 
+.tm-app-main--internal-scroll .tm-home-layout {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.tm-app-main--internal-scroll .tm-tab-scroll-layout {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
 /* Layout roots full-bleed: llenan el main internal-scroll */
 .tm-porra-layout,
 .tm-ranking-layout,
