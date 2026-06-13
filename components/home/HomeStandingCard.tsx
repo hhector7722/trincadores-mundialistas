@@ -64,7 +64,6 @@ export function HomeStandingCard({
         </div>
         <HomeDailyFactCard fact={dailyFact} />
       </div>
-      <div className="scroll-end-touch" aria-hidden />
     </div>
   );
 }

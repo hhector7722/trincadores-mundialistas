@@ -239,7 +239,17 @@ html[data-modal-open] .tm-app-main {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+}
+
+.tm-home-layout__spacer {
+  flex: 1 1 0%;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.tm-home-cards-stack {
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .tm-home-layout__hero {
