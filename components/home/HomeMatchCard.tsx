@@ -308,17 +308,19 @@ export function HomeMatchCard({
           />
       </div>
         ) : isFinished ? (
-          <HomeFinishedMatchPanel
-            match={displayMatch}
-            teamsBlockClassName={teamsBlockClassName}
-            onOpenHomeLineup={() =>
-              openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-            }
-            onOpenAwayLineup={() =>
-              openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-            }
-            onOpenDetail={openScoreModal}
-          />
+          <div className="cursor-pointer" onClick={() => openScoreModal()}>
+            <HomeFinishedMatchPanel
+              match={displayMatch}
+              teamsBlockClassName={teamsBlockClassName}
+              onOpenHomeLineup={() =>
+                openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
+              }
+              onOpenAwayLineup={() =>
+                openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
+              }
+              onOpenDetail={openScoreModal}
+            />
+          </div>
         ) : (
       <div className="cursor-pointer" onClick={() => openScoreModal()}>
         <div className={teamsBlockClassName}>
