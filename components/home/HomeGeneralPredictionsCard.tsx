@@ -19,7 +19,7 @@ import {
   saveTournamentMvp,
   saveTournamentTopScorer,
 } from "@/actions/tournament-general-predictions";
-import { GeneralPredictionRow } from "@/components/home/GeneralPredictionRow";
+import { HomeStatCardScrollHint } from "@/components/home/HomeStatCardScrollHint";
 import {
   HomeChampionTeamValue,
   HomeFinalistsTeamValue,
@@ -314,17 +314,7 @@ export function HomeGeneralPredictionsCard({
           ))}
         </div>
         {carouselSlides.length > 1 ? (
-          <div className="tm-home-general-predictions__indicators" aria-hidden>
-            {carouselSlides.map((slide, index) => (
-              <span
-                key={slide.profileId}
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
-                  index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35"
-                )}
-              />
-            ))}
-          </div>
+          <HomeStatCardScrollHint activeSlot={activeIndex === 0 ? 0 : 1} />
         ) : null}
         {error ? (
           <p className="mt-1 shrink-0 text-[10px] text-[var(--tm-danger)]" role="alert">

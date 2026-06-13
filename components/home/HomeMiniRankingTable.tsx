@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { HomeStatCardScrollHint } from "@/components/home/HomeStatCardScrollHint";
 import { AvatarDisplay } from "@/components/profile/AvatarDisplay";
 import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import {
@@ -91,6 +92,21 @@ function MiniRankingDataRow({
 
 export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRankingTableProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const [scrollHint, setScrollHint] = useState<0 | 1>(0);
+  const canScroll = rows.length > VISIBLE_ROW_COUNT;
+
+  const updateScrollHint = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+    if (maxScroll <= 1) {
+      setScrollHint(0);
+      return;
+    }
+
+    setScrollHint(viewport.scrollTop > maxScroll * 0.12 ? 1 : 0);
+  }, []);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -99,14 +115,24 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
     const startIndex = getContextualLeaderboardStartIndex(rows, currentProfileId);
     const rowHeight = viewport.clientHeight / VISIBLE_ROW_COUNT;
     viewport.scrollTop = startIndex * rowHeight;
-  }, [rows, currentProfileId]);
+    updateScrollHint();
+  }, [rows, currentProfileId, updateScrollHint]);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || !canScroll) return;
+
+    updateScrollHint();
+    viewport.addEventListener("scroll", updateScrollHint, { passive: true });
+    return () => viewport.removeEventListener("scroll", updateScrollHint);
+  }, [canScroll, updateScrollHint]);
 
   return (
     <Link
       href="/ranking"
       aria-label="Ver tabla de clasificación"
       className={cn(
-        "tm-home-top-stat-card @container flex min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card",
+        "tm-home-top-stat-card @container flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl tm-stat-card",
         "transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]/50"
       )}
     >
@@ -124,6 +150,7 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
           ))
         )}
       </div>
+      {canScroll ? <HomeStatCardScrollHint activeSlot={scrollHint} /> : null}
     </Link>
   );
 }
