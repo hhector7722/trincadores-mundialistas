@@ -30,15 +30,21 @@ export function PredictorFab({ enabled }: PredictorFabProps) {
         aria-controls="predictor-assistant-panel"
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "fixed bottom-[calc(var(--tab-bar-height,72px)+10px)] -right-6 z-50",
-          "flex size-16 items-center justify-center rounded-full",
-          "border-2 border-[var(--tm-accent)]/70 bg-[#2a1058] shadow-[0_0_24px_rgba(217,255,0,0.35)]",
-          "transition-transform duration-200 hover:scale-[1.04] active:scale-[0.96]",
+          "fixed right-0 z-50 shrink-0",
+          "bottom-[calc(var(--tab-bar-height,72px)+12px)]",
+          "flex h-14 min-h-12 w-[3.5rem] items-center justify-center",
+          "rounded-l-full rounded-r-none",
+          "bg-[#2a1058]",
+          "border-y border-l border-[var(--tm-accent)]/45",
+          "transition-[transform,width] duration-300 ease-out",
+          "hover:w-[3.75rem] hover:-translate-x-1",
+          "active:scale-[0.97] active:translate-x-0",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tm-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a1058]",
           open && "pointer-events-none opacity-0"
         )}
       >
         <span
-          className="font-display text-[15px] font-bold tracking-[0.28em] text-[var(--tm-accent)] drop-shadow-[0_0_8px_rgba(217,255,0,0.65)]"
+          className="font-display -translate-x-0.5 text-[13px] font-bold tracking-[0.22em] text-[var(--tm-accent)]"
           aria-hidden
         >
           AI
