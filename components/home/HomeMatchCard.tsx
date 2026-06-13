@@ -236,7 +236,7 @@ export function HomeMatchCard({
             </p>
           ) : (
             <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
-              Partido finalizado
+              Finalizado
             </p>
           )
         ) : (

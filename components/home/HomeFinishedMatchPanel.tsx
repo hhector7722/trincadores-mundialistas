@@ -2,6 +2,7 @@
 
 import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
+import { LiveScoreDisplay } from "@/components/live/LiveMatchScorePair";
 import {
   HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
   HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
@@ -10,7 +11,7 @@ import {
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PredictionStatusBadge } from "@/components/predictions/PredictionStatusBadge";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
-import { displayGoals, formatListScore } from "@/lib/predictions/edit-state";
+import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolveScoreOutcome } from "@/lib/predictions/prediction-outcome";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import type { ReactNode } from "react";
@@ -24,16 +25,15 @@ type HomeFinishedMatchPanelProps = {
   onOpenDetail: () => void;
 };
 
-/** Centra el contenido en el ancho completo de la card. */
 function HomeFinishedCardCenter({ children }: { children: ReactNode }) {
   return <div className="flex w-full justify-center overflow-visible">{children}</div>;
 }
 
-function HomeFinishedOfficialScore({
-  scoreLabel,
+function HomeFinishedOfficialGoal({
+  value,
   onOpenDetail,
 }: {
-  scoreLabel: string;
+  value: number;
   onOpenDetail: () => void;
 }) {
   return (
@@ -43,9 +43,9 @@ function HomeFinishedOfficialScore({
         event.stopPropagation();
         onOpenDetail();
       }}
-      className="pointer-events-auto font-display text-[11px] font-semibold normal-case tabular-nums text-white/95 transition-opacity hover:opacity-80"
+      className="pointer-events-auto transition-opacity hover:opacity-80"
     >
-      {scoreLabel}
+      <LiveScoreDisplay score={value} />
     </button>
   );
 }
@@ -116,8 +116,6 @@ export function HomeFinishedMatchPanel({
     Number.isInteger(predictedHome) &&
     Number.isInteger(predictedAway);
 
-  const scoreLabel = hasScore ? displayGoals(homeGoals, awayGoals) : "—";
-
   return (
     <div className={teamsBlockClassName}>
       <MatchTeamsDisplay
@@ -132,7 +130,29 @@ export function HomeFinishedMatchPanel({
         awayFooterSlot={<HomeSquadFooterLink onClick={onOpenAwayLineup} />}
         onHomeTeamClick={onOpenHomeLineup}
         onAwayTeamClick={onOpenAwayLineup}
+        homeScoreSlot={
+          hasScore ? (
+            <HomeFinishedOfficialGoal value={homeGoals} onOpenDetail={onOpenDetail} />
+          ) : null
+        }
+        awayScoreSlot={
+          hasScore ? (
+            <HomeFinishedOfficialGoal value={awayGoals} onOpenDetail={onOpenDetail} />
+          ) : null
+        }
       />
+
+      {hasScore && hasPrediction ? (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] flex h-10 items-center justify-center sm:h-11">
+          <HomeFinishedPredictedScore
+            predictedHome={predictedHome}
+            predictedAway={predictedAway}
+            homeGoals={homeGoals}
+            awayGoals={awayGoals}
+            onOpenDetail={onOpenDetail}
+          />
+        </div>
+      ) : null}
 
       <div
         className={cn(
@@ -148,24 +168,6 @@ export function HomeFinishedMatchPanel({
           awayAnchor="85%"
           className="pointer-events-auto h-full w-full"
           hidePossibleLineups
-          centerSlot={
-            <HomeFinishedCardCenter>
-              <HomeFinishedOfficialScore scoreLabel={scoreLabel} onOpenDetail={onOpenDetail} />
-            </HomeFinishedCardCenter>
-          }
-          predictionSlot={
-            hasScore && hasPrediction ? (
-              <HomeFinishedCardCenter>
-                <HomeFinishedPredictedScore
-                  predictedHome={predictedHome}
-                  predictedAway={predictedAway}
-                  homeGoals={homeGoals}
-                  awayGoals={awayGoals}
-                  onOpenDetail={onOpenDetail}
-                />
-              </HomeFinishedCardCenter>
-            ) : null
-          }
           bottomSlot={
             <HomeFinishedCardCenter>
               <MvpPredictionButton

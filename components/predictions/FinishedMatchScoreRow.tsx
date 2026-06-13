@@ -47,10 +47,10 @@ export function FinishedMatchScoreRow({
       ? "font-display text-2xl font-semibold tabular-nums leading-none text-white/95"
       : "font-display text-[2.5rem] font-semibold tabular-nums leading-none text-white/95 sm:text-[2.75rem]";
 
-  const homeLeft = variant === "modal" ? "34%" : "15%";
-  const awayLeft = variant === "modal" ? "66%" : "85%";
-  const topClass = variant === "modal" ? "top-[1.15rem]" : "top-[2.125rem]";
-  const rowHeight = variant === "modal" ? "h-10 sm:h-11" : "";
+  const homeLeft = variant === "modal" ? "34%" : "32.5%";
+  const awayLeft = variant === "modal" ? "66%" : "67.5%";
+  const topClass = variant === "modal" ? "top-[1.15rem]" : "top-0";
+  const rowHeight = variant === "modal" ? "h-10 sm:h-11" : "h-10 sm:h-11";
 
   return (
     <div className={cn("pointer-events-none absolute inset-x-0", topClass, rowHeight, className)}>
@@ -71,8 +71,8 @@ export function FinishedMatchScoreRow({
       {hasPrediction && outcome && predictedText ? (
         <div
           className={cn(
-            "absolute left-1/2 -translate-x-1/2",
-            variant === "modal" ? "top-[calc(100%+0.25rem)]" : "top-1/2 -translate-y-1/2",
+            "absolute left-1/2 flex -translate-x-1/2 items-center",
+            variant === "modal" ? "top-[calc(100%+0.25rem)]" : "top-0 h-10 sm:h-11",
           )}
         >
           <div className="relative pl-1">
