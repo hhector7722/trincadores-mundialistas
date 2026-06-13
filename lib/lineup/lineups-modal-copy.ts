@@ -9,7 +9,7 @@ export function areMatchLineupsFullyConfirmed(
 
 export const CONFIRMED_LINEUPS_MODAL_TITLE = "ALINEACIONES CONFIRMADAS";
 export const POSSIBLE_LINEUPS_MODAL_TITLE = "POSIBLES ALINEACIONES";
-export const CONFIRMED_LINEUPS_ACTION_CAPTION = "Alineaciones confirmadas";
+export const CONFIRMED_LINEUPS_ACTION_CAPTION = "ALINEACIONES";
 export const POSSIBLE_LINEUPS_ACTION_CAPTION = "Posibles alineaciones";
 
 export function possibleLineupsModalTitle(
