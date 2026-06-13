@@ -51,8 +51,8 @@ export function buildMatchHighlightNotificationCopy(
     : `${homeFlag} ${homeCode} - ${awayCode} ${awayFlag}`;
 
   return {
-    title: "Resumen disponible",
-    body: `Ya está disponible el resumen del ${fixture}`,
+    title: `Resumen ${fixture}`,
+    body: "",
   };
 }
 

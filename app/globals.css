@@ -199,9 +199,9 @@ html:has(.tm-app-header--compact) {
 
 .tm-app-main--internal-scroll {
   box-sizing: border-box;
-  height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
-  min-height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px));
+  height: calc(100dvh - var(--tm-tabbar-shell));
+  min-height: calc(100dvh - var(--tm-tabbar-shell));
+  max-height: calc(100dvh - var(--tm-tabbar-shell));
 }
 
 .tm-app-main--internal-scroll.tm-app-main--no-header {
@@ -1826,6 +1826,10 @@ html:has(.tm-app-shell) body {
   background: var(--tm-glass);
   flex-shrink: 0;
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+}
+
+.tm-app-main--no-header .tm-porra-calendar .tm-cal-header {
+  padding-top: 0.25rem;
 }
 
 /* Fila L-M-X… — mismo rojo que calendarios de asistencia (marbella-app: red-500 → red-600) */

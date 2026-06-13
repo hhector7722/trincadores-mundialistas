@@ -508,28 +508,38 @@ function prepareCalendarGridFlex(grid: HTMLElement): void {
   grid.style.minHeight = "0";
 }
 
-/** Ancla el cuerpo del calendario al borde superior de la TabBar. */
+/** Ancla el grid al espacio restante del calendario (flex interno o layout root). */
 export function syncCalendarGridHeight(
   calendar: HTMLElement,
   grid: HTMLElement,
   layoutRoot: HTMLElement
 ): number {
-  void layoutRoot;
   prepareCalendarGridFlex(grid);
   void calendar.offsetHeight;
   void grid.offsetHeight;
 
-  const contentBottom = readMainContentBottom();
-  const calendarRect = calendar.getBoundingClientRect();
   const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
   const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
   const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
-  const available = Math.floor(contentBottom - calendarRect.top - chromeHeight);
-  const height = Math.max(0, available);
+
+  const layoutBottom = layoutRoot.getBoundingClientRect().bottom;
+  const gridTop = grid.getBoundingClientRect().top;
+  let height = Math.max(0, Math.floor(layoutBottom - gridTop));
+
+  if (height <= 0) {
+    height = Math.max(0, calendar.clientHeight - chromeHeight);
+  }
+
+  if (height <= 0) {
+    const contentBottom = readMainContentBottom();
+    const calendarRect = calendar.getBoundingClientRect();
+    height = Math.max(0, Math.floor(contentBottom - calendarRect.top - chromeHeight));
+  }
 
   if (height > 0) {
     grid.style.height = `${height}px`;
-    grid.style.flex = "0 0 auto";
+    grid.style.flex = "1 1 0%";
+    grid.style.minHeight = "0";
   }
 
   return grid.clientHeight || height;

@@ -25,7 +25,11 @@ import {
   resetCalendarLayout,
   SIDEBAR_CARD_ANCHOR_ATTR,
 } from "@/lib/pool/calendar-layout";
-import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
+import {
+  resetLayoutAboveTabBar,
+  syncLayoutAboveTabBar,
+  VIEWPORT_CHROME_SYNC_EVENT,
+} from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
@@ -309,6 +313,9 @@ function useCalendarViewportLayout(
     const syncLayout = () => {
       calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
       const layoutEl = layout instanceof HTMLElement ? layout : null;
+      if (layoutEl) {
+        syncLayoutAboveTabBar(layoutEl);
+      }
       resetCalendarLayout(calendar, grid, layoutEl);
       void calendar.offsetHeight;
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
@@ -333,6 +340,9 @@ function useCalendarViewportLayout(
       window.visualViewport?.removeEventListener("resize", syncLayout);
       window.visualViewport?.removeEventListener("scroll", syncLayout);
       const layoutEl = layout instanceof HTMLElement ? layout : null;
+      if (layoutEl) {
+        resetLayoutAboveTabBar(layoutEl);
+      }
       resetCalendarLayout(calendar, grid, layoutEl);
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);
