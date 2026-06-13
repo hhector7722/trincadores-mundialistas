@@ -13,10 +13,7 @@ import { cn } from "@/lib/utils";
 type HomeNextMatchProps = {
   poolId: string;
   currentProfileId: string;
-  lastMatch: MatchWithPrediction | null;
-  liveMatch: MatchWithPrediction | null;
-  nextMatch: MatchWithPrediction | null;
-  upcomingMatch: MatchWithPrediction | null;
+  matches: MatchWithPrediction[];
 };
 
 type SlidePosition = "last" | "center" | "right";
@@ -25,65 +22,47 @@ type SlideItem = {
   id: string;
   mode: "live" | "scheduled" | "finished";
   slidePosition: SlidePosition;
+  isLatestFinished: boolean;
   match: MatchWithPrediction;
 };
 
-export function HomeNextMatch({
-  poolId,
-  currentProfileId,
-  lastMatch,
-  liveMatch,
-  nextMatch,
-  upcomingMatch,
-}: HomeNextMatchProps) {
-  const hasLive = liveMatch != null;
-  const centerMatch = hasLive ? liveMatch : nextMatch;
-  const rightMatch = hasLive ? nextMatch : upcomingMatch;
+const CAROUSEL_LAZY_RENDER_RADIUS = 1;
+const CAROUSEL_MAX_DOTS = 5;
+
+function resolveFocusIndex(matches: MatchWithPrediction[]): number {
+  const liveIndex = matches.findIndex((match) => match.status === "live");
+  if (liveIndex >= 0) return liveIndex;
+
+  const nextScheduledIndex = matches.findIndex((match) => match.status === "scheduled");
+  if (nextScheduledIndex >= 0) return nextScheduledIndex;
+
+  return Math.max(0, matches.length - 1);
+}
+
+function modeForMatch(match: MatchWithPrediction): SlideItem["mode"] {
+  if (match.status === "live") return "live";
+  if (match.status === "finished") return "finished";
+  return "scheduled";
+}
+
+export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMatchProps) {
+  const hasLive = matches.some((match) => match.status === "live");
+  const focusIndex = useMemo(() => resolveFocusIndex(matches), [matches]);
 
   const slides = useMemo(() => {
-    const items: SlideItem[] = [];
-
-    if (lastMatch) {
-      items.push({
-        id: `last-${lastMatch.id}`,
-        mode: "finished",
-        slidePosition: "last",
-        match: lastMatch,
-      });
-    }
-
-    if (centerMatch) {
-      items.push({
-        id: `center-${centerMatch.id}`,
-        mode: hasLive ? "live" : "scheduled",
-        slidePosition: "center",
-        match: centerMatch,
-      });
-    }
-
-    if (rightMatch && rightMatch.id !== centerMatch?.id) {
-      items.push({
-        id: `right-${rightMatch.id}`,
-        mode: "scheduled",
-        slidePosition: "right",
-        match: rightMatch,
-      });
-    }
-
-    return items;
-  }, [lastMatch, centerMatch, rightMatch, hasLive]);
-
-  const defaultIndex = useMemo(
-    () => Math.max(0, slides.findIndex((slide) => slide.slidePosition === "center")),
-    [slides],
-  );
+    return matches.map((match, index) => ({
+      id: match.id,
+      mode: modeForMatch(match),
+      slidePosition:
+        index < focusIndex ? "last" : index === focusIndex ? "center" : "right",
+      isLatestFinished:
+        match.status === "finished" && index === focusIndex - 1 && focusIndex > 0,
+      match,
+    })) satisfies SlideItem[];
+  }, [focusIndex, matches]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
-
-  function teamsBlockClassNameFor(_slide: SlideItem) {
-    return HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS;
-  }
+  const [activeIndex, setActiveIndex] = useState(focusIndex);
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
@@ -95,9 +74,9 @@ export function HomeNextMatch({
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el || slides.length === 0) return;
-    el.scrollLeft = defaultIndex * el.clientWidth;
-    setActiveIndex(defaultIndex);
-  }, [defaultIndex, slides.length]);
+    el.scrollLeft = focusIndex * el.clientWidth;
+    setActiveIndex(focusIndex);
+  }, [focusIndex, slides.length]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -117,11 +96,14 @@ export function HomeNextMatch({
         mode={slide.mode}
         slidePosition={slide.slidePosition}
         hasLiveInCarousel={hasLive}
+        isLatestFinished={slide.isLatestFinished}
         currentProfileId={currentProfileId}
-        teamsBlockClassName={teamsBlockClassNameFor(slide)}
+        teamsBlockClassName={HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS}
       />
     );
   }
+
+  const showDots = slides.length > 1 && slides.length <= CAROUSEL_MAX_DOTS;
 
   return (
     <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe={true}>
@@ -135,21 +117,26 @@ export function HomeNextMatch({
           )}
           aria-roledescription="carrusel"
         >
-          {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={cn(
-                "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
-                HOME_CARD_SCHEDULED_BODY_H_CLASS,
-              )}
-              aria-hidden={index !== activeIndex}
-            >
-              {renderSlide(slide)}
-            </div>
-          ))}
+          {slides.map((slide, index) => {
+            const shouldRender =
+              Math.abs(index - activeIndex) <= CAROUSEL_LAZY_RENDER_RADIUS;
+
+            return (
+              <div
+                key={slide.id}
+                className={cn(
+                  "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
+                  HOME_CARD_SCHEDULED_BODY_H_CLASS,
+                )}
+                aria-hidden={index !== activeIndex}
+              >
+                {shouldRender ? renderSlide(slide) : null}
+              </div>
+            );
+          })}
         </div>
 
-        {slides.length > 1 ? (
+        {showDots ? (
           <div className={HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS} aria-hidden>
             {slides.map((slide, index) => (
               <span

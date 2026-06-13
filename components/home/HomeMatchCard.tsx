@@ -52,6 +52,7 @@ type HomeMatchCardProps = {
   mode: HomeMatchCardMode;
   slidePosition: HomeMatchSlidePosition;
   hasLiveInCarousel: boolean;
+  isLatestFinished?: boolean;
   currentProfileId: string;
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
@@ -149,6 +150,7 @@ export function HomeMatchCard({
   mode,
   slidePosition,
   hasLiveInCarousel,
+  isLatestFinished = true,
   currentProfileId,
   onOpenChange,
   teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
@@ -228,9 +230,15 @@ export function HomeMatchCard({
         {isLive ? (
           <LiveMatchHeaderLabel className="relative z-10" />
         ) : isFinished ? (
-          <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
-            Último partido
-          </p>
+          isLatestFinished ? (
+            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
+              Último partido
+            </p>
+          ) : (
+            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
+              Partido finalizado
+            </p>
+          )
         ) : (
           <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">
             {scheduledHeaderLabel(slidePosition, hasLiveInCarousel)}

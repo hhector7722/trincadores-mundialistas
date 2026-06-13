@@ -22,10 +22,7 @@ type HomeStandingCardProps = {
   generalPredictionsBoard: TournamentGeneralPredictionsBoardRow[];
   dailyFact: DailyFact | null;
   quizHub: QuizDayHub;
-  lastMatch: MatchWithPrediction | null;
-  liveMatch: MatchWithPrediction | null;
-  nextMatch: MatchWithPrediction | null;
-  upcomingMatch: MatchWithPrediction | null;
+  matchCarouselMatches: MatchWithPrediction[];
 };
 
 export function HomeStandingCard({
@@ -37,10 +34,7 @@ export function HomeStandingCard({
   generalPredictionsBoard,
   dailyFact,
   quizHub,
-  lastMatch,
-  liveMatch,
-  nextMatch,
-  upcomingMatch,
+  matchCarouselMatches,
 }: HomeStandingCardProps) {
   return (
     <div className="flex min-h-0 flex-col gap-3 pb-2">
@@ -54,15 +48,12 @@ export function HomeStandingCard({
           boardRows={generalPredictionsBoard}
         />
       </div>
-      {lastMatch || liveMatch || nextMatch ? (
+      {matchCarouselMatches.length > 0 ? (
         <div className="shrink-0">
           <HomeNextMatch
             poolId={poolId}
             currentProfileId={currentProfileId}
-            lastMatch={lastMatch}
-            liveMatch={liveMatch}
-            nextMatch={nextMatch}
-            upcomingMatch={upcomingMatch}
+            matches={matchCarouselMatches}
           />
         </div>
       ) : null}
