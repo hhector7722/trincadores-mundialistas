@@ -51,7 +51,6 @@ export function MatchPredictionsBoardHeaderTitle({
   const goalScorers = extractGoalScorersByTeam(playerIncidents);
   const homeScorerLines = buildBoardGoalScorerLines(goalScorers.home);
   const awayScorerLines = buildBoardGoalScorerLines(goalScorers.away);
-  const hasScorers = homeScorerLines.length > 0 || awayScorerLines.length > 0;
 
   useLayoutEffect(() => {
     const row = teamsRowRef.current;
@@ -83,111 +82,79 @@ export function MatchPredictionsBoardHeaderTitle({
   }, [homeName, awayName, homeGoals, awayGoals]);
 
   return (
-    <div className={cn("flex w-full min-w-0 flex-col gap-0.5", className)}>
-      <div
-        ref={teamsRowRef}
-        className="grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center overflow-hidden"
-      >
-        <div className="flex min-w-0 justify-end pr-0.5">
-          <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1">
-            <TeamFlagBadge
-              name={homeTeam}
-              size="xxs"
-              loading="eager"
-              className="col-start-1 row-start-1 shrink-0"
-            />
+    <div
+      ref={teamsRowRef}
+      className={cn("grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-start gap-y-0.5", className)}
+    >
+      <div className="flex min-w-0 justify-end pr-0.5">
+        <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1 gap-y-px">
+          <TeamFlagBadge
+            name={homeTeam}
+            size="xxs"
+            loading="eager"
+            className="col-start-1 row-start-1 shrink-0"
+          />
+          <span
+            data-team-name
+            className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
+            style={{ fontSize: `${nameFontPx}px` }}
+          >
+            {homeName}
+          </span>
+          <span className="col-start-3 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+            {formatGoal(homeGoals)}
+          </span>
+          {homeScorerLines.map((line, index) => (
             <span
-              data-team-name
-              className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
-              style={{ fontSize: `${nameFontPx}px` }}
+              key={`home-scorer-${index}`}
+              className={cn(
+                GOAL_SCORER_TEXT_CLASS,
+                "col-start-1 col-end-3 justify-self-start whitespace-nowrap text-left",
+              )}
+              style={{ gridRow: index + 2 }}
             >
-              {homeName}
+              {line}
             </span>
-            <span className="col-start-3 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
-              {formatGoal(homeGoals)}
-            </span>
-          </div>
-        </div>
-
-        <span className="shrink-0 px-0.5 text-xs leading-none text-[var(--tm-muted)]">-</span>
-
-        <div className="flex min-w-0 justify-start pl-0.5">
-          <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1">
-            <span className="col-start-1 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
-              {formatGoal(awayGoals)}
-            </span>
-            <span
-              data-team-name
-              className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
-              style={{ fontSize: `${nameFontPx}px` }}
-            >
-              {awayName}
-            </span>
-            <TeamFlagBadge
-              name={awayTeam}
-              size="xxs"
-              loading="eager"
-              className="col-start-3 row-start-1 shrink-0"
-            />
-          </div>
+          ))}
         </div>
       </div>
 
-      {hasScorers ? (
-        <div className="grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-start">
-          <div className="flex min-w-0 justify-end pr-0.5">
-            <div className="inline-grid grid-cols-[auto_auto_auto] gap-x-1 gap-y-px">
-              <TeamFlagBadge
-                name={homeTeam}
-                size="xxs"
-                loading="eager"
-                aria-hidden
-                className="pointer-events-none col-start-1 row-start-1 shrink-0 opacity-0"
-              />
-              {homeScorerLines.map((line, index) => (
-                <span
-                  key={`home-scorer-${index}`}
-                  className={cn(
-                    GOAL_SCORER_TEXT_CLASS,
-                    "col-start-2 justify-self-start whitespace-nowrap text-left",
-                  )}
-                  style={{ gridRow: index + 2 }}
-                >
-                  {line}
-                </span>
-              ))}
-            </div>
-          </div>
+      <span className="row-start-1 shrink-0 self-center px-0.5 text-xs leading-none text-[var(--tm-muted)]">
+        -
+      </span>
 
-          <span aria-hidden className="shrink-0 px-0.5 opacity-0">
-            -
+      <div className="flex min-w-0 justify-start pl-0.5">
+        <div className="inline-grid grid-cols-[auto_auto_auto] items-center gap-x-1 gap-y-px">
+          <span className="col-start-1 row-start-1 shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+            {formatGoal(awayGoals)}
           </span>
-
-          <div className="flex min-w-0 justify-start pl-0.5">
-            <div className="inline-grid grid-cols-[auto_auto_auto] gap-x-1 gap-y-px">
-              {awayScorerLines.map((line, index) => (
-                <span
-                  key={`away-scorer-${index}`}
-                  className={cn(
-                    GOAL_SCORER_TEXT_CLASS,
-                    "col-start-2 justify-self-end whitespace-nowrap text-right",
-                  )}
-                  style={{ gridRow: index + 2 }}
-                >
-                  {line}
-                </span>
-              ))}
-              <TeamFlagBadge
-                name={awayTeam}
-                size="xxs"
-                loading="eager"
-                aria-hidden
-                className="pointer-events-none col-start-3 row-start-1 shrink-0 opacity-0"
-              />
-            </div>
-          </div>
+          <span
+            data-team-name
+            className="col-start-2 row-start-1 min-w-0 truncate font-semibold leading-none"
+            style={{ fontSize: `${nameFontPx}px` }}
+          >
+            {awayName}
+          </span>
+          <TeamFlagBadge
+            name={awayTeam}
+            size="xxs"
+            loading="eager"
+            className="col-start-3 row-start-1 shrink-0"
+          />
+          {awayScorerLines.map((line, index) => (
+            <span
+              key={`away-scorer-${index}`}
+              className={cn(
+                GOAL_SCORER_TEXT_CLASS,
+                "col-start-2 col-end-4 justify-self-end whitespace-nowrap text-right",
+              )}
+              style={{ gridRow: index + 2 }}
+            >
+              {line}
+            </span>
+          ))}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }
