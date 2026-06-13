@@ -342,20 +342,19 @@ export function HomeMatchCard({
             }
           />
 
-          <div
-            className={cn(
-              "absolute inset-x-0",
-              HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
-              HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
-            )}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <MatchContextActionsRow
-              compact
-              layout="homeCardScheduledStacked"
-              homeAnchor="15%"
-              awayAnchor="85%"
-              className="h-full w-full"
+        <div
+          className={cn(
+            "absolute inset-x-0 pointer-events-none",
+            HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
+            HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
+          )}
+        >
+          <MatchContextActionsRow
+            compact
+            layout="homeCardScheduledStacked"
+            homeAnchor="15%"
+            awayAnchor="85%"
+            className="pointer-events-auto h-full w-full"
               centerSlot={
                 saved ? (
                   <HomeScheduledPredictionScore

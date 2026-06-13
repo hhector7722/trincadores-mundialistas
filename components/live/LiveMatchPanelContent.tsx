@@ -110,15 +110,14 @@ export function LiveMatchPanelContent({
         ) : null}
 
         <div
-          className={cn("absolute inset-x-0 bottom-0", actionsClassName)}
-          onClick={(event) => event.stopPropagation()}
+          className={cn("absolute inset-x-0 bottom-0 pointer-events-none", actionsClassName)}
         >
           <MatchContextActionsRow
             compact
             layout={useHomeCompactLayout ? "homeCardCompactStacked" : "homeCardStacked"}
             homeAnchor={actionsHomeAnchor}
             awayAnchor={actionsAwayAnchor}
-            className="h-full"
+            className={cn("pointer-events-auto", useHomeCompactLayout ? "h-full" : undefined)}
             centerSlot={
               useHomeCompactLayout ? (
                 predictionScoreText ? (

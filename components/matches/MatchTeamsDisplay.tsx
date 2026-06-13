@@ -359,7 +359,7 @@ export function MatchTeamsDisplay({
 
       <div className={cn("relative w-full min-h-[4.25rem]", showSectionLabel && "mt-2")}>
         <div
-          className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
+          className={cn("absolute top-0 -translate-x-1/2 z-[3]", teamBlocksTopClass)}
           style={{ left: homeAnchor }}
         >
           <TeamBlock
@@ -372,7 +372,7 @@ export function MatchTeamsDisplay({
         </div>
 
         <div
-          className={cn("absolute top-0 -translate-x-1/2", teamBlocksTopClass)}
+          className={cn("absolute top-0 -translate-x-1/2 z-[3]", teamBlocksTopClass)}
           style={{ left: awayAnchor }}
         >
           <TeamBlock

@@ -136,18 +136,17 @@ export function HomeFinishedMatchPanel({
 
       <div
         className={cn(
-          "absolute inset-x-0",
+          "absolute inset-x-0 pointer-events-none",
           HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
           HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
         )}
-        onClick={(event) => event.stopPropagation()}
       >
         <MatchContextActionsRow
           compact
           layout="homeCardScheduledStacked"
           homeAnchor="15%"
           awayAnchor="85%"
-          className="h-full w-full"
+          className="pointer-events-auto h-full w-full"
           hidePossibleLineups
           centerSlot={
             <HomeFinishedCardCenter>
