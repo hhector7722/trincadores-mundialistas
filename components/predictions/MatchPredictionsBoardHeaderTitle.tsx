@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { GOAL_SCORER_TEXT_CLASS, goalScorerTextStyle } from "@/lib/ui/general-prediction-value-style";
+import { GOAL_SCORER_TEXT_CLASS, goalScorerTextStyle } from "@/lib/ui/goal-scorer-style";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { buildBoardGoalScorerLines, extractGoalScorersByTeam } from "@/lib/live/goal-scorers";
 import type { MatchPlayerIncident } from "@/lib/live/types";

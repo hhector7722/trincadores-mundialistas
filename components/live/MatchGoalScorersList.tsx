@@ -1,8 +1,5 @@
 import { buildCardGoalScorerLines, type MatchGoalScorer } from "@/lib/live/goal-scorers";
-import {
-  GOAL_SCORER_TEXT_CLASS,
-  goalScorerTextStyle,
-} from "@/lib/ui/general-prediction-value-style";
+import { GOAL_SCORER_TEXT_CLASS, goalScorerTextStyle } from "@/lib/ui/goal-scorer-style";
 import { cn } from "@/lib/utils";
 
 type MatchGoalScorersListProps = {
@@ -11,7 +8,7 @@ type MatchGoalScorersListProps = {
   className?: string;
 };
 
-export { GOAL_SCORER_TEXT_CLASS } from "@/lib/ui/general-prediction-value-style";
+export { GOAL_SCORER_TEXT_CLASS } from "@/lib/ui/goal-scorer-style";
 
 export function MatchGoalScorersList({
   goals,
