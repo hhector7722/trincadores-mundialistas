@@ -73,12 +73,9 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
   }
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col" data-block-tab-swipe>
-      <div className="tm-home-hero-carousel-stage grid min-h-0 flex-1 [&>*]:col-start-1 [&>*]:row-start-1">
-        <div
-          className="invisible pointer-events-none min-h-0 min-w-0 tm-home-hero-carousel-sizer"
-          aria-hidden="true"
-        >
+    <div className="flex min-w-0 flex-col" data-block-tab-swipe>
+      <div className="grid min-w-0 [&>*]:col-start-1 [&>*]:row-start-1">
+        <div className="invisible pointer-events-none min-w-0" aria-hidden="true">
           {highlightToSlideBody(sizingHighlight)}
         </div>
         <div

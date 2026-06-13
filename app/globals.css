@@ -53,7 +53,6 @@
   --tm-app-header-block: calc(
     var(--tm-app-header-pt) + var(--tm-app-header-inner) + var(--tm-app-header-pb)
   );
-  --tm-home-row-gap: 0.625rem;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -236,71 +235,15 @@ html[data-modal-open] .tm-app-main {
   height: 100%;
   min-height: 0;
   flex: 1 1 auto;
-  overflow: hidden;
-}
-
-.tm-home-body,
-.tm-home-body-inner {
-  display: contents;
-}
-
-.tm-home-layout > .tm-home-layout__hero,
-.tm-home-layout > .tm-home-row {
-  flex: 1 1 0%;
-  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
 .tm-home-layout__hero {
-  flex: 1 1 0%;
-  min-height: 0;
-}
-
-.tm-home-layout__hero .tm-hero-card {
-  height: 100%;
-}
-
-.tm-home-layout__hero .tm-hero-player-img-wrap {
-  max-height: calc(100% - 0.5rem);
-}
-
-.tm-home-layout__hero .tm-hero-player-img-wrap img {
-  height: 100%;
-  max-height: 13rem;
-  width: auto;
-}
-
-.tm-home-hero-carousel-stage {
-  min-height: 0;
-}
-
-.tm-home-layout .tm-home-hero-carousel-sizer {
-  display: none;
-}
-
-.tm-home-layout [data-block-tab-swipe] {
-  flex: 1 1 0%;
-  min-height: 0;
-}
-
-.tm-home-row--match > .tm-glass-card {
-  display: flex;
-  height: 100%;
-  min-height: 0;
-  flex-direction: column;
-}
-
-.tm-home-next-match-slide > .relative {
-  display: flex;
-  min-height: 0;
-  flex: 1 1 0%;
-  flex-direction: column;
-}
-
-.tm-home-next-match-slide > .relative > .cursor-pointer {
-  display: flex;
-  min-height: 0;
-  flex: 1 1 0%;
-  flex-direction: column;
+  flex: 0 0 auto;
 }
 
 /* Indicadores swipe: fixed sobre la TabBar (portal en body) */
@@ -607,13 +550,7 @@ html:has(.tm-app-frame) {
 
 .tm-home-top-stat-card,
 .tm-home-secondary-row {
-  height: 100%;
-  min-height: 0;
-}
-
-.tm-home-row .tm-home-top-stat-card,
-.tm-home-row.tm-home-secondary-row {
-  height: 100%;
+  height: var(--tm-home-top-stat-height);
 }
 
 /* Home mini ranking: 3 filas visibles, scroll vertical con snap */
@@ -654,18 +591,6 @@ html:has(.tm-app-frame) {
   flex-shrink: 0;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-}
-
-.tm-home-layout .tm-home-mini-ranking__viewport {
-  flex: 1 1 0%;
-  min-height: 0;
-}
-
-.tm-home-layout .tm-home-mini-ranking__row {
-  height: 33.333%;
-  min-height: 0;
-  max-height: none;
-  flex: none;
 }
 
 /* Pronósticos globales home: carrusel horizontal + 5 filas repartiendo altura */

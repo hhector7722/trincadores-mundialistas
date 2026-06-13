@@ -4,7 +4,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { HomeMatchCard } from "@/components/home/HomeMatchCard";
 import {
   HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS,
-  HOME_CARD_SCHEDULED_TEAMS_BLOCK_VIEWPORT_CLASS,
+  HOME_CARD_SCHEDULED_BODY_H_CLASS,
+  HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import { buildBoardCarouselMatches } from "@/lib/predictions/board-carousel";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -110,7 +111,7 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
         isLatestFinished={slide.isLatestFinished}
         currentProfileId={currentProfileId}
         boardCarouselMatches={boardCarouselMatches}
-        teamsBlockClassName={HOME_CARD_SCHEDULED_TEAMS_BLOCK_VIEWPORT_CLASS}
+        teamsBlockClassName={HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS}
       />
     );
   }
@@ -118,12 +119,13 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
   const activeDotIndex = resolveActiveDotIndex(activeIndex, focusIndex);
 
   return (
-    <section className="tm-glass-card flex h-full min-h-0 flex-col overflow-hidden p-0" data-block-tab-swipe={true}>
-      <div className="flex min-h-0 flex-1 flex-col px-4 pb-1 pt-1">
+    <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe={true}>
+      <div className="px-4 pb-1 pt-1">
         <div
           ref={scrollRef}
           className={cn(
-            "tm-home-next-match-carousel flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
+            "flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
+            HOME_CARD_SCHEDULED_BODY_H_CLASS,
             "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           )}
           aria-roledescription="carrusel"
@@ -135,7 +137,10 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
             return (
               <div
                 key={slide.id}
-                className="tm-home-next-match-slide flex h-full min-h-0 w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always flex-col"
+                className={cn(
+                  "w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always",
+                  HOME_CARD_SCHEDULED_BODY_H_CLASS,
+                )}
                 aria-hidden={index !== activeIndex}
               >
                 {shouldRender ? renderSlide(slide) : null}
