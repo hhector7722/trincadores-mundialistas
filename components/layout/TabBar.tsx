@@ -23,7 +23,10 @@ const TAB_ICONS = {
   "/profile": User,
 } as const;
 
-/** Clases copiadas de marbella-app/src/components/StaffBottomNav.tsx */
+const TABBAR_NAV_CLASS =
+  "tm-app-tabbar fixed bottom-0 left-0 right-0 z-[95] flex h-20 items-center justify-around border-t border-[var(--tm-border)] bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] backdrop-blur-md md:h-16 md:px-8";
+
+/** Copia literal de marbella-app/src/components/StaffBottomNav.tsx */
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -61,14 +64,7 @@ export function TabBar() {
 
   return (
     <nav
-      className={cn(
-        "tm-app-tabbar relative z-[95] shrink-0 w-full",
-        "flex h-20 items-center justify-around md:h-16",
-        "border-t border-[var(--tm-border)]",
-        "bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe md:px-8",
-        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
-        showIndicators && "tm-app-tabbar--with-indicators",
-      )}
+      className={cn(TABBAR_NAV_CLASS, showIndicators && "tm-app-tabbar--with-indicators")}
       aria-label="Navegacion principal"
     >
       {showIndicators ? (
@@ -90,13 +86,12 @@ export function TabBar() {
             onClick={(event) => handleTabClick(event, href)}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
-              "transition-all duration-200 active:scale-95",
-              active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
+              "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center transition-all duration-200 active:scale-95",
+              active ? "scale-110 text-[var(--tm-accent)] drop-shadow-md" : "text-[var(--tm-muted)]",
               navigating && "opacity-90",
             )}
           >
-            <Icon size={20} className="md:h-5 md:w-5" strokeWidth={active ? 2.5 : 2} />
+            <Icon size={20} className="md:h-5 md:w-5" strokeWidth={2.5} />
             <span className="mt-0.5 text-[7.5px] font-black uppercase tracking-tighter whitespace-nowrap md:mt-1 md:text-[9px] md:tracking-widest">
               {label}
             </span>
