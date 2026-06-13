@@ -1,8 +1,8 @@
 import { MatchPredictionsBoardRow } from "@/components/predictions/MatchPredictionsBoardRow";
 import {
-  MATCH_PREDICTIONS_GRID,
   MATCH_PREDICTIONS_ROW_COUNT,
-  MATCH_PREDICTIONS_SUBGRID_ROW,
+  matchPredictionsGrid,
+  matchPredictionsSubgridRow,
 } from "@/components/predictions/match-predictions-grid";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
@@ -30,18 +30,21 @@ function TeamHeader({ team }: { team: string }) {
 function MatchPredictionsBoardTableHeader({
   homeTeam,
   awayTeam,
+  showOutcomes,
 }: {
   homeTeam: string;
   awayTeam: string;
+  showOutcomes: boolean;
 }) {
   return (
     <div
       className={cn(
-        MATCH_PREDICTIONS_SUBGRID_ROW,
+        matchPredictionsSubgridRow(showOutcomes),
         "shrink-0 border-b border-[var(--tm-border)] py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
       <span className="col-span-2 text-left">Trincador</span>
+      {showOutcomes ? <span aria-hidden="true" /> : null}
       <span className="text-center">
         <TeamHeader team={homeTeam} />
       </span>
@@ -53,11 +56,11 @@ function MatchPredictionsBoardTableHeader({
   );
 }
 
-function MatchPredictionsEmptyRow() {
+function MatchPredictionsEmptyRow({ showOutcomes }: { showOutcomes: boolean }) {
   return (
     <div
       className={cn(
-        MATCH_PREDICTIONS_SUBGRID_ROW,
+        matchPredictionsSubgridRow(showOutcomes),
         "tm-ranking-row border-b border-[var(--tm-border)] last:border-0"
       )}
       aria-hidden="true"
@@ -66,6 +69,7 @@ function MatchPredictionsEmptyRow() {
         <span className="size-6 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
       </span>
       <span className="whitespace-nowrap">&nbsp;</span>
+      {showOutcomes ? <span aria-hidden="true" /> : null}
       <span />
       <span />
       <span />
@@ -90,16 +94,20 @@ export function MatchPredictionsBoardTable({
 
   return (
     <div className="tm-match-predictions-board">
-      <div className={cn(MATCH_PREDICTIONS_GRID, "tm-match-predictions-board__grid")}>
-        <MatchPredictionsBoardTableHeader homeTeam={homeTeam} awayTeam={awayTeam} />
+      <div className={cn(matchPredictionsGrid(showOutcomes), "tm-match-predictions-board__grid")}>
+        <MatchPredictionsBoardTableHeader
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
+          showOutcomes={showOutcomes}
+        />
         {loading
           ? Array.from({ length: MATCH_PREDICTIONS_ROW_COUNT }, (_, index) => (
-              <MatchPredictionsEmptyRow key={`loading-${index}`} />
+              <MatchPredictionsEmptyRow key={`loading-${index}`} showOutcomes={showOutcomes} />
             ))
           : Array.from({ length: slotCount }, (_, index) => {
               const row = dataRows[index];
               if (!row) {
-                return <MatchPredictionsEmptyRow key={`pad-${index}`} />;
+                return <MatchPredictionsEmptyRow key={`pad-${index}`} showOutcomes={showOutcomes} />;
               }
               return (
                 <MatchPredictionsBoardRow

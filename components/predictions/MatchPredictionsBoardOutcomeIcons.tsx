@@ -6,7 +6,7 @@ type MatchPredictionsBoardOutcomeIconsProps = {
   mvpCorrect: boolean;
 };
 
-/** Tras el nombre: ticks verdes (signo ×1, exacto ×2) y estrella MVP a la derecha. */
+/** Columna de aciertos: ticks verdes (signo ×1, exacto ×2) y estrella MVP a la derecha. */
 export function MatchPredictionsBoardOutcomeIcons({
   scoreOutcome,
   mvpCorrect,

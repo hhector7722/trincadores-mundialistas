@@ -4,7 +4,7 @@ import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { MatchPredictionsBoardOutcomeIcons } from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
-import { MATCH_PREDICTIONS_SUBGRID_ROW } from "@/components/predictions/match-predictions-grid";
+import { matchPredictionsSubgridRow } from "@/components/predictions/match-predictions-grid";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
@@ -50,7 +50,7 @@ export function MatchPredictionsBoardRow({
     <>
       <div
         className={cn(
-          MATCH_PREDICTIONS_SUBGRID_ROW,
+          matchPredictionsSubgridRow(showOutcomes),
           "tm-ranking-row border-b border-[var(--tm-border)] px-3 text-left last:border-0"
         )}
       >
@@ -73,22 +73,22 @@ export function MatchPredictionsBoardRow({
             />
           </button>
         </div>
-        <div className="flex min-w-0 items-center gap-0.5">
-          <span
-            className={cn(
-              "min-w-0 flex-1 truncate text-xs font-medium",
-              isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
-            )}
-          >
-            {row.label}
-          </span>
-          {showOutcomes ? (
+        <span
+          className={cn(
+            "min-w-0 truncate text-xs font-medium",
+            isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
+          )}
+        >
+          {row.label}
+        </span>
+        {showOutcomes ? (
+          <div className="flex items-center justify-start">
             <MatchPredictionsBoardOutcomeIcons
               scoreOutcome={row.scoreOutcome}
               mvpCorrect={row.mvpCorrect}
             />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         <CellValue value={formatGoalCell(row.homeGoals)} />
         <CellValue value={formatGoalCell(row.awayGoals)} />
         <CellValue value={formatMvpCell(row.mvpPlayerName)} />
