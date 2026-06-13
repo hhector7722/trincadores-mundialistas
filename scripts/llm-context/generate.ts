@@ -74,7 +74,7 @@ function buildExecutive(): string {
 }
 
 function buildArchitecture(pkg: ReturnType<typeof parsePackageJson>): string {
-  return `${section("Arquitectura", 2)}${section("Visión general", 3)}Monolito full-stack en **Next.js 16** con **Server Components** por defecto y **Server Actions** como única capa de mutación. No hay API Routes REST. La base de datos es la fuente de verdad del scoring; TypeScript replica la lógica solo para tests.
+  return `${section("Arquitectura", 2)}${section("Visión general", 3)}Monolito full-stack en **Next.js 16** con **Server Components** por defecto. Las mutaciones de usuario van por **Server Actions**; los **API Routes** en \`app/api/\` cubren crons Vercel, Web Push (VAPID) y helpers de auth/PWA. La base de datos es la fuente de verdad del scoring; TypeScript replica la lógica solo para tests.
 
 ${section("Stack técnico", 3)}| Capa | Tecnología |
 |------|------------|
@@ -172,7 +172,7 @@ function buildFrontend(): string {
   return `${section("Frontend", 2)}${section("Resumen", 3)}- **Sin** hooks globales, Context API, Zustand ni React Query
 - Estado client solo en formularios y navegación (\`useState\`, \`useTransition\`, \`useRouter\`, \`usePathname\`)
 - PWA: \`app/manifest.ts\`, iconos dinámicos \`icon.tsx\` / \`apple-icon.tsx\`
-- Diseño: panel claro, cobalto \`#0047FF\`, lima solo LIVE, targets táctiles 48px+
+- Diseño: dark mode morado \`#2a1058\` + glass + acento neón lima \`#D4FF00\`, estilo porra deportiva, targets táctiles 48px+
 
 ${section("Rutas (pages)", 3)}| Ruta | Archivo | Render |
 |------|---------|--------|
@@ -194,9 +194,24 @@ ${section("Gestión de estado", 3)}| Mecanismo | Ubicación | Uso |
 `;
 }
 
+function readVercelCrons(): { path: string; schedule: string }[] {
+  const p = path.join(ROOT, "vercel.json");
+  if (!fs.existsSync(p)) return [];
+  try {
+    const json = JSON.parse(readText(p)) as { crons?: { path: string; schedule: string }[] };
+    return json.crons ?? [];
+  } catch {
+    return [];
+  }
+}
+
 function buildBackend(): string {
   const actionFiles = walkDir(path.join(ROOT, "actions"), { exts: new Set([".ts"]) });
+  const apiRoutes = walkDir(path.join(ROOT, "app/api"), { exts: new Set([".ts"]) }).filter((f) =>
+    f.rel.endsWith("/route.ts"),
+  );
   const libFiles = walkPaths(["lib"], new Set([".ts"]));
+  const crons = readVercelCrons();
 
   const actionRows = actionFiles
     .flatMap((f) => {
@@ -207,6 +222,20 @@ function buildBackend(): string {
         return `| \`${fn}\` | \`${f.rel}\` | \`${sig.replace(/\s+/g, " ").slice(0, 80)}\` |`;
       });
     })
+    .join("\n");
+
+  const apiRows = apiRoutes
+    .map((r) => {
+      const route = r.rel.replace(/^app\/api/, "/api").replace(/\/route\.ts$/, "");
+      const methods = [...readText(r.abs).matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)/g)]
+        .map((m) => m[1])
+        .join(", ");
+      return `| \`${route}\` | \`${r.rel}\` | ${methods || "—"} |`;
+    })
+    .join("\n");
+
+  const cronRows = crons
+    .map((c) => `| \`${c.path}\` | \`${c.schedule}\` | \`CRON_SECRET\` |`)
     .join("\n");
 
   const libGroups = groupBy(
@@ -223,11 +252,15 @@ function buildBackend(): string {
     })
     .join("\n");
 
-  return `${section("Backend", 2)}${section("Resumen", 3)}No existen \`app/api/*\` routes. Toda la lógica server-side usa Server Actions + queries en \`lib/\`.
+  return `${section("Backend", 2)}${section("Resumen", 3)}Mutaciones de usuario vía **Server Actions** + queries en \`lib/\`. **API Routes** para crons, push y auth device.
 
 ${section("Server Actions", 3)}| Función | Archivo | Firma (resumen) |
 |---------|---------|-----------------|
 ${actionRows}
+
+${section("API Routes", 3)}| Ruta | Archivo | Métodos |
+|------|---------|---------|
+${apiRows || "| — | — | — |"}
 
 ${section("Detalle de acciones", 3)}| Acción | Recibe | Devuelve | Dependencias |
 |--------|--------|----------|--------------|
@@ -238,6 +271,10 @@ ${section("Detalle de acciones", 3)}| Acción | Recibe | Devuelve | Dependencias
 | \`setActivePool\` | poolId uuid | \`{ok}\` o error | valida membresía, cookie |
 | \`savePrediction\` | poolId, matchId, goles | marcador guardado o error | RLS + \`prediction_edit_allowed\` |
 | \`submitMatchResult\` | poolId, matchId, goles | \`{ok}\` o error | admin check + RPC scoring |
+| \`savePushSubscriptionAction\` | PushSubscription JSON | \`{ok}\` o error | \`push_subscriptions\` + VAPID |
+| \`startQuiz\` / \`submitQuiz\` | quizId, respuestas | intento + puntuación | RPC \`start_quiz_attempt\` / \`submit_quiz_attempt\` |
+| \`saveMvpPrediction\` | poolId, matchId, dorsal | MVP guardado | \`match_mvp_predictions\` |
+| \`fetchMatchLineupBundleAction\` | matchId | alineaciones tácticas | FotMob → BSD → API-Football |
 
 ${section("Proxy / Middleware", 3)}| Archivo | Rol |
 |---------|-----|
@@ -246,11 +283,14 @@ ${section("Proxy / Middleware", 3)}| Archivo | Rol |
 
 ${section("Módulos lib/ (capa de datos)", 3)}${libSections}
 
-${section("Jobs / Cron / Webhooks", 3)}| Tipo | Estado |
+${section("Jobs / Cron / Webhooks", 3)}| Job | Schedule | Auth |
+|-----|----------|------|
+${cronRows || "| — | — | — |"}
+
+| Tipo | Estado |
 |------|--------|
-| Vercel Cron | \`vercel.json\` → \`crons: []\` (vacío) |
 | Edge Functions Supabase | No implementadas |
-| Webhooks | No implementados |
+| Webhooks externos | No implementados |
 | RPC batch | \`expire_stale_quiz_attempts\`, \`generate_news_batch\` (stub) preparados en SQL |
 
 `;
@@ -267,22 +307,46 @@ function buildDatabase(): string {
     pool_members: "Membresía N:M con rol owner/admin/player",
     invite_codes: "Códigos de invitación (solo RPC, sin SELECT directo)",
     matchdays: "Jornadas de competición dentro de una porra",
-    matches: "Partidos con kickoff, equipos y status",
-    match_results: "Marcador oficial (1:1 con match)",
+    matches: "Partidos con kickoff, equipos, status y highlight_headline",
+    match_results: "Marcador oficial + MVP oficial (1:1 con match)",
     predictions: "Predicción de marcador por usuario/partido/porra",
     pool_member_scores: "Puntos acumulados y rank por jornada",
     activity_events: "Eventos para feed de actividad (fase 1e)",
     news_items: "Noticias/narrativa generada por pool",
-    notifications: "Notificaciones in-app por usuario",
+    notifications: "Notificaciones in-app por usuario (4 kinds + push)",
     achievements: "Catálogo de logros",
     profile_achievements: "Logros desbloqueados por perfil",
-    push_subscriptions: "Suscripciones Web Push (pendiente)",
+    push_subscriptions: "Suscripciones Web Push (VAPID)",
     admin_audit_log: "Auditoría acciones administrativas",
-    quizzes: "Cuestionarios opcionales por porra",
+    quizzes: "Cuestionarios diarios por porra",
     quiz_questions: "Preguntas de un quiz",
     quiz_question_keys: "Respuestas correctas (acceso revocado)",
     quiz_attempts: "Intento de quiz por usuario",
     quiz_responses: "Respuestas individuales por intento",
+    quiz_facts_worldcup: "Banco de hechos históricos para generador quiz",
+    quiz_final_ranking_scores: "Bonus ranking final quiz",
+    competitions: "Catálogo OpenFootball (competiciones)",
+    tournament_stages: "Fases del torneo (grupos, eliminatorias)",
+    host_cities: "Sedes del Mundial",
+    teams: "Equipos del catálogo WC2026",
+    team_squads: "Plantillas oficiales por equipo/torneo",
+    team_squad_players: "Jugadores de plantilla",
+    external_id_map: "Mapeo partidos → IDs externos (BSD, FotMob, API-Football)",
+    match_live_state: "Snapshot live: marcador, stats, payload BSD",
+    match_team_lineups: "Alineaciones confirmadas/predicted por partido/equipo",
+    match_mvp_predictions: "Predicción MVP por usuario/partido",
+    match_highlights: "Vídeos resumen YouTube vinculados a partido",
+    tournament_general_predictions: "Pronósticos generales (campeón, finalistas, goleador…)",
+    tournament_official_awards: "Premios oficiales del torneo (admin)",
+    tournament_general_prediction_scores: "Puntos pronósticos generales",
+    data_source_registry: "Registro de fuentes de datos externas",
+    wc_historic_tournaments: "Histórico Mundiales (Fjelstul)",
+    wc_historic_teams: "Equipos históricos",
+    wc_historic_stadiums: "Estadios históricos",
+    wc_historic_matches: "Partidos históricos",
+    wc_historic_goals: "Goles históricos",
+    wc_historic_award_winners: "Premios históricos",
+    wc_historic_tournament_standings: "Clasificaciones históricas",
   };
 
   const tableRows = schema.tables
@@ -434,8 +498,23 @@ function envPurpose(name: string): string {
     NEXT_PUBLIC_SITE_URL: "URL pública para redirects auth",
     DATABASE_URL: "Postgres directo para seed.sql",
     AUTH_INTERNAL_DOMAIN: "Dominio email sintético",
-    CRON_SECRET: "Protección endpoints cron (sin uso aún)",
+    CRON_SECRET: "Bearer token para endpoints `/api/cron/*`",
     NODE_ENV: "Entorno Node (cookies secure)",
+    BSD_API_KEY: "API key Bzzoiro/BSD (lineups, live, headlines)",
+    API_FOOTBALL_KEY: "API-Football (lineups confirmadas fallback)",
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: "Clave pública Web Push",
+    VAPID_PRIVATE_KEY: "Clave privada Web Push",
+    VAPID_SUBJECT: "mailto: para VAPID",
+    FIFA_API_BASE_URL: "Base URL API FIFA (squads, MVP)",
+    FIFA_SEASON_ID: "Season ID FIFA WC2026",
+    WC2026_API_BASE: "Base URL feed worldcup2026",
+    WC2026_API_TOKEN: "Token feed worldcup2026",
+    ONBOARDING_ACCESS_CODES_JSON: "Mapa username→código acceso PWA",
+    VERCEL_DEPLOYMENT_ID: "ID deploy Vercel (detección actualización PWA)",
+    VERCEL_GIT_COMMIT_SHA: "SHA commit Vercel (fallback versión PWA)",
+    QUIZ_DATE: "Fecha civil quiz para scripts seed/publish",
+    POOL_SLUG: "Slug porra para scripts quiz/seed",
+    CONFIRM_RESEED: "Flag `1` para permitir reseed quiz",
   };
   return map[name] ?? "Ver código";
 }
@@ -461,6 +540,21 @@ function envSample(name: string): string {
     AUTH_INTERNAL_DOMAIN: "auth.trincadores.local",
     CRON_SECRET: "random-secret-string",
     NODE_ENV: "development",
+    BSD_API_KEY: "bsd_xxxx",
+    API_FOOTBALL_KEY: "af_xxxx",
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: "BExxxx...",
+    VAPID_PRIVATE_KEY: "xxxx",
+    VAPID_SUBJECT: "mailto:admin@example.com",
+    FIFA_API_BASE_URL: "https://api.fifa.com",
+    FIFA_SEASON_ID: "285023",
+    WC2026_API_BASE: "https://api.example.com",
+    WC2026_API_TOKEN: "token",
+    ONBOARDING_ACCESS_CODES_JSON: '{"hector":"CODE1234"}',
+    VERCEL_DEPLOYMENT_ID: "dpl_xxxx",
+    VERCEL_GIT_COMMIT_SHA: "abc123",
+    QUIZ_DATE: "2026-06-11",
+    POOL_SLUG: "trincadores",
+    CONFIRM_RESEED: "1",
   };
   return map[name] ?? "";
 }
@@ -469,7 +563,13 @@ function buildIntegrations(pkg: ReturnType<typeof parsePackageJson>): string {
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   const rows = [
     ["Supabase", "Auth, Postgres, RLS, RPC", "@supabase/ssr, @supabase/supabase-js", "lib/supabase/*, actions/*"],
-    ["Vercel", "Deploy + crons (vacíos)", "—", "vercel.json"],
+    ["Vercel", "Deploy + crons (live, quiz, lineups, push)", "—", "vercel.json, app/api/cron/*"],
+    ["BSD (Bzzoiro)", "Lineups predicted/confirmed, live stats, headlines", "fetch nativo", "lib/lineup/sources/bsd-*, lib/live/sources/bsd-*"],
+    ["FotMob", "Lineups confirmadas WC2026, MVP oficial", "fetch nativo", "lib/lineup/sources/fotmob-*, lib/live/sources/fotmob-*"],
+    ["FIFA API", "Squads oficiales, MVP fallback", "fetch nativo", "lib/worldcup2026/fifa-squads.ts, lib/live/sources/fifa-*"],
+    ["API-Football", "Lineups confirmadas fallback", "fetch nativo", "lib/lineup/sources/api-football-*"],
+    ["YouTube RSS", "Resúmenes DAZN/FIFA/Teledeporte", "fetch nativo", "lib/youtube/*, cron youtube-highlights"],
+    ["Web Push (VAPID)", "Notificaciones push navegador", "web-push", "lib/push/*, actions/push.ts"],
     ["Google Fonts", "Tipografía", "next/font", "app/layout.tsx"],
     ["lucide-react", "Iconos UI", deps["lucide-react"] ?? "", "components/layout/TabBar.tsx"],
     ["pg", "Seed SQL directo", deps.pg ?? "", "supabase/seed-auth.ts"],
@@ -481,7 +581,7 @@ function buildIntegrations(pkg: ReturnType<typeof parsePackageJson>): string {
 |-------------|----------|---------|----------------|
 ${rows}
 
-**No integrado aún:** OpenAI/Anthropic (stub en \`lib/narrative/llm-provider.stub.ts\`), Stripe, Resend, Twilio, Clerk, push notifications.
+**No integrado aún:** OpenAI/Anthropic (stub en \`lib/narrative/llm-provider.stub.ts\`), Stripe, Resend, Twilio, Clerk.
 
 `;
 }
@@ -511,11 +611,24 @@ ${section("4. Ranking y home", 3)}1. Jornada de referencia = mayor \`sequence\` 
 ${section("5. Perfil público", 3)}1. \`/profile/:profileId\` muestra standing de un rival
 2. Solo datos de porra compartida (RLS \`is_pool_member\`)
 
-${section("6. Quiz (esquema listo, UI pendiente)", 3)}1. RPC \`start_quiz_attempt\` devuelve preguntas sin respuestas
-2. Usuario responde → \`submit_quiz_attempt\`
-3. Máx 3 puntos, un intento por quiz, expiración 30 min
+${section("6. Quiz diario", 3)}1. Cron \`quiz-daily\` abre/cierra día (Madrid 00:00 / 23:59)
+2. Hub \`/quiz\` → play \`/quiz/play\` → result \`/quiz/result\`
+3. RPC \`start_quiz_attempt\` / \`submit_quiz_attempt\` — un intento competitivo por día
+4. Recordatorio push vía cron \`quiz-daily-reminder\`
 
-${section("7. Activity feed (pendiente fase 1e)", 3)}Tabla \`activity_events\` existe; UI \`/activity\` es placeholder.
+${section("7. Alineaciones y MVP partido", 3)}1. Fuentes: FotMob (confirmada) → BSD → API-Football; predicted BSD
+2. Cron \`lineup-prewarm\` precalienta XI confirmado T-90
+3. Modal táctico en calendario/home; predicción MVP por dorsal (+5 pts)
+
+${section("8. Partido en vivo y highlights", 3)}1. Cron \`live-matches\` (2 min): marcador/stats BSD → \`match_live_state\` + \`match_results\`
+2. MVP oficial: FotMob → FIFA → BSD → \`match_results.mvp_*\`
+3. Cron \`youtube-highlights\`: RSS DAZN/FIFA/Teledeporte → \`match_highlights\`
+4. UI hero con reproductor in-app y titular \`highlight_headline\`
+
+${section("9. Notificaciones (in-app + push)", 3)}4 kinds: pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario.
+\`savePushSubscriptionAction\` + VAPID en \`/api/push/vapid-key\`.
+
+${section("10. Activity feed (pendiente fase 1e)", 3)}Tabla \`activity_events\` existe; ruta \`/activity\` retirada del TabBar (sustituida por Quiz).
 
 `;
 }
@@ -599,12 +712,12 @@ ${section("Deuda técnica conocida", 3)}| Item | Detalle |
 |------|---------|
 | PWA icons | Manifest referencia \`/icons/*.png\` inexistentes en \`public/\` |
 | Recovery password | UI sin SMTP real |
-| \`lib/supabase/client.ts\` | Browser client sin imports |
 | \`lib/narrative/*\` | Motor sin integrar en UI |
-| \`CRON_SECRET\` | Definida pero sin endpoints |
+| API-Football free tier | Temporada 2026 no disponible; lineups vía BSD/FotMob |
 | N+1 RPC | \`fetchEditableByMatchIds\` llama RPC por partido |
 | Duplicación | Profile loading repetido en ranking y predictions |
 | Timezone | \`formatKickoff\` usa \`new Date(iso)\` directo |
+| Placeholders UEFA | 11 partidos sin mapeo BSD por placeholders \`3A/B/C/D/F\` |
 
 `;
 }
@@ -644,7 +757,11 @@ ${section("Roadmap implícito", 3)}| Fase | Estado |
 | 1c Predicciones + admin | ✅ |
 | 1d Ranking + home + rivales + perfil | ✅ |
 | 1e Activity feed | 📅 |
-| 2 Quiz UI + narrative/LLM | 📅 |
+| 2a Catálogo OpenFootball + import WC2026 | ✅ |
+| 2b Datos externos (Fjelstul, squads, live, lineups, highlights) | ✅ |
+| Quiz UI + gameplay + crons | ✅ |
+| Push + notificaciones in-app | ✅ |
+| Narrative/LLM | 📅 |
 
 `;
 }
@@ -652,7 +769,7 @@ ${section("Roadmap implícito", 3)}| Fase | Estado |
 function buildMeta(): string {
   return `${section("Meta", 2)}- **Generador:** \`npm run llm-context\` → \`scripts/generate-llm-context.ts\`
 - **Auto-actualización:** manual (\`npm run llm-context\`). Hook git desactivado.
-- **Archivos vigilados:** \`app/\`, \`actions/\`, \`components/\`, \`lib/\`, \`types/\`, \`supabase/migrations/\`, \`docs/\`, configs raíz
+- **Archivos vigilados:** \`app/\`, \`app/api/\`, \`actions/\`, \`components/\`, \`lib/\`, \`types/\`, \`supabase/migrations/\`, \`docs/\`, configs raíz
 - **Límites escalabilidad:** ${LIMITS.maxItemsPerGroup} ítems por grupo; archivos >${LIMITS.maxFileLinesDetail} líneas solo en riesgos
 
 `;

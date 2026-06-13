@@ -6,6 +6,7 @@ export const OUTPUT_FILE = "llm_context.md";
 
 export const WATCH_GLOBS = [
   "app",
+  "app/api",
   "actions",
   "components",
   "lib",

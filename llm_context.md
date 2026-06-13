@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-12T00:15:11.398Z`.
+> Fuente única de verdad para LLMs. Regenerado automáticamente. Última actualización: `2026-06-13T00:28:56.716Z`.
 
 | Campo | Valor |
 |-------|-------|
@@ -16,7 +16,7 @@
 | **Fase actual** | 2b datos externos Mundiales (Fjelstul + worldcup2026 feed) |
 | **Stack** | Next.js 16 App Router · React 19 · Tailwind 4 · Supabase (Auth + Postgres + RLS) |
 
-**Completado reciente:** Resúmenes FIFA YouTube: cron RSS `@fifa`, slide hero «Último partido», reproductor in-app, modal partido finalizado · Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push · Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar · MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin · Alineaciones confirmadas: FotMob como fuente prioritaria (`matchDetails.lineup`, WC2026); script `db:map-fotmob-fixtures` · Titulares BSD en highlights: columnas `matches.highlight_headline` / `highlight_headline_source`; sync social → incidentes vía cron `live-matches` y `youtube-highlights`; UI hero con titular corto
+**Completado reciente:** Resúmenes YouTube: cron RSS `@fifa` + `@TeledeporteRTVE` + `@DAZNES` (prioridad DAZN > FIFA > Teledeporte), slide hero «Último partido», reproductor in-app, modal partido finalizado · Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push · Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar · MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin · Alineaciones confirmadas: FotMob como fuente prioritaria (`matchDetails.lineup`, WC2026); script `db:map-fotmob-fixtures` · Titulares BSD en highlights: columnas `matches.highlight_headline` / `highlight_headline_source`; sync social → incidentes vía cron `live-matches` y `youtube-highlights`; UI hero con titular corto
 
 **Siguiente:** API-Football free tier: temporada 2026 no disponible; lineups confirmadas vía BSD o plan de pago API-Football
 
@@ -25,7 +25,7 @@
 
 ### Visión general
 
-Monolito full-stack en **Next.js 16** con **Server Components** por defecto y **Server Actions** como única capa de mutación. No hay API Routes REST. La base de datos es la fuente de verdad del scoring; TypeScript replica la lógica solo para tests.
+Monolito full-stack en **Next.js 16** con **Server Components** por defecto. Las mutaciones de usuario van por **Server Actions**; los **API Routes** en `app/api/` cubren crons Vercel, Web Push (VAPID) y helpers de auth/PWA. La base de datos es la fuente de verdad del scoring; TypeScript replica la lógica solo para tests.
 
 ### Stack técnico
 
@@ -88,7 +88,7 @@ flowchart TB
 - **Sin** hooks globales, Context API, Zustand ni React Query
 - Estado client solo en formularios y navegación (`useState`, `useTransition`, `useRouter`, `usePathname`)
 - PWA: `app/manifest.ts`, iconos dinámicos `icon.tsx` / `apple-icon.tsx`
-- Diseño: panel claro, cobalto `#0047FF`, lima solo LIVE, targets táctiles 48px+
+- Diseño: dark mode morado `#2a1058` + glass + acento neón lima `#D4FF00`, estilo porra deportiva, targets táctiles 48px+
 
 ### Rutas (pages)
 
@@ -97,6 +97,7 @@ flowchart TB
 | `/activity` | `app/(app)/activity/page.tsx` | force-dynamic |
 | `/admin` | `app/(app)/admin/page.tsx` | force-dynamic |
 | `/general-predictions` | `app/(app)/general-predictions/page.tsx` | force-dynamic |
+| `/laboratorio` | `app/(app)/laboratorio/page.tsx` | force-dynamic |
 | `/` | `app/(app)/page.tsx` | force-dynamic |
 | `/predictions/:matchId` | `app/(app)/predictions/[matchId]/page.tsx` | force-dynamic |
 | `/predictions/knockout` | `app/(app)/predictions/knockout/page.tsx` | force-dynamic |
@@ -145,6 +146,8 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `HighlightScorelineToggle` | `components/highlights/HighlightScorelineToggle.tsx` | client | HighlightScorelineToggle |
+| `HighlightScorelineVisibilityProvider` | `components/highlights/HighlightScorelineVisibilityProvider.tsx` | client | HighlightScorelineVisibilityProvider, useHighlightScorelineVisibility |
 | `MatchHighlightBlock` | `components/highlights/MatchHighlightBlock.tsx` | client | MatchHighlightBlock |
 | `MatchHighlightPlayerModal` | `components/highlights/MatchHighlightPlayerModal.tsx` | client | MatchHighlightPlayerModal |
 | `MatchHighlightScoreline` | `components/highlights/MatchHighlightScoreline.tsx` | server | MatchHighlightScoreline |
@@ -157,17 +160,19 @@ flowchart TB
 | `BackgroundPlayerLayer` | `components/home/BackgroundPlayerLayer.tsx` | server | BackgroundPlayerLayer |
 | `GeneralPredictionRow` | `components/home/GeneralPredictionRow.tsx` | client | GeneralPredictionRow |
 | `GeneralPredictionTeamValue` | `components/home/GeneralPredictionTeamValue.tsx` | server | HomeChampionTeamValue, HomeFinalistsTeamValue |
-| `HomeAtmosphere` | `components/home/HomeAtmosphere.tsx` | server | HomeAtmosphere |
+| `HomeAtmosphere` | `components/home/HomeAtmosphere.tsx` | client | HomeAtmosphere |
 | `HomeDailyFactCard` | `components/home/HomeDailyFactCard.tsx` | server | HomeDailyFactCard |
 | `HomeDailyQuizCard` | `components/home/HomeDailyQuizCard.tsx` | client | HomeDailyQuizCard |
+| `HomeFinishedMatchPanel` | `components/home/HomeFinishedMatchPanel.tsx` | client | HomeFinishedMatchPanel |
 | `HomeGeneralPredictionsCard` | `components/home/HomeGeneralPredictionsCard.tsx` | client | HomeGeneralPredictionsCard |
 | `HomeHero` | `components/home/HomeHero.tsx` | server | HomeHero |
 | `HomeHeroCarousel` | `components/home/HomeHeroCarousel.tsx` | client | HomeHeroCarousel |
 | `HomeMatchCard` | `components/home/HomeMatchCard.tsx` | client | HomeMatchCard |
-| `HomeMiniRankingTable` | `components/home/HomeMiniRankingTable.tsx` | server | HomeMiniRankingTable |
+| `HomeMiniRankingTable` | `components/home/HomeMiniRankingTable.tsx` | client | HomeMiniRankingTable |
 | `HomeNextMatch` | `components/home/HomeNextMatch.tsx` | client | HomeNextMatch |
 | `HomeScoringRulesCard` | `components/home/HomeScoringRulesCard.tsx` | client | HomeScoringRulesCard |
 | `HomeStandingCard` | `components/home/HomeStandingCard.tsx` | server | HomeStandingCard |
+| `HomeStatCardScrollHint` | `components/home/HomeStatCardScrollHint.tsx` | client | HomeStatCardScrollHint |
 | `HomeTopThree` | `components/home/HomeTopThree.tsx` | server | HomeTopThree |
 | `HomeViewportShell` | `components/home/HomeViewportShell.tsx` | server | HomeViewportShell |
 | `ScoringRulesModal` | `components/home/ScoringRulesModal.tsx` | client | ScoringRulesModal |
@@ -252,6 +257,7 @@ flowchart TB
 
 | Componente | Ruta | Tipo | Exports |
 |------------|------|------|--------|
+| `HighlightNotificationOpener` | `components/notifications/HighlightNotificationOpener.tsx` | client | HighlightNotificationOpener |
 | `LineupsNotificationOpener` | `components/notifications/LineupsNotificationOpener.tsx` | client | LineupsNotificationOpener |
 | `NotificationCountBadge` | `components/notifications/NotificationCountBadge.tsx` | server | NotificationCountBadge |
 | `NotificationsBell` | `components/notifications/NotificationsBell.tsx` | client | NotificationsBell |
@@ -276,8 +282,9 @@ flowchart TB
 | `CalendarFinishedMatchCardVisual` | `components/predictions/CalendarFinishedMatchCardVisual.tsx` | server | CalendarFinishedMatchCardVisual |
 | `CalendarGroupRowBadge` | `components/predictions/CalendarGroupRowBadge.tsx` | server | CalendarGroupRowBadge |
 | `CalendarGroupsPanel` | `components/predictions/CalendarGroupsPanel.tsx` | server | CalendarGroupsPanel |
+| `CalendarGuideAccess` | `components/predictions/CalendarGuideAccess.tsx` | client | CalendarGuideAccess |
 | `CalendarGuideModal` | `components/predictions/CalendarGuideModal.tsx` | client | CalendarGuideModal |
-| `CalendarGuidePreviewCell` | `components/predictions/CalendarGuidePreviewCell.tsx` | client | CalendarGuidePreviewCell |
+| `CalendarMatchCardFlagsRow` | `components/predictions/CalendarMatchCardFlagsRow.tsx` | server | CalendarMatchCardFlagsRow |
 | `CalendarSidebarAccessDock` | `components/predictions/CalendarSidebarAccessDock.tsx` | client | CalendarSidebarAccessDock |
 | `CalendarSidebarSlot` | `components/predictions/CalendarSidebarSlot.tsx` | server | CalendarSidebarSlot |
 | `FinishedMatchScoreRow` | `components/predictions/FinishedMatchScoreRow.tsx` | server | FinishedMatchScoreRow |
@@ -285,7 +292,10 @@ flowchart TB
 | `GroupStandingsModal` | `components/predictions/GroupStandingsModal.tsx` | client | GroupStandingsModal |
 | `KnockoutBracket` | `components/predictions/KnockoutBracket.tsx` | client | KnockoutBracket |
 | `MatchPredictionCard` | `components/predictions/MatchPredictionCard.tsx` | server | MatchPredictionCard |
+| `MatchPredictionsBoardHeaderTitle` | `components/predictions/MatchPredictionsBoardHeaderTitle.tsx` | client | matchPredictionsBoardAriaTitle, MatchPredictionsBoardHeaderTitle |
+| `MatchPredictionsBoardLegend` | `components/predictions/MatchPredictionsBoardLegend.tsx` | server | MatchPredictionsBoardLegend |
 | `MatchPredictionsBoardModal` | `components/predictions/MatchPredictionsBoardModal.tsx` | client | MatchPredictionsBoardModal |
+| `MatchPredictionsBoardOutcomeIcons` | `components/predictions/MatchPredictionsBoardOutcomeIcons.tsx` | server | MatchPredictionsBoardOutcomeIcons |
 | `MatchPredictionsBoardRow` | `components/predictions/MatchPredictionsBoardRow.tsx` | client | MatchPredictionsBoardRow |
 | `MatchPredictionsBoardTable` | `components/predictions/MatchPredictionsBoardTable.tsx` | server | MatchPredictionsBoardTable |
 | `MvpPredictionButton` | `components/predictions/MvpPredictionButton.tsx` | client | MvpPredictionButton |
@@ -295,7 +305,7 @@ flowchart TB
 | `PredictionForm` | `components/predictions/PredictionForm.tsx` | client | PredictionForm |
 | `PredictionOutcomeIcon` | `components/predictions/PredictionOutcomeIcon.tsx` | server | PredictionOutcomeIcon |
 | `PredictionsCalendar` | `components/predictions/PredictionsCalendar.tsx` | client | PredictionsCalendar |
-| `PredictionStatusBadge` | `components/predictions/PredictionStatusBadge.tsx` | server | PredictionStatusBadge |
+| `PredictionStatusBadge` | `components/predictions/PredictionStatusBadge.tsx` | server | PredictionEditStateBadge, PredictionStatusBadge |
 | `QuickPredictionModal` | `components/predictions/QuickPredictionModal.tsx` | client | QuickPredictionModal |
 | `ScoreStepper` | `components/predictions/ScoreStepper.tsx` | client | ScoreStepper |
 | `TeamFlagBadge` | `components/predictions/TeamFlagBadge.tsx` | server | TeamFlagBadge |
@@ -327,6 +337,24 @@ flowchart TB
 | `AppUpdateNotifier` | `components/pwa/AppUpdateNotifier.tsx` | client | AppUpdateNotifier |
 | `AvatarGenerationStep` | `components/pwa/AvatarGenerationStep.tsx` | client | AvatarGenerationStep |
 | `PwaOnboardingFlow` | `components/pwa/PwaOnboardingFlow.tsx` | client | PwaOnboardingFlow |
+
+#### quiz/lab/formats
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `LabGuessImageStage` | `components/quiz/lab/formats/LabGuessImageStage.tsx` | client | LabGuessImageStage |
+| `LabGuessPlayerCropStage` | `components/quiz/lab/formats/LabGuessPlayerCropStage.tsx` | client | LabGuessPlayerCropStage |
+| `LabGuessPlayerSilhouetteStage` | `components/quiz/lab/formats/LabGuessPlayerSilhouetteStage.tsx` | client | LabGuessPlayerSilhouetteStage |
+| `LabGuessSelectionStage` | `components/quiz/lab/formats/LabGuessSelectionStage.tsx` | client | LabGuessSelectionStage |
+| `LabQuestionPreview` | `components/quiz/lab/formats/LabQuestionPreview.tsx` | client | LabQuestionPreview |
+| `LabVideoPlayEndStage` | `components/quiz/lab/formats/LabVideoPlayEndStage.tsx` | client | LabVideoPlayEndStage |
+
+#### quiz/lab
+
+| Componente | Ruta | Tipo | Exports |
+|------------|------|------|--------|
+| `LabShell` | `components/quiz/lab/LabShell.tsx` | client | LabShell |
+| `LabWorkspace` | `components/quiz/lab/LabWorkspace.tsx` | client | LabWorkspace |
 
 #### quiz
 
@@ -393,7 +421,7 @@ flowchart TB
 
 ### Resumen
 
-No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + queries en `lib/`.
+Mutaciones de usuario vía **Server Actions** + queries en `lib/`. **API Routes** para crons, push y auth device.
 
 ### Server Actions
 
@@ -409,6 +437,8 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `signOut` | `actions/auth.ts` | `export async function signOut(): Promise<void> ` |
 | `setActivePool` | `actions/auth.ts` | `export async function setActivePool(poolId: string): Promise<AuthActionResult> ` |
 | `AuthActionResult` | `actions/auth.ts` | `AuthActionResult` |
+| `setHeroHighlightScorelineVisible` | `actions/highlights.ts` | `export async function setHeroHighlightScorelineVisible( poolId: string, visible:` |
+| `HighlightActionResult` | `actions/highlights.ts` | `HighlightActionResult` |
 | `fetchAllTournamentPlayersAction` | `actions/lineup.ts` | `export async function fetchAllTournamentPlayersAction(): Promise< LineupActionRe` |
 | `fetchTeamSquadAction` | `actions/lineup.ts` | `export async function fetchTeamSquadAction( teamName: string ): Promise<LineupAc` |
 | `fetchPlayerDetailAction` | `actions/lineup.ts` | `export async function fetchPlayerDetailAction( teamName: string, playerName: str` |
@@ -427,6 +457,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `saveMvpPrediction` | `actions/mvp-predictions.ts` | `export async function saveMvpPrediction( poolId: string, matchId: string, player` |
 | `MvpPredictionActionResult` | `actions/mvp-predictions.ts` | `MvpPredictionActionResult` |
 | `fetchMatchLineupsModalContextAction` | `actions/notifications.ts` | `export async function fetchMatchLineupsModalContextAction( matchId: string, ): P` |
+| `fetchMatchHighlightModalContextAction` | `actions/notifications.ts` | `export async function fetchMatchHighlightModalContextAction( matchId: string, ):` |
 | `NotificationActionResult` | `actions/notifications.ts` | `NotificationActionResult` |
 | `fetchMatchPredictionsBoardAction` | `actions/predictions.ts` | `export async function fetchMatchPredictionsBoardAction( poolId: string, matchId:` |
 | `savePrediction` | `actions/predictions.ts` | `export async function savePrediction( poolId: string, matchId: string, homeGoals` |
@@ -452,6 +483,22 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `saveTournamentGoldenGlove` | `actions/tournament-general-predictions.ts` | `export async function saveTournamentGoldenGlove( poolId: string, playerName: str` |
 | `TournamentGeneralActionResult` | `actions/tournament-general-predictions.ts` | `TournamentGeneralActionResult` |
 
+### API Routes
+
+| Ruta | Archivo | Métodos |
+|------|---------|---------|
+| `/api/app-version` | `app/api/app-version/route.ts` | GET |
+| `/api/auth/phone-login` | `app/api/auth/phone-login/route.ts` | POST |
+| `/api/auth/restore` | `app/api/auth/restore/route.ts` | GET |
+| `/api/cron/fotmob-map-fixtures` | `app/api/cron/fotmob-map-fixtures/route.ts` | GET |
+| `/api/cron/lineup-prewarm` | `app/api/cron/lineup-prewarm/route.ts` | GET |
+| `/api/cron/live-matches` | `app/api/cron/live-matches/route.ts` | GET |
+| `/api/cron/prediction-reminders` | `app/api/cron/prediction-reminders/route.ts` | GET |
+| `/api/cron/quiz-daily-reminder` | `app/api/cron/quiz-daily-reminder/route.ts` | GET |
+| `/api/cron/quiz-daily` | `app/api/cron/quiz-daily/route.ts` | GET |
+| `/api/cron/youtube-highlights` | `app/api/cron/youtube-highlights/route.ts` | GET |
+| `/api/push/vapid-key` | `app/api/push/vapid-key/route.ts` | — |
+
 ### Detalle de acciones
 
 | Acción | Recibe | Devuelve | Dependencias |
@@ -463,6 +510,10 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `setActivePool` | poolId uuid | `{ok}` o error | valida membresía, cookie |
 | `savePrediction` | poolId, matchId, goles | marcador guardado o error | RLS + `prediction_edit_allowed` |
 | `submitMatchResult` | poolId, matchId, goles | `{ok}` o error | admin check + RPC scoring |
+| `savePushSubscriptionAction` | PushSubscription JSON | `{ok}` o error | `push_subscriptions` + VAPID |
+| `startQuiz` / `submitQuiz` | quizId, respuestas | intento + puntuación | RPC `start_quiz_attempt` / `submit_quiz_attempt` |
+| `saveMvpPrediction` | poolId, matchId, dorsal | MVP guardado | `match_mvp_predictions` |
+| `fetchMatchLineupBundleAction` | matchId | alineaciones tácticas | FotMob → BSD → API-Football |
 
 ### Proxy / Middleware
 
@@ -511,12 +562,19 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/fjelstul-worldcup/normalize.ts` | 274 líneas | isWomenTournament, isMenTournament, inferGender, onlyMenTournaments, menTournamentExternalIds, filterByMenTournaments, playerDisplayName, normalizeTournaments, normalizeTeams, normalizeStadiums, normalizeMatches, normalizeGoals, normalizeAwardWinners, normalizeStandings, normalizeSquads, assertErrorRate, WOMENS_WC_TOURNAMENT_IDS, NormalizeStats |
 | `lib/fjelstul-worldcup/parse-csv.ts` | 79 líneas | parseCsvContent, readBool, readInt, readOptionalText, CsvRow |
 
-**highlights/** — 3 archivos
+**fotmob/** — 1 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
+| `lib/fotmob/sync-fotmob-fixtures.ts` | 152 líneas | syncFotmobFixtures, SyncFotmobFixturesResult |
+
+**highlights/** — 4 archivos
+
+| Archivo | Tamaño | Exports |
+|---------|--------|--------|
+| `lib/highlights/hero-scoreline-visibility.ts` | 31 líneas | canControlHighlightScorelineVisibility, readHeroHighlightScorelineVisible, withHeroHighlightScorelineVisible, HERO_HIGHLIGHT_SCORELINE_SETTING_KEY |
 | `lib/highlights/queries.ts` | 89 líneas | getLatestMatchHighlightForPool |
-| `lib/highlights/sync-bsd-headline.ts` | 112 líneas | syncBsdHeadlineForMatch |
+| `lib/highlights/sync-bsd-headline.ts` | 126 líneas | syncBsdHeadlineForMatch |
 | `lib/highlights/types.ts` | 12 líneas | MatchHighlightView |
 
 **home/** — 2 archivos
@@ -605,21 +663,22 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/lineup/use-goya-field-ready.ts` | 20 líneas | useGoyaFieldReady |
 | `lib/lineup/use-match-tactical-lineup-data.ts` | 141 líneas | useMatchTacticalLineupData |
 
-**live/** — 12 archivos
+**live/** — 13 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/live/match-stats-rows.ts` | 44 líneas | buildMatchStatRows, MatchStatRow |
 | `lib/live/queries.ts` | 73 líneas | loadMatchLiveSnapshot, loadLiveSnapshotsForMatches, rowToMatchLiveSnapshot |
-| `lib/live/sources/bsd-headline.ts` | 177 líneas | fetchBsdHeadline, truncateHeadline, pickHeadlineFromBsdSocial, composeHeadlineFromBsdIncidents, BsdHeadlineSource, BsdHeadline, BsdHeadlineContext |
-| `lib/live/sources/bsd-live.ts` | 209 líneas | fetchBsdLiveLeagueEvents, fetchBsdEventDetail, fetchBsdEventStats, fetchBsdEventIncidents, fetchBsdLiveBundle, parseBsdStats, parseBsdSubstitutions, formatBsdMinuteLabel, isBsdEventLive, isBsdEventFinished, BsdLiveEventRow |
+| `lib/live/sources/bsd-headline.ts` | 181 líneas | fetchBsdHeadline, truncateHeadline, isScoreStyleHeadline, pickHeadlineFromBsdSocial, composeHeadlineFromBsdIncidents, BsdHeadlineSource, BsdHeadline, BsdHeadlineContext |
+| `lib/live/sources/bsd-live.ts` | 227 líneas | fetchBsdLiveLeagueEvents, fetchBsdEventDetail, fetchBsdEventStats, fetchBsdEventIncidents, fetchBsdEventPlayerStats, fetchBsdLiveBundle, parseBsdStats, parseBsdSubstitutions, formatBsdMinuteLabel, isBsdEventLive, isBsdEventFinished, BsdLiveEventRow |
 | `lib/live/sources/bsd-official-mvp.ts` | 134 líneas | fetchOfficialMvpFromBsd, parseOfficialMvpFromBsdIncidents, parseOfficialMvpFromBsdEventDetail, OfficialMvpFromBsd |
+| `lib/live/sources/bsd-player-incidents.ts` | 169 líneas | parseBsdIncidentsPlayerEvents, parseBsdPlayerStatsIncidents, mergePlayerIncidents, BsdPlayerIncidentRaw, BsdPlayerStatsResponse |
 | `lib/live/sources/fifa-official-mvp.ts` | 338 líneas | loadFifaCalendarLookup, fetchOfficialMvpFromFifa, buildFifaCalendarLookup, resolveFifaMatchFromCalendar, findFifaTimelineMvpPlayerId, parseOfficialMvpFromFifaLive, FIFA_WC_SOURCE_CODE, FifaResolvedMatch, OfficialMvpFromFifa |
 | `lib/live/sources/fotmob-official-mvp.ts` | 159 líneas | loadFotmobMatchesForDate, fetchOfficialMvpFromFotmob, fetchOfficialMvpFromFotmobByTeams, canonicalStoredPlayerName, resolveFotmobMatchId, parseOfficialMvpFromFotmobDetails, FOTMOB_SOURCE_CODE, FotMobMatchListItem, OfficialMvpFromFotmob |
 | `lib/live/substitution-markers.ts` | 41 líneas | buildSubstitutionMarkers, substitutionMarkerForPlayer |
-| `lib/live/sync-live-matches.ts` | 300 líneas | syncLiveMatches, SyncLiveMatchesResult |
+| `lib/live/sync-live-matches.ts` | 355 líneas | syncLiveMatches, SyncLiveMatchesResult |
 | `lib/live/sync-official-mvp.ts` | 247 líneas | loadMatchesMissingOfficialMvp, syncOfficialMvps |
-| `lib/live/types.ts` | 45 líneas | MatchSubstitution, MatchLiveStats, MatchLivePayload, MatchLiveSnapshot, SubstitutionMarkers |
+| `lib/live/types.ts` | 52 líneas | MatchSubstitution, MatchLiveStats, MatchPlayerIncident, MatchLivePayload, MatchLiveSnapshot, SubstitutionMarkers |
 | `lib/live/use-match-live-snapshot.ts` | 43 líneas | useMatchLiveSnapshot |
 
 **media/** — 1 archivos
@@ -637,15 +696,16 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/narrative/template-provider.ts` | 16 líneas | — |
 | `lib/narrative/types.ts` | 22 líneas | NarrativeTone, NarrativeContext, NarrativeItem |
 
-**notifications/** — 10 archivos
+**notifications/** — 11 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/notifications/confirmed-lineup-notifications.ts` | 247 líneas | areBothLineupsConfirmedInCache, maybeNotifyConfirmedLineup, syncConfirmedLineupNotifications, buildConfirmedLineupNotificationCopy, NotifyConfirmedLineupResult, SyncConfirmedLineupNotificationsResult |
+| `lib/notifications/confirmed-lineup-notifications.ts` | 250 líneas | areBothLineupsConfirmedInCache, maybeNotifyConfirmedLineup, syncConfirmedLineupNotifications, buildConfirmedLineupNotificationCopy, NotifyConfirmedLineupResult, SyncConfirmedLineupNotificationsResult |
 | `lib/notifications/format.ts` | 23 líneas | formatNotificationDateTimeLine |
-| `lib/notifications/kinds.ts` | 5 líneas | NOTIFICATION_KIND_PREDICTION_REMINDER, NOTIFICATION_KIND_CONFIRMED_LINEUP, NOTIFICATION_KIND_QUIZ_ACTIVE, NOTIFICATION_KIND_QUIZ_DAILY_REMINDER |
+| `lib/notifications/kinds.ts` | 6 líneas | NOTIFICATION_KIND_PREDICTION_REMINDER, NOTIFICATION_KIND_CONFIRMED_LINEUP, NOTIFICATION_KIND_MATCH_HIGHLIGHT, NOTIFICATION_KIND_QUIZ_ACTIVE, NOTIFICATION_KIND_QUIZ_DAILY_REMINDER |
+| `lib/notifications/match-highlight-notifications.ts` | 196 líneas | maybeNotifyMatchHighlight, buildMatchHighlightNotificationCopy, NotifyMatchHighlightResult |
 | `lib/notifications/notification-action.ts` | 25 líneas | resolveNotificationAction, NotificationAction |
-| `lib/notifications/notification-navigation.ts` | 15 líneas | notificationNavigationPath, LINEUPS_NOTIFICATION_QUERY |
+| `lib/notifications/notification-navigation.ts` | 20 líneas | notificationNavigationPath, LINEUPS_NOTIFICATION_QUERY |
 | `lib/notifications/prediction-reminders.ts` | 192 líneas | sendPredictionReminders, isPredictionReminderDue, buildPredictionReminderCopy, PREDICTION_REMINDER_KIND, PREDICTION_REMINDER_MINUTES, PREDICTION_REMINDER_CRON_INTERVAL_MS, PredictionReminderMissing, SendPredictionRemindersResult |
 | `lib/notifications/quiz-active-announcement.ts` | 79 líneas | broadcastQuizActiveAnnouncement, BroadcastQuizActiveAnnouncementResult |
 | `lib/notifications/quiz-active-copy.ts` | 17 líneas | buildQuizActiveAnnouncementCopy, buildQuizActiveModalCopy |
@@ -674,23 +734,23 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/pool/active-pool.ts` | 67 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
+| `lib/pool/active-pool.ts` | 75 líneas | loadAppShellContext, assertPoolMembership, UserPool, AppShellContext |
 | `lib/pool/admin.ts` | 31 líneas | isPoolAdmin, isPoolOwner |
-| `lib/pool/calendar-layout.ts` | 677 líneas | getMaxMatchesInMonthGrid, resetPredictionLabelMetrics, fitPredictionLabel, syncCalendarGridHeight, resetCalendarGridHeight, fitCalendarLayout, syncCalendarGuidePreview, resetCalendarLayout, CALENDAR_SIDEBAR_CARD_ANCHOR, SIDEBAR_CARD_ANCHOR_ATTR, CalendarLayoutResult |
+| `lib/pool/calendar-layout.ts` | 701 líneas | getMaxMatchesInMonthGrid, resetPredictionLabelMetrics, fitPredictionLabel, syncCalendarGridHeight, resetCalendarGridHeight, fitCalendarLayout, syncCalendarGuidePreview, syncAllCalendarGuidePreviews, resetCalendarLayout, CALENDAR_SIDEBAR_CARD_ANCHOR, SIDEBAR_CARD_ANCHOR_ATTR, CalendarLayoutResult |
 | `lib/pool/format-kickoff.ts` | 11 líneas | formatKickoff |
 | `lib/pool/group-standings.ts` | 278 líneas | toGroupMatchRows, buildGroupStandingsDetail, buildGroupStandings, findGroupStandingDetail, isCalendarGroupsPanelDay, isCalendarSidebarDay, isCalendarGroupsCompanionDay, CALENDAR_GROUPS_PANEL_DAYS, CALENDAR_SIDEBAR_DAYS, CALENDAR_GROUPS_COMPANION_DAY, GroupTeamStanding, GroupStandingRow, GroupStandingDetail, GroupStandingsSource, GroupMatchLike |
 | `lib/pool/match-calendar.ts` | 258 líneas | kickoffDateKey, toMonthKey, parseMonthKey, formatCalendarDayLabel, formatCalendarMonthLabel, formatMonthYearLabel, formatMonthLabel, formatKickoffTime, formatCalendarKickoffHour, indexMatchesByDate, getMonthRangeFromMatches, getInitialMonthYear, shiftMonth, compareMonth, buildMonthGrid, trimEmptyMatchWeeks, groupMatchesByDay, WEEKDAY_LABELS, CalendarMatchLike, MatchDayGroup, CalendarCell, CalendarWeek, MonthYear |
 | `lib/pool/queries.ts` | 44 líneas | getPoolMatches, PoolMatchRow |
 | `lib/pool/require-context.ts` | 29 líneas | requireActivePoolContext, getCachedAppShellContext |
-| `lib/pool/tournament-stats.ts` | 70 líneas | tournamentHasGoals, getTournamentTopScorers, getTournamentStatRows, TournamentScorerRow, TournamentStatRow, TournamentStatKind |
+| `lib/pool/tournament-stats.ts` | 110 líneas | tournamentHasGoals, getTournamentTopScorers, getTournamentStatRows, TournamentScorerRow, TournamentStatRow, TournamentStatKind |
 
 **predictions/** — 16 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/predictions/calendar-data-access.ts` | 8 líneas | CalendarModalOpenOptions, CalendarModalOpener |
-| `lib/predictions/calendar-finished-card.ts` | 96 líneas | resolveCalendarFinishedCard, CalendarFinishedCardVariant, CalendarFinishedCardState |
-| `lib/predictions/calendar-guide-demos.ts` | 127 líneas | CalendarGuideEntry |
+| `lib/predictions/calendar-finished-card.ts` | 83 líneas | resolveCalendarFinishedCard, CAL_FINISHED_OUTER_MUTED_CLASS, CalendarFinishedCardVariant, CalendarFinishedCardState |
+| `lib/predictions/calendar-guide-demos.ts` | 129 líneas | CalendarGuideEntry |
 | `lib/predictions/deadline.ts` | 27 líneas | predictionLockDeadlineMs, formatPredictionCountdown, PREDICTION_LOCK_MINUTES |
 | `lib/predictions/edit-state.ts` | 54 líneas | resolvePredictionUiState, displayGoals, formatListScore, NO_PREDICTION_LABEL, PredictionUiState, PredictionUiInput |
 | `lib/predictions/knockout-bracket-geometry.ts` | 424 líneas | bracketGridRowCenter, gridRowToPercentY, buildColumnCenters, mapColumnX, gutterX, cardEdgeX, connectorEdgeX, buildBracketGeometry, finalCenterYFromGeometry, buildPairCentersInBand, buildBracketConnectorPaths, matchPosition, finalHitSpanPercent, BRACKET_GRID_COLS, BRACKET_GRID_ROWS, COL_R32_LEFT, COL_FINAL_HOME, COL_FINAL_AWAY, COL_R32_RIGHT, BRACKET_HEADER_BAND_Y, BRACKET_FOOTER_BAND_Y, R32_BOTTOM_ANCHOR_Y, R32_TOP_ANCHOR_Y, KO_CARD_SIZE_SCALE, ORB_PAIR_INNER_HALF_Y, R32_PAIR_INNER_HALF_Y, FINAL_CUP_OFFSET_ABOVE_FINAL, CARD_HALF_WIDTH_BASE, ORB_HALF_WIDTH_X, BRACKET_COLUMN_INSET, FINAL_CENTER_X, FINAL_ANCHOR_LEFT_X, FINAL_ANCHOR_RIGHT_X, BracketGridRoundIndex, BracketMatchGeometry, BracketConnectorSegment |
@@ -699,7 +759,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/predictions/mvp-match-state.ts` | 92 líneas | mvpPlayerNameFromMatch, mvpShirtNumberFromMatch, mvpSnapshotFromMatch, mergeMvpIntoMatch, mvpOverridesFromMatches, preferMatchMvpData, patchMatchMvpPrediction, mvpOverridesFromMatchListAndActive, MvpSnapshot |
 | `lib/predictions/mvp-queries.ts` | 58 líneas | fetchMvpPredictionsForMatches, getMvpPredictionForMatch, MvpPrediction |
 | `lib/predictions/prediction-outcome.ts` | 29 líneas | resolveScoreOutcome, isMvpPredictionCorrect, ScoreOutcome |
-| `lib/predictions/queries.ts` | 496 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getMatchPredictionsBoard, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow, MatchPredictionsBoardRow, MatchPredictionsBoard |
+| `lib/predictions/queries.ts` | 621 líneas | assertMatchInPool, fetchMatchEditableFromDb, getPoolMatchesWithPredictions, getPoolGroupStageMatchesWithPredictions, getPoolKnockoutMatchesWithPredictions, getMatchPredictionDetail, countPendingPredictions, getAdminOpenMatches, getMatchPredictionsBoard, getPeerPredictionsForMatch, computePredictionEditableLocally, arePeerPredictionsLikelyVisible, MatchWithPrediction, MatchDetail, AdminOpenMatch, PeerPredictionRow, MatchPredictionsBoardRow, MatchPredictionsBoard |
 | `lib/predictions/scoring.ts` | 14 líneas | formatMvpPointsLabel, MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS |
 | `lib/predictions/stage-filter.ts` | 34 líneas | isGroupStageMatchdayKey, isKnockoutMatchdayKey, GROUP_STAGE_CALENDAR_MONTH, KNOCKOUT_ROUND_ORDER |
 | `lib/predictions/teams-picker-data.ts` | 15 líneas | getAllWorldCupTeamsAlphabetically |
@@ -711,8 +771,8 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 |---------|--------|--------|
 | `lib/push/client.ts` | 86 líneas | registerPushServiceWorker, getServiceWorkerRegistration, getExistingPushSubscription, subscribeToPush, isPushSupported, serializePushSubscription, getPushClientStatus, PushClientStatus |
 | `lib/push/prompt-storage.ts` | 15 líneas | isPushPromptDismissed, dismissPushPrompt, clearPushPromptDismissed |
-| `lib/push/send.ts` | 83 líneas | sendPushToProfile, PushPayload, SendPushResult |
-| `lib/push/urls.ts` | 49 líneas | quizActiveNotificationUrl, confirmedLineupNotificationUrl, predictionReminderNotificationUrl, quizDailyReminderNotificationUrl, pushUrlForNotificationKind, QUIZ_ACTIVE_NOTIFICATION_QUERY, LINEUPS_NOTIFICATION_QUERY |
+| `lib/push/send.ts` | 85 líneas | sendPushToProfile, PushPayload, SendPushResult |
+| `lib/push/urls.ts` | 64 líneas | highlightThumbNotificationUrl, quizActiveNotificationUrl, confirmedLineupNotificationUrl, predictionReminderNotificationUrl, matchHighlightNotificationUrl, quizDailyReminderNotificationUrl, pushUrlForNotificationKind, QUIZ_ACTIVE_NOTIFICATION_QUERY, LINEUPS_NOTIFICATION_QUERY, HIGHLIGHT_NOTIFICATION_QUERY |
 | `lib/push/vapid.ts` | 27 líneas | getVapidPublicKey, assertVapidConfigured, isVapidConfigured |
 
 **pwa/** — 7 archivos
@@ -727,7 +787,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/pwa/onboarding-phones.ts` | 51 líneas | normalizePhone, isOnboardingEligibleUsername, resolveParticipantByAlias, resolveParticipantByPhone, ONBOARDING_ELIGIBLE_USERNAMES, PhoneParticipant |
 | `lib/pwa/standalone.ts` | 30 líneas | isStandalonePWA, detectMobileOs, MobileOs |
 
-**quiz/** — 35 archivos
+**quiz/** — 43 archivos
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
@@ -742,9 +802,17 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/generate-question.ts` | 58 líneas | generateQuestionFromFact, GeneratedQuizQuestion |
 | `lib/quiz/generate-worldcup-facts.ts` | 217 líneas | buildWorldcupFactsFromHistoric |
 | `lib/quiz/generated-day.ts` | 69 líneas | toSeedQuestion, generatedDayToSeedFile, parseGeneratedOrSeedDay, questionsMetaFromDay, GeneratedQuizDayFile |
-| `lib/quiz/home-teaser.ts` | 71 líneas | homeQuizSlideFromHub, HomeQuizSlide |
+| `lib/quiz/home-teaser.ts` | 69 líneas | homeQuizSlideFromHub, HomeQuizSlide |
 | `lib/quiz/intro-countdown.ts` | 29 líneas | introCountdownFromRemaining, IntroCountdownView |
 | `lib/quiz/intro.ts` | 18 líneas | QUIZ_INTRO_VIDEO_SRC, QUIZ_INTRO_TITLE_MS, QUIZ_INTRO_CROSSFADE_MS, QUIZ_INTRO_OUTRO_MS, QUIZ_INTRO_OUTRO_LEAD_S, QUIZ_PLAY_ENTER_MS |
+| `lib/quiz/lab-access.ts` | 10 líneas | canAccessQuizLab, isQuizLabPath |
+| `lib/quiz/lab/club-crests.ts` | 92 líneas | getApiSportsCrestUrl, resolveClubCrestUrl, clubSlotWithCrest, demoPlayerNameForSlot, ClubSlotSeed |
+| `lib/quiz/lab/defaults.ts` | 236 líneas | createLabQuestion, createDefaultLabDraft |
+| `lib/quiz/lab/demo-assets.ts` | 8 líneas | LAB_DEMO_IMAGES |
+| `lib/quiz/lab/demo-video.ts` | 11 líneas | isExternalLabVideoUrl, LAB_DEMO_VIDEO_SRC, LAB_DEMO_VIDEO_STOP_AT_SECONDS |
+| `lib/quiz/lab/hydrate.ts` | 131 líneas | hydrateLabQuestion, hydrateLabDraft, selectionSlotsForFormation |
+| `lib/quiz/lab/storage.ts` | 43 líneas | readLabDraft, writeLabDraft, resetLabDraft |
+| `lib/quiz/lab/types.ts` | 232 líneas | isLabPlayerCropFormat, isLabPlayerCropQuestion, isLabPlayerSilhouetteQuestion, LAB_QUESTION_FORMATS, LabQuestionFormat, LabOption, LabQuestionBase, LabQuestionMultipleChoice, LabQuestionGuessImage, LabSelectionSlot, LabQuestionGuessSelection, LabQuestionGuessPlayerCrop, LabQuestionGuessPlayerSilhouette, LabQuestionVideoPlayEnd, LabQuestion, LabDraft |
 | `lib/quiz/mode.ts` | 45 líneas | isPoolCompetitive |
 | `lib/quiz/module.contract.ts` | 3 líneas | QuizModuleContract |
 | `lib/quiz/options.ts` | 35 líneas | parseQuizOptions, validateQuizAnswers |
@@ -753,7 +821,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/play-routes.ts` | 10 líneas | isQuizPlayResume, QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF |
 | `lib/quiz/publish-day.ts` | 109 líneas | publishQuizDay, PublishQuizDayResult, PublishQuizDayOptions |
 | `lib/quiz/quality.ts` | 151 líneas | validateSemanticCoherence, validateGeneratedQuestion, assertGeneratedQuestions, QualityResult |
-| `lib/quiz/queries.ts` | 386 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, isQuizPlayable |
+| `lib/quiz/queries.ts` | 383 líneas | getQuizzesForDate, getQuizAttemptsForProfile, getQuizDayHub, startQuizSession, getQuizResult, getQuizLeaderboard, isQuizPlayable |
 | `lib/quiz/question-templates.ts` | 59 líneas | renderQuestionFromFact, QuestionTemplateResult |
 | `lib/quiz/quiz-facts-repository.ts` | 118 líneas | upsertWorldcupFacts, shouldPersistFacts, validateWorldcupFactRow, prepareFactsForUpsert, toUpsertPayload, QUIZ_FACTS_WORLDCUP_TABLE, PrepareFactsResult, UpsertFactsResult, UpsertWorldcupFactsDeps |
 | `lib/quiz/recent-fact-ids.ts` | 66 líneas | loadRecentFactIdsFromDb, factIdsFromSettings |
@@ -763,8 +831,8 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | `lib/quiz/scoring.ts` | 10 líneas | quizFinalRankingBonusForPosition, QUIZ_FINAL_RANKING_BONUS_BY_POSITION, QUIZ_FINAL_RANKING_TOP_N |
 | `lib/quiz/seed-day.ts` | 154 líneas | parseSeedQuizDayFile, scoringFieldsForMode, QUIZ_OFFICIAL_TITLE, SeedQuizOption, SeedQuizQuestion, SeedBonusBlock, SeedQuizDayFile |
 | `lib/quiz/seed-db.ts` | 234 líneas | ensureQuizPool, isPoolCompetitiveAdmin, findQuizForDate, upsertQuizBundle, seedQuizDayToDb, QuizAdminClient |
-| `lib/quiz/slot-status.ts` | 158 líneas | getQuizSlotStatus, getLatestSubmittedAttemptId, canOpenQuizPlay, canReplayQuiz, getQuizPlayCta, shouldShowQuizAlreadyPlayedModal, formatQuizSlotStatusLabel, QuizSlotStatus, QuizPlayAccessOptions, QuizPlayCta |
-| `lib/quiz/types.ts` | 103 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizQuestionPlay, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
+| `lib/quiz/slot-status.ts` | 141 líneas | getQuizSlotStatus, getLatestSubmittedAttemptId, canOpenQuizPlay, canReplayQuiz, getQuizPlayCta, shouldShowQuizAlreadyPlayedModal, formatQuizSlotStatusLabel, QuizSlotStatus, QuizPlayCta |
+| `lib/quiz/types.ts` | 102 líneas | QuizKind, QuizScoringMode, QuizAttemptStatus, QuizOption, QuizQuestionPublic, QuizQuestionPlay, QuizSummary, QuizStartSession, QuizRow, QuizAttemptRow, QuizDaySlot, QuizDayHub, QuizLeaderboardRow, QuizResultResponse |
 | `lib/quiz/worldcup-facts-source.ts` | 189 líneas | fetchWorldcupFactsFromDb, loadQuizFactsWithFallback, isMenQuizFact, mapWorldcupRowToQuizFact, parseWorldcupFactsRows, mergeFactPools, MIN_FACTS_FOR_DAY, MIN_FACTS_POOL, QuizFactsSourceKind, QuizFactsLoadResult, LoadQuizFactsDeps |
 
 **ranking/** — 4 archivos
@@ -772,8 +840,8 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
 | `lib/ranking/context-rows.ts` | 30 líneas | getContextualLeaderboardStartIndex, pickContextualLeaderboardRows, VISIBLE_ROW_COUNT |
-| `lib/ranking/format.ts` | 4 líneas | formatAggregateStat |
-| `lib/ranking/queries.ts` | 464 líneas | getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
+| `lib/ranking/format.ts` | 22 líneas | formatAggregateStat, formatPoints, formatReferenceMatchDate, formatReferenceMatchLabel |
+| `lib/ranking/queries.ts` | 589 líneas | getReferenceMatch, getReferenceMatchday, getReferenceMatchdayId, getPoolLeaderboard, getMemberStanding, memberStandingFromLeaderboard, ReferenceMatch, ReferenceMatchday, PositionTrend, LeaderboardRow, MemberStanding |
 | `lib/ranking/reliability.ts` | 17 líneas | computeReliabilityPct, formatReliabilityPct, MAX_POINTS_PER_MATCH |
 
 **scoring/** — 1 archivos
@@ -866,21 +934,31 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 
 | Archivo | Tamaño | Exports |
 |---------|--------|--------|
-| `lib/youtube/constants.ts` | 47 líneas | youtubeChannelRssUrl, fifaChannelRssUrl, teledeporteRssUrl, youtubeThumbnailUrl, youtubeEmbedUrl, FIFA_YOUTUBE_CHANNEL_ID, TELEDEPORTE_RTVE_YOUTUBE_CHANNEL_ID, HIGHLIGHT_SOURCE_CODES, YoutubeThumbnailQuality |
-| `lib/youtube/highlight-priority.ts` | 32 líneas | shouldReplaceMatchHighlight, highlightSourceLabel, HighlightSourceCode |
-| `lib/youtube/match-video.ts` | 160 líneas | isFifaHighlightTitle, isTeledeporteHighlightTitle, parseTeamsFromHighlightTitle, parseTeamsFromTeledeporteTitle, buildTeamAliasIndex, resolveTeamLabel, pickMatchForHighlightVideo, TeamAliasIndex |
+| `lib/youtube/constants.ts` | 55 líneas | youtubeChannelRssUrl, fifaChannelRssUrl, teledeporteRssUrl, daznEsRssUrl, youtubeThumbnailUrl, youtubeEmbedUrl, FIFA_YOUTUBE_CHANNEL_ID, TELEDEPORTE_RTVE_YOUTUBE_CHANNEL_ID, DAZN_ES_YOUTUBE_CHANNEL_ID, HIGHLIGHT_SOURCE_CODES, YoutubeThumbnailQuality |
+| `lib/youtube/highlight-priority.ts` | 44 líneas | shouldReplaceMatchHighlight, hasLowerHighlightPriority, highlightSourceLabel, HighlightSourceCode |
+| `lib/youtube/match-video.ts` | 183 líneas | isFifaHighlightTitle, isDaznHighlightTitle, isTeledeporteHighlightTitle, parseTeamsFromHighlightTitle, parseTeamsFromDaznTitle, parseTeamsFromTeledeporteTitle, buildTeamAliasIndex, resolveTeamLabel, pickMatchForHighlightVideo, TeamAliasIndex |
 | `lib/youtube/parse-feed.ts` | 42 líneas | parseYoutubeChannelFeed |
-| `lib/youtube/sync-highlights.ts` | 331 líneas | syncAllMatchHighlights, syncYoutubeFifaHighlights, SyncYoutubeHighlightsResult, SyncAllMatchHighlightsResult |
+| `lib/youtube/sync-highlights.ts` | 382 líneas | syncAllMatchHighlights, syncYoutubeFifaHighlights, SyncYoutubeHighlightsResult, SyncAllMatchHighlightsResult |
 | `lib/youtube/types.ts` | 13 líneas | YoutubeFeedVideo, YoutubeHighlightMatchCandidate |
 
 
 ### Jobs / Cron / Webhooks
 
+| Job | Schedule | Auth |
+|-----|----------|------|
+| `/api/cron/quiz-daily` | `0 * * * *` | `CRON_SECRET` |
+| `/api/cron/quiz-daily` | `59 * * * *` | `CRON_SECRET` |
+| `/api/cron/quiz-daily-reminder` | `0 * * * *` | `CRON_SECRET` |
+| `/api/cron/lineup-prewarm` | `*/5 * * * *` | `CRON_SECRET` |
+| `/api/cron/prediction-reminders` | `*/5 * * * *` | `CRON_SECRET` |
+| `/api/cron/youtube-highlights` | `*/15 * * * *` | `CRON_SECRET` |
+| `/api/cron/live-matches` | `*/2 * * * *` | `CRON_SECRET` |
+| `/api/cron/fotmob-map-fixtures` | `0 */6 * * *` | `CRON_SECRET` |
+
 | Tipo | Estado |
 |------|--------|
-| Vercel Cron | `vercel.json` → `crons: []` (vacío) |
 | Edge Functions Supabase | No implementadas |
-| Webhooks | No implementados |
+| Webhooks externos | No implementados |
 | RPC batch | `expire_stale_quiz_attempts`, `generate_news_batch` (stub) preparados en SQL |
 
 
@@ -891,7 +969,7 @@ No existen `app/api/*` routes. Toda la lógica server-side usa Server Actions + 
 | Aspecto | Valor |
 |---------|-------|
 | ORM | **Ninguno** — SQL directo vía Supabase JS + RPC |
-| Migraciones | 37 archivos en `supabase/migrations/` |
+| Migraciones | 41 archivos en `supabase/migrations/` |
 | Tablas | 44 |
 | Enums | match_status, pool_member_role, pool_member_role_new, quiz_attempt_status, quiz_kind, quiz_scoring_mode |
 | Funciones SQL | 35 |
@@ -929,47 +1007,47 @@ erDiagram
 | `achievements` | Catálogo de logros | RLS habilitado |
 | `activity_events` | Eventos para feed de actividad (fase 1e) | RLS habilitado |
 | `admin_audit_log` | Auditoría acciones administrativas | RLS habilitado |
-| `competitions` | Ver migraciones SQL | RLS habilitado |
-| `data_source_registry` | Ver migraciones SQL | RLS habilitado |
-| `external_id_map` | Ver migraciones SQL | RLS habilitado |
-| `host_cities` | Ver migraciones SQL | RLS habilitado |
+| `competitions` | Catálogo OpenFootball (competiciones) | RLS habilitado |
+| `data_source_registry` | Registro de fuentes de datos externas | RLS habilitado |
+| `external_id_map` | Mapeo partidos → IDs externos (BSD, FotMob, API-Football) | RLS habilitado |
+| `host_cities` | Sedes del Mundial | RLS habilitado |
 | `invite_codes` | Códigos de invitación (solo RPC, sin SELECT directo) | RLS habilitado |
-| `match_live_state` | Ver migraciones SQL | RLS habilitado |
-| `match_mvp_predictions` | Ver migraciones SQL | RLS habilitado |
-| `match_results` | Marcador oficial (1:1 con match) | RLS habilitado |
-| `match_team_lineups` | Ver migraciones SQL | RLS habilitado |
+| `match_live_state` | Snapshot live: marcador, stats, payload BSD | RLS habilitado |
+| `match_mvp_predictions` | Predicción MVP por usuario/partido | RLS habilitado |
+| `match_results` | Marcador oficial + MVP oficial (1:1 con match) | RLS habilitado |
+| `match_team_lineups` | Alineaciones confirmadas/predicted por partido/equipo | RLS habilitado |
 | `matchdays` | Jornadas de competición dentro de una porra | RLS habilitado |
-| `matches` | Partidos con kickoff, equipos y status | RLS habilitado |
+| `matches` | Partidos con kickoff, equipos, status y highlight_headline | RLS habilitado |
 | `news_items` | Noticias/narrativa generada por pool | RLS habilitado |
-| `notifications` | Notificaciones in-app por usuario | RLS habilitado |
+| `notifications` | Notificaciones in-app por usuario (4 kinds + push) | RLS habilitado |
 | `pool_member_scores` | Puntos acumulados y rank por jornada | RLS habilitado |
 | `pool_members` | Membresía N:M con rol owner/admin/player | RLS habilitado |
 | `pools` | Porra privada con settings_json (visibilidad predicciones) | RLS habilitado |
 | `predictions` | Predicción de marcador por usuario/partido/porra | RLS habilitado |
 | `profile_achievements` | Logros desbloqueados por perfil | RLS habilitado |
 | `profiles` | Perfil 1:1 con auth.users (username, display_name) | RLS habilitado |
-| `push_subscriptions` | Suscripciones Web Push (pendiente) | RLS habilitado |
+| `push_subscriptions` | Suscripciones Web Push (VAPID) | RLS habilitado |
 | `quiz_attempts` | Intento de quiz por usuario | RLS habilitado |
-| `quiz_facts_worldcup` | Ver migraciones SQL | RLS habilitado |
-| `quiz_final_ranking_scores` | Ver migraciones SQL | RLS habilitado |
+| `quiz_facts_worldcup` | Banco de hechos históricos para generador quiz | RLS habilitado |
+| `quiz_final_ranking_scores` | Bonus ranking final quiz | RLS habilitado |
 | `quiz_question_keys` | Respuestas correctas (acceso revocado) | RLS habilitado |
 | `quiz_questions` | Preguntas de un quiz | RLS habilitado |
 | `quiz_responses` | Respuestas individuales por intento | RLS habilitado |
-| `quizzes` | Cuestionarios opcionales por porra | RLS habilitado |
-| `team_squad_players` | Ver migraciones SQL | RLS habilitado |
-| `team_squads` | Ver migraciones SQL | RLS habilitado |
-| `teams` | Ver migraciones SQL | RLS habilitado |
-| `tournament_general_prediction_scores` | Ver migraciones SQL | RLS habilitado |
-| `tournament_general_predictions` | Ver migraciones SQL | RLS habilitado |
-| `tournament_official_awards` | Ver migraciones SQL | RLS habilitado |
-| `tournament_stages` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_award_winners` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_goals` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_matches` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_stadiums` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_teams` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_tournament_standings` | Ver migraciones SQL | RLS habilitado |
-| `wc_historic_tournaments` | Ver migraciones SQL | RLS habilitado |
+| `quizzes` | Cuestionarios diarios por porra | RLS habilitado |
+| `team_squad_players` | Jugadores de plantilla | RLS habilitado |
+| `team_squads` | Plantillas oficiales por equipo/torneo | RLS habilitado |
+| `teams` | Equipos del catálogo WC2026 | RLS habilitado |
+| `tournament_general_prediction_scores` | Puntos pronósticos generales | RLS habilitado |
+| `tournament_general_predictions` | Pronósticos generales (campeón, finalistas, goleador…) | RLS habilitado |
+| `tournament_official_awards` | Premios oficiales del torneo (admin) | RLS habilitado |
+| `tournament_stages` | Fases del torneo (grupos, eliminatorias) | RLS habilitado |
+| `wc_historic_award_winners` | Premios históricos | RLS habilitado |
+| `wc_historic_goals` | Goles históricos | RLS habilitado |
+| `wc_historic_matches` | Partidos históricos | RLS habilitado |
+| `wc_historic_stadiums` | Estadios históricos | RLS habilitado |
+| `wc_historic_teams` | Equipos históricos | RLS habilitado |
+| `wc_historic_tournament_standings` | Clasificaciones históricas | RLS habilitado |
+| `wc_historic_tournaments` | Histórico Mundiales (Fjelstul) | RLS habilitado |
 
 ### Enums
 
@@ -1066,11 +1144,15 @@ erDiagram
 - `supabase/migrations/20260611200000_quiz_daily_reminder_notifications.sql` (19 líneas)
 - `supabase/migrations/20260611220000_match_predictions_board_rpc.sql` (76 líneas)
 - `supabase/migrations/20260612120000_profile_onboarding_completed.sql` (8 líneas)
+- `supabase/migrations/20260612140000_quiz_no_owner_replay.sql` (190 líneas)
+- `supabase/migrations/20260612150000_fix_pool_member_scores_cumulative_order.sql` (63 líneas)
 - `supabase/migrations/20260613120000_teams_primary_kit_hex.sql` (71 líneas)
 - `supabase/migrations/20260614120000_match_team_lineups.sql` (31 líneas)
 - `supabase/migrations/20260615120000_match_highlights.sql` (14 líneas)
 - `supabase/migrations/20260616200000_match_highlight_source.sql` (24 líneas)
 - `supabase/migrations/20260617120000_match_highlight_headline.sql` (12 líneas)
+- `supabase/migrations/20260618120000_fotmob_data_source.sql` (6 líneas)
+- `supabase/migrations/20260618120000_match_highlight_dazn_source.sql` (16 líneas)
 
 Documentación RLS ampliada: `docs/RLS_NOTES.md`
 
@@ -1129,36 +1211,36 @@ sequenceDiagram
 | `ALLOW_BOOTSTRAP` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `ALLOW_IMPORT` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `ALLOW_QUIZ_SEED` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
-| `API_FOOTBALL_KEY` | Ver código | Opcional | `` | lib/lineup/sources/api-football-client.ts, lib/lineup/sources/api-football.ts, scripts/probe-match-mvp-sources.ts |
+| `API_FOOTBALL_KEY` | API-Football (lineups confirmadas fallback) | Opcional | `af_xxxx` | lib/lineup/sources/api-football-client.ts, lib/lineup/sources/api-football.ts, scripts/probe-match-mvp-sources.ts |
 | `AUTH_INTERNAL_DOMAIN` | Dominio email sintético | Opcional | `auth.trincadores.local` | lib/auth/credentials.ts |
-| `BSD_API_KEY` | Ver código | Opcional | `` | lib/lineup/sources/bsd-client.ts, lib/live/sources/bsd-headline.ts, scripts/emit-bsd-map-sql.ts |
+| `BSD_API_KEY` | API key Bzzoiro/BSD (lineups, live, headlines) | Opcional | `bsd_xxxx` | lib/lineup/sources/bsd-client.ts, lib/live/sources/bsd-headline.ts, scripts/emit-bsd-map-sql.ts |
 | `CONFIRM_PURGE` | Ver código | Opcional | `` | lib/scripts/env-guard.ts |
 | `CONFIRM_REIMPORT` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
-| `CONFIRM_RESEED` | Ver código | Opcional | `` | scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
-| `CRON_SECRET` | Protección endpoints cron (sin uso aún) | Opcional | `random-secret-string` | app/api/cron/live-matches/route.ts, lib/quiz/cron.ts |
+| `CONFIRM_RESEED` | Flag `1` para permitir reseed quiz | Opcional | `1` | scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
+| `CRON_SECRET` | Bearer token para endpoints `/api/cron/*` | Opcional | `random-secret-string` | app/api/cron/live-matches/route.ts, lib/quiz/cron.ts |
 | `DATABASE_URL` | Postgres directo para seed.sql | Opcional | `postgresql://postgres:pass@host:5432/postgres` | — |
 | `EXCLUDE_FACT_IDS` | Ver código | Opcional | `` | scripts/publish-quiz-day.ts |
-| `FIFA_API_BASE_URL` | Ver código | Opcional | `` | lib/live/sources/fifa-official-mvp.ts, lib/worldcup2026/fifa-squads.ts |
-| `FIFA_SEASON_ID` | Ver código | Opcional | `` | lib/live/sources/fifa-official-mvp.ts, lib/worldcup2026/fifa-squads.ts |
+| `FIFA_API_BASE_URL` | Base URL API FIFA (squads, MVP) | Opcional | `https://api.fifa.com` | lib/live/sources/fifa-official-mvp.ts, lib/worldcup2026/fifa-squads.ts |
+| `FIFA_SEASON_ID` | Season ID FIFA WC2026 | Opcional | `285023` | lib/live/sources/fifa-official-mvp.ts, lib/worldcup2026/fifa-squads.ts |
 | `NEXT_PUBLIC_SITE_URL` | URL pública para redirects auth | Opcional | `http://localhost:3000` | lib/site-url.ts, scripts/bootstrap-participants.ts |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon | Sí | `eyJhbG...anon` | lib/supabase/client.ts, lib/supabase/middleware.ts, lib/supabase/route.ts |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL proyecto Supabase | Sí | `https://xxxx.supabase.co` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Ver código | Opcional | `` | lib/push/vapid.ts |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Clave pública Web Push | Opcional | `BExxxx...` | lib/push/vapid.ts |
 | `NODE_ENV` | Entorno Node (cookies secure) | Auto | `development` | actions/pwa-onboarding.ts, lib/auth/clear-device-cookies.ts, lib/auth/onboarding-device.ts |
-| `ONBOARDING_ACCESS_CODES_JSON` | Ver código | Opcional | `` | lib/pwa/onboarding-access-codes.test.ts, lib/pwa/onboarding-access-codes.ts |
+| `ONBOARDING_ACCESS_CODES_JSON` | Mapa username→código acceso PWA | Opcional | `{"hector":"CODE1234"}` | lib/pwa/onboarding-access-codes.test.ts, lib/pwa/onboarding-access-codes.ts |
 | `OPENFOOTBALL_DIR` | Ver código | Opcional | `` | scripts/import-openfootball-wc2026.ts |
-| `POOL_SLUG` | Ver código | Opcional | `` | lib/quiz/seed-db.ts, scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
-| `QUIZ_DATE` | Ver código | Opcional | `` | scripts/generate-quiz-day.ts, scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
+| `POOL_SLUG` | Slug porra para scripts quiz/seed | Opcional | `trincadores` | lib/quiz/seed-db.ts, scripts/import-openfootball-wc2026.ts, scripts/seed-quiz-day.ts |
+| `QUIZ_DATE` | Fecha civil quiz para scripts seed/publish | Opcional | `2026-06-11` | scripts/generate-quiz-day.ts, scripts/publish-quiz-day.ts, scripts/seed-quiz-day.ts |
 | `QUIZ_DAY_FILE` | Ver código | Opcional | `` | scripts/seed-quiz-day.ts |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (server/seed/rollback) | Sí | `eyJhbG...service` | lib/scripts/env-guard.ts, lib/scripts/supabase-admin.ts, lib/supabase/admin.ts |
-| `VAPID_PRIVATE_KEY` | Ver código | Opcional | `` | lib/push/vapid.ts |
-| `VAPID_SUBJECT` | Ver código | Opcional | `` | lib/push/vapid.ts |
-| `VERCEL_DEPLOYMENT_ID` | Ver código | Opcional | `` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
-| `VERCEL_GIT_COMMIT_SHA` | Ver código | Opcional | `` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
+| `VAPID_PRIVATE_KEY` | Clave privada Web Push | Opcional | `xxxx` | lib/push/vapid.ts |
+| `VAPID_SUBJECT` | mailto: para VAPID | Opcional | `mailto:admin@example.com` | lib/push/vapid.ts |
+| `VERCEL_DEPLOYMENT_ID` | ID deploy Vercel (detección actualización PWA) | Opcional | `dpl_xxxx` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
+| `VERCEL_GIT_COMMIT_SHA` | SHA commit Vercel (fallback versión PWA) | Opcional | `abc123` | lib/pwa/app-update.test.ts, lib/pwa/deployment-version.ts |
 | `VERCEL_PROJECT_PRODUCTION_URL` | Ver código | Opcional | `` | lib/site-url.ts |
 | `VERCEL_URL` | Ver código | Opcional | `` | lib/site-url.ts |
-| `WC2026_API_BASE` | Ver código | Opcional | `` | lib/worldcup2026/api-client.ts |
-| `WC2026_API_TOKEN` | Ver código | Opcional | `` | lib/worldcup2026/api-client.ts |
+| `WC2026_API_BASE` | Base URL feed worldcup2026 | Opcional | `https://api.example.com` | lib/worldcup2026/api-client.ts |
+| `WC2026_API_TOKEN` | Token feed worldcup2026 | Opcional | `token` | lib/worldcup2026/api-client.ts |
 
 
 ## APIs e integraciones externas
@@ -1166,12 +1248,18 @@ sequenceDiagram
 | Integración | Para qué | Paquete | Archivos clave |
 |-------------|----------|---------|----------------|
 | **Supabase** | Auth, Postgres, RLS, RPC | @supabase/ssr, @supabase/supabase-js | lib/supabase/*, actions/* |
-| **Vercel** | Deploy + crons (vacíos) | — | vercel.json |
+| **Vercel** | Deploy + crons (live, quiz, lineups, push) | — | vercel.json, app/api/cron/* |
+| **BSD (Bzzoiro)** | Lineups predicted/confirmed, live stats, headlines | fetch nativo | lib/lineup/sources/bsd-*, lib/live/sources/bsd-* |
+| **FotMob** | Lineups confirmadas WC2026, MVP oficial | fetch nativo | lib/lineup/sources/fotmob-*, lib/live/sources/fotmob-* |
+| **FIFA API** | Squads oficiales, MVP fallback | fetch nativo | lib/worldcup2026/fifa-squads.ts, lib/live/sources/fifa-* |
+| **API-Football** | Lineups confirmadas fallback | fetch nativo | lib/lineup/sources/api-football-* |
+| **YouTube RSS** | Resúmenes DAZN/FIFA/Teledeporte | fetch nativo | lib/youtube/*, cron youtube-highlights |
+| **Web Push (VAPID)** | Notificaciones push navegador | web-push | lib/push/*, actions/push.ts |
 | **Google Fonts** | Tipografía | next/font | app/layout.tsx |
 | **lucide-react** | Iconos UI | ^1.17.0 | components/layout/TabBar.tsx |
 | **pg** | Seed SQL directo | ^8.21.0 | supabase/seed-auth.ts |
 
-**No integrado aún:** OpenAI/Anthropic (stub en `lib/narrative/llm-provider.stub.ts`), Stripe, Resend, Twilio, Clerk, push notifications.
+**No integrado aún:** OpenAI/Anthropic (stub en `lib/narrative/llm-provider.stub.ts`), Stripe, Resend, Twilio, Clerk.
 
 
 ## Flujos de negocio
@@ -1210,15 +1298,34 @@ sequenceDiagram
 1. `/profile/:profileId` muestra standing de un rival
 2. Solo datos de porra compartida (RLS `is_pool_member`)
 
-### 6. Quiz (esquema listo, UI pendiente)
+### 6. Quiz diario
 
-1. RPC `start_quiz_attempt` devuelve preguntas sin respuestas
-2. Usuario responde → `submit_quiz_attempt`
-3. Máx 3 puntos, un intento por quiz, expiración 30 min
+1. Cron `quiz-daily` abre/cierra día (Madrid 00:00 / 23:59)
+2. Hub `/quiz` → play `/quiz/play` → result `/quiz/result`
+3. RPC `start_quiz_attempt` / `submit_quiz_attempt` — un intento competitivo por día
+4. Recordatorio push vía cron `quiz-daily-reminder`
 
-### 7. Activity feed (pendiente fase 1e)
+### 7. Alineaciones y MVP partido
 
-Tabla `activity_events` existe; UI `/activity` es placeholder.
+1. Fuentes: FotMob (confirmada) → BSD → API-Football; predicted BSD
+2. Cron `lineup-prewarm` precalienta XI confirmado T-90
+3. Modal táctico en calendario/home; predicción MVP por dorsal (+5 pts)
+
+### 8. Partido en vivo y highlights
+
+1. Cron `live-matches` (2 min): marcador/stats BSD → `match_live_state` + `match_results`
+2. MVP oficial: FotMob → FIFA → BSD → `match_results.mvp_*`
+3. Cron `youtube-highlights`: RSS DAZN/FIFA/Teledeporte → `match_highlights`
+4. UI hero con reproductor in-app y titular `highlight_headline`
+
+### 9. Notificaciones (in-app + push)
+
+4 kinds: pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario.
+`savePushSubscriptionAction` + VAPID en `/api/push/vapid-key`.
+
+### 10. Activity feed (pendiente fase 1e)
+
+Tabla `activity_events` existe; ruta `/activity` retirada del TabBar (sustituida por Quiz).
 
 
 ## Convenciones del proyecto
@@ -1271,30 +1378,30 @@ docs/               → AUTH, RLS, SEED
 
 | Archivo | Líneas | Nota |
 |---------|--------|------|
-| `components/predictions/QuickPredictionModal.tsx` | 957 | Revisar extracción |
-| `lib/pool/calendar-layout.ts` | 677 | Revisar extracción |
+| `components/predictions/QuickPredictionModal.tsx` | 982 | Revisar extracción |
+| `lib/pool/calendar-layout.ts` | 701 | Revisar extracción |
 | `supabase/migrations/20260604220000_initial_schema.sql` | 661 | Revisar extracción |
-| `components/predictions/PredictionsCalendar.tsx` | 589 | Revisar extracción |
+| `components/quiz/lab/LabWorkspace.tsx` | 643 | Revisar extracción |
+| `lib/predictions/queries.ts` | 621 | Revisar extracción |
+| `lib/ranking/queries.ts` | 589 | Revisar extracción |
+| `components/predictions/PredictionsCalendar.tsx` | 586 | Revisar extracción |
 | `components/ui/modal.tsx` | 555 | Revisar extracción |
 | `lib/lineup/sources/bsd-squad-match.ts` | 508 | Revisar extracción |
-| `lib/predictions/queries.ts` | 496 | Revisar extracción |
-| `lib/ranking/queries.ts` | 464 | Revisar extracción |
+| `components/home/HomeGeneralPredictionsCard.tsx` | 463 | Revisar extracción |
+| `components/home/HomeMatchCard.tsx` | 458 | Revisar extracción |
+| `components/matches/MatchTeamsDisplay.tsx` | 441 | Revisar extracción |
 | `components/layout/TabSwipeNavigator.tsx` | 436 | Revisar extracción |
 | `components/pwa/PwaOnboardingFlow.tsx` | 428 | Revisar extracción |
 | `lib/predictions/knockout-bracket-geometry.ts` | 424 | Revisar extracción |
-| `components/matches/MatchTeamsDisplay.tsx` | 390 | Revisar extracción |
-| `lib/quiz/queries.ts` | 386 | Revisar extracción |
-| `components/lineup/EntityModalController.tsx` | 361 | Revisar extracción |
-| `components/quiz/QuizPlaySession.tsx` | 351 | Revisar extracción |
 
 ### Código posiblemente sin uso
 
-- `components/highlights/MatchHighlightScoreline.tsx` — posible código muerto
 - `components/home/BackgroundPlayerLayer.tsx` — posible código muerto
 - `components/home/HomeTopThree.tsx` — posible código muerto
 - `components/lineup/LineupSourceBadge.tsx` — posible código muerto
 - `components/lineup/MatchMvpFieldGraphic.tsx` — posible código muerto
 - `components/match/MatchRow.tsx` — posible código muerto
+- `components/predictions/CalendarGroupRowBadge.tsx` — posible código muerto
 - `components/predictions/MatchPredictionCard.tsx` — posible código muerto
 - `components/quiz/QuizModeBadge.tsx` — posible código muerto
 - `components/quiz/QuizProgressDots.tsx` — posible código muerto
@@ -1305,10 +1412,10 @@ docs/               → AUTH, RLS, SEED
 - `lib/fjelstul-worldcup/download.ts` — posible código muerto
 - `lib/layout/bottom-chrome.ts` — posible código muerto
 - `lib/lineup/sources/bsd-slot-coords.ts` — posible código muerto
-- `lib/lineup/sources/fotmob-match-mapper.ts` — posible código muerto
 - `lib/lineup/sources/predicted-provider.ts` — posible código muerto
 - `lib/narrative/engine.ts` — posible código muerto
 - `lib/notifications/quiz-active-announcement.ts` — posible código muerto
+- `lib/quiz/generate-worldcup-facts.ts` — posible código muerto
 
 ### Deuda técnica conocida
 
@@ -1316,12 +1423,12 @@ docs/               → AUTH, RLS, SEED
 |------|---------|
 | PWA icons | Manifest referencia `/icons/*.png` inexistentes en `public/` |
 | Recovery password | UI sin SMTP real |
-| `lib/supabase/client.ts` | Browser client sin imports |
 | `lib/narrative/*` | Motor sin integrar en UI |
-| `CRON_SECRET` | Definida pero sin endpoints |
+| API-Football free tier | Temporada 2026 no disponible; lineups vía BSD/FotMob |
 | N+1 RPC | `fetchEditableByMatchIds` llama RPC por partido |
 | Duplicación | Profile loading repetido en ranking y predictions |
 | Timezone | `formatKickoff` usa `new Date(iso)` directo |
+| Placeholders UEFA | 11 partidos sin mapeo BSD por placeholders `3A/B/C/D/F` |
 
 
 ## Estado actual del desarrollo
@@ -1370,7 +1477,8 @@ docs/               → AUTH, RLS, SEED
 - [x] Quiz training rejugable (migracion RPC/índice)
 - [x] Bonus deprecado en UI/seed
 - [x] Quiz gameplay rapido: timer 10s, feedback inmediato, auto-submit, resultado minimo
-- [x] Quiz generador: distractores semanticos + owner replay ilimitado
+- [x] Quiz generador: distractores semanticos
+- [x] Quiz competitivo: un solo intento por dia (sin excepcion owner)
 - [x] Quiz cron diario 00:00 abrir / 23:59 cerrar Madrid (`/api/cron/quiz-daily` + `publishQuizDay` + `closeQuizDay`)
 - [x] Quiz competitivo oficial desde 2026-06-11 (fecha civil Madrid)
 - [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play
@@ -1379,7 +1487,7 @@ docs/               → AUTH, RLS, SEED
 - [x] MVP partido: proyección por bandas tácticas, claves por dorsal y targets táctiles 48px
 - [x] Sistema táctico unificado: `formation-coordinates` (6 formaciones incl. 4-1-4-1) + espejo vertical MVP + UI compacta (reservas arriba, meta abajo, sin pastilla de formación)
 - [x] Cron precalentamiento alineaciones (`/api/cron/lineup-prewarm`, cada 5 min, XI confirmado T-90, horizonte 48h)
-- [x] Resúmenes FIFA YouTube: cron RSS `@fifa`, slide hero «Último partido», reproductor in-app, modal partido finalizado
+- [x] Resúmenes YouTube: cron RSS `@fifa` + `@TeledeporteRTVE` + `@DAZNES` (prioridad DAZN > FIFA > Teledeporte), slide hero «Último partido», reproductor in-app, modal partido finalizado
 - [x] Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
 - [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin
@@ -1401,8 +1509,9 @@ _Ninguno._
 
 ### TODOs / FIXMEs en código
 
-- `components/notifications/NotificationsBell.tsx:32` — <p className="text-[15px] font-semibold tracking-tight text-[#2F5D6A]">Todo al día</p>
-- `components/notifications/NotificationsBell.tsx:258` — {clearingAll ? "…" : "Borrar todo"}
+- `components/matches/MatchTeamsDisplay.tsx:27` — /** Card próximo partido: columna central a todo el alto del bloque equipos. */
+- `components/notifications/NotificationsBell.tsx:34` — <p className="text-[15px] font-semibold tracking-tight text-[#2F5D6A]">Todo al día</p>
+- `components/notifications/NotificationsBell.tsx:325` — {clearingAll ? "…" : "Borrar todo"}
 - `lib/lineup/fit-field-modal-layout.test.ts:21` — it("encaja todo en viewports bajos sin depender de scroll", () => {
 - `lib/lineup/fit-mvp-horizontal-layout.test.ts:39` — it("encaja todo en viewports bajos sin scroll", () => {
 
@@ -1416,13 +1525,17 @@ _Ninguno._
 | 1c Predicciones + admin | ✅ |
 | 1d Ranking + home + rivales + perfil | ✅ |
 | 1e Activity feed | 📅 |
-| 2 Quiz UI + narrative/LLM | 📅 |
+| 2a Catálogo OpenFootball + import WC2026 | ✅ |
+| 2b Datos externos (Fjelstul, squads, live, lineups, highlights) | ✅ |
+| Quiz UI + gameplay + crons | ✅ |
+| Push + notificaciones in-app | ✅ |
+| Narrative/LLM | 📅 |
 
 
 ## Meta
 
 - **Generador:** `npm run llm-context` → `scripts/generate-llm-context.ts`
 - **Auto-actualización:** manual (`npm run llm-context`). Hook git desactivado.
-- **Archivos vigilados:** `app/`, `actions/`, `components/`, `lib/`, `types/`, `supabase/migrations/`, `docs/`, configs raíz
+- **Archivos vigilados:** `app/`, `app/api/`, `actions/`, `components/`, `lib/`, `types/`, `supabase/migrations/`, `docs/`, configs raíz
 - **Límites escalabilidad:** 40 ítems por grupo; archivos >300 líneas solo en riesgos
 
