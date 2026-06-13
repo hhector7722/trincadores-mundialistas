@@ -27,7 +27,6 @@ import {
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
-import { Button } from "@/components/ui/button";
 import {
   lineupsActionCaption,
   lineupsModalTitle,
@@ -67,6 +66,14 @@ function scheduledHeaderLabel(
 }
 
 const SCHEDULED_SCORE_EDIT_GAP_PX = 10;
+
+const HOME_PREDICTIONS_BOARD_BUTTON_CLASS = cn(
+  "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
+  "inline-flex h-auto w-max shrink-0 items-center justify-center",
+  "rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+  "text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black",
+  "transition-opacity hover:opacity-90 active:opacity-80"
+);
 
 /** Marcador centrado en el ancho de la card; el lápiz no desplaza el centro. */
 function HomeScheduledPredictionScore({
@@ -250,31 +257,14 @@ export function HomeMatchCard({
         >
           Ver todos
         </Link>
-        {isLive ? (
+        {isLive || isFinished ? (
           <button
             type="button"
             onClick={() => setPredictionsBoardOpen(true)}
-            className={cn(
-              "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
-              "inline-flex h-auto w-max shrink-0 items-center justify-center",
-              "rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
-              "text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black",
-              "transition-opacity hover:opacity-90 active:opacity-80",
-            )}
+            className={HOME_PREDICTIONS_BOARD_BUTTON_CLASS}
           >
             Ver pronósticos
           </button>
-        ) : isFinished ? (
-          <Button
-            type="button"
-            onClick={() => setPredictionsBoardOpen(true)}
-            className={cn(
-              "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
-              "!min-h-0 h-auto w-max px-3 py-1 text-[10px] leading-none uppercase tracking-[0.12em]",
-            )}
-          >
-            Ver pronósticos
-          </Button>
         ) : (
           <p
             className={cn(

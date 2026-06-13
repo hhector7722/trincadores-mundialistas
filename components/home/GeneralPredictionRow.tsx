@@ -29,14 +29,14 @@ export function GeneralPredictionRow({
   }
 
   return (
-    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,4.75rem)_minmax(0,1fr)_1.25rem] items-center gap-1">
-      <span className="flex min-w-0 items-center truncate text-[9px] font-semibold uppercase tracking-wide text-white/50">
+    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_0.875rem] items-center gap-0.5">
+      <span className="flex min-w-0 items-center text-[clamp(7px,2cqw,9px)] font-semibold uppercase leading-tight tracking-wide text-white/50">
         {label}
       </span>
-      <div className="flex min-w-0 items-center justify-center overflow-visible">
+      <div className="flex min-w-0 items-center justify-center overflow-visible px-0.5">
         {hasValue ? (
           valueNode ?? (
-            <span className="max-w-full truncate text-center text-[10px] font-medium text-[#CCFF00]">
+            <span className="line-clamp-2 max-w-full break-words text-center text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight text-[#CCFF00]">
               {value}
             </span>
           )

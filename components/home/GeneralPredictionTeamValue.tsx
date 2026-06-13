@@ -10,19 +10,26 @@ export function HomeChampionTeamValue({
   abbrClassName?: string;
 }) {
   return (
-    <span className="inline-flex max-w-full items-center justify-center gap-0.5">
+    <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-0.5 gap-y-0">
       <TeamFlagBadge name={team} size="xxs" loading="eager" className="shrink-0" />
-      <span className={cn("truncate text-[10px] font-medium", abbrClassName)}>{teamAbbr(team)}</span>
+      <span
+        className={cn(
+          "line-clamp-2 break-words text-center text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight",
+          abbrClassName
+        )}
+      >
+        {teamAbbr(team)}
+      </span>
     </span>
   );
 }
 
 export function HomeFinalistsTeamValue({ teamA, teamB }: { teamA: string; teamB: string }) {
   return (
-    <span className="inline-flex max-w-full items-center justify-center gap-0.5 text-[10px] font-medium text-[#CCFF00]">
-      <span className="whitespace-nowrap">{teamAbbr(teamA)}</span>
+    <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-0.5 gap-y-0 text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight text-[#CCFF00]">
+      <span className="break-words">{teamAbbr(teamA)}</span>
       <span className="text-white/40">-</span>
-      <span className="whitespace-nowrap">{teamAbbr(teamB)}</span>
+      <span className="break-words">{teamAbbr(teamB)}</span>
     </span>
   );
 }
