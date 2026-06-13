@@ -47,6 +47,12 @@
   --tab-bar-height: var(--tm-tabbar-core);
   --tm-content-bottom: var(--tm-tabbar-core);
   --tm-tab-indicators-bottom: var(--tm-tabbar-core);
+  --tm-app-header-inner: 3.25rem;
+  --tm-app-header-pt: max(0.75rem, env(safe-area-inset-top, 0px));
+  --tm-app-header-pb: 0.5rem;
+  --tm-app-header-block: calc(
+    var(--tm-app-header-pt) + var(--tm-app-header-inner) + var(--tm-app-header-pb)
+  );
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -147,6 +153,25 @@ html[data-modal-open] .tm-app-main {
 
 .tm-app-header {
   background: transparent;
+}
+
+.tm-app-header--pinned {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 90;
+  box-sizing: border-box;
+  padding-top: var(--tm-app-header-pt);
+  padding-bottom: var(--tm-app-header-pb);
+  transform: translateZ(0);
+}
+
+.tm-app-header-spacer {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--tm-app-header-block);
+  flex-shrink: 0;
 }
 
 .tm-app-main {

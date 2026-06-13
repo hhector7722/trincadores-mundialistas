@@ -212,7 +212,7 @@ export function PullToRefresh() {
         !showIndicator && "opacity-0"
       )}
       style={{
-        top: "calc(env(safe-area-inset-top, 0px) + 3.25rem)",
+        top: "var(--tm-app-header-block)",
         transform: `translateY(${indicatorOffset}px)`,
         opacity: showIndicator ? Math.min(1, 0.35 + progress * 0.65) : 0,
         transition:

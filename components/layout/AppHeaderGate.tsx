@@ -28,6 +28,7 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
     <AppHeader
       ctx={ctx}
       stackedTitle={isHome}
+      pinned={isHome}
       showNotificationsBell={isHome}
       title={
         isRanking
