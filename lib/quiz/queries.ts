@@ -1,5 +1,5 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
-import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
+import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
 import { parseQuizOptions } from "@/lib/quiz/options";
@@ -133,11 +133,13 @@ export async function getQuizDayHub(
   );
 
   const officialQuiz = quizzes.find((q) => q.kind === "official");
+  const publishHeld = isQuizPublishHeld(quizDate);
 
   return {
     quizDate,
     competitive,
-    official: slotFrom(officialQuiz, attempts),
+    publishHeld,
+    official: publishHeld ? null : slotFrom(officialQuiz, attempts),
     bonus: null,
   };
 }

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, type MouseEvent } from "react";
 import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
+import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
 import {
   getLatestSubmittedAttemptId,
   getQuizPlayCta,
@@ -19,24 +20,34 @@ type HomeDailyQuizCardProps = {
 export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps) {
   const router = useRouter();
   const [alreadyPlayedOpen, setAlreadyPlayedOpen] = useState(false);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
   const playCta = getQuizPlayCta(quizHub.official, {
     resultAttemptId: getLatestSubmittedAttemptId(quizHub.official),
   });
 
+  function showComingSoon() {
+    setComingSoonOpen(true);
+  }
+
   function handleCardNavigate() {
+    if (quizHub.publishHeld || !quizHub.official) {
+      showComingSoon();
+      return;
+    }
+
     router.push("/quiz");
   }
 
   function handlePlay(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
 
-    const slot = quizHub.official;
-    if (!slot) {
-      router.push("/quiz");
+    if (quizHub.publishHeld || !quizHub.official) {
+      showComingSoon();
       return;
     }
 
+    const slot = quizHub.official;
     if (shouldShowQuizAlreadyPlayedModal(slot)) {
       setAlreadyPlayedOpen(true);
       return;
@@ -92,6 +103,12 @@ export function HomeDailyQuizCard({ quizHub, className }: HomeDailyQuizCardProps
         open={alreadyPlayedOpen}
         onClose={() => setAlreadyPlayedOpen(false)}
         message="Hoy ya has jugado al quiz diario crack."
+      />
+
+      <QuizWaitModal
+        open={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        message={QUIZ_COMING_SOON_MESSAGE}
       />
     </>
   );

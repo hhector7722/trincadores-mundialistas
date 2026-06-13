@@ -1,4 +1,4 @@
-import { isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
+import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { NOTIFICATION_KIND_QUIZ_DAILY_REMINDER } from "@/lib/notifications/kinds";
 import { quizDailyReminderNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
@@ -52,6 +52,8 @@ export async function sendQuizDailyReminders(
     pushSkipped: 0,
     pushFailed: 0,
   };
+
+  if (isQuizPublishHeld(quizDate)) return result;
 
   const { data: quizzes, error: quizzesError } = await admin
     .from("quizzes")

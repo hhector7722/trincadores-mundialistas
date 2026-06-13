@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
 import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
+import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
 import {
   getLatestSubmittedAttemptId,
   getQuizPlayCta,
@@ -23,6 +24,7 @@ type QuizHubProps = {
 export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps) {
   const router = useRouter();
   const [waitModalOpen, setWaitModalOpen] = useState(false);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
   const quizAvailable = Boolean(hub.official);
   const playCta = getQuizPlayCta(hub.official, {
@@ -30,7 +32,10 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
   });
 
   function handlePlay() {
-    if (!quizAvailable || !hub.official) return;
+    if (hub.publishHeld || !quizAvailable || !hub.official) {
+      setComingSoonOpen(true);
+      return;
+    }
 
     if (shouldShowQuizAlreadyPlayedModal(hub.official)) {
       setWaitModalOpen(true);
@@ -62,13 +67,19 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           <button
             type="button"
             onClick={handlePlay}
-            disabled={!quizAvailable || !playCta?.entersPlay}
+            disabled={quizAvailable && !playCta?.entersPlay}
             className={playButtonClass}
           >
             JUGAR
           </button>
 
-          {!quizAvailable && (
+          {hub.publishHeld && (
+            <p className="text-center text-sm text-[var(--tm-muted)]">
+              {QUIZ_COMING_SOON_MESSAGE}
+            </p>
+          )}
+
+          {!quizAvailable && !hub.publishHeld && (
             <p className="text-center text-sm text-[var(--tm-muted)]">
               Todavia no hay quiz publicado para hoy. Vuelve mas tarde.
             </p>
@@ -84,6 +95,12 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         open={waitModalOpen}
         onClose={() => setWaitModalOpen(false)}
         message="Hoy ya has jugado al quiz diario crack."
+      />
+
+      <QuizWaitModal
+        open={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        message={QUIZ_COMING_SOON_MESSAGE}
       />
     </div>
   );

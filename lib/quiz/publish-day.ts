@@ -1,3 +1,4 @@
+import { isQuizPublishHeld } from "@/lib/quiz/date";
 import { generatedDayToSeedFile } from "@/lib/quiz/generated-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
@@ -34,6 +35,16 @@ export type PublishQuizDayOptions = {
 export async function publishQuizDay(
   options: PublishQuizDayOptions
 ): Promise<PublishQuizDayResult> {
+  if (isQuizPublishHeld(options.quizDate)) {
+    return {
+      quizDate: options.quizDate,
+      quizId: "",
+      scoringMode: "competitive",
+      skipped: true,
+      factIds: [],
+    };
+  }
+
   const poolId = options.poolId ?? (await ensureQuizPool(options.admin));
 
   const existingId = await findQuizForDate(

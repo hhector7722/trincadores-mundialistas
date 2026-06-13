@@ -70,6 +70,8 @@ export type QuizDaySlot = {
 export type QuizDayHub = {
   quizDate: string;
   competitive: boolean;
+  /** true cuando el dia esta en pausa editorial (sin quiz jugable). */
+  publishHeld: boolean;
   official: QuizDaySlot | null;
   bonus: QuizDaySlot | null;
 };
