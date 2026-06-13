@@ -124,7 +124,7 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell flex: min-h-dvh; scroll solo en contenedores internos */
+/* Shell flex: min-h-dvh; sin cage de altura en html/body (rompe fixed en iOS WebKit) */
 .tm-app-frame {
   position: relative;
   display: flex;
@@ -213,8 +213,7 @@ html[data-modal-open] .tm-app-main {
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: contain;
+  overscroll-behavior: contain;
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
@@ -247,8 +246,6 @@ html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
 
 .tm-fixed-bottombar {
   box-sizing: border-box;
-  min-height: calc(var(--tm-tabbar-core) + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html[data-modal-open] .tm-fixed-bottombar,

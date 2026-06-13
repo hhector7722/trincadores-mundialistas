@@ -9,7 +9,6 @@ import {
   findPullScrollRoot,
   isPullRefreshBlocked,
   isScrollAtTop,
-  isTouchInsideScrollRoot,
   pullProgress,
   PULL_THRESHOLD_PX,
 } from "@/lib/layout/pull-to-refresh";
@@ -56,14 +55,31 @@ export function PullToRefresh() {
     setPullDistance(next);
   }, []);
 
-  const applyRootTransform = useCallback((_distance: number) => {
-    // Solo indicador: no desplazar el layout (evita hueco sobre la cabecera).
+  const applyRootTransform = useCallback((distance: number) => {
+    const root = rootRef.current;
+    if (!root) return;
+    if (distance > 0) {
+      root.style.transform = `translate3d(0, ${distance}px, 0)`;
+      root.style.transition = "none";
+    } else {
+      root.style.transform = "";
+      root.style.transition = "";
+    }
   }, []);
 
   const snapBack = useCallback(() => {
+    const root = rootRef.current;
+    if (root) {
+      root.style.transition = `transform ${SNAP_BACK_MS}ms ${IOS_EASING}`;
+      root.style.transform = "translate3d(0, 0, 0)";
+    }
     setPhaseSafe("snapping");
     syncDistance(0);
     window.setTimeout(() => {
+      if (root) {
+        root.style.transition = "";
+        root.style.transform = "";
+      }
       setPhaseSafe("idle");
       pullingRef.current = false;
       lockedRef.current = "none";
@@ -101,8 +117,7 @@ export function PullToRefresh() {
 
       const root = findPullScrollRoot();
       rootRef.current = root;
-      if (!root || !isTouchInsideScrollRoot(event.target, root)) return;
-      if (!canStartFromTarget(event.target, root)) return;
+      if (!root || !canStartFromTarget(event.target, root)) return;
 
       startYRef.current = event.touches[0]?.clientY ?? 0;
       startXRef.current = event.touches[0]?.clientX ?? 0;

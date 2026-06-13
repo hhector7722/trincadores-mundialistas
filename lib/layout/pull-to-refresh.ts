@@ -63,10 +63,6 @@ export function isScrollAtTop(el: HTMLElement): boolean {
   return el.scrollTop <= 1;
 }
 
-export function isTouchInsideScrollRoot(target: EventTarget | null, root: HTMLElement): boolean {
-  return target instanceof Element && root.contains(target);
-}
-
 export function applyPullResistance(distance: number): number {
   if (distance <= 0) return 0;
   const capped = Math.min(distance, PULL_MAX_PX * 1.35);
