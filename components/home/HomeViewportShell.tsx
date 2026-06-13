@@ -8,7 +8,7 @@ type HomeViewportShellProps = {
   body: ReactNode;
 };
 
-/** Inicio: scroll en tm-app-main; la TabBar va en flujo al pie del shell. */
+/** Inicio: scroll en tm-app-main; TabBar fija al pie vía portal (TabBarWrapper). */
 export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
   return (
     <div className={cn("tm-home-layout relative z-10 flex w-full flex-col px-4 pt-2 pb-3")}>

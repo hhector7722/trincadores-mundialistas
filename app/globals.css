@@ -221,12 +221,13 @@ html:has(.tm-app-header--compact) {
 }
 
 .tm-app-tabbar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 95;
   box-sizing: border-box;
   transform: translateZ(0);
-}
-
-.tm-app-tabbar--with-indicators {
-  position: relative;
 }
 
 .tm-app-tabbar--with-indicators .tm-tabbar-indicators-row {
