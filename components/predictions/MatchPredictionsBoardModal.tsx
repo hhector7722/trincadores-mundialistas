@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchMatchPredictionsBoardAction } from "@/actions/predictions";
 import {
   MatchPredictionsBoardHeaderTitle,
@@ -9,9 +9,11 @@ import {
 import { MatchPredictionsBoardLegend } from "@/components/predictions/MatchPredictionsBoardLegend";
 import { MatchPredictionsBoardTable } from "@/components/predictions/MatchPredictionsBoardTable";
 import { Modal } from "@/components/ui/modal";
+import { LoadingCenter } from "@/components/ui/spinner";
 import type { MatchPredictionsBoardCarouselMatch } from "@/lib/predictions/board-carousel";
 import type { MatchPredictionsBoard } from "@/lib/predictions/queries";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
+import { cn } from "@/lib/utils";
 
 type MatchPredictionsBoardModalProps = {
   open: boolean;
@@ -30,112 +32,35 @@ type MatchPredictionsBoardModalProps = {
 const MODAL_PANEL_CLASS =
   "flex min-h-[min(78dvh,34rem)] max-h-[min(78dvh,34rem)] w-full max-w-lg flex-col";
 
-function MatchPredictionsBoardBody({
-  loading,
-  error,
+const MODAL_LOADING_MIN_H = "min-h-[min(50dvh,22rem)]";
+
+type LoadedBoardState = {
+  matchId: string;
+  board: MatchPredictionsBoard;
+};
+
+function MatchPredictionsBoardContent({
   board,
-  homeTeam,
-  awayTeam,
   currentProfileId,
 }: {
-  loading: boolean;
-  error: string | null;
-  board: MatchPredictionsBoard | null;
-  homeTeam: string;
-  awayTeam: string;
+  board: MatchPredictionsBoard;
   currentProfileId: string;
 }) {
-  const tableHomeTeam = board?.homeTeam ?? homeTeam;
-  const tableAwayTeam = board?.awayTeam ?? awayTeam;
-  const showOutcomes = board?.showOutcomes ?? false;
-
-  if (error) {
-    return (
-      <div className="flex flex-1 items-center justify-center px-3">
-        <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
-          {error}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <>
       <MatchPredictionsBoardTable
-        loading={loading}
-        rows={board?.rows ?? []}
+        rows={board.rows}
         currentProfileId={currentProfileId}
-        homeTeam={tableHomeTeam}
-        awayTeam={tableAwayTeam}
-        showOutcomes={showOutcomes}
+        homeTeam={board.homeTeam}
+        awayTeam={board.awayTeam}
+        showOutcomes={board.showOutcomes}
       />
-      {!loading && showOutcomes ? (
+      {board.showOutcomes ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <MatchPredictionsBoardLegend />
         </div>
       ) : null}
     </>
-  );
-}
-
-function MatchPredictionsBoardPanel({
-  poolId,
-  matchId,
-  homeTeam,
-  awayTeam,
-  currentProfileId,
-  onBoardLoaded,
-}: {
-  poolId: string;
-  matchId: string;
-  homeTeam: string;
-  awayTeam: string;
-  currentProfileId: string;
-  onBoardLoaded?: (board: MatchPredictionsBoard | null) => void;
-}) {
-  const [board, setBoard] = useState<MatchPredictionsBoard | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    setBoard(null);
-
-    void fetchMatchPredictionsBoardAction(poolId, matchId)
-      .then((result) => {
-        if (cancelled) return;
-        setLoading(false);
-        if (!result.ok) {
-          setError(result.error);
-          onBoardLoaded?.(null);
-          return;
-        }
-        setBoard(result.board);
-        onBoardLoaded?.(result.board);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setLoading(false);
-        setError("No se pudieron cargar los pronosticos. Comprueba la conexion.");
-        onBoardLoaded?.(null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [poolId, matchId, onBoardLoaded]);
-
-  return (
-    <MatchPredictionsBoardBody
-      loading={loading}
-      error={error}
-      board={board}
-      homeTeam={homeTeam}
-      awayTeam={awayTeam}
-      currentProfileId={currentProfileId}
-    />
   );
 }
 
@@ -159,6 +84,11 @@ export function MatchPredictionsBoardModal({
   const canSwipeBoard =
     carouselMatches.length > 1 && carouselMatches.some((item) => item.id === matchId);
 
+  const boardCacheRef = useRef(new Map<string, MatchPredictionsBoard>());
+  const [loadedBoard, setLoadedBoard] = useState<LoadedBoardState | null>(null);
+  const [fetching, setFetching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const {
     activeIndex,
     activeItem,
@@ -175,63 +105,133 @@ export function MatchPredictionsBoardModal({
   });
 
   const displayMatch = canSwipeBoard ? (activeItem ?? fallbackMatch) : fallbackMatch;
-  const [headerBoard, setHeaderBoard] = useState<MatchPredictionsBoard | null>(null);
+  const activeBoard =
+    loadedBoard?.matchId === displayMatch.id ? loadedBoard.board : null;
+  const isLoading = !error && (fetching || activeBoard === null);
+
+  const prefetchBoard = useCallback(
+    async (targetMatchId: string) => {
+      if (boardCacheRef.current.has(targetMatchId)) return;
+
+      const result = await fetchMatchPredictionsBoardAction(poolId, targetMatchId);
+      if (result.ok) {
+        boardCacheRef.current.set(targetMatchId, result.board);
+      }
+    },
+    [poolId],
+  );
 
   useEffect(() => {
-    if (!open) setHeaderBoard(null);
-  }, [open]);
+    if (!open) {
+      boardCacheRef.current.clear();
+      setLoadedBoard(null);
+      setFetching(false);
+      setError(null);
+      return;
+    }
+
+    const cached = boardCacheRef.current.get(displayMatch.id);
+    if (cached) {
+      setLoadedBoard({ matchId: displayMatch.id, board: cached });
+      setFetching(false);
+      setError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setFetching(true);
+    setError(null);
+
+    void fetchMatchPredictionsBoardAction(poolId, displayMatch.id)
+      .then((result) => {
+        if (cancelled) return;
+        setFetching(false);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        boardCacheRef.current.set(displayMatch.id, result.board);
+        setLoadedBoard({ matchId: displayMatch.id, board: result.board });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setFetching(false);
+        setError("No se pudieron cargar los pronosticos. Comprueba la conexion.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, poolId, displayMatch.id]);
+
+  useEffect(() => {
+    if (!open || isLoading || !canSwipe) return;
+
+    const previous = carouselMatches[activeIndex - 1];
+    const next = carouselMatches[activeIndex + 1];
+    if (previous) void prefetchBoard(previous.id);
+    if (next) void prefetchBoard(next.id);
+  }, [open, isLoading, canSwipe, activeIndex, carouselMatches, prefetchBoard]);
+
+  const handleStartSlide = useCallback(
+    (offset: 1 | -1) => {
+      const target = carouselMatches[activeIndex + offset];
+      if (target) void prefetchBoard(target.id);
+      startSlide(offset);
+    },
+    [activeIndex, carouselMatches, prefetchBoard, startSlide],
+  );
 
   const carouselPanelSlide = canSwipe
-    ? buildCarouselPanelSlide((item) => (
+    ? buildCarouselPanelSlide(() => (
         <div className="flex min-h-0 flex-1 flex-col px-1 pb-2">
-          <MatchPredictionsBoardPanel
-            poolId={poolId}
-            matchId={item.id}
-            homeTeam={item.homeTeam}
-            awayTeam={item.awayTeam}
-            currentProfileId={currentProfileId}
-          />
+          <LoadingCenter minHeightClassName={MODAL_LOADING_MIN_H} />
         </div>
       ))
     : null;
 
-  const tableHomeTeam = headerBoard?.homeTeam ?? displayMatch.homeTeam;
-  const tableAwayTeam = headerBoard?.awayTeam ?? displayMatch.awayTeam;
-  const officialHome = headerBoard?.officialHome ?? null;
-  const officialAway = headerBoard?.officialAway ?? null;
-  const ariaTitle = matchPredictionsBoardAriaTitle(
-    tableHomeTeam,
-    tableAwayTeam,
-    officialHome,
-    officialAway,
-  );
+  const ariaTitle = activeBoard
+    ? matchPredictionsBoardAriaTitle(
+        activeBoard.homeTeam,
+        activeBoard.awayTeam,
+        activeBoard.officialHome,
+        activeBoard.officialAway,
+      )
+    : "Cargando pronósticos";
 
   return (
     <Modal
       open={open}
       onClose={onClose}
       hideHeaderDivider
+      hideTitle={isLoading}
+      ariaLabel={isLoading ? "Cargando pronósticos" : undefined}
       title={
-        <>
-          <span className="sr-only">{ariaTitle}</span>
-          <span
-            aria-hidden
-            className="flex w-full min-w-0 normal-case tracking-normal"
-          >
-            <MatchPredictionsBoardHeaderTitle
-              homeTeam={tableHomeTeam}
-              awayTeam={tableAwayTeam}
-              homeGoals={officialHome}
-              awayGoals={officialAway}
-              playerIncidents={headerBoard?.playerIncidents}
-            />
-          </span>
-        </>
+        activeBoard ? (
+          <>
+            <span className="sr-only">{ariaTitle}</span>
+            <span
+              aria-hidden
+              className="flex w-full min-w-0 normal-case tracking-normal"
+            >
+              <MatchPredictionsBoardHeaderTitle
+                homeTeam={activeBoard.homeTeam}
+                awayTeam={activeBoard.awayTeam}
+                homeGoals={activeBoard.officialHome}
+                awayGoals={activeBoard.officialAway}
+                playerIncidents={activeBoard.playerIncidents}
+              />
+            </span>
+          </>
+        ) : (
+          "Cargando pronósticos"
+        )
       }
       className={MODAL_PANEL_CLASS}
       scrollContent={false}
-      onSwipeLeft={canSwipe && !carouselPanelSlide ? () => startSlide(1) : undefined}
-      onSwipeRight={canSwipe && !carouselPanelSlide ? () => startSlide(-1) : undefined}
+      loading={isLoading}
+      onSwipeLeft={canSwipe && !carouselPanelSlide ? () => handleStartSlide(1) : undefined}
+      onSwipeRight={canSwipe && !carouselPanelSlide ? () => handleStartSlide(-1) : undefined}
       belowPanel={
         canSwipe ? (
           <CarouselSwipeDots activeIndex={activeIndex} total={carouselMatches.length} />
@@ -240,14 +240,20 @@ export function MatchPredictionsBoardModal({
       panelSlide={carouselPanelSlide}
     >
       <div className="flex min-h-0 flex-1 flex-col px-1 pb-2">
-        <MatchPredictionsBoardPanel
-          poolId={poolId}
-          matchId={displayMatch.id}
-          homeTeam={displayMatch.homeTeam}
-          awayTeam={displayMatch.awayTeam}
-          currentProfileId={currentProfileId}
-          onBoardLoaded={setHeaderBoard}
-        />
+        {error ? (
+          <div className="flex flex-1 items-center justify-center px-3">
+            <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
+              {error}
+            </p>
+          </div>
+        ) : activeBoard ? (
+          <MatchPredictionsBoardContent
+            board={activeBoard}
+            currentProfileId={currentProfileId}
+          />
+        ) : (
+          <div className={cn("flex-1", MODAL_LOADING_MIN_H)} aria-hidden="true" />
+        )}
       </div>
     </Modal>
   );
