@@ -95,7 +95,7 @@ export function TabBar() {
               )}
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
-              <span className="mt-0.5 max-w-full truncate">{label}</span>
+              <span className="max-w-full truncate">{label}</span>
             </Link>
           );
         })}
