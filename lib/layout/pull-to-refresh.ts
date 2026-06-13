@@ -1,6 +1,5 @@
 /** Selectores de contenedor principal por ruta (orden de prioridad). */
 export const PULL_SCROLL_SELECTORS = [
-  ".tm-home-layout__scroll",
   ".tm-home-layout",
   ".tm-tab-scroll-layout",
   ".tm-quiz-play-scroll",
