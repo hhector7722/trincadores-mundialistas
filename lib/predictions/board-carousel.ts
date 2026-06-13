@@ -6,11 +6,11 @@ export type MatchPredictionsBoardCarouselMatch = {
   awayTeam: string;
 };
 
-export function buildFinishedMatchesForBoardCarousel(
+export function buildBoardCarouselMatches(
   matches: Pick<MatchWithPrediction, "id" | "status" | "kickoff_at" | "home_team" | "away_team">[],
 ): MatchPredictionsBoardCarouselMatch[] {
   return matches
-    .filter((match) => match.status === "finished")
+    .filter((match) => match.status === "finished" || match.status === "live")
     .sort(
       (a, b) => new Date(a.kickoff_at).getTime() - new Date(b.kickoff_at).getTime(),
     )
@@ -20,3 +20,6 @@ export function buildFinishedMatchesForBoardCarousel(
       awayTeam: match.away_team,
     }));
 }
+
+/** @deprecated Usar `buildBoardCarouselMatches`. */
+export const buildFinishedMatchesForBoardCarousel = buildBoardCarouselMatches;

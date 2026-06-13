@@ -62,7 +62,7 @@ import {
   PLAYER_MODAL_PANEL_HOST_CLASS,
   PLAYER_MODAL_WRAPPER_CLASS,
 } from "@/lib/lineup/field-asset";
-import { buildFinishedMatchesForBoardCarousel } from "@/lib/predictions/board-carousel";
+import { buildBoardCarouselMatches } from "@/lib/predictions/board-carousel";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
@@ -243,8 +243,8 @@ export function QuickPredictionModal({
   const highlightVideoId = viewMatch.highlightYoutubeId;
   const canSwipeMatches = orderedMatches.length > 1 && Boolean(onMatchChange);
   const dotPosition = resolveDotPosition(activeIndex, orderedMatches.length);
-  const finishedMatchesForBoard = useMemo(
-    () => buildFinishedMatchesForBoardCarousel(orderedMatches),
+  const boardCarouselMatches = useMemo(
+    () => buildBoardCarouselMatches(orderedMatches),
     [orderedMatches],
   );
 
@@ -967,7 +967,7 @@ export function QuickPredictionModal({
         homeTeam={viewMatch.home_team}
         awayTeam={viewMatch.away_team}
         currentProfileId={currentProfileId}
-        finishedMatches={finishedMatchesForBoard}
+        carouselMatches={boardCarouselMatches}
       />
     ) : null}
 

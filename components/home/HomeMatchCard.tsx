@@ -54,7 +54,7 @@ type HomeMatchCardProps = {
   hasLiveInCarousel: boolean;
   isLatestFinished?: boolean;
   currentProfileId: string;
-  finishedMatchesForBoard?: MatchPredictionsBoardCarouselMatch[];
+  boardCarouselMatches?: MatchPredictionsBoardCarouselMatch[];
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
 };
@@ -161,7 +161,7 @@ export function HomeMatchCard({
   hasLiveInCarousel,
   isLatestFinished = true,
   currentProfileId,
-  finishedMatchesForBoard = [],
+  boardCarouselMatches = [],
   onOpenChange,
   teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
 }: HomeMatchCardProps) {
@@ -455,7 +455,7 @@ export function HomeMatchCard({
           homeTeam={displayMatch.home_team}
           awayTeam={displayMatch.away_team}
           currentProfileId={currentProfileId}
-          finishedMatches={finishedMatchesForBoard}
+          carouselMatches={boardCarouselMatches}
         />
       ) : null}
     </>

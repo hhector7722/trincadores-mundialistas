@@ -21,7 +21,9 @@ type MatchPredictionsBoardModalProps = {
   homeTeam: string;
   awayTeam: string;
   currentProfileId: string;
-  /** Partidos finalizados para deslizar entre tableros (orden kickoff). */
+  /** Partidos en juego o finalizados para deslizar entre tableros (orden kickoff). */
+  carouselMatches?: MatchPredictionsBoardCarouselMatch[];
+  /** @deprecated Usar `carouselMatches`. */
   finishedMatches?: MatchPredictionsBoardCarouselMatch[];
 };
 
@@ -145,15 +147,16 @@ export function MatchPredictionsBoardModal({
   homeTeam,
   awayTeam,
   currentProfileId,
-  finishedMatches = [],
+  carouselMatches: carouselMatchesProp,
+  finishedMatches,
 }: MatchPredictionsBoardModalProps) {
   const fallbackMatch = useMemo(
     () => ({ id: matchId, homeTeam, awayTeam }),
     [matchId, homeTeam, awayTeam],
   );
 
-  const carouselMatches = finishedMatches;
-  const canSwipeFinished =
+  const carouselMatches = carouselMatchesProp ?? finishedMatches ?? [];
+  const canSwipeBoard =
     carouselMatches.length > 1 && carouselMatches.some((item) => item.id === matchId);
 
   const {
@@ -167,11 +170,11 @@ export function MatchPredictionsBoardModal({
     open,
     initialItemKey: matchId,
     getItemKey: (item) => item.id,
-    enabled: canSwipeFinished,
+    enabled: canSwipeBoard,
     canSlide: true,
   });
 
-  const displayMatch = canSwipeFinished ? (activeItem ?? fallbackMatch) : fallbackMatch;
+  const displayMatch = canSwipeBoard ? (activeItem ?? fallbackMatch) : fallbackMatch;
   const [headerBoard, setHeaderBoard] = useState<MatchPredictionsBoard | null>(null);
 
   useEffect(() => {
