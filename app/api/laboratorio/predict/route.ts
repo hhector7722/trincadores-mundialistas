@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
-const ANTHROPIC_VERSION = "2023-06-01";
+const OPENAI_MODEL = "gpt-4o";
 
 type ChatRole = "user" | "assistant";
 
@@ -45,7 +44,7 @@ function parseMessages(body: unknown): ChatMessage[] {
   });
 }
 
-function extractTextDeltaFromSseBlock(block: string): string | null {
+function extractOpenAiTextDeltaFromSseBlock(block: string): string | null {
   const dataLines = block
     .split("\n")
     .filter((line) => line.startsWith("data: "))
@@ -63,20 +62,28 @@ function extractTextDeltaFromSseBlock(block: string): string | null {
   try {
     const parsed = JSON.parse(payload) as {
       type?: string;
-      delta?: { type?: string; text?: string };
+      delta?: string;
+      error?: { message?: string };
     };
 
-    if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta") {
-      return parsed.delta.text ?? null;
+    if (parsed.type === "error") {
+      throw new Error(parsed.error?.message ?? "Error en streaming de OpenAI.");
     }
-  } catch {
-    return null;
+
+    if (parsed.type === "response.output_text.delta" && typeof parsed.delta === "string") {
+      return parsed.delta;
+    }
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return null;
+    }
+    throw error;
   }
 
   return null;
 }
 
-function createAnthropicTextTransformStream(
+function createOpenAiTextTransformStream(
   upstream: ReadableStream<Uint8Array>,
 ): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
@@ -93,7 +100,7 @@ function createAnthropicTextTransformStream(
           const block = buffer.slice(0, boundary);
           buffer = buffer.slice(boundary + 2);
 
-          const text = extractTextDeltaFromSseBlock(block);
+          const text = extractOpenAiTextDeltaFromSseBlock(block);
           if (text) {
             controller.enqueue(encoder.encode(text));
           }
@@ -107,7 +114,7 @@ function createAnthropicTextTransformStream(
           return;
         }
 
-        const text = extractTextDeltaFromSseBlock(trailing);
+        const text = extractOpenAiTextDeltaFromSseBlock(trailing);
         if (text) {
           controller.enqueue(encoder.encode(text));
         }
@@ -145,7 +152,7 @@ export async function POST(request: Request) {
     return denied;
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     return new Response("Servicio de predicciones no configurado.", { status: 500 });
   }
@@ -158,36 +165,31 @@ export async function POST(request: Request) {
     return new Response(message, { status: 400 });
   }
 
-  const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
+  const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": ANTHROPIC_VERSION,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
-      max_tokens: 1200,
+      model: OPENAI_MODEL,
+      instructions: buildPredictorSystemPrompt(),
+      input: messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
+      tools: [{ type: "web_search" }],
       stream: true,
-      system: buildPredictorSystemPrompt(),
-      tools: [
-        {
-          type: "web_search_20250305",
-          name: "web_search",
-          max_uses: 5,
-        },
-      ],
-      messages,
     }),
   });
 
-  if (!anthropicResponse.ok || !anthropicResponse.body) {
-    const detail = await anthropicResponse.text().catch(() => "");
-    console.error("[laboratorio/predict] Anthropic error:", anthropicResponse.status, detail);
+  if (!openAiResponse.ok || !openAiResponse.body) {
+    const detail = await openAiResponse.text().catch(() => "");
+    console.error("[laboratorio/predict] OpenAI error:", openAiResponse.status, detail);
     return new Response("No se pudo generar la prediccion.", { status: 502 });
   }
 
-  const textStream = createAnthropicTextTransformStream(anthropicResponse.body);
+  const textStream = createOpenAiTextTransformStream(openAiResponse.body);
 
   return new Response(textStream, {
     headers: {
