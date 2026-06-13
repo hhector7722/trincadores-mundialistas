@@ -47,7 +47,9 @@
   /* Indicadores + fila de tabs (pb-safe va aparte en border-box del nav) */
   --tm-tabbar-core: calc(var(--tm-tabbar-indicators-row) + var(--tm-tabbar-tabs-row));
   --tm-tabbar-shell: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
-  --tab-bar-height: var(--tm-tabbar-core);
+  --tm-chrome-bottom: 0px;
+  --tab-bar-height: var(--tm-tabbar-shell);
+  --tm-content-bottom: var(--tm-tabbar-shell);
   --tm-app-header-inner: 3rem;
   --tm-app-header-pt: max(0.75rem, env(safe-area-inset-top, 0px));
   --tm-app-header-pb: 0.5rem;
@@ -197,6 +199,7 @@ html:has(.tm-app-header--compact) {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
+  padding-bottom: var(--tm-tabbar-shell);
   overflow-x: hidden;
 }
 
@@ -218,8 +221,16 @@ html:has(.tm-app-header--compact) {
 }
 
 .tm-app-tabbar {
-  flex: 0 0 auto;
+  position: fixed;
+  right: 0;
+  bottom: var(--tm-chrome-bottom, 0px);
+  left: 0;
+  z-index: 90;
+  box-sizing: border-box;
   width: 100%;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Viewports a pantalla completa: scroll interno en main */
@@ -325,9 +336,9 @@ html:has(.tm-tab-swipe-root) {
     12px 0 32px rgba(0, 0, 0, 0.22);
 }
 
-/* Overscroll: arriba tono cabecera */
+/* Overscroll: arriba tono cabecera; abajo mismo tono que TabBar (sin franja ajena) */
 html:has(.tm-app-frame) {
-  background-color: var(--tm-bg-top);
+  background-color: var(--tm-tabbar-bg-hex);
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -337,6 +348,7 @@ html:has(.tm-app-frame) body {
   overscroll-behavior: none;
   min-height: var(--tm-vv-height, 100dvh);
   max-height: var(--tm-vv-height, 100dvh);
+  background-color: var(--tm-tabbar-bg-hex);
 }
 
 .font-display {

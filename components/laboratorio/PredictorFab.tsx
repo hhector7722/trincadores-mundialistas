@@ -31,7 +31,7 @@ export function PredictorFab({ enabled }: PredictorFabProps) {
         onClick={() => setOpen((current) => !current)}
         className={cn(
           "tm-predictor-fab fixed right-0 z-50 shrink-0",
-          "bottom-[calc(var(--tab-bar-height,72px)+12px)]",
+          "bottom-[calc(var(--tm-tabbar-shell)+12px)]",
           "flex h-14 min-h-12 w-[3.5rem] items-center justify-center",
           "rounded-l-full rounded-r-none",
           "bg-[#2a1058]",
