@@ -47,7 +47,6 @@
   /* Indicadores + fila de tabs (pb-safe va aparte en border-box del nav) */
   --tm-tabbar-core: calc(var(--tm-tabbar-indicators-row) + var(--tm-tabbar-tabs-row));
   --tab-bar-height: var(--tm-tabbar-core);
-  --tm-content-bottom: var(--tm-tabbar-core);
   --tm-app-header-inner: 3rem;
   --tm-app-header-pt: max(0.75rem, env(safe-area-inset-top, 0px));
   --tm-app-header-pb: 0.5rem;
@@ -164,46 +163,27 @@ html[data-modal-open] .tm-app-main {
   background: transparent;
 }
 
-.tm-app-header--pinned {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 90;
-  box-sizing: border-box;
-  padding-top: var(--tm-app-header-pt-pinned);
-  padding-bottom: var(--tm-app-header-pb-pinned);
-  transform: translateZ(0);
-}
-
-.tm-app-header--pinned .tm-app-header__row {
+.tm-app-header__row--compact {
   box-sizing: border-box;
   height: var(--tm-app-header-inner-pinned);
   min-height: var(--tm-app-header-inner-pinned);
   max-height: var(--tm-app-header-inner-pinned);
 }
 
-.tm-app-header--pinned .tm-app-header__row .size-9 {
+.tm-app-header__row--compact .size-9 {
   width: 2rem;
   height: 2rem;
 }
 
 @media (min-width: 640px) {
-  .tm-app-header--pinned .tm-app-header__row .sm\:size-10 {
+  .tm-app-header__row--compact .sm\:size-10 {
     width: 2.25rem;
     height: 2.25rem;
   }
 }
 
-html:has(.tm-app-header--pinned) {
+html:has(.tm-app-header--compact) {
   --tm-app-header-block: var(--tm-app-header-block-pinned);
-}
-
-.tm-app-header-spacer {
-  box-sizing: border-box;
-  width: 100%;
-  height: var(--tm-app-header-block-pinned);
-  flex-shrink: 0;
 }
 
 .tm-app-main {
@@ -211,8 +191,15 @@ html:has(.tm-app-header--pinned) {
   position: relative;
   z-index: 10;
   flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  padding-bottom: var(--tm-content-bottom);
+  overflow-x: hidden;
+}
+
+.tm-app-main:has(.tm-home-layout) {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Viewports a pantalla completa: scroll interno, sin padding en main */
@@ -264,13 +251,8 @@ html:has(.tm-app-header--pinned) {
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;
-  height: auto;
-  min-height: 0;
   flex: 0 0 auto;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overflow: visible;
 }
 
 .tm-home-cards-stack {
@@ -295,36 +277,11 @@ html:has(.tm-app-header--pinned) {
   min-height: var(--tm-tabbar-tabs-row);
 }
 
-.tm-fixed-bottombar--with-indicators {
+.tm-app-tabbar--with-indicators {
   min-height: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
 }
 
-.tm-bottom-chrome-placeholder {
-  box-sizing: border-box;
-}
-
-html[data-tab-chrome-ready] .tm-bottom-chrome-placeholder {
-  display: none;
-}
-
-.tm-fixed-bottombar {
-  box-sizing: border-box;
-  bottom: var(--tm-chrome-bottom, 0px);
-}
-
-html[data-tab-chrome-ready] .tm-fixed-bottombar::after {
-  content: "";
-  position: fixed;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 94;
-  height: var(--tm-chrome-bottom, 0px);
-  pointer-events: none;
-  background: var(--tm-tabbar-bg-hex);
-}
-
-html[data-modal-open] .tm-fixed-bottombar {
+html[data-modal-open] .tm-app-tabbar {
   filter: blur(6px);
   opacity: 0.35;
   pointer-events: none;

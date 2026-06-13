@@ -11,27 +11,31 @@ export function AppHeader({
   title,
   titleClassName,
   showNotificationsBell = false,
-  pinned = false,
+  compact = false,
 }: {
   ctx: AppShellContext;
   stackedTitle?: boolean;
   title?: string;
   titleClassName?: string;
   showNotificationsBell?: boolean;
-  /** Home: cabecera fija al viewport; el spacer reserva el hueco en el flujo. */
-  pinned?: boolean;
+  /** Home: cabecera más compacta, siempre en flujo (sin fixed). */
+  compact?: boolean;
 }) {
   return (
-    <>
     <header
       className={cn(
         "tm-app-header relative z-20 shrink-0 px-4",
-        pinned
-          ? "tm-app-header--pinned"
+        compact
+          ? "tm-app-header--compact pb-0.5 pt-[max(0.375rem,env(safe-area-inset-top))]"
           : "pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]",
       )}
     >
-      <div className="tm-app-header__row relative flex items-center justify-center">
+      <div
+        className={cn(
+          "tm-app-header__row relative flex items-center justify-center",
+          compact && "tm-app-header__row--compact",
+        )}
+      >
         <h1
           className={cn(
             "font-display tracking-wider",
@@ -54,7 +58,5 @@ export function AppHeader({
         </div>
       </div>
     </header>
-    {pinned ? <div className="tm-app-header-spacer shrink-0" aria-hidden /> : null}
-    </>
   );
 }

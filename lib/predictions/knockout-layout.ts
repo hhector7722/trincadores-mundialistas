@@ -1,5 +1,5 @@
 import {
-  readTabBarTop,
+  readMainContentBottom,
   syncLayoutAboveTabBar,
 } from "@/lib/layout/viewport-chrome";
 
@@ -10,7 +10,7 @@ export function syncKnockoutViewportHeight(
 ): number {
   syncLayoutAboveTabBar(layoutRoot);
   const top = pageRoot.getBoundingClientRect().top;
-  const height = Math.max(0, Math.floor(readTabBarTop() - top));
+  const height = Math.max(0, Math.floor(readMainContentBottom() - top));
 
   pageRoot.style.height = `${height}px`;
   pageRoot.style.maxHeight = `${height}px`;

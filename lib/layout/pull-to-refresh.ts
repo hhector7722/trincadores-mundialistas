@@ -1,6 +1,5 @@
 /** Selectores de contenedor principal por ruta (orden de prioridad). */
 export const PULL_SCROLL_SELECTORS = [
-  ".tm-home-layout",
   ".tm-tab-scroll-layout",
   ".tm-quiz-play-scroll",
   ".tm-quiz-page:not(.tm-quiz-page--play):not(.tm-quiz-page--hub):not(.tm-quiz-page--viewport)",
@@ -8,6 +7,7 @@ export const PULL_SCROLL_SELECTORS = [
   ".tm-ranking-layout",
   ".tm-quiz-page--hub",
   ".tm-quiz-page--viewport",
+  ".tm-app-main",
 ] as const;
 
 export const PULL_THRESHOLD_PX = 68;

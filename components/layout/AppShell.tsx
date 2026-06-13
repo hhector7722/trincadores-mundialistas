@@ -7,6 +7,7 @@ import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotif
 import { PushNotificationProvider } from "@/components/push/PushNotificationProvider";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
+import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
@@ -38,6 +39,7 @@ export function AppShell({
               <HighlightNotificationOpener />
               <PullToRefresh />
               <TabNavigationProvider>
+                <VisualViewportSync />
                 <div className="tm-app-frame">
                   <div
                     id="tm-safe-probe"
@@ -49,8 +51,8 @@ export function AppShell({
                   <main className="tm-app-main">
                     <TabSwipeNavigator>{children}</TabSwipeNavigator>
                   </main>
+                  <TabBarWrapper />
                 </div>
-                <TabBarWrapper />
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />
                 </Suspense>

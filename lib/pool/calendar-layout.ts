@@ -1,5 +1,5 @@
 import {
-  readTabBarTop,
+  readMainContentBottom,
   resetLayoutAboveTabBar,
   syncLayoutAboveTabBar,
 } from "@/lib/layout/viewport-chrome";
@@ -523,7 +523,7 @@ export function syncCalendarGridHeight(
   void calendar.offsetHeight;
   void grid.offsetHeight;
 
-  const contentBottom = readTabBarTop();
+  const contentBottom = readMainContentBottom();
   const calendarRect = calendar.getBoundingClientRect();
   const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
   const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
