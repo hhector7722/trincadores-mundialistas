@@ -6,14 +6,72 @@ export type MatchGoalScorer = {
   minute: number | null;
 };
 
+export type GroupedGoalScorer = {
+  playerName: string;
+  minutes: number[];
+};
+
+const CARD_COMPACT_THRESHOLD = 3;
+const CARD_MAX_SCORERS_PER_ROW = 3;
+
 export function goalScorerDisplayName(fullName: string): string {
   return shirtPlayerName(fullName);
 }
 
 export function formatGoalScorerLabel(goal: MatchGoalScorer): string {
-  const name = goalScorerDisplayName(goal.playerName);
-  if (goal.minute != null) return `${name} ${goal.minute}'`;
-  return name;
+  return formatGroupedGoalScorerLabel({
+    playerName: goal.playerName,
+    minutes: goal.minute != null ? [goal.minute] : [],
+  });
+}
+
+export function groupGoalScorersByPlayer(goals: MatchGoalScorer[]): GroupedGoalScorer[] {
+  const order: string[] = [];
+  const groups = new Map<string, GroupedGoalScorer>();
+
+  for (const goal of goals) {
+    const key = goal.playerName.trim().toLowerCase();
+    let group = groups.get(key);
+    if (!group) {
+      group = { playerName: goal.playerName, minutes: [] };
+      groups.set(key, group);
+      order.push(key);
+    }
+    if (goal.minute != null) group.minutes.push(goal.minute);
+  }
+
+  return order.map((key) => groups.get(key)!);
+}
+
+export function formatGroupedGoalScorerLabel(group: GroupedGoalScorer): string {
+  const name = goalScorerDisplayName(group.playerName);
+  if (!group.minutes.length) return name;
+  return `${name} ${group.minutes.map((minute) => `${minute}'`).join(" ")}`;
+}
+
+/** Card/modal partido: una fila por goleador o varios en la misma fila si hay muchos. */
+export function buildCardGoalScorerLines(
+  goals: MatchGoalScorer[],
+  maxPerRow = CARD_MAX_SCORERS_PER_ROW,
+): string[] {
+  const groups = groupGoalScorersByPlayer(goals);
+  if (!groups.length) return [];
+
+  if (groups.length <= CARD_COMPACT_THRESHOLD) {
+    return groups.map(formatGroupedGoalScorerLabel);
+  }
+
+  const lines: string[] = [];
+  for (let index = 0; index < groups.length; index += maxPerRow) {
+    const chunk = groups.slice(index, index + maxPerRow);
+    lines.push(chunk.map(formatGroupedGoalScorerLabel).join(", "));
+  }
+  return lines;
+}
+
+/** Tablero de pronósticos: un goleador (con todos sus minutos) por fila. */
+export function buildBoardGoalScorerLines(goals: MatchGoalScorer[]): string[] {
+  return groupGoalScorersByPlayer(goals).map(formatGroupedGoalScorerLabel);
 }
 
 export function extractGoalScorersByTeam(

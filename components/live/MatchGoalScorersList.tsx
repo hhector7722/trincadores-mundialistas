@@ -1,4 +1,4 @@
-import { formatGoalScorerLabel, type MatchGoalScorer } from "@/lib/live/goal-scorers";
+import { buildCardGoalScorerLines, type MatchGoalScorer } from "@/lib/live/goal-scorers";
 import { cn } from "@/lib/utils";
 
 type MatchGoalScorersListProps = {
@@ -8,7 +8,7 @@ type MatchGoalScorersListProps = {
 };
 
 /** Mismo color que el valor de «Campeón» en pronósticos globales. */
-const GOAL_SCORER_TEXT_CLASS =
+export const GOAL_SCORER_TEXT_CLASS =
   "text-[8px] font-normal leading-tight text-[#CCFF00]";
 
 export function MatchGoalScorersList({
@@ -16,7 +16,8 @@ export function MatchGoalScorersList({
   align = "center",
   className,
 }: MatchGoalScorersListProps) {
-  if (!goals.length) return null;
+  const lines = buildCardGoalScorerLines(goals);
+  if (!lines.length) return null;
 
   const alignClass =
     align === "left"
@@ -26,13 +27,13 @@ export function MatchGoalScorersList({
         : "items-center text-center";
 
   return (
-    <div className={cn("flex w-full max-w-[5.5rem] flex-col gap-px sm:max-w-[6.5rem]", alignClass, className)}>
-      {goals.map((goal, index) => (
+    <div className={cn("flex w-full max-w-[9rem] flex-col gap-px sm:max-w-[10.5rem]", alignClass, className)}>
+      {lines.map((line, index) => (
         <p
-          key={`${goal.playerName}-${goal.minute ?? "na"}-${index}`}
+          key={`${line}-${index}`}
           className={cn(GOAL_SCORER_TEXT_CLASS, "w-full whitespace-nowrap")}
         >
-          {formatGoalScorerLabel(goal)}
+          {line}
         </p>
       ))}
     </div>
