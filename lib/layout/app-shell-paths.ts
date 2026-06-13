@@ -15,14 +15,6 @@ export function isAppHeaderHidden(pathname: string): boolean {
 export function isInternalScrollPath(pathname: string): boolean {
   if (isFullscreenPath(pathname)) return true;
 
-  if (pathname === "/") {
-    return true;
-  }
-
-  if (pathname === "/profile") {
-    return true;
-  }
-
   if (pathname === "/predictions" || pathname.startsWith("/predictions/")) {
     return true;
   }

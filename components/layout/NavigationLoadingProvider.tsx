@@ -106,8 +106,8 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     setNavigating(true);
   }, []);
 
-  /* Solo navegación por enlace fuera de tabs; sin overlay para evitar flash visual. */
-  const showOverlay = false;
+  /* Solo navegación por enlace: evita flash oscuro al cambiar de tab (replace + transition). */
+  const showOverlay = navigating;
 
   return (
     <NavigationLoadingContext.Provider value={{ navigate, navigateTab, setNavigating }}>
