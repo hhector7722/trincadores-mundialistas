@@ -5,13 +5,14 @@ import {
   resetLayoutAboveTabBar,
   syncLayoutAboveIndicators,
   syncLayoutAboveTabBar,
+  syncLayoutFillAboveTabBar,
   syncLayoutFitAboveTabBar,
   VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 import { TAB_INDICATORS_SYNC_EVENT } from "@/lib/layout/tab-indicators-position";
 
 export type LayoutBottomAnchor = "tabbar" | "indicators";
-export type LayoutHeightMode = "viewport" | "content";
+export type LayoutHeightMode = "viewport" | "content" | "fill";
 
 /** Fija la altura del contenedor hasta la TabBar o los indicadores swipe. */
 export function useLayoutAboveTabBar(
@@ -29,6 +30,10 @@ export function useLayoutAboveTabBar(
     const sync = () => {
       if (heightMode === "content") {
         syncLayoutFitAboveTabBar(root);
+        return;
+      }
+      if (heightMode === "fill") {
+        syncLayoutFillAboveTabBar(root);
         return;
       }
       if (bottomAnchor === "indicators") {

@@ -209,16 +209,26 @@ html:has(.tm-app-header--compact) {
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overflow: hidden;
 }
 
 .tm-app-main:has(.tm-home-layout) .tm-tab-swipe-root {
-  display: block;
-  height: auto;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+}
+
+.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-track {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: var(--tm-tabbar-shell);
 }
 
 .tm-app-tabbar {
@@ -289,14 +299,16 @@ html:has(.tm-app-header--compact) {
 .tm-home-layout {
   box-sizing: border-box;
   width: 100%;
-  flex: 0 0 auto;
+  min-height: 100%;
+  flex: 1 1 auto;
   overflow: visible;
 }
 
 .tm-home-cards-stack {
   box-sizing: border-box;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   width: 100%;
+  min-height: 0;
 }
 
 .tm-home-layout__hero {

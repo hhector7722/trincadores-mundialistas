@@ -51,7 +51,7 @@ export function collectExtendedLayoutMetrics(pathname: string): ExtendedLayoutMe
   const indicators = nav?.querySelector<HTMLElement>(".tm-tabbar-indicators-row");
   const home = document.querySelector<HTMLElement>(".tm-home-layout");
   const swipeRoot = document.querySelector<HTMLElement>(".tm-tab-swipe-root");
-  const swipeTrack = swipeRoot?.querySelector<HTMLElement>("[class*='will-change-transform']");
+  const swipeTrack = document.querySelector<HTMLElement>(".tm-tab-swipe-track");
 
   const frameRect = frame?.getBoundingClientRect();
   const mainRect = main?.getBoundingClientRect();

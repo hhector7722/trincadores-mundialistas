@@ -51,8 +51,8 @@ export function AppShell({
                   <main className="tm-app-main">
                     <TabSwipeNavigator>{children}</TabSwipeNavigator>
                   </main>
-                  <TabBarWrapper />
                 </div>
+                <TabBarWrapper />
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />
                 </Suspense>

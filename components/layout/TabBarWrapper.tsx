@@ -1,8 +1,11 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { BottomChrome } from "@/components/layout/BottomChrome";
 
-/** TabBar en flujo dentro de tm-app-frame (misma altura en loading y con contenido). */
+/** Portal a body — TabBar fija al borde inferior (marbella-app). */
 export function TabBarWrapper() {
-  return <BottomChrome />;
+  if (typeof document === "undefined") return null;
+
+  return createPortal(<BottomChrome />, document.body);
 }

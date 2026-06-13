@@ -137,6 +137,19 @@ export function syncLayoutFitAboveTabBar(root: HTMLElement): number {
   return maxHeight;
 }
 
+/** Min-height hasta la TabBar: llena el hueco morado si el contenido es corto. */
+export function syncLayoutFillAboveTabBar(root: HTMLElement): number {
+  const top = root.getBoundingClientRect().top;
+  const fillHeight = Math.max(0, Math.floor(readLayoutContentBottom() - top));
+
+  root.style.minHeight = `${fillHeight}px`;
+  root.style.height = "auto";
+  root.style.maxHeight = "none";
+  root.style.flex = "1 1 auto";
+
+  return fillHeight;
+}
+
 /** Fija la altura del contenedor hasta encima de los indicadores swipe. */
 export function syncLayoutAboveIndicators(root: HTMLElement): number {
   const top = root.getBoundingClientRect().top;
@@ -151,6 +164,7 @@ export function syncLayoutAboveIndicators(root: HTMLElement): number {
 
 export function resetLayoutAboveTabBar(root: HTMLElement): void {
   root.style.removeProperty("height");
+  root.style.removeProperty("min-height");
   root.style.removeProperty("max-height");
   root.style.removeProperty("flex");
 }

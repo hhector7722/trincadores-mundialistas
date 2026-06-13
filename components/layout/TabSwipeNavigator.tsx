@@ -419,7 +419,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       <div
         ref={trackRef}
         className={cn(
-          "relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
+          "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
           isDragging && "tm-tab-swipe-track--dragging",
           !animating && dragX === 0 && "transform-gpu"
         )}
