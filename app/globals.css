@@ -693,6 +693,14 @@ html:has(.tm-app-frame) {
   align-items: center;
 }
 
+/* Mismo color que el valor de «Campeón» en pronósticos globales (#CCFF00). */
+.tm-goal-scorer-text {
+  color: #ccff00;
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
 .tm-home-stat-card__scroll-hint {
   align-items: center;
   display: flex;

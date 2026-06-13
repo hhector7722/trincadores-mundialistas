@@ -7,9 +7,8 @@ type MatchGoalScorersListProps = {
   className?: string;
 };
 
-/** Mismo color que el valor de «Campeón» en pronósticos globales. */
-export const GOAL_SCORER_TEXT_CLASS =
-  "text-[8px] font-normal leading-tight text-[#CCFF00]";
+/** Clase compartida: color #CCFF00 del valor «Campeón» en pronósticos globales. */
+export const GOAL_SCORER_TEXT_CLASS = "tm-goal-scorer-text";
 
 export function MatchGoalScorersList({
   goals,
