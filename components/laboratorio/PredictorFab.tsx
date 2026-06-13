@@ -30,14 +30,18 @@ export function PredictorFab({ enabled }: PredictorFabProps) {
         aria-controls="predictor-assistant-panel"
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "fixed bottom-[calc(var(--tab-bar-height,72px)+16px)] right-4 z-50 flex size-12 items-center justify-center rounded-xl",
-          "border border-[var(--tm-border)] bg-[var(--tm-glass)] text-[var(--tm-accent)] shadow-[var(--tm-shadow)] backdrop-blur-md",
-          "transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]",
+          "fixed bottom-[calc(var(--tab-bar-height,72px)+10px)] -right-6 z-50",
+          "flex size-16 items-center justify-center rounded-full",
+          "border-2 border-[var(--tm-accent)]/70 bg-[#2a1058] shadow-[0_0_24px_rgba(217,255,0,0.35)]",
+          "transition-transform duration-200 hover:scale-[1.04] active:scale-[0.96]",
           open && "pointer-events-none opacity-0"
         )}
       >
-        <span className="text-xl leading-none" aria-hidden>
-          ⚽
+        <span
+          className="font-display text-[15px] font-bold tracking-[0.28em] text-[var(--tm-accent)] drop-shadow-[0_0_8px_rgba(217,255,0,0.65)]"
+          aria-hidden
+        >
+          AI
         </span>
       </button>
 
