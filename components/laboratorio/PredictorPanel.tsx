@@ -66,15 +66,58 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
   const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(false);
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true);
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    setVisible(false);
+  }, [open]);
+
+  useEffect(() => {
+    if (!mounted || visible) {
+      return;
+    }
+
+    const panel = panelRef.current;
+    if (!panel) {
+      setMounted(false);
+      return;
+    }
+
+    function handleTransitionEnd(event: TransitionEvent) {
+      if (event.target !== panel || event.propertyName !== "transform") {
+        return;
+      }
+
+      setMounted(false);
+    }
+
+    panel.addEventListener("transitionend", handleTransitionEnd);
+    const fallback = window.setTimeout(() => setMounted(false), 480);
+
+    return () => {
+      panel.removeEventListener("transitionend", handleTransitionEnd);
+      window.clearTimeout(fallback);
+    };
+  }, [mounted, visible]);
 
   const scrollToBottom = useCallback(() => {
     scrollAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, []);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !visible) {
       return;
     }
 
@@ -84,10 +127,10 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [open, messages, streamingText, scrollToBottom]);
+  }, [open, visible, messages, streamingText, scrollToBottom]);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !visible) {
       return;
     }
 
@@ -97,10 +140,10 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [open]);
+  }, [open, visible]);
 
   useEffect(() => {
-    if (!open) {
+    if (!mounted) {
       return;
     }
 
@@ -112,7 +155,7 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
 
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [open, onClose]);
+  }, [mounted, onClose]);
 
   async function handleSubmit(event?: FormEvent) {
     event?.preventDefault();
@@ -167,7 +210,7 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
     }
   }
 
-  if (!open) {
+  if (!mounted) {
     return null;
   }
 
@@ -179,19 +222,23 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
       <button
         type="button"
         aria-label="Cerrar asistente de predicciones"
-        className="absolute inset-0 bg-[#2a1058]/45 backdrop-blur-sm"
+        className={cn(
+          "tm-predictor-overlay absolute inset-0 bg-[#2a1058]/45 backdrop-blur-sm",
+          visible && "tm-predictor-overlay--visible"
+        )}
         onClick={onClose}
       />
 
       <section
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="predictor-panel-title"
         className={cn(
-          "relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--tm-border)]",
+          "tm-predictor-panel relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--tm-border)]",
           "bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] backdrop-blur-xl",
           "max-h-[min(72dvh,calc(100dvh-var(--tab-bar-height,72px)-2.5rem))]",
-          "transition-all duration-200 ease-out"
+          visible && "tm-predictor-panel--visible"
         )}
       >
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--tm-border)] px-4 py-3">
