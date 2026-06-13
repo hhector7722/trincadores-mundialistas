@@ -1,18 +1,8 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { BottomChrome } from "@/components/layout/BottomChrome";
 
-/** Portal a body — patrón marbella-app/BottomNavWrapper.tsx */
+/** TabBar en flujo dentro de tm-app-frame (misma altura en loading y con contenido). */
 export function TabBarWrapper() {
-  const [mounted, setMounted] = useState(false);
-
-  useLayoutEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return createPortal(<BottomChrome />, document.body);
+  return <BottomChrome />;
 }
