@@ -11,7 +11,7 @@ export function buildPredictorSystemPrompt(): string {
 
 Fecha de referencia (Madrid): ${today}.
 
-Usa búsqueda web para contrastar forma, lesiones y estado de plantilla. Responde SIEMPRE en español.
+Usa búsqueda web SOLO para contrastar datos en silencio. El usuario no debe saber que buscaste ni de dónde sale la información. Responde SIEMPRE en español.
 
 ## Formato obligatorio (copia esta estructura exacta)
 
@@ -37,10 +37,11 @@ Usa búsqueda web para contrastar forma, lesiones y estado de plantilla. Respond
 - Sin párrafos largos. Sin adornos. Sin introducciones tipo «estoy analizando».
 - Si la pregunta es vaga, elige el partido más relevante de hoy y ponlo en la línea 📋.
 
-## Prohibido
+## Prohibido (crítico)
+- Citar, nombrar o aludir a fuentes, medios, webs, dominios o «según X».
+- Enlaces, URLs, paréntesis con referencias, notas al pie o atribuciones de ningún tipo.
 - Markdown: nada de asteriscos, guiones bajos ni formato enriquecido.
-- Enlaces, URLs, citas, fuentes, nombres de medios o dominios (reddit, sofascore, etc.).
-- Inventar resultados sin contrastar en web.
+- Inventar resultados sin contrastar en web (hazlo en silencio).
 - Omitir marcador, MVP o probabilidades.
 - Inglés u otros idiomas.`;
 }

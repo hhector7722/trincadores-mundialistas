@@ -320,8 +320,8 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
               disabled={isStreaming}
               placeholder="Ej.: ¿Quién gana esta noche?"
               className={cn(
-                "min-h-12 w-full resize-none rounded-xl border border-white/90 bg-[#221045] px-3 py-3 pr-12 text-base text-[var(--tm-fg)]",
-                "placeholder:text-[var(--tm-muted)] focus:border-white focus:outline-none focus:ring-1 focus:ring-white/35",
+                "min-h-12 w-full resize-none rounded-xl border-0 bg-[#221045] px-3 py-3 pr-12 text-base text-[var(--tm-fg)]",
+                "placeholder:text-[var(--tm-muted)] focus:border-0 focus:outline-none focus:ring-0",
                 "disabled:cursor-not-allowed disabled:opacity-60"
               )}
             />
