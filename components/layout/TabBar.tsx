@@ -61,49 +61,43 @@ export function TabBar() {
   return (
     <nav
       className={cn(
-        "tm-app-tabbar z-[90] box-border w-full shrink-0",
-        "flex min-h-[var(--tm-tabbar-shell)] flex-col border-t border-[var(--tm-border)] pb-safe",
+        "tm-app-tabbar z-[90] box-border w-full shrink-0 border-t border-[var(--tm-border)] pb-safe",
         "bg-[var(--tm-tabbar-bg-hex)]",
         "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
-        showIndicators ? null : "justify-end"
       )}
       aria-label="Navegacion principal"
     >
       {showIndicators ? (
-        <div className="tm-tabbar-indicators-row flex shrink-0 items-center justify-center">
+        <div className="tm-tabbar-indicators-row flex shrink-0 items-end justify-center">
           <TabPageIndicators />
         </div>
       ) : null}
-      <div
-        className={cn(
-          "tm-tabbar-tabs-row flex w-full min-h-12 shrink-0 justify-around px-1",
-          showIndicators ? "items-end pb-0.5" : "flex-1 items-end"
-        )}
-      >
-      {MAIN_TABS.map(({ href, label }) => {
-        const Icon = TAB_ICONS[href];
-        const active = isMainTabActive(displayPath, href);
-        const navigating = optimisticHref === href;
+      <div className="tm-tabbar-tabs-row w-full shrink-0 justify-around px-0.5">
+        {MAIN_TABS.map(({ href, label }) => {
+          const Icon = TAB_ICONS[href];
+          const active = isMainTabActive(displayPath, href);
+          const navigating = optimisticHref === href;
 
-        return (
-          <Link
-            key={href}
-            href={href}
-            prefetch
-            scroll
-            onClick={(event) => handleTabClick(event, href)}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "flex min-h-12 min-w-12 flex-1 touch-manipulation flex-col items-center justify-center gap-0 px-0.5 text-[9px] font-medium leading-none transition-colors duration-150 active:opacity-80",
-              active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
-              navigating && "opacity-90"
-            )}
-          >
-            <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
-            <span className="mt-0.5 truncate">{label}</span>
-          </Link>
-        );
-      })}
+          return (
+            <Link
+              key={href}
+              href={href}
+              prefetch
+              scroll
+              onClick={(event) => handleTabClick(event, href)}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex h-[var(--tm-tabbar-tabs-row)] min-w-10 flex-1 touch-manipulation flex-col items-center justify-end gap-px px-0.5 pb-px",
+                "text-[8px] font-medium leading-none transition-colors duration-150 active:opacity-80",
+                active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
+                navigating && "opacity-90",
+              )}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
+              <span className="max-w-full truncate">{label}</span>
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
