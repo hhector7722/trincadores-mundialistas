@@ -86,6 +86,18 @@ html {
   text-size-adjust: 100%;
 }
 
+html:has(.tm-app-frame) {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html:has(.tm-app-frame) body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 input,
 textarea,
 select {
@@ -124,14 +136,17 @@ html[data-modal-open] .tm-app-main {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 
-/* Shell flex: min-h-dvh; sin cage de altura en html/body (rompe fixed en iOS WebKit) */
+/* Shell flex: altura fija al viewport; scroll solo en contenedores internos */
 .tm-app-frame {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
   flex-direction: column;
   isolation: isolate;
+  overflow: hidden;
 }
 
 /* Degradado fijo: mismo tono en cabecera y contenido */
@@ -146,6 +161,9 @@ html[data-modal-open] .tm-app-main {
 }
 
 .tm-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 25;
   background: transparent;
 }
 
@@ -210,10 +228,18 @@ html[data-modal-open] .tm-app-main {
   height: 100%;
   min-height: 0;
   flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.tm-home-layout__scroll {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: contain;
   scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
 }
 

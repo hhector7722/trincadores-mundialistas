@@ -1,5 +1,6 @@
 /** Selectores de contenedor principal por ruta (orden de prioridad). */
 export const PULL_SCROLL_SELECTORS = [
+  ".tm-home-layout__scroll",
   ".tm-home-layout",
   ".tm-tab-scroll-layout",
   ".tm-quiz-play-scroll",
@@ -61,6 +62,10 @@ export function findNearestScrollable(
 
 export function isScrollAtTop(el: HTMLElement): boolean {
   return el.scrollTop <= 1;
+}
+
+export function isTouchInsideScrollRoot(target: EventTarget | null, root: HTMLElement): boolean {
+  return target instanceof Element && root.contains(target);
 }
 
 export function applyPullResistance(distance: number): number {

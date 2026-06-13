@@ -1,3 +1,4 @@
+import { HomeScrollBody } from "@/components/home/HomeScrollBody";
 import type { ReactNode } from "react";
 
 type HomeViewportShellProps = {
@@ -5,12 +6,12 @@ type HomeViewportShellProps = {
   body: ReactNode;
 };
 
-/** Inicio: scroll interno acotado; TabBar fixed fuera del flujo (portal). */
+/** Inicio: hero fijo bajo cabecera; scroll solo en el cuerpo. */
 export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
   return (
     <div className="tm-home-layout relative z-10 flex h-full min-h-0 w-full flex-col gap-3 p-4 pb-0">
       <div className="tm-home-layout__hero shrink-0">{hero}</div>
-      {body}
+      <HomeScrollBody>{body}</HomeScrollBody>
     </div>
   );
 }
