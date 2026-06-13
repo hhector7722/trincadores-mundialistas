@@ -23,6 +23,7 @@ const TAB_ICONS = {
   "/profile": User,
 } as const;
 
+/** Misma estructura que marbella-app/src/components/StaffBottomNav.tsx */
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -60,18 +61,11 @@ export function TabBar() {
 
   return (
     <nav
-      className={cn(
-        "tm-app-tabbar",
-        "flex h-20 items-center justify-around md:h-16",
-        "border-t border-[var(--tm-border)]",
-        "bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe md:px-8",
-        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
-        showIndicators && "tm-app-tabbar--with-indicators",
-      )}
+      className={cn("tm-app-tabbar", showIndicators && "tm-app-tabbar--with-indicators")}
       aria-label="Navegacion principal"
     >
       {showIndicators ? (
-        <div className="tm-tabbar-indicators-row flex items-center justify-center">
+        <div className="tm-tabbar-indicators-row">
           <TabPageIndicators />
         </div>
       ) : null}
@@ -89,15 +83,13 @@ export function TabBar() {
             onClick={(event) => handleTabClick(event, href)}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
-              "text-[7.5px] font-semibold uppercase leading-none tracking-tight",
-              "transition-all duration-150 active:scale-95 active:opacity-80 md:text-[9px]",
-              active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
+              "tm-app-tabbar__link",
+              active ? "tm-app-tabbar__link--active" : "tm-app-tabbar__link--idle",
               navigating && "opacity-90",
             )}
           >
-            <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-            <span className="mt-0.5 max-w-full truncate md:mt-1">{label}</span>
+            <Icon strokeWidth={active ? 2.5 : 2} />
+            <span className="tm-app-tabbar__label">{label}</span>
           </Link>
         );
       })}

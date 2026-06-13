@@ -32,14 +32,6 @@ export function applyVisualViewportChrome(): void {
     frame.style.maxHeight = `${height}px`;
     frame.style.top = `${offsetTop}px`;
   }
-
-  const nav = document.querySelector<HTMLElement>(TAB_BAR_SELECTOR);
-  if (nav) {
-    const tabBarHeight = Math.ceil(nav.getBoundingClientRect().height);
-    if (tabBarHeight > 0) {
-      root.style.setProperty("--tm-tabbar-shell", `${tabBarHeight}px`);
-    }
-  }
 }
 
 export function resetVisualViewportChrome(): void {
