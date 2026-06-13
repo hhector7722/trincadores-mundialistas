@@ -27,7 +27,13 @@ type SlideItem = {
 };
 
 const CAROUSEL_LAZY_RENDER_RADIUS = 1;
-const CAROUSEL_MAX_DOTS = 5;
+const CAROUSEL_ZONE_DOTS = ["last", "center", "right"] as const;
+
+function resolveActiveDotIndex(activeIndex: number, focusIndex: number): number {
+  if (activeIndex < focusIndex) return 0;
+  if (activeIndex > focusIndex) return 2;
+  return 1;
+}
 
 function resolveFocusIndex(matches: MatchWithPrediction[]): number {
   const liveIndex = matches.findIndex((match) => match.status === "live");
@@ -103,7 +109,7 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
     );
   }
 
-  const showDots = slides.length > 1 && slides.length <= CAROUSEL_MAX_DOTS;
+  const activeDotIndex = resolveActiveDotIndex(activeIndex, focusIndex);
 
   return (
     <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe={true}>
@@ -136,14 +142,14 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
           })}
         </div>
 
-        {showDots ? (
+        {slides.length > 1 ? (
           <div className={HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS} aria-hidden>
-            {slides.map((slide, index) => (
+            {CAROUSEL_ZONE_DOTS.map((dotId, index) => (
               <span
-                key={slide.id}
+                key={dotId}
                 className={cn(
                   "h-1.5 rounded-full transition-all duration-300",
-                  index === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
+                  index === activeDotIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
                 )}
               />
             ))}
