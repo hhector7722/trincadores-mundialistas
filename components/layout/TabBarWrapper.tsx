@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { BottomChrome } from "@/components/layout/BottomChrome";
 
@@ -8,7 +8,7 @@ import { BottomChrome } from "@/components/layout/BottomChrome";
 export function TabBarWrapper() {
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setMounted(true);
   }, []);
 

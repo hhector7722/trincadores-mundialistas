@@ -46,7 +46,8 @@
   --tm-tabbar-height-md: 4rem;
   --tm-tabbar-indicators-row: 0.375rem;
   --tm-tabbar-core: var(--tm-tabbar-height);
-  --tm-tabbar-shell: calc(var(--tm-tabbar-height) + var(--tm-safe-bottom));
+  /* Solo 5rem: pb-safe ya vive dentro del h-20 (border-box). Sumar safe otra vez duplica la zona inferior. */
+  --tm-tabbar-shell: var(--tm-tabbar-height);
   --tm-chrome-bottom: 0px;
   --tab-bar-height: var(--tm-tabbar-shell);
   --tm-content-bottom: var(--tm-tabbar-shell);
