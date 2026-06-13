@@ -138,6 +138,9 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
     >
       <MiniRankingHeader />
       <div className="tm-home-mini-ranking__body">
+        {canScroll ? (
+          <HomeStatCardScrollHint activeSlot={scrollHint} orientation="vertical" />
+        ) : null}
         <div ref={viewportRef} className="tm-home-mini-ranking__viewport">
           {rows.length === 0 ? (
             <p className="px-3 py-4 text-center text-[8px] text-white/35">Sin clasificación</p>
@@ -151,9 +154,6 @@ export function HomeMiniRankingTable({ rows, currentProfileId }: HomeMiniRanking
             ))
           )}
         </div>
-        {canScroll ? (
-          <HomeStatCardScrollHint activeSlot={scrollHint} orientation="vertical" />
-        ) : null}
       </div>
     </Link>
   );
