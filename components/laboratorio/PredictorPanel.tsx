@@ -188,40 +188,40 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
         aria-modal="true"
         aria-labelledby="predictor-panel-title"
         className={cn(
-          "relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-200",
-          "bg-white text-zinc-900 shadow-[0_12px_40px_rgba(0,0,0,0.22)]",
+          "relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--tm-border)]",
+          "bg-[var(--tm-glass)] shadow-[var(--tm-shadow-soft)] backdrop-blur-xl",
           "max-h-[min(72dvh,calc(100dvh-var(--tab-bar-height,72px)-2.5rem))]",
           "transition-all duration-200 ease-out"
         )}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-3">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--tm-border)] px-4 py-3">
           <div className="min-w-0">
             <p
               id="predictor-panel-title"
-              className="truncate text-sm font-semibold text-zinc-900"
+              className="truncate text-sm font-semibold text-[var(--tm-fg)]"
             >
               Asistente de predicciones
             </p>
-            <p className="truncate text-xs text-zinc-500">
-              Forma, plantilla y pronóstico al grano
+            <p className="truncate text-xs text-[var(--tm-muted)]">
+              Marcador, MVP y probabilidades con datos actuales
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar panel"
-            className="flex size-12 shrink-0 items-center justify-center rounded-xl text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+            className="flex size-12 shrink-0 items-center justify-center rounded-xl text-[var(--tm-muted)] transition-colors hover:bg-white/5 hover:text-[var(--tm-fg)]"
           >
             <X className="size-5" />
           </button>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col bg-white">
+        <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-white px-4 py-4">
             {messages.length === 0 && !streamingText ? (
               <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-relaxed text-zinc-600">
-                Pregunta por un partido o deja que elija el más relevante de hoy.
-                Respuesta corta: forma, plantilla y pronóstico con iconos.
+                Pregunta por un partido concreto o deja que interprete el choque mas relevante de hoy.
+                Siempre te devuelvo marcador, MVP y probabilidades.
               </div>
             ) : null}
 
@@ -235,9 +235,9 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
               >
                 <div
                   className={cn(
-                    "max-w-[92%] rounded-xl px-3 py-2.5 text-sm leading-snug whitespace-pre-wrap",
+                    "max-w-[88%] rounded-xl px-3 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
                     message.role === "user"
-                      ? "bg-[#2a1058] text-white"
+                      ? "bg-[var(--tm-accent)] text-[var(--tm-primary-fg)]"
                       : "border border-zinc-200 bg-zinc-50 text-zinc-900"
                   )}
                 >
@@ -250,16 +250,16 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
 
             {streamingText ? (
               <div className="flex justify-start">
-                <div className="max-w-[92%] rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-snug whitespace-pre-wrap text-zinc-900">
+                <div className="max-w-[88%] rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-zinc-900">
                   {streamingText}
-                  <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-[#2a1058] align-middle" />
+                  <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-[var(--tm-accent)] align-middle" />
                 </div>
               </div>
             ) : null}
 
             {error ? (
               <p
-                className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700"
+                className="rounded-xl border border-[var(--tm-danger)]/35 bg-[var(--tm-danger)]/10 px-3 py-2 text-sm text-[var(--tm-danger)]"
                 role="alert"
               >
                 {error}
@@ -271,7 +271,7 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
 
           <form
             onSubmit={handleSubmit}
-            className="shrink-0 border-t border-zinc-200 bg-white p-3"
+            className="shrink-0 border-t border-[var(--tm-border)] p-3"
           >
             <div className="flex items-end gap-2">
               <label className="sr-only" htmlFor="predictor-chat-input">
@@ -287,8 +287,8 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
                 disabled={isStreaming}
                 placeholder="Ej.: ¿Quién gana esta noche?"
                 className={cn(
-                  "min-h-12 flex-1 resize-none rounded-xl border border-zinc-300 bg-white px-3 py-3 text-sm text-zinc-900",
-                  "placeholder:text-zinc-400 focus:border-[#2a1058] focus:outline-none focus:ring-1 focus:ring-[#2a1058]/30",
+                  "min-h-12 flex-1 resize-none rounded-xl border border-[var(--tm-border)] bg-[#2a1058]/55 px-3 py-3 text-sm text-[var(--tm-fg)]",
+                  "placeholder:text-[var(--tm-muted)] focus:border-[var(--tm-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--tm-accent)]/40",
                   "disabled:cursor-not-allowed disabled:opacity-60"
                 )}
               />
@@ -297,7 +297,7 @@ export function PredictorPanel({ open, onClose }: PredictorPanelProps) {
                 disabled={isStreaming || !draft.trim()}
                 aria-label="Enviar pregunta"
                 className={cn(
-                  "flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#2a1058] text-[var(--tm-accent)]",
+                  "flex size-12 shrink-0 items-center justify-center rounded-xl bg-[var(--tm-accent)] text-[var(--tm-primary-fg)]",
                   "transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
                 )}
               >
