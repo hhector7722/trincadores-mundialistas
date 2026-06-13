@@ -46,6 +46,7 @@
   --tm-tabbar-tabs-row: 3rem;
   /* Indicadores + fila de tabs (pb-safe va aparte en border-box del nav) */
   --tm-tabbar-core: calc(var(--tm-tabbar-indicators-row) + var(--tm-tabbar-tabs-row));
+  --tm-tabbar-shell: calc(var(--tm-tabbar-core) + var(--tm-safe-bottom));
   --tab-bar-height: var(--tm-tabbar-core);
   --tm-app-header-inner: 3rem;
   --tm-app-header-pt: max(0.75rem, env(safe-area-inset-top, 0px));
@@ -197,17 +198,34 @@ html:has(.tm-app-header--compact) {
 }
 
 .tm-app-main:has(.tm-home-layout) {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(
+    var(--tm-vv-height, 100dvh) - var(--tm-app-header-block) - var(--tm-tabbar-shell)
+  );
+  overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 
-/* Viewports a pantalla completa: scroll interno, sin padding en main */
+.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-root {
+  display: block;
+  height: auto;
+  min-height: 0;
+}
+
+.tm-app-tabbar {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+/* Viewports a pantalla completa: scroll interno en main */
 .tm-app-main:has(.tm-porra-layout),
 .tm-app-main:has(.tm-ranking-layout),
 .tm-app-main:has(.tm-tab-scroll-layout),
-.tm-app-main:has(.tm-quiz-page),
-.tm-app-main:has(.tm-home-layout) {
+.tm-app-main:has(.tm-quiz-page) {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -219,8 +237,7 @@ html:has(.tm-app-header--compact) {
 .tm-app-main:has(.tm-porra-layout) .tm-tab-swipe-root,
 .tm-app-main:has(.tm-ranking-layout) .tm-tab-swipe-root,
 .tm-app-main:has(.tm-tab-scroll-layout) .tm-tab-swipe-root,
-.tm-app-main:has(.tm-quiz-page) .tm-tab-swipe-root,
-.tm-app-main:has(.tm-home-layout) .tm-tab-swipe-root {
+.tm-app-main:has(.tm-quiz-page) .tm-tab-swipe-root {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -259,6 +276,13 @@ html:has(.tm-app-header--compact) {
   box-sizing: border-box;
   flex: 0 0 auto;
   width: 100%;
+}
+
+.tm-home-tabbar-buffer__row {
+  width: 100%;
+  border-radius: var(--tm-radius-lg);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .tm-home-layout__hero {

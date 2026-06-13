@@ -37,7 +37,7 @@ export function HomeStandingCard({
   matchCarouselMatches,
 }: HomeStandingCardProps) {
   return (
-    <div className="flex min-h-0 flex-col gap-3 pb-3">
+    <div className="flex min-h-0 flex-col gap-3">
       <div className="grid shrink-0 grid-cols-2 gap-3">
         <HomeMiniRankingTable rows={leaderboardRows} currentProfileId={currentProfileId} />
         <HomeGeneralPredictionsCard

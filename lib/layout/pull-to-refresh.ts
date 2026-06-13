@@ -27,6 +27,10 @@ export function isPullRefreshBlocked(): boolean {
 export function findPullScrollRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
 
+  if (document.querySelector(".tm-home-layout")) {
+    return document.querySelector<HTMLElement>(".tm-app-main");
+  }
+
   for (const selector of PULL_SCROLL_SELECTORS) {
     const el = document.querySelector<HTMLElement>(selector);
     if (el) return el;
