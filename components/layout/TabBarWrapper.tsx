@@ -1,18 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { BottomChrome } from "@/components/layout/BottomChrome";
 
-/** Portal a body (patrón marbella-app/BottomNavWrapper). Sin sync extra aquí. */
+/** TabBar en flujo al pie del shell (como staff/layout en marbella-app). */
 export function TabBarWrapper() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return createPortal(<BottomChrome />, document.body);
+  return <BottomChrome />;
 }

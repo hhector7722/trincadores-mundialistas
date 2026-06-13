@@ -23,7 +23,7 @@ const TAB_ICONS = {
   "/profile": User,
 } as const;
 
-/** Misma estructura que marbella-app/src/components/StaffBottomNav.tsx */
+/** Clases copiadas de marbella-app/src/components/StaffBottomNav.tsx */
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -61,11 +61,18 @@ export function TabBar() {
 
   return (
     <nav
-      className={cn("tm-app-tabbar", showIndicators && "tm-app-tabbar--with-indicators")}
+      className={cn(
+        "tm-app-tabbar relative z-[95] shrink-0 w-full",
+        "flex h-20 items-center justify-around md:h-16",
+        "border-t border-[var(--tm-border)]",
+        "bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe md:px-8",
+        "shadow-[0_-4px_20px_rgba(0,0,0,0.18)] backdrop-blur-md",
+        showIndicators && "tm-app-tabbar--with-indicators",
+      )}
       aria-label="Navegacion principal"
     >
       {showIndicators ? (
-        <div className="tm-tabbar-indicators-row">
+        <div className="tm-tabbar-indicators-row flex items-center justify-center">
           <TabPageIndicators />
         </div>
       ) : null}
@@ -83,13 +90,16 @@ export function TabBar() {
             onClick={(event) => handleTabClick(event, href)}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "tm-app-tabbar__link",
-              active ? "tm-app-tabbar__link--active" : "tm-app-tabbar__link--idle",
+              "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
+              "transition-all duration-200 active:scale-95",
+              active ? "text-[var(--tm-accent)]" : "text-[var(--tm-muted)]",
               navigating && "opacity-90",
             )}
           >
-            <Icon strokeWidth={active ? 2.5 : 2} />
-            <span className="tm-app-tabbar__label">{label}</span>
+            <Icon size={20} className="md:h-5 md:w-5" strokeWidth={active ? 2.5 : 2} />
+            <span className="mt-0.5 text-[7.5px] font-black uppercase tracking-tighter whitespace-nowrap md:mt-1 md:text-[9px] md:tracking-widest">
+              {label}
+            </span>
           </Link>
         );
       })}
