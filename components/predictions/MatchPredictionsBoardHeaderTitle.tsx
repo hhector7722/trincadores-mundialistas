@@ -104,7 +104,6 @@ export function MatchPredictionsBoardHeaderTitle({
         <MatchGoalScorersList
           goals={goalScorers.home}
           align="left"
-          tone="muted"
           className="max-w-none self-start"
         />
       </div>
@@ -126,7 +125,6 @@ export function MatchPredictionsBoardHeaderTitle({
         <MatchGoalScorersList
           goals={goalScorers.away}
           align="right"
-          tone="muted"
           className="max-w-none self-end"
         />
       </div>

@@ -4,15 +4,16 @@ import { cn } from "@/lib/utils";
 type MatchGoalScorersListProps = {
   goals: MatchGoalScorer[];
   align?: "left" | "center" | "right";
-  /** `card` = acento lima bajo selección; `muted` = texto secundario en cabeceras de modal. */
-  tone?: "card" | "muted";
   className?: string;
 };
+
+/** Mismo color que el valor de «Campeón» en pronósticos globales. */
+const GOAL_SCORER_TEXT_CLASS =
+  "text-[8px] font-normal leading-tight text-[#CCFF00]";
 
 export function MatchGoalScorersList({
   goals,
   align = "center",
-  tone = "card",
   className,
 }: MatchGoalScorersListProps) {
   if (!goals.length) return null;
@@ -24,17 +25,12 @@ export function MatchGoalScorersList({
         ? "items-end text-right"
         : "items-center text-center";
 
-  const textClass =
-    tone === "muted"
-      ? "text-[8px] font-normal leading-tight text-white/55"
-      : "text-[8px] font-normal leading-tight text-[var(--tm-accent)]";
-
   return (
     <div className={cn("flex w-full max-w-[5.5rem] flex-col gap-px sm:max-w-[6.5rem]", alignClass, className)}>
       {goals.map((goal, index) => (
         <p
           key={`${goal.playerName}-${goal.minute ?? "na"}-${index}`}
-          className={cn(textClass, "w-full whitespace-nowrap")}
+          className={cn(GOAL_SCORER_TEXT_CLASS, "w-full whitespace-nowrap")}
         >
           {formatGoalScorerLabel(goal)}
         </p>
