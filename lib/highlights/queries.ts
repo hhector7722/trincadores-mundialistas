@@ -7,7 +7,7 @@ type HighlightRow = {
   away_team: string;
   highlight_youtube_id: string;
   highlight_published_at: string;
-  highlight_source: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte";
+  highlight_source: "youtube_dazn_es" | "youtube_fifa" | "youtube_replay" | "youtube_rtve_teledeporte";
   highlight_headline: string | null;
   match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
@@ -50,12 +50,10 @@ async function getMatchdayIdsForPool(poolId: string): Promise<string[]> {
   return (data ?? []).map((row) => row.id);
 }
 
-/** Último partido finalizado de la porra con resumen FIFA (para hero home). */
-export async function getLatestMatchHighlightForPool(
-  poolId: string,
-): Promise<MatchHighlightView | null> {
+/** Todos los partidos finalizados de la porra con vídeo (cronológico, más antiguo primero). */
+export async function getMatchHighlightsForPool(poolId: string): Promise<MatchHighlightView[]> {
   const dayIds = await getMatchdayIdsForPool(poolId);
-  if (!dayIds.length) return null;
+  if (!dayIds.length) return [];
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -76,13 +74,19 @@ export async function getLatestMatchHighlightForPool(
     .in("matchday_id", dayIds)
     .eq("status", "finished")
     .not("highlight_youtube_id", "is", null)
-    .order("kickoff_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order("kickoff_at", { ascending: true });
 
-  if (error || !data?.highlight_youtube_id || !data.highlight_published_at || !data.highlight_source) {
-    return null;
-  }
+  if (error || !data?.length) return [];
 
-  return rowToHighlightView(data as HighlightRow);
+  return data
+    .map((row) => rowToHighlightView(row as HighlightRow))
+    .filter((highlight): highlight is MatchHighlightView => highlight != null);
+}
+
+/** Último partido finalizado de la porra con resumen (para hero home y otros usos). */
+export async function getLatestMatchHighlightForPool(
+  poolId: string,
+): Promise<MatchHighlightView | null> {
+  const highlights = await getMatchHighlightsForPool(poolId);
+  return highlights.at(-1) ?? null;
 }

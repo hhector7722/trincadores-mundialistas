@@ -1,15 +1,12 @@
 import Image from "next/image";
 import { HomeHeroCarousel } from "@/components/home/HomeHeroCarousel";
 import type { MatchHighlightView } from "@/lib/highlights/types";
-import type { HomeQuizSlide } from "@/lib/quiz/home-teaser";
 
 type HomeHeroProps = {
-  pendingCount: number;
-  quizSlide: HomeQuizSlide | null;
-  lastMatchHighlight: MatchHighlightView | null;
+  matchHighlights: MatchHighlightView[];
 };
 
-export function HomeHero({ pendingCount, quizSlide, lastMatchHighlight }: HomeHeroProps) {
+export function HomeHero({ matchHighlights }: HomeHeroProps) {
   return (
     <section className="tm-hero-card relative grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2 overflow-hidden rounded-3xl px-5 pt-2 pb-1.5">
       <div className="tm-hero-card-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -19,11 +16,7 @@ export function HomeHero({ pendingCount, quizSlide, lastMatchHighlight }: HomeHe
       />
 
       <div className="@container/hero relative z-10 min-w-0 overflow-hidden">
-        <HomeHeroCarousel
-          pendingCount={pendingCount}
-          quizSlide={quizSlide}
-          lastMatchHighlight={lastMatchHighlight}
-        />
+        <HomeHeroCarousel matchHighlights={matchHighlights} />
       </div>
 
       <div

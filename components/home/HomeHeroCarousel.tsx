@@ -1,133 +1,43 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
 import type { MatchHighlightView } from "@/lib/highlights/types";
-import type { HomeQuizSlide } from "@/lib/quiz/home-teaser";
 import { cn } from "@/lib/utils";
 
-type SlideCta = {
-  label: string;
-  href: string;
-};
-
-type Slide = {
-  id: string;
-  eyebrow: string;
-  headline?: React.ReactNode;
-  description?: string;
-  cta?: SlideCta;
-  customBody?: React.ReactNode;
-  align?: "center" | "left";
-};
-
 type HomeHeroCarouselProps = {
-  pendingCount: number;
-  quizSlide: HomeQuizSlide | null;
-  lastMatchHighlight: MatchHighlightView | null;
+  matchHighlights: MatchHighlightView[];
 };
 
-function buildSlides(
-  pendingCount: number,
-  quizSlide: HomeQuizSlide | null,
-  lastMatchHighlight: MatchHighlightView | null,
-): Slide[] {
-  const pendingDisplay = pendingCount > 0 ? String(pendingCount) : " ";
-
-  const slides: Slide[] = [];
-
-  if (lastMatchHighlight) {
-    slides.push({
-      id: "last-match-highlight",
-      eyebrow: "",
-      align: "left",
-      customBody: (
-        <MatchHighlightBlock
-          variant="hero"
-          className="w-full"
-          homeTeam={lastMatchHighlight.homeTeam}
-          awayTeam={lastMatchHighlight.awayTeam}
-          homeGoals={lastMatchHighlight.homeGoals}
-          awayGoals={lastMatchHighlight.awayGoals}
-          youtubeVideoId={lastMatchHighlight.youtubeVideoId}
-          highlightSource={lastMatchHighlight.source}
-          headline={lastMatchHighlight.headline}
-        />
-      ),
-    });
-  }
-
-  slides.push(
-    {
-      id: "mundial",
-      align: "center",
-      eyebrow: "Mundial 2026",
-      headline: (
-        <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
-          104 partidos
-        </p>
-      ),
-      description: "Unos que shanelan de esto, otros que no tanto, y muchas caritas que pintar.",
-      cta: { label: "Ver calendario", href: "/predictions" },
-    },
-    {
-      id: "pending",
-      align: "center",
-      eyebrow: "Resultados pendientes",
-      headline: (
-        <p
-          className="max-w-full font-display text-[clamp(1.5rem,20cqw,2.75rem)] font-black leading-[0.85] tracking-tight text-[#CCFF00] drop-shadow-[0_0_32px_rgba(204,255,0,0.15)]"
-          aria-label={pendingCount > 0 ? `${pendingCount} resultados pendientes` : undefined}
-        >
-          {pendingDisplay}
-        </p>
-      ),
-      description: "Se cierran 5 min antes de que sonría la redonda",
-      cta: { label: "Mis pronósticos", href: "/predictions" },
-    },
+function highlightToSlideBody(highlight: MatchHighlightView) {
+  return (
+    <MatchHighlightBlock
+      variant="hero"
+      className="w-full"
+      homeTeam={highlight.homeTeam}
+      awayTeam={highlight.awayTeam}
+      homeGoals={highlight.homeGoals}
+      awayGoals={highlight.awayGoals}
+      youtubeVideoId={highlight.youtubeVideoId}
+      highlightSource={highlight.source}
+      headline={highlight.headline}
+    />
   );
-
-  if (quizSlide) {
-    const training = quizSlide.scoringMode === "training" || !quizSlide.competitive;
-    slides.push({
-      id: "quiz",
-      align: "center",
-      eyebrow: training ? "Quiz del dia · entrenamiento" : "Quiz del dia · competitivo",
-      headline: (
-        <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-[#CCFF00]">
-          {quizSlide.headline}
-        </p>
-      ),
-      description: quizSlide.description,
-      cta: { label: quizSlide.ctaLabel, href: quizSlide.ctaHref },
-    });
-  }
-
-  slides.push({
-    id: "ranking",
-    align: "center",
-    eyebrow: "Clasificación",
-    headline: (
-      <p className="max-w-full font-display text-[clamp(1.125rem,11cqw,1.75rem)] font-black leading-[0.95] tracking-tight text-white">
-        ¿Quién manda?
-      </p>
-    ),
-    description: "Mira tu posición y cuánto te separa del resto",
-    cta: { label: "Ver ranking", href: "/ranking" },
-  });
-
-  return slides;
 }
 
-export function HomeHeroCarousel({
-  pendingCount,
-  quizSlide,
-  lastMatchHighlight,
-}: HomeHeroCarouselProps) {
-  const slides = buildSlides(pendingCount, quizSlide, lastMatchHighlight);
+export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
+  const slides = useMemo(
+    () =>
+      matchHighlights.map((highlight) => ({
+        id: highlight.matchId,
+        highlight,
+      })),
+    [matchHighlights],
+  );
+
+  const defaultIndex = Math.max(0, slides.length - 1);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
@@ -135,6 +45,13 @@ export function HomeHeroCarousel({
     const index = Math.round(el.scrollLeft / el.clientWidth);
     setActiveIndex(Math.min(Math.max(index, 0), slides.length - 1));
   }, [slides.length]);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el || slides.length === 0) return;
+    el.scrollLeft = defaultIndex * el.clientWidth;
+    setActiveIndex(defaultIndex);
+  }, [defaultIndex, slides.length]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -145,6 +62,10 @@ export function HomeHeroCarousel({
     return () => el.removeEventListener("scroll", updateActiveIndex);
   }, [updateActiveIndex]);
 
+  if (!slides.length) return null;
+
+  const sizingHighlight = slides[defaultIndex]?.highlight ?? slides[0].highlight;
+
   function scrollToIndex(index: number) {
     const el = scrollRef.current;
     if (!el) return;
@@ -154,94 +75,53 @@ export function HomeHeroCarousel({
   return (
     <div className="flex min-w-0 flex-col" data-block-tab-swipe>
       <div className="grid min-w-0 [&>*]:col-start-1 [&>*]:row-start-1">
-        {lastMatchHighlight ? (
-          <div className="invisible pointer-events-none min-w-0" aria-hidden="true">
-            <MatchHighlightBlock
-              variant="hero"
-              className="w-full"
-              homeTeam={lastMatchHighlight.homeTeam}
-              awayTeam={lastMatchHighlight.awayTeam}
-              homeGoals={lastMatchHighlight.homeGoals}
-              awayGoals={lastMatchHighlight.awayGoals}
-              youtubeVideoId={lastMatchHighlight.youtubeVideoId}
-              highlightSource={lastMatchHighlight.source}
-              headline={lastMatchHighlight.headline}
-            />
-          </div>
-        ) : null}
+        <div className="invisible pointer-events-none min-w-0" aria-hidden="true">
+          {highlightToSlideBody(sizingHighlight)}
+        </div>
         <div
           ref={scrollRef}
           className="flex h-full min-h-0 w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-roledescription="carrusel"
         >
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className="flex h-full min-h-full w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
-            aria-hidden={index !== activeIndex}
-          >
+          {slides.map((slide, index) => (
             <div
-              className={cn(
-                "flex h-full w-full min-w-0 max-w-full flex-col",
-                slide.align === "left"
-                  ? "items-stretch justify-start text-left"
-                  : "items-center justify-center text-center",
-              )}
+              key={slide.id}
+              className="flex h-full min-h-full w-full min-w-full max-w-full shrink-0 basis-full snap-start snap-always"
+              aria-hidden={index !== activeIndex}
             >
-              {slide.eyebrow ? (
-                <p className="max-w-full truncate text-[clamp(8px,2.2cqw,10px)] font-semibold uppercase tracking-[0.12em] text-white/60">
-                  {slide.eyebrow}
-                </p>
-              ) : null}
-              {slide.customBody ? (
-                slide.customBody
-              ) : (
-                <>
-                  {slide.headline}
-                  {slide.description ? (
-                    <p className="mt-1 max-w-full text-[clamp(10px,2.8cqw,13px)] leading-snug text-white/50">
-                      {slide.description}
-                    </p>
-                  ) : null}
-                </>
-              )}
-              {slide.cta && (
-                <Link
-                  href={slide.cta.href}
-                  className="mt-1.5 inline-flex w-fit max-w-full items-center whitespace-nowrap rounded-full bg-[#CCFF00] px-[clamp(8px,2.5cqw,10px)] py-[clamp(3px,1cqw,4px)] text-[clamp(9px,2.4cqw,10px)] font-bold uppercase tracking-wide text-black transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(204,255,0,0.35)]"
-                >
-                  {slide.cta.label}
-                </Link>
-              )}
+              <div className="flex h-full w-full min-w-0 max-w-full flex-col items-stretch justify-start text-left">
+                {highlightToSlideBody(slide.highlight)}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
 
-      <div
-        className="mt-1.5 flex items-center justify-center gap-1.5"
-        role="tablist"
-        aria-label="Contenido del hero"
-      >
-        {slides.map((slide, index) => {
-          const isActive = index === activeIndex;
-          return (
-            <button
-              key={slide.id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              aria-label={`${slide.eyebrow || (slide.id === "last-match-highlight" ? "Highlights" : slide.id)}${isActive ? ", activo" : ""}`}
-              onClick={() => scrollToIndex(index)}
-              className={cn(
-                "h-1.5 shrink-0 rounded-full transition-all duration-300 ease-out",
-                isActive ? "w-4 bg-white" : "w-1.5 bg-white/35 hover:bg-white/55"
-              )}
-            />
-          );
-        })}
-      </div>
+      {slides.length > 1 ? (
+        <div
+          className="mt-1.5 flex items-center justify-center gap-1.5"
+          role="tablist"
+          aria-label="Highlights del mundial"
+        >
+          {slides.map((slide, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <button
+                key={slide.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Highlight ${index + 1}${isActive ? ", activo" : ""}`}
+                onClick={() => scrollToIndex(index)}
+                className={cn(
+                  "h-1.5 shrink-0 rounded-full transition-all duration-300 ease-out",
+                  isActive ? "w-4 bg-white" : "w-1.5 bg-white/35 hover:bg-white/55",
+                )}
+              />
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
