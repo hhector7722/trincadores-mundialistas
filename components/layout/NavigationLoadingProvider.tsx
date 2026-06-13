@@ -18,6 +18,7 @@ type NavigationLoadingContextValue = {
   navigate: (href: string) => void;
   navigateTab: (href: string) => void;
   setNavigating: (active: boolean) => void;
+  tabPending: boolean;
 };
 
 const NavigationLoadingContext = createContext<NavigationLoadingContextValue | null>(null);
@@ -59,8 +60,9 @@ export function useAppNavigation() {
 
   return {
     navigate: context?.navigate ?? ((href: string) => router.push(href)),
-    navigateTab: context?.navigateTab ?? ((href: string) => router.push(href)),
+    navigateTab: context?.navigateTab ?? ((href: string) => router.replace(href)),
     setNavigating: context?.setNavigating ?? (() => undefined),
+    tabPending: context?.tabPending ?? false,
   };
 }
 
@@ -69,6 +71,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
   const [isPending, startTransition] = useTransition();
+  const [tabPending, startTabTransition] = useTransition();
   const [navigating, setNavigating] = useState(false);
 
   const navigate = useCallback(
@@ -85,7 +88,9 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const navigateTab = useCallback(
     (href: string) => {
       if (isSameAppPath(pathnameRef.current, href)) return;
-      router.replace(href, { scroll: false });
+      startTabTransition(() => {
+        router.replace(href, { scroll: false });
+      });
     },
     [router]
   );
@@ -106,15 +111,22 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     setNavigating(true);
   }, []);
 
-  /* Solo navegación por enlace: evita flash oscuro al cambiar de tab (replace + transition). */
-  const showOverlay = navigating;
+  const showLinkOverlay = navigating && isPending;
+  const showTabOverlay = tabPending;
 
   return (
-    <NavigationLoadingContext.Provider value={{ navigate, navigateTab, setNavigating }}>
+    <NavigationLoadingContext.Provider
+      value={{ navigate, navigateTab, setNavigating, tabPending }}
+    >
       <div className="contents" onClickCapture={handleCaptureClick}>
         {children}
       </div>
-      {showOverlay ? (
+      {showTabOverlay ? (
+        <div className="tm-tab-loading-overlay" aria-busy="true" aria-live="polite">
+          <LoadingCenter minHeightClassName="min-h-0" />
+        </div>
+      ) : null}
+      {showLinkOverlay ? (
         <div className="tm-nav-loading-overlay" aria-busy="true" aria-live="polite">
           <LoadingCenter />
         </div>

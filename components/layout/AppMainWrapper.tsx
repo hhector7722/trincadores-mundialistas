@@ -22,7 +22,7 @@ export function AppMainWrapper({ children }: AppMainWrapperProps) {
   return (
     <main
       className={cn(
-        "tm-app-main relative z-10 w-full transition-all duration-300",
+        "tm-app-main relative z-10 w-full",
         !fullscreen && !headerHidden && "pt-[var(--tm-app-header-block)]",
         !fullscreen &&
           !internalScroll &&

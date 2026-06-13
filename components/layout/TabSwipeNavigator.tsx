@@ -106,9 +106,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const startTimeRef = useRef(0);
   const edgeStartRef = useRef(false);
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
-  const navigatingRef = useRef(false);
   const animatingRef = useRef(false);
-  const pendingEntryStartRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
     (next: number) => {
@@ -130,7 +128,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     lockedAxisRef.current = "none";
     pointerIdRef.current = null;
     edgeStartRef.current = false;
-    navigatingRef.current = false;
   }, [setSwipeProgress]);
 
   useEffect(() => {
@@ -256,36 +253,19 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
   const commitToIndex = useCallback(
     (nextIndex: number) => {
-      if (navigatingRef.current || animatingRef.current) return;
+      if (animatingRef.current) return;
 
       if (activeIndex == null || nextIndex === activeIndex) {
         animateTo(0, resetSwipe);
         return;
       }
 
-      const width = widthRef.current;
-      if (width <= 0) {
-        const href = MAIN_TABS[nextIndex]?.href;
-        if (href) navigateTab(href);
-        return;
-      }
-
-      const direction = nextIndex > activeIndex ? -1 : 1;
       const href = MAIN_TABS[nextIndex]?.href;
+      if (!href) return;
 
-      if (href) {
-        router.prefetch(href);
-      }
-
-      pendingEntryStartRef.current = -direction * width;
-      navigatingRef.current = true;
-
-      animateTo(direction * width, () => {
-        if (href) {
-          navigateTab(href);
-        }
-        navigatingRef.current = false;
-      });
+      router.prefetch(href);
+      resetSwipe();
+      navigateTab(href);
     },
     [activeIndex, animateTo, navigateTab, resetSwipe, router]
   );
@@ -301,22 +281,10 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [commitToIndex, enabled, registerTabNavigator]);
 
   useEffect(() => {
-    const entryStart = pendingEntryStartRef.current;
-    if (entryStart != null && enabled && activeIndex != null) {
-      pendingEntryStartRef.current = null;
-      setAnimating(false);
-      setIsDragging(false);
-      syncDrag(entryStart);
-      requestAnimationFrame(() => {
-        animateTo(0, resetSwipe);
-      });
-      return;
-    }
-
-    if (!navigatingRef.current) {
+    if (!isDragging && !animatingRef.current) {
       resetSwipe();
     }
-  }, [activeIndex, animateTo, enabled, pathname, resetSwipe, syncDrag]);
+  }, [isDragging, pathname, resetSwipe]);
 
   const settleDrag = useCallback(() => {
     if (activeIndex == null) {
@@ -345,7 +313,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [activeIndex, animateTo, commitToIndex, resetSwipe]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!enabled || animating || navigatingRef.current || isModalOpen()) return;
+    if (!enabled || animating || isModalOpen()) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!canStartSwipe(event.target)) return;
 
@@ -363,7 +331,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (pointerIdRef.current !== event.pointerId || !enabled || animating || navigatingRef.current) {
+    if (pointerIdRef.current !== event.pointerId || !enabled || animating) {
       return;
     }
 

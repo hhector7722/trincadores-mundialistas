@@ -1,5 +1,5 @@
-import { TabScrollLoading } from "@/components/layout/TabScrollLoading";
+import { TabPageLoading } from "@/components/layout/TabPageLoading";
 
 export default function AppSectionLoading() {
-  return <TabScrollLoading />;
+  return <TabPageLoading />;
 }

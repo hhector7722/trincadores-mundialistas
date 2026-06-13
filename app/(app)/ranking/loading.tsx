@@ -1,12 +1,5 @@
-import { TabScrollLoading } from "@/components/layout/TabScrollLoading";
-import { RankingTableSkeleton } from "@/components/ranking/RankingTableSkeleton";
+import { TabPageLoading } from "@/components/layout/TabPageLoading";
 
 export default function RankingLoading() {
-  return (
-    <TabScrollLoading label="Cargando ranking">
-      <div className="tm-ranking-page">
-        <RankingTableSkeleton />
-      </div>
-    </TabScrollLoading>
-  );
+  return <TabPageLoading label="Cargando ranking" />;
 }

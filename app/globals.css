@@ -479,6 +479,20 @@ html:has(.tm-app-shell) body {
   background: transparent;
 }
 
+.tm-tab-loading-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: var(--tm-tabbar-shell);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: transparent;
+}
+
 .tm-card-surface {
   background: var(--tm-glass);
   backdrop-filter: blur(16px);
