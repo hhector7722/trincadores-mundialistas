@@ -469,9 +469,7 @@ html:has(.tm-app-shell) body {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: rgba(42, 16, 88, 0.52);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: transparent;
 }
 
 .tm-card-surface {
@@ -1495,14 +1493,7 @@ html:has(.tm-app-shell) body {
 
 /* ── Porra: calendario a pantalla completa ── */
 .tm-porra-layout {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--tm-glass);
 }
 
 .tm-porra-page {
@@ -1554,9 +1545,7 @@ html:has(.tm-app-shell) body {
   max-width: 100%;
   min-width: 0;
   overflow: hidden;
-  background: var(--tm-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: transparent;
 }
 
 .tm-porra-calendar--fullbleed {
@@ -1823,7 +1812,7 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-porra-calendar .tm-cal-header {
-  background: var(--tm-glass);
+  background: transparent;
   flex-shrink: 0;
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
 }
@@ -1846,7 +1835,7 @@ html:has(.tm-app-shell) body {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  background: var(--tm-cal-cell-bg);
+  background: #f5f5f7;
   border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 

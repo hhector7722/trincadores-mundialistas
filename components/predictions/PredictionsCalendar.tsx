@@ -25,11 +25,7 @@ import {
   resetCalendarLayout,
   SIDEBAR_CARD_ANCHOR_ATTR,
 } from "@/lib/pool/calendar-layout";
-import {
-  resetLayoutAboveTabBar,
-  syncLayoutAboveTabBar,
-  VIEWPORT_CHROME_SYNC_EVENT,
-} from "@/lib/layout/viewport-chrome";
+import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
@@ -310,39 +306,44 @@ function useCalendarViewportLayout(
       rootRef.current ??
       calendar.parentElement;
 
+    const mainEl = layout instanceof HTMLElement ? layout.closest(".tm-app-main") : null;
+
     const syncLayout = () => {
       calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
       const layoutEl = layout instanceof HTMLElement ? layout : null;
-      if (layoutEl) {
-        syncLayoutAboveTabBar(layoutEl);
-      }
       resetCalendarLayout(calendar, grid, layoutEl);
       void calendar.offsetHeight;
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
     };
 
-    syncLayout();
-    requestAnimationFrame(syncLayout);
+    const scheduleSync = () => {
+      syncLayout();
+      requestAnimationFrame(() => {
+        syncLayout();
+        requestAnimationFrame(syncLayout);
+      });
+    };
 
-    const observer = new ResizeObserver(syncLayout);
+    scheduleSync();
+
+    const observer = new ResizeObserver(scheduleSync);
     if (layout instanceof HTMLElement) observer.observe(layout);
+    if (mainEl instanceof HTMLElement) observer.observe(mainEl);
     observer.observe(calendar);
     observer.observe(grid);
-    window.addEventListener("resize", syncLayout);
-    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, syncLayout);
-    window.visualViewport?.addEventListener("resize", syncLayout);
-    window.visualViewport?.addEventListener("scroll", syncLayout);
+    window.addEventListener("resize", scheduleSync);
+    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, scheduleSync);
+    window.visualViewport?.addEventListener("resize", scheduleSync);
+    window.visualViewport?.addEventListener("scroll", scheduleSync);
+    window.addEventListener("load", scheduleSync, { once: true });
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", syncLayout);
-      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, syncLayout);
-      window.visualViewport?.removeEventListener("resize", syncLayout);
-      window.visualViewport?.removeEventListener("scroll", syncLayout);
+      window.removeEventListener("resize", scheduleSync);
+      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, scheduleSync);
+      window.visualViewport?.removeEventListener("resize", scheduleSync);
+      window.visualViewport?.removeEventListener("scroll", scheduleSync);
       const layoutEl = layout instanceof HTMLElement ? layout : null;
-      if (layoutEl) {
-        resetLayoutAboveTabBar(layoutEl);
-      }
       resetCalendarLayout(calendar, grid, layoutEl);
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);

@@ -108,7 +108,8 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     setNavigating(true);
   }, []);
 
-  const showOverlay = isPending || navigating;
+  /* Solo navegación por enlace: evita flash oscuro al cambiar de tab (replace + transition). */
+  const showOverlay = navigating;
 
   return (
     <NavigationLoadingContext.Provider value={{ navigate, navigateTab, setNavigating }}>

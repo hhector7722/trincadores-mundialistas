@@ -74,8 +74,10 @@ function TabPeek({ side }: { side: "left" | "right" }) {
   return (
     <div
       className={cn(
-        "h-full w-full bg-[var(--tm-shell-bg-hex)]/95",
-        side === "left" ? "bg-gradient-to-r from-[var(--tm-accent)]/5 to-transparent" : "bg-gradient-to-l from-[var(--tm-accent)]/5 to-transparent"
+        "h-full w-full bg-transparent",
+        side === "left"
+          ? "bg-gradient-to-r from-[var(--tm-accent)]/8 to-transparent"
+          : "bg-gradient-to-l from-[var(--tm-accent)]/8 to-transparent"
       )}
       aria-hidden="true"
     />
