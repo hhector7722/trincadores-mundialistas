@@ -316,11 +316,18 @@ function useCalendarViewportLayout(
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
     };
 
+    const syncFrameRef = { current: null as number | null };
+
     const scheduleSync = () => {
-      syncLayout();
-      requestAnimationFrame(() => {
-        syncLayout();
-        requestAnimationFrame(syncLayout);
+      if (syncFrameRef.current != null) {
+        cancelAnimationFrame(syncFrameRef.current);
+      }
+
+      syncFrameRef.current = requestAnimationFrame(() => {
+        syncFrameRef.current = requestAnimationFrame(() => {
+          syncLayout();
+          syncFrameRef.current = null;
+        });
       });
     };
 
@@ -338,6 +345,9 @@ function useCalendarViewportLayout(
     window.addEventListener("load", scheduleSync, { once: true });
 
     return () => {
+      if (syncFrameRef.current != null) {
+        cancelAnimationFrame(syncFrameRef.current);
+      }
       observer.disconnect();
       window.removeEventListener("resize", scheduleSync);
       window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, scheduleSync);

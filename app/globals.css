@@ -304,13 +304,20 @@ html:has(.tm-tab-swipe-root) {
     12px 0 32px rgba(0, 0, 0, 0.22);
 }
 
-/* Overscroll: tono TabBar en el chin inferior */
+.tm-tab-swipe-track {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Overscroll: mismo degradado del shell (no tono plano distinto al cargar). */
 html:has(.tm-app-shell) {
-  background-color: var(--tm-tabbar-bg-hex);
+  background-color: var(--tm-purple-deep);
+  background-image: var(--tm-shell-bg-image);
 }
 
 html:has(.tm-app-shell) body {
-  background-color: var(--tm-tabbar-bg-hex);
+  background-color: var(--tm-purple-deep);
+  background-image: var(--tm-shell-bg-image);
 }
 
 .font-display {

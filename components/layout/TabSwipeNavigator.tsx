@@ -27,7 +27,7 @@ const COMMIT_RATIO = 0.16;
 const VELOCITY_THRESHOLD = 0.22;
 /** Resistencia en el primer/último tab (0–1, más alto = más suave). */
 const EDGE_RESISTANCE = 0.58;
-const ANIMATION_MS = 420;
+const ANIMATION_MS = 360;
 const IOS_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
 const LOCK_THRESHOLD_PX = 5;
 /** Zona lateral donde el swipe horizontal tiene prioridad (px). */
@@ -88,7 +88,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { navigateTab } = useAppNavigation();
-  const { setSwipeProgress } = useTabNavigation();
+  const { setSwipeProgress, registerTabNavigator } = useTabNavigation();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const activeIndex = getMainTabIndex(pathname);
@@ -107,6 +107,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const edgeStartRef = useRef(false);
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const navigatingRef = useRef(false);
+  const animatingRef = useRef(false);
+  const pendingEntryStartRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
     (next: number) => {
@@ -122,6 +124,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     dragXRef.current = 0;
     setDragX(0);
     setAnimating(false);
+    animatingRef.current = false;
     setIsDragging(false);
     setSwipeProgress(null);
     lockedAxisRef.current = "none";
@@ -129,10 +132,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     edgeStartRef.current = false;
     navigatingRef.current = false;
   }, [setSwipeProgress]);
-
-  useEffect(() => {
-    resetSwipe();
-  }, [pathname, resetSwipe]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -222,19 +221,33 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       }
 
       setAnimating(true);
+      animatingRef.current = true;
       syncDrag(target);
 
       if (!track) {
         setAnimating(false);
+        animatingRef.current = false;
         onDone?.();
         return;
       }
 
-      const handleEnd = () => {
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
         track.removeEventListener("transitionend", handleEnd);
+        window.clearTimeout(fallbackTimer);
         setAnimating(false);
+        animatingRef.current = false;
         onDone?.();
       };
+
+      const handleEnd = (event: TransitionEvent) => {
+        if (event.target !== track || event.propertyName !== "transform") return;
+        finish();
+      };
+
+      const fallbackTimer = window.setTimeout(finish, ANIMATION_MS + 80);
 
       track.addEventListener("transitionend", handleEnd);
     },
@@ -243,31 +256,67 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
   const commitToIndex = useCallback(
     (nextIndex: number) => {
+      if (navigatingRef.current || animatingRef.current) return;
+
       if (activeIndex == null || nextIndex === activeIndex) {
         animateTo(0, resetSwipe);
         return;
       }
 
       const width = widthRef.current;
+      if (width <= 0) {
+        const href = MAIN_TABS[nextIndex]?.href;
+        if (href) navigateTab(href);
+        return;
+      }
+
       const direction = nextIndex > activeIndex ? -1 : 1;
+      const href = MAIN_TABS[nextIndex]?.href;
+
+      if (href) {
+        router.prefetch(href);
+      }
+
+      pendingEntryStartRef.current = -direction * width;
       navigatingRef.current = true;
 
       animateTo(direction * width, () => {
-        const href = MAIN_TABS[nextIndex]?.href;
         if (href) {
           navigateTab(href);
-          router.prefetch(href);
         }
-        dragXRef.current = 0;
-        setDragX(0);
-        setAnimating(false);
-        setIsDragging(false);
-        setSwipeProgress(null);
         navigatingRef.current = false;
       });
     },
-    [activeIndex, animateTo, navigateTab, resetSwipe, router, setSwipeProgress]
+    [activeIndex, animateTo, navigateTab, resetSwipe, router]
   );
+
+  useEffect(() => {
+    if (!enabled) {
+      registerTabNavigator(null);
+      return;
+    }
+
+    registerTabNavigator({ commitToTab: commitToIndex });
+    return () => registerTabNavigator(null);
+  }, [commitToIndex, enabled, registerTabNavigator]);
+
+  useEffect(() => {
+    const entryStart = pendingEntryStartRef.current;
+    if (entryStart != null && enabled && activeIndex != null) {
+      pendingEntryStartRef.current = null;
+      setAnimating(false);
+      setIsDragging(false);
+      syncDrag(entryStart);
+      requestAnimationFrame(() => {
+        animateTo(0, resetSwipe);
+      });
+      return;
+    }
+
+    if (!navigatingRef.current) {
+      resetSwipe();
+    }
+  }, [activeIndex, animateTo, enabled, pathname, resetSwipe, syncDrag]);
 
   const settleDrag = useCallback(() => {
     if (activeIndex == null) {

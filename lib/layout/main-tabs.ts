@@ -37,6 +37,13 @@ export function getMainTabIndex(pathname: string): number | null {
   return null;
 }
 
+export function getMainTabIndexForHref(href: string): number | null {
+  for (let i = 0; i < MAIN_TABS.length; i++) {
+    if (MAIN_TABS[i]!.href === href) return i;
+  }
+  return null;
+}
+
 export function isMainTabRoot(pathname: string): boolean {
   return getMainTabIndex(pathname) !== null;
 }

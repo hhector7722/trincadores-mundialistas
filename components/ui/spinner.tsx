@@ -60,7 +60,7 @@ export function LoadingOverlay({ label, className }: LoadingOverlayProps) {
   return (
     <div
       className={cn(
-        "absolute inset-0 z-20 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]/50 backdrop-blur-[3px]",
+        "absolute inset-0 z-20 flex items-center justify-center bg-transparent",
         className
       )}
       aria-busy="true"

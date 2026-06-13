@@ -6,7 +6,7 @@ import { isQuizLabPath } from "@/lib/quiz/lab-access";
 export function HomeAtmosphere() {
   const pathname = usePathname();
 
-  if (isQuizLabPath(pathname)) {
+  if (pathname !== "/" || isQuizLabPath(pathname)) {
     return null;
   }
 

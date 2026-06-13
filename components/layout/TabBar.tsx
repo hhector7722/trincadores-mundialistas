@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
-import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
+import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
 import {
   isMainTabActive,
@@ -29,7 +29,7 @@ const TABBAR_NAV_CLASS =
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { navigateTab } = useAppNavigation();
+  const { switchMainTab } = useTabNavigation();
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function TabBar() {
 
     event.preventDefault();
     setOptimisticHref(href);
-    navigateTab(href);
+    switchMainTab(href);
   }
 
   return (
@@ -87,8 +87,8 @@ export function TabBar() {
             className={cn(
               "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
               "transition-all duration-200 active:scale-95",
-              active ? "scale-110 text-[var(--tm-accent)] drop-shadow-md" : "text-[var(--tm-muted)]",
-              navigating && "opacity-90",
+              active ? "text-[var(--tm-accent)] drop-shadow-md" : "text-[var(--tm-muted)]",
+              navigating && "opacity-80",
             )}
           >
             <Icon size={20} className="md:h-5 md:w-5" strokeWidth={2.5} />

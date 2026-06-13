@@ -85,9 +85,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const navigateTab = useCallback(
     (href: string) => {
       if (isSameAppPath(pathnameRef.current, href)) return;
-      startTransition(() => {
-        router.replace(href);
-      });
+      router.replace(href, { scroll: false });
     },
     [router]
   );
