@@ -55,7 +55,7 @@ function readTabBarCorePx(): number {
   if (Number.isFinite(parsed) && parsed > 0) {
     return parsed;
   }
-  return 58;
+  return 48;
 }
 
 function readVisibleViewportBottom(): number {
@@ -93,7 +93,7 @@ export function readTabBarBottom(): number {
 }
 
 const INDICATOR_GAP_ABOVE_PX = 10;
-const INDICATOR_ZONE_FALLBACK_PX = 24;
+const INDICATOR_ZONE_FALLBACK_PX = 18;
 
 /** Borde inferior del contenido: justo encima de los indicadores (dentro de la TabBar). */
 export function readLayoutBottomAboveIndicators(): number {
