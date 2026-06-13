@@ -19,6 +19,7 @@ import {
   saveTournamentMvp,
   saveTournamentTopScorer,
 } from "@/actions/tournament-general-predictions";
+import { GeneralPredictionRow } from "@/components/home/GeneralPredictionRow";
 import { HomeStatCardScrollHint } from "@/components/home/HomeStatCardScrollHint";
 import {
   HomeChampionTeamValue,
