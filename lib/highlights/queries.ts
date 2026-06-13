@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { MatchHighlightView } from "@/lib/highlights/types";
+import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 
 type HighlightRow = {
   id: string;
@@ -7,8 +8,7 @@ type HighlightRow = {
   away_team: string;
   highlight_youtube_id: string;
   highlight_published_at: string;
-  highlight_source: "youtube_dazn_es" | "youtube_fifa" | "youtube_replay" | "youtube_rtve_teledeporte";
-  highlight_headline: string | null;
+  highlight_source: HighlightSourceCode;  highlight_headline: string | null;
   match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
 };
@@ -79,7 +79,7 @@ export async function getMatchHighlightsForPool(poolId: string): Promise<MatchHi
   if (error || !data?.length) return [];
 
   return data
-    .map((row) => rowToHighlightView(row as HighlightRow))
+    .map((row) => rowToHighlightView(row as unknown as HighlightRow))
     .filter((highlight): highlight is MatchHighlightView => highlight != null);
 }
 

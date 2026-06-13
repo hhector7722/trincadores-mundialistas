@@ -1,3 +1,5 @@
+import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
+
 export type MatchHighlightView = {
   matchId: string;
   homeTeam: string;
@@ -6,6 +8,6 @@ export type MatchHighlightView = {
   awayGoals: number;
   youtubeVideoId: string;
   publishedAt: string;
-  source: "youtube_dazn_es" | "youtube_fifa" | "youtube_rtve_teledeporte";
+  source: HighlightSourceCode;
   headline: string | null;
 };
