@@ -114,7 +114,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
           </div>
 
           {data && data.matchdays.length > 0 ? (
-            <div className="shrink-0 space-y-1 px-1">
+            <div className="shrink-0 px-1">
               <RangeSlider
                 min={0}
                 max={data.matchdays.length - 1}
@@ -123,9 +123,6 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
                 thumbImageSrc="/icons/slider.png?v=3"
                 aria-label="Jornada final visible en el grafico"
               />
-              <p className="text-center text-[10px] font-medium tracking-wide text-[var(--tm-muted)]">
-                Jornadas disputadas.
-              </p>
             </div>
           ) : null}
         </div>
