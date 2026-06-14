@@ -103,15 +103,10 @@ export async function getPoolRankingEvolution(poolId: string): Promise<RankingEv
 
   const initialStandings = allPoints[0]?.standings ?? [];
 
-  // Jornada 1 no aporta cambios: solo ancla inicial; el gráfico empieza en jornada 2.
-  if (allMatchdays.length <= 1) {
-    return { members, initialStandings, matchdays: [], points: [] };
-  }
-
   return {
     members,
     initialStandings,
-    matchdays: allMatchdays.slice(1),
-    points: allPoints.slice(1),
+    matchdays: allMatchdays,
+    points: allPoints,
   };
 }

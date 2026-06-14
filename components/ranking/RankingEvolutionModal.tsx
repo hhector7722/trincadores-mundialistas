@@ -99,7 +99,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
             <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
           ) : null}
 
-          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-mid)] p-2">
+          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] p-2">
             {data && data.matchdays.length > 0 ? (
               <RankingEvolutionChart
                 data={data}
@@ -108,9 +108,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
               />
             ) : !loading && !error ? (
               <div className="flex h-full min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
-                {data?.initialStandings.length
-                  ? "Aun no hay cambios de clasificacion entre jornadas."
-                  : "Aun no hay jornadas con partidos finalizados."}
+                Aun no hay jornadas con partidos finalizados.
               </div>
             ) : null}
           </div>
@@ -122,10 +120,10 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
                 max={data.matchdays.length - 1}
                 value={endMatchdayIndex}
                 onChange={setEndMatchdayIndex}
-                thumbImageSrc="/icons/slider.png"
+                thumbImageSrc="/icons/slider.png?v=2"
                 aria-label="Jornada final visible en el grafico"
               />
-              <p className="text-center text-[10px] font-medium uppercase tracking-wide text-[var(--tm-muted)]">
+              <p className="text-center text-[10px] font-medium tracking-wide text-[var(--tm-muted)]">
                 Jornadas disputadas.
               </p>
             </div>

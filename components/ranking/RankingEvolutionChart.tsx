@@ -17,8 +17,8 @@ const LINE_COLORS = [
   "#A0A0FF",
 ];
 
-/** Fondo del área de trazado: morado medio de la app, buen contraste con líneas neón. */
-const CHART_BG = "var(--tm-bg-mid)";
+/** Fondo del área de trazado: morado oscuro de la app. */
+const CHART_BG = "var(--tm-bg-elevated)";
 
 /** Espacio vertical entre posiciones (~altura fila ranking: 2.375rem). */
 const ROW_GAP_PX = 38;
@@ -137,7 +137,7 @@ export function RankingEvolutionChart({
   if (!visibleMatchdays.length || !series.length) {
     return (
       <div className="flex min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
-        Aun no hay cambios de clasificacion entre jornadas.
+        No hay datos de evolucion todavia.
       </div>
     );
   }
