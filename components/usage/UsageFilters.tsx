@@ -4,21 +4,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { todayQuizDate } from "@/lib/quiz/date";
 import {
   applyVisualViewportChrome,
   VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 import type { UsageDashboardFilters, UsageFilterUser } from "@/lib/usage/queries";
 import { cn } from "@/lib/utils";
-
-function buildFilterHref(filters: UsageDashboardFilters): string {
-  const params = new URLSearchParams();
-  if (filters.day) params.set("dia", filters.day);
-  if (filters.profileId) params.set("usuario", filters.profileId);
-  const query = params.toString();
-  return query ? `/uso?${query}` : "/uso";
-}
 
 function resyncViewportChrome() {
   applyVisualViewportChrome();
@@ -32,14 +23,6 @@ function resyncViewportChromeAfterFormControl() {
   window.setTimeout(resyncViewportChrome, 320);
 }
 
-const pillClass = (active: boolean) =>
-  cn(
-    "inline-flex h-10 shrink-0 items-center justify-center rounded-lg border px-2.5 text-[11px] font-medium uppercase tracking-wide",
-    active
-      ? "border-[var(--tm-primary)] text-[var(--tm-primary)]"
-      : "border-[var(--tm-border)]/70 text-[var(--tm-muted)] hover:border-[var(--tm-primary)]/40"
-  );
-
 type UsageFiltersProps = {
   filters: UsageDashboardFilters;
   users: UsageFilterUser[];
@@ -48,7 +31,6 @@ type UsageFiltersProps = {
 export function UsageFilters({ filters, users }: UsageFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const today = todayQuizDate();
 
   const [day, setDay] = useState(filters.day ?? "");
   const [profileId, setProfileId] = useState(filters.profileId ?? "");
@@ -117,22 +99,6 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
           </option>
         ))}
       </select>
-
-      <Link
-        href={buildFilterHref({ ...filters, day: today })}
-        onClick={() => resyncViewportChromeAfterFormControl()}
-        className={pillClass(filters.day === today)}
-      >
-        Hoy
-      </Link>
-
-      <Link
-        href={buildFilterHref({ ...filters, day: null })}
-        onClick={() => resyncViewportChromeAfterFormControl()}
-        className={pillClass(!filters.day)}
-      >
-        Todos
-      </Link>
 
       <Button type="submit" className="h-10 shrink-0 px-3 text-xs">
         OK
