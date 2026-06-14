@@ -1,5 +1,6 @@
 import { quizDayClosesAt, quizDayOpensAt, todayQuizDate } from "@/lib/quiz/date";
-import { buildUsageContextMaps, resolveUsageEventLabel } from "@/lib/usage/resolve-context";
+import { buildUsageRecentFeed } from "@/lib/usage/present";
+import { buildUsageContextMaps } from "@/lib/usage/resolve-context";
 import type { AppUsageEventType } from "@/lib/usage/types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,12 +33,7 @@ export type UsageRecentEvent = {
   id: string;
   username: string;
   displayName: string;
-  eventType: AppUsageEventType;
-  path: string | null;
-  search: string | null;
-  label: string;
-  detail: string;
-  durationMs: number | null;
+  title: string;
   createdAt: string;
   timeLabel: string;
 };
@@ -111,19 +107,6 @@ function getMadridHour(iso: string): number {
   return hour ? Number(hour) : 0;
 }
 
-function buildEventDetail(
-  path: string | null,
-  search: string | null,
-  metadata: Record<string, unknown> | null
-): string {
-  const parts: string[] = [];
-  if (path) parts.push(path);
-  if (search) parts.push(search);
-  if (metadata?.action === "tab_switch" && typeof metadata.tabLabel === "string") {
-    parts.push(`tab:${metadata.tabLabel}`);
-  }
-  return parts.join(" ") || " ";
-}
 
 type PoolMemberProfile = {
   username: string;
@@ -295,23 +278,20 @@ export async function getUsageDashboardData(
     return bTime.localeCompare(aTime);
   });
 
-  const recentEvents: UsageRecentEvent[] = rows.slice(0, 120).map((row) => {
-    const profile = resolveUsageEventProfile(row.profiles);
-    const metadata = row.metadata ?? null;
-    const label = resolveUsageEventLabel(row.path, row.label, metadata, contextMaps);
+  const rowById = new Map(rows.map((row) => [row.id, row]));
+  const recentFeed = buildUsageRecentFeed(rows, contextMaps, 80);
+
+  const recentEvents: UsageRecentEvent[] = recentFeed.map((item) => {
+    const row = rowById.get(item.id);
+    const profile = row ? resolveUsageEventProfile(row.profiles) : null;
 
     return {
-      id: row.id,
+      id: item.id,
       username: profile?.username ?? "?",
       displayName: profile?.display_name ?? profile?.username ?? "?",
-      eventType: row.event_type,
-      path: row.path,
-      search: row.search,
-      label,
-      detail: buildEventDetail(row.path, row.search, metadata),
-      durationMs: row.duration_ms,
-      createdAt: row.created_at,
-      timeLabel: formatDateTimeMadrid(row.created_at),
+      title: item.title,
+      createdAt: item.createdAt,
+      timeLabel: formatDateTimeMadrid(item.createdAt),
     };
   });
 

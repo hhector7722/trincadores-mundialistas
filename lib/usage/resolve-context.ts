@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { deriveUsageLabel } from "@/lib/usage/labels";
 
 export type UsageContextMaps = {
   matchLabels: Map<string, string>;
@@ -122,6 +123,13 @@ export function resolveUsageEventLabel(
     const quizDay = maps.quizDays.get(meta.quizId) ?? meta.quizDay;
     if (quizDay) return `Quiz del ${quizDay}`;
   }
+
+  if (path) {
+    const derived = deriveUsageLabel(path, meta as never, typeof meta.action === "string" ? "action" : "page_view");
+    if (derived !== path) return derived;
+  }
+
+  if (label && !label.startsWith("/")) return label;
 
   return label ?? path ?? " ";
 }

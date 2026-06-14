@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { UsageFilters } from "@/components/usage/UsageFilters";
-import { formatDurationMs } from "@/lib/usage/labels";
-import type { AppUsageEventType } from "@/lib/usage/types";
 import type { UsageDashboardData } from "@/lib/usage/queries";
 
 function formatDateTimeMadrid(iso: string | null): string {
@@ -16,13 +14,6 @@ function formatDateTimeMadrid(iso: string | null): string {
     second: "2-digit",
     hour12: false,
   }).format(new Date(iso));
-}
-
-function eventTypeShort(type: AppUsageEventType): string {
-  if (type === "login") return "Login";
-  if (type === "session") return "Ses";
-  if (type === "action") return "Acc";
-  return "Pag";
 }
 
 export function UsageDashboard({ data }: { data: UsageDashboardData }) {
@@ -78,41 +69,24 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
           <p className="text-xs text-[var(--tm-muted)]">Sin eventos recientes.</p>
         ) : (
           <div className="divide-y divide-[var(--tm-border)]/50">
-            {data.recentEvents.map((event) => {
-              const duration =
-                event.durationMs != null && event.durationMs > 0
-                  ? formatDurationMs(event.durationMs)
-                  : null;
-
-              return (
-                <div
-                  key={event.id}
-                  className="flex min-h-9 items-center gap-2 py-1 text-xs"
-                >
-                  {!userFiltered ? (
-                    <p className="w-[4.5rem] shrink-0 truncate text-[var(--tm-muted)]">
-                      {event.displayName}
-                    </p>
-                  ) : null}
-                  <p className="min-w-0 flex-1 truncate font-medium text-[var(--tm-fg)]">
-                    {event.label}
+            {data.recentEvents.map((event) => (
+              <div
+                key={event.id}
+                className="flex min-h-9 items-center gap-2 py-1 text-xs"
+              >
+                {!userFiltered ? (
+                  <p className="w-[4.5rem] shrink-0 truncate text-[var(--tm-muted)]">
+                    {event.displayName}
                   </p>
-                  <p className="shrink-0 text-[10px] uppercase tracking-wide text-[var(--tm-muted)]">
-                    {eventTypeShort(event.eventType)}
-                  </p>
-                  {duration ? (
-                    <p className="w-10 shrink-0 text-right text-[10px] text-[var(--tm-primary)]">
-                      {duration}
-                    </p>
-                  ) : (
-                    <span className="w-10 shrink-0" aria-hidden />
-                  )}
-                  <p className="w-[6.5rem] shrink-0 text-right tabular-nums text-[var(--tm-muted)]">
-                    {event.timeLabel}
-                  </p>
-                </div>
-              );
-            })}
+                ) : null}
+                <p className="min-w-0 flex-1 truncate font-medium text-[var(--tm-fg)]">
+                  {event.title}
+                </p>
+                <p className="w-[6.5rem] shrink-0 text-right tabular-nums text-[var(--tm-muted)]">
+                  {event.timeLabel}
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </section>
