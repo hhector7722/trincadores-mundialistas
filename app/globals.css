@@ -2411,25 +2411,26 @@ html:has(.tm-app-shell) body {
   line-height: 1;
 }
 
-/* Quiz laboratorio — sandbox Matrix (solo hector) */
+/* Quiz laboratorio — sandbox monocromo (solo hector) */
 .tm-lab-root {
-  --lab-bg: #020a04;
-  --lab-bg-elevated: #041408;
-  --lab-fg: #ffffff;
-  --lab-accent: #00ff41;
-  --lab-muted: #6b9b78;
-  --lab-border: rgba(0, 255, 65, 0.28);
-  --lab-surface: rgba(0, 255, 65, 0.08);
+  --lab-bg: #0a0a0a;
+  --lab-bg-elevated: #141414;
+  --lab-fg: #f5f5f5;
+  --lab-accent: #ffffff;
+  --lab-muted: #737373;
+  --lab-border: rgba(255, 255, 255, 0.14);
+  --lab-surface: rgba(255, 255, 255, 0.06);
+  --lab-highlight: rgba(255, 255, 255, 0.14);
   background-color: var(--lab-bg);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 255, 65, 0.08) 0%, transparent 55%),
-    linear-gradient(180deg, #031208 0%, var(--lab-bg) 40%, #010502 100%);
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 55%),
+    linear-gradient(180deg, #171717 0%, var(--lab-bg) 42%, #050505 100%);
   color: var(--lab-fg);
   font-family: var(--font-ui);
 }
 
 .tm-lab-header {
-  background: rgba(2, 10, 4, 0.92);
+  background: rgba(10, 10, 10, 0.92);
   border-color: var(--lab-border);
   backdrop-filter: blur(8px);
 }
@@ -2439,10 +2440,10 @@ html:has(.tm-app-shell) body {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 255, 65, 0.03) 2px,
-    rgba(0, 255, 65, 0.03) 4px
+    rgba(255, 255, 255, 0.025) 2px,
+    rgba(255, 255, 255, 0.025) 4px
   );
-  opacity: 0.6;
+  opacity: 0.45;
 }
 
 .tm-lab-root select,
@@ -2452,8 +2453,8 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-lab-root select option {
-  background: #041408;
-  color: #ffffff;
+  background: #141414;
+  color: #f5f5f5;
 }
 
 /* Asistente de predicciones — overlay y panel */

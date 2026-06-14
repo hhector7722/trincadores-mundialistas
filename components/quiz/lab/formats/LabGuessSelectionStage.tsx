@@ -60,7 +60,7 @@ export function LabGuessSelectionStage({
             >
               <div
                 className={cn(
-                  "flex items-center justify-center overflow-hidden rounded-full border-2 bg-white p-0.5 shadow-[0_0_12px_rgba(0,255,65,0.35)]",
+                  "flex items-center justify-center overflow-hidden rounded-full border-2 bg-white p-0.5 shadow-[0_0_12px_rgba(255,255,255,0.18)]",
                   revealed ? "border-white" : "border-[var(--lab-accent)]",
                   compact ? "h-9 w-9" : "h-11 w-11"
                 )}

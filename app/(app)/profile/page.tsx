@@ -49,7 +49,7 @@ export default async function ProfilePage() {
         <Card className="p-4">
           <Link
             href="/laboratorio"
-            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-[#00ff41]/40 bg-[#020a04] font-display text-sm uppercase tracking-[0.15em] text-white shadow-[0_0_20px_rgba(0,255,65,0.15)]"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl border border-zinc-600 bg-zinc-950 font-display text-sm uppercase tracking-[0.15em] text-zinc-100 shadow-[0_0_20px_rgba(255,255,255,0.06)]"
           >
             Laboratorio
           </Link>
