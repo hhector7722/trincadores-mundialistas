@@ -14,7 +14,13 @@ function shouldTrackPath(pathname: string): boolean {
   if (!pathname || pathname.startsWith("/api/") || pathname.startsWith("/_next")) {
     return false;
   }
-  if (pathname.startsWith("/icon") || pathname.startsWith("/sw.js")) {
+  if (
+    pathname.startsWith("/icon") ||
+    pathname.startsWith("/sw.js") ||
+    pathname.startsWith("/fonts/") ||
+    pathname.startsWith("/images/") ||
+    pathname.startsWith("/app-icon")
+  ) {
     return false;
   }
   return true;
