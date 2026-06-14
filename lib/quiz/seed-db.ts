@@ -192,6 +192,7 @@ export async function seedQuizDayToDb(args: {
   payload: SeedQuizDayFile;
   generated?: boolean;
   allowReseed?: boolean;
+  labDailyPackSummary?: Record<string, unknown>;
 }): Promise<{ quizId: string; scoringMode: QuizScoringMode; created: boolean }> {
   const officialOrders = args.payload.official.questions.map((q) => q.sort_order).sort((a, b) => a - b);
   if (officialOrders.join(",") !== "1,2,3") {
@@ -220,6 +221,7 @@ export async function seedQuizDayToDb(args: {
     settingsJson: {
       generated: args.generated ?? false,
       questions_meta: questionsMetaFromDay(args.payload),
+      ...(args.labDailyPackSummary ? { lab_daily_pack: args.labDailyPackSummary } : {}),
     },
     questions: args.payload.official.questions,
     allowReseed: args.allowReseed,

@@ -1,4 +1,5 @@
 import { fetchOfficialMvpFromBsd } from "@/lib/live/sources/bsd-official-mvp";
+import { fetchOfficialMvpFromFifaMatchReport } from "@/lib/live/sources/fifa-match-report-mvp";
 import {
   fetchOfficialMvpFromFifa,
   loadFifaCalendarLookup,
@@ -143,7 +144,7 @@ async function persistOfficialMvp(
   return "written";
 }
 
-/** Prioridad: FIFA → BSD (señales explícitas). FotMob excluido: usa mejor nota, no POTM FIFA. */
+/** Prioridad: crónica FIFA.com → api.fifa.com → BSD. FotMob excluido (nota, no POTM FIFA). */
 async function resolveOfficialMvp(
   match: MatchMvpCandidate,
   fifaLookup: Map<string, FifaResolvedMatch>,
@@ -155,6 +156,15 @@ async function resolveOfficialMvp(
     match.away_team,
     match.kickoff_at,
   );
+
+  const reportMvp = await fetchOfficialMvpFromFifaMatchReport(
+    match.home_team,
+    match.away_team,
+    { idMatch: fifaMatch?.idMatch },
+  );
+  if (reportMvp) {
+    return { playerName: reportMvp.playerName, teamName: reportMvp.teamName };
+  }
 
   if (fifaMatch) {
     const fifaMvp = await fetchOfficialMvpFromFifa(fifaMatch, match.home_team, match.away_team);

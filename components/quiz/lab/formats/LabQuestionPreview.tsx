@@ -1,6 +1,6 @@
 "use client";
 
-import { LabGuessImageStage } from "@/components/quiz/lab/formats/LabGuessImageStage";
+import { LabImageTriviaStage } from "@/components/quiz/lab/formats/LabImageTriviaStage";
 import { LabGuessPlayerCropStage } from "@/components/quiz/lab/formats/LabGuessPlayerCropStage";
 import { LabGuessPlayerSilhouetteStage } from "@/components/quiz/lab/formats/LabGuessPlayerSilhouetteStage";
 import { LabGuessSelectionStage } from "@/components/quiz/lab/formats/LabGuessSelectionStage";
@@ -53,12 +53,8 @@ export function LabQuestionPreview({
         </div>
       ) : null}
 
-      {question.format === "guess_image" ? (
-        <LabGuessImageStage
-          question={question}
-          playing={playing}
-          secondsLeft={secondsLeft}
-        />
+      {question.format === "image_trivia" ? (
+        <LabImageTriviaStage question={question} />
       ) : null}
 
       {question.format === "guess_selection" ? (
@@ -97,7 +93,7 @@ export function LabQuestionPreview({
         </>
       ) : null}
 
-      {question.format === "guess_image" ? (
+      {question.format === "image_trivia" ? (
         <p className="font-display text-base leading-snug text-[var(--lab-fg)]">
           {question.prompt}
         </p>

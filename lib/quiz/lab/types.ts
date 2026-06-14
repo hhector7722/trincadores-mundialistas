@@ -4,19 +4,19 @@ import type { FormationId } from "@/lib/lineup/types";
 
 export const LAB_QUESTION_FORMATS = [
 
-  "multiple_choice",
+  "image_trivia",
 
-  "guess_image",
-
-  "guess_selection",
+  "guess_player_silhouette",
 
   "guess_player_hair",
 
   "guess_player_eyes",
 
-  "guess_player_silhouette",
+  "guess_selection",
 
   "video_play_end",
+
+  "multiple_choice",
 
 ] as const;
 
@@ -64,22 +64,19 @@ export type LabQuestionMultipleChoice = LabQuestionBase & {
 
 
 
-export type LabQuestionGuessImage = LabQuestionBase & {
+export type LabQuestionImageTrivia = LabQuestionBase & {
 
-  format: "guess_image";
+  format: "image_trivia";
 
   imageUrl: string;
 
-  blurStartPx: number;
-
-  revealSeconds: number;
-
-  /** Id del momento en world-cup-moments.json (solo laboratorio). */
   momentId?: string | null;
 
   momentLabel?: string | null;
 
   momentDifficulty?: "easy" | "medium" | "hard" | null;
+
+  answerType?: "year" | "team" | "player" | "opponent" | "phase" | null;
 
 };
 
@@ -141,6 +138,10 @@ export type LabQuestionGuessPlayerSilhouette = LabQuestionBase & {
 
   silhouetteDemoId?: string | null;
 
+  momentId?: string | null;
+
+  momentLabel?: string | null;
+
 };
 
 
@@ -161,7 +162,7 @@ export type LabQuestion =
 
   | LabQuestionMultipleChoice
 
-  | LabQuestionGuessImage
+  | LabQuestionImageTrivia
 
   | LabQuestionGuessSelection
 
@@ -189,7 +190,7 @@ export const LAB_FORMAT_LABELS: Record<LabQuestionFormat, string> = {
 
   multiple_choice: "Test clásico",
 
-  guess_image: "Adivina la imagen",
+  image_trivia: "Pregunta sobre la imagen",
 
   guess_selection: "Adivina la selección",
 
@@ -209,15 +210,15 @@ export const LAB_FORMAT_DESCRIPTIONS: Record<LabQuestionFormat, string> = {
 
   multiple_choice: "Pregunta con texto, imagen opcional y 4 opciones.",
 
-  guess_image: "Imagen difuminada que se aclara con el tiempo.",
+  image_trivia: "Imagen fija (gol, celebración…) y pregunta contextual: rival, año, fase…",
 
   guess_selection: "Escudos de clubes en formación sobre el campo.",
 
-  guess_player_hair: "Recorte del pelo o cabeza; al resolver se revela el jugador.",
+  guess_player_hair: "Primer plano del pelo; cabeza desde las cejas hacia arriba, sin mostrar cejas.",
 
-  guess_player_eyes: "Recorte de los ojos; al resolver se revela el jugador.",
+  guess_player_eyes: "Primer plano de los ojos; sin pelo ni nariz.",
 
-  guess_player_silhouette: "Foto de equipo con un jugador en silueta negra.",
+  guess_player_silhouette: "Varios jugadores en escena; uno en silueta negra opaca.",
 
   video_play_end: "Vídeo que se corta en seco; elige el desenlace.",
 

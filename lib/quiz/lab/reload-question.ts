@@ -1,6 +1,6 @@
 import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
 import { LAB_DEMO_VIDEO_SRC, LAB_DEMO_VIDEO_STOP_AT_SECONDS } from "@/lib/quiz/lab/demo-video";
-import { reloadGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
+import { reloadImageTriviaFromCatalog } from "@/lib/quiz/lab/image-trivia-catalog";
 import {
   pickSelectionPreset,
   selectionPresetToQuestion,
@@ -8,7 +8,7 @@ import {
 import type {
   LabQuestion,
   LabQuestionFormat,
-  LabQuestionGuessImage,
+  LabQuestionImageTrivia,
   LabQuestionGuessPlayerCrop,
   LabQuestionGuessPlayerSilhouette,
   LabQuestionGuessSelection,
@@ -25,7 +25,7 @@ import {
 } from "@/lib/quiz/world-cup-moments";
 
 const RELOADABLE_FORMATS = new Set<LabQuestionFormat>([
-  "guess_image",
+  "image_trivia",
   "guess_selection",
   "guess_player_hair",
   "guess_player_eyes",
@@ -221,8 +221,8 @@ export function reloadLabQuestion(
   const minDifficulty = opts?.minDifficulty ?? "hard";
 
   switch (question.format) {
-    case "guess_image":
-      return reloadGuessImageFromCatalog(question, minDifficulty);
+    case "image_trivia":
+      return reloadImageTriviaFromCatalog(question as LabQuestionImageTrivia, minDifficulty);
     case "guess_selection":
       return reloadSelection(question);
     case "guess_player_hair":

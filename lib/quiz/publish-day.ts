@@ -3,6 +3,10 @@ import { generatedDayToSeedFile } from "@/lib/quiz/generated-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
 import {
+  labDailyPackSettingsSummary,
+  pregenerateQuizLabDailyPack,
+} from "@/lib/quiz/lab/daily-pack.server";
+import {
   factIdsFromSettings,
   loadRecentFactIdsFromDb,
 } from "@/lib/quiz/recent-fact-ids";
@@ -19,6 +23,11 @@ export type PublishQuizDayResult = {
   scoringMode: "training" | "competitive";
   skipped: boolean;
   factIds: string[];
+  labDailyPack?: {
+    skipped: boolean;
+    questionCount: number;
+    momentIds: string[];
+  };
 };
 
 export type PublishQuizDayOptions = {
@@ -30,6 +39,8 @@ export type PublishQuizDayOptions = {
   includeFilesystemHistory?: boolean;
   /** Hechos a excluir siempre (p. ej. quiz de entreno sustituido manualmente). */
   extraExcludeFactIds?: string[];
+  /** Si false, no pregenera assets de imagen del laboratorio (silueta, pelo, ojos, trivia). */
+  pregenerateLabAssets?: boolean;
 };
 
 export async function publishQuizDay(
@@ -44,6 +55,13 @@ export async function publishQuizDay(
       factIds: [],
     };
   }
+
+  const shouldPregenerateLab = options.pregenerateLabAssets !== false;
+  const labResult = shouldPregenerateLab
+    ? await pregenerateQuizLabDailyPack(options.quizDate, {
+        force: Boolean(options.allowReseed),
+      })
+    : null;
 
   const poolId = options.poolId ?? (await ensureQuizPool(options.admin));
 
@@ -60,6 +78,13 @@ export async function publishQuizDay(
       scoringMode: "training",
       skipped: true,
       factIds: [],
+      labDailyPack: labResult?.pack
+        ? {
+            skipped: labResult.skipped,
+            questionCount: labResult.pack.questions.length,
+            momentIds: labResult.pack.momentIds,
+          }
+        : undefined,
     };
   }
 
@@ -105,6 +130,9 @@ export async function publishQuizDay(
     payload,
     generated: true,
     allowReseed: options.allowReseed,
+    labDailyPackSummary: labResult?.pack
+      ? labDailyPackSettingsSummary(labResult.pack)
+      : undefined,
   });
 
   const factIds = generated._meta?.fact_ids ?? [];
@@ -115,5 +143,12 @@ export async function publishQuizDay(
     scoringMode,
     skipped: !created && !options.allowReseed,
     factIds,
+    labDailyPack: labResult?.pack
+      ? {
+          skipped: labResult.skipped,
+          questionCount: labResult.pack.questions.length,
+          momentIds: labResult.pack.momentIds,
+        }
+      : undefined,
   };
 }

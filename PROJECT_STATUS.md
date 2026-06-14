@@ -66,6 +66,6 @@
 - [x] Resúmenes YouTube: cron RSS `@fifa` + `@TeledeporteRTVE` + `@DAZNES` (prioridad DAZN > FIFA > Teledeporte), slide hero «Último partido», reproductor in-app, modal partido finalizado
 - [x] Notificaciones push+: las 4 kinds (pronóstico T-30, alineaciones confirmadas, quiz activo, recordatorio quiz diario) envían in-app + Web Push
 - [x] Mundial en juego: cron `live-matches` (cada 2 min) persiste marcador/stats BSD, marca `live`/`finished`, escribe `match_results` y recalcula ranking al finalizar
-- [x] MVP oficial automático: cron `live-matches` prioriza FotMob (`playerOfTheMatch` FIFA en Mundiales) → FIFA → BSD; persiste `match_results.mvp_*` sin pisar admin
+- [x] MVP oficial automático: cron `live-matches` prioriza crónica FIFA.com (CXM, bloque Michelob Ultra Superior Player of the Match) → api.fifa.com → BSD; persiste `match_results.mvp_*` sin pisar admin
 - [x] Alineaciones confirmadas: FotMob como fuente prioritaria (`matchDetails.lineup`, WC2026); script `db:map-fotmob-fixtures`
 - [x] Titulares BSD en highlights: columnas `matches.highlight_headline` / `highlight_headline_source`; sync social → incidentes vía cron `live-matches` y `youtube-highlights`; UI hero con titular corto

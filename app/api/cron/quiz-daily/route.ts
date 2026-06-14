@@ -11,7 +11,7 @@ import { publishQuizDay } from "@/lib/quiz/publish-day";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(request: Request) {
   if (!assertCronAuthorized(request)) {
@@ -66,6 +66,7 @@ export async function GET(request: Request) {
       scoringMode: result.scoringMode,
       skipped: result.skipped,
       factIds: result.factIds,
+      labDailyPack: result.labDailyPack,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido";

@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  cropClipPath,
+  cropFocusForKind,
+  type LabCropKind,
+} from "@/lib/quiz/lab/crop-focus";
+import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+
 type LabGuessPlayerCropStageProps = {
   prompt: string;
   imageUrl: string;
@@ -9,6 +16,10 @@ type LabGuessPlayerCropStageProps = {
   revealedPlayerName?: string | null;
 };
 
+function cropKindFromLabel(cropLabel: "PEINADO" | "OJOS"): LabCropKind {
+  return cropLabel === "PEINADO" ? "hair" : "eyes";
+}
+
 export function LabGuessPlayerCropStage({
   prompt,
   imageUrl,
@@ -17,6 +28,9 @@ export function LabGuessPlayerCropStage({
   revealed = false,
   revealedPlayerName,
 }: LabGuessPlayerCropStageProps) {
+  const focus = cropFocusForKind(cropKindFromLabel(cropLabel));
+  const useDerivedAsset = isDerivedLabAssetUrl(imageUrl);
+
   return (
     <div className="overflow-hidden rounded-2xl border border-[var(--lab-border)] bg-black">
       <div className="flex items-center justify-between border-b border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2">
@@ -29,13 +43,44 @@ export function LabGuessPlayerCropStage({
           </span>
         ) : null}
       </div>
-      <div className="relative aspect-[16/10] w-full bg-[#0a0a0a]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={imageUrl}
-          alt=""
-          className="h-full w-full object-contain object-center"
-        />
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0a0a0a]">
+        {useDerivedAsset ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={imageUrl} alt="" className="h-full w-full object-contain object-center" />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ clipPath: cropClipPath(focus) }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              style={{
+                transform: `scale(${focus.scale})`,
+                transformOrigin: `${focus.originX} ${focus.originY}`,
+              }}
+            />
+          </div>
+        )}
+        {!useDerivedAsset && cropLabel === "PEINADO" ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent"
+            aria-hidden
+          />
+        ) : !useDerivedAsset && cropLabel === "OJOS" ? (
+          <>
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-[28%] bg-gradient-to-b from-[#0a0a0a] to-transparent"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/95 to-transparent"
+              aria-hidden
+            />
+          </>
+        ) : null}
         {!revealed ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-8">
             <p className="text-center font-display text-sm uppercase tracking-wider text-white">

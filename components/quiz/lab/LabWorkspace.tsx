@@ -8,7 +8,11 @@ import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
 import { createLabQuestion } from "@/lib/quiz/lab/defaults";
-import { createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
+import {
+  canAutoGenerateLabFormat,
+  questionNeedsAutoGeneration,
+} from "@/lib/quiz/lab/auto-formats";
+import { fetchGeneratedLabQuestion } from "@/lib/quiz/lab/generate-question.client";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { canReloadLabQuestion, reloadLabQuestion } from "@/lib/quiz/lab/reload-question";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
@@ -47,8 +51,10 @@ export function LabWorkspace() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
   const [savedFlash, setSavedFlash] = useState(false);
-  const [guessImageDifficulty, setGuessImageDifficulty] =
-    useState<WorldCupMomentDifficulty>("hard");
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [catalogDifficulty, setCatalogDifficulty] =
+    useState<WorldCupMomentDifficulty>("medium");
 
   const activeQuestion =
     draft.questions.find((q) => q.id === activeQuestionId) ?? draft.questions[0] ?? null;
@@ -85,6 +91,56 @@ export function LabWorkspace() {
     return () => window.clearInterval(interval);
   }, [mode, playQuestion, playIndex, selectedOptionId]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function autoGenerateInitialQuestions() {
+      const pending = draft.questions.filter(questionNeedsAutoGeneration);
+      if (!pending.length) return;
+
+      setGenerating(true);
+      setGenerateError(null);
+
+      try {
+        for (const question of pending) {
+          if (cancelled) return;
+          const generated = await fetchGeneratedLabQuestion({
+            format: question.format,
+            questionId: question.id,
+            excludeMomentId:
+              "momentId" in question && question.momentId ? question.momentId : null,
+            minDifficulty: catalogDifficulty,
+          });
+          if (cancelled) return;
+          persist((prev) => ({
+            ...prev,
+            questions: prev.questions.map((item) =>
+              item.id === question.id ? generated : item
+            ),
+          }));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setGenerateError(
+            error instanceof Error
+              ? error.message
+              : "No se pudieron generar las imagenes automaticamente."
+          );
+        }
+      } finally {
+        if (!cancelled) setGenerating(false);
+      }
+    }
+
+    void autoGenerateInitialQuestions();
+
+    return () => {
+      cancelled = true;
+    };
+    // Solo al montar: genera assets para el borrador cargado desde localStorage.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleSave() {
     writeLabDraft(draft);
     setSavedFlash(true);
@@ -98,12 +154,26 @@ export function LabWorkspace() {
     setMode("edit");
   }
 
-  function addQuestion(format: LabQuestionFormat) {
+  async function addQuestion(format: LabQuestionFormat) {
+    setGenerateError(null);
     let question = createLabQuestion(format);
-    if (format === "guess_image") {
-      const fromCatalog = createGuessImageFromCatalog({ minDifficulty: guessImageDifficulty });
-      if (fromCatalog) question = fromCatalog;
+
+    if (canAutoGenerateLabFormat(format)) {
+      setGenerating(true);
+      try {
+        question = await fetchGeneratedLabQuestion({
+          format,
+          minDifficulty: catalogDifficulty,
+        });
+      } catch (error) {
+        setGenerateError(
+          error instanceof Error ? error.message : "No se pudo generar la pregunta."
+        );
+      } finally {
+        setGenerating(false);
+      }
     }
+
     persist((prev) => ({ ...prev, questions: [...prev.questions, question] }));
     setActiveQuestionId(question.id);
   }
@@ -138,15 +208,45 @@ export function LabWorkspace() {
     persist((prev) => updateQuestion(prev, questionId, patch));
   }
 
-  function reloadActiveQuestion() {
-    if (!activeQuestion || !canReloadLabQuestion(activeQuestion.format)) return;
-    const reloaded = reloadLabQuestion(activeQuestion, {
-      minDifficulty: guessImageDifficulty,
-    });
-    persist((prev) => ({
-      ...prev,
-      questions: prev.questions.map((q) => (q.id === activeQuestion.id ? reloaded : q)),
-    }));
+  async function reloadActiveQuestion() {
+    if (!activeQuestion) return;
+
+    setGenerateError(null);
+    setGenerating(true);
+
+    try {
+      let reloaded: LabQuestion;
+
+      if (canAutoGenerateLabFormat(activeQuestion.format)) {
+        reloaded = await fetchGeneratedLabQuestion({
+          format: activeQuestion.format,
+          questionId: activeQuestion.id,
+          excludeMomentId:
+            "momentId" in activeQuestion && activeQuestion.momentId
+              ? activeQuestion.momentId
+              : null,
+          minDifficulty: catalogDifficulty,
+          force: true,
+        });
+      } else if (canReloadLabQuestion(activeQuestion.format)) {
+        reloaded = reloadLabQuestion(activeQuestion, {
+          minDifficulty: catalogDifficulty,
+        });
+      } else {
+        return;
+      }
+
+      persist((prev) => ({
+        ...prev,
+        questions: prev.questions.map((q) => (q.id === activeQuestion.id ? reloaded : q)),
+      }));
+    } catch (error) {
+      setGenerateError(
+        error instanceof Error ? error.message : "No se pudo actualizar la pregunta."
+      );
+    } finally {
+      setGenerating(false);
+    }
   }
 
   function startPreview() {
@@ -325,7 +425,8 @@ export function LabWorkspace() {
                   Editar · {LAB_FORMAT_LABELS[activeQuestion.format]}
                 </p>
 
-                {canReloadLabQuestion(activeQuestion.format) ? (
+                {(canReloadLabQuestion(activeQuestion.format) ||
+                  canAutoGenerateLabFormat(activeQuestion.format)) ? (
                   <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
@@ -333,14 +434,15 @@ export function LabWorkspace() {
                       </p>
                       <button
                         type="button"
-                        onClick={reloadActiveQuestion}
-                        className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)]"
+                        onClick={() => void reloadActiveQuestion()}
+                        disabled={generating}
+                        className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
                       >
                         <Shuffle className="size-4" aria-hidden />
-                        Actualizar
+                        {generating ? "Generando…" : "Actualizar"}
                       </button>
                     </div>
-                    {activeQuestion.format === "guess_image" ||
+                    {activeQuestion.format === "image_trivia" ||
                     activeQuestion.format === "guess_player_hair" ||
                     activeQuestion.format === "guess_player_eyes" ? (
                       <div className="flex flex-wrap gap-2">
@@ -348,10 +450,10 @@ export function LabWorkspace() {
                           <button
                             key={level}
                             type="button"
-                            onClick={() => setGuessImageDifficulty(level)}
+                            onClick={() => setCatalogDifficulty(level)}
                             className={cn(
                               "min-h-10 rounded-lg border px-3 text-[10px] font-bold uppercase tracking-wider",
-                              guessImageDifficulty === level
+                              catalogDifficulty === level
                                 ? "border-[var(--lab-accent)] text-[var(--lab-fg)]"
                                 : "border-[var(--lab-border)] text-[var(--lab-muted)]"
                             )}
@@ -368,6 +470,16 @@ export function LabWorkspace() {
                         {"momentDifficulty" in activeQuestion && activeQuestion.momentDifficulty ? (
                           <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
                             {activeQuestion.momentDifficulty}
+                          </span>
+                        ) : null}
+                      </p>
+                    ) : activeQuestion.format === "image_trivia" ? (
+                      <p className="text-xs text-[var(--lab-fg)]">
+                        <span className="text-[var(--lab-muted)]">Pregunta: </span>
+                        {activeQuestion.prompt}
+                        {activeQuestion.answerType ? (
+                          <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
+                            {activeQuestion.answerType}
                           </span>
                         ) : null}
                       </p>
@@ -388,6 +500,12 @@ export function LabWorkspace() {
                       </p>
                     ) : null}
                   </div>
+                ) : null}
+
+                {generateError ? (
+                  <p className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
+                    {generateError}
+                  </p>
                 ) : null}
 
                 <label className="block space-y-1">
@@ -432,51 +550,17 @@ export function LabWorkspace() {
                   </label>
                 ) : null}
 
-                {activeQuestion.format === "guess_image" ? (
-                  <>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        URL imagen
-                      </span>
-                      <input
-                        value={activeQuestion.imageUrl}
-                        onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="block space-y-1">
-                        <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                          Blur inicial (px)
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          max={40}
-                          value={activeQuestion.blurStartPx}
-                          onChange={(e) =>
-                            patchActive(activeQuestion.id, { blurStartPx: Number(e.target.value) || 0 })
-                          }
-                          className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                        />
-                      </label>
-                      <label className="block space-y-1">
-                        <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                          Revelar en (s)
-                        </span>
-                        <input
-                          type="number"
-                          min={1}
-                          max={30}
-                          value={activeQuestion.revealSeconds}
-                          onChange={(e) =>
-                            patchActive(activeQuestion.id, { revealSeconds: Number(e.target.value) || 8 })
-                          }
-                          className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                        />
-                      </label>
-                    </div>
-                  </>
+                {activeQuestion.format === "image_trivia" ? (
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                      URL imagen
+                    </span>
+                    <input
+                      value={activeQuestion.imageUrl}
+                      onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
+                      className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                    />
+                  </label>
                 ) : null}
 
                 {activeQuestion.format === "guess_selection" ? (
