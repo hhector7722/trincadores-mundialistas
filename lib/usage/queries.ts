@@ -39,17 +39,26 @@ export type UsageDashboardData = {
   };
 };
 
-type RawEvent = {
+type UsageEventProfile = {
+  username: string;
+  display_name: string | null;
+};
+
+type UsageEventRow = {
   id: string;
   event_type: "login" | "session" | "page_view";
   path: string | null;
   created_at: string;
   profile_id: string;
-  profiles: {
-    username: string;
-    display_name: string | null;
-  } | null;
+  profiles: UsageEventProfile | UsageEventProfile[] | null;
 };
+
+function resolveUsageEventProfile(
+  profiles: UsageEventProfile | UsageEventProfile[] | null | undefined
+): UsageEventProfile | null {
+  if (!profiles) return null;
+  return Array.isArray(profiles) ? (profiles[0] ?? null) : profiles;
+}
 
 const MADRID_TZ = "Europe/Madrid";
 
@@ -107,7 +116,7 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
     throw new Error(error.message);
   }
 
-  const rows = (events ?? []) as RawEvent[];
+  const rows = (events ?? []) as UsageEventRow[];
   const summaryMap = new Map<string, UsageUserSummary>();
   const hourly = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
 
@@ -116,7 +125,7 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
   let loginsToday = 0;
 
   for (const row of rows) {
-    const profile = row.profiles;
+    const profile = resolveUsageEventProfile(row.profiles);
     const username = profile?.username ?? "?";
     const displayName = profile?.display_name ?? username;
     const existing = summaryMap.get(row.profile_id);
@@ -161,15 +170,18 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
     return bTime.localeCompare(aTime);
   });
 
-  const recentEvents: UsageRecentEvent[] = rows.slice(0, 80).map((row) => ({
-    id: row.id,
-    username: row.profiles?.username ?? "?",
-    displayName: row.profiles?.display_name ?? row.profiles?.username ?? "?",
-    eventType: row.event_type,
-    path: row.path,
-    createdAt: row.created_at,
-    hourLabel: formatHourMadrid(row.created_at),
-  }));
+  const recentEvents: UsageRecentEvent[] = rows.slice(0, 80).map((row) => {
+    const profile = resolveUsageEventProfile(row.profiles);
+    return {
+      id: row.id,
+      username: profile?.username ?? "?",
+      displayName: profile?.display_name ?? profile?.username ?? "?",
+      eventType: row.event_type,
+      path: row.path,
+      createdAt: row.created_at,
+      hourLabel: formatHourMadrid(row.created_at),
+    };
+  });
 
   return {
     summaries,
