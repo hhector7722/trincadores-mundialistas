@@ -26,6 +26,8 @@ function eventTypeShort(type: AppUsageEventType): string {
 }
 
 export function UsageDashboard({ data }: { data: UsageDashboardData }) {
+  const userFiltered = Boolean(data.filters.profileId);
+
   return (
     <div className="space-y-4">
       <Suspense
@@ -87,9 +89,11 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
                   key={event.id}
                   className="flex min-h-9 items-center gap-2 py-1 text-xs"
                 >
-                  <p className="w-[4.5rem] shrink-0 truncate text-[var(--tm-muted)]">
-                    {event.displayName}
-                  </p>
+                  {!userFiltered ? (
+                    <p className="w-[4.5rem] shrink-0 truncate text-[var(--tm-muted)]">
+                      {event.displayName}
+                    </p>
+                  ) : null}
                   <p className="min-w-0 flex-1 truncate font-medium text-[var(--tm-fg)]">
                     {event.label}
                   </p>
