@@ -306,6 +306,13 @@ export async function getReferenceMatchdayId(
   return ref?.id ?? null;
 }
 
+export type PoolRankingMember = {
+  profileId: string;
+  label: string;
+  username: string;
+  avatarUrl: string | null;
+};
+
 async function loadMembers(poolId: string): Promise<MemberRow[]> {
   const supabase = await createClient();
   const { data: memberships } = await supabase
@@ -346,6 +353,39 @@ async function loadMembers(poolId: string): Promise<MemberRow[]> {
       };
     })
     .filter((row): row is MemberRow => row !== null);
+}
+
+export async function loadPoolRankingMembers(poolId: string): Promise<PoolRankingMember[]> {
+  return loadMembers(poolId);
+}
+
+export type RankingEvolutionStanding = {
+  profileId: string;
+  position: number;
+  cumulativePoints: number;
+};
+
+/** Posiciones globales a partir de snapshots (misma regla que la tabla). */
+export function buildPositionsFromSnapshots(
+  members: Array<{ profileId: string; label: string }>,
+  snapshots: Map<string, RankingSortSnapshot>
+): RankingEvolutionStanding[] {
+  const merged = members.map((m) => {
+    const snap = snapshots.get(m.profileId);
+    return {
+      profileId: m.profileId,
+      label: m.label,
+      cumulativePoints: snap?.cumulativePoints ?? 0,
+      exactHits: snap?.exactHits ?? 0,
+    };
+  });
+
+  merged.sort(compareRows);
+  return merged.map((row, index) => ({
+    profileId: row.profileId,
+    position: index + 1,
+    cumulativePoints: row.cumulativePoints,
+  }));
 }
 
 async function loadResolvedPredictionStats(

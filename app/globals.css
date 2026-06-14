@@ -1495,6 +1495,63 @@ html:has(.tm-app-shell) body {
   padding: 0.25rem 0.75rem 0;
 }
 
+.tm-ranking-evolution-trigger {
+  flex-shrink: 0;
+}
+
+.tm-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.75rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tm-range-slider:focus {
+  outline: none;
+}
+
+.tm-range-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--tm-accent);
+}
+
+.tm-range-slider:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 2px var(--tm-accent);
+}
+
+.tm-range-slider::-webkit-slider-runnable-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.tm-range-slider::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.tm-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: -0.6875rem;
+  border: 2px solid #2a1058;
+  border-radius: 9999px;
+  background: var(--tm-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.tm-range-slider::-moz-range-thumb {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid #2a1058;
+  border-radius: 9999px;
+  background: var(--tm-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
 .tm-ranking-table {
   display: flex;
   flex: 1 1 auto;

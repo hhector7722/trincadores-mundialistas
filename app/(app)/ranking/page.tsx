@@ -1,4 +1,4 @@
-import { RankingTable } from "@/components/ranking/RankingTable";
+import { RankingTableShell } from "@/components/ranking/RankingTableShell";
 import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +16,11 @@ export default async function RankingPage() {
 
   return (
     <div className="tm-ranking-page">
-      <RankingTable rows={rows} currentProfileId={user!.id} />
+      <RankingTableShell
+        rows={rows}
+        currentProfileId={user!.id}
+        poolId={ctx.activePoolId}
+      />
     </div>
   );
 }
