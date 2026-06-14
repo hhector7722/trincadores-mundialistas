@@ -1,10 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffectiveShellPathname } from "@/lib/layout/use-effective-shell-pathname";
 import { isQuizLabPath } from "@/lib/quiz/lab-access";
 
 export function HomeAtmosphere() {
-  const pathname = usePathname();
+  const pathname = useEffectiveShellPathname();
 
   if (pathname !== "/" || isQuizLabPath(pathname)) {
     return null;

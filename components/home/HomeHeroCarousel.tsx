@@ -38,6 +38,7 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
   const defaultIndex = Math.max(0, slides.length - 1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
+  const [scrollReady, setScrollReady] = useState(false);
 
   const updateActiveIndex = useCallback(() => {
     const el = scrollRef.current;
@@ -49,8 +50,10 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el || slides.length === 0) return;
+    setScrollReady(false);
     el.scrollLeft = defaultIndex * el.clientWidth;
     setActiveIndex(defaultIndex);
+    setScrollReady(true);
   }, [defaultIndex, slides.length]);
 
   useEffect(() => {
@@ -80,7 +83,10 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
         </div>
         <div
           ref={scrollRef}
-          className="flex h-full min-h-0 w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className={cn(
+            "flex h-full min-h-0 w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            !scrollReady && "invisible"
+          )}
           aria-roledescription="carrusel"
         >
           {slides.map((slide, index) => (

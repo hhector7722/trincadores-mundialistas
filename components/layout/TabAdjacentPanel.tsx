@@ -1,33 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { getTabSnapshot, hasTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
-import { toTabPreviewUrl } from "@/lib/layout/tab-preview";
+import { useEffect, useRef } from "react";
+import { getTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
 import { TAB_SWIPE_ANIMATION_MS, TAB_SWIPE_EASING } from "@/lib/layout/tab-swipe";
-import { cn } from "@/lib/utils";
 
 type TabAdjacentPanelProps = {
   href: string;
   dragX: number;
   animating: boolean;
   side: "left" | "right";
-  preload: boolean;
 };
 
-export function TabAdjacentPanel({
-  href,
-  dragX,
-  animating,
-  side,
-  preload,
-}: TabAdjacentPanelProps) {
+/** Panel lateral durante el gesto: solo snapshot estático (sin iframe duplicado). */
+export function TabAdjacentPanel({ href, dragX, animating, side }: TabAdjacentPanelProps) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const snapshotReady = hasTabSnapshot(href);
-  const [iframeReady, setIframeReady] = useState(false);
-
-  useEffect(() => {
-    setIframeReady(false);
-  }, [href]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -38,14 +24,12 @@ export function TabAdjacentPanel({
       return;
     }
     host.replaceChildren();
-  }, [href, snapshotReady]);
+  }, [href]);
 
   const transform =
     side === "left"
       ? `translate3d(calc(-100% + ${dragX}px), 0, 0)`
       : `translate3d(calc(100% + ${dragX}px), 0, 0)`;
-
-  const showIframe = preload && !snapshotReady;
 
   return (
     <div
@@ -60,24 +44,8 @@ export function TabAdjacentPanel({
     >
       <div
         ref={hostRef}
-        className={cn(
-          "tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent",
-          showIframe && iframeReady && "opacity-0"
-        )}
+        className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent"
       />
-      {showIframe ? (
-        <iframe
-          title=""
-          src={toTabPreviewUrl(href)}
-          className={cn(
-            "absolute inset-0 h-full w-full border-0 bg-transparent",
-            iframeReady ? "opacity-100" : "opacity-0"
-          )}
-          tabIndex={-1}
-          loading="eager"
-          onLoad={() => setIframeReady(true)}
-        />
-      ) : null}
     </div>
   );
 }

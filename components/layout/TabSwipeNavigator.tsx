@@ -98,6 +98,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [snapshotVersion, setSnapshotVersion] = useState(0);
   const [commitActive, setCommitActive] = useState(false);
+  const [navigateDispatched, setNavigateDispatched] = useState(false);
 
   const dragXRef = useRef(0);
   const widthRef = useRef(0);
@@ -293,7 +294,10 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       router.prefetch(href);
 
       if (width <= 0) {
+        setNavigateDispatched(true);
         setShellPathnameOverride(href);
+        setCommitActive(true);
+        commitTargetHrefRef.current = href;
         navigateTab(href);
         return;
       }
@@ -301,12 +305,14 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       const direction = nextIndex > activeIndex ? -1 : 1;
       commitTargetHrefRef.current = href;
       commitFromIndexRef.current = activeIndex;
+      setNavigateDispatched(false);
       setShellPathnameOverride(href);
       setCommitActive(true);
       navigatingRef.current = true;
       setSwipeNavigating(true);
 
       animateTo(direction * width, () => {
+        setNavigateDispatched(true);
         navigateTab(href);
         navigatingRef.current = false;
       });
@@ -333,6 +339,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
     commitTargetHrefRef.current = null;
     commitFromIndexRef.current = null;
+    setNavigateDispatched(false);
     setShellPathnameOverride(null);
     setCommitActive(false);
     syncDrag(0);
@@ -455,7 +462,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   );
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
-  const showAdjacentPanels = isDragging || animating || commitActive;
+  const showAdjacentPanels = (isDragging || animating) && !navigateDispatched;
+  const hideTrackDuringTargetLoad = navigateDispatched && commitActive && Math.abs(dragX) > 0.5;
   const slideTransition = animating
     ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
     : "none";
@@ -479,7 +487,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
           dragX={dragX}
           animating={animating}
           side="left"
-          preload
         />
       ) : null}
 
@@ -490,7 +497,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
           dragX={dragX}
           animating={animating}
           side="right"
-          preload
         />
       ) : null}
 
@@ -498,7 +504,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         ref={trackRef}
         className={cn(
           "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
-          !animating && dragX === 0 && "transform-gpu"
+          !animating && dragX === 0 && "transform-gpu",
+          hideTrackDuringTargetLoad && "opacity-0"
         )}
         style={{
           transform: `translate3d(${dragX}px, 0, 0)`,
