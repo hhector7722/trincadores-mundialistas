@@ -1,6 +1,26 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildBoardHeaderTeamScorerBlock } from "@/lib/predictions/board-header-scorers";
+import {
+  boardMvpPlayerNamesMatch,
+  buildBoardHeaderTeamScorerBlock,
+  groupBoardGoalScorersByPlayer,
+} from "@/lib/predictions/board-header-scorers";
+
+test("boardMvpPlayerNamesMatch une nombre FIFA y apellido camiseta", () => {
+  assert.equal(boardMvpPlayerNamesMatch("Nestory Irankunda", "Irankunda"), true);
+  assert.equal(boardMvpPlayerNamesMatch("Irankunda", "Nestory Irankunda"), true);
+  assert.equal(boardMvpPlayerNamesMatch("Metcalfe", "Irankunda"), false);
+});
+
+test("groupBoardGoalScorersByPlayer fusiona variantes del mismo jugador", () => {
+  const groups = groupBoardGoalScorersByPlayer([
+    { playerName: "Nestory Irankunda", minute: 27 },
+    { playerName: "Irankunda", minute: 90 },
+  ]);
+
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0]?.minutes, [27, 90]);
+});
 
 test("opción 1: MVP goleador resalta su fila y no crea fila extra", () => {
   const block = buildBoardHeaderTeamScorerBlock(
@@ -15,6 +35,21 @@ test("opción 1: MVP goleador resalta su fila y no crea fila extra", () => {
   assert.equal(block.mvpOnlyName, null);
   assert.equal(block.scorerRows.length, 2);
   assert.equal(block.scorerRows[0]?.highlightMvpName, false);
+  assert.equal(block.scorerRows[1]?.highlightMvpName, true);
+});
+
+test("opción 1: MVP oficial con nombre largo y gol con apellido no duplica", () => {
+  const block = buildBoardHeaderTeamScorerBlock(
+    [
+      { playerName: "Metcalfe", minute: 75 },
+      { playerName: "Nestory Irankunda", minute: 27 },
+    ],
+    "Irankunda",
+    true,
+  );
+
+  assert.equal(block.mvpOnlyName, null);
+  assert.equal(block.scorerRows.length, 2);
   assert.equal(block.scorerRows[1]?.highlightMvpName, true);
 });
 
