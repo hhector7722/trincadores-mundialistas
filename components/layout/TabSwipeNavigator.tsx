@@ -12,7 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { TabAdjacentPanel } from "@/components/layout/TabAdjacentPanel";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
-import { getMainTabIndex, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
+import { getMainTabIndex, isMainTabActive, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
 import { saveTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
 import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import {
@@ -109,6 +109,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const navigatingRef = useRef(false);
   const animatingRef = useRef(false);
+  const commitTargetHrefRef = useRef<string | null>(null);
+  const commitFromIndexRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
     (next: number) => {
@@ -296,6 +298,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       }
 
       const direction = nextIndex > activeIndex ? -1 : 1;
+      commitTargetHrefRef.current = href;
+      commitFromIndexRef.current = activeIndex;
       setCommitActive(true);
       navigatingRef.current = true;
       setSwipeNavigating(true);
@@ -319,8 +323,14 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [commitToIndex, enabled, registerTabNavigator]);
 
   useEffect(() => {
-    if (!commitActive || tabPending) return;
+    if (!commitActive) return;
 
+    const targetHref = commitTargetHrefRef.current;
+    if (!targetHref || !isMainTabActive(pathname, targetHref)) return;
+    if (tabPending) return;
+
+    commitTargetHrefRef.current = null;
+    commitFromIndexRef.current = null;
     setCommitActive(false);
     syncDrag(0);
     resetSwipe();
@@ -429,7 +439,11 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     return <div className="tm-tab-swipe-root min-h-0 min-w-0 flex-1">{children}</div>;
   }
 
-  const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(activeIndex);
+  const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(
+    commitActive && commitFromIndexRef.current != null
+      ? commitFromIndexRef.current
+      : activeIndex
+  );
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
   const showAdjacentPanels = isDragging || animating || commitActive;
