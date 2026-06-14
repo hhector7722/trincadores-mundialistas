@@ -6,6 +6,11 @@ import {
   resolveFifaMatchFromCalendar,
   type FifaResolvedMatch,
 } from "@/lib/live/sources/fifa-official-mvp";
+import {
+  mvpPlayerNamesMatch,
+  mvpTeamsMatch,
+  resolveStoredOfficialMvpPlayerName,
+} from "@/lib/predictions/mvp-name-match";
 import type { SyncLiveMatchesResult } from "@/lib/live/sync-live-matches";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
@@ -70,23 +75,35 @@ async function loadFinishedMatchesWithOfficialMvp(
   return (data ?? []) as MatchMvpCandidate[];
 }
 
-function normalizeMvpToken(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .trim()
-    .toLowerCase();
-}
-
 function officialMvpMatchesStored(
   official: { playerName: string; teamName: string },
   storedPlayer: string,
   storedTeam: string,
 ): boolean {
   return (
-    normalizeMvpToken(official.playerName) === normalizeMvpToken(storedPlayer) &&
-    normalizeMvpToken(official.teamName) === normalizeMvpToken(storedTeam)
+    mvpPlayerNamesMatch(official.playerName, storedPlayer) &&
+    mvpTeamsMatch(official.teamName, storedTeam)
   );
+}
+
+async function loadPredictedMvpPlayerNames(
+  admin: AdminClient,
+  matchId: string,
+): Promise<string[]> {
+  const { data, error } = await admin
+    .from("match_mvp_predictions")
+    .select("player_name")
+    .eq("match_id", matchId);
+
+  if (error) throw new Error(`match_mvp_predictions names: ${error.message}`);
+
+  return [
+    ...new Set(
+      (data ?? [])
+        .map((row) => row.player_name?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ];
 }
 
 async function loadPoolIdForMatch(admin: AdminClient, matchId: string): Promise<string | null> {
@@ -194,10 +211,13 @@ async function applyOfficialMvp(
   poolsToRebuild: Set<string>,
   options?: { overwrite?: boolean },
 ): Promise<void> {
+  const predictedNames = await loadPredictedMvpPlayerNames(admin, match.id);
+  const playerName = resolveStoredOfficialMvpPlayerName(official.playerName, predictedNames);
+
   const outcome = await persistOfficialMvp(
     admin,
     match.id,
-    official.playerName,
+    playerName,
     official.teamName,
     options,
   );
