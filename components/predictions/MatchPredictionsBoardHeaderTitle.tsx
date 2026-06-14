@@ -29,7 +29,7 @@ type MatchPredictionsBoardHeaderTitleProps = {
 const MAX_NAME_FONT_PX = 12;
 const MIN_NAME_FONT_PX = 8;
 
-const HEADER_GRID = "grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-start";
+const HEADER_GRID = "grid w-full min-w-0 grid-cols-3 items-start";
 
 function formatGoal(value: number | null): string {
   if (value === null) return "—";
@@ -178,8 +178,9 @@ export function MatchPredictionsBoardHeaderTitle({
 
   return (
     <div ref={headerRef} className={cn(HEADER_GRID, className)}>
-      {/* Col 1: local — alineado a la derecha; goleadores en filas extra */}
-      <div className="col-start-1 flex min-w-0 flex-col items-end gap-px pr-2">
+      {/* Col 1: local — tercio izquierdo, contenido alineado a la derecha */}
+      <div className="col-start-1 min-w-0">
+        <div className="flex w-full min-w-0 flex-col items-end gap-px">
         <div className="inline-flex max-w-full items-center justify-end gap-1 whitespace-nowrap">
           <TeamFlagBadge name={homeTeam} size="xxs" loading="eager" className="shrink-0" />
           <span
@@ -204,15 +205,17 @@ export function MatchPredictionsBoardHeaderTitle({
         {homeScorerBlock.mvpOnlyName ? (
           <BoardHeaderOfficialMvpLine playerName={homeScorerBlock.mvpOnlyName} align="right" />
         ) : null}
+        </div>
       </div>
 
-      {/* Col 2: separador centrado en el modal; solo fila del marcador */}
-      <div className="col-start-2 row-start-1 flex shrink-0 items-center justify-center self-start px-2">
+      {/* Col 2: tercio central; solo el separador, centrado en la columna */}
+      <div className="col-start-2 row-start-1 flex w-full min-w-0 items-start justify-center self-start">
         <span className="text-xs leading-none text-[var(--tm-muted)]">-</span>
       </div>
 
-      {/* Col 3: visitante — alineado a la izquierda; goleadores en filas extra */}
-      <div className="col-start-3 flex min-w-0 flex-col items-start gap-px pl-2">
+      {/* Col 3: visitante — tercio derecho, contenido alineado a la izquierda */}
+      <div className="col-start-3 min-w-0">
+        <div className="flex w-full min-w-0 flex-col items-start gap-px">
         <div className="inline-flex max-w-full items-center justify-start gap-1 whitespace-nowrap">
           <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" className="shrink-0" />
           <span
@@ -237,6 +240,7 @@ export function MatchPredictionsBoardHeaderTitle({
         {awayScorerBlock.mvpOnlyName ? (
           <BoardHeaderOfficialMvpLine playerName={awayScorerBlock.mvpOnlyName} align="left" />
         ) : null}
+        </div>
       </div>
     </div>
   );

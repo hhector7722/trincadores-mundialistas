@@ -203,8 +203,11 @@ export function MatchPredictionsBoardModal({
     <Modal
       open={open}
       onClose={onClose}
+      usageId="match-predictions-board"
+      usageLabel={ariaTitle}
       hideCloseButton
       hideHeaderDivider
+      headerTitleAlign="left"
       hideTitle={isLoading}
       ariaLabel={isLoading ? "Cargando pronósticos" : undefined}
       title={
