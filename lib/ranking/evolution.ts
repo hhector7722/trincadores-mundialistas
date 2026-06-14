@@ -16,6 +16,8 @@ export type RankingEvolutionMatchday = {
 
 export type RankingEvolutionData = {
   members: PoolRankingMember[];
+  /** Posiciones tras la primera jornada (ancla de avatares a la izquierda). */
+  initialStandings: RankingEvolutionStanding[];
   matchdays: RankingEvolutionMatchday[];
   points: Array<{
     matchdayId: string;
@@ -78,7 +80,7 @@ export async function getPoolRankingEvolution(poolId: string): Promise<RankingEv
   ]);
 
   if (!members.length || !cutoffs.length) {
-    return { members, matchdays: [], points: [] };
+    return { members, initialStandings: [], matchdays: [], points: [] };
   }
 
   const snapshots = await Promise.all(
@@ -87,17 +89,29 @@ export async function getPoolRankingEvolution(poolId: string): Promise<RankingEv
     )
   );
 
-  const matchdays: RankingEvolutionMatchday[] = cutoffs.map((cutoff) => ({
+  const allMatchdays: RankingEvolutionMatchday[] = cutoffs.map((cutoff) => ({
     id: cutoff.id,
     name: cutoff.name,
     sequence: cutoff.sequence,
     shortLabel: matchdayShortLabel(cutoff.sequence, cutoff.name),
   }));
 
-  const points = cutoffs.map((cutoff, index) => ({
+  const allPoints = cutoffs.map((cutoff, index) => ({
     matchdayId: cutoff.id,
     standings: buildPositionsFromSnapshots(members, snapshots[index]!),
   }));
 
-  return { members, matchdays, points };
+  const initialStandings = allPoints[0]?.standings ?? [];
+
+  // Jornada 1 no aporta cambios: solo ancla inicial; el gráfico empieza en jornada 2.
+  if (allMatchdays.length <= 1) {
+    return { members, initialStandings, matchdays: [], points: [] };
+  }
+
+  return {
+    members,
+    initialStandings,
+    matchdays: allMatchdays.slice(1),
+    points: allPoints.slice(1),
+  };
 }

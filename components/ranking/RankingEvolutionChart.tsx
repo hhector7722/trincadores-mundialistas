@@ -17,16 +17,22 @@ const LINE_COLORS = [
   "#A0A0FF",
 ];
 
+/** Espacio vertical entre posiciones (~altura fila ranking: 2.375rem). */
+const ROW_GAP_PX = 38;
 const CHART_WIDTH = 380;
-const CHART_HEIGHT = 520;
 const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
-const MARGIN_TOP = 24;
-const MARGIN_BOTTOM = 40;
+const MARGIN_TOP = 20;
+const MARGIN_BOTTOM = 36;
 const AVATAR_RADIUS = 11;
 const AVATAR_X = 42;
 const PLOT_START_X = 64;
 const LABEL_OFFSET = 12;
+
+function chartHeightForMemberCount(memberCount: number): number {
+  const plotH = memberCount <= 1 ? ROW_GAP_PX : (memberCount - 1) * ROW_GAP_PX;
+  return MARGIN_TOP + plotH + MARGIN_BOTTOM;
+}
 
 function avatarInitials(label: string): string {
   const trimmed = label.trim();
@@ -44,7 +50,6 @@ type ChartSeries = {
   avatarUrl: string | null;
   color: string;
   initialY: number;
-  initialPosition: number;
   points: Array<{ x: number; y: number; position: number }>;
 };
 
@@ -67,13 +72,15 @@ export function RankingEvolutionChart({
   endMatchdayIndex,
   filteredProfileIds,
 }: RankingEvolutionChartProps) {
-  const { plotWidth, plotHeight, memberCount, visibleMatchdays, series } = useMemo(() => {
+  const memberCount = data.members.length;
+  const chartHeight = chartHeightForMemberCount(memberCount);
+
+  const { plotWidth, plotHeight, visibleMatchdays, series } = useMemo(() => {
     const visible = data.matchdays.slice(0, endMatchdayIndex + 1);
     const visiblePoints = data.points.slice(0, endMatchdayIndex + 1);
-    const initialPoint = data.points[0];
     const count = data.members.length;
     const plotW = CHART_WIDTH - PLOT_START_X - MARGIN_RIGHT;
-    const plotH = CHART_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM;
+    const plotH = chartHeight - MARGIN_TOP - MARGIN_BOTTOM;
     const colorMap = buildColorMap(data.members);
 
     const xAt = (index: number) =>
@@ -90,7 +97,7 @@ export function RankingEvolutionChart({
       .filter((member) => filteredProfileIds.has(member.profileId))
       .map((member) => {
         const color = colorMap.get(member.profileId) ?? LINE_COLORS[0]!;
-        const initialStanding = initialPoint?.standings.find(
+        const initialStanding = data.initialStandings.find(
           (row) => row.profileId === member.profileId
         );
         const initialPosition = initialStanding?.position ?? count;
@@ -112,7 +119,6 @@ export function RankingEvolutionChart({
           avatarUrl: member.avatarUrl,
           color,
           initialY,
-          initialPosition,
           points,
         };
       });
@@ -120,11 +126,10 @@ export function RankingEvolutionChart({
     return {
       plotWidth: plotW,
       plotHeight: plotH,
-      memberCount: count,
       visibleMatchdays: visible,
       series: builtSeries,
     };
-  }, [data, endMatchdayIndex, filteredProfileIds]);
+  }, [data, endMatchdayIndex, filteredProfileIds, chartHeight]);
 
   const gridYPositions = useMemo(() => {
     if (memberCount <= 1) return [MARGIN_TOP + plotHeight / 2];
@@ -146,20 +151,20 @@ export function RankingEvolutionChart({
   if (!visibleMatchdays.length || !series.length) {
     return (
       <div className="flex min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
-        No hay datos de evolucion todavia.
+        Aun no hay cambios de clasificacion entre jornadas.
       </div>
     );
   }
 
   return (
     <svg
-      viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+      viewBox={`0 0 ${CHART_WIDTH} ${chartHeight}`}
       width="100%"
-      height="auto"
+      height={chartHeight}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Grafico de evolucion de clasificacion por jornada"
-      className="block max-h-[min(62dvh,32rem)] w-full"
+      className="block w-full"
     >
       <defs>
         {series.map((item) => (
@@ -188,7 +193,7 @@ export function RankingEvolutionChart({
           x1={x}
           y1={MARGIN_TOP}
           x2={x}
-          y2={CHART_HEIGHT - MARGIN_BOTTOM}
+          y2={chartHeight - MARGIN_BOTTOM}
           stroke="rgba(255,255,255,0.18)"
           strokeWidth={1}
           strokeDasharray="3 4"
@@ -225,7 +230,7 @@ export function RankingEvolutionChart({
           <text
             key={`x-label-${matchday.id}`}
             x={x}
-            y={CHART_HEIGHT - 12}
+            y={chartHeight - 10}
             textAnchor="middle"
             fill="rgba(255,255,255,0.55)"
             fontSize={9}
@@ -241,11 +246,10 @@ export function RankingEvolutionChart({
         for (const point of item.points) {
           pathParts.push(`L ${point.x} ${point.y}`);
         }
-        const pathD = pathParts.join(" ");
         return (
           <path
             key={`line-${item.profileId}`}
-            d={pathD}
+            d={pathParts.join(" ")}
             fill="none"
             stroke={item.color}
             strokeWidth={2}

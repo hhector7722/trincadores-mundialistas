@@ -17,7 +17,7 @@ type RankingEvolutionModalProps = {
 };
 
 const MODAL_PANEL_CLASS =
-  "flex min-h-[min(78dvh,34rem)] max-h-[min(78dvh,34rem)] w-full max-w-lg flex-col";
+  "flex min-h-[min(92dvh,46rem)] max-h-[min(94dvh,48rem)] w-full max-w-lg flex-col";
 
 export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutionModalProps) {
   const [data, setData] = useState<RankingEvolutionData | null>(null);
@@ -53,8 +53,6 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
     if (!data) return false;
     return appliedFilterIds.size < data.members.length;
   }, [appliedFilterIds.size, data]);
-
-  const currentMatchday = data?.matchdays[endMatchdayIndex] ?? null;
 
   function clearFilter() {
     if (!data) return;
@@ -101,7 +99,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
             <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
           ) : null}
 
-          <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-[var(--tm-border)]/40 bg-[#0a0618] p-2">
+          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)]/40 bg-[#0a0618] p-2">
             {data && data.matchdays.length > 0 ? (
               <RankingEvolutionChart
                 data={data}
@@ -110,24 +108,26 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
               />
             ) : !loading && !error ? (
               <div className="flex h-full min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
-                Aun no hay jornadas con partidos finalizados.
+                {data?.initialStandings.length
+                  ? "Aun no hay cambios de clasificacion entre jornadas."
+                  : "Aun no hay jornadas con partidos finalizados."}
               </div>
             ) : null}
           </div>
 
           {data && data.matchdays.length > 0 ? (
-            <div className="shrink-0 space-y-2 px-1">
-              <p className="text-center text-[11px] font-medium uppercase tracking-wide text-[var(--tm-muted)]">
-                Hasta jornada {endMatchdayIndex + 1}
-                {currentMatchday ? ` — ${currentMatchday.name}` : ""}
-              </p>
+            <div className="shrink-0 space-y-1 px-1">
               <RangeSlider
                 min={0}
                 max={data.matchdays.length - 1}
                 value={endMatchdayIndex}
                 onChange={setEndMatchdayIndex}
+                thumbImageSrc="/icons/slider.png"
                 aria-label="Jornada final visible en el grafico"
               />
+              <p className="text-center text-[10px] font-medium uppercase tracking-wide text-[var(--tm-muted)]">
+                Jornadas disputadas.
+              </p>
             </div>
           ) : null}
         </div>
