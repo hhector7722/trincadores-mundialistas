@@ -116,6 +116,8 @@ export type LabQuestionGuessPlayerCrop = LabQuestionBase & {
 
   imageUrl: string;
 
+  revealImageUrl: string | null;
+
   sceneHint: string | null;
 
   momentId?: string | null;
@@ -147,13 +149,11 @@ export type LabQuestionGuessPlayerSilhouette = LabQuestionBase & {
 
 
 export type LabQuestionVideoPlayEnd = LabQuestionBase & {
-
   format: "video_play_end";
-
   videoUrl: string;
-
   stopAtSeconds: number;
-
+  momentId?: string | null;
+  momentLabel?: string | null;
 };
 
 

@@ -358,7 +358,8 @@ export function LabWorkspace() {
                 {(activeQuestion.format === "image_trivia" ||
                   activeQuestion.format === "guess_player_hair" ||
                   activeQuestion.format === "guess_player_eyes" ||
-                  activeQuestion.format === "guess_player_silhouette") && (
+                  activeQuestion.format === "guess_player_silhouette" ||
+                  activeQuestion.format === "video_play_end") && (
                   <div className="flex gap-1">
                     {(["easy", "medium", "hard"] as const).map((level) => (
                       <button

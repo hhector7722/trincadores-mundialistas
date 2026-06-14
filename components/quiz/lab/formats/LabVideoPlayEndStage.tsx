@@ -3,21 +3,43 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import type { LabQuestionVideoPlayEnd } from "@/lib/quiz/lab/types";
-import { cn } from "@/lib/utils";
+
+export type VideoPlayEndPhase =
+  | "idle"
+  | "intro"
+  | "awaiting_answer"
+  | "revealing"
+  | "ended";
 
 type LabVideoPlayEndStageProps = {
   question: LabQuestionVideoPlayEnd;
   playing?: boolean;
+  showFeedback?: boolean;
+  onPhaseChange?: (phase: VideoPlayEndPhase) => void;
 };
 
 export function LabVideoPlayEndStage({
   question,
   playing = false,
+  showFeedback = false,
+  onPhaseChange,
 }: LabVideoPlayEndStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [phase, setPhase] = useState<"idle" | "playing" | "stopped">("idle");
+  const phaseRef = useRef<VideoPlayEndPhase>("idle");
+  const [phase, setPhase] = useState<VideoPlayEndPhase>("idle");
   const [mediaError, setMediaError] = useState(false);
   const [needsTapToPlay, setNeedsTapToPlay] = useState(false);
+
+  const pauseAt = question.stopAtSeconds;
+
+  const setPhaseSafe = useCallback(
+    (next: VideoPlayEndPhase) => {
+      phaseRef.current = next;
+      setPhase(next);
+      onPhaseChange?.(next);
+    },
+    [onPhaseChange]
+  );
 
   const tryPlay = useCallback(async () => {
     const video = videoRef.current;
@@ -40,7 +62,7 @@ export function LabVideoPlayEndStage({
     if (!video) return;
 
     if (!playing) {
-      setPhase("idle");
+      setPhaseSafe("idle");
       setMediaError(false);
       setNeedsTapToPlay(false);
       video.pause();
@@ -48,29 +70,27 @@ export function LabVideoPlayEndStage({
       return;
     }
 
-    setPhase("playing");
+    setPhaseSafe("intro");
     setMediaError(false);
     setNeedsTapToPlay(false);
     video.currentTime = 0;
     video.load();
-
-    const stopAt = question.stopAtSeconds;
 
     const onCanPlay = () => {
       void tryPlay();
     };
 
     const onTimeUpdate = () => {
-      if (video.currentTime >= stopAt) {
+      if (phaseRef.current === "intro" && video.currentTime >= pauseAt) {
         video.pause();
-        video.currentTime = stopAt;
-        setPhase("stopped");
+        video.currentTime = pauseAt;
+        setPhaseSafe("awaiting_answer");
         setNeedsTapToPlay(false);
       }
     };
 
     const onEnded = () => {
-      setPhase("stopped");
+      setPhaseSafe("ended");
       setNeedsTapToPlay(false);
     };
 
@@ -87,54 +107,80 @@ export function LabVideoPlayEndStage({
       video.removeEventListener("timeupdate", onTimeUpdate);
       video.removeEventListener("ended", onEnded);
     };
-  }, [playing, question.stopAtSeconds, question.videoUrl, tryPlay]);
+    // phase omitted on purpose: only reset when play session starts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, pauseAt, question.videoUrl, tryPlay, setPhaseSafe]);
 
-  const frozen = phase === "stopped";
+  useEffect(() => {
+    if (!showFeedback || phase !== "awaiting_answer") return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    setPhaseSafe("revealing");
+    void tryPlay();
+  }, [showFeedback, phase, setPhaseSafe, tryPlay]);
+
+  const showQuestionOverlay = phase === "awaiting_answer" && !showFeedback;
+  const showRevealOverlay = showFeedback && (phase === "revealing" || phase === "ended");
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-[var(--lab-border)] bg-black">
+    <div className="relative aspect-video w-full overflow-hidden border-b border-[var(--lab-border)] bg-black">
       <video
         ref={videoRef}
         key={question.videoUrl}
         src={question.videoUrl}
-        className={cn("h-full w-full object-contain", frozen && "opacity-95")}
+        className="h-full w-full object-contain"
         playsInline
         muted
         preload="auto"
         onError={() => setMediaError(true)}
       />
       {mediaError ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-4 text-center text-sm text-[var(--lab-fg)]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-4 text-center text-sm text-white">
           <p>No se pudo cargar el vídeo.</p>
           <p className="text-xs text-[var(--lab-muted)]">
-            Usa una ruta local (p. ej. /icons/gabri-video.mp4) o revisa la URL.
+            Importa un clip con npm run quiz:import-video-clip
           </p>
         </div>
       ) : null}
-      {!mediaError && needsTapToPlay && playing && !frozen ? (
+      {!mediaError && needsTapToPlay && playing && phase === "intro" ? (
         <button
           type="button"
           onClick={() => void tryPlay()}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 text-[var(--lab-fg)]"
+          className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 text-white"
         >
           <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--lab-accent)] bg-black/70">
             <Play className="h-7 w-7 fill-current text-[var(--lab-accent)]" />
           </span>
-          <span className="font-display text-sm uppercase tracking-wider">Toca para reproducir</span>
+          <span className="text-sm font-medium">Toca para reproducir</span>
         </button>
       ) : null}
-      {frozen ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/35">
-          <span className="rounded-xl border border-[var(--lab-accent)] bg-black/80 px-4 py-2 font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]">
-            ¿Cómo acabó?
+      {showQuestionOverlay ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <span className="rounded-md bg-black/75 px-4 py-2 text-sm font-semibold text-white">
+            {question.prompt}
           </span>
         </div>
       ) : null}
-      <div className="absolute inset-x-0 top-3 text-center">
-        <span className="rounded-lg bg-black/60 px-3 py-1 text-[10px] uppercase tracking-widest text-[var(--lab-fg)]">
-          {phase === "playing"
-            ? `Reproduciendo… corte en ${question.stopAtSeconds}s`
-            : `Corte en ${question.stopAtSeconds}s`}
+      {showRevealOverlay ? (
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3 text-center">
+          <p className="text-[10px] uppercase tracking-wider text-[var(--lab-accent-soft)]">
+            {phase === "ended" ? "Así acabó" : "Reproduciendo el final…"}
+          </p>
+        </div>
+      ) : null}
+      <div className="absolute inset-x-0 top-2 text-center">
+        <span className="rounded-md bg-black/55 px-2 py-0.5 text-[10px] text-white">
+          {phase === "idle"
+            ? `Pausa en ${pauseAt}s · luego continúa al responder`
+            : phase === "intro"
+              ? `Reproduciendo hasta ${pauseAt}s…`
+              : phase === "awaiting_answer"
+                ? "Elige la respuesta"
+                : phase === "revealing"
+                  ? "Mostrando el desenlace"
+                  : "Fin del clip"}
         </span>
       </div>
     </div>

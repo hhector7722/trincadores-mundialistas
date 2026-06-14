@@ -1,6 +1,6 @@
 import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
-import { LAB_DEMO_VIDEO_SRC, LAB_DEMO_VIDEO_STOP_AT_SECONDS } from "@/lib/quiz/lab/demo-video";
 import { reloadImageTriviaFromCatalog } from "@/lib/quiz/lab/image-trivia-catalog";
+import { reloadVideoPlayEndFromCatalog } from "@/lib/quiz/lab/video-play-end-catalog";
 import {
   pickSelectionPreset,
   selectionPresetToQuestion,
@@ -15,7 +15,6 @@ import type {
   LabQuestionMultipleChoice,
   LabQuestionVideoPlayEnd,
 } from "@/lib/quiz/lab/types";
-import { shuffleWithRng } from "@/lib/quiz/rng";
 import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
 import {
   filterCatalogReadyMoments,
@@ -95,6 +94,7 @@ function momentToPlayerCropQuestion(
     format,
     prompt: "¿QUIÉN ES?",
     imageUrl,
+    revealImageUrl: resolveMomentImageUrl(moment),
     sceneHint: momentSceneHint(moment),
     timerSeconds: 10,
     momentId: moment.id,
@@ -192,24 +192,7 @@ function reloadSelection(question: LabQuestionGuessSelection): LabQuestionGuessS
 }
 
 function reloadVideo(question: LabQuestionVideoPlayEnd): LabQuestionVideoPlayEnd {
-  const correctLabel =
-    question.options.find((option) => option.id === question.correctOptionId)?.label ??
-    question.options[0]?.label ??
-    "Gol";
-
-  const labels = question.options.map((option) => option.label);
-  const shuffled = shuffleWithRng(labels, () => Math.random());
-  const options = defaultOptions(shuffled);
-  const correctOptionId =
-    options.find((option) => option.label === correctLabel)?.id ?? "opt_1";
-
-  return {
-    ...question,
-    videoUrl: question.videoUrl || LAB_DEMO_VIDEO_SRC,
-    stopAtSeconds: question.stopAtSeconds || LAB_DEMO_VIDEO_STOP_AT_SECONDS,
-    options,
-    correctOptionId,
-  };
+  return reloadVideoPlayEndFromCatalog(question, "medium");
 }
 
 export type ReloadLabQuestionOptions = {

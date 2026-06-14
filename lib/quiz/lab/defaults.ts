@@ -63,6 +63,7 @@ export function createLabQuestionStub(format: LabQuestionFormat): LabQuestion {
         format,
         prompt: "¿QUIÉN ES?",
         imageUrl: "",
+        revealImageUrl: null,
         sceneHint: null,
         momentId: null,
         momentLabel: null,
@@ -74,6 +75,7 @@ export function createLabQuestionStub(format: LabQuestionFormat): LabQuestion {
         format,
         prompt: "¿QUIÉN ES?",
         imageUrl: "",
+        revealImageUrl: null,
         sceneHint: null,
         momentId: null,
         momentLabel: null,
@@ -99,6 +101,8 @@ export function createLabQuestionStub(format: LabQuestionFormat): LabQuestion {
         prompt: "¿Cómo acabó la jugada?",
         videoUrl: "",
         stopAtSeconds: LAB_DEMO_VIDEO_STOP_AT_SECONDS,
+        momentId: null,
+        momentLabel: null,
       };
   }
 }

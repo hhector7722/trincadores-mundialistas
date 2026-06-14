@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "moments": [
+    {
+      "id": "wc-demo-lab-intro",
+      "year": 2026,
+      "label": "Demo laboratorio — entradilla quiz",
+      "moment_type": "iconic",
+      "teams": [
+        "España",
+        "Mundial"
+      ],
+      "players": [
+        "Gabri"
+      ],
+      "competition": "Demo",
+      "difficulty": "easy",
+      "search_hint": null,
+      "stop_at_seconds": 2.5,
+      "clip_start_seconds": 0,
+      "clip_duration_seconds": 8,
+      "local_path": "/videos/quiz/historic/demo/wc-demo-lab-intro.mp4",
+      "source_url": null,
+      "source_label": "local/icons/gabri-video.mp4",
+      "status": "ready",
+      "quiz": {
+        "prompt": "¿Cómo acabó la jugada?",
+        "correct_option": "Gol",
+        "options": [
+          "Gol",
+          "Palo",
+          "Fuera de juego",
+          "Parada del portero"
+        ]
+      }
+    },
+    {
+      "id": "wc2010-iniesta-final-goal",
+      "year": 2010,
+      "label": "Iniesta — gol en la final vs Países Bajos",
+      "moment_type": "goal",
+      "teams": [
+        "España",
+        "Países Bajos"
+      ],
+      "players": [
+        "Andrés Iniesta"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Iniesta goal 2010 World Cup final Netherlands",
+      "stop_at_seconds": 4,
+      "clip_start_seconds": 0,
+      "clip_duration_seconds": 12,
+      "local_path": "/videos/quiz/historic/2010/wc2010-iniesta-final-goal.mp4",
+      "source_url": null,
+      "source_label": "pending/youtube",
+      "status": "ready",
+      "quiz": {
+        "prompt": "¿Cómo acabó la jugada?",
+        "correct_option": "Gol",
+        "options": [
+          "Gol",
+          "Palo",
+          "Fuera de juego",
+          "Parada del portero"
+        ]
+      }
+    },
+    {
+      "id": "wc2014-goetze-final-goal",
+      "year": 2014,
+      "label": "Götze — gol en la prórroga de la final",
+      "moment_type": "goal",
+      "teams": [
+        "Alemania",
+        "Argentina"
+      ],
+      "players": [
+        "Mario Götze"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Mario Gotze goal 2014 World Cup final extra time",
+      "stop_at_seconds": 3.5,
+      "clip_start_seconds": 0,
+      "clip_duration_seconds": 12,
+      "local_path": "/videos/quiz/historic/2014/wc2014-goetze-final-goal.mp4",
+      "source_url": null,
+      "source_label": "pending/youtube",
+      "status": "ready",
+      "quiz": {
+        "prompt": "¿Cómo acabó la jugada?",
+        "correct_option": "Gol",
+        "options": [
+          "Gol",
+          "Palo",
+          "Fuera de juego",
+          "Parada del portero"
+        ]
+      }
+    },
+    {
+      "id": "wc1986-maradona-england-goal",
+      "year": 1986,
+      "label": "Maradona — gol a Inglaterra (México 86)",
+      "moment_type": "goal",
+      "teams": [
+        "Argentina",
+        "Inglaterra"
+      ],
+      "players": [
+        "Diego Maradona"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "medium",
+      "search_hint": "Maradona goal England 1986 World Cup quarter final",
+      "stop_at_seconds": 4,
+      "clip_start_seconds": 0,
+      "clip_duration_seconds": 14,
+      "local_path": "/videos/quiz/historic/1986/wc1986-maradona-england-goal.mp4",
+      "source_url": null,
+      "source_label": "pending/youtube",
+      "status": "ready",
+      "quiz": {
+        "prompt": "¿Cómo acabó la jugada?",
+        "correct_option": "Gol",
+        "options": [
+          "Gol",
+          "Palo",
+          "Fuera de juego",
+          "Parada del portero"
+        ]
+      }
+    },
+    {
+      "id": "wc2018-degea-save",
+      "year": 2018,
+      "label": "De Gea — parada vs Portugal",
+      "moment_type": "save",
+      "teams": [
+        "España",
+        "Portugal"
+      ],
+      "players": [
+        "David De Gea"
+      ],
+      "competition": "Fase de grupos",
+      "difficulty": "hard",
+      "search_hint": "De Gea save Spain Portugal 2018 World Cup",
+      "stop_at_seconds": 3,
+      "clip_start_seconds": 0,
+      "clip_duration_seconds": 10,
+      "local_path": "/videos/quiz/historic/2018/wc2018-degea-save.mp4",
+      "source_url": null,
+      "source_label": "pending/youtube",
+      "status": "ready",
+      "quiz": {
+        "prompt": "¿Cómo acabó la jugada?",
+        "correct_option": "Parada del portero",
+        "options": [
+          "Gol",
+          "Palo",
+          "Fuera de juego",
+          "Parada del portero"
+        ]
+      }
+    }
+  ]
+}

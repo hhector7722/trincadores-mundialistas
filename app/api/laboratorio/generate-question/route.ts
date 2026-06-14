@@ -101,9 +101,8 @@ export async function POST(request: Request) {
     return Response.json({ question });
   } catch (error) {
     console.error("[laboratorio/generate-question]", error);
-    return Response.json(
-      { error: "No se pudo generar la pregunta automaticamente." },
-      { status: 500 }
-    );
+    const detail =
+      error instanceof Error ? error.message : "No se pudo generar la pregunta automaticamente.";
+    return Response.json({ error: detail }, { status: 500 });
   }
 }

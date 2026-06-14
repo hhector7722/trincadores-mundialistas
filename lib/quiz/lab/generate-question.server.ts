@@ -54,6 +54,7 @@ function buildPlayerCropQuestion(
     format,
     prompt: "¿QUIÉN ES?",
     imageUrl,
+    revealImageUrl: resolveMomentImageUrl(moment),
     sceneHint: momentSceneHint(moment),
     timerSeconds: 10,
     momentId: moment.id,

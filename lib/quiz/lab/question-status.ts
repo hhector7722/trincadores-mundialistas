@@ -21,7 +21,7 @@ export function labQuestionNeedsGeneration(question: LabQuestion): boolean {
   }
 
   if (question.format === "video_play_end") {
-    return !question.videoUrl.trim();
+    return !question.momentId;
   }
 
   if (question.format === "multiple_choice") {

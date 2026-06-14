@@ -5,7 +5,15 @@ import {
   reloadImageTriviaFromCatalog,
 } from "@/lib/quiz/lab/image-trivia-catalog";
 import { reloadLabQuestion } from "@/lib/quiz/lab/reload-question";
-import type { LabQuestion, LabQuestionImageTrivia } from "@/lib/quiz/lab/types";
+import {
+  createVideoPlayEndFromCatalog,
+  reloadVideoPlayEndFromCatalog,
+} from "@/lib/quiz/lab/video-play-end-catalog";
+import type {
+  LabQuestion,
+  LabQuestionImageTrivia,
+  LabQuestionVideoPlayEnd,
+} from "@/lib/quiz/lab/types";
 import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 
 export type GenerateLabQuestionContentOptions = {
@@ -13,15 +21,6 @@ export type GenerateLabQuestionContentOptions = {
   /** true = rotar a otro momento / otro contenido */
   force?: boolean;
 };
-
-function clientGeneratedFormats(question: LabQuestion): boolean {
-  return (
-    question.format === "multiple_choice" ||
-    question.format === "guess_selection" ||
-    question.format === "video_play_end" ||
-    question.format === "image_trivia"
-  );
-}
 
 export async function generateLabQuestionContent(
   question: LabQuestion,
@@ -48,7 +47,30 @@ export async function generateLabQuestionContent(
     return fresh;
   }
 
-  if (clientGeneratedFormats(question)) {
+  if (question.format === "video_play_end") {
+    const exclude = question.momentId ? [question.momentId] : undefined;
+    const fresh =
+      force && question.momentId
+        ? reloadVideoPlayEndFromCatalog(question as LabQuestionVideoPlayEnd, minDifficulty)
+        : createVideoPlayEndFromCatalog({
+            minDifficulty,
+            questionId: question.id,
+            excludeMomentIds: exclude,
+            seed: Date.now(),
+          });
+
+    if (!fresh) {
+      throw new Error(
+        "No hay clips de vídeo listos. Importa uno con npm run quiz:import-video-clip -- --id=... --from-local=..."
+      );
+    }
+    return fresh;
+  }
+
+  if (
+    question.format === "multiple_choice" ||
+    question.format === "guess_selection"
+  ) {
     return reloadLabQuestion(question, { minDifficulty });
   }
 

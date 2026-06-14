@@ -90,6 +90,8 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("[laboratorio/asset]", error);
-    return new Response("No se pudo generar la imagen.", { status: 500 });
+    const detail =
+      error instanceof Error ? error.message : "No se pudo generar la imagen.";
+    return new Response(detail, { status: 500 });
   }
 }
