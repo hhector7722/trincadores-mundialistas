@@ -16,9 +16,16 @@ export type QuizQuestionPublic = {
   image_url: string | null;
 };
 
+export type QuizPlayQuestionFormat =
+  | "classic"
+  | "image_trivia"
+  | "guess_player_silhouette";
+
 /** Pregunta en sesión de play: incluye clave correcta vía RPC start (solo intento activo). */
 export type QuizQuestionPlay = QuizQuestionPublic & {
   correct_option_id: string;
+  format?: QuizPlayQuestionFormat;
+  reveal_image_url?: string | null;
 };
 
 export type QuizSummary = {

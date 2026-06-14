@@ -1,5 +1,5 @@
 import { isQuizPublishHeld } from "@/lib/quiz/date";
-import { generatedDayToSeedFile } from "@/lib/quiz/generated-day";
+import { composeOfficialQuizDay } from "@/lib/quiz/compose-official-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
 import {
@@ -121,18 +121,37 @@ export async function publishQuizDay(
   const generated = await generateQuizDayFromSources({
     quizDate: options.quizDate,
     excludeFactIds,
+    questionCount: 1,
   });
 
-  const payload = generatedDayToSeedFile(generated);
+  if (!labResult?.pack?.questions?.length || labResult.pack.questions.length < 2) {
+    throw new Error(
+      "Faltan preguntas de laboratorio (imagen + silueta). Ejecuta pregenerateLabAssets o CONFIRM_RESEED=1."
+    );
+  }
+
+  const classicQuestion = generated.official.questions[0];
+  if (!classicQuestion) {
+    throw new Error("No se pudo generar la pregunta test clásica del día.");
+  }
+
+  const composed = composeOfficialQuizDay({
+    quizDate: options.quizDate,
+    title: generated.title,
+    classicQuestion,
+    labQuestions: labResult.pack.questions,
+  });
+
   const { quizId, scoringMode, created } = await seedQuizDayToDb({
     admin: options.admin,
     poolId,
-    payload,
+    payload: composed.payload,
     generated: true,
     allowReseed: options.allowReseed,
     labDailyPackSummary: labResult?.pack
       ? labDailyPackSettingsSummary(labResult.pack)
       : undefined,
+    playFormats: composed.playFormats,
   });
 
   const factIds = generated._meta?.fact_ids ?? [];

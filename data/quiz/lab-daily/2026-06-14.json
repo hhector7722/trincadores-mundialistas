@@ -1,0 +1,71 @@
+{
+  "quizDate": "2026-06-14",
+  "generatedAt": "2026-06-14T15:44:39.249Z",
+  "momentIds": [
+    "wc1998-bergkamp-argentina",
+    "wc2006-zidane-trophy-walk"
+  ],
+  "questions": [
+    {
+      "id": "daily-2026-06-14-image_trivia",
+      "format": "image_trivia",
+      "prompt": "¿Contra qué selección fue este partido?",
+      "imageUrl": "/images/quiz/historic/1998/wc1998-bergkamp-argentina.jpg",
+      "timerSeconds": 10,
+      "momentId": "wc1998-bergkamp-argentina",
+      "momentLabel": "Dennis Bergkamp — control vs Argentina",
+      "momentDifficulty": "hard",
+      "answerType": "opponent",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Argentina"
+        },
+        {
+          "id": "opt_2",
+          "label": "Brasil"
+        },
+        {
+          "id": "opt_3",
+          "label": "Alemania"
+        },
+        {
+          "id": "opt_4",
+          "label": "Italia"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    },
+    {
+      "id": "daily-2026-06-14-guess_player_silhouette",
+      "format": "guess_player_silhouette",
+      "prompt": "¿QUÉ JUGADOR ES LA SILUETA?",
+      "imageUrl": "/images/quiz/lab/generated/wc2006-zidane-trophy-walk-silhouette.jpg",
+      "revealImageUrl": "/images/quiz/historic/2006/wc2006-zidane-trophy-walk.jpg",
+      "sceneLabel": "2006 — Francia vs Italia",
+      "timerSeconds": 10,
+      "silhouetteDemoId": null,
+      "momentId": "wc2006-zidane-trophy-walk",
+      "momentLabel": "Zidane pasa junto a la Copa — Berlín 2006",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Zinedine Zidane"
+        },
+        {
+          "id": "opt_2",
+          "label": "Thierry Henry"
+        },
+        {
+          "id": "opt_3",
+          "label": "Lilian Thuram"
+        },
+        {
+          "id": "opt_4",
+          "label": "David Trezeguet"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    }
+  ]
+}

@@ -112,7 +112,7 @@ export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMo
       isSilhouetteLabReadyMoment(moment.id)
   );
 
-  ready = filterMomentsByDifficulty(ready, opts?.minDifficulty ?? "easy");
+  // Pool curado a mano: no filtrar por dificultad (todos son easy; Medium/Hard vaciaría el pool).
 
   if (exclude.size) {
     ready = ready.filter((moment) => !exclude.has(moment.id));

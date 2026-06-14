@@ -109,9 +109,6 @@ export function LabGuessPlayerCropStage({
         ) : null}
         {revealed && revealedPlayerName ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-4 pt-10">
-            <p className="text-center text-[10px] uppercase tracking-[0.25em] text-[var(--lab-accent)]">
-              {showFullImage ? "Así es" : "Es"}
-            </p>
             <p className="text-center font-display text-xl uppercase tracking-wide text-white">
               {revealedPlayerName}
             </p>

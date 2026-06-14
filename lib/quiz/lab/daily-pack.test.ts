@@ -7,8 +7,8 @@ import {
 } from "@/lib/quiz/lab/daily-pack.server";
 import { seedFromQuizDate } from "@/lib/quiz/rng";
 
-test("DAILY_LAB_QUESTION_FORMATS incluye los 4 formatos de imagen", () => {
-  assert.equal(DAILY_LAB_QUESTION_FORMATS.length, 4);
+test("DAILY_LAB_QUESTION_FORMATS incluye imagen y silueta", () => {
+  assert.equal(DAILY_LAB_QUESTION_FORMATS.length, 2);
   assert.ok(DAILY_LAB_QUESTION_FORMATS.includes("guess_player_silhouette"));
   assert.ok(DAILY_LAB_QUESTION_FORMATS.includes("image_trivia"));
 });

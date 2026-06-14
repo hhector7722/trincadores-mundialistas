@@ -94,9 +94,6 @@ export function LabGuessPlayerSilhouetteStage({
 
         {revealed && revealedPlayerName && !assetLoading && !assetError ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-4 pt-12">
-            <p className="text-center text-[10px] uppercase tracking-[0.25em] text-[var(--lab-accent)]">
-              {showRevealPhoto ? "Así es" : "La silueta es"}
-            </p>
             <p className="text-center font-display text-2xl uppercase tracking-wide text-white">
               {revealedPlayerName}
             </p>

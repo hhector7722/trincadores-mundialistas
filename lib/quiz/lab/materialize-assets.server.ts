@@ -50,16 +50,14 @@ export async function materializeLabAsset(
     throw new Error(`Momento ${momentId} sin imagen histórica lista.`);
   }
 
-  if (!options?.force) {
-    const exists = await labAssetExistsOnDisk(momentId, variant);
-    if (exists) {
-      return {
-        momentId,
-        variant,
-        publicUrl: persistedDerivedAssetPublicUrl(momentId, variant),
-        skipped: true,
-      };
-    }
+  const exists = await labAssetExistsOnDisk(momentId, variant);
+  if (exists) {
+    return {
+      momentId,
+      variant,
+      publicUrl: persistedDerivedAssetPublicUrl(momentId, variant),
+      skipped: true,
+    };
   }
 
   const buffer = await getDerivedLabAssetBuffer(
@@ -115,7 +113,7 @@ export async function materializeLabQuestionAssets(
   const moment = pickMomentById(catalog, momentId, { readyOnly: true });
   if (!moment) return question;
 
-  const silhouetteForce = variant === "silhouette";
+  const silhouetteForce = variant === "silhouette" && !(await labAssetExistsOnDisk(momentId, variant));
   await materializeLabAsset(moment, variant, {
     force: options?.force ?? silhouetteForce,
   });

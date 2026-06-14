@@ -7,6 +7,7 @@ import {
   getDerivedLabAssetBuffer,
   momentSourceAbsolutePath,
 } from "@/lib/quiz/lab/derive-images.server";
+import { labAssetExistsOnDisk } from "@/lib/quiz/lab/materialize-assets.server";
 import {
   pickImageTriviaMoment,
   pickPlayerMoment,
@@ -69,15 +70,21 @@ export async function generateLabQuestion(
     if (!sourcePath) return null;
 
     if (input.force) {
-      try {
-        await getDerivedLabAssetBuffer(
-          momentSourceAbsolutePath(sourcePath),
-          moment.id,
-          "silhouette",
-          { moment, force: true }
-        );
-      } catch (error) {
-        console.warn("[generateLabQuestion] Silueta OpenAI no disponible, se sirve bajo demanda.", error);
+      const hasStaticSilhouette = await labAssetExistsOnDisk(moment.id, "silhouette");
+      if (!hasStaticSilhouette) {
+        try {
+          await getDerivedLabAssetBuffer(
+            momentSourceAbsolutePath(sourcePath),
+            moment.id,
+            "silhouette",
+            { moment, force: true }
+          );
+        } catch (error) {
+          console.warn(
+            "[generateLabQuestion] Silueta OpenAI no disponible, se sirve bajo demanda.",
+            error
+          );
+        }
       }
     }
 

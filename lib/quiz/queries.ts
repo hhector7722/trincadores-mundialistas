@@ -1,4 +1,5 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
+import { canAccessQuizBeta } from "@/lib/quiz/access";
 import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
@@ -122,10 +123,15 @@ export async function getQuizDayHub(
   profileId: string,
   quizDate = todayQuizDate()
 ): Promise<QuizDayHub> {
-  const [quizzes, competitive] = await Promise.all([
+  const supabase = await createClient();
+
+  const [quizzes, competitive, profileResult] = await Promise.all([
     getQuizzesForDate(poolId, quizDate),
     isPoolCompetitive(poolId),
+    supabase.from("profiles").select("username").eq("id", profileId).maybeSingle(),
   ]);
+
+  if (profileResult.error) throw new Error(profileResult.error.message);
 
   const attempts = await getQuizAttemptsForProfile(
     quizzes.map((q) => q.id),
@@ -133,7 +139,8 @@ export async function getQuizDayHub(
   );
 
   const officialQuiz = quizzes.find((q) => q.kind === "official");
-  const publishHeld = isQuizPublishHeld(quizDate);
+  const betaRestricted = !canAccessQuizBeta(profileResult.data?.username);
+  const publishHeld = isQuizPublishHeld(quizDate) || betaRestricted;
 
   return {
     quizDate,

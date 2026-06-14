@@ -7,6 +7,7 @@ import { startQuiz, submitQuiz } from "@/actions/quiz";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { QuizDailyIntro } from "@/components/quiz/QuizDailyIntro";
 import { QuizQuestionStage } from "@/components/quiz/QuizQuestionStage";
+import { QuizSilhouetteQuestionStage } from "@/components/quiz/QuizSilhouetteQuestionStage";
 import { LoadingCenter } from "@/components/ui/spinner";
 import type { QuestionPhase } from "@/lib/quiz/play-flow";
 import {
@@ -282,14 +283,25 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
             {PLAY_TITLE}
           </h1>
 
-          <QuizQuestionStage
-            question={currentQuestion}
-            selectedOptionId={answers[currentQuestion.id] ?? null}
-            phase={phase}
-            secondsLeft={secondsLeft}
-            locked={phase === "feedback"}
-            onSelect={resolveAnswer}
-          />
+          {currentQuestion.format === "guess_player_silhouette" ? (
+            <QuizSilhouetteQuestionStage
+              question={currentQuestion}
+              selectedOptionId={answers[currentQuestion.id] ?? null}
+              phase={phase}
+              secondsLeft={secondsLeft}
+              locked={phase === "feedback"}
+              onSelect={resolveAnswer}
+            />
+          ) : (
+            <QuizQuestionStage
+              question={currentQuestion}
+              selectedOptionId={answers[currentQuestion.id] ?? null}
+              phase={phase}
+              secondsLeft={secondsLeft}
+              locked={phase === "feedback"}
+              onSelect={resolveAnswer}
+            />
+          )}
         </div>
       </div>
     );

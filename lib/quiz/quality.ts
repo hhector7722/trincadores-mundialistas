@@ -123,10 +123,12 @@ export function validateGeneratedQuestion(
 
 export function assertGeneratedQuestions(
   questions: GeneratedQuizQuestion[],
-  factsById?: Map<string, QuizFact>
+  factsById?: Map<string, QuizFact>,
+  options?: { expectedCount?: number }
 ): void {
-  if (questions.length !== 3) {
-    throw new Error("El dia debe tener exactamente 3 preguntas.");
+  const expectedCount = options?.expectedCount ?? 3;
+  if (questions.length !== expectedCount) {
+    throw new Error(`El dia debe tener exactamente ${expectedCount} preguntas.`);
   }
   const factIds = new Set<string>();
   const prompts = new Set<string>();

@@ -4,7 +4,7 @@ const MADRID_TZ = "Europe/Madrid";
 export const QUIZ_COMPETITIVE_START_DATE = "2026-06-11";
 
 /** Fechas civiles Madrid sin publicacion automatica (cron 00:00) ni acceso en app. */
-export const QUIZ_PUBLISH_HOLD_DATES = ["2026-06-14"] as const;
+export const QUIZ_PUBLISH_HOLD_DATES = [] as const;
 
 export const QUIZ_COMING_SOON_MESSAGE = "Próximamente";
 

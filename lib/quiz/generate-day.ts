@@ -118,12 +118,15 @@ export function generateQuizDay(args: {
   facts: QuizFact[];
   excludeFactIds?: Set<string>;
   title?: string;
+  /** Hechos para la pregunta test clásica (por defecto 3; el quiz oficial usa 1). */
+  questionCount?: number;
 }): GeneratedQuizDayFile {
   const baseSeed = seedFromQuizDate(args.quizDate);
   const selected = selectFactsForDay({
     quizDate: args.quizDate,
     facts: args.facts,
     excludeFactIds: args.excludeFactIds,
+    count: args.questionCount,
   });
 
   const questions = selected.map((fact, index) =>
@@ -136,7 +139,9 @@ export function generateQuizDay(args: {
   );
 
   const factsById = new Map(args.facts.map((f) => [f.id, f]));
-  assertGeneratedQuestions(questions, factsById);
+  assertGeneratedQuestions(questions, factsById, {
+    expectedCount: args.questionCount ?? 3,
+  });
 
   return {
     quiz_date: args.quizDate,
@@ -180,6 +185,7 @@ export async function generateQuizDayFromSources(args: {
   excludeFactIds?: Set<string>;
   title?: string;
   factsDeps?: LoadQuizFactsDeps;
+  questionCount?: number;
 }): Promise<GeneratedQuizDayFile> {
   const loadResult = await loadQuizFactsWithFallback(args.factsDeps);
   const day = generateQuizDay({
@@ -187,6 +193,7 @@ export async function generateQuizDayFromSources(args: {
     facts: loadResult.facts,
     excludeFactIds: args.excludeFactIds,
     title: args.title,
+    questionCount: args.questionCount,
   });
   return attachFactsSourceMeta(day, loadResult);
 }
