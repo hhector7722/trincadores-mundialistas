@@ -8,7 +8,7 @@ import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { LINEUP_MODAL_FIELD_WIDTH_PX } from "@/lib/lineup/field-asset";
 import { estimateMvpInlineBenchLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
-import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
+import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupFieldGate } from "@/components/lineup/LineupFieldGate";
@@ -110,7 +110,7 @@ export function LineupModalPanel({
   }
 
   const resolvedLineup = lineup ?? buildFallbackLineup(squad.players);
-  const formationSlots = resolveFormationSlotsFromLineup(resolvedLineup);
+  const formationSlots = resolveVisualLineupSlots(resolvedLineup);
   const bench = resolveBenchPlayers(squad, resolvedLineup);
   const benchLayout = estimateMvpInlineBenchLayout(bench.length, LINEUP_MODAL_FIELD_WIDTH_PX);
 

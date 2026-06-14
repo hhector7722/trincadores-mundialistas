@@ -1,6 +1,6 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
-import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
+import { isPredictedLineupCacheStale, isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
   findPrimaryMatchIdForTeam,
   isBetterLineupSource,
@@ -178,16 +178,19 @@ export async function resolveTeamLineup(
     return buildFallbackWithKnownFormation(supabase, context);
   }
 
-  const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
-  if (cached?.sourceKind === "confirmed") {
-    return cached;
-  }
-
   const matchMeta = await loadMatchMeta(supabase, matchId);
   const tryConfirmed = shouldFetchConfirmedLineup(
     matchMeta?.kickoff_at,
     matchMeta?.status
   );
+
+  const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
+  if (
+    cached?.sourceKind === "confirmed" &&
+    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status)
+  ) {
+    return cached;
+  }
 
   if (
     cached?.sourceKind === "predicted" &&
@@ -292,14 +295,17 @@ export async function resolveMatchLineups(
   homeTeam: string,
   awayTeam: string,
   homePlayers: LineupResolveContext["players"],
-  awayPlayers: LineupResolveContext["players"]
+  awayPlayers: LineupResolveContext["players"],
+  options?: { notifyConfirmedLineup?: boolean }
 ): Promise<{ home: ResolvedLineup; away: ResolvedLineup }> {
   const [home, away] = await Promise.all([
     resolveTeamLineup(supabase, { matchId, teamName: homeTeam, players: homePlayers }),
     resolveTeamLineup(supabase, { matchId, teamName: awayTeam, players: awayPlayers }),
   ]);
 
-  scheduleConfirmedLineupNotification(matchId, homeTeam, awayTeam);
+  if (options?.notifyConfirmedLineup !== false) {
+    scheduleConfirmedLineupNotification(matchId, homeTeam, awayTeam);
+  }
 
   return { home, away };
 }

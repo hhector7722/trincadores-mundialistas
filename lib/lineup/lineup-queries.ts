@@ -2,6 +2,7 @@ import { isFormationId } from "@/lib/lineup/formation-coordinates";
 import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import { normalizeFormationId, normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
+import { lineupUsesSourceLayout } from "@/lib/lineup/visual-lineup-slots";
 import type {
   FormationId,
   LineupBenchPlayer,
@@ -36,7 +37,7 @@ const SOURCE_PRIORITY: Record<LineupSourceKind, number> = {
 function rowToResolved(row: StoredLineupRow): ResolvedLineup {
   const formation = normalizeFormationTemplate(row.formation);
   const bench = row.bench as LineupBenchPlayer[];
-  return relayoutLineupSlots({
+  const resolved: ResolvedLineup = {
     formation,
     formationLabel: row.formation,
     slots: row.slots as LineupSlot[],
@@ -46,7 +47,13 @@ function rowToResolved(row: StoredLineupRow): ResolvedLineup {
     sourceKind: row.source_kind,
     dataSourceCode: row.data_source_code,
     fetchedAt: row.fetched_at,
-  });
+  };
+
+  if (lineupUsesSourceLayout(resolved)) {
+    return resolved;
+  }
+
+  return relayoutLineupSlots(resolved);
 }
 
 /** Plantilla oficial WC2026 desde BD (dorsales únicos). */
@@ -195,11 +202,22 @@ export async function upsertTeamLineup(
     lineup.sourceKind === "predicted" &&
     isPredictedLineupCacheStale(existing);
 
-  if (existing && !isBetterLineupSource(lineup.sourceKind, existing.sourceKind) && !refreshStalePredicted) {
+  const fetchedExisting = existing?.fetchedAt ? Date.parse(existing.fetchedAt) : 0;
+  const fetchedIncoming = lineup.fetchedAt ? Date.parse(lineup.fetchedAt) : Date.now();
+  const hasNewerPayload = Number.isFinite(fetchedIncoming) && fetchedIncoming > fetchedExisting;
+
+  if (
+    existing &&
+    !isBetterLineupSource(lineup.sourceKind, existing.sourceKind) &&
+    !refreshStalePredicted &&
+    !hasNewerPayload
+  ) {
     return;
   }
 
-  const normalized = relayoutLineupSlots({ ...lineup, bench, benchCount: bench.length });
+  const normalized = lineupUsesSourceLayout(lineup)
+    ? { ...lineup, bench, benchCount: bench.length }
+    : relayoutLineupSlots({ ...lineup, bench, benchCount: bench.length });
 
   const payload = {
     match_id: matchId,

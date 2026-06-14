@@ -5,7 +5,7 @@ import {
   loadLastKnownFormation,
   upsertTeamLineup,
 } from "@/lib/lineup/lineup-queries";
-import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
+import { isPredictedLineupCacheStale, isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
   isPrewarmCacheFresh,
   PREWARM_HORIZON_MS,
@@ -68,7 +68,10 @@ async function prewarmTeamLineup(
   };
 
   const cached = await loadCachedTeamLineup(supabase, match.id, teamName);
-  if (cached?.sourceKind === "confirmed") {
+  if (
+    cached?.sourceKind === "confirmed" &&
+    !isConfirmedLineupCacheStale(cached, match.kickoff_at, match.status)
+  ) {
     return { status: "skipped", reason: "confirmed_cached" };
   }
 
@@ -119,7 +122,8 @@ async function prewarmTeamLineup(
 
 export async function prewarmUpcomingLineups(
   supabase: SupabaseClient,
-  nowMs: number = Date.now()
+  nowMs: number = Date.now(),
+  options?: { notifyConfirmedLineup?: boolean }
 ): Promise<PrewarmLineupsResult> {
   const matches = await loadUpcomingMatches(supabase, nowMs);
   const result: PrewarmLineupsResult = {
@@ -164,16 +168,18 @@ export async function prewarmUpcomingLineups(
       }
     }
 
-    try {
-      await maybeNotifyConfirmedLineup(supabase, {
-        id: match.id,
-        home_team: match.home_team,
-        away_team: match.away_team,
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Error al notificar alineaciones confirmadas";
-      result.errors.push(`${match.id}/notify: ${message}`);
+    if (options?.notifyConfirmedLineup !== false) {
+      try {
+        await maybeNotifyConfirmedLineup(supabase, {
+          id: match.id,
+          home_team: match.home_team,
+          away_team: match.away_team,
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Error al notificar alineaciones confirmadas";
+        result.errors.push(`${match.id}/notify: ${message}`);
+      }
     }
   }
 

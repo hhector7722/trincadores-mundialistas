@@ -7,7 +7,7 @@ import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
-import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
+import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import type { FormationId, ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { teamNameEs } from "@/lib/teams/display";
@@ -68,7 +68,7 @@ export function ProbableXI({
 
   const lineup =
     resolvedLineup ?? buildFallbackLineup(squad.players, { knownFormation: formation });
-  const formationSlots = resolveFormationSlotsFromLineup(lineup);
+  const formationSlots = resolveVisualLineupSlots(lineup);
   const activeFormation = formation ?? lineup.formation;
   const showFormationPicker = lineup.sourceKind === "fallback" && teamSlug;
   const bench = resolveBenchPlayers(squad, lineup);

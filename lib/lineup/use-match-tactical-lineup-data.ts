@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchMatchLineupBundleAction } from "@/actions/lineup";
 import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
-import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
+import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import {
   mapSlotsToAwayRight,
@@ -89,14 +89,14 @@ export function useMatchTacticalLineupData(
   const awaySlots = useMemo(
     () =>
       resolvedAwayLineup
-        ? mapSlotsToAwayRight(resolveFormationSlotsFromLineup(resolvedAwayLineup))
+        ? mapSlotsToAwayRight(resolveVisualLineupSlots(resolvedAwayLineup))
         : [],
     [resolvedAwayLineup]
   );
   const homeSlots = useMemo(
     () =>
       resolvedHomeLineup
-        ? mapSlotsToHomeLeft(resolveFormationSlotsFromLineup(resolvedHomeLineup))
+        ? mapSlotsToHomeLeft(resolveVisualLineupSlots(resolvedHomeLineup))
         : [],
     [resolvedHomeLineup]
   );

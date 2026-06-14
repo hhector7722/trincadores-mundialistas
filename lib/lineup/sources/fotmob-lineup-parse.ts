@@ -1,35 +1,29 @@
 import { dedupeBenchAgainstStarters } from "@/lib/lineup/bench-dedupe";
+import { normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import {
-  fallbackSlotKeyForRole,
-  normalizeFormationTemplate,
-} from "@/lib/lineup/formation-templates";
-import { layoutPredictedStarters } from "@/lib/lineup/predicted-slot-layout";
+  loadOfficialSquadFromClient,
+  type OfficialSquadPlayer,
+} from "@/lib/lineup/lineup-queries";
 import { positionLabelEs } from "@/lib/lineup/position-map";
-import { findSquadPlayer, reserveSquadPlayerIdentity } from "@/lib/lineup/sources/bsd-squad-match";
+import { tacticalSlotLabelEs } from "@/lib/lineup/tactical-profile";
 import { FOTMOB_SOURCE_CODE, type FotMobLineupPlayer, type FotMobLineupTeam } from "@/lib/lineup/sources/fotmob-client";
+import { fotmobPlayerToFieldCoord } from "@/lib/lineup/sources/fotmob-layout-coords";
+import {
+  roleFromSlotKey,
+  slotKeyFromFotmobPositionId,
+} from "@/lib/lineup/sources/fotmob-position-id";
+import { findSquadPlayer, reserveSquadPlayerIdentity } from "@/lib/lineup/sources/bsd-squad-match";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   LineupBenchPlayer,
   LineupPlayerInput,
   LineupSlot,
-  PositionRole,
   ResolvedLineup,
 } from "@/lib/lineup/types";
 
 function normalizeFormationLabel(raw: string | null | undefined): string {
   const value = (raw ?? "").trim();
   return value.length > 0 ? value : "4-3-3";
-}
-
-function toFormationId(label: string) {
-  return normalizeFormationTemplate(label);
-}
-
-function roleFromFotmobPlayer(player: FotMobLineupPlayer): PositionRole {
-  const usual = player.usualPlayingPositionId;
-  if (usual === 0) return "GK";
-  if (usual === 1) return "DF";
-  if (usual === 3) return "FW";
-  return "MF";
 }
 
 function parseShirtNumber(raw: string | number | null | undefined): number | null {
@@ -56,50 +50,69 @@ function toBenchPlayer(
   };
 }
 
+function starterSlotFromFotmob(
+  starter: FotMobLineupPlayer,
+  squadPlayer: LineupPlayerInput | null,
+  index: number
+): LineupSlot | null {
+  const coord = fotmobPlayerToFieldCoord(starter);
+  if (!coord) return null;
+
+  const slotKey = slotKeyFromFotmobPositionId(starter.positionId) ?? "CM";
+  const role = roleFromSlotKey(slotKey);
+  const shirtNumber = squadPlayer?.shirt_number ?? parseShirtNumber(starter.shirtNumber);
+  const name = squadPlayer?.player_name ?? starter.name?.trim() ?? "Por confirmar";
+  const tacticalLabel = tacticalSlotLabelEs(slotKey);
+
+  return {
+    key: `${name}-${shirtNumber ?? index}`,
+    name,
+    shirtNumber,
+    positionLabel:
+      tacticalLabel ?? positionLabelEs(role, squadPlayer?.position ?? null),
+    role,
+    isPlaceholder: !name || name === "Por confirmar",
+    slotKey,
+    x: coord.x,
+    y: coord.y,
+  };
+}
+
 export function parseFotmobConfirmedTeamLineup(
   payload: FotMobLineupTeam,
   players: LineupPlayerInput[],
-  fetchedAt: string
+  fetchedAt: string,
+  officialSquad: OfficialSquadPlayer[] = []
 ): ResolvedLineup | null {
   const starters = (payload.starters ?? []).filter((player) => player.name?.trim());
   if (starters.length < 11) return null;
 
   const formationLabel = normalizeFormationLabel(payload.formation);
-  const formation = toFormationId(formationLabel);
+  const formation = normalizeFormationTemplate(formationLabel);
   const usedSquadIdentities = new Set<string>();
-  const roleGroups: Record<PositionRole, number> = { GK: 0, DF: 0, MF: 0, FW: 0 };
+  const usedShirtNumbers = new Set<number>();
 
-  const starterInputs = starters.slice(0, 11).map((starter, index) => {
-    const shirtNumber = parseShirtNumber(starter.shirtNumber);
-    const squadPlayer = findSquadPlayer(
-      { name: starter.name ?? "", shirtNumber: shirtNumber ?? 0 },
-      players,
-      [],
-      new Set<number>(),
-      { excludeIdentities: usedSquadIdentities }
-    );
-    reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
+  const slots: LineupSlot[] = starters
+    .slice(0, 11)
+    .map((starter, index) => {
+      const shirtNumber = parseShirtNumber(starter.shirtNumber);
+      const squadPlayer = findSquadPlayer(
+        { name: starter.name ?? "", shirtNumber: shirtNumber ?? 0 },
+        players,
+        officialSquad,
+        usedShirtNumbers,
+        { excludeIdentities: usedSquadIdentities }
+      );
+      if (squadPlayer?.shirt_number) {
+        usedShirtNumbers.add(squadPlayer.shirtNumber);
+        reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
+      }
 
-    const role = roleFromFotmobPlayer(starter);
-    const roleIndex = roleGroups[role];
-    roleGroups[role] += 1;
+      return starterSlotFromFotmob(starter, squadPlayer, index);
+    })
+    .filter((slot): slot is LineupSlot => slot != null);
 
-    const templateId = normalizeFormationTemplate(formationLabel);
-    const slotKey = fallbackSlotKeyForRole(templateId, role, roleIndex);
-    const name = squadPlayer?.player_name ?? starter.name ?? "Por confirmar";
-
-    return {
-      slotKey,
-      role,
-      key: `${name}-${shirtNumber ?? index}`,
-      name,
-      shirtNumber: squadPlayer?.shirt_number ?? shirtNumber,
-      positionLabel: positionLabelEs(role, squadPlayer?.position ?? null),
-      isPlaceholder: !name || name === "Por confirmar",
-    };
-  });
-
-  const slots: LineupSlot[] = layoutPredictedStarters(starterInputs, formationLabel);
+  if (slots.length < 11) return null;
 
   const rawBench = (payload.subs ?? [])
     .map((player, index) => {
@@ -109,8 +122,8 @@ export function parseFotmobConfirmedTeamLineup(
           shirtNumber: parseShirtNumber(player.shirtNumber) ?? 0,
         },
         players,
-        [],
-        new Set<number>()
+        officialSquad,
+        usedShirtNumbers
       );
       return toBenchPlayer(player, squadPlayer, index);
     })
@@ -129,4 +142,20 @@ export function parseFotmobConfirmedTeamLineup(
     dataSourceCode: FOTMOB_SOURCE_CODE,
     fetchedAt,
   };
+}
+
+export async function parseFotmobConfirmedTeamLineupWithOfficialSquad(
+  payload: FotMobLineupTeam,
+  players: LineupPlayerInput[],
+  fetchedAt: string,
+  options?: { supabase?: SupabaseClient; teamName?: string }
+): Promise<ResolvedLineup | null> {
+  const teamName = options?.teamName?.trim() ?? payload.name?.trim() ?? "";
+  let officialSquad: OfficialSquadPlayer[] = [];
+
+  if (teamName && options?.supabase) {
+    officialSquad = await loadOfficialSquadFromClient(options.supabase, teamName);
+  }
+
+  return parseFotmobConfirmedTeamLineup(payload, players, fetchedAt, officialSquad);
 }

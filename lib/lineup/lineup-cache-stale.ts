@@ -1,8 +1,11 @@
+import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import {
   BSD_PREDICTED_SOURCE_CODE,
   BSD_SOURCE_CODE,
 } from "@/lib/lineup/sources/bsd-constants";
+
+const CONFIRMED_REFRESH_MS = 5 * 60 * 1000;
 
 /** Dorsales repetidos entre titulares (cache anterior al matching oficial). */
 export function hasDuplicateStarterShirts(lineup: ResolvedLineup): boolean {
@@ -39,4 +42,34 @@ export function isPredictedLineupCacheStale(lineup: ResolvedLineup): boolean {
   }
 
   return lineup.dataSourceCode !== BSD_PREDICTED_SOURCE_CODE && lineup.dataSourceCode != null;
+}
+
+function hasPlaceholderStarters(lineup: ResolvedLineup): boolean {
+  return lineup.slots.some(
+    (slot) =>
+      slot.isPlaceholder ||
+      !slot.name?.trim() ||
+      slot.name.trim().toLowerCase() === "por confirmar"
+  );
+}
+
+/** Cache confirmada obsoleta: partido en vivo, placeholders o antigüedad en ventana T-90. */
+export function isConfirmedLineupCacheStale(
+  lineup: ResolvedLineup,
+  kickoffAt: string | null | undefined,
+  status: string | null | undefined,
+  nowMs: number = Date.now()
+): boolean {
+  if (lineup.sourceKind !== "confirmed") return false;
+  if (status === "live") return true;
+  if (hasPlaceholderStarters(lineup)) return true;
+
+  const starters = lineup.slots.filter((slot) => !slot.isPlaceholder);
+  if (starters.length < 11) return true;
+
+  if (!shouldFetchConfirmedLineup(kickoffAt, status, nowMs)) return false;
+
+  const fetchedMs = lineup.fetchedAt ? Date.parse(lineup.fetchedAt) : Number.NaN;
+  if (!Number.isFinite(fetchedMs)) return true;
+  return nowMs - fetchedMs > CONFIRMED_REFRESH_MS;
 }

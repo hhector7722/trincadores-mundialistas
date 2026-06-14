@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   hasDuplicateStarterShirts,
+  isConfirmedLineupCacheStale,
   isPredictedLineupCacheStale,
 } from "./lineup-cache-stale";
 import { BSD_PREDICTED_SOURCE_CODE, BSD_SOURCE_CODE } from "./sources/bsd-constants";
@@ -87,5 +88,32 @@ test("isPredictedLineupCacheStale detecta duplicados y dorsal BSD inválido", ()
       predictedLineup([1, 5, 4, 10], { sourceKind: "confirmed" })
     ),
     false
+  );
+});
+
+test("isConfirmedLineupCacheStale refresca en vivo y con placeholders", () => {
+  const confirmed = predictedLineup([1, 5, 4, 10], {
+    sourceKind: "confirmed",
+    dataSourceCode: "fotmob",
+    isProbable: false,
+    fetchedAt: new Date().toISOString(),
+  });
+
+  assert.equal(
+    isConfirmedLineupCacheStale(confirmed, "2026-06-14T17:00:00.000Z", "live"),
+    true
+  );
+
+  const withPlaceholder = {
+    ...confirmed,
+    slots: confirmed.slots.map((slot, index) =>
+      index === 10
+        ? { ...slot, name: "Por confirmar", shirtNumber: null, isPlaceholder: true }
+        : slot
+    ),
+  };
+  assert.equal(
+    isConfirmedLineupCacheStale(withPlaceholder, "2026-06-14T17:00:00.000Z", "finished"),
+    true
   );
 });

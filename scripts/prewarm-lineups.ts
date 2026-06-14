@@ -7,7 +7,9 @@ import { createAdminClient } from "@/lib/scripts/supabase-admin";
 
 async function main() {
   const admin = createAdminClient();
-  const result = await prewarmUpcomingLineups(admin);
+  const result = await prewarmUpcomingLineups(admin, Date.now(), {
+    notifyConfirmedLineup: false,
+  });
   console.log(JSON.stringify(result, null, 2));
   if (result.errors.length > 0) process.exitCode = 1;
 }
