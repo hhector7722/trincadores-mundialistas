@@ -70,13 +70,11 @@ function buildColorMap(members: RankingEvolutionData["members"]): Map<string, st
 type RankingEvolutionChartProps = {
   data: RankingEvolutionData;
   endMatchdayIndex: number;
-  filteredProfileIds: Set<string>;
 };
 
 export function RankingEvolutionChart({
   data,
   endMatchdayIndex,
-  filteredProfileIds,
 }: RankingEvolutionChartProps) {
   const memberCount = data.members.length;
   const chartHeight = chartHeightForMemberCount(memberCount);
@@ -99,9 +97,7 @@ export function RankingEvolutionChart({
         ? MARGIN_TOP + plotH / 2
         : MARGIN_TOP + ((position - 1) / (count - 1)) * plotH;
 
-    const builtSeries: ChartSeries[] = data.members
-      .filter((member) => filteredProfileIds.has(member.profileId))
-      .map((member) => {
+    const builtSeries: ChartSeries[] = data.members.map((member) => {
         const color = colorMap.get(member.profileId) ?? LINE_COLORS[0]!;
         const initialStanding = data.initialStandings.find(
           (row) => row.profileId === member.profileId
@@ -135,7 +131,7 @@ export function RankingEvolutionChart({
       visibleMatchdays: visible,
       series: builtSeries,
     };
-  }, [data, endMatchdayIndex, filteredProfileIds, chartHeight]);
+  }, [data, endMatchdayIndex, chartHeight]);
 
   if (!visibleMatchdays.length || !series.length) {
     return (
