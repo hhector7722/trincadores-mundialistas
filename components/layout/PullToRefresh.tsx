@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import { cn } from "@/lib/utils";
 import {
   applyPullResistance,
@@ -31,6 +32,7 @@ function canStartFromTarget(target: EventTarget | null, root: HTMLElement): bool
 
 export function PullToRefresh() {
   const pathname = usePathname();
+  const previewMode = useTabPreviewMode();
   const router = useRouter();
   const [pullDistance, setPullDistance] = useState(0);
   const [phase, setPhase] = useState<PullPhase>("idle");
@@ -204,6 +206,10 @@ export function PullToRefresh() {
   const progress = pullProgress(pullDistance);
   const showIndicator = phase === "pulling" || phase === "refreshing" || pullDistance > 0;
   const indicatorOffset = Math.max(12, pullDistance * 0.55);
+
+  if (previewMode) {
+    return null;
+  }
 
   return (
     <div

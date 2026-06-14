@@ -309,6 +309,21 @@ html:has(.tm-tab-swipe-root) {
   -webkit-backface-visibility: hidden;
 }
 
+.tm-tab-swipe-adjacent {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tm-tab-swipe-adjacent-host,
+.tm-tab-swipe-adjacent-content {
+  min-height: 0;
+  height: 100%;
+}
+
+html[data-tab-swipe-navigating] .tm-tab-loading-overlay {
+  display: none;
+}
+
 /* Overscroll: mismo degradado del shell (no tono plano distinto al cargar). */
 html:has(.tm-app-shell) {
   background-color: var(--tm-purple-deep);

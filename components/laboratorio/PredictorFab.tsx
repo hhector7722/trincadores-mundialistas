@@ -3,6 +3,7 @@
 import { useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { PredictorPanel } from "@/components/laboratorio/PredictorPanel";
+import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import { cn } from "@/lib/utils";
 
 type PredictorFabProps = {
@@ -10,6 +11,7 @@ type PredictorFabProps = {
 };
 
 export function PredictorFab({ enabled }: PredictorFabProps) {
+  const previewMode = useTabPreviewMode();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -17,7 +19,7 @@ export function PredictorFab({ enabled }: PredictorFabProps) {
     setMounted(true);
   }, []);
 
-  if (!enabled || !mounted) {
+  if (!enabled || previewMode || !mounted) {
     return null;
   }
 

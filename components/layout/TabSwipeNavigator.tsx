@@ -9,15 +9,20 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { TabAdjacentPanel } from "@/components/layout/TabAdjacentPanel";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { getMainTabIndex, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
+import { saveTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
+import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import {
   getMainTabBarNeighbors,
   getTabSwipeProgress,
   pointerOffsetToSwipeDirection,
   resolveTabSwipeCommit,
   shouldApplyEdgeResistance,
+  TAB_SWIPE_ANIMATION_MS,
+  TAB_SWIPE_EASING,
 } from "@/lib/layout/tab-swipe";
 import { cn } from "@/lib/utils";
 
@@ -27,8 +32,6 @@ const COMMIT_RATIO = 0.16;
 const VELOCITY_THRESHOLD = 0.22;
 /** Resistencia en el primer/último tab (0–1, más alto = más suave). */
 const EDGE_RESISTANCE = 0.58;
-const ANIMATION_MS = 360;
-const IOS_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
 const LOCK_THRESHOLD_PX = 5;
 /** Zona lateral donde el swipe horizontal tiene prioridad (px). */
 const EDGE_ZONE_PX = 44;
@@ -39,6 +42,15 @@ const AXIS_Y_RATIO_EDGE = 1.05;
 type TabSwipeNavigatorProps = {
   children: ReactNode;
 };
+
+function setSwipeNavigating(active: boolean) {
+  if (typeof document === "undefined") return;
+  if (active) {
+    document.documentElement.setAttribute("data-tab-swipe-navigating", "");
+  } else {
+    document.documentElement.removeAttribute("data-tab-swipe-navigating");
+  }
+}
 
 function isModalOpen() {
   return typeof document !== "undefined" && document.documentElement.hasAttribute("data-modal-open");
@@ -70,33 +82,22 @@ function applyEdgeResistance(activeIndex: number, offset: number, width: number)
   return edgeResistance(offset, width);
 }
 
-function TabPeek({ side }: { side: "left" | "right" }) {
-  return (
-    <div
-      className={cn(
-        "h-full w-full bg-transparent",
-        side === "left"
-          ? "bg-gradient-to-r from-[var(--tm-accent)]/8 to-transparent"
-          : "bg-gradient-to-l from-[var(--tm-accent)]/8 to-transparent"
-      )}
-      aria-hidden="true"
-    />
-  );
-}
-
 export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const previewMode = useTabPreviewMode();
   const { navigateTab } = useAppNavigation();
   const { setSwipeProgress, registerTabNavigator } = useTabNavigation();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const activeIndex = getMainTabIndex(pathname);
-  const enabled = isMainTabRoot(pathname) && activeIndex != null;
+  const enabled = !previewMode && isMainTabRoot(pathname) && activeIndex != null;
 
   const [dragX, setDragX] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [snapshotVersion, setSnapshotVersion] = useState(0);
+  const [entryPhase, setEntryPhase] = useState(false);
 
   const dragXRef = useRef(0);
   const widthRef = useRef(0);
@@ -106,7 +107,9 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const startTimeRef = useRef(0);
   const edgeStartRef = useRef(false);
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
+  const navigatingRef = useRef(false);
   const animatingRef = useRef(false);
+  const pendingEntryStartRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
     (next: number) => {
@@ -128,6 +131,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     lockedAxisRef.current = "none";
     pointerIdRef.current = null;
     edgeStartRef.current = false;
+    navigatingRef.current = false;
+    setSwipeNavigating(false);
   }, [setSwipeProgress]);
 
   useEffect(() => {
@@ -149,7 +154,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     };
   }, []);
 
-  /** Evita que el gesto "atrás" del navegador compita con el swipe entre pestañas. */
   useEffect(() => {
     if (!enabled) return;
 
@@ -168,7 +172,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     };
   }, [enabled]);
 
-  /** En raíz de pestaña, el botón/gesto atrás no debe salir de la app ni duplicar navegación. */
   useEffect(() => {
     if (!enabled) return;
 
@@ -205,6 +208,28 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     }
     return () => html.removeAttribute("data-tab-swipe-dragging");
   }, [isDragging]);
+
+  useEffect(() => {
+    if (!enabled || activeIndex == null) return;
+    const { left, right } = getMainTabBarNeighbors(activeIndex);
+    if (left != null) router.prefetch(MAIN_TABS[left]!.href);
+    if (right != null) router.prefetch(MAIN_TABS[right]!.href);
+  }, [activeIndex, enabled, router]);
+
+  useEffect(() => {
+    if (!enabled || isDragging || navigatingRef.current || animatingRef.current) return;
+    const track = trackRef.current;
+    if (!track || activeIndex == null) return;
+    const href = MAIN_TABS[activeIndex]?.href;
+    if (!href) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      saveTabSnapshot(href, track);
+      setSnapshotVersion((value) => value + 1);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeIndex, enabled, isDragging, pathname]);
 
   const animateTo = useCallback(
     (target: number, onDone?: () => void) => {
@@ -244,7 +269,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         finish();
       };
 
-      const fallbackTimer = window.setTimeout(finish, ANIMATION_MS + 80);
+      const fallbackTimer = window.setTimeout(finish, TAB_SWIPE_ANIMATION_MS + 80);
 
       track.addEventListener("transitionend", handleEnd);
     },
@@ -253,19 +278,33 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
   const commitToIndex = useCallback(
     (nextIndex: number) => {
-      if (animatingRef.current) return;
+      if (navigatingRef.current || animatingRef.current) return;
 
       if (activeIndex == null || nextIndex === activeIndex) {
         animateTo(0, resetSwipe);
         return;
       }
 
+      const width = widthRef.current;
       const href = MAIN_TABS[nextIndex]?.href;
       if (!href) return;
 
       router.prefetch(href);
-      resetSwipe();
-      navigateTab(href);
+
+      if (width <= 0) {
+        navigateTab(href);
+        return;
+      }
+
+      const direction = nextIndex > activeIndex ? -1 : 1;
+      pendingEntryStartRef.current = -direction * width;
+      navigatingRef.current = true;
+      setSwipeNavigating(true);
+
+      animateTo(direction * width, () => {
+        navigateTab(href);
+        navigatingRef.current = false;
+      });
     },
     [activeIndex, animateTo, navigateTab, resetSwipe, router]
   );
@@ -281,10 +320,27 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [commitToIndex, enabled, registerTabNavigator]);
 
   useEffect(() => {
-    if (!isDragging && !animatingRef.current) {
+    const entryStart = pendingEntryStartRef.current;
+    if (entryStart != null && enabled && activeIndex != null) {
+      pendingEntryStartRef.current = null;
+      setAnimating(false);
+      setIsDragging(false);
+      setEntryPhase(true);
+      setSwipeNavigating(true);
+      syncDrag(entryStart);
+      requestAnimationFrame(() => {
+        animateTo(0, () => {
+          setEntryPhase(false);
+          resetSwipe();
+        });
+      });
+      return;
+    }
+
+    if (!navigatingRef.current && !isDragging && !animatingRef.current) {
       resetSwipe();
     }
-  }, [isDragging, pathname, resetSwipe]);
+  }, [activeIndex, animateTo, enabled, isDragging, pathname, resetSwipe, syncDrag]);
 
   const settleDrag = useCallback(() => {
     if (activeIndex == null) {
@@ -313,7 +369,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [activeIndex, animateTo, commitToIndex, resetSwipe]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!enabled || animating || isModalOpen()) return;
+    if (!enabled || animating || navigatingRef.current || isModalOpen()) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!canStartSwipe(event.target)) return;
 
@@ -331,7 +387,12 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (pointerIdRef.current !== event.pointerId || !enabled || animating) {
+    if (
+      pointerIdRef.current !== event.pointerId ||
+      !enabled ||
+      animating ||
+      navigatingRef.current
+    ) {
       return;
     }
 
@@ -383,6 +444,10 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
   const showEdgeHints = !isDragging && !animating && dragX === 0;
+  const showAdjacentPanels = isDragging || (animating && !entryPhase);
+  const slideTransition = animating
+    ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
+    : "none";
 
   return (
     <div
@@ -409,30 +474,26 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         />
       ) : null}
 
-      {prevTab ? (
-        <div
-          className="pointer-events-none absolute inset-0 z-0 will-change-transform"
-          style={{
-            transform: `translate3d(calc(-100% + ${dragX}px), 0, 0)`,
-            transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
-          }}
-          aria-hidden
-        >
-          <TabPeek side="left" />
-        </div>
+      {showAdjacentPanels && prevTab ? (
+        <TabAdjacentPanel
+          key={`${prevTab.href}-${snapshotVersion}`}
+          href={prevTab.href}
+          dragX={dragX}
+          animating={animating}
+          side="left"
+          preload
+        />
       ) : null}
 
-      {nextTab ? (
-        <div
-          className="pointer-events-none absolute inset-0 z-0 will-change-transform"
-          style={{
-            transform: `translate3d(calc(100% + ${dragX}px), 0, 0)`,
-            transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
-          }}
-          aria-hidden
-        >
-          <TabPeek side="right" />
-        </div>
+      {showAdjacentPanels && nextTab ? (
+        <TabAdjacentPanel
+          key={`${nextTab.href}-${snapshotVersion}`}
+          href={nextTab.href}
+          dragX={dragX}
+          animating={animating}
+          side="right"
+          preload
+        />
       ) : null}
 
       <div
@@ -444,7 +505,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         )}
         style={{
           transform: `translate3d(${dragX}px, 0, 0)`,
-          transition: animating ? `transform ${ANIMATION_MS}ms ${IOS_EASING}` : "none",
+          transition: slideTransition,
         }}
       >
         {children}

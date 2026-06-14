@@ -1,5 +1,8 @@
 import { MAIN_TABS } from "@/lib/layout/main-tabs";
 
+export const TAB_SWIPE_ANIMATION_MS = 360;
+export const TAB_SWIPE_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
+
 /** Deslizar el dedo hacia la izquierda o hacia la derecha. */
 export type TabSwipeDirection = "left" | "right";
 

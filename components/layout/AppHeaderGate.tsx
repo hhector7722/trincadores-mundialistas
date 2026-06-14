@@ -2,13 +2,15 @@
 
 import { usePathname } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
   const pathname = usePathname();
+  const previewMode = useTabPreviewMode();
 
-  if (isQuizLabPath(pathname)) {
+  if (previewMode || isQuizLabPath(pathname)) {
     return null;
   }
 
