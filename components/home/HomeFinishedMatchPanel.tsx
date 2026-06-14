@@ -184,7 +184,7 @@ export function HomeFinishedMatchPanel({
                 officialTeamName={match.officialMvpTeamName}
                 variant="compact"
                 finishedInline
-                className="pointer-events-auto w-max"
+                className="pointer-events-auto w-full"
               />
             </HomeFinishedCardCenter>
           }

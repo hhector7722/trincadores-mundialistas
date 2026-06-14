@@ -1,11 +1,112 @@
 "use client";
 
+import { useLayoutEffect, useRef, useState } from "react";
 import { ConfirmedLineupCheckIcon } from "@/components/lineup/ConfirmedLineupCheckIcon";
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
 import { isMvpPredictionCorrect } from "@/lib/predictions/prediction-outcome";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import { cn } from "@/lib/utils";
+
+const FINISHED_INLINE_CHECK_GAP_PX = 4;
+const FINISHED_INLINE_CENTER_GAP_PX = 8;
+
+/** Nombre centrado en el ancho de la card; el tick no desplaza el centro. */
+function FinishedInlineMvpCorrect({
+  savedLabel,
+  className,
+}: {
+  savedLabel: string;
+  className?: string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const [checkPos, setCheckPos] = useState<{ left: number; top: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const label = labelRef.current;
+      const container = containerRef.current;
+      if (!label || !container) return;
+
+      const labelRect = label.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      setCheckPos({
+        left: labelRect.right - containerRect.left + FINISHED_INLINE_CHECK_GAP_PX,
+        top: labelRect.top - containerRect.top + labelRect.height / 2,
+      });
+    };
+
+    update();
+
+    const label = labelRef.current;
+    if (!label) return;
+
+    const observer = new ResizeObserver(update);
+    observer.observe(label);
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, [savedLabel]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "relative w-full text-[9px] font-semibold leading-none",
+        className,
+      )}
+    >
+      <span ref={labelRef} className="block w-full truncate text-center text-white">
+        {savedLabel}
+      </span>
+      {checkPos != null ? (
+        <span
+          className="absolute -translate-y-1/2"
+          style={{ left: checkPos.left, top: checkPos.top }}
+        >
+          <ConfirmedLineupCheckIcon />
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** El hueco entre pronóstico+error y MVP oficial queda en el centro de la card. */
+function FinishedInlineMvpIncorrect({
+  savedLabel,
+  officialLabel,
+  className,
+}: {
+  savedLabel: string;
+  officialLabel: string;
+  className?: string;
+}) {
+  const halfGap = FINISHED_INLINE_CENTER_GAP_PX / 2;
+
+  return (
+    <div
+      className={cn(
+        "relative w-full min-h-[1em] text-[9px] font-semibold leading-none",
+        className,
+      )}
+    >
+      <div
+        className="absolute inset-y-0 left-0 flex min-w-0 items-center justify-end gap-1"
+        style={{ right: "50%", paddingRight: halfGap }}
+      >
+        <span className="min-w-0 truncate text-[var(--tm-accent)] line-through">{savedLabel}</span>
+        <PredictionOutcomeIcon variant="error" className="shrink-0" />
+      </div>
+      <div
+        className="absolute inset-y-0 flex min-w-0 items-center justify-start"
+        style={{ left: "50%", right: 0, paddingLeft: halfGap }}
+      >
+        <span className="min-w-0 truncate text-white">{officialLabel}</span>
+      </div>
+    </div>
+  );
+}
 
 type MvpPredictionButtonProps = {
   savedPlayerName?: string | null;
@@ -53,32 +154,17 @@ export function MvpPredictionButton({
 
     if (finishedInline && !correct) {
       return (
-        <div
-          className={cn(
-            "inline-flex min-w-0 max-w-full items-center justify-center gap-1 text-[9px] font-semibold leading-none",
-            className,
-          )}
-        >
-          <span className="max-w-[5rem] truncate text-center text-[var(--tm-accent)] line-through">
-            {savedLabel}
-          </span>
-          <PredictionOutcomeIcon variant="error" className="shrink-0" />
-          <span className="max-w-[5rem] truncate text-center text-white">{officialLabel}</span>
-        </div>
+        <FinishedInlineMvpIncorrect
+          savedLabel={savedLabel!}
+          officialLabel={officialLabel!}
+          className={className}
+        />
       );
     }
 
     if (finishedInline && correct) {
       return (
-        <div
-          className={cn(
-            "inline-flex min-w-0 max-w-full items-center justify-center gap-1 text-[9px] font-semibold leading-none",
-            className,
-          )}
-        >
-          <span className="max-w-full truncate text-center text-white">{savedLabel}</span>
-          <ConfirmedLineupCheckIcon />
-        </div>
+        <FinishedInlineMvpCorrect savedLabel={savedLabel!} className={className} />
       );
     }
 
