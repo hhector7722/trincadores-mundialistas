@@ -1,4 +1,4 @@
-import { isQuizPublishHeld } from "@/lib/quiz/date";
+import { isQuizPublishHeld, resolveQuizPublishWindow } from "@/lib/quiz/date";
 import { composeOfficialQuizDay } from "@/lib/quiz/compose-official-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
@@ -46,9 +46,12 @@ export type PublishQuizDayOptions = {
 export async function publishQuizDay(
   options: PublishQuizDayOptions
 ): Promise<PublishQuizDayResult> {
-  if (isQuizPublishHeld(options.quizDate)) {
+  const publishWindow = resolveQuizPublishWindow(options.quizDate);
+  const quizDate = publishWindow.quizDate;
+
+  if (isQuizPublishHeld(quizDate)) {
     return {
-      quizDate: options.quizDate,
+      quizDate,
       quizId: "",
       scoringMode: "competitive",
       skipped: true,
@@ -58,7 +61,7 @@ export async function publishQuizDay(
 
   const shouldPregenerateLab = options.pregenerateLabAssets !== false;
   const labResult = shouldPregenerateLab
-    ? await pregenerateQuizLabDailyPack(options.quizDate, {
+    ? await pregenerateQuizLabDailyPack(quizDate, {
         force: Boolean(options.allowReseed),
       })
     : null;
@@ -68,12 +71,12 @@ export async function publishQuizDay(
   const existingId = await findQuizForDate(
     options.admin,
     poolId,
-    options.quizDate,
+    quizDate,
     "official"
   );
   if (existingId && !options.allowReseed) {
     return {
-      quizDate: options.quizDate,
+      quizDate,
       quizId: existingId,
       scoringMode: "training",
       skipped: true,
@@ -91,12 +94,12 @@ export async function publishQuizDay(
   const excludeFromDb = await loadRecentFactIdsFromDb(
     options.admin,
     poolId,
-    options.quizDate
+    quizDate
   );
 
   const excludeFactIds = new Set(excludeFromDb);
   if (options.includeFilesystemHistory) {
-    for (const id of loadRecentFactIds(options.quizDate)) {
+    for (const id of loadRecentFactIds(quizDate)) {
       excludeFactIds.add(id);
     }
   }
@@ -119,7 +122,7 @@ export async function publishQuizDay(
   }
 
   const generated = await generateQuizDayFromSources({
-    quizDate: options.quizDate,
+    quizDate,
     excludeFactIds,
     questionCount: 1,
   });
@@ -136,7 +139,7 @@ export async function publishQuizDay(
   }
 
   const composed = composeOfficialQuizDay({
-    quizDate: options.quizDate,
+    quizDate,
     title: generated.title,
     classicQuestion,
     labQuestions: labResult.pack.questions,
@@ -152,12 +155,13 @@ export async function publishQuizDay(
       ? labDailyPackSettingsSummary(labResult.pack)
       : undefined,
     playFormats: composed.playFormats,
+    publishWindow,
   });
 
   const factIds = generated._meta?.fact_ids ?? [];
 
   return {
-    quizDate: options.quizDate,
+    quizDate,
     quizId,
     scoringMode,
     skipped: !created && !options.allowReseed,

@@ -133,9 +133,15 @@ export async function upsertQuizBundle(args: {
   settingsJson: Record<string, unknown>;
   questions: SeedQuizQuestion[];
   allowReseed?: boolean;
+  opensAt?: string;
+  closesAt?: string;
 }): Promise<string> {
   const scoring = scoringFieldsForMode(args.kind, args.scoringMode);
-  const { opensAt, closesAt } = quizDayWindow(args.quizDate);
+  const window =
+    args.opensAt && args.closesAt
+      ? { opensAt: args.opensAt, closesAt: args.closesAt }
+      : quizDayWindow(args.quizDate);
+  const { opensAt, closesAt } = window;
   const existingId = await findQuizForDate(args.admin, args.poolId, args.quizDate, args.kind);
 
   if (existingId && !args.allowReseed) {
@@ -198,6 +204,7 @@ export async function seedQuizDayToDb(args: {
     format: string;
     reveal_image_url?: string | null;
   }>;
+  publishWindow?: { opensAt: string; closesAt: string };
 }): Promise<{ quizId: string; scoringMode: QuizScoringMode; created: boolean }> {
   const officialOrders = args.payload.official.questions.map((q) => q.sort_order).sort((a, b) => a - b);
   if (officialOrders.join(",") !== "1,2,3") {
@@ -231,6 +238,8 @@ export async function seedQuizDayToDb(args: {
     },
     questions: args.payload.official.questions,
     allowReseed: args.allowReseed,
+    opensAt: args.publishWindow?.opensAt,
+    closesAt: args.publishWindow?.closesAt,
   });
 
   return {

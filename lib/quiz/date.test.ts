@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   isQuizPublishHeld,
   QUIZ_PUBLISH_HOLD_DATES,
+  resolveQuizPublishWindow,
   todayQuizDate,
 } from "./date";
 
@@ -16,4 +17,17 @@ test("isQuizPublishHeld blocks configured Madrid dates", () => {
     assert.equal(isQuizPublishHeld(heldDate), true);
   }
   assert.equal(isQuizPublishHeld("2026-06-13"), false);
+});
+
+test("resolveQuizPublishWindow mantiene el dia en el cron de medianoche", () => {
+  const atCron = new Date("2026-06-14T22:00:30.000Z");
+  const result = resolveQuizPublishWindow("2026-06-15", atCron);
+  assert.equal(result.quizDate, "2026-06-15");
+});
+
+test("resolveQuizPublishWindow aplaza publicacion manual diurna al dia siguiente", () => {
+  const afternoon = new Date("2026-06-15T14:00:00.000Z");
+  const result = resolveQuizPublishWindow("2026-06-15", afternoon);
+  assert.equal(result.quizDate, "2026-06-16");
+  assert.ok(new Date(result.opensAt).getTime() > afternoon.getTime());
 });

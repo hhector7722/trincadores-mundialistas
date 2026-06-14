@@ -133,7 +133,21 @@ export async function getQuizDayHub(
   );
 
   const officialQuiz = quizzes.find((q) => q.kind === "official");
-  const publishHeld = isQuizPublishHeld(quizDate);
+  const officialAttempt =
+    officialQuiz &&
+    (attempts.find(
+      (a) =>
+        a.quiz_id === officialQuiz.id &&
+        (a.status === "submitted" || a.status === "in_progress")
+    ) ??
+      null);
+
+  const windowPending =
+    Boolean(officialQuiz) &&
+    !isQuizWindowOpen(officialQuiz!) &&
+    !officialAttempt;
+
+  const publishHeld = isQuizPublishHeld(quizDate) || windowPending;
 
   return {
     quizDate,

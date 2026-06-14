@@ -12,6 +12,47 @@ export function isQuizPublishHeld(quizDate: string): boolean {
   return (QUIZ_PUBLISH_HOLD_DATES as readonly string[]).includes(quizDate);
 }
 
+/** Margen tras medianoche para el cron de apertura (00:00 Europe/Madrid). */
+export const QUIZ_CRON_OPEN_GRACE_MS = 5 * 60 * 1000;
+
+export function addQuizDays(quizDate: string, delta: number): string {
+  const [y, m, d] = quizDate.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + delta);
+  const yy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  const dd = String(dt.getDate()).padStart(2, "0");
+  return `${yy}-${mm}-${dd}`;
+}
+
+/**
+ * Ventana efectiva al publicar: si se publica manualmente después de la medianoche
+ * del día solicitado, aplaza a la medianoche del día siguiente (solo cron 00:00).
+ */
+export function resolveQuizPublishWindow(
+  quizDate: string,
+  now = new Date()
+): { quizDate: string; opensAt: string; closesAt: string } {
+  const dayWindow = quizDayWindow(quizDate);
+  const opensMs = new Date(dayWindow.opensAt).getTime();
+
+  if (now.getTime() > opensMs + QUIZ_CRON_OPEN_GRACE_MS) {
+    const deferredDate = addQuizDays(quizDate, 1);
+    const deferredWindow = quizDayWindow(deferredDate);
+    return {
+      quizDate: deferredDate,
+      opensAt: deferredWindow.opensAt,
+      closesAt: deferredWindow.closesAt,
+    };
+  }
+
+  return {
+    quizDate,
+    opensAt: dayWindow.opensAt,
+    closesAt: dayWindow.closesAt,
+  };
+}
+
 export function isQuizCompetitiveDay(quizDate: string): boolean {
   return quizDate >= QUIZ_COMPETITIVE_START_DATE;
 }
