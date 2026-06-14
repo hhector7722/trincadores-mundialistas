@@ -154,7 +154,13 @@ html[data-modal-open] .tm-app-main {
   z-index: -1;
   pointer-events: none;
   background-color: var(--tm-purple-deep);
-  background-image: var(--tm-shell-bg-image);
+  background-image:
+    radial-gradient(
+      ellipse 100% 55% at 50% -5%,
+      rgba(170, 120, 255, 0.18) 0%,
+      transparent 68%
+    ),
+    var(--tm-shell-bg-image);
 }
 
 .tm-app-header {
@@ -754,6 +760,14 @@ html:has(.tm-app-shell) body {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.tm-home-atmosphere:not([data-active="true"]) .tm-home-layer-glow,
+.tm-home-atmosphere:not([data-active="true"]) .tm-home-layer-glow-secondary,
+.tm-home-atmosphere:not([data-active="true"]) .tm-home-layer-particles {
+  animation-play-state: paused;
 }
 
 .tm-home-layer-radial {

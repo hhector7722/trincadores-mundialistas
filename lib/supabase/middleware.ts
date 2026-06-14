@@ -7,6 +7,10 @@ import {
   type OnboardingProfileRow,
 } from "@/lib/auth/onboarding-device";
 import { PWA_ONBOARDING_COOKIE } from "@/lib/pwa/onboarding-cookie";
+import {
+  applyUsageTrackingCookies,
+  trackAppUsageInMiddleware,
+} from "@/lib/usage/middleware-track";
 
 const AUTH_PATHS = ["/login"];
 const ONBOARDING_PATHS = ["/bienvenida"];
@@ -133,6 +137,13 @@ export async function updateSession(request: NextRequest) {
       redirectUrl.pathname = "/";
       redirectUrl.search = "";
       return NextResponse.redirect(redirectUrl);
+    }
+
+    try {
+      const flags = await trackAppUsageInMiddleware(request, supabase, user.id, pathname);
+      applyUsageTrackingCookies(supabaseResponse, pathname, flags);
+    } catch {
+      // No bloquear navegacion si falla el tracking.
     }
   }
 

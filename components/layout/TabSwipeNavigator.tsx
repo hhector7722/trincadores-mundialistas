@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -330,11 +331,14 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     return () => registerTabNavigator(null);
   }, [commitToIndex, enabled, registerTabNavigator]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!commitActive) return;
 
     const targetHref = commitTargetHrefRef.current;
     if (!targetHref || !isMainTabActive(pathname, targetHref)) return;
+
+    syncDrag(0);
+
     if (tabPending) return;
 
     commitTargetHrefRef.current = null;
@@ -342,7 +346,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     setNavigateDispatched(false);
     setShellPathnameOverride(null);
     setCommitActive(false);
-    syncDrag(0);
     resetSwipe();
   }, [commitActive, pathname, resetSwipe, setShellPathnameOverride, syncDrag, tabPending]);
 
@@ -462,8 +465,13 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   );
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
-  const showAdjacentPanels = (isDragging || animating) && !navigateDispatched;
-  const hideTrackDuringTargetLoad = navigateDispatched && commitActive && Math.abs(dragX) > 0.5;
+  const commitTargetHref = commitTargetHrefRef.current;
+  const reachedCommitTarget =
+    commitActive &&
+    commitTargetHref != null &&
+    isMainTabActive(pathname, commitTargetHref);
+  const visualDragX = reachedCommitTarget ? 0 : dragX;
+  const showAdjacentPanels = (isDragging || animating) && !navigateDispatched && !reachedCommitTarget;
   const slideTransition = animating
     ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
     : "none";
@@ -484,7 +492,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <TabAdjacentPanel
           key={`${prevTab.href}-${snapshotVersion}`}
           href={prevTab.href}
-          dragX={dragX}
+          dragX={visualDragX}
           animating={animating}
           side="left"
         />
@@ -494,7 +502,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <TabAdjacentPanel
           key={`${nextTab.href}-${snapshotVersion}`}
           href={nextTab.href}
-          dragX={dragX}
+          dragX={visualDragX}
           animating={animating}
           side="right"
         />
@@ -504,12 +512,11 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         ref={trackRef}
         className={cn(
           "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
-          !animating && dragX === 0 && "transform-gpu",
-          hideTrackDuringTargetLoad && "opacity-0"
+          !animating && visualDragX === 0 && "transform-gpu"
         )}
         style={{
-          transform: `translate3d(${dragX}px, 0, 0)`,
-          transition: slideTransition,
+          transform: `translate3d(${visualDragX}px, 0, 0)`,
+          transition: reachedCommitTarget ? "none" : slideTransition,
         }}
       >
         {children}

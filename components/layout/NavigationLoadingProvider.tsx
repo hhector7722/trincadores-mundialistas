@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
   useTransition,
-  useSyncExternalStore,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -23,23 +22,6 @@ type NavigationLoadingContextValue = {
 };
 
 const NavigationLoadingContext = createContext<NavigationLoadingContextValue | null>(null);
-
-function subscribeSwipeLoadingState(onStoreChange: () => void) {
-  const observer = new MutationObserver(onStoreChange);
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["data-tab-swipe-dragging", "data-tab-swipe-navigating"],
-  });
-  return () => observer.disconnect();
-}
-
-function getSwipeLoadingSnapshot() {
-  const html = document.documentElement;
-  return (
-    html.hasAttribute("data-tab-swipe-dragging") ||
-    html.hasAttribute("data-tab-swipe-navigating")
-  );
-}
 
 function isSameAppPath(currentPath: string, nextHref: string) {
   try {
@@ -91,11 +73,6 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const [isPending, startTransition] = useTransition();
   const [tabPending, startTabTransition] = useTransition();
   const [navigating, setNavigating] = useState(false);
-  const swipeCoversLoading = useSyncExternalStore(
-    subscribeSwipeLoadingState,
-    getSwipeLoadingSnapshot,
-    () => false
-  );
 
   const navigate = useCallback(
     (href: string) => {
@@ -135,7 +112,6 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   }, []);
 
   const showLinkOverlay = navigating && isPending;
-  const showTabOverlay = tabPending && !swipeCoversLoading;
 
   return (
     <NavigationLoadingContext.Provider
@@ -144,11 +120,6 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
       <div className="contents" onClickCapture={handleCaptureClick}>
         {children}
       </div>
-      {showTabOverlay ? (
-        <div className="tm-tab-loading-overlay" aria-busy="true" aria-live="polite">
-          <LoadingCenter minHeightClassName="min-h-0" />
-        </div>
-      ) : null}
       {showLinkOverlay ? (
         <div className="tm-nav-loading-overlay" aria-busy="true" aria-live="polite">
           <LoadingCenter />

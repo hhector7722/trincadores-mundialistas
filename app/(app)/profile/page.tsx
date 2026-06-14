@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { ProfilePushNotificationsCard } from "@/components/profile/ProfilePushNotificationsCard";
 import { isPoolAdmin } from "@/lib/pool/admin";
+import { UsageAnalyticsButton } from "@/components/profile/UsageAnalyticsButton";
 import { canAccessQuizLab } from "@/lib/quiz/lab-access";
+import { canAccessUsageAnalytics } from "@/lib/usage/access";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 
@@ -29,6 +31,7 @@ export default async function ProfilePage() {
 
   const label = profile?.display_name ?? profile?.username ?? "Jugador";
   const showLab = canAccessQuizLab(profile?.username);
+  const showUsage = canAccessUsageAnalytics(profile?.username);
 
   return (
     <div className="space-y-4 p-4 pb-4">
@@ -41,6 +44,7 @@ export default async function ProfilePage() {
         <p className="text-lg font-medium text-[var(--tm-fg)]">{label}</p>
       </div>
       <ProfilePushNotificationsCard />
+      {showUsage && <UsageAnalyticsButton />}
       {showLab && (
         <Card className="p-4">
           <Link

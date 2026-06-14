@@ -1,17 +1,34 @@
 "use client";
 
-import { useEffectiveShellPathname } from "@/lib/layout/use-effective-shell-pathname";
-import { isQuizLabPath } from "@/lib/quiz/lab-access";
+import { usePathname } from "next/navigation";
+import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
+
+const HOME_TAB_INDEX = 2;
+
+function getHomeAtmosphereOpacity(pathname: string, swipeProgress: number | null): number {
+  if (swipeProgress != null) {
+    return Math.max(0, Math.min(1, 1 - Math.abs(swipeProgress - HOME_TAB_INDEX)));
+  }
+  return pathname === "/" ? 1 : 0;
+}
 
 export function HomeAtmosphere() {
-  const pathname = useEffectiveShellPathname();
-
-  if (pathname !== "/" || isQuizLabPath(pathname)) {
-    return null;
-  }
+  const pathname = usePathname();
+  const { swipeProgress } = useTabNavigation();
+  const opacity = getHomeAtmosphereOpacity(pathname, swipeProgress);
+  const isDragging =
+    swipeProgress != null && Math.abs(swipeProgress - Math.round(swipeProgress)) > 0.02;
 
   return (
-    <div className="tm-home-atmosphere" aria-hidden="true">
+    <div
+      className="tm-home-atmosphere"
+      data-active={opacity > 0.02 ? "true" : "false"}
+      style={{
+        opacity,
+        transition: isDragging ? "none" : "opacity 320ms ease-out",
+      }}
+      aria-hidden="true"
+    >
       <div className="tm-home-layer-radial" />
       <div className="tm-home-layer-top-wash" />
       <div className="tm-home-layer-glow" />

@@ -18,6 +18,7 @@ import { signInUserByPhone } from "@/lib/auth/phone-sign-in";
 import { stampOnboardingCompletedIfNeeded } from "@/lib/auth/stamp-onboarding-completed";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
+import { recordAppUsageEvent } from "@/lib/usage/record";
 
 export type AuthActionResult =
   | { ok: true; needsOnboarding?: boolean }
@@ -100,6 +101,7 @@ export async function signIn(
   }
 
   await setOnboardedDeviceCookie(username);
+  void recordAppUsageEvent(data.user.id, "login", "/login");
   return { ok: true };
 }
 

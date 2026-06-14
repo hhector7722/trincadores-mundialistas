@@ -1,5 +1,4 @@
-import { TabPageLoading } from "@/components/layout/TabPageLoading";
-
+/** Sin spinner en transiciones de pestaña: evita parpadeo entre tabs principales. */
 export default function AppSectionLoading() {
-  return <TabPageLoading />;
+  return null;
 }

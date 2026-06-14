@@ -6,6 +6,7 @@ import { resolvePoolMemberships, setActivePoolCookie } from "@/lib/auth/session"
 import { normalizeUsername } from "@/lib/auth/validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { recordAppUsageEventWithClient } from "@/lib/usage/record";
 import {
   normalizePhone,
   ONBOARDING_PHONE_DIRECTORY,
@@ -41,6 +42,7 @@ async function finishSession(
   }
 
   await setOnboardedDeviceCookie(username);
+  void recordAppUsageEventWithClient(supabase, userId, "login", "/api/auth/phone-login");
   return { ok: true, username };
 }
 
