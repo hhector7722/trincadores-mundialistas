@@ -29,7 +29,7 @@ type MatchPredictionsBoardHeaderTitleProps = {
 const MAX_NAME_FONT_PX = 12;
 const MIN_NAME_FONT_PX = 8;
 
-const HEADER_GRID = "grid w-full min-w-0 grid-cols-3 items-start";
+const HEADER_GRID = "grid w-full min-w-0 grid-cols-[1fr_auto_1fr] items-start";
 
 function formatGoal(value: number | null): string {
   if (value === null) return "—";
@@ -113,7 +113,7 @@ export function matchPredictionsBoardAriaTitle(
   return `${teamNameEs(homeTeam)} ${formatGoal(homeGoals)} - ${formatGoal(awayGoals)} ${teamNameEs(awayTeam)}`;
 }
 
-/** Cabecera del modal: 3 columnas simétricas (local | «-» centrado | visitante). */
+/** Cabecera del modal: local | «-» (ancho mínimo) | visitante. */
 export function MatchPredictionsBoardHeaderTitle({
   homeTeam,
   awayTeam,
@@ -208,9 +208,9 @@ export function MatchPredictionsBoardHeaderTitle({
         </div>
       </div>
 
-      {/* Col 2: tercio central; solo el separador, centrado en la columna */}
-      <div className="col-start-2 row-start-1 flex w-full min-w-0 items-start justify-center self-start">
-        <span className="text-xs leading-none text-[var(--tm-muted)]">-</span>
+      {/* Col 2: ancho mínimo al guion */}
+      <div className="col-start-2 row-start-1 flex shrink-0 items-start justify-center self-start">
+        <span className="shrink-0 text-xs leading-none text-[var(--tm-muted)]">-</span>
       </div>
 
       {/* Col 3: visitante — tercio derecho, contenido alineado a la izquierda */}
