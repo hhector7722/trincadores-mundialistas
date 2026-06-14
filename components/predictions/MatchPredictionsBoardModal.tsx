@@ -53,6 +53,7 @@ function MatchPredictionsBoardContent({
         currentProfileId={currentProfileId}
         homeTeam={board.homeTeam}
         awayTeam={board.awayTeam}
+        playerIncidents={board.playerIncidents}
         showOutcomes={board.showOutcomes}
       />
       {board.showOutcomes ? (
@@ -203,6 +204,7 @@ export function MatchPredictionsBoardModal({
     <Modal
       open={open}
       onClose={onClose}
+      hideCloseButton
       hideHeaderDivider
       hideTitle={isLoading}
       ariaLabel={isLoading ? "Cargando pronósticos" : undefined}
@@ -220,6 +222,8 @@ export function MatchPredictionsBoardModal({
                 homeGoals={activeBoard.officialHome}
                 awayGoals={activeBoard.officialAway}
                 playerIncidents={activeBoard.playerIncidents}
+                officialMvpPlayerName={activeBoard.officialMvpPlayerName}
+                officialMvpTeamName={activeBoard.officialMvpTeamName}
               />
             </span>
           </>

@@ -5,6 +5,7 @@ import {
   matchPredictionsSubgridRow,
 } from "@/components/predictions/match-predictions-grid";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import type { MatchPlayerIncident } from "@/lib/live/types";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ type MatchPredictionsBoardTableProps = {
   currentProfileId: string;
   homeTeam: string;
   awayTeam: string;
+  playerIncidents: MatchPlayerIncident[];
   showOutcomes?: boolean;
   loading?: boolean;
 };
@@ -92,6 +94,7 @@ export function MatchPredictionsBoardTable({
   currentProfileId,
   homeTeam,
   awayTeam,
+  playerIncidents,
   showOutcomes = false,
   loading = false,
 }: MatchPredictionsBoardTableProps) {
@@ -125,6 +128,7 @@ export function MatchPredictionsBoardTable({
                   row={row}
                   isCurrentUser={row.profileId === currentProfileId}
                   showOutcomes={showOutcomes}
+                  playerIncidents={playerIncidents}
                 />
               );
             })}

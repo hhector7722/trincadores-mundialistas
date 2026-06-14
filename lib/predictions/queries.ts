@@ -383,6 +383,8 @@ export type MatchPredictionsBoard = {
   awayTeam: string;
   officialHome: number | null;
   officialAway: number | null;
+  officialMvpPlayerName: string | null;
+  officialMvpTeamName: string | null;
   showOutcomes: boolean;
   playerIncidents: MatchPlayerIncident[];
   rows: MatchPredictionsBoardRow[];
@@ -498,6 +500,8 @@ export async function getMatchPredictionsBoard(
       awayTeam: match.away_team,
       officialHome,
       officialAway,
+      officialMvpPlayerName: result?.mvp_player_name ?? null,
+      officialMvpTeamName: result?.mvp_team_name ?? null,
       showOutcomes,
       playerIncidents,
       rows: [],
@@ -603,6 +607,8 @@ export async function getMatchPredictionsBoard(
     awayTeam: match.away_team,
     officialHome,
     officialAway,
+    officialMvpPlayerName: result?.mvp_player_name ?? null,
+    officialMvpTeamName: result?.mvp_team_name ?? null,
     showOutcomes,
     playerIncidents,
     rows,

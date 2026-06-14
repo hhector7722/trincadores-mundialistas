@@ -1,4 +1,5 @@
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
+import { mvpPlayerNamesMatch } from "@/lib/predictions/mvp-name-match";
 import type { MatchPlayerIncident } from "@/lib/live/types";
 
 export type MatchGoalScorer = {
@@ -99,4 +100,17 @@ export function resolveMatchGoalScorers(
 ): { home: MatchGoalScorer[]; away: MatchGoalScorer[] } {
   const incidents = liveIncidents?.length ? liveIncidents : fallbackIncidents;
   return extractGoalScorersByTeam(incidents);
+}
+
+/** Goleadores del jugador en el partido (cualquier equipo), para etiqueta MVP del tablero. */
+export function findGroupedGoalScorerForPlayer(
+  playerName: string,
+  incidents: MatchPlayerIncident[] | undefined | null,
+): GroupedGoalScorer | null {
+  const trimmed = playerName.trim();
+  if (!trimmed) return null;
+
+  const { home, away } = extractGoalScorersByTeam(incidents);
+  const groups = groupGoalScorersByPlayer([...home, ...away]);
+  return groups.find((group) => mvpPlayerNamesMatch(group.playerName, trimmed)) ?? null;
 }

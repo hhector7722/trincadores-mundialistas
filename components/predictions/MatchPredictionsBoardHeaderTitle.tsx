@@ -3,8 +3,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { GOAL_SCORER_TEXT_CLASS, goalScorerTextStyle } from "@/lib/ui/goal-scorer-style";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { MatchPredictionsBoardMvpLabel } from "@/components/predictions/MatchPredictionsBoardMvpLabel";
 import { buildBoardGoalScorerLines, extractGoalScorersByTeam } from "@/lib/live/goal-scorers";
 import type { MatchPlayerIncident } from "@/lib/live/types";
+import { mvpTeamsMatch } from "@/lib/predictions/mvp-name-match";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +16,8 @@ type MatchPredictionsBoardHeaderTitleProps = {
   homeGoals: number | null;
   awayGoals: number | null;
   playerIncidents?: MatchPlayerIncident[];
+  officialMvpPlayerName?: string | null;
+  officialMvpTeamName?: string | null;
   className?: string;
 };
 
@@ -41,6 +45,8 @@ export function MatchPredictionsBoardHeaderTitle({
   homeGoals,
   awayGoals,
   playerIncidents = [],
+  officialMvpPlayerName,
+  officialMvpTeamName,
   className,
 }: MatchPredictionsBoardHeaderTitleProps) {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -51,6 +57,14 @@ export function MatchPredictionsBoardHeaderTitle({
   const goalScorers = extractGoalScorersByTeam(playerIncidents);
   const homeScorerLines = buildBoardGoalScorerLines(goalScorers.home);
   const awayScorerLines = buildBoardGoalScorerLines(goalScorers.away);
+  const officialMvpSide =
+    officialMvpPlayerName?.trim() && officialMvpTeamName?.trim()
+      ? mvpTeamsMatch(officialMvpTeamName, homeTeam)
+        ? "home"
+        : mvpTeamsMatch(officialMvpTeamName, awayTeam)
+          ? "away"
+          : null
+      : null;
 
   useLayoutEffect(() => {
     const header = headerRef.current;
@@ -117,6 +131,14 @@ export function MatchPredictionsBoardHeaderTitle({
             {line}
           </span>
         ))}
+        {officialMvpSide === "home" ? (
+          <MatchPredictionsBoardMvpLabel
+            variant="header"
+            align="left"
+            playerName={officialMvpPlayerName}
+            playerIncidents={playerIncidents}
+          />
+        ) : null}
       </div>
 
       <div className="col-start-2 row-start-1 flex shrink-0 items-center justify-center self-start px-1">
@@ -151,6 +173,14 @@ export function MatchPredictionsBoardHeaderTitle({
             {line}
           </span>
         ))}
+        {officialMvpSide === "away" ? (
+          <MatchPredictionsBoardMvpLabel
+            variant="header"
+            align="right"
+            playerName={officialMvpPlayerName}
+            playerIncidents={playerIncidents}
+          />
+        ) : null}
       </div>
     </div>
   );

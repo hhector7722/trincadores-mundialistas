@@ -3,24 +3,19 @@
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { MatchPredictionsBoardMvpLabel } from "@/components/predictions/MatchPredictionsBoardMvpLabel";
 import {
   MatchPredictionsBoardOutcomeIconTicks,
   MatchPredictionsBoardPointsLabel,
 } from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
 import { matchPredictionsSubgridRow } from "@/components/predictions/match-predictions-grid";
-import { shirtPlayerName } from "@/lib/lineup/short-player-name";
+import type { MatchPlayerIncident } from "@/lib/live/types";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
 function formatGoalCell(value: number | null): string {
   if (value === null) return "—";
   return String(value);
-}
-
-function formatMvpCell(name: string | null): string {
-  const trimmed = name?.trim();
-  if (!trimmed) return "—";
-  return shirtPlayerName(trimmed);
 }
 
 function CellValue({ value }: { value: string }) {
@@ -35,10 +30,12 @@ export function MatchPredictionsBoardRow({
   row,
   isCurrentUser,
   showOutcomes,
+  playerIncidents,
 }: {
   row: MatchPredictionsBoardRowType;
   isCurrentUser: boolean;
   showOutcomes: boolean;
+  playerIncidents: MatchPlayerIncident[];
 }) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const canPreview = Boolean(row.avatarUrl);
@@ -102,7 +99,10 @@ export function MatchPredictionsBoardRow({
         ) : null}
         <CellValue value={formatGoalCell(row.homeGoals)} />
         <CellValue value={formatGoalCell(row.awayGoals)} />
-        <CellValue value={formatMvpCell(row.mvpPlayerName)} />
+        <MatchPredictionsBoardMvpLabel
+          playerName={row.mvpPlayerName}
+          playerIncidents={playerIncidents}
+        />
       </div>
       {canPreview ? (
         <AvatarPreviewModal

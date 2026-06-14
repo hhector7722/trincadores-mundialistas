@@ -52,6 +52,8 @@ type ModalProps = {
   opaque?: boolean;
   /** Apila por encima de otro modal (p. ej. al abrir desde «Ver datos»). */
   stackElevated?: boolean;
+  /** Oculta el botón X de la cabecera (p. ej. cierre solo por backdrop). */
+  hideCloseButton?: boolean;
 };
 
 function lockPageScroll() {
@@ -110,6 +112,7 @@ function ModalPanelShell({
   className,
   children,
   loading = false,
+  hideCloseButton = false,
 }: {
   title: ReactNode;
   titleId: string;
@@ -128,6 +131,7 @@ function ModalPanelShell({
   className?: string;
   children: ReactNode;
   loading?: boolean;
+  hideCloseButton?: boolean;
 }) {
   const titleLeft = headerTitleAlign === "left";
   const titleCenter = headerTitleAlign === "center";
@@ -230,17 +234,19 @@ function ModalPanelShell({
         ) : null}
         <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2">
           {headerTrailing ? <div className="shrink-0">{headerTrailing}</div> : null}
-          <button
-            type="button"
-            aria-label="Cerrar modal"
-            onClick={onClose}
-            className={cn(
-              "flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]",
-              headerCompact ? "h-8 w-8" : "h-10 w-10"
-            )}
-          >
-            <X className={headerCompact ? "h-4 w-4" : "h-5 w-5"} />
-          </button>
+          {!hideCloseButton ? (
+            <button
+              type="button"
+              aria-label="Cerrar modal"
+              onClick={onClose}
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-full text-[var(--tm-muted)] transition-colors hover:bg-[var(--tm-surface-elevated)] hover:text-[var(--tm-fg)]",
+                headerCompact ? "h-8 w-8" : "h-10 w-10"
+              )}
+            >
+              <X className={headerCompact ? "h-4 w-4" : "h-5 w-5"} />
+            </button>
+          ) : null}
         </div>
       </div>
       )}
@@ -291,6 +297,7 @@ export function Modal({
   scrollContent = true,
   opaque = false,
   stackElevated = false,
+  hideCloseButton = false,
 }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -447,6 +454,7 @@ export function Modal({
                       opaque={opaque}
                       className={className}
                       loading={loading}
+                      hideCloseButton={hideCloseButton}
                     >
                       {children}
                     </ModalPanelShell>
@@ -469,6 +477,7 @@ export function Modal({
                       opaque={opaque}
                       className={className}
                       loading={loading}
+                      hideCloseButton={hideCloseButton}
                     >
                       {panelSlide.incoming}
                     </ModalPanelShell>
@@ -494,6 +503,7 @@ export function Modal({
                       opaque={opaque}
                       className={className}
                       loading={loading}
+                      hideCloseButton={hideCloseButton}
                     >
                       {panelSlide.incoming}
                     </ModalPanelShell>
@@ -516,6 +526,7 @@ export function Modal({
                       opaque={opaque}
                       className={className}
                       loading={loading}
+                      hideCloseButton={hideCloseButton}
                     >
                       {children}
                     </ModalPanelShell>
@@ -541,6 +552,7 @@ export function Modal({
               opaque={opaque}
               className={className}
               loading={loading}
+              hideCloseButton={hideCloseButton}
             >
               {children}
             </ModalPanelShell>
