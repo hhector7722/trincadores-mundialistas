@@ -9,7 +9,6 @@ import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import { cn } from "@/lib/utils";
 
 const FINISHED_INLINE_CHECK_GAP_PX = 4;
-const FINISHED_INLINE_CENTER_GAP_PX = 8;
 
 /** Nombre centrado en el ancho de la card; el tick no desplaza el centro. */
 function FinishedInlineMvpCorrect({
@@ -72,7 +71,7 @@ function FinishedInlineMvpCorrect({
   );
 }
 
-/** El hueco entre pronóstico+error y MVP oficial queda en el centro de la card. */
+/** La cruz roja queda en el centro de la card; pronóstico a la izquierda y MVP oficial a la derecha. */
 function FinishedInlineMvpIncorrect({
   savedLabel,
   officialLabel,
@@ -82,28 +81,18 @@ function FinishedInlineMvpIncorrect({
   officialLabel: string;
   className?: string;
 }) {
-  const halfGap = FINISHED_INLINE_CENTER_GAP_PX / 2;
-
   return (
     <div
       className={cn(
-        "relative w-full min-h-[1em] text-[9px] font-semibold leading-none",
+        "grid w-full grid-cols-[1fr_auto_1fr] items-center gap-1 text-[9px] font-semibold leading-none",
         className,
       )}
     >
-      <div
-        className="absolute inset-y-0 left-0 flex min-w-0 items-center justify-end gap-1"
-        style={{ right: "50%", paddingRight: halfGap }}
-      >
-        <span className="min-w-0 truncate text-[var(--tm-accent)] line-through">{savedLabel}</span>
-        <PredictionOutcomeIcon variant="error" className="shrink-0" />
-      </div>
-      <div
-        className="absolute inset-y-0 flex min-w-0 items-center justify-start"
-        style={{ left: "50%", right: 0, paddingLeft: halfGap }}
-      >
-        <span className="min-w-0 truncate text-white">{officialLabel}</span>
-      </div>
+      <span className="min-w-0 truncate text-right text-[var(--tm-accent)] line-through">
+        {savedLabel}
+      </span>
+      <PredictionOutcomeIcon variant="error" className="shrink-0 justify-self-center" />
+      <span className="min-w-0 truncate text-left text-white">{officialLabel}</span>
     </div>
   );
 }
