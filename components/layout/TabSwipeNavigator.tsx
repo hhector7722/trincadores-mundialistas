@@ -86,7 +86,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const pathname = usePathname();
   const router = useRouter();
   const previewMode = useTabPreviewMode();
-  const { navigateTab } = useAppNavigation();
+  const { navigateTab, tabPending } = useAppNavigation();
   const { setSwipeProgress, registerTabNavigator } = useTabNavigation();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -97,7 +97,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const [animating, setAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [snapshotVersion, setSnapshotVersion] = useState(0);
-  const [entryPhase, setEntryPhase] = useState(false);
+  const [commitActive, setCommitActive] = useState(false);
 
   const dragXRef = useRef(0);
   const widthRef = useRef(0);
@@ -109,7 +109,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const navigatingRef = useRef(false);
   const animatingRef = useRef(false);
-  const pendingEntryStartRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
     (next: number) => {
@@ -297,7 +296,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       }
 
       const direction = nextIndex > activeIndex ? -1 : 1;
-      pendingEntryStartRef.current = -direction * width;
+      setCommitActive(true);
       navigatingRef.current = true;
       setSwipeNavigating(true);
 
@@ -320,27 +319,17 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [commitToIndex, enabled, registerTabNavigator]);
 
   useEffect(() => {
-    const entryStart = pendingEntryStartRef.current;
-    if (entryStart != null && enabled && activeIndex != null) {
-      pendingEntryStartRef.current = null;
-      setAnimating(false);
-      setIsDragging(false);
-      setEntryPhase(true);
-      setSwipeNavigating(true);
-      syncDrag(entryStart);
-      requestAnimationFrame(() => {
-        animateTo(0, () => {
-          setEntryPhase(false);
-          resetSwipe();
-        });
-      });
-      return;
-    }
+    if (!commitActive || tabPending) return;
 
-    if (!navigatingRef.current && !isDragging && !animatingRef.current) {
-      resetSwipe();
-    }
-  }, [activeIndex, animateTo, enabled, isDragging, pathname, resetSwipe, syncDrag]);
+    setCommitActive(false);
+    syncDrag(0);
+    resetSwipe();
+  }, [commitActive, pathname, resetSwipe, syncDrag, tabPending]);
+
+  useEffect(() => {
+    if (commitActive || navigatingRef.current || isDragging || animatingRef.current) return;
+    resetSwipe();
+  }, [commitActive, isDragging, pathname, resetSwipe]);
 
   const settleDrag = useCallback(() => {
     if (activeIndex == null) {
@@ -443,7 +432,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(activeIndex);
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
-  const showAdjacentPanels = isDragging || (animating && !entryPhase);
+  const showAdjacentPanels = isDragging || animating || commitActive;
   const slideTransition = animating
     ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
     : "none";
