@@ -1,33 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Play,
-  Plus,
-  RotateCcw,
-  Save,
-  Sparkles,
-  Trash2,
-} from "lucide-react";import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
+import { Loader2, Play, Plus, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
 import { LabShell } from "@/components/quiz/lab/LabShell";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
 import { createLabQuestionStub } from "@/lib/quiz/lab/defaults";
 import { generateLabQuestionContent } from "@/lib/quiz/lab/generate-content.client";
+import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import {
   canGenerateLabQuestion,
   labQuestionIsReady,
-  labQuestionNeedsGeneration,
-} from "@/lib/quiz/lab/question-status";import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
+} from "@/lib/quiz/lab/question-status";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
   isLabPlayerCropQuestion,
   isLabPlayerSilhouetteQuestion,
-  LAB_FORMAT_DESCRIPTIONS,
   LAB_FORMAT_LABELS,
   LAB_QUESTION_FORMATS,
   type LabDraft,
@@ -39,13 +29,16 @@ import { cn } from "@/lib/utils";
 
 type WorkspaceMode = "edit" | "preview";
 
-function updateQuestion(draft: LabDraft, questionId: string, patch: Partial<LabQuestion>): LabDraft {
-  return {
-    ...draft,
-    questions: draft.questions.map((q) =>
-      q.id === questionId ? ({ ...q, ...patch } as LabQuestion) : q
-    ),
-  };
+function statusLabel(question: LabQuestion, generating: boolean) {
+  if (generating) return "Generando";
+  if (labQuestionIsReady(question)) return "Lista";
+  return "Pendiente";
+}
+
+function statusColor(question: LabQuestion, generating: boolean) {
+  if (generating) return "bg-amber-500";
+  if (labQuestionIsReady(question)) return "bg-[var(--lab-accent)]";
+  return "bg-[var(--lab-border)]";
 }
 
 export function LabWorkspace() {
@@ -58,7 +51,7 @@ export function LabWorkspace() {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
-  const [savedFlash, setSavedFlash] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [generatingIds, setGeneratingIds] = useState<Set<string>>(() => new Set());
   const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
   const [catalogDifficulty, setCatalogDifficulty] =
@@ -84,18 +77,10 @@ export function LabWorkspace() {
 
   useEffect(() => {
     if (mode !== "preview" || !playQuestion || selectedOptionId !== null) return;
-
     setSecondsLeft(playQuestion.timerSeconds);
     const interval = window.setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          window.clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-
     return () => window.clearInterval(interval);
   }, [mode, playQuestion, playIndex, selectedOptionId]);
 
@@ -109,9 +94,10 @@ export function LabWorkspace() {
   }, []);
 
   const generateQuestion = useCallback(
-    async (question: LabQuestion, force = false) => {
+    async (question: LabQuestion) => {
       if (!canGenerateLabQuestion(question.format)) return;
 
+      const rotate = labQuestionIsReady(question);
       setQuestionGenerating(question.id, true);
       setQuestionErrors((prev) => {
         const next = { ...prev };
@@ -122,7 +108,7 @@ export function LabWorkspace() {
       try {
         const generated = await generateLabQuestionContent(question, {
           minDifficulty: catalogDifficulty,
-          force,
+          force: rotate,
         });
         persist((prev) => ({
           ...prev,
@@ -146,21 +132,18 @@ export function LabWorkspace() {
   const generateAllQuestions = useCallback(() => {
     for (const question of draft.questions) {
       if (canGenerateLabQuestion(question.format)) {
-        void generateQuestion(question, labQuestionNeedsGeneration(question));
+        void generateQuestion(question);
       }
     }
   }, [draft.questions, generateQuestion]);
 
-  function handleSave() {    writeLabDraft(draft);
-    setSavedFlash(true);
-    window.setTimeout(() => setSavedFlash(false), 1500);
-  }
-
-  function handleReset() {
-    const fresh = resetLabDraft();
-    setDraft(fresh);
-    setActiveQuestionId(fresh.questions[0]?.id ?? null);
-    setMode("edit");
+  function patchActive(questionId: string, patch: Partial<LabQuestion>) {
+    persist((prev) => ({
+      ...prev,
+      questions: prev.questions.map((q) =>
+        q.id === questionId ? ({ ...q, ...patch } as LabQuestion) : q
+      ),
+    }));
   }
 
   function addQuestion(format: LabQuestionFormat) {
@@ -168,654 +151,425 @@ export function LabWorkspace() {
     persist((prev) => ({ ...prev, questions: [...prev.questions, question] }));
     setActiveQuestionId(question.id);
   }
+
   function removeQuestion(id: string) {
-    let nextActiveId: string | null | undefined;
     persist((prev) => {
       const questions = prev.questions.filter((q) => q.id !== id);
       if (activeQuestionId === id) {
-        nextActiveId = questions[0]?.id ?? null;
+        setActiveQuestionId(questions[0]?.id ?? null);
       }
       return { ...prev, questions };
     });
-    if (nextActiveId !== undefined) {
-      setActiveQuestionId(nextActiveId);
-    }
   }
 
-  function moveQuestion(id: string, direction: -1 | 1) {
-    persist((prev) => {
-      const index = prev.questions.findIndex((q) => q.id === id);
-      const target = index + direction;
-      if (index < 0 || target < 0 || target >= prev.questions.length) return prev;
-      const questions = [...prev.questions];
-      const [item] = questions.splice(index, 1);
-      questions.splice(target, 0, item);
-      return { ...prev, questions };
-    });
-  }
-
-  function patchActive(questionId: string, patch: Partial<LabQuestion>) {
-    persist((prev) => updateQuestion(prev, questionId, patch));
-  }
-
-  function reloadActiveQuestion() {
-    if (!activeQuestion) return;
-    void generateQuestion(activeQuestion, true);
-  }
   function startPreview() {
-    if (draft.questions.length === 0) return;
+    if (!draft.questions.length) return;
     setMode("preview");
     setPlayIndex(0);
     setSelectedOptionId(null);
     setShowFeedback(false);
   }
 
-  function handlePlaySelect(optionId: string) {
-    if (!playQuestion || selectedOptionId) return;
-    setSelectedOptionId(optionId);
-    setShowFeedback(true);
-  }
+  const headerActions = (
+    <>
+      <button
+        type="button"
+        onClick={() => setMode("edit")}
+        className={cn(
+          "tm-lab-btn tm-lab-btn-ghost px-3",
+          mode === "edit" && "text-[var(--lab-fg)] underline decoration-[var(--lab-accent)] decoration-2 underline-offset-4"
+        )}
+      >
+        Editar
+      </button>
+      <button
+        type="button"
+        onClick={startPreview}
+        disabled={!draft.questions.length}
+        className={cn(
+          "tm-lab-btn tm-lab-btn-ghost inline-flex items-center gap-1.5 px-3",
+          mode === "preview" && "text-[var(--lab-fg)] underline decoration-[var(--lab-accent)] decoration-2 underline-offset-4",
+          !draft.questions.length && "opacity-40"
+        )}
+      >
+        <Play className="h-3.5 w-3.5" />
+        Probar
+      </button>
+    </>
+  );
 
-  function nextPlayQuestion() {
-    if (playIndex + 1 >= draft.questions.length) {
-      setMode("edit");
-      setPlayIndex(0);
-      setSelectedOptionId(null);
-      setShowFeedback(false);
-      return;
-    }
-    setPlayIndex((i) => i + 1);
-    setSelectedOptionId(null);
-    setShowFeedback(false);
+  if (mode === "preview" && playQuestion) {
+    return (
+      <LabShell title={draft.title} actions={headerActions}>
+        <div className="flex min-h-0 flex-1 flex-col px-4 py-4">
+          <p className="mb-3 text-xs text-[var(--lab-muted)]">
+            {playIndex + 1} / {draft.questions.length} · {LAB_FORMAT_LABELS[playQuestion.format]}
+          </p>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <LabQuestionPreview
+              question={playQuestion}
+              mode="play"
+              selectedOptionId={selectedOptionId}
+              secondsLeft={secondsLeft}
+              showFeedback={showFeedback}
+              onSelect={(id) => {
+                if (selectedOptionId) return;
+                setSelectedOptionId(id);
+                setShowFeedback(true);
+              }}
+              loading={generatingIds.has(playQuestion.id)}
+            />
+          </div>
+          {showFeedback ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (playIndex + 1 >= draft.questions.length) {
+                  setMode("edit");
+                  setPlayIndex(0);
+                  setSelectedOptionId(null);
+                  setShowFeedback(false);
+                  return;
+                }
+                setPlayIndex((i) => i + 1);
+                setSelectedOptionId(null);
+                setShowFeedback(false);
+              }}
+              className="tm-lab-btn tm-lab-btn-primary mt-4 w-full shrink-0"
+            >
+              {playIndex + 1 >= draft.questions.length ? "Volver al editor" : "Siguiente"}
+            </button>
+          ) : null}
+        </div>
+      </LabShell>
+    );
   }
 
   return (
-    <LabShell subtitle={draft.title}>
-      <div className="flex shrink-0 gap-2 border-b border-[var(--lab-border)] px-4 py-2">
-        <button
-          type="button"
-          onClick={() => setMode("edit")}
-          className={cn(
-            "min-h-10 flex-1 rounded-lg border text-xs font-semibold uppercase tracking-wider",
-            mode === "edit"
-              ? "border-[var(--lab-accent)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
-              : "border-[var(--lab-border)] text-[var(--lab-muted)]"
-          )}
-        >
-          Editor
-        </button>
-        <button
-          type="button"
-          onClick={startPreview}
-          disabled={draft.questions.length === 0}
-          className={cn(
-            "flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wider",
-            mode === "preview"
-              ? "border-[var(--lab-accent)] bg-[var(--lab-surface)] text-[var(--lab-fg)]"
-              : "border-[var(--lab-border)] text-[var(--lab-muted)]",
-            draft.questions.length === 0 && "opacity-40"
-          )}
-        >
-          <Play className="h-3.5 w-3.5" />
-          Probar
-        </button>
-      </div>
-
-      {mode === "edit" ? (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="shrink-0 space-y-2 border-b border-[var(--lab-border)] px-4 py-3">
-            <label className="block text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-              Título del borrador
-            </label>
-            <input
-              value={draft.title}
-              onChange={(e) => persist({ ...draft, title: e.target.value })}
-              className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)] outline-none focus:border-[var(--lab-accent)]"
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleSave}
-                className="flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--lab-accent)] text-xs font-semibold uppercase text-[var(--lab-fg)]"
-              >
-                <Save className="h-3.5 w-3.5" />
-                {savedFlash ? "Guardado" : "Guardar"}
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[var(--lab-border)] px-3 text-xs uppercase text-[var(--lab-muted)]"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-            <p className="mb-2 text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-              Preguntas ({draft.questions.length})
-            </p>
+    <LabShell title={draft.title} actions={headerActions}>
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+        {/* Lista de preguntas */}
+        <aside className="flex shrink-0 flex-col border-b border-[var(--lab-border)] md:w-72 md:border-b-0 md:border-r">
+          <div className="flex items-center gap-2 px-4 py-3">
             <button
               type="button"
               onClick={generateAllQuestions}
-              disabled={draft.questions.length === 0 || generatingIds.size > 0}
-              className="mb-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[var(--lab-accent)] text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
+              disabled={!draft.questions.length}
+              className="tm-lab-btn tm-lab-btn-primary inline-flex flex-1 items-center justify-center gap-2 px-3"
             >
-              <Sparkles className="size-4" aria-hidden />
-              Generar todas en segundo plano
+              <Sparkles className="h-4 w-4" />
+              Generar todas
             </button>
-            <div className="mb-4 space-y-2">
-              {draft.questions.map((q, index) => {
-                const isGenerating = generatingIds.has(q.id);
-                const isReady = labQuestionIsReady(q);
-                const error = questionErrors[q.id];
+            <button
+              type="button"
+              onClick={() => {
+                const fresh = resetLabDraft();
+                setDraft(fresh);
+                setActiveQuestionId(fresh.questions[0]?.id ?? null);
+              }}
+              className="tm-lab-btn tm-lab-btn-ghost px-3"
+              aria-label="Resetear borrador"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          </div>
 
-                return (
+          <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" aria-label="Preguntas del borrador">
+            {draft.questions.map((q, index) => {
+              const generating = generatingIds.has(q.id);
+              const selected = activeQuestionId === q.id;
+              return (
                 <div
                   key={q.id}
                   className={cn(
-                    "flex items-center gap-2 rounded-xl border p-2",
-                    activeQuestionId === q.id
-                      ? "border-[var(--lab-accent)] bg-[var(--lab-surface)]"
-                      : "border-[var(--lab-border)]"
+                    "mb-0.5 flex items-center gap-2 rounded-md px-2 py-2",
+                    selected && "bg-white/70"
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveQuestionId(q.id)}
-                    className="min-w-0 flex-1 text-left"
+                    className="flex min-w-0 flex-1 items-start gap-2 text-left"
                   >
-                    <span className="flex items-center gap-2 text-[10px] uppercase text-[var(--lab-muted)]">
-                      <span>
+                    <span
+                      className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", statusColor(q, generating))}
+                      aria-hidden
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-xs font-medium text-[var(--lab-fg)]">
                         {index + 1}. {LAB_FORMAT_LABELS[q.format]}
                       </span>
-                      {isGenerating ? (
-                        <span className="inline-flex items-center gap-1 text-[var(--lab-accent)]">
-                          <Loader2 className="size-3 animate-spin" aria-hidden />
-                          Generando
-                        </span>
-                      ) : isReady ? (
-                        <span className="text-[var(--lab-accent)]">Lista</span>
-                      ) : (
-                        <span>Pendiente</span>
-                      )}
+                      <span className="block truncate text-[11px] text-[var(--lab-muted)]">
+                        {statusLabel(q, generating)}
+                        {questionErrors[q.id] ? ` · ${questionErrors[q.id]}` : ""}
+                      </span>
                     </span>
-                    <span className="block truncate text-sm text-[var(--lab-fg)]">
-                      {q.prompt || "(sin enunciado)"}
-                    </span>
-                    {error ? (
-                      <span className="block truncate text-[11px] text-red-400">{error}</span>
-                    ) : null}
                   </button>
                   {canGenerateLabQuestion(q.format) ? (
                     <button
                       type="button"
-                      aria-label="Generar pregunta"
-                      disabled={isGenerating}
-                      onClick={() => void generateQuestion(q, true)}
-                      className="flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border border-[var(--lab-accent)] px-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
+                      disabled={generating}
+                      onClick={() => void generateQuestion(q)}
+                      className="tm-lab-btn tm-lab-btn-ghost shrink-0 px-2 text-[11px]"
                     >
-                      {isGenerating ? (
-                        <Loader2 className="size-4 animate-spin" aria-hidden />
-                      ) : (
-                        <Sparkles className="size-4" aria-hidden />
-                      )}
-                      Generar
+                      {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Gen."}
                     </button>
-                  ) : null}                  <div className="flex shrink-0 flex-col gap-1">
-                    <button
-                      type="button"
-                      aria-label="Subir"
-                      onClick={() => moveQuestion(q.id, -1)}
-                      className="flex h-8 w-8 items-center justify-center rounded border border-[var(--lab-border)] text-[var(--lab-muted)]"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Bajar"
-                      onClick={() => moveQuestion(q.id, 1)}
-                      className="flex h-8 w-8 items-center justify-center rounded border border-[var(--lab-border)] text-[var(--lab-muted)]"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
-                  </div>
+                  ) : null}
                   <button
                     type="button"
-                    aria-label="Eliminar"
                     onClick={() => removeQuestion(q.id)}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-red-900/50 text-red-400"
+                    className="shrink-0 p-1 text-[var(--lab-muted)] hover:text-[var(--lab-danger)]"
+                    aria-label="Eliminar"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                );
-              })}
-            </div>
-            <p className="mb-2 text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-              Añadir formato
-            </p>
-            <div className="mb-6 grid gap-2">
+              );
+            })}
+          </nav>
+
+          <div className="border-t border-[var(--lab-border)] px-4 py-3">
+            <p className="mb-2 text-[11px] font-medium text-[var(--lab-muted)]">Añadir formato</p>
+            <div className="flex flex-wrap gap-1">
               {LAB_QUESTION_FORMATS.map((format) => (
                 <button
                   key={format}
                   type="button"
                   onClick={() => addQuestion(format)}
-                  className="flex min-h-12 items-start gap-2 rounded-xl border border-dashed border-[var(--lab-border)] px-3 py-2 text-left transition-colors active:bg-[var(--lab-surface)]"
+                  className="inline-flex items-center gap-1 rounded-md bg-white/80 px-2 py-1 text-[11px] text-[var(--lab-fg)] hover:bg-white"
                 >
-                  <Plus className="mt-0.5 h-4 w-4 shrink-0 text-[var(--lab-fg)]" />
-                  <span>
-                    <span className="block text-sm font-medium text-[var(--lab-fg)]">
-                      {LAB_FORMAT_LABELS[format]}
-                    </span>
-                    <span className="block text-[11px] text-[var(--lab-muted)]">
-                      {LAB_FORMAT_DESCRIPTIONS[format]}
-                    </span>
-                  </span>
+                  <Plus className="h-3 w-3" />
+                  {LAB_FORMAT_LABELS[format]}
                 </button>
               ))}
             </div>
+          </div>
+        </aside>
 
-            {activeQuestion ? (
-              <div className="space-y-4 border-t border-[var(--lab-border)] pt-4">
-                <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-                  Editar · {LAB_FORMAT_LABELS[activeQuestion.format]}
-                </p>
-
-                {canGenerateLabQuestion(activeQuestion.format) ? (
-                  <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-                        Contenido de la pregunta
-                      </p>
+        {/* Panel principal */}
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          {activeQuestion ? (
+            <>
+              <div className="flex flex-wrap items-center gap-2 border-b border-[var(--lab-border)] px-4 py-3">
+                <span className="text-sm font-semibold text-[var(--lab-fg)]">
+                  {LAB_FORMAT_LABELS[activeQuestion.format]}
+                </span>
+                <div className="flex-1" />
+                {(activeQuestion.format === "image_trivia" ||
+                  activeQuestion.format === "guess_player_hair" ||
+                  activeQuestion.format === "guess_player_eyes" ||
+                  activeQuestion.format === "guess_player_silhouette") && (
+                  <div className="flex gap-1">
+                    {(["easy", "medium", "hard"] as const).map((level) => (
                       <button
+                        key={level}
                         type="button"
-                        onClick={reloadActiveQuestion}
-                        disabled={generatingIds.has(activeQuestion.id)}
-                        className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
-                      >
-                        {generatingIds.has(activeQuestion.id) ? (
-                          <Loader2 className="size-4 animate-spin" aria-hidden />
-                        ) : (
-                          <Sparkles className="size-4" aria-hidden />
+                        onClick={() => setCatalogDifficulty(level)}
+                        className={cn(
+                          "rounded-md px-2 py-1 text-[11px] font-medium capitalize",
+                          catalogDifficulty === level
+                            ? "bg-[var(--lab-accent)] text-white"
+                            : "text-[var(--lab-muted)] hover:bg-white/60"
                         )}
-                        {generatingIds.has(activeQuestion.id) ? "Generando…" : "Generar"}
-                      </button>
-                    </div>                    {activeQuestion.format === "image_trivia" ||
-                    activeQuestion.format === "guess_player_hair" ||
-                    activeQuestion.format === "guess_player_eyes" ? (
-                      <div className="flex flex-wrap gap-2">
-                        {(["easy", "medium", "hard"] as const).map((level) => (
-                          <button
-                            key={level}
-                            type="button"
-                            onClick={() => setCatalogDifficulty(level)}
-                            className={cn(
-                              "min-h-10 rounded-lg border px-3 text-[10px] font-bold uppercase tracking-wider",
-                              catalogDifficulty === level
-                                ? "border-[var(--lab-accent)] text-[var(--lab-fg)]"
-                                : "border-[var(--lab-border)] text-[var(--lab-muted)]"
-                            )}
-                          >
-                            {level}
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
-                    {"momentLabel" in activeQuestion && activeQuestion.momentLabel ? (
-                      <p className="text-xs text-[var(--lab-fg)]">
-                        <span className="text-[var(--lab-muted)]">Fuente: </span>
-                        {activeQuestion.momentLabel}
-                        {"momentDifficulty" in activeQuestion && activeQuestion.momentDifficulty ? (
-                          <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
-                            {activeQuestion.momentDifficulty}
-                          </span>
-                        ) : null}
-                      </p>
-                    ) : activeQuestion.format === "image_trivia" ? (
-                      <p className="text-xs text-[var(--lab-fg)]">
-                        <span className="text-[var(--lab-muted)]">Pregunta: </span>
-                        {activeQuestion.prompt}
-                        {activeQuestion.answerType ? (
-                          <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
-                            {activeQuestion.answerType}
-                          </span>
-                        ) : null}
-                      </p>
-                    ) : activeQuestion.format === "guess_selection" ? (
-                      <p className="text-xs text-[var(--lab-fg)]">
-                        <span className="text-[var(--lab-muted)]">Selección: </span>
-                        {activeQuestion.options.find((o) => o.id === activeQuestion.correctOptionId)
-                          ?.label ?? "—"}
-                      </p>
-                    ) : activeQuestion.format === "guess_player_silhouette" ? (
-                      <p className="text-xs text-[var(--lab-fg)]">
-                        <span className="text-[var(--lab-muted)]">Escena: </span>
-                        {activeQuestion.sceneLabel}
-                      </p>
-                    ) : activeQuestion.format === "video_play_end" ? (
-                      <p className="text-xs text-[var(--lab-muted)]">
-                        Mezcla las opciones de respuesta manteniendo el vídeo.
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {questionErrors[activeQuestion.id] ? (
-                  <p className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
-                    {questionErrors[activeQuestion.id]}
-                  </p>
-                ) : null}
-                <label className="block space-y-1">
-                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">Enunciado</span>
-                  <input
-                    value={activeQuestion.prompt}
-                    onChange={(e) => patchActive(activeQuestion.id, { prompt: e.target.value })}
-                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                  />
-                </label>
-
-                <label className="block space-y-1">
-                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                    Timer (segundos)
-                  </span>
-                  <input
-                    type="number"
-                    min={5}
-                    max={60}
-                    value={activeQuestion.timerSeconds}
-                    onChange={(e) =>
-                      patchActive(activeQuestion.id, { timerSeconds: Number(e.target.value) || 10 })
-                    }
-                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                  />
-                </label>
-
-                {activeQuestion.format === "multiple_choice" ? (
-                  <label className="block space-y-1">
-                    <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                      URL imagen (opcional)
-                    </span>
-                    <input
-                      value={activeQuestion.imageUrl ?? ""}
-                      onChange={(e) =>
-                        patchActive(activeQuestion.id, {
-                          imageUrl: e.target.value.trim() || null,
-                        } as Partial<LabQuestion>)
-                      }
-                      className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                    />
-                  </label>
-                ) : null}
-
-                {activeQuestion.format === "image_trivia" ? (
-                  <label className="block space-y-1">
-                    <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                      URL imagen
-                    </span>
-                    <input
-                      value={activeQuestion.imageUrl}
-                      onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
-                      className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                    />
-                  </label>
-                ) : null}
-
-                {activeQuestion.format === "guess_selection" ? (
-                  <>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        Formación
-                      </span>
-                      <select
-                        value={activeQuestion.formation}
-                        onChange={(e) => {
-                          const formation = e.target.value as typeof activeQuestion.formation;
-                          patchActive(activeQuestion.id, {
-                            formation,
-                            slots: selectionSlotsForFormation(formation),
-                          });
-                        }}
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       >
-                        {FORMATION_IDS.map((id) => (
-                          <option key={id} value={id}>
-                            {id}
-                          </option>
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {canGenerateLabQuestion(activeQuestion.format) ? (
+                  <button
+                    type="button"
+                    disabled={generatingIds.has(activeQuestion.id)}
+                    onClick={() => void generateQuestion(activeQuestion)}
+                    className="tm-lab-btn tm-lab-btn-primary inline-flex items-center gap-2 px-4"
+                  >
+                    {generatingIds.has(activeQuestion.id) ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                    {labQuestionIsReady(activeQuestion) ? "Otra pregunta" : "Generar"}
+                  </button>
+                ) : null}
+              </div>
+
+              {questionErrors[activeQuestion.id] ? (
+                <p className="border-b border-[var(--lab-border)] bg-red-50 px-4 py-2 text-xs text-[var(--lab-danger)]">
+                  {questionErrors[activeQuestion.id]}
+                </p>
+              ) : null}
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+                <LabQuestionPreview
+                  question={activeQuestion}
+                  mode="editor"
+                  loading={generatingIds.has(activeQuestion.id)}
+                />
+              </div>
+
+              <div className="shrink-0 border-t border-[var(--lab-border)]">
+                <button
+                  type="button"
+                  onClick={() => setShowSettings((v) => !v)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-medium text-[var(--lab-muted)]"
+                >
+                  Ajustes manuales
+                  <span>{showSettings ? "−" : "+"}</span>
+                </button>
+                {showSettings ? (
+                  <div className="space-y-3 border-t border-[var(--lab-border)] px-4 py-3">
+                    <label className="block space-y-1 text-xs">
+                      <span className="text-[var(--lab-muted)]">Título borrador</span>
+                      <input
+                        value={draft.title}
+                        onChange={(e) => persist({ ...draft, title: e.target.value })}
+                        className="w-full px-3 py-2 text-sm"
+                      />
+                    </label>
+                    <label className="block space-y-1 text-xs">
+                      <span className="text-[var(--lab-muted)]">Enunciado</span>
+                      <input
+                        value={activeQuestion.prompt}
+                        onChange={(e) => patchActive(activeQuestion.id, { prompt: e.target.value })}
+                        className="w-full px-3 py-2 text-sm"
+                      />
+                    </label>
+                    <label className="block space-y-1 text-xs">
+                      <span className="text-[var(--lab-muted)]">Timer (s)</span>
+                      <input
+                        type="number"
+                        min={5}
+                        max={60}
+                        value={activeQuestion.timerSeconds}
+                        onChange={(e) =>
+                          patchActive(activeQuestion.id, {
+                            timerSeconds: Number(e.target.value) || 10,
+                          })
+                        }
+                        className="w-full px-3 py-2 text-sm"
+                      />
+                    </label>
+
+                    {activeQuestion.format === "guess_selection" ? (
+                      <>
+                        <label className="block space-y-1 text-xs">
+                          <span className="text-[var(--lab-muted)]">Formación</span>
+                          <select
+                            value={activeQuestion.formation}
+                            onChange={(e) => {
+                              const formation = e.target.value as typeof activeQuestion.formation;
+                              patchActive(activeQuestion.id, {
+                                formation,
+                                slots: selectionSlotsForFormation(formation),
+                              });
+                            }}
+                            className="w-full px-3 py-2 text-sm"
+                          >
+                            {FORMATION_IDS.map((id) => (
+                              <option key={id} value={id}>
+                                {id}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        {activeQuestion.slots.map((slot, index) => (
+                          <div key={slot.slotKey} className="grid gap-2 sm:grid-cols-2">
+                            <input
+                              value={slot.clubLabel}
+                              onChange={(e) => {
+                                const slots = [...activeQuestion.slots];
+                                slots[index] = {
+                                  ...slot,
+                                  clubLabel: e.target.value,
+                                  clubImageUrl:
+                                    resolveClubCrestUrl(e.target.value) ?? slot.clubImageUrl,
+                                };
+                                patchActive(activeQuestion.id, { slots });
+                              }}
+                              placeholder="Club"
+                              className="px-3 py-2 text-sm"
+                            />
+                            <input
+                              value={slot.playerName ?? ""}
+                              onChange={(e) => {
+                                const slots = [...activeQuestion.slots];
+                                slots[index] = { ...slot, playerName: e.target.value };
+                                patchActive(activeQuestion.id, { slots });
+                              }}
+                              placeholder="Jugador"
+                              className="px-3 py-2 text-sm"
+                            />
+                          </div>
                         ))}
-                      </select>
-                    </label>
-                    <div className="space-y-2">
-                      {activeQuestion.slots.map((slot, index) => (
-                        <div key={slot.slotKey} className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                          <input
-                            value={slot.clubLabel}
-                            onChange={(e) => {
-                              const clubLabel = e.target.value;
-                              const slots = [...activeQuestion.slots];
-                              slots[index] = {
-                                ...slot,
-                                clubLabel,
-                                clubImageUrl: resolveClubCrestUrl(clubLabel) ?? slot.clubImageUrl,
-                              };
-                              patchActive(activeQuestion.id, { slots });
-                            }}
-                            placeholder={`Club ${slot.slotKey}`}
-                            className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                          />
-                          <input
-                            value={slot.playerName ?? ""}
-                            onChange={(e) => {
-                              const slots = [...activeQuestion.slots];
-                              slots[index] = {
-                                ...slot,
-                                playerName: e.target.value,
-                              };
-                              patchActive(activeQuestion.id, { slots });
-                            }}
-                            placeholder={`Jugador ${slot.slotKey}`}
-                            className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                          />
-                          <input
-                            value={slot.clubImageUrl ?? ""}
-                            onChange={(e) => {
-                              const slots = [...activeQuestion.slots];
-                              slots[index] = {
-                                ...slot,
-                                clubImageUrl: e.target.value.trim() || null,
-                              };
-                              patchActive(activeQuestion.id, { slots });
-                            }}
-                            placeholder="URL escudo (auto)"
-                            className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-xs text-[var(--lab-fg)]"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
+                      </>
+                    ) : null}
 
-                {isLabPlayerCropQuestion(activeQuestion) ? (
-                  <>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        URL imagen (recorte)
-                      </span>
+                    {isLabPlayerCropQuestion(activeQuestion) ? (
                       <input
                         value={activeQuestion.imageUrl}
                         onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                        placeholder="URL imagen"
+                        className="w-full px-3 py-2 text-sm"
                       />
-                    </label>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        Contexto (opcional)
-                      </span>
-                      <input
-                        value={activeQuestion.sceneHint ?? ""}
-                        onChange={(e) =>
-                          patchActive(activeQuestion.id, {
-                            sceneHint: e.target.value.trim() || null,
-                          } as Partial<LabQuestion>)
-                        }
-                        placeholder="Mundial 2002, Champions..."
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                    </label>
-                  </>
-                ) : null}
+                    ) : null}
 
-                {isLabPlayerSilhouetteQuestion(activeQuestion) ? (
-                  <>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        URL foto con silueta
-                      </span>
+                    {isLabPlayerSilhouetteQuestion(activeQuestion) ? (
                       <input
                         value={activeQuestion.imageUrl}
                         onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                        placeholder="URL silueta"
+                        className="w-full px-3 py-2 text-sm"
                       />
-                    </label>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        URL foto revelada (opcional)
-                      </span>
-                      <input
-                        value={activeQuestion.revealImageUrl ?? ""}
-                        onChange={(e) =>
-                          patchActive(activeQuestion.id, {
-                            revealImageUrl: e.target.value.trim() || null,
-                          } as Partial<LabQuestion>)
-                        }
-                        placeholder="Sin silueta, al resolver"
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                    </label>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        Escena / momento
-                      </span>
-                      <input
-                        value={activeQuestion.sceneLabel}
-                        onChange={(e) => patchActive(activeQuestion.id, { sceneLabel: e.target.value })}
-                        placeholder="Euro 2008 — España"
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                    </label>
-                  </>
-                ) : null}
+                    ) : null}
 
-                {activeQuestion.format === "video_play_end" ? (
-                  <>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        URL vídeo
-                      </span>
+                    {activeQuestion.format === "video_play_end" ? (
                       <input
                         value={activeQuestion.videoUrl}
                         onChange={(e) => patchActive(activeQuestion.id, { videoUrl: e.target.value })}
                         placeholder={LAB_DEMO_VIDEO_SRC}
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                        className="w-full px-3 py-2 text-sm"
                       />
-                      <p className="text-[10px] text-[var(--lab-muted)]">
-                        Recomendado: vídeo local en /public (p. ej. {LAB_DEMO_VIDEO_SRC})
-                      </p>
-                    </label>
-                    <label className="block space-y-1">
-                      <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                        Corte (segundos)
-                      </span>
-                      <input
-                        type="number"
-                        min={1}
-                        max={120}
-                        step={0.5}
-                        value={activeQuestion.stopAtSeconds}
-                        onChange={(e) =>
-                          patchActive(activeQuestion.id, { stopAtSeconds: Number(e.target.value) || 3 })
-                        }
-                        className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                    </label>
-                  </>
-                ) : null}
+                    ) : null}
 
-                <div className="space-y-2">
-                  <p className="text-[10px] uppercase text-[var(--lab-muted)]">Opciones</p>
-                  {activeQuestion.options.map((option, index) => (
-                    <div key={option.id} className="flex gap-2">
-                      <input
-                        value={option.label}
-                        onChange={(e) => {
-                          const options = [...activeQuestion.options];
-                          options[index] = { ...option, label: e.target.value };
-                          patchActive(activeQuestion.id, { options });
-                        }}
-                        className="min-h-10 flex-1 rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => patchActive(activeQuestion.id, { correctOptionId: option.id })}
-                        className={cn(
-                          "min-h-10 shrink-0 rounded-lg border px-3 text-[10px] font-bold uppercase",
-                          activeQuestion.correctOptionId === option.id
-                            ? "border-[var(--lab-accent)] text-[var(--lab-fg)]"
-                            : "border-[var(--lab-border)] text-[var(--lab-muted)]"
-                        )}
-                      >
-                        OK
-                      </button>
+                    <div className="space-y-2">
+                      {activeQuestion.options.map((option, index) => (
+                        <div key={option.id} className="flex gap-2">
+                          <input
+                            value={option.label}
+                            onChange={(e) => {
+                              const options = [...activeQuestion.options];
+                              options[index] = { ...option, label: e.target.value };
+                              patchActive(activeQuestion.id, { options });
+                            }}
+                            className="min-h-10 flex-1 px-3 py-2 text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              patchActive(activeQuestion.id, { correctOptionId: option.id })
+                            }
+                            className={cn(
+                              "min-h-10 shrink-0 rounded-md px-3 text-[11px] font-semibold",
+                              activeQuestion.correctOptionId === option.id
+                                ? "bg-[var(--lab-accent)] text-white"
+                                : "bg-white/80 text-[var(--lab-muted)]"
+                            )}
+                          >
+                            OK
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-
-                <div className="rounded-xl border border-[var(--lab-border)] bg-black/30 p-3">
-                  <p className="mb-2 text-[10px] uppercase text-[var(--lab-muted)]">Vista previa</p>
-                  <LabQuestionPreview
-                    question={activeQuestion}
-                    mode="editor"
-                    loading={generatingIds.has(activeQuestion.id)}
-                  />
-                </div>              </div>
-            ) : null}
-          </div>
-        </div>
-      ) : (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-4">
-          {playQuestion ? (
-            <>
-              <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-                <span>
-                  Pregunta {playIndex + 1} / {draft.questions.length}
-                </span>
-                <span>{LAB_FORMAT_LABELS[playQuestion.format]}</span>
+                  </div>
+                ) : null}
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto">
-                <LabQuestionPreview
-                  question={playQuestion}
-                  mode="play"
-                  selectedOptionId={selectedOptionId}
-                  secondsLeft={secondsLeft}
-                  showFeedback={showFeedback}
-                  onSelect={handlePlaySelect}
-                  loading={generatingIds.has(playQuestion.id)}
-                />              </div>
-              {showFeedback ? (
-                <button
-                  type="button"
-                  onClick={nextPlayQuestion}
-                  className="mt-4 min-h-12 shrink-0 rounded-xl border border-[var(--lab-accent)] bg-[var(--lab-surface)] font-display text-sm uppercase tracking-wider text-[var(--lab-fg)]"
-                >
-                  {playIndex + 1 >= draft.questions.length ? "Volver al editor" : "Siguiente"}
-                </button>
-              ) : null}
             </>
           ) : (
-            <p className="text-center text-sm text-[var(--lab-muted)]">No hay preguntas.</p>
+            <p className="p-6 text-sm text-[var(--lab-muted)]">No hay preguntas en el borrador.</p>
           )}
-        </div>
-      )}
+        </main>
+      </div>
     </LabShell>
   );
 }

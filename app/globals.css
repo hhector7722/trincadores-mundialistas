@@ -2411,50 +2411,81 @@ html:has(.tm-app-shell) body {
   line-height: 1;
 }
 
-/* Quiz laboratorio — sandbox monocromo (solo hector) */
+/* Quiz laboratorio — taller claro, distinto de la app morada */
 .tm-lab-root {
-  --lab-bg: #0a0a0a;
-  --lab-bg-elevated: #141414;
-  --lab-fg: #f5f5f5;
-  --lab-accent: #ffffff;
-  --lab-muted: #737373;
-  --lab-border: rgba(255, 255, 255, 0.14);
-  --lab-surface: rgba(255, 255, 255, 0.06);
-  --lab-highlight: rgba(255, 255, 255, 0.14);
+  --lab-bg: #ebe6dc;
+  --lab-bg-elevated: #f5f1ea;
+  --lab-fg: #2c2825;
+  --lab-accent: #2d6a4f;
+  --lab-accent-soft: #40916c;
+  --lab-muted: #6b6560;
+  --lab-border: #d4cdc3;
+  --lab-surface: transparent;
+  --lab-highlight: #d8f3dc;
+  --lab-danger: #b91c1c;
   background-color: var(--lab-bg);
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 55%),
-    linear-gradient(180deg, #171717 0%, var(--lab-bg) 42%, #050505 100%);
   color: var(--lab-fg);
   font-family: var(--font-ui);
 }
 
 .tm-lab-header {
-  background: rgba(10, 10, 10, 0.92);
-  border-color: var(--lab-border);
-  backdrop-filter: blur(8px);
-}
-
-.tm-lab-scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(255, 255, 255, 0.025) 2px,
-    rgba(255, 255, 255, 0.025) 4px
-  );
-  opacity: 0.45;
+  background: var(--lab-bg-elevated);
+  border-bottom: 1px solid var(--lab-border);
 }
 
 .tm-lab-root select,
 .tm-lab-root input,
 .tm-lab-root textarea {
-  color-scheme: dark;
+  color-scheme: light;
+  background: #fff;
+  border: 1px solid var(--lab-border);
+  border-radius: 0.375rem;
+}
+
+.tm-lab-root select:focus,
+.tm-lab-root input:focus,
+.tm-lab-root textarea:focus {
+  outline: 2px solid color-mix(in srgb, var(--lab-accent) 35%, transparent);
+  border-color: var(--lab-accent-soft);
 }
 
 .tm-lab-root select option {
-  background: #141414;
-  color: #f5f5f5;
+  background: #fff;
+  color: var(--lab-fg);
+}
+
+.tm-lab-btn {
+  min-height: 2.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.tm-lab-btn-primary {
+  background: var(--lab-accent);
+  color: #fff;
+}
+
+.tm-lab-btn-primary:hover:not(:disabled) {
+  background: var(--lab-accent-soft);
+}
+
+.tm-lab-btn-primary:disabled {
+  opacity: 0.45;
+}
+
+.tm-lab-btn-ghost {
+  color: var(--lab-muted);
+}
+
+.tm-lab-btn-ghost:hover:not(:disabled) {
+  color: var(--lab-fg);
+  background: color-mix(in srgb, var(--lab-border) 55%, transparent);
+}
+
+.tm-lab-divider {
+  border-color: var(--lab-border);
 }
 
 /* Asistente de predicciones — overlay y panel */

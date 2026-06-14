@@ -36,18 +36,16 @@ export function LabGuessPlayerCropStage({
   const hasImage = Boolean(imageUrl?.trim());
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[var(--lab-border)] bg-black">
-      <div className="flex items-center justify-between border-b border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2">
-        <span className="font-display text-xs uppercase tracking-[0.2em] text-[var(--lab-accent)]">
-          {cropLabel}
-        </span>
+    <div className="overflow-hidden border-b border-[var(--lab-border)]">
+      <div className="flex items-center justify-between bg-[var(--lab-bg-elevated)] px-3 py-2">
+        <span className="text-xs font-medium text-[var(--lab-muted)]">{cropLabel}</span>
         {sceneHint ? (
           <span className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
             {sceneHint}
           </span>
         ) : null}
       </div>
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0a0a0a]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
         {hasImage && !loading ? (
           useDerivedAsset ? (
             /* eslint-disable-next-line @next/next/no-img-element */

@@ -132,14 +132,18 @@ export async function generateLabQuestion(
     if (!sourcePath) return null;
 
     if (input.force) {
-      await getDerivedLabAssetBuffer(
-        momentSourceAbsolutePath(sourcePath),
-        moment.id,
-        "silhouette",
-        { moment, force: true }
-      );
+      try {
+        await getDerivedLabAssetBuffer(
+          momentSourceAbsolutePath(sourcePath),
+          moment.id,
+          "silhouette",
+          { moment, force: true }
+        );
+      } catch (error) {
+        console.warn("[generateLabQuestion] Silueta OpenAI no disponible, se sirve bajo demanda.", error);
+      }
     }
-    const imageUrl = labGeneratedAssetApiUrl(moment.id, "silhouette", input.force);
+    const imageUrl = labGeneratedAssetApiUrl(moment.id, "silhouette", false);
 
     return buildSilhouetteQuestion(moment, imageUrl, questionId);
   }

@@ -28,10 +28,7 @@ export function questionNeedsAutoGeneration(question: LabQuestion): boolean {
     question.format === "guess_player_eyes" ||
     question.format === "guess_player_silhouette"
   ) {
-    const imageUrl = question.imageUrl?.trim() ?? "";
-    if (!imageUrl) return true;
-    if (imageUrl.includes("/api/laboratorio/asset")) return true;
-    return !imageUrl.startsWith("/images/quiz/lab/generated/");
+    return !question.momentId;
   }
 
   return false;

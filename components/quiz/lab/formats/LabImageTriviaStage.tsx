@@ -13,14 +13,12 @@ export function LabImageTriviaStage({ question, loading = false }: LabImageTrivi
   const hasImage = Boolean(question.imageUrl?.trim());
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[var(--lab-border)] bg-black">
-      <div className="border-b border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2">
-        <span className="font-display text-xs uppercase tracking-[0.2em] text-[var(--lab-accent)]">
-          Momento histórico
-        </span>
+    <div className="overflow-hidden border-b border-[var(--lab-border)]">
+      <div className="bg-[var(--lab-bg-elevated)] px-3 py-2">
+        <span className="text-xs font-medium text-[var(--lab-muted)]">Momento histórico</span>
       </div>
       {hasImage && !loading ? (
-        <div className="relative aspect-[4/3] w-full bg-[#0a0a0a]">
+        <div className="relative aspect-[4/3] w-full bg-white">
           <Image
             src={question.imageUrl}
             alt=""

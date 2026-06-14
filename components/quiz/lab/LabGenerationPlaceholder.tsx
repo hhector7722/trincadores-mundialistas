@@ -17,15 +17,15 @@ export function LabGenerationPlaceholder({
   return (
     <div
       className={cn(
-        "flex aspect-[4/3] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[var(--lab-border)] bg-[#0a0a0a] px-6 text-center",
+        "flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 px-6 py-8 text-center",
         className
       )}
     >
       {loading ? (
-        <Loader2 className="h-8 w-8 animate-spin text-[var(--lab-accent)]" aria-hidden />
+        <Loader2 className="h-6 w-6 animate-spin text-[var(--lab-accent)]" aria-hidden />
       ) : null}
-      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--lab-muted)]">
-        {loading ? "Generando…" : "Sin contenido"}
+      <p className="text-xs font-medium text-[var(--lab-muted)]">
+        {loading ? "Generando contenido…" : "Sin contenido"}
       </p>
       <p className="text-sm text-[var(--lab-fg)]">{label}</p>
     </div>
