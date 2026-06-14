@@ -1,25 +1,118 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
+import { trackUsageHighlightOpen, trackUsageHighlightWatch } from "@/lib/usage/client";
+import { loadYouTubeIframeApi, type YTPlayer } from "@/lib/youtube/iframe-api";
 
 type MatchHighlightPlayerModalProps = {
   open: boolean;
   onClose: () => void;
-  /** URL del embed (con autoplay) generada en el gesto de clic del usuario. */
-  embedSrc: string | null;
+  videoId: string;
   title: string;
+  matchId?: string;
 };
 
 export function MatchHighlightPlayerModal({
   open,
   onClose,
-  embedSrc,
+  videoId,
   title,
+  matchId,
 }: MatchHighlightPlayerModalProps) {
+  const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
+  const playingSinceRef = useRef<number | null>(null);
+  const watchedMsRef = useRef(0);
+  const videoDurationSecRef = useRef(0);
+  const openTrackedRef = useRef(false);
+  const usageLabel = `Resumen: ${title}`;
+
+  const flushPlayingTime = useCallback(() => {
+    if (playingSinceRef.current == null) return;
+    watchedMsRef.current += Date.now() - playingSinceRef.current;
+    playingSinceRef.current = null;
+  }, []);
+
+  const reportWatchSession = useCallback(() => {
+    flushPlayingTime();
+    trackUsageHighlightWatch(
+      videoId,
+      usageLabel,
+      pathname,
+      watchedMsRef.current,
+      videoDurationSecRef.current,
+      matchId
+    );
+  }, [flushPlayingTime, matchId, pathname, usageLabel, videoId]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (!openTrackedRef.current) {
+      openTrackedRef.current = true;
+      trackUsageHighlightOpen(videoId, usageLabel, pathname, matchId);
+    }
+
+    let destroyed = false;
+
+    void loadYouTubeIframeApi()
+      .then((YT) => {
+        if (destroyed || !containerRef.current) return;
+
+        playerRef.current = new YT.Player(containerRef.current, {
+          videoId,
+          playerVars: {
+            autoplay: 1,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+          },
+          events: {
+            onReady: (event) => {
+              const duration = event.target.getDuration();
+              if (duration > 0) {
+                videoDurationSecRef.current = duration;
+              }
+            },
+            onStateChange: (event) => {
+              const { PLAYING, PAUSED, ENDED, BUFFERING } = YT.PlayerState;
+
+              if (event.data === PLAYING) {
+                playingSinceRef.current = Date.now();
+                return;
+              }
+
+              if (event.data === PAUSED || event.data === ENDED || event.data === BUFFERING) {
+                flushPlayingTime();
+              }
+            },
+          },
+        });
+      })
+      .catch(() => {
+        // Sin API: al menos queda highlight_open al abrir el modal.
+      });
+
+    return () => {
+      destroyed = true;
+      reportWatchSession();
+      playerRef.current?.destroy();
+      playerRef.current = null;
+      playingSinceRef.current = null;
+      watchedMsRef.current = 0;
+      videoDurationSecRef.current = 0;
+      openTrackedRef.current = false;
+    };
+  }, [flushPlayingTime, matchId, open, pathname, reportWatchSession, usageLabel, videoId]);
+
   return (
     <Modal
       open={open}
       onClose={onClose}
+      disableUsageTracking
       title="Resumen del partido"
       ariaLabel={title}
       scrollContent={false}
@@ -28,17 +121,7 @@ export function MatchHighlightPlayerModal({
       <div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
         <div className="overflow-hidden rounded-xl border border-[var(--tm-border)] bg-black">
           <div className="relative aspect-video w-full">
-            {open && embedSrc ? (
-              <iframe
-                key={embedSrc}
-                src={embedSrc}
-                title={title}
-                className="absolute inset-0 h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
-            ) : null}
+            {open ? <div ref={containerRef} className="absolute inset-0 h-full w-full" /> : null}
           </div>
         </div>
       </div>

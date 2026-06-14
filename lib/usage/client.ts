@@ -103,3 +103,55 @@ export function trackUsageModalDwell(
     },
   });
 }
+
+export function trackUsageHighlightOpen(
+  videoId: string,
+  label: string,
+  pagePath: string,
+  matchId?: string
+): void {
+  void sendUsageEvent({
+    eventType: "action",
+    path: pagePath,
+    label,
+    metadata: {
+      action: "highlight_open",
+      videoId,
+      videoLabel: label,
+      matchId,
+    },
+  });
+}
+
+export function trackUsageHighlightWatch(
+  videoId: string,
+  label: string,
+  pagePath: string,
+  watchedMs: number,
+  videoDurationSec: number,
+  matchId?: string
+): void {
+  if (watchedMs < 1000) return;
+
+  const watchedSec = Math.round(watchedMs / 1000);
+  const percentWatched =
+    videoDurationSec > 0
+      ? Math.min(100, Math.round((watchedSec / videoDurationSec) * 100))
+      : undefined;
+
+  void sendUsageEvent({
+    eventType: "action",
+    path: pagePath,
+    label,
+    durationMs: watchedMs,
+    metadata: {
+      action: "highlight_watch",
+      videoId,
+      videoLabel: label,
+      matchId,
+      watchedSec,
+      videoDurationSec: videoDurationSec > 0 ? Math.round(videoDurationSec) : undefined,
+      percentWatched,
+    },
+  });
+}

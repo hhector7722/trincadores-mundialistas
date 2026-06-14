@@ -22,6 +22,7 @@ function highlightToSlideBody(highlight: MatchHighlightView) {
     <MatchHighlightBlock
       variant="hero"
       className="w-full"
+      matchId={highlight.matchId}
       homeTeam={highlight.homeTeam}
       awayTeam={highlight.awayTeam}
       homeGoals={highlight.homeGoals}

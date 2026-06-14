@@ -5,7 +5,6 @@ import { Suspense, useEffect, useState } from "react";
 import { fetchMatchHighlightModalContextAction } from "@/actions/notifications";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { HIGHLIGHT_NOTIFICATION_QUERY } from "@/lib/push/urls";
-import { youtubeEmbedUrl } from "@/lib/youtube/constants";
 import { teamAbbr } from "@/lib/teams/display";
 
 function HighlightNotificationOpenerInner() {
@@ -13,9 +12,12 @@ function HighlightNotificationOpenerInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const matchId = searchParams.get(HIGHLIGHT_NOTIFICATION_QUERY);
-  const [player, setPlayer] = useState<{ open: boolean; embedSrc: string; title: string } | null>(
-    null,
-  );
+  const [player, setPlayer] = useState<{
+    open: boolean;
+    videoId: string;
+    title: string;
+    matchId: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!matchId) return;
@@ -36,8 +38,9 @@ function HighlightNotificationOpenerInner() {
       const title = `${teamAbbr(result.data.homeTeam)} - ${teamAbbr(result.data.awayTeam)}`;
       setPlayer({
         open: true,
-        embedSrc: youtubeEmbedUrl(result.data.highlightYoutubeId, true),
+        videoId: result.data.highlightYoutubeId,
         title,
+        matchId,
       });
     })();
 
@@ -52,8 +55,9 @@ function HighlightNotificationOpenerInner() {
     <MatchHighlightPlayerModal
       open={player.open}
       onClose={() => setPlayer(null)}
-      embedSrc={player.embedSrc}
+      videoId={player.videoId}
       title={player.title}
+      matchId={player.matchId}
     />
   );
 }

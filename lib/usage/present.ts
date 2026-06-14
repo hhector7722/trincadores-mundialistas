@@ -65,6 +65,21 @@ export function formatUsageActivityTitle(
       const duration = formatDurationMs(row.duration_ms);
       return duration.trim() ? `${duration} en ${modalLabel}` : `Tiempo en ${modalLabel}`;
     }
+    if (action === "highlight_open") {
+      const videoLabel = typeof meta.videoLabel === "string" ? meta.videoLabel : place;
+      return `Abrio ${videoLabel}`;
+    }
+    if (action === "highlight_watch") {
+      const videoLabel = typeof meta.videoLabel === "string" ? meta.videoLabel : place;
+      const duration = formatDurationMs(row.duration_ms);
+      const percent =
+        typeof meta.percentWatched === "number" && meta.percentWatched > 0
+          ? ` (${meta.percentWatched}%)`
+          : "";
+      return duration.trim()
+        ? `${duration} de ${videoLabel}${percent}`
+        : `Vio ${videoLabel}${percent}`;
+    }
     if (action === "prediction_saved") return place;
     if (action === "quiz_started") return "Empezo un quiz";
     if (action === "quiz_submitted") return place;

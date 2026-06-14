@@ -5,6 +5,8 @@ export type AppUsageActionKind =
   | "page_dwell"
   | "modal_open"
   | "modal_dwell"
+  | "highlight_open"
+  | "highlight_watch"
   | "prediction_saved"
   | "quiz_started"
   | "quiz_submitted";
@@ -20,6 +22,11 @@ export type AppUsageMetadata = {
   score?: number;
   modalId?: string;
   modalLabel?: string;
+  videoId?: string;
+  videoLabel?: string;
+  watchedSec?: number;
+  videoDurationSec?: number;
+  percentWatched?: number;
   source?: "client" | "middleware" | "server";
   [key: string]: string | number | boolean | null | undefined;
 };

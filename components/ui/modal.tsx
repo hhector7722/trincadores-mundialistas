@@ -60,6 +60,8 @@ type ModalProps = {
   usageId?: string;
   /** Etiqueta legible para analytics (si title no es string). */
   usageLabel?: string;
+  /** Desactiva tracking de modal (p. ej. reproductor de resumen con metricas propias). */
+  disableUsageTracking?: boolean;
 };
 
 function lockPageScroll() {
@@ -306,6 +308,7 @@ export function Modal({
   hideCloseButton = false,
   usageId,
   usageLabel,
+  disableUsageTracking = false,
 }: ModalProps) {
   const titleId = useId();
   const pathname = usePathname();
@@ -332,6 +335,8 @@ export function Modal({
       .replace(/^-|-$/g, "");
 
   useEffect(() => {
+    if (disableUsageTracking) return;
+
     if (!open) {
       if (openedAtRef.current != null && trackedLabelRef.current) {
         trackUsageModalDwell(
@@ -366,7 +371,7 @@ export function Modal({
     }
 
     trackedLabelRef.current = resolvedUsageLabel;
-  }, [open, pathname, resolvedUsageId, resolvedUsageLabel]);
+  }, [disableUsageTracking, open, pathname, resolvedUsageId, resolvedUsageLabel]);
 
   useEffect(() => {
     if (!open) return;

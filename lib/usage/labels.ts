@@ -24,6 +24,8 @@ const ACTION_LABELS: Record<string, string> = {
   page_dwell: "Tiempo en pantalla",
   modal_open: "Modal abierto",
   modal_dwell: "Tiempo en modal",
+  highlight_open: "Resumen abierto",
+  highlight_watch: "Tiempo en resumen",
   prediction_saved: "Pronostico guardado",
   quiz_started: "Quiz iniciado",
   quiz_submitted: "Quiz enviado",
@@ -47,6 +49,12 @@ export function deriveUsageLabel(
     }
     if (metadata.action === "modal_open" && metadata.modalLabel) {
       return String(metadata.modalLabel);
+    }
+    if (
+      (metadata.action === "highlight_open" || metadata.action === "highlight_watch") &&
+      metadata.videoLabel
+    ) {
+      return String(metadata.videoLabel);
     }
     return base;
   }

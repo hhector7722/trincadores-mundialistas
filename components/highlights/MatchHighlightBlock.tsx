@@ -6,7 +6,6 @@ import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighligh
 import { MatchHighlightScoreline } from "@/components/highlights/MatchHighlightScoreline";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
 import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
-import { youtubeEmbedUrl } from "@/lib/youtube/constants";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -16,10 +15,10 @@ type MatchHighlightBlockProps = {
   homeGoals: number;
   awayGoals: number;
   youtubeVideoId: string;
+  matchId?: string;
   highlightSource?: HighlightSourceCode | null;
   headline?: string | null;
   variant?: "hero" | "modal";
-  /** Reduce altura del thumbnail ~22 % en modal detalle. */
   compactThumbnail?: boolean;
   className?: string;
 };
@@ -30,6 +29,7 @@ export function MatchHighlightBlock({
   homeGoals,
   awayGoals,
   youtubeVideoId,
+  matchId,
   highlightSource = null,
   headline = null,
   variant = "modal",
@@ -37,19 +37,9 @@ export function MatchHighlightBlock({
   className,
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
-  const [embedSrc, setEmbedSrc] = useState<string | null>(null);
   const { visible: scorelineVisible } = useHighlightScorelineVisibility();
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
-  function openPlayer() {
-    setEmbedSrc(youtubeEmbedUrl(youtubeVideoId, true));
-    setPlayerOpen(true);
-  }
-
-  function closePlayer() {
-    setPlayerOpen(false);
-    setEmbedSrc(null);
-  }
 
   return (
     <>
@@ -86,7 +76,7 @@ export function MatchHighlightBlock({
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={openPlayer}
+              onPlay={() => setPlayerOpen(true)}
               compact
               className="mx-0 w-full max-w-none"
             />
@@ -99,7 +89,7 @@ export function MatchHighlightBlock({
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={openPlayer}
+              onPlay={() => setPlayerOpen(true)}
               reduced={compactThumbnail}
               className="max-w-none"
             />
@@ -109,9 +99,10 @@ export function MatchHighlightBlock({
 
       <MatchHighlightPlayerModal
         open={playerOpen}
-        onClose={closePlayer}
-        embedSrc={embedSrc}
+        onClose={() => setPlayerOpen(false)}
+        videoId={youtubeVideoId}
         title={title}
+        matchId={matchId}
       />
     </>
   );
