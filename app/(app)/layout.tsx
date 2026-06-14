@@ -3,6 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { PredictorFab } from "@/components/laboratorio/PredictorFab";
 import { Button } from "@/components/ui/button";
 import { canAccessQuizLab } from "@/lib/quiz/lab-access";
+import { getQuizDayHub } from "@/lib/quiz/queries";
 import { getCachedAppShellContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/actions/auth";
@@ -20,8 +21,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   const ctx = await getCachedAppShellContext();
+  const quizHub = ctx ? await getQuizDayHub(ctx.activePoolId, user.id) : null;
 
-  if (!ctx) {
+  if (!ctx || !quizHub) {
     return (
       <main className="relative z-10 flex min-h-dvh flex-col items-center justify-center p-6">
         <p className="text-sm text-[var(--tm-fg)]">No perteneces a ninguna porra.</p>
@@ -38,7 +40,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      <AppShell ctx={ctx}>{children}</AppShell>
+      <AppShell ctx={ctx} quizHub={quizHub}>
+        {children}
+      </AppShell>
       {predictorEnabled ? <PredictorFab enabled={predictorEnabled} /> : null}
     </>
   );

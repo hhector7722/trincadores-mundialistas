@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { QuizReplayButton } from "@/components/quiz/QuizReplayButton";
 
 type QuizResultSummaryProps = {
   score: number;
@@ -48,14 +49,7 @@ export function QuizResultSummary({
       </Card>
 
       <div className="tm-quiz-actions flex flex-col gap-2">
-        {canReplay && (
-          <Link
-            href="/quiz/play"
-            className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)]"
-          >
-            Jugar otra vez
-          </Link>
-        )}
+        {canReplay && <QuizReplayButton />}
         <Link
           href="/quiz"
           className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] px-5 text-sm font-semibold text-[var(--tm-fg)]"

@@ -3,7 +3,9 @@ import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { AppMainWrapper } from "@/components/layout/AppMainWrapper";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
 import { HighlightNotificationOpener } from "@/components/notifications/HighlightNotificationOpener";
+import { QuizEntryProvider } from "@/components/quiz/QuizEntryProvider";
 import { QuizActiveNotificationProvider } from "@/components/notifications/QuizActiveNotificationProvider";
+import type { QuizDayHub } from "@/lib/quiz/types";
 import { UnreadNotificationsShell } from "@/components/notifications/UnreadNotificationsShell";
 import { PushNotificationProvider } from "@/components/push/PushNotificationProvider";
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
@@ -20,9 +22,11 @@ import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppShell({
   ctx,
+  quizHub,
   children,
 }: {
   ctx: AppShellContext;
+  quizHub: QuizDayHub;
   children: React.ReactNode;
 }) {
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null;
@@ -30,8 +34,9 @@ export function AppShell({
   return (
     <NavigationLoadingProvider>
       <UnreadNotificationsShell>
-        <QuizActiveNotificationProvider>
-          <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
+        <QuizEntryProvider quizHub={quizHub}>
+          <QuizActiveNotificationProvider>
+            <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
             <HighlightScorelineVisibilityProvider
               poolId={ctx.activePoolId}
               username={ctx.username}
@@ -62,8 +67,9 @@ export function AppShell({
                 </Suspense>
               </TabNavigationProvider>
             </HighlightScorelineVisibilityProvider>
-          </PushNotificationProvider>
-        </QuizActiveNotificationProvider>
+            </PushNotificationProvider>
+          </QuizActiveNotificationProvider>
+        </QuizEntryProvider>
       </UnreadNotificationsShell>
     </NavigationLoadingProvider>
   );

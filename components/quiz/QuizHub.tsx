@@ -1,15 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
-import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
+import { useQuizEntry } from "@/components/quiz/QuizEntryProvider";
 import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
-import {
-  getLatestSubmittedAttemptId,
-  getQuizPlayCta,
-  shouldShowQuizAlreadyPlayedModal,
-} from "@/lib/quiz/slot-status";
+import { getLatestSubmittedAttemptId, getQuizPlayCta } from "@/lib/quiz/slot-status";
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
 
 const playButtonClass =
@@ -22,30 +16,12 @@ type QuizHubProps = {
 };
 
 export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps) {
-  const router = useRouter();
-  const [waitModalOpen, setWaitModalOpen] = useState(false);
-  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const { requestQuizEntry } = useQuizEntry();
 
   const quizAvailable = Boolean(hub.official);
   const playCta = getQuizPlayCta(hub.official, {
     resultAttemptId: getLatestSubmittedAttemptId(hub.official),
   });
-
-  function handlePlay() {
-    if (hub.publishHeld || !quizAvailable || !hub.official) {
-      setComingSoonOpen(true);
-      return;
-    }
-
-    if (shouldShowQuizAlreadyPlayedModal(hub.official)) {
-      setWaitModalOpen(true);
-      return;
-    }
-
-    if (playCta?.entersPlay) {
-      router.push(playCta.href);
-    }
-  }
 
   return (
     <div className="tm-quiz-hub">
@@ -66,11 +42,10 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         >
           <button
             type="button"
-            onClick={handlePlay}
-            disabled={quizAvailable && !playCta?.entersPlay}
+            onClick={requestQuizEntry}
             className={playButtonClass}
           >
-            JUGAR
+            {playCta?.label ?? "JUGAR"}
           </button>
 
           {hub.publishHeld && (
@@ -90,18 +65,6 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           </p>
         </section>
       </div>
-
-      <QuizWaitModal
-        open={waitModalOpen}
-        onClose={() => setWaitModalOpen(false)}
-        message="Hoy ya has jugado al quiz diario crack."
-      />
-
-      <QuizWaitModal
-        open={comingSoonOpen}
-        onClose={() => setComingSoonOpen(false)}
-        message={QUIZ_COMING_SOON_MESSAGE}
-      />
     </div>
   );
 }
