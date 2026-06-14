@@ -26,7 +26,10 @@ const CHART_WIDTH = 380;
 const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
 const MARGIN_TOP = 20;
-const MARGIN_BOTTOM = 14;
+/** Fila inferior dedicada a etiquetas de jornada (J1, J2…). */
+const MATCHDAY_LABEL_ROW_PX = 24;
+const PLOT_LABEL_GAP = 6;
+const MARGIN_BOTTOM = PLOT_LABEL_GAP + MATCHDAY_LABEL_ROW_PX;
 const AVATAR_RADIUS = 11;
 const AVATAR_X = 42;
 const PLOT_START_X = 64;
@@ -188,14 +191,16 @@ export function RankingEvolutionChart({
           visibleMatchdays.length <= 1
             ? PLOT_START_X + plotWidth / 2
             : PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
+        const matchdayLabelY =
+          MARGIN_TOP + plotHeight + PLOT_LABEL_GAP + MATCHDAY_LABEL_ROW_PX * 0.62;
         return (
           <text
             key={`x-label-${matchday.id}`}
             x={x}
-            y={chartHeight - 6}
+            y={matchdayLabelY}
             textAnchor="middle"
-            fill="rgba(255,255,255,0.55)"
-            fontSize={9}
+            fill="rgba(255,255,255,0.65)"
+            fontSize={10}
             fontWeight={600}
           >
             {matchday.shortLabel}
