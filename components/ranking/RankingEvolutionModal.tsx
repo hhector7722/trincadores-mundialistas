@@ -120,7 +120,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
                 max={data.matchdays.length - 1}
                 value={endMatchdayIndex}
                 onChange={setEndMatchdayIndex}
-                thumbImageSrc="/icons/slider.png?v=2"
+                thumbImageSrc="/icons/slider.png?v=3"
                 aria-label="Jornada final visible en el grafico"
               />
               <p className="text-center text-[10px] font-medium tracking-wide text-[var(--tm-muted)]">
