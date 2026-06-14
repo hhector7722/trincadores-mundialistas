@@ -7,7 +7,9 @@ import {
 } from "@/lib/quiz/lab/openai-silhouette.server";
 import type { WorldCupMoment } from "@/lib/quiz/world-cup-moments";
 
-export type LabDeriveVariant = "hair" | "eyes" | "silhouette";
+import { labGeneratedAssetApiUrl, type LabAssetVariant } from "@/lib/quiz/lab/lab-asset-url";
+
+export type LabDeriveVariant = LabAssetVariant;
 
 const GENERATED_REL_DIR = "images/quiz/lab/generated";
 
@@ -18,15 +20,7 @@ export type DerivedAssetOptions = {
   force?: boolean;
 };
 
-export function labGeneratedAssetApiUrl(
-  momentId: string,
-  variant: LabDeriveVariant,
-  force = false
-): string {
-  const params = new URLSearchParams({ momentId, variant });
-  if (force) params.set("force", "1");
-  return `/api/laboratorio/asset?${params.toString()}`;
-}
+export { labGeneratedAssetApiUrl };
 
 function silhouetteFocusX(momentId: string): number {
   const hash = momentId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);

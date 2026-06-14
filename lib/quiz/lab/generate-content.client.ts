@@ -4,6 +4,12 @@ import {
   createImageTriviaFromCatalog,
   reloadImageTriviaFromCatalog,
 } from "@/lib/quiz/lab/image-trivia-catalog";
+import {
+  createPlayerCropFromCatalog,
+  createSilhouetteFromCatalog,
+  reloadPlayerCropFromCatalog,
+  reloadSilhouetteFromCatalog,
+} from "@/lib/quiz/lab/player-moment-catalog";
 import { reloadLabQuestion } from "@/lib/quiz/lab/reload-question";
 import {
   createVideoPlayEndFromCatalog,
@@ -11,6 +17,8 @@ import {
 } from "@/lib/quiz/lab/video-play-end-catalog";
 import type {
   LabQuestion,
+  LabQuestionGuessPlayerCrop,
+  LabQuestionGuessPlayerSilhouette,
   LabQuestionImageTrivia,
   LabQuestionVideoPlayEnd,
 } from "@/lib/quiz/lab/types";
@@ -67,6 +75,72 @@ export async function generateLabQuestionContent(
     return fresh;
   }
 
+  if (question.format === "guess_player_hair" || question.format === "guess_player_eyes") {
+    const exclude = question.momentId ? [question.momentId] : undefined;
+    const fresh =
+      force && question.momentId
+        ? reloadPlayerCropFromCatalog(question as LabQuestionGuessPlayerCrop, minDifficulty)
+        : createPlayerCropFromCatalog(question.format, {
+            minDifficulty,
+            questionId: question.id,
+            excludeMomentIds: exclude,
+            seed: Date.now(),
+          });
+
+    if (!fresh) {
+      throw new Error("No hay momentos de jugador listos en el catálogo.");
+    }
+
+    if (force && question.momentId) {
+      try {
+        await fetchGeneratedLabQuestion({
+          format: question.format,
+          questionId: question.id,
+          excludeMomentId: question.momentId,
+          minDifficulty,
+          force: true,
+        });
+      } catch {
+        // El recorte se generará bajo demanda al cargar el asset.
+      }
+    }
+
+    return fresh;
+  }
+
+  if (question.format === "guess_player_silhouette") {
+    const exclude = question.momentId ? [question.momentId] : undefined;
+    const fresh =
+      force && question.momentId
+        ? reloadSilhouetteFromCatalog(question as LabQuestionGuessPlayerSilhouette, minDifficulty)
+        : createSilhouetteFromCatalog({
+            minDifficulty,
+            questionId: question.id,
+            excludeMomentIds: exclude,
+            seed: Date.now(),
+          });
+
+    if (!fresh) {
+      throw new Error("No hay momentos listos para siluetas en el catálogo.");
+    }
+
+    if (force && question.momentId) {
+      try {
+        await fetchGeneratedLabQuestion({
+          format: question.format,
+          questionId: question.id,
+          excludeMomentId: question.momentId,
+          minDifficulty,
+          force: true,
+        });
+      } catch {
+        // La silueta se generará bajo demanda al cargar el asset.
+      }
+    }
+
+    return fresh;
+  }
+
   if (
     question.format === "multiple_choice" ||
     question.format === "guess_selection"
@@ -78,15 +152,5 @@ export async function generateLabQuestionContent(
     throw new Error("Formato no soportado para generación.");
   }
 
-  const hasMoment = "momentId" in question && Boolean(question.momentId);
-  const pregenerateAssets = force && hasMoment;
-
-  return fetchGeneratedLabQuestion({
-    format: question.format,
-    questionId: question.id,
-    excludeMomentId:
-      "momentId" in question && question.momentId ? question.momentId : null,
-    minDifficulty,
-    force: pregenerateAssets,
-  });
+  throw new Error("Formato no soportado para generación.");
 }

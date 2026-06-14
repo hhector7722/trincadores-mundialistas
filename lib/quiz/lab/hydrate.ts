@@ -7,6 +7,10 @@ import {
   SPAIN_DEMO_CLUB_SLOTS,
 } from "@/lib/quiz/lab/club-crests";
 import {
+  getSelectionPresetById,
+  selectionPresetToQuestion,
+} from "@/lib/quiz/lab/selection-presets";
+import {
   isExternalLabVideoUrl,
   LAB_DEMO_VIDEO_SRC,
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
@@ -57,7 +61,14 @@ function migrateLegacyGuessImage(question: LabQuestion): LabQuestion {
 }
 
 function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestionGuessSelection {
-  if (!question.selectionPresetId || question.slots.length === 0) {
+  if (question.selectionPresetId) {
+    const preset = getSelectionPresetById(question.selectionPresetId);
+    if (preset) {
+      return selectionPresetToQuestion(preset, question.id);
+    }
+  }
+
+  if (question.slots.length === 0) {
     return question;
   }
 

@@ -40,6 +40,25 @@ const CLUB_API_SPORTS_IDS: Record<string, number> = {
   villarreal: 533,
   betis: 543,
   "real betis": 543,
+  everton: 45,
+  newcastle: 34,
+  "newcastle united": 34,
+  "crystal palace": 52,
+  fulham: 36,
+  porto: 212,
+  "fc porto": 212,
+  "aston villa": 66,
+  benfica: 211,
+  lyon: 80,
+  "rb leipzig": 173,
+  leipzig: 173,
+  brighton: 51,
+  "brighton and hove albion": 51,
+  leverkusen: 168,
+  "bayer leverkusen": 168,
+  dortmund: 165,
+  "borussia dortmund": 165,
+  "inter miami": 9569,
 };
 
 export function getApiSportsCrestUrl(teamId: number): string {
@@ -58,19 +77,19 @@ export type ClubSlotSeed = {
   playerName: string;
 };
 
-/** Demo España 4-2-3-1: clubes del puzzle + jugadores revelados al resolver. */
+/** Demo España 4-2-3-1 (Mundial 2026 / temporada 2025-26). */
 export const SPAIN_DEMO_CLUB_SLOTS: ClubSlotSeed[] = [
   { slotKey: "GK", clubLabel: "Athletic Club", playerName: "Unai Simón" },
   { slotKey: "LB", clubLabel: "Chelsea", playerName: "Marc Cucurella" },
-  { slotKey: "LCB", clubLabel: "Bournemouth", playerName: "Robin Le Normand" },
-  { slotKey: "RCB", clubLabel: "Atlético Madrid", playerName: "José Gayà" },
-  { slotKey: "RB", clubLabel: "Tottenham", playerName: "Pedro Porro" },
-  { slotKey: "LDM", clubLabel: "PSG", playerName: "Fabián Ruiz" },
+  { slotKey: "LCB", clubLabel: "Atlético Madrid", playerName: "Robin Le Normand" },
+  { slotKey: "RCB", clubLabel: "Barcelona", playerName: "Pau Cubarsí" },
+  { slotKey: "RB", clubLabel: "Real Madrid", playerName: "Dani Carvajal" },
+  { slotKey: "LDM", clubLabel: "Arsenal", playerName: "Martín Zubimendi" },
   { slotKey: "RDM", clubLabel: "Barcelona", playerName: "Pedri" },
   { slotKey: "LW", clubLabel: "Athletic Club", playerName: "Nico Williams" },
-  { slotKey: "AM", clubLabel: "Real Sociedad", playerName: "Mikel Oyarzabal" },
+  { slotKey: "AM", clubLabel: "Barcelona", playerName: "Dani Olmo" },
   { slotKey: "RW", clubLabel: "Barcelona", playerName: "Lamine Yamal" },
-  { slotKey: "ST", clubLabel: "AC Milan", playerName: "Álvaro Morata" },
+  { slotKey: "ST", clubLabel: "Real Sociedad", playerName: "Mikel Oyarzabal" },
 ];
 
 export function clubSlotWithCrest(slot: ClubSlotSeed) {

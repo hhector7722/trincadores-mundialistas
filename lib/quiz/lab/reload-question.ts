@@ -1,5 +1,10 @@
-import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
 import { reloadImageTriviaFromCatalog } from "@/lib/quiz/lab/image-trivia-catalog";
+import {
+  createPlayerCropFromCatalog as createPlayerCropQuestion,
+  createSilhouetteFromCatalog as createSilhouetteQuestion,
+  reloadPlayerCropFromCatalog,
+  reloadSilhouetteFromCatalog,
+} from "@/lib/quiz/lab/player-moment-catalog";
 import { reloadVideoPlayEndFromCatalog } from "@/lib/quiz/lab/video-play-end-catalog";
 import {
   pickSelectionPreset,
@@ -15,14 +20,7 @@ import type {
   LabQuestionMultipleChoice,
   LabQuestionVideoPlayEnd,
 } from "@/lib/quiz/lab/types";
-import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
-import {
-  filterCatalogReadyMoments,
-  filterMomentsByDifficulty,
-  resolveMomentImageUrl,
-  type WorldCupMoment,
-  type WorldCupMomentDifficulty,
-} from "@/lib/quiz/world-cup-moments";
+import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 
 const RELOADABLE_FORMATS = new Set<LabQuestionFormat>([
   "multiple_choice",
@@ -45,145 +43,18 @@ function defaultOptions(labels: string[]) {
   }));
 }
 
-function pickPlayerMoment(opts?: {
-  seed?: number;
-  excludeIds?: string[];
-  minDifficulty?: WorldCupMomentDifficulty;
-}): WorldCupMoment | null {
-  const catalog = getWorldCupMomentsCatalog();
-  const seed = opts?.seed ?? Math.floor(Math.random() * 1_000_000);
-  const exclude = new Set(opts?.excludeIds ?? []);
-  const minDifficulty = opts?.minDifficulty ?? "medium";
-
-  let ready = filterCatalogReadyMoments(catalog.moments).filter(
-    (moment) => moment.quiz.answer_type === "player"
-  );
-  ready = filterMomentsByDifficulty(ready, minDifficulty);
-  if (exclude.size) {
-    ready = ready.filter((moment) => !exclude.has(moment.id));
-  }
-
-  if (!ready.length) {
-    ready = filterCatalogReadyMoments(catalog.moments).filter(
-      (moment) => moment.quiz.answer_type === "player" && !exclude.has(moment.id)
-    );
-  }
-
-  if (!ready.length) return null;
-  ready.sort((a, b) => a.id.localeCompare(b.id));
-  return ready[Math.abs(seed) % ready.length] ?? null;
-}
-
-function momentSceneHint(moment: WorldCupMoment): string {
-  const teams = moment.teams.join(" vs ");
-  return `${moment.year} — ${teams}`;
-}
-
-function momentToPlayerCropQuestion(
-  moment: WorldCupMoment,
-  format: "guess_player_hair" | "guess_player_eyes",
-  questionId: string
-): LabQuestionGuessPlayerCrop {
-  const imageUrl = resolveMomentImageUrl(moment) ?? "";
-  const correctIndex = moment.quiz.options.findIndex(
-    (option) => option === moment.quiz.correct_option
-  );
-
-  return {
-    id: questionId,
-    format,
-    prompt: "¿QUIÉN ES?",
-    imageUrl,
-    revealImageUrl: resolveMomentImageUrl(moment),
-    sceneHint: momentSceneHint(moment),
-    timerSeconds: 10,
-    momentId: moment.id,
-    momentLabel: moment.label,
-    options: moment.quiz.options.map((label, index) => ({
-      id: `opt_${index + 1}`,
-      label,
-    })),
-    correctOptionId: `opt_${correctIndex >= 0 ? correctIndex + 1 : 1}`,
-  };
-}
-
-type SilhouetteDemo = {
-  id: string;
-  imageUrl: string;
-  revealImageUrl: string | null;
-  sceneLabel: string;
-  options: [string, string, string, string];
-  correctIndex: number;
-};
-
-const SILHOUETTE_DEMOS: SilhouetteDemo[] = [
-  {
-    id: "espana-2008",
-    imageUrl: LAB_DEMO_IMAGES.spain2008Silhouette,
-    revealImageUrl: null,
-    sceneLabel: "Euro 2008 — España",
-    options: ["David Silva", "Xavi Hernández", "Andrés Iniesta", "David Villa"],
-    correctIndex: 0,
-  },
-  {
-    id: "brasil-2002",
-    imageUrl: LAB_DEMO_IMAGES.brazil2002Silhouette,
-    revealImageUrl: null,
-    sceneLabel: "Mundial 2002 — Brasil",
-    options: ["Ronaldo Nazário", "Rivaldo", "Ronaldinho", "Cafu"],
-    correctIndex: 0,
-  },
-];
-
-function pickSilhouetteDemo(excludeId?: string | null, seed = Math.floor(Math.random() * 1_000_000)) {
-  let pool = SILHOUETTE_DEMOS;
-  if (excludeId) {
-    const filtered = pool.filter((demo) => demo.id !== excludeId);
-    if (filtered.length) pool = filtered;
-  }
-  return pool[Math.abs(seed) % pool.length] ?? pool[0]!;
-}
-
-function silhouetteDemoToQuestion(
-  demo: SilhouetteDemo,
-  questionId: string
-): LabQuestionGuessPlayerSilhouette {
-  return {
-    id: questionId,
-    format: "guess_player_silhouette",
-    prompt: "¿QUÉ JUGADOR ES LA SILUETA?",
-    imageUrl: demo.imageUrl,
-    revealImageUrl: demo.revealImageUrl,
-    sceneLabel: demo.sceneLabel,
-    timerSeconds: 10,
-    silhouetteDemoId: demo.id,
-    options: defaultOptions([...demo.options]),
-    correctOptionId: `opt_${demo.correctIndex + 1}`,
-  };
-}
-
 function reloadPlayerCrop(
   question: LabQuestionGuessPlayerCrop,
   minDifficulty: WorldCupMomentDifficulty
 ): LabQuestionGuessPlayerCrop {
-  const moment = pickPlayerMoment({
-    excludeIds: question.momentId ? [question.momentId] : undefined,
-    minDifficulty,
-    seed: Date.now(),
-  });
-
-  if (moment) {
-    return momentToPlayerCropQuestion(moment, question.format, question.id);
-  }
-
-  return question;
+  return reloadPlayerCropFromCatalog(question, minDifficulty) ?? question;
 }
 
 function reloadSilhouette(
-  question: LabQuestionGuessPlayerSilhouette
+  question: LabQuestionGuessPlayerSilhouette,
+  minDifficulty: WorldCupMomentDifficulty
 ): LabQuestionGuessPlayerSilhouette {
-  const demo = pickSilhouetteDemo(question.silhouetteDemoId, Date.now());
-  return silhouetteDemoToQuestion(demo, question.id);
+  return reloadSilhouetteFromCatalog(question, minDifficulty) ?? question;
 }
 
 function reloadSelection(question: LabQuestionGuessSelection): LabQuestionGuessSelection {
@@ -245,7 +116,7 @@ export function reloadLabQuestion(
     case "guess_player_eyes":
       return reloadPlayerCrop(question, minDifficulty);
     case "guess_player_silhouette":
-      return reloadSilhouette(question);
+      return reloadSilhouette(question, minDifficulty);
     case "video_play_end":
       return reloadVideo(question);
     default:
@@ -258,14 +129,22 @@ export function createPlayerCropFromCatalog(
   questionId?: string,
   minDifficulty: WorldCupMomentDifficulty = "medium"
 ): LabQuestionGuessPlayerCrop | null {
-  const moment = pickPlayerMoment({ minDifficulty, seed: Date.now() });
-  if (!moment) return null;
-  return momentToPlayerCropQuestion(moment, format, questionId ?? crypto.randomUUID());
+  return createPlayerCropQuestion(format, {
+    questionId: questionId ?? crypto.randomUUID(),
+    minDifficulty,
+    seed: Date.now(),
+  });
 }
 
-export function createSilhouetteFromCatalog(questionId?: string): LabQuestionGuessPlayerSilhouette {
-  const demo = pickSilhouetteDemo(null, Date.now());
-  return silhouetteDemoToQuestion(demo, questionId ?? crypto.randomUUID());
+export function createSilhouetteFromCatalog(
+  questionId?: string,
+  minDifficulty: WorldCupMomentDifficulty = "medium"
+): LabQuestionGuessPlayerSilhouette | null {
+  return createSilhouetteQuestion({
+    questionId: questionId ?? crypto.randomUUID(),
+    minDifficulty,
+    seed: Date.now(),
+  });
 }
 
 export function createSelectionFromCatalog(questionId?: string): LabQuestionGuessSelection {

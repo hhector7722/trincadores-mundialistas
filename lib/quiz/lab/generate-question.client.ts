@@ -23,7 +23,10 @@ export async function fetchGeneratedLabQuestion(
     | null;
 
   if (!response.ok || !payload?.question) {
-    throw new Error(payload?.error ?? "No se pudo generar la pregunta.");
+    const statusHint = response.ok ? "" : ` (${response.status})`;
+    throw new Error(
+      payload?.error ?? `No se pudo generar la pregunta${statusHint}.`
+    );
   }
 
   return payload.question;
