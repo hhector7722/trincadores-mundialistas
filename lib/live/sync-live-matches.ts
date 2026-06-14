@@ -8,7 +8,7 @@ import {
   isBsdEventFinished,
   isBsdEventLive,
 } from "@/lib/live/sources/bsd-live";
-import type { MatchLivePayload } from "@/lib/live/types";
+import type { MatchLivePayload, MatchPlayerIncident } from "@/lib/live/types";
 import { syncOfficialMvps } from "@/lib/live/sync-official-mvp";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
@@ -73,6 +73,11 @@ async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<
   return [...byId.values()];
 }
 
+function goalsMissingMinutes(incidents: MatchPlayerIncident[] | undefined): boolean {
+  const goals = (incidents ?? []).filter((row) => row.kind === "goal");
+  return goals.length > 0 && goals.every((row) => row.minute == null);
+}
+
 async function loadFinishedMatchesNeedingIncidentBackfill(
   admin: AdminClient,
   limit: number,
@@ -93,7 +98,7 @@ async function loadFinishedMatchesNeedingIncidentBackfill(
     }).match_live_state;
     const payload = Array.isArray(liveState) ? liveState[0]?.live_payload : liveState?.live_payload;
     const incidents = (payload ?? {}).playerIncidents;
-    if (incidents?.length) continue;
+    if (incidents?.length && !goalsMissingMinutes(incidents)) continue;
 
     rows.push({
       id: row.id as string,

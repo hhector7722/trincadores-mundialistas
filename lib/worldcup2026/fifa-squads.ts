@@ -48,12 +48,29 @@ function loc(items?: Localized | null): string | null {
   return en.Description?.trim() ?? null;
 }
 
-/** "Raul RANGEL" → "Raul Rangel" */
+/** Capitaliza tokens de nombre (Unicode-safe; JS \\b rompe con acentos). */
+function capitalizePlayerToken(token: string): string {
+  const lower = token.toLowerCase();
+  if (!lower) return lower;
+  if (lower.startsWith("mc") && lower.length > 2) {
+    return `Mc${lower.slice(2, 3).toUpperCase()}${lower.slice(3)}`;
+  }
+  if (lower.startsWith("mac") && lower.length > 3) {
+    return `Mac${lower.slice(3, 4).toUpperCase()}${lower.slice(4)}`;
+  }
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+/** "Raul RANGEL" → "Raul Rangel"; "VINÍCIUS JR." → "Vinícius Jr." */
 export function titleCasePlayerName(name: string): string {
   return name
-    .toLowerCase()
-    .replace(/\b([a-zà-ÿ])/g, (m) => m.toUpperCase())
-    .trim();
+    .trim()
+    .split(/(\s+|\.)/)
+    .map((part) => {
+      if (/^\s*$/.test(part) || part === ".") return part;
+      return capitalizePlayerToken(part);
+    })
+    .join("");
 }
 
 function fifaBase(): string {
