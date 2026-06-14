@@ -8,7 +8,7 @@ import {
 } from "@/lib/quiz/world-cup-moments";
 import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
 import {
-  hasMaterializedSilhouette,
+  isSilhouetteLabReadyMoment,
   SILHOUETTE_LAB_MOMENT_ID_SET,
 } from "@/lib/quiz/lab/silhouette-lab-pool";
 
@@ -109,7 +109,7 @@ export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMo
       moment.quiz.answer_type === "player" &&
       SILHOUETTE_LAB_MOMENT_ID_SET.has(moment.id) &&
       momentSupportsLabFormat(moment, "silhouette") &&
-      hasMaterializedSilhouette(moment.id)
+      isSilhouetteLabReadyMoment(moment.id)
   );
 
   ready = filterMomentsByDifficulty(ready, opts?.minDifficulty ?? "easy");

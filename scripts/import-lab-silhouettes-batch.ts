@@ -13,6 +13,7 @@ import {
   importLabSilhouetteFile,
 } from "@/lib/quiz/lab/import-lab-silhouette";
 import { listPlayerMomentsForLab } from "@/lib/quiz/lab/materialize-assets.server";
+import { isSilhouetteLabReadyMoment } from "@/lib/quiz/lab/silhouette-lab-pool";
 
 function readArg(prefix: string): string | null {
   const match = process.argv.find((arg) => arg.startsWith(`${prefix}=`));
@@ -29,6 +30,8 @@ function main() {
   const skipped: string[] = [];
   const failures: Array<{ file: string; error: string }> = [];
 
+  const needsReadyListUpdate: string[] = [];
+
   for (const file of files.sort()) {
     const momentId = file.replace(/-silhouette\.jpg$/, "");
     if (!playerIds.has(momentId)) {
@@ -40,6 +43,9 @@ function main() {
       const url = importLabSilhouetteFile(momentId, resolve(dir, file));
       imported.push(`${momentId} → ${url}`);
       console.log(`OK ${momentId}`);
+      if (!isSilhouetteLabReadyMoment(momentId)) {
+        needsReadyListUpdate.push(momentId);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       failures.push({ file, error: message });
@@ -66,6 +72,13 @@ function main() {
       2
     )
   );
+
+  if (needsReadyListUpdate.length) {
+    console.log("\nAñade estos IDs a SILHOUETTE_LAB_READY_IDS en lib/quiz/lab/silhouette-lab-pool.ts:");
+    for (const id of needsReadyListUpdate) {
+      console.log(`  "${id}",`);
+    }
+  }
 
   if (failures.length) process.exit(1);
 }
