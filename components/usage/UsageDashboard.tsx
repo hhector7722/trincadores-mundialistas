@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { UsageFilters } from "@/components/usage/UsageFilters";
 import type { UsageDashboardData } from "@/lib/usage/queries";
@@ -30,7 +31,9 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
 
   return (
     <div className="space-y-4">
-      <UsageFilters filters={data.filters} users={data.filterUsers} />
+      <Suspense fallback={<div className="min-h-40 rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)] p-4" aria-hidden />}>
+        <UsageFilters filters={data.filters} users={data.filterUsers} />
+      </Suspense>
 
       <div className="grid grid-cols-2 gap-3">
         <Card className="p-3">

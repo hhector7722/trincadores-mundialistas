@@ -13,7 +13,16 @@ export type MainTabHref = (typeof MAIN_TABS)[number]["href"];
 export const MAIN_TAB_HREFS = MAIN_TABS.map((tab) => tab.href);
 
 export function isMainTabActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href;
+  if (href === "/") {
+    return pathname === "/";
+  }
+  if (pathname === href || pathname.startsWith(`${href}/`)) {
+    return true;
+  }
+
+  const sectionIndex = getMainTabSectionIndex(pathname);
+  const tabIndex = getMainTabIndexForHref(href);
+  return sectionIndex != null && tabIndex != null && sectionIndex === tabIndex;
 }
 
 /** Índice de sección para indicadores (incluye subrutas de la misma pestaña). */
