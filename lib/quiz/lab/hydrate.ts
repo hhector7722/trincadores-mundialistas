@@ -6,21 +6,32 @@ import {
   resolveClubCrestUrl,
   SPAIN_DEMO_CLUB_SLOTS,
 } from "@/lib/quiz/lab/club-crests";
+import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import {
+  momentToPlayerCropQuestion,
+  momentToSilhouetteQuestion,
+} from "@/lib/quiz/lab/from-player-moment";
 import {
   getSelectionPresetById,
   selectionPresetToQuestion,
 } from "@/lib/quiz/lab/selection-presets";
-import {
-  isExternalLabVideoUrl,
-  LAB_DEMO_VIDEO_SRC,
-  LAB_DEMO_VIDEO_STOP_AT_SECONDS,
-} from "@/lib/quiz/lab/demo-video";
+import { createVideoPlayEndFromCatalog } from "@/lib/quiz/lab/video-play-end-catalog";
 import type {
   LabDraft,
   LabQuestion,
+  LabQuestionGuessPlayerCrop,
+  LabQuestionGuessPlayerSilhouette,
   LabQuestionGuessSelection,
   LabQuestionImageTrivia,
+  LabQuestionVideoPlayEnd,
 } from "@/lib/quiz/lab/types";
+import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
+import { pickMomentById } from "@/lib/quiz/world-cup-moments";
+
+const LEGACY_VIDEO_URLS = new Set([
+  "/icons/gabri-video.mp4",
+  "/videos/quiz/historic/demo/wc-demo-lab-intro.mp4",
+]);
 
 type LegacyGuessImageQuestion = {
   id: string;
@@ -105,22 +116,68 @@ function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestion
   return { ...question, slots };
 }
 
-function hydrateMultipleChoice(question: LabQuestion): LabQuestion {
-  if (question.format !== "multiple_choice") return question;
+function hydratePlayerCrop(question: LabQuestionGuessPlayerCrop): LabQuestionGuessPlayerCrop {
+  if (!isDerivedLabAssetUrl(question.imageUrl)) {
+    return question;
+  }
+
+  const catalog = getWorldCupMomentsCatalog();
+  const moment = question.momentId
+    ? pickMomentById(catalog, question.momentId, { readyOnly: true })
+    : null;
+
+  if (moment) {
+    return (
+      momentToPlayerCropQuestion(moment, question.format, question.id) ?? question
+    );
+  }
+
+  if (question.revealImageUrl?.startsWith("/images/quiz/historic/")) {
+    return { ...question, imageUrl: question.revealImageUrl };
+  }
+
   return question;
 }
 
-function hydrateVideo(question: LabQuestion): LabQuestion {
-  if (question.format !== "video_play_end") return question;
+function hydrateSilhouette(
+  question: LabQuestionGuessPlayerSilhouette
+): LabQuestionGuessPlayerSilhouette {
+  if (
+    question.imageUrl === question.revealImageUrl &&
+    question.momentId &&
+    isDerivedLabAssetUrl(question.revealImageUrl ?? "")
+  ) {
+    const catalog = getWorldCupMomentsCatalog();
+    const moment = pickMomentById(catalog, question.momentId, { readyOnly: true });
+    if (moment) {
+      return momentToSilhouetteQuestion(moment, question.id) ?? question;
+    }
+  }
 
-  if (!isExternalLabVideoUrl(question.videoUrl)) return question;
+  return question;
+}
 
-  return {
-    ...question,
-    videoUrl: LAB_DEMO_VIDEO_SRC,
-    stopAtSeconds: question.stopAtSeconds || LAB_DEMO_VIDEO_STOP_AT_SECONDS,
-    prompt: question.prompt || "¿Cómo acabó la jugada?",
-  };
+function hydrateVideo(question: LabQuestionVideoPlayEnd): LabQuestionVideoPlayEnd {
+  const isLegacy =
+    question.momentId === "wc-demo-lab-intro" ||
+    LEGACY_VIDEO_URLS.has(question.videoUrl) ||
+    question.videoUrl.includes("/demo/wc-demo-lab-intro");
+
+  const hasHistoricClip =
+    question.videoUrl.startsWith("/videos/quiz/historic/") &&
+    !question.videoUrl.includes("/demo/");
+
+  if (!isLegacy && question.momentId && hasHistoricClip) {
+    return question;
+  }
+
+  const fresh = createVideoPlayEndFromCatalog({
+    questionId: question.id,
+    excludeMomentIds: question.momentId ? [question.momentId] : undefined,
+    seed: Date.now(),
+  });
+
+  return fresh ?? question;
 }
 
 export function hydrateLabQuestion(question: LabQuestion): LabQuestion {
@@ -130,8 +187,18 @@ export function hydrateLabQuestion(question: LabQuestion): LabQuestion {
     next = hydrateGuessSelection(next);
   }
 
-  next = hydrateMultipleChoice(next);
-  next = hydrateVideo(next);
+  if (next.format === "guess_player_hair" || next.format === "guess_player_eyes") {
+    next = hydratePlayerCrop(next);
+  }
+
+  if (next.format === "guess_player_silhouette") {
+    next = hydrateSilhouette(next);
+  }
+
+  if (next.format === "video_play_end") {
+    next = hydrateVideo(next);
+  }
+
   return next;
 }
 

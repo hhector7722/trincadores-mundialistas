@@ -1,4 +1,4 @@
-import { LAB_DEMO_VIDEO_SRC, LAB_DEMO_VIDEO_STOP_AT_SECONDS } from "@/lib/quiz/lab/demo-video";
+import { LAB_DEMO_VIDEO_STOP_AT_SECONDS } from "@/lib/quiz/lab/demo-video";
 import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
 
 const PLACEHOLDER_OPTION = "—";

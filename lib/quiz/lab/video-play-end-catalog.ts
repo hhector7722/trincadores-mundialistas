@@ -54,7 +54,9 @@ export function reloadVideoPlayEndFromCatalog(
 
 export function countReadyVideoMoments(minDifficulty: WorldCupMomentDifficulty = "medium") {
   const catalog = getWorldCupVideoMomentsCatalog();
-  let ready = filterCatalogReadyVideoMoments(catalog.moments);
+  let ready = filterCatalogReadyVideoMoments(catalog.moments).filter(
+    (moment) => !moment.id.startsWith("wc-demo-")
+  );
   ready = filterVideoMomentsByDifficulty(ready, minDifficulty);
   return ready.length;
 }

@@ -91,20 +91,6 @@ export async function generateLabQuestionContent(
       throw new Error("No hay momentos de jugador listos en el catálogo.");
     }
 
-    if (force && question.momentId) {
-      try {
-        await fetchGeneratedLabQuestion({
-          format: question.format,
-          questionId: question.id,
-          excludeMomentId: question.momentId,
-          minDifficulty,
-          force: true,
-        });
-      } catch {
-        // El recorte se generará bajo demanda al cargar el asset.
-      }
-    }
-
     return fresh;
   }
 
@@ -134,7 +120,7 @@ export async function generateLabQuestionContent(
           force: true,
         });
       } catch {
-        // La silueta se generará bajo demanda al cargar el asset.
+        // La silueta SVG se genera bajo demanda al cargar el asset.
       }
     }
 

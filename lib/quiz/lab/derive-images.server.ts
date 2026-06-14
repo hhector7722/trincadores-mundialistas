@@ -64,7 +64,14 @@ async function renderSilhouetteFallback(
   );
   const top = Math.max(0, Math.round(height * 0.1));
 
-  return sharp(sourceAbsolutePath)
+  return sharp({
+    create: {
+      width,
+      height,
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 },
+    },
+  })
     .composite([{ input: buildSilhouetteSvg(figureW, figureH), left, top }])
     .jpeg({ quality: 88 })
     .toBuffer();
@@ -73,9 +80,10 @@ async function renderSilhouetteFallback(
 async function renderSilhouetteBuffer(
   sourceAbsolutePath: string,
   momentId: string,
-  moment?: WorldCupMoment
+  moment?: WorldCupMoment,
+  forceOpenAi = false
 ): Promise<Buffer> {
-  if (moment && isOpenAiSilhouetteEnabled()) {
+  if (forceOpenAi && moment && isOpenAiSilhouetteEnabled()) {
     try {
       const generated = await Promise.race([
         generateSilhouetteWithOpenAi(sourceAbsolutePath, moment),
@@ -130,7 +138,7 @@ async function renderDerivedBuffer(
       .toBuffer();
   }
 
-  return renderSilhouetteBuffer(sourceAbsolutePath, momentId, opts?.moment);
+  return renderSilhouetteBuffer(sourceAbsolutePath, momentId, opts?.moment, opts?.force);
 }
 
 export function momentSourceAbsolutePath(localPath: string): string {

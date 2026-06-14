@@ -240,7 +240,9 @@ export function pickVideoPlayEndMoment(
   const minDifficulty = opts?.minDifficulty ?? "medium";
   const exclude = new Set(opts?.excludeIds ?? []);
 
-  let ready = filterCatalogReadyVideoMoments(catalog.moments);
+  let ready = filterCatalogReadyVideoMoments(catalog.moments).filter(
+    (moment) => !moment.id.startsWith("wc-demo-")
+  );
   ready = filterVideoMomentsByDifficulty(ready, minDifficulty);
   if (exclude.size) {
     ready = ready.filter((moment) => !exclude.has(moment.id));

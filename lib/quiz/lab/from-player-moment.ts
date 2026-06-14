@@ -24,7 +24,6 @@ export function momentToPlayerCropQuestion(
   const sourcePath = resolveMomentImageUrl(moment);
   if (!sourcePath) return null;
 
-  const variant = format === "guess_player_hair" ? "hair" : "eyes";
   const correctIndex = moment.quiz.options.findIndex(
     (option) => option === moment.quiz.correct_option
   );
@@ -33,7 +32,7 @@ export function momentToPlayerCropQuestion(
     id: questionId,
     format,
     prompt: "¿QUIÉN ES?",
-    imageUrl: labGeneratedAssetApiUrl(moment.id, variant),
+    imageUrl: sourcePath,
     revealImageUrl: sourcePath,
     sceneHint: momentSceneHint(moment),
     timerSeconds: 10,
