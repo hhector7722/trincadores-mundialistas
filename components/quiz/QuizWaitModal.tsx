@@ -39,20 +39,19 @@ export function QuizWaitModal({
       <div
         className={cn(
           "flex flex-col items-center",
-          hasImage ? "gap-4 px-4 py-5 sm:px-5 sm:py-6" : "px-3 py-5 sm:px-4"
+          hasImage ? "gap-3 px-4 py-4 sm:px-5 sm:py-5" : "px-3 py-5 sm:px-4"
         )}
       >
         {imageSrc ? (
-          <div className="relative mx-auto aspect-[3/4] w-full max-w-[11.5rem] overflow-hidden rounded-2xl bg-black sm:max-w-[13rem]">
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              fill
-              className="object-contain"
-              sizes="(max-width: 640px) 46vw, 208px"
-              priority
-            />
-          </div>
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={160}
+            height={220}
+            className="mx-auto h-auto w-[5.5rem] max-w-full object-contain mix-blend-screen drop-shadow-[0_10px_28px_rgba(0,0,0,0.28)] sm:w-[6.25rem]"
+            sizes="100px"
+            priority
+          />
         ) : null}
         <p
           className={cn(
