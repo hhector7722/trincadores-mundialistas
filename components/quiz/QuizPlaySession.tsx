@@ -35,6 +35,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   const { navigate } = useAppNavigation();
   const [introDone, setIntroDone] = useState(skipIntro);
   const [quizRevealed, setQuizRevealed] = useState(skipIntro);
+  const [sessionStarted, setSessionStarted] = useState(skipIntro);
   const [session, setSession] = useState<QuizStartSession | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -98,6 +99,8 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   }, [clearQuestionTimer, clearFeedbackTimer]);
 
   useEffect(() => {
+    if (!sessionStarted) return;
+
     startLoading(async () => {
       const result = await startQuiz(poolId, quizId);
       if (!result.ok) {
@@ -107,7 +110,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
       setSession(result.data);
       setLoadError(null);
     });
-  }, [poolId, quizId]);
+  }, [poolId, quizId, sessionStarted]);
 
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;
@@ -237,6 +240,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
 
   const handleIntroComplete = useCallback(() => {
     setIntroDone(true);
+    setSessionStarted(true);
   }, []);
 
   let body: ReactNode;
@@ -308,7 +312,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
   }
 
   const showIntro = !skipIntro && !introDone;
-  const showPreparing = !playReady && !loadError && (skipIntro || introDone);
+  const showPreparing = sessionStarted && !playReady && !loadError;
 
   return (
     <div className="tm-quiz-play-root flex min-h-0 flex-1 flex-col">

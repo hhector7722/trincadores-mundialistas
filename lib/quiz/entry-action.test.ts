@@ -67,16 +67,16 @@ test("resolveQuizEntryAction competitivo completado muestra ya jugado", () => {
   );
 });
 
-test("resolveQuizEntryAction en curso navega sin confirmar", () => {
+test("resolveQuizEntryAction en curso pide confirmacion para continuar", () => {
   assert.deepEqual(
     resolveQuizEntryAction(hub({ official: slot("competitive", "in_progress") })),
-    { type: "navigate", href: "/quiz/play?resume=1" },
+    { type: "confirm_start", href: "/quiz/play?resume=1&start=1" },
   );
 });
 
 test("resolveQuizEntryAction listo pide confirmacion", () => {
   assert.deepEqual(resolveQuizEntryAction(hub()), {
     type: "confirm_start",
-    href: "/quiz/play",
+    href: "/quiz/play?start=1",
   });
 });

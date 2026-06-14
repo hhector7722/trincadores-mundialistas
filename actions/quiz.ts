@@ -7,8 +7,8 @@ import {
   enrichQuestionsWithPlayFormats,
   parsePlayFormats,
 } from "@/lib/quiz/play-formats";
-import { getQuizResult, startQuizSession } from "@/lib/quiz/queries";
-import type { QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
+import { getQuizResult, getQuizDayHub, startQuizSession } from "@/lib/quiz/queries";
+import type { QuizDayHub, QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
 import { trackUsageAction } from "@/lib/usage/track-action";
@@ -219,4 +219,30 @@ export async function submitQuiz(
       score: scoreValue,
     },
   };
+}
+
+export async function fetchQuizDayHubAction(
+  poolId: string
+): Promise<QuizActionResult<QuizDayHub>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesion no valida. Vuelve a iniciar sesion." };
+  }
+
+  const member = await assertPoolMembership(user.id, poolId);
+  if (!member) {
+    return { ok: false, error: "No perteneces a esta porra." };
+  }
+
+  try {
+    const hub = await getQuizDayHub(poolId, user.id);
+    return { ok: true, data: hub };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "No se pudo cargar el quiz de hoy.";
+    return { ok: false, error: msg };
+  }
 }

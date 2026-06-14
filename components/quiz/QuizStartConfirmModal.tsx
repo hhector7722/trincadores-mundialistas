@@ -7,6 +7,7 @@ type QuizStartConfirmModalProps = {
   open: boolean;
   title: string;
   body: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onClose: () => void;
 };
@@ -15,6 +16,7 @@ export function QuizStartConfirmModal({
   open,
   title,
   body,
+  confirmLabel = "Empezar",
   onConfirm,
   onClose,
 }: QuizStartConfirmModalProps) {
@@ -24,7 +26,7 @@ export function QuizStartConfirmModal({
         <p className="text-sm leading-relaxed text-[var(--tm-muted)]">{body}</p>
         <div className="flex shrink-0 flex-col gap-2">
           <Button type="button" className="w-full" onClick={onConfirm}>
-            Empezar
+            {confirmLabel}
           </Button>
           <Button type="button" variant="ghost" className="w-full" onClick={onClose}>
             Ahora no

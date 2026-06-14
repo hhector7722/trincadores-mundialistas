@@ -34,7 +34,7 @@ export function AppShell({
   return (
     <NavigationLoadingProvider>
       <UnreadNotificationsShell>
-        <QuizEntryProvider quizHub={quizHub}>
+        <QuizEntryProvider quizHub={quizHub} poolId={ctx.activePoolId}>
           <QuizActiveNotificationProvider>
             <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
             <HighlightScorelineVisibilityProvider

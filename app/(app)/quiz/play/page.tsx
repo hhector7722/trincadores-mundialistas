@@ -3,7 +3,7 @@ import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
 import { canAccessQuizBeta } from "@/lib/quiz/access";
 import { getLatestSubmittedAttemptId, getQuizDayHub } from "@/lib/quiz/queries";
-import { isQuizPlayResume } from "@/lib/quiz/play-routes";
+import { isQuizPlayResume, isQuizPlayStartAuthorized } from "@/lib/quiz/play-routes";
 import { canOpenQuizPlay } from "@/lib/quiz/slot-status";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -11,12 +11,16 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 type QuizPlayPageProps = {
-  searchParams: Promise<{ resume?: string }>;
+  searchParams: Promise<{ resume?: string; start?: string }>;
 };
 
 export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) {
   const params = await searchParams;
   const resume = isQuizPlayResume(params);
+
+  if (!isQuizPlayStartAuthorized(params)) {
+    redirect("/quiz");
+  }
   const ctx = await requireActivePoolContext();
   const supabase = await createClient();
   const {

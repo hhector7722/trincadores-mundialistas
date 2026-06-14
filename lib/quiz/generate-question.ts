@@ -1,5 +1,6 @@
 import { buildDistractorLabels, buildMcqOptions } from "@/lib/quiz/distractors";
 import type { QuizFact } from "@/lib/quiz/facts";
+import { resolveFactContextImage } from "@/lib/quiz/fact-context-image";
 import { renderQuestionFromFact } from "@/lib/quiz/question-templates";
 import { mulberry32 } from "@/lib/quiz/rng";
 
@@ -45,7 +46,7 @@ export function generateQuestionFromFact(args: {
   return {
     sort_order: args.sortOrder,
     prompt: rendered.prompt,
-    image_url: args.fact.image_url ?? null,
+    image_url: resolveFactContextImage(args.fact),
     options: mcq.options,
     correct_option_id: mcq.correct_option_id,
     fact_id: args.fact.id,

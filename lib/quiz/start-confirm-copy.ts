@@ -1,6 +1,17 @@
+import { getQuizSlotStatus } from "@/lib/quiz/slot-status";
 import type { QuizDayHub } from "@/lib/quiz/types";
 
 export function buildQuizStartConfirmCopy(hub: QuizDayHub): { title: string; body: string } {
+  const inProgress =
+    hub.official != null && getQuizSlotStatus(hub.official) === "in_progress";
+
+  if (inProgress) {
+    return {
+      title: "Continuar quiz",
+      body: "Tienes un intento en curso. ¿Seguimos donde lo dejaste?",
+    };
+  }
+
   const competitive =
     hub.competitive && hub.official?.quiz.scoring_mode === "competitive";
 

@@ -36,10 +36,5 @@ export function resolveQuizEntryAction(hub: QuizDayHub): QuizEntryAction {
     return { type: "navigate", href: playCta?.href ?? "/quiz" };
   }
 
-  const status = getQuizSlotStatus(slot);
-  if (status === "in_progress") {
-    return { type: "navigate", href: playCta.href };
-  }
-
   return { type: "confirm_start", href: playCta.href };
 }
