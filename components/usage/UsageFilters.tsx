@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { todayQuizDate } from "@/lib/quiz/date";
 import {
   applyVisualViewportChrome,
@@ -84,7 +83,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
       data-block-tab-swipe=""
       className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      <Input
+      <input
         id="usage-day"
         name="dia"
         type="date"
@@ -92,7 +91,11 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
         value={day}
         onChange={(event) => setDay(event.target.value)}
         onBlur={resyncViewportChromeAfterFormControl}
-        className="h-10 w-[8.75rem] shrink-0 px-2 text-xs"
+        className={cn(
+          "box-border h-10 w-[6.85rem] max-w-[6.85rem] shrink-0 rounded-lg border border-[var(--tm-border)]/70 bg-transparent px-1 text-xs text-[var(--tm-fg)] outline-none",
+          "focus:border-[var(--tm-accent-muted)] [color-scheme:dark]",
+          "[&::-webkit-calendar-picker-indicator]:ml-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+        )}
       />
 
       <select
