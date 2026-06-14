@@ -9,6 +9,14 @@ type HomeHeroCarouselProps = {
   matchHighlights: MatchHighlightView[];
 };
 
+const CAROUSEL_ZONE_DOTS = ["last", "center", "right"] as const;
+
+function resolveActiveDotIndex(activeIndex: number, focusIndex: number): number {
+  if (activeIndex < focusIndex) return 0;
+  if (activeIndex > focusIndex) return 2;
+  return 1;
+}
+
 function highlightToSlideBody(highlight: MatchHighlightView) {
   return (
     <MatchHighlightBlock
@@ -68,12 +76,7 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
   if (!slides.length) return null;
 
   const sizingHighlight = slides[defaultIndex]?.highlight ?? slides[0].highlight;
-
-  function scrollToIndex(index: number) {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
-  }
+  const activeDotIndex = resolveActiveDotIndex(activeIndex, defaultIndex);
 
   return (
     <div className="flex min-w-0 flex-col" data-block-tab-swipe>
@@ -104,28 +107,16 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
       </div>
 
       {slides.length > 1 ? (
-        <div
-          className="mt-1.5 flex items-center justify-center gap-1.5"
-          role="tablist"
-          aria-label="Highlights del mundial"
-        >
-          {slides.map((slide, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-label={`Highlight ${index + 1}${isActive ? ", activo" : ""}`}
-                onClick={() => scrollToIndex(index)}
-                className={cn(
-                  "h-1.5 shrink-0 rounded-full transition-all duration-300 ease-out",
-                  isActive ? "w-4 bg-white" : "w-1.5 bg-white/35 hover:bg-white/55",
-                )}
-              />
-            );
-          })}
+        <div className="mt-1.5 flex h-1.5 shrink-0 items-center justify-center gap-1.5" aria-hidden>
+          {CAROUSEL_ZONE_DOTS.map((dotId, index) => (
+            <span
+              key={dotId}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                index === activeDotIndex ? "w-4 bg-white" : "w-1.5 bg-white/35",
+              )}
+            />
+          ))}
         </div>
       ) : null}
     </div>

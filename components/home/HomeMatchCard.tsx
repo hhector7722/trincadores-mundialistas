@@ -55,6 +55,8 @@ type HomeMatchCardProps = {
   isLatestFinished?: boolean;
   currentProfileId: string;
   boardCarouselMatches?: MatchPredictionsBoardCarouselMatch[];
+  modalCarouselMatches?: MatchWithPrediction[];
+  onModalMatchChange?: (match: MatchWithPrediction) => void;
   onOpenChange?: (open: boolean) => void;
   teamsBlockClassName?: string;
 };
@@ -162,6 +164,8 @@ export function HomeMatchCard({
   isLatestFinished = true,
   currentProfileId,
   boardCarouselMatches = [],
+  modalCarouselMatches,
+  onModalMatchChange,
   onOpenChange,
   teamsBlockClassName = HOME_CARD_TEAMS_BLOCK_CLASS,
 }: HomeMatchCardProps) {
@@ -430,6 +434,8 @@ export function HomeMatchCard({
         onClose={() => setScoreModalOpen(false)}
         poolId={poolId}
         match={displayMatch}
+        matches={modalCarouselMatches}
+        onMatchChange={onModalMatchChange}
         currentProfileId={currentProfileId}
         onMvpSaved={(_matchId, playerName, teamName, shirtNumber) =>
           handleMvpSaved(playerName, teamName, shirtNumber)

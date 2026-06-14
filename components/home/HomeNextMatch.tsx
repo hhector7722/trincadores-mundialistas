@@ -111,12 +111,16 @@ export function HomeNextMatch({ poolId, currentProfileId, matches }: HomeNextMat
         isLatestFinished={slide.isLatestFinished}
         currentProfileId={currentProfileId}
         boardCarouselMatches={boardCarouselMatches}
+        modalCarouselMatches={matches}
+        onModalMatchChange={handleModalMatchChange}
         teamsBlockClassName={HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS}
       />
     );
   }
 
   const activeDotIndex = resolveActiveDotIndex(activeIndex, focusIndex);
+
+  const handleModalMatchChange = useCallback((_match: MatchWithPrediction) => {}, []);
 
   return (
     <section className="tm-glass-card overflow-hidden p-0" data-block-tab-swipe={true}>
