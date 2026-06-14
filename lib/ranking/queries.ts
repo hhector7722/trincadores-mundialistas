@@ -93,6 +93,52 @@ function compareRows(
   return ka[2].localeCompare(kb[2], "es");
 }
 
+export type RankingSortSnapshot = {
+  cumulativePoints: number;
+  exactHits: number;
+};
+
+/** Misma regla de orden que `getPoolLeaderboard` (pts → exactos → nombre). */
+export function compareLeaderboardRows(
+  a: { label: string; cumulativePoints: number; exactHits: number },
+  b: { label: string; cumulativePoints: number; exactHits: number }
+): number {
+  return compareRows(a, b);
+}
+
+/** Clasificación acumulada hasta el pitido indicado (incluye general + bonus quiz final). */
+export async function loadRankingSnapshotThroughKickoff(
+  poolId: string,
+  throughKickoffAt: string
+): Promise<Map<string, RankingSortSnapshot>> {
+  const [members, matchIds, generalScoreRows, quizFinalBonus] = await Promise.all([
+    loadMembers(poolId),
+    getFinishedMatchIdsThroughKickoff(poolId, throughKickoffAt),
+    loadTournamentGeneralScoresByProfile(poolId),
+    loadQuizFinalRankingBonusesByProfile(poolId),
+  ]);
+
+  const matchStats = await loadMatchStatsForMatchIds(poolId, matchIds);
+  const scores = toScoreRowMap(matchStats);
+  const generalPoints = new Map(
+    [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
+  );
+
+  const snapshot = new Map<string, RankingSortSnapshot>();
+  for (const member of members) {
+    const scoreRow = scores.get(member.profileId);
+    const general = generalPoints.get(member.profileId) ?? 0;
+    const quizBonus = quizFinalBonus.get(member.profileId) ?? 0;
+    const matchCumulative = scoreRow?.cumulative_points ?? 0;
+    snapshot.set(member.profileId, {
+      cumulativePoints: matchCumulative + general + quizBonus,
+      exactHits: scoreRow?.exact_hits ?? 0,
+    });
+  }
+
+  return snapshot;
+}
+
 function mapReferenceMatch(row: {
   id: string;
   home_team: string;

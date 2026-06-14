@@ -13,6 +13,10 @@ import {
   resolveScoreOutcome,
   type ScoreOutcome,
 } from "@/lib/predictions/prediction-outcome";
+import {
+  compareLeaderboardRows,
+  loadRankingSnapshotThroughKickoff,
+} from "@/lib/ranking/queries";
 import type { MatchStatus, Prediction } from "@/types/database";
 
 export type MatchWithPrediction = {
@@ -437,7 +441,7 @@ export async function getMatchPredictionsBoard(
     await Promise.all([
       admin
         .from("matches")
-        .select("id, home_team, away_team, status")
+        .select("id, home_team, away_team, status, kickoff_at")
         .eq("id", matchId)
         .maybeSingle(),
       admin
@@ -572,7 +576,27 @@ export async function getMatchPredictionsBoard(
     });
   }
 
-  rows.sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
+  if (showOutcomes && match.kickoff_at) {
+    const rankingSnapshot = await loadRankingSnapshotThroughKickoff(poolId, match.kickoff_at);
+    rows.sort((a, b) => {
+      const snapshotA = rankingSnapshot.get(a.profileId);
+      const snapshotB = rankingSnapshot.get(b.profileId);
+      return compareLeaderboardRows(
+        {
+          label: a.label,
+          cumulativePoints: snapshotA?.cumulativePoints ?? 0,
+          exactHits: snapshotA?.exactHits ?? 0,
+        },
+        {
+          label: b.label,
+          cumulativePoints: snapshotB?.cumulativePoints ?? 0,
+          exactHits: snapshotB?.exactHits ?? 0,
+        }
+      );
+    });
+  } else {
+    rows.sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
+  }
 
   return {
     homeTeam: match.home_team,
