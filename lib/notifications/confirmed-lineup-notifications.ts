@@ -62,6 +62,7 @@ export async function maybeNotifyConfirmedLineup(
   admin: AdminClient,
   match: MatchRef,
   siteOrigin?: string,
+  options?: { sendPush?: boolean },
 ): Promise<NotifyConfirmedLineupResult> {
   const bothConfirmed = await areBothLineupsConfirmedInCache(admin, match);
   if (!bothConfirmed) {
@@ -126,7 +127,7 @@ export async function maybeNotifyConfirmedLineup(
 
   const copy = buildConfirmedLineupNotificationCopy(match.home_team, match.away_team);
   const pushUrl = confirmedLineupNotificationUrl(match.id, siteOrigin);
-  const pushEnabled = isVapidConfigured();
+  const pushEnabled = options?.sendPush === true && isVapidConfigured();
   let recipients = 0;
   let skippedDuplicate = 0;
   let pushSent = 0;

@@ -14,7 +14,9 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await prewarmUpcomingLineups(admin);
+    const result = await prewarmUpcomingLineups(admin, Date.now(), {
+      notifyConfirmedLineup: false,
+    });
 
     return NextResponse.json({
       ok: true,

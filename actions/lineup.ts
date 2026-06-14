@@ -141,7 +141,8 @@ export async function fetchMatchLineupBundleAction(
       homeTeam,
       awayTeam,
       homeSquad?.players ?? [],
-      awaySquad?.players ?? []
+      awaySquad?.players ?? [],
+      { notifyConfirmedLineup: false }
     );
 
     return {

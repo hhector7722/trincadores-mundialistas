@@ -303,7 +303,7 @@ export async function resolveMatchLineups(
     resolveTeamLineup(supabase, { matchId, teamName: awayTeam, players: awayPlayers }),
   ]);
 
-  if (options?.notifyConfirmedLineup !== false) {
+  if (options?.notifyConfirmedLineup === true) {
     scheduleConfirmedLineupNotification(matchId, homeTeam, awayTeam);
   }
 
