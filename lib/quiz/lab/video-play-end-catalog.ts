@@ -5,12 +5,12 @@ import {
   filterCatalogReadyVideoMoments,
   filterVideoMomentsByDifficulty,
   pickVideoPlayEndMoment,
-  type WorldCupVideoMomentDifficulty,
 } from "@/lib/quiz/world-cup-video-moments";
+import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 
 export type VideoPlayEndCatalogOptions = {
   seed?: number;
-  minDifficulty?: WorldCupVideoMomentDifficulty;
+  minDifficulty?: WorldCupMomentDifficulty;
   questionId?: string;
   excludeMomentIds?: string[];
 };
@@ -33,7 +33,7 @@ export function createVideoPlayEndFromCatalog(
 
 export function reloadVideoPlayEndFromCatalog(
   question: LabQuestionVideoPlayEnd,
-  minDifficulty: WorldCupVideoMomentDifficulty = "medium"
+  minDifficulty: WorldCupMomentDifficulty = "medium"
 ): LabQuestionVideoPlayEnd {
   const exclude = question.momentId ? [question.momentId] : undefined;
   let fresh = createVideoPlayEndFromCatalog({
@@ -52,7 +52,7 @@ export function reloadVideoPlayEndFromCatalog(
   return fresh ?? question;
 }
 
-export function countReadyVideoMoments(minDifficulty: WorldCupVideoMomentDifficulty = "medium") {
+export function countReadyVideoMoments(minDifficulty: WorldCupMomentDifficulty = "medium") {
   const catalog = getWorldCupVideoMomentsCatalog();
   let ready = filterCatalogReadyVideoMoments(catalog.moments);
   ready = filterVideoMomentsByDifficulty(ready, minDifficulty);
