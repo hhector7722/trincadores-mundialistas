@@ -6,8 +6,10 @@ import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import { cn } from "@/lib/utils";
 import {
   applyPullResistance,
+  clearDocumentElementPullTransform,
   findNearestScrollable,
   findPullScrollRoot,
+  findPullTransformRoot,
   isPullRefreshBlocked,
   isScrollAtTop,
   pullProgress,
@@ -38,7 +40,8 @@ export function PullToRefresh() {
   const [phase, setPhase] = useState<PullPhase>("idle");
   const [isPending, startTransition] = useTransition();
 
-  const rootRef = useRef<HTMLElement | null>(null);
+  const scrollRootRef = useRef<HTMLElement | null>(null);
+  const transformRootRef = useRef<HTMLElement | null>(null);
   const phaseRef = useRef<PullPhase>("idle");
   const startYRef = useRef(0);
   const startXRef = useRef(0);
@@ -58,8 +61,8 @@ export function PullToRefresh() {
   }, []);
 
   const applyRootTransform = useCallback((distance: number) => {
-    const root = rootRef.current;
-    if (!root || root === document.documentElement) return;
+    const root = transformRootRef.current;
+    if (!root) return;
     if (distance > 0) {
       root.style.transform = `translate3d(0, ${distance}px, 0)`;
       root.style.transition = "none";
@@ -70,18 +73,16 @@ export function PullToRefresh() {
   }, []);
 
   const clearRootTransform = useCallback(() => {
-    const root = rootRef.current;
-    if (!root || root === document.documentElement) {
-      document.documentElement.style.transition = "";
-      document.documentElement.style.transform = "";
-      return;
+    const root = transformRootRef.current;
+    if (root) {
+      root.style.transition = "";
+      root.style.transform = "";
     }
-    root.style.transition = "";
-    root.style.transform = "";
+    clearDocumentElementPullTransform();
   }, []);
 
   const snapBack = useCallback(() => {
-    const root = rootRef.current;
+    const root = transformRootRef.current;
     if (root) {
       root.style.transition = `transform ${SNAP_BACK_MS}ms ${IOS_EASING}`;
       root.style.transform = "translate3d(0, 0, 0)";
@@ -93,6 +94,7 @@ export function PullToRefresh() {
         root.style.transition = "";
         root.style.transform = "";
       }
+      clearDocumentElementPullTransform();
       setPhaseSafe("idle");
       pullingRef.current = false;
       lockedRef.current = "none";
@@ -117,24 +119,28 @@ export function PullToRefresh() {
   }, [isPending, snapBack]);
 
   useEffect(() => {
-    document.documentElement.style.transition = "";
-    document.documentElement.style.transform = "";
-
-    rootRef.current = findPullScrollRoot();
+    const scrollRoot = findPullScrollRoot();
+    scrollRootRef.current = scrollRoot;
+    transformRootRef.current = findPullTransformRoot(scrollRoot);
     clearRootTransform();
     syncDistance(0);
     setPhaseSafe("idle");
     pullingRef.current = false;
     lockedRef.current = "none";
+
+    return () => {
+      clearRootTransform();
+    };
   }, [clearRootTransform, pathname, setPhaseSafe, syncDistance]);
 
   useEffect(() => {
     const onTouchStart = (event: TouchEvent) => {
       if (isPullRefreshBlocked() || phaseRef.current === "refreshing") return;
 
-      const root = findPullScrollRoot();
-      rootRef.current = root;
-      if (!root || !canStartFromTarget(event.target, root)) return;
+      const scrollRoot = findPullScrollRoot();
+      scrollRootRef.current = scrollRoot;
+      transformRootRef.current = findPullTransformRoot(scrollRoot);
+      if (!scrollRoot || !canStartFromTarget(event.target, scrollRoot)) return;
 
       startYRef.current = event.touches[0]?.clientY ?? 0;
       startXRef.current = event.touches[0]?.clientX ?? 0;
@@ -145,8 +151,8 @@ export function PullToRefresh() {
     const onTouchMove = (event: TouchEvent) => {
       if (!pullingRef.current || phaseRef.current === "refreshing" || isPullRefreshBlocked()) return;
 
-      const root = rootRef.current;
-      if (!root) return;
+      const scrollRoot = scrollRootRef.current;
+      if (!scrollRoot) return;
 
       const touch = event.touches[0];
       if (!touch) return;
@@ -166,7 +172,7 @@ export function PullToRefresh() {
           lockedRef.current = "scroll";
           return;
         }
-        if (!canStartFromTarget(event.target, root)) {
+        if (!canStartFromTarget(event.target, scrollRoot)) {
           pullingRef.current = false;
           lockedRef.current = "scroll";
           return;

@@ -51,31 +51,37 @@ export function isPullRefreshBlocked(): boolean {
 
 
 export function findPullScrollRoot(): HTMLElement | null {
-
   if (typeof document === "undefined") return null;
 
-
-
   if (!document.querySelector(".tm-app-main--internal-scroll")) {
-
     return document.documentElement;
-
   }
-
-
 
   for (const selector of PULL_SCROLL_SELECTORS) {
-
     const el = document.querySelector<HTMLElement>(selector);
-
     if (el) return el;
-
   }
 
-
-
   return document.querySelector<HTMLElement>(".tm-tab-swipe-root");
+}
 
+/** Raíz del translate del pull. Nunca `html`: un transform ahí rompe `position:fixed` de la TabBar en `body`. */
+export function findPullTransformRoot(scrollRoot: HTMLElement | null): HTMLElement | null {
+  if (!scrollRoot) return null;
+  if (scrollRoot !== document.documentElement) {
+    return scrollRoot;
+  }
+
+  return (
+    document.querySelector<HTMLElement>(".tm-app-shell") ??
+    document.querySelector<HTMLElement>(".tm-app-main")
+  );
+}
+
+export function clearDocumentElementPullTransform(): void {
+  if (typeof document === "undefined") return;
+  document.documentElement.style.transition = "";
+  document.documentElement.style.transform = "";
 }
 
 

@@ -1,11 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { BottomChrome } from "@/components/layout/BottomChrome";
+import { clearDocumentElementPullTransform } from "@/lib/layout/pull-to-refresh";
 
 /** Portal a body — TabBar fija al borde inferior (marbella-app). */
 export function TabBarWrapper() {
-  if (typeof document === "undefined") return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    clearDocumentElementPullTransform();
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return createPortal(<BottomChrome />, document.body);
 }
