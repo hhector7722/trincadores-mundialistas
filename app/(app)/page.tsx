@@ -3,7 +3,6 @@ import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { HomeViewportShell } from "@/components/home/HomeViewportShell";
 import { getMatchHighlightsForPool } from "@/lib/highlights/queries";
 import { getDailyFactForToday } from "@/lib/home/daily-fact";
-import { getQuizDayHub } from "@/lib/quiz/queries";
 import {
   getPoolMatchesWithPredictions,
 } from "@/lib/predictions/queries";
@@ -27,14 +26,12 @@ export default async function HomePage() {
   const [
     matchCarouselMatches,
     leaderboard,
-    quizHub,
     generalPredictionsBundle,
     generalPredictionsBoard,
     matchHighlights,
   ] = await Promise.all([
     getPoolMatchesWithPredictions(ctx.activePoolId, user!.id),
     getPoolLeaderboard(ctx.activePoolId),
-    getQuizDayHub(ctx.activePoolId, user!.id),
     getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
     getPoolTournamentGeneralPredictionsBoard(ctx.activePoolId),
     getMatchHighlightsForPool(ctx.activePoolId),
@@ -56,7 +53,6 @@ export default async function HomePage() {
           generalPredictionsEditable={generalPredictionsBundle.editable}
           generalPredictionsBoard={generalPredictionsBoard}
           dailyFact={dailyFact}
-          quizHub={quizHub}
           matchCarouselMatches={matchCarouselMatches}
         />
       }

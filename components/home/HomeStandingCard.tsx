@@ -6,7 +6,6 @@ import { HomeNextMatch } from "@/components/home/HomeNextMatch";
 import { HomeScoringRulesCard } from "@/components/home/HomeScoringRulesCard";
 import type { DailyFact } from "@/lib/home/daily-fact";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import type { QuizDayHub } from "@/lib/quiz/types";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import type {
   TournamentGeneralPredictions,
@@ -21,7 +20,6 @@ type HomeStandingCardProps = {
   generalPredictionsEditable: boolean;
   generalPredictionsBoard: TournamentGeneralPredictionsBoardRow[];
   dailyFact: DailyFact | null;
-  quizHub: QuizDayHub;
   matchCarouselMatches: MatchWithPrediction[];
 };
 
@@ -33,7 +31,6 @@ export function HomeStandingCard({
   generalPredictionsEditable,
   generalPredictionsBoard,
   dailyFact,
-  quizHub,
   matchCarouselMatches,
 }: HomeStandingCardProps) {
   return (
@@ -60,7 +57,7 @@ export function HomeStandingCard({
       <div className="tm-home-secondary-row grid shrink-0 grid-cols-2 items-stretch gap-3">
         <div className="flex h-full min-h-0 min-w-0 flex-col gap-1">
           <HomeScoringRulesCard className="min-h-0 flex-1" />
-          <HomeDailyQuizCard quizHub={quizHub} className="shrink-0" />
+          <HomeDailyQuizCard className="shrink-0" />
         </div>
         <HomeDailyFactCard fact={dailyFact} />
       </div>
