@@ -1591,6 +1591,59 @@ html:has(.tm-app-shell) body {
   box-shadow: 0 0 0 2px var(--tm-accent);
 }
 
+.tm-flag-range-slider {
+  --tm-flag-track-y: calc(var(--tm-range-thumb-h, 56px) * 0.8);
+  height: calc(var(--tm-range-thumb-h, 56px) + 0.625rem);
+  padding-top: 0.125rem;
+}
+
+.tm-flag-range-slider__hit {
+  position: relative;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.tm-flag-range-slider__hit:active {
+  cursor: grabbing;
+}
+
+.tm-flag-range-slider__hit:focus-visible {
+  outline: none;
+}
+
+.tm-flag-range-slider__hit:focus-visible .tm-flag-range-slider__track {
+  box-shadow: 0 0 0 2px var(--tm-accent);
+}
+
+.tm-flag-range-slider__track {
+  position: absolute;
+  left: calc(var(--tm-range-thumb-w, 46px) / 2);
+  right: calc(var(--tm-range-thumb-w, 46px) / 2);
+  top: var(--tm-flag-track-y);
+  height: 0.25rem;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.tm-flag-range-slider__thumb {
+  position: absolute;
+  top: var(--tm-flag-track-y);
+  width: var(--tm-range-thumb-w, 46px);
+  height: var(--tm-range-thumb-h, 56px);
+  transform: translate(-50%, calc(-1 * var(--tm-range-thumb-above, 80%)));
+  background: transparent var(--tm-range-thumb-image) center / contain no-repeat;
+  pointer-events: none;
+  will-change: left;
+  transition: left 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tm-flag-range-slider__thumb--dragging {
+  transition: none;
+}
+
 .tm-ranking-table {
   display: flex;
   flex: 1 1 auto;
