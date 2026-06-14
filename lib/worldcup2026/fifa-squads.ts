@@ -48,9 +48,9 @@ function loc(items?: Localized | null): string | null {
   return en.Description?.trim() ?? null;
 }
 
-/** Capitaliza tokens de nombre (Unicode-safe; JS \\b rompe con acentos). */
-function capitalizePlayerToken(token: string): string {
-  const lower = token.toLowerCase();
+/** Capitaliza un segmento sin guiones (Mc/Mac incluidos). */
+function capitalizeSimplePart(part: string): string {
+  const lower = part.toLowerCase();
   if (!lower) return lower;
   if (lower.startsWith("mc") && lower.length > 2) {
     return `Mc${lower.slice(2, 3).toUpperCase()}${lower.slice(3)}`;
@@ -59,6 +59,14 @@ function capitalizePlayerToken(token: string): string {
     return `Mac${lower.slice(3, 4).toUpperCase()}${lower.slice(4)}`;
   }
   return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+/** Capitaliza tokens de nombre (Unicode-safe; JS \\b rompe con acentos). */
+function capitalizePlayerToken(token: string): string {
+  if (token.includes("-")) {
+    return token.split("-").map((part) => capitalizeSimplePart(part)).join("-");
+  }
+  return capitalizeSimplePart(token);
 }
 
 /** "Raul RANGEL" → "Raul Rangel"; "VINÍCIUS JR." → "Vinícius Jr." */

@@ -82,12 +82,12 @@ function BoardHeaderOfficialMvpLine({
     <span
       className={cn(
         GOAL_SCORER_TEXT_CLASS,
-        "block w-full max-w-full whitespace-nowrap text-[var(--tm-primary)]",
+        "block w-full max-w-full whitespace-nowrap",
         align === "right" ? "text-right" : "text-left",
       )}
       style={goalScorerTextStyle}
     >
-      {goalScorerDisplayName(playerName)}
+      <span className="text-[var(--tm-primary)]">{goalScorerDisplayName(playerName)}</span>
     </span>
   );
 }
