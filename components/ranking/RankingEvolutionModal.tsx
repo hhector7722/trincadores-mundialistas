@@ -67,6 +67,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
         open={open}
         onClose={onClose}
         title="Evolución de la tabla"
+        hideHeaderDivider
         className={MODAL_PANEL_CLASS}
         loading={loading}
         scrollContent={false}

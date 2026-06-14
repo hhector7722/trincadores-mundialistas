@@ -17,14 +17,16 @@ const LINE_COLORS = [
   "#A0A0FF",
 ];
 
-const CHART_WIDTH = 360;
-const CHART_HEIGHT = 280;
-const MARGIN_LEFT = 28;
+const CHART_WIDTH = 380;
+const CHART_HEIGHT = 520;
+const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
-const MARGIN_TOP = 20;
-const MARGIN_BOTTOM = 36;
+const MARGIN_TOP = 24;
+const MARGIN_BOTTOM = 40;
 const AVATAR_RADIUS = 11;
-const LABEL_OFFSET = 14;
+const AVATAR_X = 42;
+const PLOT_START_X = 64;
+const LABEL_OFFSET = 12;
 
 function avatarInitials(label: string): string {
   const trimmed = label.trim();
@@ -41,6 +43,8 @@ type ChartSeries = {
   label: string;
   avatarUrl: string | null;
   color: string;
+  initialY: number;
+  initialPosition: number;
   points: Array<{ x: number; y: number; position: number }>;
 };
 
@@ -66,15 +70,16 @@ export function RankingEvolutionChart({
   const { plotWidth, plotHeight, memberCount, visibleMatchdays, series } = useMemo(() => {
     const visible = data.matchdays.slice(0, endMatchdayIndex + 1);
     const visiblePoints = data.points.slice(0, endMatchdayIndex + 1);
+    const initialPoint = data.points[0];
     const count = data.members.length;
-    const plotW = CHART_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
+    const plotW = CHART_WIDTH - PLOT_START_X - MARGIN_RIGHT;
     const plotH = CHART_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM;
     const colorMap = buildColorMap(data.members);
 
     const xAt = (index: number) =>
       visible.length <= 1
-        ? MARGIN_LEFT + plotW / 2
-        : MARGIN_LEFT + (index / (visible.length - 1)) * plotW;
+        ? PLOT_START_X + plotW / 2
+        : PLOT_START_X + (index / (visible.length - 1)) * plotW;
 
     const yAt = (position: number) =>
       count <= 1
@@ -85,6 +90,12 @@ export function RankingEvolutionChart({
       .filter((member) => filteredProfileIds.has(member.profileId))
       .map((member) => {
         const color = colorMap.get(member.profileId) ?? LINE_COLORS[0]!;
+        const initialStanding = initialPoint?.standings.find(
+          (row) => row.profileId === member.profileId
+        );
+        const initialPosition = initialStanding?.position ?? count;
+        const initialY = yAt(initialPosition);
+
         const points = visiblePoints.map((point, index) => {
           const standing = point.standings.find((row) => row.profileId === member.profileId);
           const position = standing?.position ?? count;
@@ -94,11 +105,14 @@ export function RankingEvolutionChart({
             position,
           };
         });
+
         return {
           profileId: member.profileId,
           label: member.label,
           avatarUrl: member.avatarUrl,
           color,
+          initialY,
+          initialPosition,
           points,
         };
       });
@@ -122,10 +136,10 @@ export function RankingEvolutionChart({
 
   const gridXPositions = useMemo(() => {
     if (visibleMatchdays.length <= 1) {
-      return [MARGIN_LEFT + plotWidth / 2];
+      return [PLOT_START_X + plotWidth / 2];
     }
     return visibleMatchdays.map((_, index) => {
-      return MARGIN_LEFT + (index / (visibleMatchdays.length - 1)) * plotWidth;
+      return PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
     });
   }, [visibleMatchdays.length, plotWidth]);
 
@@ -145,19 +159,14 @@ export function RankingEvolutionChart({
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Grafico de evolucion de clasificacion por jornada"
-      className="block max-h-[min(52dvh,20rem)] w-full"
+      className="block max-h-[min(62dvh,32rem)] w-full"
     >
       <defs>
-        {series.map((item) =>
-          item.points.map((point, pointIndex) => (
-            <clipPath
-              key={`clip-${item.profileId}-${pointIndex}`}
-              id={`evo-clip-${item.profileId}-${pointIndex}`}
-            >
-              <circle cx={point.x} cy={point.y} r={AVATAR_RADIUS} />
-            </clipPath>
-          ))
-        )}
+        {series.map((item) => (
+          <clipPath key={`clip-${item.profileId}`} id={`evo-clip-${item.profileId}`}>
+            <circle cx={AVATAR_X} cy={item.initialY} r={AVATAR_RADIUS} />
+          </clipPath>
+        ))}
       </defs>
 
       {gridYPositions.map((y, index) => (
@@ -195,7 +204,7 @@ export function RankingEvolutionChart({
         return (
           <text
             key={`y-label-${position}`}
-            x={MARGIN_LEFT - 6}
+            x={MARGIN_LEFT - 2}
             y={y + 4}
             textAnchor="end"
             fill="rgba(255,255,255,0.55)"
@@ -210,13 +219,13 @@ export function RankingEvolutionChart({
       {visibleMatchdays.map((matchday, index) => {
         const x =
           visibleMatchdays.length <= 1
-            ? MARGIN_LEFT + plotWidth / 2
-            : MARGIN_LEFT + (index / (visibleMatchdays.length - 1)) * plotWidth;
+            ? PLOT_START_X + plotWidth / 2
+            : PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
         return (
           <text
             key={`x-label-${matchday.id}`}
             x={x}
-            y={CHART_HEIGHT - 10}
+            y={CHART_HEIGHT - 12}
             textAnchor="middle"
             fill="rgba(255,255,255,0.55)"
             fontSize={9}
@@ -228,10 +237,11 @@ export function RankingEvolutionChart({
       })}
 
       {series.map((item) => {
-        if (item.points.length < 2) return null;
-        const pathD = item.points
-          .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-          .join(" ");
+        const pathParts = [`M ${AVATAR_X} ${item.initialY}`];
+        for (const point of item.points) {
+          pathParts.push(`L ${point.x} ${point.y}`);
+        }
+        const pathD = pathParts.join(" ");
         return (
           <path
             key={`line-${item.profileId}`}
@@ -245,57 +255,72 @@ export function RankingEvolutionChart({
         );
       })}
 
-      {series.flatMap((item) =>
-        item.points.map((point, pointIndex) => {
-          const clipId = `evo-clip-${item.profileId}-${pointIndex}`;
-          return (
-            <g key={`node-${item.profileId}-${pointIndex}`}>
+      {series.map((item) => (
+        <g key={`avatar-${item.profileId}`}>
+          <circle
+            cx={AVATAR_X}
+            cy={item.initialY}
+            r={AVATAR_RADIUS + 1}
+            fill="#0a0618"
+            stroke={item.color}
+            strokeWidth={1.5}
+          />
+          {item.avatarUrl ? (
+            <image
+              href={item.avatarUrl}
+              x={AVATAR_X - AVATAR_RADIUS}
+              y={item.initialY - AVATAR_RADIUS}
+              width={AVATAR_RADIUS * 2}
+              height={AVATAR_RADIUS * 2}
+              clipPath={`url(#evo-clip-${item.profileId})`}
+              preserveAspectRatio="xMidYMid slice"
+            />
+          ) : (
+            <>
+              <circle
+                cx={AVATAR_X}
+                cy={item.initialY}
+                r={AVATAR_RADIUS}
+                fill="rgba(111,43,255,0.35)"
+              />
               <text
-                x={point.x}
-                y={point.y - LABEL_OFFSET}
+                x={AVATAR_X}
+                y={item.initialY + 4}
                 textAnchor="middle"
-                fill={item.color}
-                fontSize={9}
+                fill="rgba(255,255,255,0.85)"
+                fontSize={8}
                 fontWeight={700}
               >
-                {point.position}
+                {avatarInitials(item.label)}
               </text>
-              <circle
-                cx={point.x}
-                cy={point.y}
-                r={AVATAR_RADIUS + 1}
-                fill="#0a0618"
-                stroke={item.color}
-                strokeWidth={1.5}
-              />
-              {item.avatarUrl ? (
-                <image
-                  href={item.avatarUrl}
-                  x={point.x - AVATAR_RADIUS}
-                  y={point.y - AVATAR_RADIUS}
-                  width={AVATAR_RADIUS * 2}
-                  height={AVATAR_RADIUS * 2}
-                  clipPath={`url(#${clipId})`}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              ) : (
-                <>
-                  <circle cx={point.x} cy={point.y} r={AVATAR_RADIUS} fill="rgba(111,43,255,0.35)" />
-                  <text
-                    x={point.x}
-                    y={point.y + 4}
-                    textAnchor="middle"
-                    fill="rgba(255,255,255,0.85)"
-                    fontSize={8}
-                    fontWeight={700}
-                  >
-                    {avatarInitials(item.label)}
-                  </text>
-                </>
-              )}
-            </g>
-          );
-        })
+            </>
+          )}
+        </g>
+      ))}
+
+      {series.flatMap((item) =>
+        item.points.map((point, pointIndex) => (
+          <g key={`node-${item.profileId}-${pointIndex}`}>
+            <text
+              x={point.x}
+              y={point.y - LABEL_OFFSET}
+              textAnchor="middle"
+              fill={item.color}
+              fontSize={9}
+              fontWeight={700}
+            >
+              {point.position}
+            </text>
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r={3}
+              fill={item.color}
+              stroke="#0a0618"
+              strokeWidth={1}
+            />
+          </g>
+        ))
       )}
     </svg>
   );
