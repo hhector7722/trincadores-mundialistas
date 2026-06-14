@@ -99,7 +99,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
             <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
           ) : null}
 
-          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)]/40 bg-[#0a0618] p-2">
+          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-mid)] p-2">
             {data && data.matchdays.length > 0 ? (
               <RankingEvolutionChart
                 data={data}

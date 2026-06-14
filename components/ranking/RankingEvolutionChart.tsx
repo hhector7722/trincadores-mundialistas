@@ -17,6 +17,9 @@ const LINE_COLORS = [
   "#A0A0FF",
 ];
 
+/** Fondo del área de trazado: morado medio de la app, buen contraste con líneas neón. */
+const CHART_BG = "var(--tm-bg-mid)";
+
 /** Espacio vertical entre posiciones (~altura fila ranking: 2.375rem). */
 const ROW_GAP_PX = 38;
 const CHART_WIDTH = 380;
@@ -131,23 +134,6 @@ export function RankingEvolutionChart({
     };
   }, [data, endMatchdayIndex, filteredProfileIds, chartHeight]);
 
-  const gridYPositions = useMemo(() => {
-    if (memberCount <= 1) return [MARGIN_TOP + plotHeight / 2];
-    return Array.from({ length: memberCount }, (_, index) => {
-      const position = index + 1;
-      return MARGIN_TOP + ((position - 1) / (memberCount - 1)) * plotHeight;
-    });
-  }, [memberCount, plotHeight]);
-
-  const gridXPositions = useMemo(() => {
-    if (visibleMatchdays.length <= 1) {
-      return [PLOT_START_X + plotWidth / 2];
-    }
-    return visibleMatchdays.map((_, index) => {
-      return PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
-    });
-  }, [visibleMatchdays.length, plotWidth]);
-
   if (!visibleMatchdays.length || !series.length) {
     return (
       <div className="flex min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
@@ -174,31 +160,7 @@ export function RankingEvolutionChart({
         ))}
       </defs>
 
-      {gridYPositions.map((y, index) => (
-        <line
-          key={`grid-y-${index}`}
-          x1={MARGIN_LEFT}
-          y1={y}
-          x2={CHART_WIDTH - MARGIN_RIGHT}
-          y2={y}
-          stroke="rgba(255,255,255,0.18)"
-          strokeWidth={1}
-          strokeDasharray="3 4"
-        />
-      ))}
-
-      {gridXPositions.map((x, index) => (
-        <line
-          key={`grid-x-${index}`}
-          x1={x}
-          y1={MARGIN_TOP}
-          x2={x}
-          y2={chartHeight - MARGIN_BOTTOM}
-          stroke="rgba(255,255,255,0.18)"
-          strokeWidth={1}
-          strokeDasharray="3 4"
-        />
-      ))}
+      <rect x={0} y={0} width={CHART_WIDTH} height={chartHeight} fill={CHART_BG} />
 
       {Array.from({ length: memberCount }, (_, index) => {
         const position = index + 1;
@@ -265,7 +227,7 @@ export function RankingEvolutionChart({
             cx={AVATAR_X}
             cy={item.initialY}
             r={AVATAR_RADIUS + 1}
-            fill="#0a0618"
+            fill={CHART_BG}
             stroke={item.color}
             strokeWidth={1.5}
           />
@@ -285,7 +247,7 @@ export function RankingEvolutionChart({
                 cx={AVATAR_X}
                 cy={item.initialY}
                 r={AVATAR_RADIUS}
-                fill="rgba(111,43,255,0.35)"
+              fill="var(--tm-surface-elevated)"
               />
               <text
                 x={AVATAR_X}
@@ -320,7 +282,7 @@ export function RankingEvolutionChart({
               cy={point.y}
               r={3}
               fill={item.color}
-              stroke="#0a0618"
+              stroke={CHART_BG}
               strokeWidth={1}
             />
           </g>
