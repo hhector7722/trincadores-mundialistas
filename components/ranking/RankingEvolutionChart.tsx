@@ -26,7 +26,7 @@ const CHART_WIDTH = 380;
 const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
 const MARGIN_TOP = 20;
-const MARGIN_BOTTOM = 36;
+const MARGIN_BOTTOM = 14;
 const AVATAR_RADIUS = 11;
 const AVATAR_X = 42;
 const PLOT_START_X = 64;
@@ -192,7 +192,7 @@ export function RankingEvolutionChart({
           <text
             key={`x-label-${matchday.id}`}
             x={x}
-            y={chartHeight - 10}
+            y={chartHeight - 6}
             textAnchor="middle"
             fill="rgba(255,255,255,0.55)"
             fontSize={9}

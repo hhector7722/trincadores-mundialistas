@@ -17,7 +17,7 @@ type RankingEvolutionModalProps = {
 };
 
 const MODAL_PANEL_CLASS =
-  "flex min-h-[min(92dvh,46rem)] max-h-[min(94dvh,48rem)] w-full max-w-lg flex-col";
+  "flex max-h-[min(94dvh,48rem)] w-full max-w-lg flex-col";
 
 export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutionModalProps) {
   const [data, setData] = useState<RankingEvolutionData | null>(null);
@@ -70,7 +70,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
         loading={loading}
         scrollContent={false}
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-3 px-3 pb-3 pt-1">
+        <div className="flex flex-col gap-3 px-3 pb-3 pt-1">
           <div className="flex shrink-0 justify-center">
             <div className="relative">
             <button
@@ -99,7 +99,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
             <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
           ) : null}
 
-          <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] p-2">
+          <div className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-1">
             {data && data.matchdays.length > 0 ? (
               <RankingEvolutionChart
                 data={data}
