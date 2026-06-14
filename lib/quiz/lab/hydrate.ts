@@ -11,6 +11,7 @@ import {
   LAB_DEMO_VIDEO_SRC,
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
 } from "@/lib/quiz/lab/demo-video";
+import { createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
 import type { LabDraft, LabQuestion, LabQuestionGuessSelection } from "@/lib/quiz/lab/types";
 
 const GENERIC_OPTION_LABELS = new Set(["opción a", "opción b", "opción c", "opción d"]);
@@ -51,6 +52,24 @@ function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestion
   });
 
   return { ...question, slots };
+}
+
+function hydrateGuessImage(question: LabQuestion): LabQuestion {
+  if (question.format !== "guess_image") return question;
+
+  const isHistoric = question.imageUrl.startsWith("/images/quiz/historic/");
+  const isFallback = question.imageUrl.includes("unsplash.com");
+
+  if (isHistoric && question.momentId) return question;
+  if (!isHistoric || isFallback) {
+    const fresh = createGuessImageFromCatalog({
+      minDifficulty: "hard",
+      questionId: question.id,
+    });
+    if (fresh) return fresh;
+  }
+
+  return question;
 }
 
 function hydrateMultipleChoice(question: LabQuestion): LabQuestion {
@@ -102,6 +121,7 @@ export function hydrateLabQuestion(question: LabQuestion): LabQuestion {
   if (next.format === "guess_selection") {
     next = hydrateGuessSelection(next);
   }
+  next = hydrateGuessImage(next);
   next = hydrateMultipleChoice(next);
   next = hydrateVideo(next);
   return next;

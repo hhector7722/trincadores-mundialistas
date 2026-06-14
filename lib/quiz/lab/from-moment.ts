@@ -22,6 +22,9 @@ export function momentToGuessImageQuestion(
     blurStartPx: moment.quiz.blur_start_px,
     revealSeconds: moment.quiz.reveal_seconds,
     timerSeconds: 10,
+    momentId: moment.id,
+    momentLabel: moment.label,
+    momentDifficulty: moment.difficulty,
     options: moment.quiz.options.map((label, index) => ({
       id: `opt_${index + 1}`,
       label,

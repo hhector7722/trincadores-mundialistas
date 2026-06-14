@@ -1,26 +1,21 @@
 import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
-import { momentToGuessImageQuestion } from "@/lib/quiz/lab/from-moment";
+import { createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
 import {
   LAB_DEMO_VIDEO_SRC,
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
 } from "@/lib/quiz/lab/demo-video";
-import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
+import type { LabDraft, LabQuestion, LabQuestionFormat, LabQuestionGuessImage } from "@/lib/quiz/lab/types";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
-import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
-import { pickGuessImageMoment } from "@/lib/quiz/world-cup-moments";
 
 const FALLBACK_GUESS_IMAGE_URL =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80";
 
-function defaultGuessImageQuestion(): LabQuestion {
-  try {
-    const catalog = getWorldCupMomentsCatalog();
-    const moment = pickGuessImageMoment(catalog, { minDifficulty: "hard" });
-    const fromCatalog = moment ? momentToGuessImageQuestion(moment) : null;
-    if (fromCatalog) return fromCatalog;
-  } catch {
-    // Catálogo ausente o inválido: fallback demo.
-  }
+export { createGuessImageFromCatalog, reloadGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
+export type { GuessImageCatalogOptions } from "@/lib/quiz/lab/guess-image-catalog";
+
+function defaultGuessImageQuestion(): LabQuestionGuessImage {
+  const fromCatalog = createGuessImageFromCatalog({ minDifficulty: "hard" });
+  if (fromCatalog) return fromCatalog;
 
   return {
     id: uid(),
@@ -30,12 +25,13 @@ function defaultGuessImageQuestion(): LabQuestion {
     blurStartPx: 24,
     revealSeconds: 8,
     timerSeconds: 10,
+    momentId: null,
+    momentLabel: null,
+    momentDifficulty: null,
     options: defaultOptions(["Balón Nike", "Balón Adidas", "Balón Puma", "Balón Molten"]),
     correctOptionId: "opt_1",
   };
 }
-
-
 
 function uid(): string {
 

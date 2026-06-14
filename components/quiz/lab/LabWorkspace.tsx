@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Play, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Play, Plus, RotateCcw, Save, Shuffle, Trash2 } from "lucide-react";
 import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
 import { LabShell } from "@/components/quiz/lab/LabShell";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
 import { createLabQuestion } from "@/lib/quiz/lab/defaults";
+import { reloadGuessImageFromCatalog, createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
@@ -19,7 +20,9 @@ import {
   type LabDraft,
   type LabQuestion,
   type LabQuestionFormat,
+  type LabQuestionGuessImage,
 } from "@/lib/quiz/lab/types";
+import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 import { cn } from "@/lib/utils";
 
 type WorkspaceMode = "edit" | "preview";
@@ -44,6 +47,8 @@ export function LabWorkspace() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [guessImageDifficulty, setGuessImageDifficulty] =
+    useState<WorldCupMomentDifficulty>("hard");
 
   const activeQuestion =
     draft.questions.find((q) => q.id === activeQuestionId) ?? draft.questions[0] ?? null;
@@ -91,7 +96,11 @@ export function LabWorkspace() {
   }
 
   function addQuestion(format: LabQuestionFormat) {
-    const question = createLabQuestion(format);
+    let question = createLabQuestion(format);
+    if (format === "guess_image") {
+      const fromCatalog = createGuessImageFromCatalog({ minDifficulty: guessImageDifficulty });
+      if (fromCatalog) question = fromCatalog;
+    }
     const next = { ...draft, questions: [...draft.questions, question] };
     persist(next);
     setActiveQuestionId(question.id);
@@ -118,6 +127,15 @@ export function LabWorkspace() {
   function patchActive(patch: Partial<LabQuestion>) {
     if (!activeQuestion) return;
     persist(updateQuestion(draft, activeQuestion.id, patch));
+  }
+
+  function shuffleGuessImageMoment() {
+    if (!activeQuestion || activeQuestion.format !== "guess_image") return;
+    const next = reloadGuessImageFromCatalog(
+      activeQuestion as LabQuestionGuessImage,
+      guessImageDifficulty
+    );
+    persist(updateQuestion(draft, activeQuestion.id, next));
   }
 
   function startPreview() {
@@ -340,6 +358,53 @@ export function LabWorkspace() {
 
                 {activeQuestion.format === "guess_image" ? (
                   <>
+                    <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
+                          Catálogo histórico
+                        </p>
+                        <button
+                          type="button"
+                          onClick={shuffleGuessImageMoment}
+                          className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)]"
+                        >
+                          <Shuffle className="size-4" aria-hidden />
+                          Otro momento
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(["easy", "medium", "hard"] as const).map((level) => (
+                          <button
+                            key={level}
+                            type="button"
+                            onClick={() => setGuessImageDifficulty(level)}
+                            className={cn(
+                              "min-h-10 rounded-lg border px-3 text-[10px] font-bold uppercase tracking-wider",
+                              guessImageDifficulty === level
+                                ? "border-[var(--lab-accent)] text-[var(--lab-fg)]"
+                                : "border-[var(--lab-border)] text-[var(--lab-muted)]"
+                            )}
+                          >
+                            {level}
+                          </button>
+                        ))}
+                      </div>
+                      {activeQuestion.momentLabel ? (
+                        <p className="text-xs text-[var(--lab-fg)]">
+                          <span className="text-[var(--lab-muted)]">Momento: </span>
+                          {activeQuestion.momentLabel}
+                          {activeQuestion.momentDifficulty ? (
+                            <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
+                              {activeQuestion.momentDifficulty}
+                            </span>
+                          ) : null}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-[var(--lab-muted)]">
+                          Sin momento del catálogo — pulsa «Otro momento».
+                        </p>
+                      )}
+                    </div>
                     <label className="block space-y-1">
                       <span className="text-[10px] uppercase text-[var(--lab-muted)]">
                         URL imagen

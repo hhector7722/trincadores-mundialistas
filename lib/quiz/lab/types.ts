@@ -74,6 +74,13 @@ export type LabQuestionGuessImage = LabQuestionBase & {
 
   revealSeconds: number;
 
+  /** Id del momento en world-cup-moments.json (solo laboratorio). */
+  momentId?: string | null;
+
+  momentLabel?: string | null;
+
+  momentDifficulty?: "easy" | "medium" | "hard" | null;
+
 };
 
 

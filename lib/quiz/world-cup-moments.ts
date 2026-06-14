@@ -262,19 +262,28 @@ export function pickGuessImageMoment(
   opts?: {
     seed?: number;
     minDifficulty?: WorldCupMomentDifficulty;
+    excludeIds?: string[];
   }
 ): WorldCupMoment | null {
-  const seed = opts?.seed ?? 0;
+  const seed = opts?.seed ?? Math.floor(Math.random() * 1_000_000);
   const minDifficulty = opts?.minDifficulty ?? "hard";
+  const exclude = new Set(opts?.excludeIds ?? []);
 
   let ready = filterCatalogReadyMoments(catalog.moments);
   ready = filterMomentsByDifficulty(ready, minDifficulty);
+  if (exclude.size) {
+    ready = ready.filter((moment) => !exclude.has(moment.id));
+  }
 
   if (!ready.length && minDifficulty !== "easy") {
-    ready = filterMomentsByDifficulty(
+    let fallback = filterMomentsByDifficulty(
       filterCatalogReadyMoments(catalog.moments),
       minDifficulty === "hard" ? "medium" : "easy"
     );
+    if (exclude.size) {
+      fallback = fallback.filter((moment) => !exclude.has(moment.id));
+    }
+    ready = fallback;
   }
 
   if (!ready.length) return null;
