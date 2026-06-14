@@ -44,7 +44,12 @@ function MatchPredictionsBoardTableHeader({
       )}
     >
       <span className="col-span-2 flex h-full items-center text-left">Trincador</span>
-      {showOutcomes ? <span aria-hidden="true" className="h-full" /> : null}
+      {showOutcomes ? (
+        <>
+          <span aria-hidden="true" className="h-full" />
+          <span aria-hidden="true" className="h-full" />
+        </>
+      ) : null}
       <span className="flex h-full items-center justify-center">
         <TeamHeader team={homeTeam} />
       </span>
@@ -69,7 +74,12 @@ function MatchPredictionsEmptyRow({ showOutcomes }: { showOutcomes: boolean }) {
         <span className="size-5 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
       </span>
       <span className="flex h-full items-center whitespace-nowrap">&nbsp;</span>
-      {showOutcomes ? <span aria-hidden="true" className="h-full" /> : null}
+      {showOutcomes ? (
+        <>
+          <span aria-hidden="true" className="h-full" />
+          <span aria-hidden="true" className="h-full" />
+        </>
+      ) : null}
       <span className="h-full" />
       <span className="h-full" />
       <span className="h-full" />

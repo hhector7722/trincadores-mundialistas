@@ -3,7 +3,10 @@
 import { useState, type MouseEvent } from "react";
 import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
-import { MatchPredictionsBoardOutcomeIcons } from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
+import {
+  MatchPredictionsBoardOutcomeIconTicks,
+  MatchPredictionsBoardPointsLabel,
+} from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
 import { matchPredictionsSubgridRow } from "@/components/predictions/match-predictions-grid";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
@@ -82,12 +85,20 @@ export function MatchPredictionsBoardRow({
           {row.label}
         </span>
         {showOutcomes ? (
-          <div className="flex h-full items-center justify-start">
-            <MatchPredictionsBoardOutcomeIcons
-              scoreOutcome={row.scoreOutcome}
-              mvpCorrect={row.mvpCorrect}
-            />
-          </div>
+          <>
+            <div className="flex h-full items-center justify-center">
+              <MatchPredictionsBoardPointsLabel
+                scoreOutcome={row.scoreOutcome}
+                mvpCorrect={row.mvpCorrect}
+              />
+            </div>
+            <div className="flex h-full items-center justify-start">
+              <MatchPredictionsBoardOutcomeIconTicks
+                scoreOutcome={row.scoreOutcome}
+                mvpCorrect={row.mvpCorrect}
+              />
+            </div>
+          </>
         ) : null}
         <CellValue value={formatGoalCell(row.homeGoals)} />
         <CellValue value={formatGoalCell(row.awayGoals)} />
