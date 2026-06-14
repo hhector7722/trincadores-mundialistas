@@ -59,7 +59,7 @@ export function PullToRefresh() {
 
   const applyRootTransform = useCallback((distance: number) => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root || root === document.documentElement) return;
     if (distance > 0) {
       root.style.transform = `translate3d(0, ${distance}px, 0)`;
       root.style.transition = "none";
@@ -67,6 +67,17 @@ export function PullToRefresh() {
       root.style.transform = "";
       root.style.transition = "";
     }
+  }, []);
+
+  const clearRootTransform = useCallback(() => {
+    const root = rootRef.current;
+    if (!root || root === document.documentElement) {
+      document.documentElement.style.transition = "";
+      document.documentElement.style.transform = "";
+      return;
+    }
+    root.style.transition = "";
+    root.style.transform = "";
   }, []);
 
   const snapBack = useCallback(() => {
@@ -106,12 +117,16 @@ export function PullToRefresh() {
   }, [isPending, snapBack]);
 
   useEffect(() => {
+    document.documentElement.style.transition = "";
+    document.documentElement.style.transform = "";
+
     rootRef.current = findPullScrollRoot();
+    clearRootTransform();
     syncDistance(0);
     setPhaseSafe("idle");
     pullingRef.current = false;
     lockedRef.current = "none";
-  }, [pathname, setPhaseSafe, syncDistance]);
+  }, [clearRootTransform, pathname, setPhaseSafe, syncDistance]);
 
   useEffect(() => {
     const onTouchStart = (event: TouchEvent) => {

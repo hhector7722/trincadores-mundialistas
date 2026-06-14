@@ -1,0 +1,419 @@
+{
+  "version": 1,
+  "moments": [
+    {
+      "id": "wc1970-pelé-final",
+      "year": 1970,
+      "label": "Pelé en la final México 70",
+      "moment_type": "final",
+      "teams": [
+        "Brasil",
+        "Italia"
+      ],
+      "players": [
+        "Pelé"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1970/wc1970-pele-final.jpg",
+      "source_url": "https://assets.goal.com/images/v3/bltaf5993a2bddfe395/Pel%C3%A9_1970.jpg?auto=webp&format=pjpg&width=3840&quality=60",
+      "source_label": "auto/goal.com",
+      "status": "ready",
+      "image_alt": "Pelé en acción en la final del Mundial 1970",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "1970",
+        "options": [
+          "1966",
+          "1970",
+          "1974",
+          "1978"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1982-rossi-final",
+      "year": 1982,
+      "label": "Paolo Rossi — España 82",
+      "moment_type": "goal",
+      "teams": [
+        "Italia",
+        "Alemania"
+      ],
+      "players": [
+        "Paolo Rossi"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1982/wc1982-rossi-final.jpg",
+      "source_url": "https://estaticos-cdn.sport.es/clip/f254e4a0-0906-4fc8-b113-849e9e17675a_alta-libre-aspect-ratio_default_0.jpg",
+      "source_label": "auto/sport.es",
+      "status": "ready",
+      "image_alt": "Paolo Rossi en el Mundial 1982",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "1982",
+        "options": [
+          "1978",
+          "1982",
+          "1986",
+          "1990"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1986-maradona-cup",
+      "year": 1986,
+      "label": "Maradona levanta la Copa — México 86",
+      "moment_type": "celebration",
+      "teams": [
+        "Argentina"
+      ],
+      "players": [
+        "Diego Maradona"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1986/wc1986-maradona-cup.jpg",
+      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2016/06/29/14672098812900.jpg",
+      "source_label": "auto/marca.com",
+      "status": "ready",
+      "image_alt": "Maradona levantando la copa en el Azteca",
+      "quiz": {
+        "prompt": "¿Qué selección ganó este Mundial?",
+        "answer_type": "team",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Alemania",
+          "Brasil",
+          "Italia"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1986-burruchaga-goal",
+      "year": 1986,
+      "label": "Gol de Burruchaga — final 1986",
+      "moment_type": "goal",
+      "teams": [
+        "Argentina",
+        "Alemania"
+      ],
+      "players": [
+        "Jorge Burruchaga"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1986/wc1986-burruchaga-goal.jpg",
+      "source_url": "https://cdn.plus.fifa.com/images/public/cms/11/d7/e3/5e/11d7e35e-092f-4656-bef8-4191301440cc.jpg?width=935",
+      "source_label": "auto/plus.fifa.com",
+      "status": "ready",
+      "image_alt": "Burruchaga celebra el gol en la final de 1986",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "1986",
+        "options": [
+          "1982",
+          "1986",
+          "1990",
+          "1994"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1990-maradona-tears",
+      "year": 1990,
+      "label": "Maradona tras Italia 90",
+      "moment_type": "iconic",
+      "teams": [
+        "Argentina",
+        "Alemania"
+      ],
+      "players": [
+        "Diego Maradona"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1990/wc1990-maradona-tears.jpg",
+      "source_url": "https://www.clarin.com/img/2018/05/15/maradona-vs-brasil-en-el___SyDjZrsAz_720x0__1.jpg",
+      "source_label": "auto/telesolnoticias.com",
+      "status": "ready",
+      "image_alt": "Maradona en el Mundial Italia 1990",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "1990",
+        "options": [
+          "1986",
+          "1990",
+          "1994",
+          "1998"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1994-baggio-penalty",
+      "year": 1994,
+      "label": "Baggio — tanda USA 94",
+      "moment_type": "iconic",
+      "teams": [
+        "Italia",
+        "Brasil"
+      ],
+      "players": [
+        "Roberto Baggio"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1994/wc1994-baggio-penalty.jpg",
+      "source_url": "https://c8.alamy.com/comp/G5MDXE/16-07-94-1994-world-cup-final-roberto-baggio-on-the-ball-against-brazil-G5MDXE.jpg",
+      "source_label": "auto/alamy.com",
+      "status": "ready",
+      "image_alt": "Roberto Baggio en la final del Mundial 1994",
+      "quiz": {
+        "prompt": "¿Qué jugador aparece en la imagen?",
+        "answer_type": "player",
+        "correct_option": "Roberto Baggio",
+        "options": [
+          "Roberto Baggio",
+          "Romário",
+          "Bebeto",
+          "Paolo Maldini"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1998-zidane-final",
+      "year": 1998,
+      "label": "Zidane — final Francia 98",
+      "moment_type": "action",
+      "teams": [
+        "Francia",
+        "Brasil"
+      ],
+      "players": [
+        "Zinedine Zidane"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/1998/wc1998-zidane-final.jpg",
+      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2018/12/12/15445971586202.jpg",
+      "source_label": "auto/marca.com",
+      "status": "ready",
+      "image_alt": "Zinedine Zidane en la final del Mundial 1998",
+      "quiz": {
+        "prompt": "¿Qué jugador aparece en la imagen?",
+        "answer_type": "player",
+        "correct_option": "Zinedine Zidane",
+        "options": [
+          "Zinedine Zidane",
+          "Ronaldo Nazário",
+          "Thierry Henry",
+          "Dennis Bergkamp"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2002-ronaldo-celebration",
+      "year": 2002,
+      "label": "Ronaldo — Corea/Japón 2002",
+      "moment_type": "celebration",
+      "teams": [
+        "Brasil",
+        "Alemania"
+      ],
+      "players": [
+        "Ronaldo Nazário"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/2002/wc2002-ronaldo-celebration.jpg",
+      "source_url": "https://images.daznservices.com/di/library/GOAL/69/23/ronaldo-nazario-de-lima-brazil_1rujxaqy6z6fw13eivx23uecsp.jpg?quality=60&w=1600",
+      "source_label": "auto/goal.com",
+      "status": "ready",
+      "image_alt": "Ronaldo Nazário en el Mundial 2002",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "2002",
+        "options": [
+          "1998",
+          "2002",
+          "2006",
+          "2010"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2006-zidane-headbutt",
+      "year": 2006,
+      "label": "Zidane — Alemania 2006",
+      "moment_type": "iconic",
+      "teams": [
+        "Francia",
+        "Italia"
+      ],
+      "players": [
+        "Zinedine Zidane"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/2006/wc2006-zidane-headbutt.jpg",
+      "source_url": "https://www.sopitas.com/wp-content/uploads/2015/09/zidane_2006.jpg",
+      "source_label": "auto/sopitas.com",
+      "status": "ready",
+      "image_alt": "Zinedine Zidane en la final del Mundial 2006",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "2006",
+        "options": [
+          "2002",
+          "2006",
+          "2010",
+          "2014"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2010-iniesta-goal",
+      "year": 2010,
+      "label": "Iniesta — gol final Sudáfrica",
+      "moment_type": "goal",
+      "teams": [
+        "España",
+        "Países Bajos"
+      ],
+      "players": [
+        "Andrés Iniesta"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/2010/wc2010-iniesta-goal.jpg",
+      "source_url": "https://media.gettyimages.com/id/102815158/photo/2010-fifa-world-cup-final.jpg?s=1024x1024&w=gi&k=20&c=rpE5WwgMcTKg9HUW8xfabiCYZRiZigYi2J27a6eER8c=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Andrés Iniesta celebra en la final del Mundial 2010",
+      "quiz": {
+        "prompt": "¿Qué selección ganó este Mundial?",
+        "answer_type": "team",
+        "correct_option": "España",
+        "options": [
+          "España",
+          "Países Bajos",
+          "Alemania",
+          "Brasil"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2014-james-volley",
+      "year": 2014,
+      "label": "James Rodríguez — Brasil 2014",
+      "moment_type": "goal",
+      "teams": [
+        "Colombia",
+        "Uruguay"
+      ],
+      "players": [
+        "James Rodríguez"
+      ],
+      "competition": "Octavos",
+      "local_path": "/images/quiz/historic/2014/wc2014-james-volley.jpg",
+      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2016/07/01/14673876430215.jpg",
+      "source_label": "auto/marca.com",
+      "status": "ready",
+      "image_alt": "James Rodríguez en el Mundial 2014",
+      "quiz": {
+        "prompt": "¿Qué jugador aparece en la imagen?",
+        "answer_type": "player",
+        "correct_option": "James Rodríguez",
+        "options": [
+          "James Rodríguez",
+          "Neymar",
+          "Luis Suárez",
+          "Thomas Müller"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2018-mbappe-final",
+      "year": 2018,
+      "label": "Mbappé — final Rusia 2018",
+      "moment_type": "action",
+      "teams": [
+        "Francia",
+        "Croacia"
+      ],
+      "players": [
+        "Kylian Mbappé"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/2018/wc2018-mbappe-final.jpg",
+      "source_url": "https://imgresizer.eurosport.com/unsafe/1200x0/filters:format(jpeg):focal(1196x415:1198x413)/origin-imgresizer.eurosport.com/2018/07/15/2373643-49371630-2560-1440.jpg",
+      "source_label": "auto/eurosport.es",
+      "status": "ready",
+      "image_alt": "Kylian Mbappé en la final del Mundial 2018",
+      "quiz": {
+        "prompt": "¿En qué Mundial fue este momento?",
+        "answer_type": "year",
+        "correct_option": "2018",
+        "options": [
+          "2014",
+          "2018",
+          "2022",
+          "2026"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc2022-messi-cup",
+      "year": 2022,
+      "label": "Messi con la copa — Qatar 2022",
+      "moment_type": "celebration",
+      "teams": [
+        "Argentina"
+      ],
+      "players": [
+        "Lionel Messi"
+      ],
+      "competition": "Final",
+      "local_path": "/images/quiz/historic/2022/wc2022-messi-cup.jpg",
+      "source_url": "https://cloudfront-us-east-2.images.arcpublishing.com/reuters/TVO76CDW5VOCXOIYBW67B76BVY.jpg",
+      "source_label": "auto/reuters.com",
+      "status": "ready",
+      "image_alt": "Lionel Messi con la copa del mundo en Qatar 2022",
+      "quiz": {
+        "prompt": "¿Qué selección ganó este Mundial?",
+        "answer_type": "team",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Francia",
+          "Brasil",
+          "Alemania"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { TabScrollLayout } from "@/components/layout/TabScrollLayout";
 
-export default function ProfileLayout({ children }: { children: React.ReactNode }) {
+export default function UsoLayout({ children }: { children: React.ReactNode }) {
   return <TabScrollLayout>{children}</TabScrollLayout>;
 }

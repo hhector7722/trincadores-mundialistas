@@ -1,16 +1,41 @@
 import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
-
+import { momentToGuessImageQuestion } from "@/lib/quiz/lab/from-moment";
 import {
-
   LAB_DEMO_VIDEO_SRC,
-
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
-
 } from "@/lib/quiz/lab/demo-video";
-
 import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
-
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
+import {
+  loadWorldCupMomentsCatalog,
+  pickDefaultGuessImageMoment,
+} from "@/lib/quiz/world-cup-moments";
+
+const FALLBACK_GUESS_IMAGE_URL =
+  "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80";
+
+function defaultGuessImageQuestion(): LabQuestion {
+  try {
+    const catalog = loadWorldCupMomentsCatalog();
+    const moment = pickDefaultGuessImageMoment(catalog);
+    const fromCatalog = moment ? momentToGuessImageQuestion(moment) : null;
+    if (fromCatalog) return fromCatalog;
+  } catch {
+    // Catálogo ausente o inválido: fallback demo.
+  }
+
+  return {
+    id: uid(),
+    format: "guess_image",
+    prompt: "ADIVINA LA IMAGEN",
+    imageUrl: FALLBACK_GUESS_IMAGE_URL,
+    blurStartPx: 24,
+    revealSeconds: 8,
+    timerSeconds: 10,
+    options: defaultOptions(["Balón Nike", "Balón Adidas", "Balón Puma", "Balón Molten"]),
+    correctOptionId: "opt_1",
+  };
+}
 
 
 
@@ -75,26 +100,7 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
       };
 
     case "guess_image":
-
-      return {
-
-        ...base,
-
-        format,
-
-        prompt: "ADIVINA LA IMAGEN",
-
-        imageUrl:
-
-          "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
-
-        blurStartPx: 24,
-
-        revealSeconds: 8,
-
-        options: defaultOptions(["Balón Nike", "Balón Adidas", "Balón Puma", "Balón Molten"]),
-
-      };
+      return defaultGuessImageQuestion();
 
     case "guess_selection":
 

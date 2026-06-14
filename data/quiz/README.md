@@ -10,6 +10,19 @@ Cada hecho incluye `source_url`, `source_label`, `category`, `fact_type` y campo
 
 Campo opcional `image_url`: ruta publica (`/images/quiz/...`) o URL `https`. Debe ser tematica (estadio, seleccion, era del futbol) y **no delatar** la respuesta correcta.
 
+## 1b. Banco de momentos históricos (imágenes)
+
+Catálogo manual: `data/quiz/images/world-cup-moments.json`  
+Imágenes locales: `public/images/quiz/historic/{año}/`
+
+```bash
+npm run quiz:discover-moment-images
+npm run quiz:discover-moment-images -- --download
+npm run quiz:validate-moments -- --write
+```
+
+Ver `data/quiz/images/README.md` para el flujo completo (1970+, solo jugadores, copia local).
+
 ## 2. Generar el día (automático)
 
 ```bash

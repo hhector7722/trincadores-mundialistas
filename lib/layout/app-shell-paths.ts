@@ -35,6 +35,14 @@ export function isInternalScrollPath(pathname: string): boolean {
     return true;
   }
 
+  if (pathname === "/profile" || pathname.startsWith("/profile/")) {
+    return true;
+  }
+
+  if (pathname === "/uso" || pathname.startsWith("/uso/")) {
+    return true;
+  }
+
   return false;
 }
 

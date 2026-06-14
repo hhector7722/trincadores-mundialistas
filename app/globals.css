@@ -239,6 +239,20 @@ html:has(.tm-app-header--compact) {
   overflow: hidden;
 }
 
+.tm-tab-scroll-layout__viewport {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .tm-quiz-page--hub {
   overflow: hidden;
   padding-bottom: 0;
@@ -246,6 +260,7 @@ html:has(.tm-app-header--compact) {
 
 .tm-app-tabbar {
   box-sizing: border-box;
+  bottom: var(--tm-chrome-bottom, 0px);
 }
 
 .tm-app-tabbar--with-indicators .tm-tabbar-indicators-row {

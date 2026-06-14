@@ -18,6 +18,10 @@ export function isMainTabActive(pathname: string, href: string) {
 
 /** Índice de sección para indicadores (incluye subrutas de la misma pestaña). */
 export function getMainTabSectionIndex(pathname: string): number | null {
+  if (pathname === "/uso" || pathname.startsWith("/uso/")) {
+    return getMainTabIndexForHref("/profile");
+  }
+
   for (let i = 0; i < MAIN_TABS.length; i++) {
     const href = MAIN_TABS[i].href;
     if (href === "/") {

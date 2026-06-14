@@ -12,6 +12,7 @@ import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
+import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import type { AppShellContext } from "@/lib/pool/active-pool";
@@ -53,6 +54,7 @@ export function AppShell({
                 </div>
                 <PullToRefresh />
                 <TabBarWrapper />
+                <VisualViewportSync />
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />
                 </Suspense>
