@@ -12,7 +12,13 @@ import {
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
 } from "@/lib/quiz/lab/demo-video";
 import { createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
+import {
+  createPlayerCropFromCatalog,
+  createSelectionFromCatalog,
+  createSilhouetteFromCatalog,
+} from "@/lib/quiz/lab/reload-question";
 import type { LabDraft, LabQuestion, LabQuestionGuessSelection } from "@/lib/quiz/lab/types";
+import { LAB_DEMO_IMAGES } from "@/lib/quiz/lab/demo-assets";
 
 const GENERIC_OPTION_LABELS = new Set(["opción a", "opción b", "opción c", "opción d"]);
 
@@ -21,6 +27,10 @@ function hasGenericOptions(labels: string[]): boolean {
 }
 
 function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestionGuessSelection {
+  if (!question.selectionPresetId) {
+    return createSelectionFromCatalog(question.id);
+  }
+
   const useSpainDemo =
     question.formation === "4-2-3-1" &&
     question.slots.every((slot) => !slot.clubImageUrl);
@@ -70,6 +80,35 @@ function hydrateGuessImage(question: LabQuestion): LabQuestion {
   }
 
   return question;
+}
+
+function hydratePlayerCrop(question: LabQuestion): LabQuestion {
+  if (question.format !== "guess_player_hair" && question.format !== "guess_player_eyes") {
+    return question;
+  }
+
+  if (question.momentId) return question;
+
+  const isStaticDemo =
+    question.imageUrl === LAB_DEMO_IMAGES.ronaldoHair2002 ||
+    question.imageUrl === LAB_DEMO_IMAGES.mbappeEyes;
+
+  if (!isStaticDemo) return question;
+
+  const fresh = createPlayerCropFromCatalog(question.format, question.id);
+  return fresh ?? question;
+}
+
+function hydrateSilhouette(question: LabQuestion): LabQuestion {
+  if (question.format !== "guess_player_silhouette") return question;
+  if (question.silhouetteDemoId) return question;
+
+  const isStaticDemo =
+    question.imageUrl === LAB_DEMO_IMAGES.spain2008Silhouette ||
+    question.imageUrl === LAB_DEMO_IMAGES.brazil2002Silhouette;
+
+  if (!isStaticDemo) return question;
+  return createSilhouetteFromCatalog(question.id);
 }
 
 function hydrateMultipleChoice(question: LabQuestion): LabQuestion {
@@ -122,6 +161,8 @@ export function hydrateLabQuestion(question: LabQuestion): LabQuestion {
     next = hydrateGuessSelection(next);
   }
   next = hydrateGuessImage(next);
+  next = hydratePlayerCrop(next);
+  next = hydrateSilhouette(next);
   next = hydrateMultipleChoice(next);
   next = hydrateVideo(next);
   return next;

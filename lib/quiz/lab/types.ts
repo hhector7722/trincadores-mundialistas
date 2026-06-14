@@ -107,6 +107,8 @@ export type LabQuestionGuessSelection = LabQuestionBase & {
 
   slots: LabSelectionSlot[];
 
+  selectionPresetId?: string | null;
+
 };
 
 
@@ -118,6 +120,10 @@ export type LabQuestionGuessPlayerCrop = LabQuestionBase & {
   imageUrl: string;
 
   sceneHint: string | null;
+
+  momentId?: string | null;
+
+  momentLabel?: string | null;
 
 };
 
@@ -132,6 +138,8 @@ export type LabQuestionGuessPlayerSilhouette = LabQuestionBase & {
   revealImageUrl: string | null;
 
   sceneLabel: string;
+
+  silhouetteDemoId?: string | null;
 
 };
 

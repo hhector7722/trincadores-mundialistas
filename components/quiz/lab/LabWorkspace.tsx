@@ -8,8 +8,9 @@ import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
 import { createLabQuestion } from "@/lib/quiz/lab/defaults";
-import { reloadGuessImageFromCatalog, createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
+import { createGuessImageFromCatalog } from "@/lib/quiz/lab/guess-image-catalog";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
+import { canReloadLabQuestion, reloadLabQuestion } from "@/lib/quiz/lab/reload-question";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
   isLabPlayerCropQuestion,
@@ -20,7 +21,6 @@ import {
   type LabDraft,
   type LabQuestion,
   type LabQuestionFormat,
-  type LabQuestionGuessImage,
 } from "@/lib/quiz/lab/types";
 import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 import { cn } from "@/lib/utils";
@@ -54,9 +54,12 @@ export function LabWorkspace() {
     draft.questions.find((q) => q.id === activeQuestionId) ?? draft.questions[0] ?? null;
   const playQuestion = draft.questions[playIndex] ?? null;
 
-  const persist = useCallback((next: LabDraft) => {
-    setDraft(next);
-    writeLabDraft(next);
+  const persist = useCallback((next: LabDraft | ((prev: LabDraft) => LabDraft)) => {
+    setDraft((prev) => {
+      const resolved = typeof next === "function" ? next(prev) : next;
+      writeLabDraft(resolved);
+      return resolved;
+    });
   }, []);
 
   useEffect(() => {
@@ -101,41 +104,49 @@ export function LabWorkspace() {
       const fromCatalog = createGuessImageFromCatalog({ minDifficulty: guessImageDifficulty });
       if (fromCatalog) question = fromCatalog;
     }
-    const next = { ...draft, questions: [...draft.questions, question] };
-    persist(next);
+    persist((prev) => ({ ...prev, questions: [...prev.questions, question] }));
     setActiveQuestionId(question.id);
   }
 
   function removeQuestion(id: string) {
-    const next = { ...draft, questions: draft.questions.filter((q) => q.id !== id) };
-    persist(next);
-    if (activeQuestionId === id) {
-      setActiveQuestionId(next.questions[0]?.id ?? null);
+    let nextActiveId: string | null | undefined;
+    persist((prev) => {
+      const questions = prev.questions.filter((q) => q.id !== id);
+      if (activeQuestionId === id) {
+        nextActiveId = questions[0]?.id ?? null;
+      }
+      return { ...prev, questions };
+    });
+    if (nextActiveId !== undefined) {
+      setActiveQuestionId(nextActiveId);
     }
   }
 
   function moveQuestion(id: string, direction: -1 | 1) {
-    const index = draft.questions.findIndex((q) => q.id === id);
-    const target = index + direction;
-    if (index < 0 || target < 0 || target >= draft.questions.length) return;
-    const questions = [...draft.questions];
-    const [item] = questions.splice(index, 1);
-    questions.splice(target, 0, item);
-    persist({ ...draft, questions });
+    persist((prev) => {
+      const index = prev.questions.findIndex((q) => q.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= prev.questions.length) return prev;
+      const questions = [...prev.questions];
+      const [item] = questions.splice(index, 1);
+      questions.splice(target, 0, item);
+      return { ...prev, questions };
+    });
   }
 
-  function patchActive(patch: Partial<LabQuestion>) {
-    if (!activeQuestion) return;
-    persist(updateQuestion(draft, activeQuestion.id, patch));
+  function patchActive(questionId: string, patch: Partial<LabQuestion>) {
+    persist((prev) => updateQuestion(prev, questionId, patch));
   }
 
-  function shuffleGuessImageMoment() {
-    if (!activeQuestion || activeQuestion.format !== "guess_image") return;
-    const next = reloadGuessImageFromCatalog(
-      activeQuestion as LabQuestionGuessImage,
-      guessImageDifficulty
-    );
-    persist(updateQuestion(draft, activeQuestion.id, next));
+  function reloadActiveQuestion() {
+    if (!activeQuestion || !canReloadLabQuestion(activeQuestion.format)) return;
+    const reloaded = reloadLabQuestion(activeQuestion, {
+      minDifficulty: guessImageDifficulty,
+    });
+    persist((prev) => ({
+      ...prev,
+      questions: prev.questions.map((q) => (q.id === activeQuestion.id ? reloaded : q)),
+    }));
   }
 
   function startPreview() {
@@ -314,64 +325,24 @@ export function LabWorkspace() {
                   Editar · {LAB_FORMAT_LABELS[activeQuestion.format]}
                 </p>
 
-                <label className="block space-y-1">
-                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">Enunciado</span>
-                  <input
-                    value={activeQuestion.prompt}
-                    onChange={(e) => patchActive({ prompt: e.target.value })}
-                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                  />
-                </label>
-
-                <label className="block space-y-1">
-                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                    Timer (segundos)
-                  </span>
-                  <input
-                    type="number"
-                    min={5}
-                    max={60}
-                    value={activeQuestion.timerSeconds}
-                    onChange={(e) =>
-                      patchActive({ timerSeconds: Number(e.target.value) || 10 })
-                    }
-                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                  />
-                </label>
-
-                {activeQuestion.format === "multiple_choice" ? (
-                  <label className="block space-y-1">
-                    <span className="text-[10px] uppercase text-[var(--lab-muted)]">
-                      URL imagen (opcional)
-                    </span>
-                    <input
-                      value={activeQuestion.imageUrl ?? ""}
-                      onChange={(e) =>
-                        patchActive({
-                          imageUrl: e.target.value.trim() || null,
-                        } as Partial<LabQuestion>)
-                      }
-                      className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
-                    />
-                  </label>
-                ) : null}
-
-                {activeQuestion.format === "guess_image" ? (
-                  <>
-                    <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-                          Catálogo histórico
-                        </p>
-                        <button
-                          type="button"
-                          onClick={shuffleGuessImageMoment}
-                          className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)]"
-                        >
-                          <Shuffle className="size-4" aria-hidden />
-                          Otro momento
-                        </button>
-                      </div>
+                {canReloadLabQuestion(activeQuestion.format) ? (
+                  <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
+                        Contenido generado
+                      </p>
+                      <button
+                        type="button"
+                        onClick={reloadActiveQuestion}
+                        className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)]"
+                      >
+                        <Shuffle className="size-4" aria-hidden />
+                        Actualizar
+                      </button>
+                    </div>
+                    {activeQuestion.format === "guess_image" ||
+                    activeQuestion.format === "guess_player_hair" ||
+                    activeQuestion.format === "guess_player_eyes" ? (
                       <div className="flex flex-wrap gap-2">
                         {(["easy", "medium", "hard"] as const).map((level) => (
                           <button
@@ -389,29 +360,87 @@ export function LabWorkspace() {
                           </button>
                         ))}
                       </div>
-                      {activeQuestion.momentLabel ? (
-                        <p className="text-xs text-[var(--lab-fg)]">
-                          <span className="text-[var(--lab-muted)]">Momento: </span>
-                          {activeQuestion.momentLabel}
-                          {activeQuestion.momentDifficulty ? (
-                            <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
-                              {activeQuestion.momentDifficulty}
-                            </span>
-                          ) : null}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-[var(--lab-muted)]">
-                          Sin momento del catálogo — pulsa «Otro momento».
-                        </p>
-                      )}
-                    </div>
+                    ) : null}
+                    {"momentLabel" in activeQuestion && activeQuestion.momentLabel ? (
+                      <p className="text-xs text-[var(--lab-fg)]">
+                        <span className="text-[var(--lab-muted)]">Fuente: </span>
+                        {activeQuestion.momentLabel}
+                        {"momentDifficulty" in activeQuestion && activeQuestion.momentDifficulty ? (
+                          <span className="ml-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] uppercase text-[var(--lab-muted)]">
+                            {activeQuestion.momentDifficulty}
+                          </span>
+                        ) : null}
+                      </p>
+                    ) : activeQuestion.format === "guess_selection" ? (
+                      <p className="text-xs text-[var(--lab-fg)]">
+                        <span className="text-[var(--lab-muted)]">Selección: </span>
+                        {activeQuestion.options.find((o) => o.id === activeQuestion.correctOptionId)
+                          ?.label ?? "—"}
+                      </p>
+                    ) : activeQuestion.format === "guess_player_silhouette" ? (
+                      <p className="text-xs text-[var(--lab-fg)]">
+                        <span className="text-[var(--lab-muted)]">Escena: </span>
+                        {activeQuestion.sceneLabel}
+                      </p>
+                    ) : activeQuestion.format === "video_play_end" ? (
+                      <p className="text-xs text-[var(--lab-muted)]">
+                        Mezcla las opciones de respuesta manteniendo el vídeo.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <label className="block space-y-1">
+                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">Enunciado</span>
+                  <input
+                    value={activeQuestion.prompt}
+                    onChange={(e) => patchActive(activeQuestion.id, { prompt: e.target.value })}
+                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                  />
+                </label>
+
+                <label className="block space-y-1">
+                  <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                    Timer (segundos)
+                  </span>
+                  <input
+                    type="number"
+                    min={5}
+                    max={60}
+                    value={activeQuestion.timerSeconds}
+                    onChange={(e) =>
+                      patchActive(activeQuestion.id, { timerSeconds: Number(e.target.value) || 10 })
+                    }
+                    className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                  />
+                </label>
+
+                {activeQuestion.format === "multiple_choice" ? (
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase text-[var(--lab-muted)]">
+                      URL imagen (opcional)
+                    </span>
+                    <input
+                      value={activeQuestion.imageUrl ?? ""}
+                      onChange={(e) =>
+                        patchActive(activeQuestion.id, {
+                          imageUrl: e.target.value.trim() || null,
+                        } as Partial<LabQuestion>)
+                      }
+                      className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
+                    />
+                  </label>
+                ) : null}
+
+                {activeQuestion.format === "guess_image" ? (
+                  <>
                     <label className="block space-y-1">
                       <span className="text-[10px] uppercase text-[var(--lab-muted)]">
                         URL imagen
                       </span>
                       <input
                         value={activeQuestion.imageUrl}
-                        onChange={(e) => patchActive({ imageUrl: e.target.value })}
+                        onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
                     </label>
@@ -426,7 +455,7 @@ export function LabWorkspace() {
                           max={40}
                           value={activeQuestion.blurStartPx}
                           onChange={(e) =>
-                            patchActive({ blurStartPx: Number(e.target.value) || 0 })
+                            patchActive(activeQuestion.id, { blurStartPx: Number(e.target.value) || 0 })
                           }
                           className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                         />
@@ -441,7 +470,7 @@ export function LabWorkspace() {
                           max={30}
                           value={activeQuestion.revealSeconds}
                           onChange={(e) =>
-                            patchActive({ revealSeconds: Number(e.target.value) || 8 })
+                            patchActive(activeQuestion.id, { revealSeconds: Number(e.target.value) || 8 })
                           }
                           className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                         />
@@ -460,7 +489,7 @@ export function LabWorkspace() {
                         value={activeQuestion.formation}
                         onChange={(e) => {
                           const formation = e.target.value as typeof activeQuestion.formation;
-                          patchActive({
+                          patchActive(activeQuestion.id, {
                             formation,
                             slots: selectionSlotsForFormation(formation),
                           });
@@ -487,7 +516,7 @@ export function LabWorkspace() {
                                 clubLabel,
                                 clubImageUrl: resolveClubCrestUrl(clubLabel) ?? slot.clubImageUrl,
                               };
-                              patchActive({ slots });
+                              patchActive(activeQuestion.id, { slots });
                             }}
                             placeholder={`Club ${slot.slotKey}`}
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
@@ -500,7 +529,7 @@ export function LabWorkspace() {
                                 ...slot,
                                 playerName: e.target.value,
                               };
-                              patchActive({ slots });
+                              patchActive(activeQuestion.id, { slots });
                             }}
                             placeholder={`Jugador ${slot.slotKey}`}
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
@@ -513,7 +542,7 @@ export function LabWorkspace() {
                                 ...slot,
                                 clubImageUrl: e.target.value.trim() || null,
                               };
-                              patchActive({ slots });
+                              patchActive(activeQuestion.id, { slots });
                             }}
                             placeholder="URL escudo (auto)"
                             className="rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-xs text-[var(--lab-fg)]"
@@ -532,7 +561,7 @@ export function LabWorkspace() {
                       </span>
                       <input
                         value={activeQuestion.imageUrl}
-                        onChange={(e) => patchActive({ imageUrl: e.target.value })}
+                        onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
                     </label>
@@ -543,7 +572,7 @@ export function LabWorkspace() {
                       <input
                         value={activeQuestion.sceneHint ?? ""}
                         onChange={(e) =>
-                          patchActive({
+                          patchActive(activeQuestion.id, {
                             sceneHint: e.target.value.trim() || null,
                           } as Partial<LabQuestion>)
                         }
@@ -562,7 +591,7 @@ export function LabWorkspace() {
                       </span>
                       <input
                         value={activeQuestion.imageUrl}
-                        onChange={(e) => patchActive({ imageUrl: e.target.value })}
+                        onChange={(e) => patchActive(activeQuestion.id, { imageUrl: e.target.value })}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
                     </label>
@@ -573,7 +602,7 @@ export function LabWorkspace() {
                       <input
                         value={activeQuestion.revealImageUrl ?? ""}
                         onChange={(e) =>
-                          patchActive({
+                          patchActive(activeQuestion.id, {
                             revealImageUrl: e.target.value.trim() || null,
                           } as Partial<LabQuestion>)
                         }
@@ -587,7 +616,7 @@ export function LabWorkspace() {
                       </span>
                       <input
                         value={activeQuestion.sceneLabel}
-                        onChange={(e) => patchActive({ sceneLabel: e.target.value })}
+                        onChange={(e) => patchActive(activeQuestion.id, { sceneLabel: e.target.value })}
                         placeholder="Euro 2008 — España"
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
@@ -603,7 +632,7 @@ export function LabWorkspace() {
                       </span>
                       <input
                         value={activeQuestion.videoUrl}
-                        onChange={(e) => patchActive({ videoUrl: e.target.value })}
+                        onChange={(e) => patchActive(activeQuestion.id, { videoUrl: e.target.value })}
                         placeholder={LAB_DEMO_VIDEO_SRC}
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
@@ -622,7 +651,7 @@ export function LabWorkspace() {
                         step={0.5}
                         value={activeQuestion.stopAtSeconds}
                         onChange={(e) =>
-                          patchActive({ stopAtSeconds: Number(e.target.value) || 3 })
+                          patchActive(activeQuestion.id, { stopAtSeconds: Number(e.target.value) || 3 })
                         }
                         className="w-full rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
@@ -639,13 +668,13 @@ export function LabWorkspace() {
                         onChange={(e) => {
                           const options = [...activeQuestion.options];
                           options[index] = { ...option, label: e.target.value };
-                          patchActive({ options });
+                          patchActive(activeQuestion.id, { options });
                         }}
                         className="min-h-10 flex-1 rounded-lg border border-[var(--lab-border)] bg-[var(--lab-surface)] px-3 py-2 text-sm text-[var(--lab-fg)]"
                       />
                       <button
                         type="button"
-                        onClick={() => patchActive({ correctOptionId: option.id })}
+                        onClick={() => patchActive(activeQuestion.id, { correctOptionId: option.id })}
                         className={cn(
                           "min-h-10 shrink-0 rounded-lg border px-3 text-[10px] font-bold uppercase",
                           activeQuestion.correctOptionId === option.id

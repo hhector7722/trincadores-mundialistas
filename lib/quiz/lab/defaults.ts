@@ -4,8 +4,12 @@ import {
   LAB_DEMO_VIDEO_SRC,
   LAB_DEMO_VIDEO_STOP_AT_SECONDS,
 } from "@/lib/quiz/lab/demo-video";
+import {
+  createPlayerCropFromCatalog,
+  createSelectionFromCatalog,
+  createSilhouetteFromCatalog,
+} from "@/lib/quiz/lab/reload-question";
 import type { LabDraft, LabQuestion, LabQuestionFormat, LabQuestionGuessImage } from "@/lib/quiz/lab/types";
-import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 
 const FALLBACK_GUESS_IMAGE_URL =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80";
@@ -97,86 +101,38 @@ export function createLabQuestion(format: LabQuestionFormat): LabQuestion {
       return defaultGuessImageQuestion();
 
     case "guess_selection":
+      return createSelectionFromCatalog();
 
+    case "guess_player_hair": {
+      const fromCatalog = createPlayerCropFromCatalog("guess_player_hair");
+      if (fromCatalog) return fromCatalog;
       return {
-
         ...base,
-
         format,
-
-        prompt: "ADIVINA LA SELECCIÓN",
-
-        formation: "4-2-3-1",
-
-        slots: selectionSlotsForFormation("4-2-3-1"),
-
-        options: defaultOptions(["España", "Francia", "Inglaterra", "Portugal"]),
-
-        correctOptionId: "opt_1",
-
-      };
-
-    case "guess_player_hair":
-
-      return {
-
-        ...base,
-
-        format,
-
         prompt: "¿QUIÉN ES?",
-
         imageUrl: LAB_DEMO_IMAGES.ronaldoHair2002,
-
         sceneHint: "Mundial 2002",
-
         options: defaultOptions(["Ronaldo Nazário", "Ronaldinho", "Rivaldo", "Adriano"]),
-
         correctOptionId: "opt_1",
-
       };
+    }
 
-    case "guess_player_eyes":
-
+    case "guess_player_eyes": {
+      const fromCatalog = createPlayerCropFromCatalog("guess_player_eyes");
+      if (fromCatalog) return fromCatalog;
       return {
-
         ...base,
-
         format,
-
         prompt: "¿QUIÉN ES?",
-
         imageUrl: LAB_DEMO_IMAGES.mbappeEyes,
-
         sceneHint: null,
-
         options: defaultOptions(["Kylian Mbappé", "Antoine Griezmann", "Karim Benzema", "Ousmane Dembélé"]),
-
         correctOptionId: "opt_1",
-
       };
+    }
 
     case "guess_player_silhouette":
-
-      return {
-
-        ...base,
-
-        format,
-
-        prompt: "¿QUÉ JUGADOR ES LA SILUETA?",
-
-        imageUrl: LAB_DEMO_IMAGES.spain2008Silhouette,
-
-        revealImageUrl: null,
-
-        sceneLabel: "Euro 2008 — España",
-
-        options: defaultOptions(["David Silva", "Xavi Hernández", "Andrés Iniesta", "David Villa"]),
-
-        correctOptionId: "opt_1",
-
-      };
+      return createSilhouetteFromCatalog();
 
     case "video_play_end":
 

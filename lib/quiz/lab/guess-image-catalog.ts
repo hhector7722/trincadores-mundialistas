@@ -34,10 +34,18 @@ export function reloadGuessImageFromCatalog(
   minDifficulty: WorldCupMomentDifficulty = "hard"
 ): LabQuestionGuessImage {
   const exclude = question.momentId ? [question.momentId] : undefined;
-  const fresh = createGuessImageFromCatalog({
+  let fresh = createGuessImageFromCatalog({
     minDifficulty,
     questionId: question.id,
     excludeMomentIds: exclude,
+    seed: Date.now(),
   });
+  if (!fresh) {
+    fresh = createGuessImageFromCatalog({
+      minDifficulty,
+      questionId: question.id,
+      seed: Date.now() + 1,
+    });
+  }
   return fresh ?? question;
 }
