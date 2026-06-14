@@ -208,8 +208,8 @@ export function MatchPredictionsBoardHeaderTitle({
         </div>
       </div>
 
-      {/* Col 2: ancho mínimo al guion */}
-      <div className="col-start-2 row-start-1 flex shrink-0 items-start justify-center self-start">
+      {/* Col 2: guion con un poco de respiro lateral */}
+      <div className="col-start-2 row-start-1 flex shrink-0 items-start justify-center self-start px-1">
         <span className="shrink-0 text-xs leading-none text-[var(--tm-muted)]">-</span>
       </div>
 
@@ -217,7 +217,9 @@ export function MatchPredictionsBoardHeaderTitle({
       <div className="col-start-3 min-w-0">
         <div className="flex w-full min-w-0 flex-col items-start gap-px">
         <div className="inline-flex max-w-full items-center justify-start gap-1 whitespace-nowrap">
-          <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" className="shrink-0" />
+          <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
+            {formatGoal(awayGoals)}
+          </span>
           <span
             data-team-name
             className="min-w-0 truncate font-semibold leading-none"
@@ -225,9 +227,7 @@ export function MatchPredictionsBoardHeaderTitle({
           >
             {awayName}
           </span>
-          <span className="shrink-0 font-display text-sm font-semibold tabular-nums leading-none">
-            {formatGoal(awayGoals)}
-          </span>
+          <TeamFlagBadge name={awayTeam} size="xxs" loading="eager" className="shrink-0" />
         </div>
         {awayScorerBlock.scorerRows.map(({ group, highlightMvpName }, index) => (
           <BoardHeaderGoalScorerLine
