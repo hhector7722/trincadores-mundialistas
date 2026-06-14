@@ -157,6 +157,8 @@ export function QuizEntryProvider({
         onClose={() => setAlreadyPlayedOpen(false)}
         message={ALREADY_PLAYED_MESSAGE}
         hideCloseButton
+        imageSrc="/images/quiz/quiz-already-played.png"
+        imageAlt="Crack en caída libre con los brazos en cruz"
       />
 
       <QuizWaitModal
