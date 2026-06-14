@@ -242,7 +242,10 @@ export function HomeMatchCard({
       <div className="relative">
       <div className={HOME_CARD_HEADER_CLASS}>
         {isLive ? (
-          <LiveMatchHeaderLabel className="relative z-10" />
+          <LiveMatchHeaderLabel
+            className="relative z-10"
+            minuteLabel={liveSnapshot?.minuteLabel}
+          />
         ) : isFinished ? (
           isLatestFinished ? (
             <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[var(--tm-accent)]">

@@ -4,21 +4,46 @@ import { cn } from "@/lib/utils";
 type LiveMatchHeaderLabelProps = {
   className?: string;
   size?: "card" | "modal";
+  /** Minuto en vivo (p. ej. 23'); fuera del pill amarillo. */
+  minuteLabel?: string | null;
 };
 
-export function LiveMatchHeaderLabel({ className, size = "card" }: LiveMatchHeaderLabelProps) {
+function shouldShowLiveMinute(minuteLabel: string | null | undefined): minuteLabel is string {
+  if (!minuteLabel) return false;
+  const trimmed = minuteLabel.trim();
+  return trimmed.length > 0 && trimmed !== "—" && trimmed.toLowerCase() !== "en juego";
+}
+
+export function LiveMatchHeaderLabel({
+  className,
+  size = "card",
+  minuteLabel,
+}: LiveMatchHeaderLabelProps) {
+  const showMinute = shouldShowLiveMinute(minuteLabel);
+
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-[#CCFF00]",
-        "px-[clamp(6px,2cqw,8px)] py-[clamp(2px,0.8cqw,3px)]",
-        "font-bold uppercase tracking-[0.12em] text-black",
-        size === "card" ? "text-[8px]" : "text-[10px]",
-        className,
-      )}
-    >
-      EN JUEGO
-      <LivePulseIcon />
+    <span className={cn("inline-flex items-center gap-1.5", className)}>
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 rounded-full bg-[#CCFF00]",
+          "px-[clamp(6px,2cqw,8px)] py-[clamp(2px,0.8cqw,3px)]",
+          "font-bold uppercase tracking-[0.12em] text-black",
+          size === "card" ? "text-[8px]" : "text-[10px]",
+        )}
+      >
+        EN JUEGO
+        <LivePulseIcon />
+      </span>
+      {showMinute ? (
+        <span
+          className={cn(
+            "shrink-0 font-bold tabular-nums leading-none text-[var(--tm-accent)]",
+            size === "card" ? "text-[8px]" : "text-[10px]",
+          )}
+        >
+          {minuteLabel}
+        </span>
+      ) : null}
     </span>
   );
 }

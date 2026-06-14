@@ -924,7 +924,12 @@ export function QuickPredictionModal({
       headerCenter={
         atPredictionRoot
           ? isLiveMatch
-            ? <LiveMatchHeaderLabel size="modal" />
+            ? (
+                <LiveMatchHeaderLabel
+                  size="modal"
+                  minuteLabel={liveSnapshot?.minuteLabel}
+                />
+              )
             : formatKickoff(viewMatch.kickoff_at)
           : undefined
       }

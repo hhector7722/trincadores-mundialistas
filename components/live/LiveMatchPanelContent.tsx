@@ -124,7 +124,7 @@ export function LiveMatchPanelContent({
             centerSlot={
               useHomeCompactLayout ? (
                 predictionScoreText ? (
-                  <p className="text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
+                  <p className="mt-1.5 text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)]">
                     {predictionScoreText}
                   </p>
                 ) : mvpPlayerName ? (
