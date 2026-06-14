@@ -26,8 +26,6 @@ type RangeSliderProps = {
 const FLAG_THUMB_ASPECT = 1178 / 1335;
 const FLAG_THUMB_HEIGHT_PX = 56;
 const FLAG_THUMB_WIDTH_PX = Math.round(FLAG_THUMB_HEIGHT_PX * FLAG_THUMB_ASPECT);
-/** 80% de la imagen por encima de la barra, 20% por debajo. */
-const FLAG_THUMB_ABOVE_RATIO = 0.8;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -125,7 +123,6 @@ function ImageThumbRangeSlider({
           "--tm-range-thumb-image": `url(${thumbImageSrc})`,
           "--tm-range-thumb-h": `${FLAG_THUMB_HEIGHT_PX}px`,
           "--tm-range-thumb-w": `${FLAG_THUMB_WIDTH_PX}px`,
-          "--tm-range-thumb-above": `${FLAG_THUMB_ABOVE_RATIO * 100}%`,
         } as CSSProperties
       }
     >
@@ -146,15 +143,17 @@ function ImageThumbRangeSlider({
         onPointerCancel={handlePointerUp}
         onKeyDown={handleKeyDown}
       >
-        <div className="tm-flag-range-slider__track" aria-hidden />
-        <div
-          className={cn(
-            "tm-flag-range-slider__thumb",
-            isDragging && "tm-flag-range-slider__thumb--dragging"
-          )}
-          style={{ left: `${thumbLeftPercent}%` }}
-          aria-hidden
-        />
+        <div ref={trackRef} className="tm-flag-range-slider__rail">
+          <div className="tm-flag-range-slider__track" aria-hidden />
+          <div
+            className={cn(
+              "tm-flag-range-slider__thumb",
+              isDragging && "tm-flag-range-slider__thumb--dragging"
+            )}
+            style={{ left: `${thumbLeftPercent}%` }}
+            aria-hidden
+          />
+        </div>
       </div>
     </div>
   );
