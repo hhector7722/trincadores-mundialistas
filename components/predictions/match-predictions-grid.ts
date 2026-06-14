@@ -2,9 +2,9 @@
 const MATCH_PREDICTIONS_COLUMNS_BASE =
   "grid-cols-[auto_minmax(0,2fr)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,1fr)]";
 
-/** Partidos finalizados: avatar | nombre | iconos | local | visitante | mvp */
+/** Partidos finalizados: avatar | nombre | pts+iconos | local | visitante | mvp */
 const MATCH_PREDICTIONS_COLUMNS_WITH_OUTCOMES =
-  "grid-cols-[auto_minmax(0,2fr)_minmax(2rem,auto)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,1fr)]";
+  "grid-cols-[auto_minmax(0,2fr)_minmax(3.5rem,auto)_minmax(0,0.7fr)_minmax(0,0.7fr)_minmax(0,1fr)]";
 
 export const MATCH_PREDICTIONS_GRID = `grid w-full ${MATCH_PREDICTIONS_COLUMNS_BASE} items-center gap-x-1.5`;
 
