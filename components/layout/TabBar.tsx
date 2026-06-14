@@ -6,7 +6,6 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { BarChart3, Brain, Home, ListOrdered, User } from "lucide-react";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { TabPageIndicators } from "@/components/layout/TabPageIndicators";
-import { useQuizEntry } from "@/components/quiz/QuizEntryProvider";
 import {
   isMainTabActive,
   MAIN_TAB_HREFS,
@@ -31,7 +30,6 @@ export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
   const { shellPathnameOverride, switchMainTab } = useTabNavigation();
-  const { requestQuizEntry } = useQuizEntry();
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,12 +57,6 @@ export function TabBar() {
     }
 
     event.preventDefault();
-
-    if (href === "/quiz") {
-      requestQuizEntry();
-      return;
-    }
-
     setOptimisticHref(href);
     switchMainTab(href);
   }
