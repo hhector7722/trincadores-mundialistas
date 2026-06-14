@@ -1,4 +1,4 @@
-import { isQuizPublishHeld, resolveQuizPublishWindow } from "@/lib/quiz/date";
+import { isQuizPublishHeld, resolveQuizPublishWindow, todayQuizDate } from "@/lib/quiz/date";
 import { composeOfficialQuizDay } from "@/lib/quiz/compose-official-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
@@ -46,7 +46,23 @@ export type PublishQuizDayOptions = {
 export async function publishQuizDay(
   options: PublishQuizDayOptions
 ): Promise<PublishQuizDayResult> {
-  const publishWindow = resolveQuizPublishWindow(options.quizDate);
+  const poolId = options.poolId ?? (await ensureQuizPool(options.admin));
+  const existingOnRequestedDate = await findQuizForDate(
+    options.admin,
+    poolId,
+    options.quizDate,
+    "official"
+  );
+
+  const publishWindow = resolveQuizPublishWindow(
+    options.quizDate,
+    new Date(),
+    Boolean(
+      existingOnRequestedDate &&
+        options.allowReseed &&
+        options.quizDate !== todayQuizDate()
+    )
+  );
   const quizDate = publishWindow.quizDate;
 
   if (isQuizPublishHeld(quizDate)) {
@@ -65,8 +81,6 @@ export async function publishQuizDay(
         force: Boolean(options.allowReseed),
       })
     : null;
-
-  const poolId = options.poolId ?? (await ensureQuizPool(options.admin));
 
   const existingId = await findQuizForDate(
     options.admin,

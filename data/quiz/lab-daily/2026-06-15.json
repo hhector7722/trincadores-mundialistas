@@ -1,0 +1,71 @@
+{
+  "quizDate": "2026-06-15",
+  "generatedAt": "2026-06-14T22:12:04.516Z",
+  "momentIds": [
+    "wc1994-stoichkov-action",
+    "wc1997-roberto-carlos-freekick"
+  ],
+  "questions": [
+    {
+      "id": "daily-2026-06-15-image_trivia",
+      "format": "image_trivia",
+      "prompt": "¿Qué selección representa el jugador?",
+      "imageUrl": "/images/quiz/historic/1994/wc1994-stoichkov-action.jpg",
+      "timerSeconds": 10,
+      "momentId": "wc1994-stoichkov-action",
+      "momentLabel": "Hristo Stoichkov — Bulgaria 94",
+      "momentDifficulty": "hard",
+      "answerType": "team",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Bulgaria"
+        },
+        {
+          "id": "opt_2",
+          "label": "Rumanía"
+        },
+        {
+          "id": "opt_3",
+          "label": "Croacia"
+        },
+        {
+          "id": "opt_4",
+          "label": "Rusia"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    },
+    {
+      "id": "daily-2026-06-15-guess_player_silhouette",
+      "format": "guess_player_silhouette",
+      "prompt": "¿QUÉ JUGADOR ES LA SILUETA?",
+      "imageUrl": "/images/quiz/lab/generated/wc1997-roberto-carlos-freekick-silhouette.jpg",
+      "revealImageUrl": "/images/quiz/historic/1997/wc1997-roberto-carlos-freekick.jpg",
+      "sceneLabel": "1997 — Brasil vs Francia",
+      "timerSeconds": 10,
+      "silhouetteDemoId": null,
+      "momentId": "wc1997-roberto-carlos-freekick",
+      "momentLabel": "Roberto Carlos — falta imposible vs Francia",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Roberto Carlos"
+        },
+        {
+          "id": "opt_2",
+          "label": "Cafu"
+        },
+        {
+          "id": "opt_3",
+          "label": "Rivaldo"
+        },
+        {
+          "id": "opt_4",
+          "label": "Dunga"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    }
+  ]
+}

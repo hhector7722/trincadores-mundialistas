@@ -15,11 +15,38 @@ import {
 export type PickMomentOptions = {
   seed?: number;
   excludeIds?: string[];
+  /** Jugadores ya usados en otra pregunta del mismo día (nombre normalizado). */
+  excludePlayerKeys?: string[];
   minDifficulty?: WorldCupMomentDifficulty;
   answerTypes?: WorldCupMoment["quiz"]["answer_type"][];
   preferMultiplePlayers?: boolean;
   labSuitability?: LabSuitability;
 };
+
+export function normalizePlayerKey(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .trim();
+}
+
+function momentUsesExcludedPlayer(
+  moment: WorldCupMoment,
+  excludePlayerKeys: Set<string>
+): boolean {
+  if (!excludePlayerKeys.size) return false;
+  return moment.players.some((player) => excludePlayerKeys.has(normalizePlayerKey(player)));
+}
+
+function filterExcludedPlayers(
+  moments: WorldCupMoment[],
+  excludePlayerKeys?: string[]
+): WorldCupMoment[] {
+  if (!excludePlayerKeys?.length) return moments;
+  const excluded = new Set(excludePlayerKeys);
+  return moments.filter((moment) => !momentUsesExcludedPlayer(moment, excluded));
+}
 
 function momentSupportsLabFormat(moment: WorldCupMoment, format: LabSuitability): boolean {
   if (!moment.lab_suitability?.length) {
@@ -60,6 +87,8 @@ export function pickCatalogMoment(opts?: PickMomentOptions): WorldCupMoment | nu
     ready = ready.filter((moment) => !exclude.has(moment.id));
   }
 
+  ready = filterExcludedPlayers(ready, opts?.excludePlayerKeys);
+
   if (!ready.length) return null;
 
   ready.sort((a, b) => a.id.localeCompare(b.id));
@@ -77,6 +106,8 @@ export function pickImageTriviaMoment(opts?: PickMomentOptions): WorldCupMoment 
   if (exclude.size) {
     ready = ready.filter((moment) => !exclude.has(moment.id));
   }
+
+  ready = filterExcludedPlayers(ready, opts?.excludePlayerKeys);
 
   const contextual = ready.filter((moment) => moment.quiz.answer_type !== "player");
   const pool = contextual.length ? contextual : ready;
@@ -100,11 +131,10 @@ export function pickPlayerMoment(
 }
 
 export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMoment | null {
-  const catalog = getWorldCupMomentsCatalog();
   const seed = opts?.seed ?? Math.floor(Math.random() * 1_000_000);
   const exclude = new Set(opts?.excludeIds ?? []);
 
-  let ready = filterCatalogReadyMoments(catalog.moments).filter(
+  let ready = filterCatalogReadyMoments(getWorldCupMomentsCatalog().moments).filter(
     (moment) =>
       moment.quiz.answer_type === "player" &&
       SILHOUETTE_LAB_MOMENT_ID_SET.has(moment.id) &&
@@ -112,11 +142,11 @@ export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMo
       isSilhouetteLabReadyMoment(moment.id)
   );
 
-  // Pool curado a mano: no filtrar por dificultad (todos son easy; Medium/Hard vaciaría el pool).
-
   if (exclude.size) {
     ready = ready.filter((moment) => !exclude.has(moment.id));
   }
+
+  ready = filterExcludedPlayers(ready, opts?.excludePlayerKeys);
 
   if (!ready.length) return null;
 

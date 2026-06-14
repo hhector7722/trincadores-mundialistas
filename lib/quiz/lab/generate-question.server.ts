@@ -25,6 +25,7 @@ export type GenerateLabQuestionInput = {
   questionId?: string;
   excludeMomentId?: string | null;
   excludeMomentIds?: string[];
+  excludePlayerKeys?: string[];
   seed?: number;
   minDifficulty?: WorldCupMomentDifficulty;
   force?: boolean;
@@ -40,7 +41,12 @@ export async function generateLabQuestion(
   ];
   const seed = input.seed ?? Date.now();
   const minDifficulty = input.minDifficulty ?? "medium";
-  const pickerOpts = { seed, excludeIds, minDifficulty };
+  const pickerOpts = {
+    seed,
+    excludeIds: excludeIds,
+    excludePlayerKeys: input.excludePlayerKeys,
+    minDifficulty,
+  };
 
   if (input.format === "image_trivia") {
     const moment = pickImageTriviaMoment(pickerOpts);

@@ -25,9 +25,15 @@ test("resolveQuizPublishWindow mantiene el dia en el cron de medianoche", () => 
   assert.equal(result.quizDate, "2026-06-15");
 });
 
-test("resolveQuizPublishWindow aplaza publicacion manual diurna al dia siguiente", () => {
+test("resolveQuizPublishWindow aplaza reseed manual diurno al dia siguiente", () => {
   const afternoon = new Date("2026-06-15T14:00:00.000Z");
-  const result = resolveQuizPublishWindow("2026-06-15", afternoon);
+  const result = resolveQuizPublishWindow("2026-06-15", afternoon, true);
   assert.equal(result.quizDate, "2026-06-16");
   assert.ok(new Date(result.opensAt).getTime() > afternoon.getTime());
+});
+
+test("resolveQuizPublishWindow permite catch-up del dia si no hay reseed", () => {
+  const afternoon = new Date("2026-06-15T14:00:00.000Z");
+  const result = resolveQuizPublishWindow("2026-06-15", afternoon, false);
+  assert.equal(result.quizDate, "2026-06-15");
 });

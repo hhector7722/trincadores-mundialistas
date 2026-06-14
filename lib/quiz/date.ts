@@ -31,12 +31,14 @@ export function addQuizDays(quizDate: string, delta: number): string {
  */
 export function resolveQuizPublishWindow(
   quizDate: string,
-  now = new Date()
+  now = new Date(),
+  /** Solo al reemplazar un quiz ya publicado fuera del cron de medianoche. */
+  deferIfPastOpen = true
 ): { quizDate: string; opensAt: string; closesAt: string } {
   const dayWindow = quizDayWindow(quizDate);
   const opensMs = new Date(dayWindow.opensAt).getTime();
 
-  if (now.getTime() > opensMs + QUIZ_CRON_OPEN_GRACE_MS) {
+  if (deferIfPastOpen && now.getTime() > opensMs + QUIZ_CRON_OPEN_GRACE_MS) {
     const deferredDate = addQuizDays(quizDate, 1);
     const deferredWindow = quizDayWindow(deferredDate);
     return {
