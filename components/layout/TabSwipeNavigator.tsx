@@ -443,7 +443,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(activeIndex);
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
-  const showEdgeHints = !isDragging && !animating && dragX === 0;
   const showAdjacentPanels = isDragging || (animating && !entryPhase);
   const slideTransition = animating
     ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
@@ -461,19 +460,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       onPointerUp={onPointerEnd}
       onPointerCancel={onPointerEnd}
     >
-      {showEdgeHints && prevTab ? (
-        <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-3 bg-gradient-to-r from-[var(--tm-accent)]/10 to-transparent"
-          aria-hidden
-        />
-      ) : null}
-      {showEdgeHints && nextTab ? (
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-3 bg-gradient-to-l from-[var(--tm-accent)]/10 to-transparent"
-          aria-hidden
-        />
-      ) : null}
-
       {showAdjacentPanels && prevTab ? (
         <TabAdjacentPanel
           key={`${prevTab.href}-${snapshotVersion}`}
@@ -500,7 +486,6 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         ref={trackRef}
         className={cn(
           "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
-          isDragging && "tm-tab-swipe-track--dragging",
           !animating && dragX === 0 && "transform-gpu"
         )}
         style={{

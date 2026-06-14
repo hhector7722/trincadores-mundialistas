@@ -298,12 +298,6 @@ html:has(.tm-tab-swipe-root) {
   overscroll-behavior-x: none;
 }
 
-.tm-tab-swipe-track--dragging {
-  box-shadow:
-    -12px 0 32px rgba(0, 0, 0, 0.22),
-    12px 0 32px rgba(0, 0, 0, 0.22);
-}
-
 .tm-tab-swipe-track {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
