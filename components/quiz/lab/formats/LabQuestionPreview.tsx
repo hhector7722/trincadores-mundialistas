@@ -24,6 +24,7 @@ type LabQuestionPreviewProps = {
   secondsLeft?: number;
   showFeedback?: boolean;
   onSelect?: (optionId: string) => void;
+  onVideoMediaError?: () => void;
   loading?: boolean;
 };
 
@@ -34,6 +35,7 @@ export function LabQuestionPreview({
   secondsLeft,
   showFeedback = false,
   onSelect,
+  onVideoMediaError,
   loading = false,
 }: LabQuestionPreviewProps) {
   const playing = mode === "play";
@@ -91,6 +93,7 @@ export function LabQuestionPreview({
           revealImageUrl={question.revealImageUrl}
           cropLabel={question.format === "guess_player_hair" ? "PEINADO" : "OJOS"}
           sceneHint={question.sceneHint}
+          momentId={question.momentId}
           revealed={showFeedback}
           revealedPlayerName={showFeedback ? correctLabel : null}
           loading={loading}
@@ -113,6 +116,7 @@ export function LabQuestionPreview({
             playing={playing}
             showFeedback={showFeedback}
             onPhaseChange={setVideoPhase}
+            onMediaError={onVideoMediaError}
           />
           {mode === "editor" ? (
             <p className="text-sm text-[var(--lab-muted)]">

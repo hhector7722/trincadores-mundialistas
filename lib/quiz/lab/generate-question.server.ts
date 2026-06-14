@@ -47,7 +47,7 @@ export async function generateLabQuestion(
   }
 
   if (input.format === "guess_player_hair" || input.format === "guess_player_eyes") {
-    const moment = pickPlayerMoment(pickerOpts);
+    const moment = pickPlayerMoment(input.format, pickerOpts);
     if (!moment) return null;
 
     const sourcePath = resolveMomentImageUrl(moment);

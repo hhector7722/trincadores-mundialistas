@@ -1,8 +1,7 @@
 "use client";
 
 import { LabGenerationPlaceholder } from "@/components/quiz/lab/LabGenerationPlaceholder";
-import { useLabAuthenticatedAsset } from "@/components/quiz/lab/useLabAuthenticatedAsset";
-import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import { useLabStaticAsset } from "@/components/quiz/lab/useLabStaticAsset";
 import type { LabQuestionGuessPlayerSilhouette } from "@/lib/quiz/lab/types";
 import { cn } from "@/lib/utils";
 
@@ -21,19 +20,17 @@ export function LabGuessPlayerSilhouetteStage({
 }: LabGuessPlayerSilhouetteStageProps) {
   const hasImage = Boolean(question.imageUrl?.trim());
   const showRevealPhoto = revealed && Boolean(question.revealImageUrl?.trim());
-  const waitingForSilhouette =
-    isDerivedLabAssetUrl(question.imageUrl) && !showRevealPhoto;
   const {
     displayUrl: silhouetteSrc,
-    loading: assetLoading,
-    error: assetError,
-  } = useLabAuthenticatedAsset(
-    question.imageUrl,
-    hasImage && !loading && waitingForSilhouette
-  );
+    assetLoading,
+    assetError,
+    onImageError,
+  } = useLabStaticAsset(question.imageUrl, {
+    momentId: question.momentId,
+    variant: "silhouette",
+    enabled: hasImage && !loading && !showRevealPhoto,
+  });
   const activeSrc = showRevealPhoto ? question.revealImageUrl! : silhouetteSrc;
-  const showLoadingOverlay =
-    hasImage && !loading && waitingForSilhouette && assetLoading;
 
   return (
     <div className="overflow-hidden border-b border-[var(--lab-border)]">
@@ -46,25 +43,26 @@ export function LabGuessPlayerSilhouetteStage({
         ) : null}
       </div>
       <div className="relative aspect-[4/3] w-full bg-white">
-        {hasImage && !loading && !assetError && activeSrc ? (
+        {hasImage && !loading && !assetError ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={activeSrc}
               alt=""
+              onError={onImageError}
               className={cn(
                 "h-full w-full object-contain object-center transition-opacity duration-500",
-                showLoadingOverlay && "opacity-0",
-                revealed && !showLoadingOverlay && "opacity-95"
+                assetLoading && "opacity-0",
+                revealed && !assetLoading && "opacity-95"
               )}
             />
-            {!revealed && !showLoadingOverlay ? (
+            {!revealed && !assetLoading ? (
               <div className="absolute inset-x-0 top-3 text-center">
                 <span className="rounded-lg bg-black/70 px-3 py-1 font-display text-xs uppercase tracking-widest text-white">
                   {question.prompt}
                 </span>
               </div>
-            ) : showRevealPhoto && !showLoadingOverlay ? (
+            ) : showRevealPhoto && !assetLoading ? (
               <div className="absolute inset-x-0 top-2 text-center">
                 <span className="rounded-md bg-black/55 px-2 py-0.5 text-[10px] text-white">
                   Foto completa
@@ -75,7 +73,7 @@ export function LabGuessPlayerSilhouetteStage({
         ) : assetError ? (
           <LabGenerationPlaceholder
             loading={false}
-            label="No se pudo cargar la silueta. Pulsa «Generar» de nuevo o salta la pregunta."
+            label="Asset no materializado. Ejecuta npm run quiz:materialize-lab-assets y vuelve a desplegar."
           />
         ) : loading || !hasImage ? (
           <LabGenerationPlaceholder
@@ -84,17 +82,17 @@ export function LabGuessPlayerSilhouetteStage({
           />
         ) : null}
 
-        {showLoadingOverlay ? (
+        {assetLoading ? (
           <div className="absolute inset-0 z-10 bg-[var(--lab-bg-elevated)]">
             <LabGenerationPlaceholder
               loading
-              label="Generando silueta…"
+              label="Cargando silueta…"
               className="h-full"
             />
           </div>
         ) : null}
 
-        {revealed && revealedPlayerName && !showLoadingOverlay && !assetError ? (
+        {revealed && revealedPlayerName && !assetLoading && !assetError ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-4 pt-12">
             <p className="text-center text-[10px] uppercase tracking-[0.25em] text-[var(--lab-accent)]">
               {showRevealPhoto ? "Así es" : "La silueta es"}

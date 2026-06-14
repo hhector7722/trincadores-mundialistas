@@ -33,7 +33,10 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 7
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc1970-jairzinho-goal",
@@ -135,7 +138,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc1974-cruyff-penalty",
@@ -203,6 +209,15 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.3
       }
     },
     {
@@ -306,6 +321,15 @@
         ],
         "blur_start_px": 34,
         "reveal_seconds": 6
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.34
       }
     },
     {
@@ -441,7 +465,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc1990-caniggia-brazil",
@@ -475,7 +502,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc1990-maradona-tears",
@@ -542,6 +572,15 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.3
       }
     },
     {
@@ -576,6 +615,15 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.28
       }
     },
     {
@@ -609,6 +657,15 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.28
       }
     },
     {
@@ -677,7 +734,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc1998-bergkamp-argentina",
@@ -745,6 +805,15 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.36
       }
     },
     {
@@ -779,7 +848,10 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2002-ahn-italy-goal",
@@ -813,7 +885,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2002-ronaldinho-freekick",
@@ -915,6 +990,15 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.36
       }
     },
     {
@@ -948,7 +1032,10 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2006-lehmann-penalties",
@@ -1118,7 +1205,10 @@
         ],
         "blur_start_px": 34,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2014-cahill-volley",
@@ -1152,7 +1242,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2014-gotze-goal",
@@ -1186,6 +1279,15 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.52,
+        "y": 0.22
       }
     },
     {
@@ -1220,7 +1322,10 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2014-schurrle-assist",
@@ -1255,7 +1360,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2018-mbappe-final",
@@ -1323,6 +1431,15 @@
         ],
         "blur_start_px": 34,
         "reveal_seconds": 6
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.48,
+        "y": 0.24
       }
     },
     {
@@ -1357,7 +1474,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2022-dimaria-goal",
@@ -1391,7 +1511,10 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2022-enzo-fernandez",
@@ -1424,7 +1547,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2022-martinez-save",
@@ -1458,7 +1584,10 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2022-messi-cup",

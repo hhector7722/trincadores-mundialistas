@@ -111,6 +111,13 @@ function faceFocusRatio(moment?: WorldCupMoment): number {
   return Math.min(0.52, Math.max(0.1, hint / 100));
 }
 
+function faceFocusXY(moment?: WorldCupMoment): { x: number; y: number } {
+  if (moment?.face_focus) {
+    return moment.face_focus;
+  }
+  return { x: 0.5, y: faceFocusRatio(moment) };
+}
+
 async function renderDerivedBuffer(
   sourceAbsolutePath: string,
   momentId: string,
@@ -120,16 +127,17 @@ async function renderDerivedBuffer(
   const meta = await sharp(sourceAbsolutePath).metadata();
   const width = meta.width ?? 1200;
   const height = meta.height ?? 800;
-  const focusY = faceFocusRatio(opts?.moment);
+  const focus = faceFocusXY(opts?.moment);
 
   if (variant === "hair") {
     const cropW = Math.max(1, Math.round(width * 0.46));
     const cropH = Math.max(1, Math.round(height * 0.24));
-    const left = Math.max(0, Math.round((width - cropW) / 2));
-    const top = Math.max(0, Math.round(height * focusY - cropH * 0.55));
+    const left = Math.max(0, Math.round(width * focus.x - cropW / 2));
+    const safeLeft = Math.min(left, Math.max(0, width - cropW));
+    const top = Math.max(0, Math.round(height * focus.y - cropH * 0.55));
     const safeTop = Math.min(top, Math.max(0, height - cropH));
     return sharp(sourceAbsolutePath)
-      .extract({ left, top: safeTop, width: cropW, height: cropH })
+      .extract({ left: safeLeft, top: safeTop, width: cropW, height: cropH })
       .resize(960, 540, { fit: "cover", position: "top" })
       .jpeg({ quality: 88 })
       .toBuffer();
@@ -138,11 +146,12 @@ async function renderDerivedBuffer(
   if (variant === "eyes") {
     const cropW = Math.max(1, Math.round(width * 0.4));
     const cropH = Math.max(1, Math.round(height * 0.14));
-    const left = Math.max(0, Math.round((width - cropW) / 2));
-    const top = Math.max(0, Math.round(height * focusY - cropH / 2));
+    const left = Math.max(0, Math.round(width * focus.x - cropW / 2));
+    const safeLeft = Math.min(left, Math.max(0, width - cropW));
+    const top = Math.max(0, Math.round(height * focus.y - cropH / 2));
     const safeTop = Math.min(top, Math.max(0, height - cropH));
     return sharp(sourceAbsolutePath)
-      .extract({ left, top: safeTop, width: cropW, height: cropH })
+      .extract({ left: safeLeft, top: safeTop, width: cropW, height: cropH })
       .resize(960, 320, { fit: "cover" })
       .jpeg({ quality: 88 })
       .toBuffer();

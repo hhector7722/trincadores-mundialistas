@@ -1,5 +1,5 @@
 import type { LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
-import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import { isStaticLabGeneratedAssetUrl } from "@/lib/quiz/lab/lab-asset-url";
 
 export const AUTO_GENERATED_LAB_FORMATS = [
   "image_trivia",
@@ -30,7 +30,7 @@ export function questionNeedsAutoGeneration(question: LabQuestion): boolean {
     question.format === "guess_player_silhouette"
   ) {
     const imageUrl = question.imageUrl?.trim() ?? "";
-    return !question.momentId || !isDerivedLabAssetUrl(imageUrl);
+    return !question.momentId || !isStaticLabGeneratedAssetUrl(imageUrl);
   }
 
   return false;

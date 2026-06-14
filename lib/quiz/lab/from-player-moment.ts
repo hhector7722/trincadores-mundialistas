@@ -1,4 +1,4 @@
-import { labGeneratedAssetApiUrl } from "@/lib/quiz/lab/lab-asset-url";
+import { resolveLabAssetUrl } from "@/lib/quiz/lab/lab-asset-url";
 import type {
   LabQuestionGuessPlayerCrop,
   LabQuestionGuessPlayerSilhouette,
@@ -33,7 +33,7 @@ export function momentToPlayerCropQuestion(
     id: questionId,
     format,
     prompt: "¿QUIÉN ES?",
-    imageUrl: labGeneratedAssetApiUrl(moment.id, variant),
+    imageUrl: resolveLabAssetUrl(moment.id, variant),
     revealImageUrl: sourcePath,
     sceneHint: momentSceneHint(moment),
     timerSeconds: 10,
@@ -67,7 +67,7 @@ export function momentToSilhouetteQuestion(
     id: questionId,
     format: "guess_player_silhouette",
     prompt: "¿QUÉ JUGADOR ES LA SILUETA?",
-    imageUrl: labGeneratedAssetApiUrl(moment.id, "silhouette"),
+    imageUrl: resolveLabAssetUrl(moment.id, "silhouette"),
     revealImageUrl: sourcePath,
     sceneLabel: momentSceneHint(moment),
     timerSeconds: 10,

@@ -2,6 +2,7 @@ import {
   filterCatalogReadyMoments,
   filterMomentsByDifficulty,
   pickGuessImageMoment,
+  type LabSuitability,
   type WorldCupMoment,
   type WorldCupMomentDifficulty,
 } from "@/lib/quiz/world-cup-moments";
@@ -13,10 +14,14 @@ export type PickMomentOptions = {
   minDifficulty?: WorldCupMomentDifficulty;
   answerTypes?: WorldCupMoment["quiz"]["answer_type"][];
   preferMultiplePlayers?: boolean;
+  labSuitability?: LabSuitability;
 };
 
-function momentPlayerCount(moment: WorldCupMoment): number {
-  return moment.players.length;
+function momentSupportsLabFormat(moment: WorldCupMoment, format: LabSuitability): boolean {
+  if (!moment.lab_suitability?.length) {
+    return format === "silhouette";
+  }
+  return moment.lab_suitability.includes(format);
 }
 
 export function pickCatalogMoment(opts?: PickMomentOptions): WorldCupMoment | null {
@@ -35,8 +40,15 @@ export function pickCatalogMoment(opts?: PickMomentOptions): WorldCupMoment | nu
     if (filtered.length) ready = filtered;
   }
 
+  if (opts?.labSuitability) {
+    const suitable = ready.filter((moment) =>
+      momentSupportsLabFormat(moment, opts.labSuitability!)
+    );
+    if (suitable.length) ready = suitable;
+  }
+
   if (opts?.preferMultiplePlayers) {
-    const multi = ready.filter((moment) => momentPlayerCount(moment) >= 1);
+    const multi = ready.filter((moment) => moment.players.length >= 2);
     if (multi.length) ready = multi;
   }
 
@@ -72,23 +84,22 @@ export function pickImageTriviaMoment(opts?: PickMomentOptions): WorldCupMoment 
   );
 }
 
-export function pickPlayerMoment(opts?: PickMomentOptions): WorldCupMoment | null {
+export function pickPlayerMoment(
+  format: "guess_player_hair" | "guess_player_eyes",
+  opts?: PickMomentOptions
+): WorldCupMoment | null {
   return pickCatalogMoment({
     ...opts,
     answerTypes: ["player"],
+    labSuitability: format === "guess_player_hair" ? "hair" : "eyes",
   });
 }
 
 export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMoment | null {
-  return (
-    pickCatalogMoment({
-      ...opts,
-      preferMultiplePlayers: true,
-      answerTypes: ["player"],
-    }) ??
-    pickCatalogMoment({
-      ...opts,
-      answerTypes: ["player"],
-    })
-  );
+  return pickCatalogMoment({
+    ...opts,
+    preferMultiplePlayers: true,
+    answerTypes: ["player"],
+    labSuitability: "silhouette",
+  });
 }

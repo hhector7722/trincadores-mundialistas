@@ -16,6 +16,7 @@ type LabVideoPlayEndStageProps = {
   playing?: boolean;
   showFeedback?: boolean;
   onPhaseChange?: (phase: VideoPlayEndPhase) => void;
+  onMediaError?: () => void;
 };
 
 export function LabVideoPlayEndStage({
@@ -23,14 +24,16 @@ export function LabVideoPlayEndStage({
   playing = false,
   showFeedback = false,
   onPhaseChange,
+  onMediaError,
 }: LabVideoPlayEndStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const phaseRef = useRef<VideoPlayEndPhase>("idle");
+  const pauseAtRef = useRef(question.stopAtSeconds);
   const [phase, setPhase] = useState<VideoPlayEndPhase>("idle");
   const [mediaError, setMediaError] = useState(false);
   const [needsTapToPlay, setNeedsTapToPlay] = useState(false);
 
-  const pauseAt = question.stopAtSeconds;
+  pauseAtRef.current = question.stopAtSeconds;
 
   const setPhaseSafe = useCallback(
     (next: VideoPlayEndPhase) => {
@@ -80,21 +83,37 @@ export function LabVideoPlayEndStage({
       void tryPlay();
     };
 
+    const onLoadedMetadata = () => {
+      if (
+        Number.isFinite(video.duration) &&
+        video.duration > 0 &&
+        video.duration < pauseAtRef.current
+      ) {
+        pauseAtRef.current = Math.max(0.5, video.duration - 0.3);
+      }
+    };
+
     const onTimeUpdate = () => {
-      if (phaseRef.current === "intro" && video.currentTime >= pauseAt) {
+      if (phaseRef.current === "intro" && video.currentTime >= pauseAtRef.current) {
         video.pause();
-        video.currentTime = pauseAt;
+        video.currentTime = pauseAtRef.current;
         setPhaseSafe("awaiting_answer");
         setNeedsTapToPlay(false);
       }
     };
 
     const onEnded = () => {
+      if (phaseRef.current === "intro") {
+        setPhaseSafe("awaiting_answer");
+        setNeedsTapToPlay(false);
+        return;
+      }
       setPhaseSafe("ended");
       setNeedsTapToPlay(false);
     };
 
     video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("loadedmetadata", onLoadedMetadata);
     video.addEventListener("timeupdate", onTimeUpdate);
     video.addEventListener("ended", onEnded);
 
@@ -104,12 +123,12 @@ export function LabVideoPlayEndStage({
 
     return () => {
       video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("loadedmetadata", onLoadedMetadata);
       video.removeEventListener("timeupdate", onTimeUpdate);
       video.removeEventListener("ended", onEnded);
     };
-    // phase omitted on purpose: only reset when play session starts
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, pauseAt, question.videoUrl, tryPlay, setPhaseSafe]);
+  }, [playing, question.stopAtSeconds, question.videoUrl, tryPlay, setPhaseSafe]);
 
   useEffect(() => {
     if (!showFeedback || phase !== "awaiting_answer") return;
@@ -123,6 +142,11 @@ export function LabVideoPlayEndStage({
 
   const showQuestionOverlay = phase === "awaiting_answer" && !showFeedback;
   const showRevealOverlay = showFeedback && (phase === "revealing" || phase === "ended");
+  const showTapOverlay =
+    !mediaError &&
+    needsTapToPlay &&
+    playing &&
+    (phase === "intro" || phase === "revealing");
 
   return (
     <div className="relative aspect-video w-full overflow-hidden border-b border-[var(--lab-border)] bg-black">
@@ -134,17 +158,20 @@ export function LabVideoPlayEndStage({
         playsInline
         muted
         preload="auto"
-        onError={() => setMediaError(true)}
+        onError={() => {
+          setMediaError(true);
+          onMediaError?.();
+        }}
       />
       {mediaError ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-4 text-center text-sm text-white">
           <p>No se pudo cargar el vídeo.</p>
           <p className="text-xs text-[var(--lab-muted)]">
-            Importa un clip con npm run quiz:import-video-clip
+            Pulsa «Generar» en la pregunta de vídeo o importa un clip.
           </p>
         </div>
       ) : null}
-      {!mediaError && needsTapToPlay && playing && phase === "intro" ? (
+      {showTapOverlay ? (
         <button
           type="button"
           onClick={() => void tryPlay()}
@@ -173,9 +200,9 @@ export function LabVideoPlayEndStage({
       <div className="absolute inset-x-0 top-2 text-center">
         <span className="rounded-md bg-black/55 px-2 py-0.5 text-[10px] text-white">
           {phase === "idle"
-            ? `Pausa en ${pauseAt}s · luego continúa al responder`
+            ? `Pausa en ${question.stopAtSeconds}s · luego continúa al responder`
             : phase === "intro"
-              ? `Reproduciendo hasta ${pauseAt}s…`
+              ? `Reproduciendo hasta ${pauseAtRef.current}s…`
               : phase === "awaiting_answer"
                 ? "Elige la respuesta"
                 : phase === "revealing"

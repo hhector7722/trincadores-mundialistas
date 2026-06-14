@@ -6,7 +6,7 @@ import {
   resolveClubCrestUrl,
   SPAIN_DEMO_CLUB_SLOTS,
 } from "@/lib/quiz/lab/club-crests";
-import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import { isStaticLabGeneratedAssetUrl } from "@/lib/quiz/lab/lab-asset-url";
 import {
   momentToPlayerCropQuestion,
   momentToSilhouetteQuestion,
@@ -120,7 +120,7 @@ function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestion
 }
 
 function hydratePlayerCrop(question: LabQuestionGuessPlayerCrop): LabQuestionGuessPlayerCrop {
-  if (isDerivedLabAssetUrl(question.imageUrl)) {
+  if (isStaticLabGeneratedAssetUrl(question.imageUrl)) {
     return question;
   }
 
@@ -141,10 +141,7 @@ function hydratePlayerCrop(question: LabQuestionGuessPlayerCrop): LabQuestionGue
 function hydrateSilhouette(
   question: LabQuestionGuessPlayerSilhouette
 ): LabQuestionGuessPlayerSilhouette {
-  if (
-    isDerivedLabAssetUrl(question.imageUrl) &&
-    question.imageUrl !== question.revealImageUrl
-  ) {
+  if (isStaticLabGeneratedAssetUrl(question.imageUrl)) {
     return question;
   }
 

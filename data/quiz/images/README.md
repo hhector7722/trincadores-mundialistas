@@ -68,6 +68,20 @@ const moment = pickMomentById(catalog, "wc2022-messi-cup", { readyOnly: true });
 const question = moment ? momentToGuessImageQuestion(moment) : null;
 ```
 
+## Assets del laboratorio (peinado / ojos / silueta)
+
+Tras añadir o cambiar un momento `player`:
+
+```bash
+npm run quiz:annotate-lab-catalog
+npm run quiz:materialize-lab-assets
+npm run quiz:validate-moments
+```
+
+- `annotate-lab-catalog` rellena `lab_suitability` y `face_focus` en el JSON
+- `materialize-lab-assets` genera JPG en `public/images/quiz/lab/generated/` (siluetas con OpenAI si hay `OPENAI_API_KEY`)
+- Commitea los JPG generados antes de desplegar
+
 ## Formato `quiz` por momento
 
 Cada entrada incluye `prompt`, `correct_option`, 4 `options`, `blur_start_px` y `reveal_seconds` para el formato `guess_image` del laboratorio.

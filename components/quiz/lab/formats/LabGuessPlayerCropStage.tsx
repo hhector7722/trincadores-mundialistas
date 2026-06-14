@@ -1,8 +1,8 @@
 "use client";
 
 import { LabGenerationPlaceholder } from "@/components/quiz/lab/LabGenerationPlaceholder";
-import { useLabAuthenticatedAsset } from "@/components/quiz/lab/useLabAuthenticatedAsset";
-import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import { useLabStaticAsset } from "@/components/quiz/lab/useLabStaticAsset";
+import type { LabAssetVariant } from "@/lib/quiz/lab/lab-asset-url";
 import { cn } from "@/lib/utils";
 
 type LabGuessPlayerCropStageProps = {
@@ -11,10 +11,15 @@ type LabGuessPlayerCropStageProps = {
   revealImageUrl?: string | null;
   cropLabel: "PEINADO" | "OJOS";
   sceneHint?: string | null;
+  momentId?: string | null;
   revealed?: boolean;
   revealedPlayerName?: string | null;
   loading?: boolean;
 };
+
+function variantFromLabel(cropLabel: "PEINADO" | "OJOS"): LabAssetVariant {
+  return cropLabel === "PEINADO" ? "hair" : "eyes";
+}
 
 export function LabGuessPlayerCropStage({
   prompt,
@@ -22,6 +27,7 @@ export function LabGuessPlayerCropStage({
   revealImageUrl = null,
   cropLabel,
   sceneHint,
+  momentId = null,
   revealed = false,
   revealedPlayerName,
   loading = false,
@@ -29,13 +35,16 @@ export function LabGuessPlayerCropStage({
   const hasImage = Boolean(imageUrl?.trim());
   const fullRevealSrc = revealImageUrl?.trim() || imageUrl;
   const showFullImage = revealed && Boolean(fullRevealSrc?.trim());
-  const useDerivedAsset = isDerivedLabAssetUrl(imageUrl) && !showFullImage;
   const {
     displayUrl: cropSrc,
-    loading: assetLoading,
-    error: assetError,
-  } = useLabAuthenticatedAsset(imageUrl, hasImage && !loading && useDerivedAsset);
-  const showAssetPlaceholder = hasImage && !loading && useDerivedAsset && assetLoading;
+    assetLoading,
+    assetError,
+    onImageError,
+  } = useLabStaticAsset(imageUrl, {
+    momentId,
+    variant: variantFromLabel(cropLabel),
+    enabled: hasImage && !loading && !showFullImage,
+  });
 
   return (
     <div className="overflow-hidden border-b border-[var(--lab-border)]">
@@ -57,23 +66,24 @@ export function LabGuessPlayerCropStage({
                 alt=""
                 className="h-full w-full object-contain object-center transition-opacity duration-500"
               />
-            ) : useDerivedAsset && cropSrc ? (
+            ) : (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={cropSrc}
                 alt=""
+                onError={onImageError}
                 className={cn(
                   "h-full w-full object-contain object-center transition-opacity duration-300",
                   assetLoading && "opacity-0"
                 )}
               />
-            ) : null}
+            )}
 
-            {showAssetPlaceholder ? (
+            {assetLoading ? (
               <div className="absolute inset-0 z-10 bg-[var(--lab-bg-elevated)]">
                 <LabGenerationPlaceholder
                   loading
-                  label={`Creando recorte de ${cropLabel === "PEINADO" ? "peinado" : "ojos"}…`}
+                  label={`Cargando recorte de ${cropLabel === "PEINADO" ? "peinado" : "ojos"}…`}
                   className="h-full"
                 />
               </div>
@@ -82,7 +92,7 @@ export function LabGuessPlayerCropStage({
         ) : assetError ? (
           <LabGenerationPlaceholder
             loading={false}
-            label="No se pudo cargar el recorte. Pulsa «Generar» de nuevo."
+            label="Asset no materializado. Ejecuta npm run quiz:materialize-lab-assets y vuelve a desplegar."
           />
         ) : (
           <LabGenerationPlaceholder

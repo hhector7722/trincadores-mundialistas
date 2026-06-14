@@ -1,8 +1,5 @@
 import { canAutoGenerateLabFormat } from "@/lib/quiz/lab/auto-formats";
-import {
-  isDerivedLabAssetUrl,
-  prewarmLabAsset,
-} from "@/lib/quiz/lab/generate-question.client";
+import { verifyStaticLabAssetExists } from "@/lib/quiz/lab/verify-lab-asset.client";
 import {
   createImageTriviaFromCatalog,
   reloadImageTriviaFromCatalog,
@@ -91,13 +88,16 @@ export async function generateLabQuestionContent(
           });
 
     if (!fresh) {
-      throw new Error("No hay momentos de jugador listos en el catálogo.");
+      throw new Error(
+        "No hay momentos de jugador aptos para este recorte en el catálogo."
+      );
     }
 
-    try {
-      await prewarmLabAsset(fresh.imageUrl, force);
-    } catch {
-      // El componente volverá a intentar la carga autenticada.
+    const assetReady = await verifyStaticLabAssetExists(fresh.imageUrl);
+    if (!assetReady) {
+      throw new Error(
+        "Falta el asset materializado. Ejecuta npm run quiz:materialize-lab-assets en local y despliega."
+      );
     }
 
     return fresh;
@@ -119,10 +119,11 @@ export async function generateLabQuestionContent(
       throw new Error("No hay momentos listos para siluetas en el catálogo.");
     }
 
-    try {
-      await prewarmLabAsset(fresh.imageUrl, force);
-    } catch {
-      // El componente volverá a intentar la carga autenticada.
+    const assetReady = await verifyStaticLabAssetExists(fresh.imageUrl);
+    if (!assetReady) {
+      throw new Error(
+        "Falta el asset materializado. Ejecuta npm run quiz:materialize-lab-assets en local y despliega."
+      );
     }
 
     return fresh;

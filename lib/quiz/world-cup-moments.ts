@@ -21,6 +21,13 @@ export type WorldCupMomentAnswerType =
   | "opponent"
   | "phase";
 
+export type LabSuitability = "hair" | "eyes" | "silhouette";
+
+export type WorldCupMomentFaceFocus = {
+  x: number;
+  y: number;
+};
+
 export type WorldCupMomentQuizHints = {
   prompt: string;
   answer_type: WorldCupMomentAnswerType;
@@ -46,6 +53,8 @@ export type WorldCupMoment = {
   status: WorldCupMomentStatus;
   image_alt: string;
   quiz: WorldCupMomentQuizHints;
+  lab_suitability?: LabSuitability[];
+  face_focus?: WorldCupMomentFaceFocus;
 };
 
 export type WorldCupMomentsCatalog = {
@@ -105,6 +114,51 @@ function readLocalPath(value: unknown, index: number): string {
     throw new Error(`moments[${index}].local_path debe terminar en .jpg, .jpeg, .png o .webp.`);
   }
   return path;
+}
+
+const LAB_SUITABILITY = new Set<LabSuitability>(["hair", "eyes", "silhouette"]);
+
+function readOptionalFaceFocus(
+  raw: unknown,
+  index: number
+): WorldCupMomentFaceFocus | undefined {
+  if (raw === null || raw === undefined) return undefined;
+  if (!raw || typeof raw !== "object") {
+    throw new Error(`moments[${index}].face_focus invalido.`);
+  }
+  const row = raw as Record<string, unknown>;
+  const x = row.x;
+  const y = row.y;
+  if (
+    typeof x !== "number" ||
+    typeof y !== "number" ||
+    x < 0 ||
+    x > 1 ||
+    y < 0 ||
+    y > 1
+  ) {
+    throw new Error(`moments[${index}].face_focus debe tener x/y entre 0 y 1.`);
+  }
+  return { x, y };
+}
+
+function readOptionalLabSuitability(
+  raw: unknown,
+  index: number
+): LabSuitability[] | undefined {
+  if (raw === null || raw === undefined) return undefined;
+  if (!Array.isArray(raw) || raw.length === 0) {
+    throw new Error(`moments[${index}].lab_suitability debe ser un array no vacio.`);
+  }
+  const values = raw.map((item, itemIndex) => {
+    if (!LAB_SUITABILITY.has(item as LabSuitability)) {
+      throw new Error(
+        `moments[${index}].lab_suitability[${itemIndex}] invalido.`
+      );
+    }
+    return item as LabSuitability;
+  });
+  return values;
 }
 
 function validateQuizHints(raw: unknown, index: number): WorldCupMomentQuizHints {
@@ -193,6 +247,15 @@ export function validateWorldCupMoment(raw: unknown, index: number): WorldCupMom
         ? searchHintRaw.trim()
         : null;
 
+  const faceFocus = readOptionalFaceFocus(row.face_focus, index);
+  const labSuitability = readOptionalLabSuitability(row.lab_suitability, index);
+
+  if (labSuitability?.some((item) => item === "hair" || item === "eyes") && !faceFocus) {
+    throw new Error(
+      `moments[${index}] requiere face_focus si lab_suitability incluye hair o eyes.`
+    );
+  }
+
   return {
     id,
     year,
@@ -209,6 +272,8 @@ export function validateWorldCupMoment(raw: unknown, index: number): WorldCupMom
     status: status as WorldCupMomentStatus,
     image_alt: readString(row, "image_alt", index),
     quiz: validateQuizHints(row.quiz, index),
+    ...(faceFocus ? { face_focus: faceFocus } : {}),
+    ...(labSuitability ? { lab_suitability: labSuitability } : {}),
   };
 }
 

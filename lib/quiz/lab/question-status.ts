@@ -2,7 +2,7 @@ import {
   canAutoGenerateLabFormat,
   questionNeedsAutoGeneration,
 } from "@/lib/quiz/lab/auto-formats";
-import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
+import { isStaticLabGeneratedAssetUrl } from "@/lib/quiz/lab/lab-asset-url";
 import { canReloadLabQuestion } from "@/lib/quiz/lab/reload-question";
 import type { LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
 
@@ -36,7 +36,7 @@ export function labQuestionNeedsGeneration(question: LabQuestion): boolean {
     question.format === "guess_player_silhouette"
   ) {
     const imageUrl = question.imageUrl?.trim() ?? "";
-    return !question.momentId || !isDerivedLabAssetUrl(imageUrl);
+    return !question.momentId || !isStaticLabGeneratedAssetUrl(imageUrl);
   }
 
   if (question.format === "multiple_choice") {

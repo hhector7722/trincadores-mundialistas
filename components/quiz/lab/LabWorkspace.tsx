@@ -13,7 +13,10 @@ import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import {
   canGenerateLabQuestion,
   labQuestionIsReady,
+  labQuestionNeedsGeneration,
 } from "@/lib/quiz/lab/question-status";
+import { isStaticLabGeneratedAssetUrl } from "@/lib/quiz/lab/lab-asset-url";
+import { verifyStaticLabAssetExists } from "@/lib/quiz/lab/verify-lab-asset.client";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
   isLabPlayerCropQuestion,
@@ -29,14 +32,32 @@ import { cn } from "@/lib/utils";
 
 type WorkspaceMode = "edit" | "preview";
 
-function statusLabel(question: LabQuestion, generating: boolean) {
-  if (generating) return "Generando";
-  if (labQuestionIsReady(question)) return "Lista";
-  return "Pendiente";
+function isPlayerAssetQuestion(question: LabQuestion): boolean {
+  return (
+    question.format === "guess_player_hair" ||
+    question.format === "guess_player_eyes" ||
+    question.format === "guess_player_silhouette"
+  );
 }
 
-function statusColor(question: LabQuestion, generating: boolean) {
+function statusLabel(
+  question: LabQuestion,
+  generating: boolean,
+  missingAsset: boolean
+) {
+  if (generating) return "Generando";
+  if (missingAsset) return "Sin asset";
+  if (labQuestionNeedsGeneration(question)) return "Pendiente";
+  return "Lista";
+}
+
+function statusColor(
+  question: LabQuestion,
+  generating: boolean,
+  missingAsset: boolean
+) {
   if (generating) return "bg-amber-500";
+  if (missingAsset) return "bg-red-500";
   if (labQuestionIsReady(question)) return "bg-[var(--lab-accent)]";
   return "bg-[var(--lab-border)]";
 }
@@ -56,6 +77,8 @@ export function LabWorkspace() {
   const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
   const [catalogDifficulty, setCatalogDifficulty] =
     useState<WorldCupMomentDifficulty>("medium");
+  const [previewWarning, setPreviewWarning] = useState<string | null>(null);
+  const [missingAssetIds, setMissingAssetIds] = useState<Set<string>>(() => new Set());
 
   const activeQuestion =
     draft.questions.find((q) => q.id === activeQuestionId) ?? draft.questions[0] ?? null;
@@ -83,6 +106,51 @@ export function LabWorkspace() {
     }, 1000);
     return () => window.clearInterval(interval);
   }, [mode, playQuestion, playIndex, selectedOptionId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkAssets() {
+      const missing = new Set<string>();
+      await Promise.all(
+        draft.questions.map(async (question) => {
+          if (!isPlayerAssetQuestion(question)) return;
+          const imageUrl = "imageUrl" in question ? question.imageUrl?.trim() : "";
+          if (!imageUrl || !isStaticLabGeneratedAssetUrl(imageUrl)) return;
+          const exists = await verifyStaticLabAssetExists(imageUrl);
+          if (!exists) missing.add(question.id);
+        })
+      );
+      if (!cancelled) setMissingAssetIds(missing);
+    }
+
+    void checkAssets();
+    return () => {
+      cancelled = true;
+    };
+  }, [draft.questions]);
+
+  const handleVideoMediaError = useCallback(async () => {
+    if (!playQuestion || playQuestion.format !== "video_play_end") return;
+    try {
+      const fresh = await generateLabQuestionContent(playQuestion, {
+        minDifficulty: catalogDifficulty,
+        force: true,
+      });
+      persist((prev) => ({
+        ...prev,
+        questions: prev.questions.map((item) =>
+          item.id === playQuestion.id ? fresh : item
+        ),
+      }));
+    } catch (error) {
+      setQuestionErrors((prev) => ({
+        ...prev,
+        [playQuestion.id]:
+          error instanceof Error ? error.message : "No se pudo recargar el vídeo.",
+      }));
+    }
+  }, [catalogDifficulty, persist, playQuestion]);
 
   const setQuestionGenerating = useCallback((questionId: string, active: boolean) => {
     setGeneratingIds((prev) => {
@@ -164,6 +232,16 @@ export function LabWorkspace() {
 
   function startPreview() {
     if (!draft.questions.length) return;
+    const pending = draft.questions.filter((question) =>
+      labQuestionNeedsGeneration(question)
+    );
+    if (pending.length > 0) {
+      setPreviewWarning(
+        `Hay ${pending.length} pregunta(s) sin generar. Pulsa «Generar todas» antes de probar.`
+      );
+      return;
+    }
+    setPreviewWarning(null);
     setMode("preview");
     setPlayIndex(0);
     setSelectedOptionId(null);
@@ -230,6 +308,7 @@ export function LabWorkspace() {
                 setSelectedOptionId(id);
                 setShowFeedback(true);
               }}
+              onVideoMediaError={() => void handleVideoMediaError()}
               loading={generatingIds.has(playQuestion.id)}
             />
           </div>
@@ -288,9 +367,16 @@ export function LabWorkspace() {
             </button>
           </div>
 
+          {previewWarning ? (
+            <p className="border-b border-[var(--lab-border)] bg-amber-50 px-4 py-2 text-xs text-amber-900">
+              {previewWarning}
+            </p>
+          ) : null}
+
           <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" aria-label="Preguntas del borrador">
             {draft.questions.map((q, index) => {
               const generating = generatingIds.has(q.id);
+              const missingAsset = missingAssetIds.has(q.id);
               const selected = activeQuestionId === q.id;
               return (
                 <div
@@ -306,7 +392,10 @@ export function LabWorkspace() {
                     className="flex min-w-0 flex-1 items-start gap-2 text-left"
                   >
                     <span
-                      className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", statusColor(q, generating))}
+                      className={cn(
+                        "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                        statusColor(q, generating, missingAsset)
+                      )}
                       aria-hidden
                     />
                     <span className="min-w-0">
@@ -314,7 +403,7 @@ export function LabWorkspace() {
                         {index + 1}. {LAB_FORMAT_LABELS[q.format]}
                       </span>
                       <span className="block truncate text-[11px] text-[var(--lab-muted)]">
-                        {statusLabel(q, generating)}
+                        {statusLabel(q, generating, missingAsset)}
                         {questionErrors[q.id] ? ` · ${questionErrors[q.id]}` : ""}
                       </span>
                     </span>

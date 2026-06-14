@@ -78,7 +78,11 @@ export async function GET(request: Request) {
       ));
 
     if (!persisted) {
-      await persistDerivedAssetToDisk(momentId, variant as LabDeriveVariant, buffer);
+      try {
+        await persistDerivedAssetToDisk(momentId, variant as LabDeriveVariant, buffer);
+      } catch (persistError) {
+        console.warn("[laboratorio/asset] Persistencia en disco omitida.", persistError);
+      }
     }
 
     return new Response(new Uint8Array(buffer), {

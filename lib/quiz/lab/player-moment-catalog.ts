@@ -20,7 +20,7 @@ export function createPlayerCropFromCatalog(
   format: "guess_player_hair" | "guess_player_eyes",
   opts?: PlayerMomentCatalogOptions
 ): LabQuestionGuessPlayerCrop | null {
-  const moment = pickPlayerMoment({
+  const moment = pickPlayerMoment(format, {
     seed: opts?.seed ?? Date.now(),
     excludeIds: opts?.excludeMomentIds,
     minDifficulty: opts?.minDifficulty ?? "medium",
