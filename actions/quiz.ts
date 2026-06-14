@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { canAccessQuizBeta } from "@/lib/quiz/access";
 import { validateQuizAnswers } from "@/lib/quiz/options";
 import {
   enrichQuestionsWithPlayFormats,
@@ -72,20 +71,6 @@ export async function startQuiz(
   const inPool = await assertQuizInPool(quizId, poolId);
   if (!inPool) {
     return { ok: false, error: "Quiz no valido para esta porra." };
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    return { ok: false, error: mapQuizRpcError(profileError.message) };
-  }
-
-  if (!canAccessQuizBeta(profile?.username)) {
-    return { ok: false, error: "El quiz estara disponible pronto para todo el grupo." };
   }
 
   try {

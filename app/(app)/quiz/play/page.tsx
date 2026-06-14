@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
-import { canAccessQuizBeta } from "@/lib/quiz/access";
 import { getLatestSubmittedAttemptId, getQuizDayHub } from "@/lib/quiz/queries";
 import { isQuizPlayResume, isQuizPlayStartAuthorized } from "@/lib/quiz/play-routes";
 import { canOpenQuizPlay } from "@/lib/quiz/slot-status";
@@ -30,17 +29,7 @@ export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) 
   const hub = await getQuizDayHub(ctx.activePoolId, user!.id);
   const slot = hub.official;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user!.id)
-    .maybeSingle();
-
-  if (!canAccessQuizBeta(profile?.username) || hub.publishHeld) {
-    redirect("/quiz");
-  }
-
-  if (!slot) {
+  if (hub.publishHeld || !slot) {
     redirect("/quiz");
   }
 
