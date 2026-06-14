@@ -87,7 +87,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const router = useRouter();
   const previewMode = useTabPreviewMode();
   const { navigateTab, tabPending } = useAppNavigation();
-  const { setSwipeProgress, registerTabNavigator } = useTabNavigation();
+  const { setSwipeProgress, registerTabNavigator, setShellPathnameOverride } = useTabNavigation();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const activeIndex = getMainTabIndex(pathname);
@@ -293,6 +293,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       router.prefetch(href);
 
       if (width <= 0) {
+        setShellPathnameOverride(href);
         navigateTab(href);
         return;
       }
@@ -300,6 +301,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       const direction = nextIndex > activeIndex ? -1 : 1;
       commitTargetHrefRef.current = href;
       commitFromIndexRef.current = activeIndex;
+      setShellPathnameOverride(href);
       setCommitActive(true);
       navigatingRef.current = true;
       setSwipeNavigating(true);
@@ -309,7 +311,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         navigatingRef.current = false;
       });
     },
-    [activeIndex, animateTo, navigateTab, resetSwipe, router]
+    [activeIndex, animateTo, navigateTab, resetSwipe, router, setShellPathnameOverride]
   );
 
   useEffect(() => {
@@ -331,15 +333,22 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
     commitTargetHrefRef.current = null;
     commitFromIndexRef.current = null;
+    setShellPathnameOverride(null);
     setCommitActive(false);
     syncDrag(0);
     resetSwipe();
-  }, [commitActive, pathname, resetSwipe, syncDrag, tabPending]);
+  }, [commitActive, pathname, resetSwipe, setShellPathnameOverride, syncDrag, tabPending]);
 
   useEffect(() => {
     if (commitActive || navigatingRef.current || isDragging || animatingRef.current) return;
     resetSwipe();
   }, [commitActive, isDragging, pathname, resetSwipe]);
+
+  useEffect(() => {
+    return () => {
+      setShellPathnameOverride(null);
+    };
+  }, [setShellPathnameOverride]);
 
   const settleDrag = useCallback(() => {
     if (activeIndex == null) {

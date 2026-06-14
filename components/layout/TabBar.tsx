@@ -29,7 +29,7 @@ const TABBAR_NAV_CLASS =
 export function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { switchMainTab } = useTabNavigation();
+  const { shellPathnameOverride, switchMainTab } = useTabNavigation();
   const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,13 +42,13 @@ export function TabBar() {
     setOptimisticHref(null);
   }, [pathname]);
 
-  const displayPath = optimisticHref ?? pathname;
+  const displayPath = shellPathnameOverride ?? optimisticHref ?? pathname;
 
   if (isQuizLabPath(pathname)) {
     return null;
   }
 
-  const showIndicators = shouldShowTabPageIndicators(pathname);
+  const showIndicators = shouldShowTabPageIndicators(displayPath);
 
   function handleTabClick(event: MouseEvent<HTMLAnchorElement>, href: string) {
     if (isMainTabActive(pathname, href)) {

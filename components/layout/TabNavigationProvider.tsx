@@ -26,6 +26,8 @@ type TabNavigationContextValue = {
   swipeProgress: number | null;
   setSwipeProgress: (progress: number | null) => void;
   activeIndex: number | null;
+  shellPathnameOverride: string | null;
+  setShellPathnameOverride: (href: string | null) => void;
   registerTabNavigator: (api: TabNavigatorApi | null) => void;
   switchMainTab: (href: string) => void;
 };
@@ -36,6 +38,7 @@ export function TabNavigationProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { navigateTab } = useAppNavigation();
   const [swipeProgress, setSwipeProgress] = useState<number | null>(null);
+  const [shellPathnameOverride, setShellPathnameOverride] = useState<string | null>(null);
   const navigatorRef = useRef<TabNavigatorApi | null>(null);
   const activeIndex = getMainTabSectionIndex(pathname);
 
@@ -65,10 +68,12 @@ export function TabNavigationProvider({ children }: { children: ReactNode }) {
       swipeProgress,
       setSwipeProgress,
       activeIndex,
+      shellPathnameOverride,
+      setShellPathnameOverride,
       registerTabNavigator,
       switchMainTab,
     }),
-    [activeIndex, registerTabNavigator, swipeProgress, switchMainTab]
+    [activeIndex, registerTabNavigator, shellPathnameOverride, swipeProgress, switchMainTab]
   );
 
   return <TabNavigationContext.Provider value={value}>{children}</TabNavigationContext.Provider>;
@@ -81,6 +86,8 @@ export function useTabNavigation() {
       swipeProgress: null,
       setSwipeProgress: () => undefined,
       activeIndex: null,
+      shellPathnameOverride: null,
+      setShellPathnameOverride: () => undefined,
       registerTabNavigator: () => undefined,
       switchMainTab: () => undefined,
     }

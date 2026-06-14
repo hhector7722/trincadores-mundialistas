@@ -1,11 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import {
   isAppHeaderHidden,
   isAppShellScrollPage,
   isFullscreenPath,
 } from "@/lib/layout/app-shell-paths";
+import { useEffectiveShellPathname } from "@/lib/layout/use-effective-shell-pathname";
 import { cn } from "@/lib/utils";
 
 type AppMainWrapperProps = {
@@ -14,7 +14,7 @@ type AppMainWrapperProps = {
 
 /** Main con padding superior/inferior estilo marbella-app MainWrapper. */
 export function AppMainWrapper({ children }: AppMainWrapperProps) {
-  const pathname = usePathname();
+  const pathname = useEffectiveShellPathname();
   const fullscreen = isFullscreenPath(pathname);
   const internalScroll = isAppShellScrollPage(pathname);
   const headerHidden = isAppHeaderHidden(pathname);

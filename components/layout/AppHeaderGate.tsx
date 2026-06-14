@@ -1,13 +1,13 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { useTabPreviewMode } from "@/lib/layout/tab-preview";
+import { useEffectiveShellPathname } from "@/lib/layout/use-effective-shell-pathname";
 import { isQuizLabPath } from "@/lib/quiz/lab-access";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
-  const pathname = usePathname();
+  const pathname = useEffectiveShellPathname();
   const previewMode = useTabPreviewMode();
 
   if (previewMode || isQuizLabPath(pathname)) {
