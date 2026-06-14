@@ -2,6 +2,7 @@ import {
   canAutoGenerateLabFormat,
   questionNeedsAutoGeneration,
 } from "@/lib/quiz/lab/auto-formats";
+import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
 import { canReloadLabQuestion } from "@/lib/quiz/lab/reload-question";
 import type { LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
 
@@ -21,7 +22,21 @@ export function labQuestionNeedsGeneration(question: LabQuestion): boolean {
   }
 
   if (question.format === "video_play_end") {
-    return !question.momentId;
+    const videoUrl = question.videoUrl?.trim() ?? "";
+    const hasHistoricClip =
+      videoUrl.startsWith("/videos/quiz/historic/") &&
+      !videoUrl.includes("/demo/") &&
+      !videoUrl.includes("gabri-video");
+    return !question.momentId || !hasHistoricClip;
+  }
+
+  if (
+    question.format === "guess_player_hair" ||
+    question.format === "guess_player_eyes" ||
+    question.format === "guess_player_silhouette"
+  ) {
+    const imageUrl = question.imageUrl?.trim() ?? "";
+    return !question.momentId || !isDerivedLabAssetUrl(imageUrl);
   }
 
   if (question.format === "multiple_choice") {

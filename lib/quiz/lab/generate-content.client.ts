@@ -1,5 +1,8 @@
 import { canAutoGenerateLabFormat } from "@/lib/quiz/lab/auto-formats";
-import { fetchGeneratedLabQuestion } from "@/lib/quiz/lab/generate-question.client";
+import {
+  isDerivedLabAssetUrl,
+  prewarmLabAsset,
+} from "@/lib/quiz/lab/generate-question.client";
 import {
   createImageTriviaFromCatalog,
   reloadImageTriviaFromCatalog,
@@ -91,6 +94,12 @@ export async function generateLabQuestionContent(
       throw new Error("No hay momentos de jugador listos en el catálogo.");
     }
 
+    try {
+      await prewarmLabAsset(fresh.imageUrl, force);
+    } catch {
+      // El componente volverá a intentar la carga autenticada.
+    }
+
     return fresh;
   }
 
@@ -110,18 +119,10 @@ export async function generateLabQuestionContent(
       throw new Error("No hay momentos listos para siluetas en el catálogo.");
     }
 
-    if (force && question.momentId) {
-      try {
-        await fetchGeneratedLabQuestion({
-          format: question.format,
-          questionId: question.id,
-          excludeMomentId: question.momentId,
-          minDifficulty,
-          force: true,
-        });
-      } catch {
-        // La silueta SVG se genera bajo demanda al cargar el asset.
-      }
+    try {
+      await prewarmLabAsset(fresh.imageUrl, force);
+    } catch {
+      // El componente volverá a intentar la carga autenticada.
     }
 
     return fresh;

@@ -105,6 +105,12 @@ async function renderSilhouetteBuffer(
   return renderSilhouetteFallback(sourceAbsolutePath, momentId);
 }
 
+function faceFocusRatio(moment?: WorldCupMoment): number {
+  if (!moment) return 0.22;
+  const hint = moment.quiz.blur_start_px;
+  return Math.min(0.52, Math.max(0.1, hint / 100));
+}
+
 async function renderDerivedBuffer(
   sourceAbsolutePath: string,
   momentId: string,
@@ -114,25 +120,29 @@ async function renderDerivedBuffer(
   const meta = await sharp(sourceAbsolutePath).metadata();
   const width = meta.width ?? 1200;
   const height = meta.height ?? 800;
+  const focusY = faceFocusRatio(opts?.moment);
 
   if (variant === "hair") {
-    const cropW = Math.max(1, Math.round(width * 0.52));
-    const cropH = Math.max(1, Math.round(height * 0.2));
+    const cropW = Math.max(1, Math.round(width * 0.46));
+    const cropH = Math.max(1, Math.round(height * 0.24));
     const left = Math.max(0, Math.round((width - cropW) / 2));
+    const top = Math.max(0, Math.round(height * focusY - cropH * 0.55));
+    const safeTop = Math.min(top, Math.max(0, height - cropH));
     return sharp(sourceAbsolutePath)
-      .extract({ left, top: 0, width: cropW, height: cropH })
+      .extract({ left, top: safeTop, width: cropW, height: cropH })
       .resize(960, 540, { fit: "cover", position: "top" })
       .jpeg({ quality: 88 })
       .toBuffer();
   }
 
   if (variant === "eyes") {
-    const cropW = Math.max(1, Math.round(width * 0.42));
-    const cropH = Math.max(1, Math.round(height * 0.12));
+    const cropW = Math.max(1, Math.round(width * 0.4));
+    const cropH = Math.max(1, Math.round(height * 0.14));
     const left = Math.max(0, Math.round((width - cropW) / 2));
-    const top = Math.max(0, Math.round(height * 0.27));
+    const top = Math.max(0, Math.round(height * focusY - cropH / 2));
+    const safeTop = Math.min(top, Math.max(0, height - cropH));
     return sharp(sourceAbsolutePath)
-      .extract({ left, top, width: cropW, height: cropH })
+      .extract({ left, top: safeTop, width: cropW, height: cropH })
       .resize(960, 320, { fit: "cover" })
       .jpeg({ quality: 88 })
       .toBuffer();

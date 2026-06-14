@@ -16,6 +16,7 @@ import {
   selectionPresetToQuestion,
 } from "@/lib/quiz/lab/selection-presets";
 import { createVideoPlayEndFromCatalog } from "@/lib/quiz/lab/video-play-end-catalog";
+import { momentToVideoPlayEndQuestion } from "@/lib/quiz/lab/from-video-moment";
 import type {
   LabDraft,
   LabQuestion,
@@ -27,6 +28,8 @@ import type {
 } from "@/lib/quiz/lab/types";
 import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
 import { pickMomentById } from "@/lib/quiz/world-cup-moments";
+import { getWorldCupVideoMomentsCatalog } from "@/lib/quiz/world-cup-video-moments-catalog";
+import { pickVideoMomentById } from "@/lib/quiz/world-cup-video-moments";
 
 const LEGACY_VIDEO_URLS = new Set([
   "/icons/gabri-video.mp4",
@@ -117,7 +120,7 @@ function hydrateGuessSelection(question: LabQuestionGuessSelection): LabQuestion
 }
 
 function hydratePlayerCrop(question: LabQuestionGuessPlayerCrop): LabQuestionGuessPlayerCrop {
-  if (!isDerivedLabAssetUrl(question.imageUrl)) {
+  if (isDerivedLabAssetUrl(question.imageUrl)) {
     return question;
   }
 
@@ -132,10 +135,6 @@ function hydratePlayerCrop(question: LabQuestionGuessPlayerCrop): LabQuestionGue
     );
   }
 
-  if (question.revealImageUrl?.startsWith("/images/quiz/historic/")) {
-    return { ...question, imageUrl: question.revealImageUrl };
-  }
-
   return question;
 }
 
@@ -143,10 +142,13 @@ function hydrateSilhouette(
   question: LabQuestionGuessPlayerSilhouette
 ): LabQuestionGuessPlayerSilhouette {
   if (
-    question.imageUrl === question.revealImageUrl &&
-    question.momentId &&
-    isDerivedLabAssetUrl(question.revealImageUrl ?? "")
+    isDerivedLabAssetUrl(question.imageUrl) &&
+    question.imageUrl !== question.revealImageUrl
   ) {
+    return question;
+  }
+
+  if (question.momentId) {
     const catalog = getWorldCupMomentsCatalog();
     const moment = pickMomentById(catalog, question.momentId, { readyOnly: true });
     if (moment) {
@@ -158,16 +160,29 @@ function hydrateSilhouette(
 }
 
 function hydrateVideo(question: LabQuestionVideoPlayEnd): LabQuestionVideoPlayEnd {
+  const videoCatalog = getWorldCupVideoMomentsCatalog();
+
+  if (question.momentId && !question.momentId.startsWith("wc-demo-")) {
+    const moment = pickVideoMomentById(videoCatalog, question.momentId);
+    if (moment) {
+      const synced = momentToVideoPlayEndQuestion(moment, question.id);
+      if (synced?.videoUrl.startsWith("/videos/quiz/historic/")) {
+        return synced;
+      }
+    }
+  }
+
   const isLegacy =
     question.momentId === "wc-demo-lab-intro" ||
     LEGACY_VIDEO_URLS.has(question.videoUrl) ||
-    question.videoUrl.includes("/demo/wc-demo-lab-intro");
+    question.videoUrl.includes("/demo/wc-demo-lab-intro") ||
+    !question.videoUrl.trim();
 
   const hasHistoricClip =
     question.videoUrl.startsWith("/videos/quiz/historic/") &&
     !question.videoUrl.includes("/demo/");
 
-  if (!isLegacy && question.momentId && hasHistoricClip) {
+  if (!isLegacy && hasHistoricClip) {
     return question;
   }
 

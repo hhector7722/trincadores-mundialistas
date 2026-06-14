@@ -39,6 +39,19 @@ export function isDerivedLabAssetUrl(imageUrl: string): boolean {
   );
 }
 
+export async function prewarmLabAsset(imageUrl: string, force = false): Promise<void> {
+  if (!isDerivedLabAssetUrl(imageUrl)) return;
+
+  const url = force
+    ? `${imageUrl}${imageUrl.includes("?") ? "&" : "?"}force=1`
+    : imageUrl;
+
+  const response = await fetch(url, { credentials: "include" });
+  if (!response.ok) {
+    throw new Error(`No se pudo preparar el asset (${response.status}).`);
+  }
+}
+
 export function isStaticLabAssetUrl(imageUrl: string): boolean {
   return (
     isDerivedLabAssetUrl(imageUrl) ||

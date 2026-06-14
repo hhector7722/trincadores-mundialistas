@@ -1,11 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { LabGenerationPlaceholder } from "@/components/quiz/lab/LabGenerationPlaceholder";
-import {
-  isSilhouetteAssetUrl,
-  useLabAssetImageLoading,
-} from "@/components/quiz/lab/useLabAssetImageLoading";
+import { useLabAuthenticatedAsset } from "@/components/quiz/lab/useLabAuthenticatedAsset";
+import { isDerivedLabAssetUrl } from "@/lib/quiz/lab/generate-question.client";
 import type { LabQuestionGuessPlayerSilhouette } from "@/lib/quiz/lab/types";
 import { cn } from "@/lib/utils";
 
@@ -22,30 +19,21 @@ export function LabGuessPlayerSilhouetteStage({
   revealedPlayerName,
   loading = false,
 }: LabGuessPlayerSilhouetteStageProps) {
-  const [retryCount, setRetryCount] = useState(0);
   const hasImage = Boolean(question.imageUrl?.trim());
-  const waitingForSilhouette =
-    isSilhouetteAssetUrl(question.imageUrl) && (!revealed || !question.revealImageUrl);
-  const assetSrc = useMemo(() => {
-    if (!question.imageUrl) return "";
-    const separator = question.imageUrl.includes("?") ? "&" : "?";
-    return `${question.imageUrl}${separator}_retry=${retryCount}`;
-  }, [question.imageUrl, retryCount]);
-
-  const { assetLoading, assetError, onAssetLoad, onAssetError } =
-    useLabAssetImageLoading(assetSrc, hasImage && !loading && waitingForSilhouette);
-
   const showRevealPhoto = revealed && Boolean(question.revealImageUrl?.trim());
-  const activeSrc = showRevealPhoto ? question.revealImageUrl! : assetSrc;
-  const showLoadingOverlay = hasImage && !loading && assetLoading && waitingForSilhouette;
-
-  const handleAssetError = () => {
-    if (retryCount < 2) {
-      setRetryCount((count) => count + 1);
-      return;
-    }
-    onAssetError();
-  };
+  const waitingForSilhouette =
+    isDerivedLabAssetUrl(question.imageUrl) && !showRevealPhoto;
+  const {
+    displayUrl: silhouetteSrc,
+    loading: assetLoading,
+    error: assetError,
+  } = useLabAuthenticatedAsset(
+    question.imageUrl,
+    hasImage && !loading && waitingForSilhouette
+  );
+  const activeSrc = showRevealPhoto ? question.revealImageUrl! : silhouetteSrc;
+  const showLoadingOverlay =
+    hasImage && !loading && waitingForSilhouette && assetLoading;
 
   return (
     <div className="overflow-hidden border-b border-[var(--lab-border)]">
@@ -58,15 +46,12 @@ export function LabGuessPlayerSilhouetteStage({
         ) : null}
       </div>
       <div className="relative aspect-[4/3] w-full bg-white">
-        {hasImage && !loading && !assetError ? (
+        {hasImage && !loading && !assetError && activeSrc ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              key={activeSrc}
               src={activeSrc}
               alt=""
-              onLoad={onAssetLoad}
-              onError={handleAssetError}
               className={cn(
                 "h-full w-full object-contain object-center transition-opacity duration-500",
                 showLoadingOverlay && "opacity-0",

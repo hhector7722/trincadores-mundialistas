@@ -62,10 +62,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const persisted =
-      variant === "silhouette" && force
-        ? null
-        : await tryReadPersistedDerivedAsset(momentId, variant as LabDeriveVariant);
+    const persisted = force
+      ? null
+      : await tryReadPersistedDerivedAsset(momentId, variant as LabDeriveVariant);
     const buffer =
       persisted ??
       (await getDerivedLabAssetBuffer(
@@ -73,7 +72,7 @@ export async function GET(request: Request) {
         momentId,
         variant as LabDeriveVariant,
         {
-          moment: variant === "silhouette" ? moment : undefined,
+          moment,
           force,
         }
       ));
