@@ -6,18 +6,16 @@ import {
 } from "@/lib/quiz/lab/demo-video";
 import type { LabDraft, LabQuestion, LabQuestionFormat } from "@/lib/quiz/lab/types";
 import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
-import {
-  loadWorldCupMomentsCatalog,
-  pickDefaultGuessImageMoment,
-} from "@/lib/quiz/world-cup-moments";
+import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
+import { pickGuessImageMoment } from "@/lib/quiz/world-cup-moments";
 
 const FALLBACK_GUESS_IMAGE_URL =
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80";
 
 function defaultGuessImageQuestion(): LabQuestion {
   try {
-    const catalog = loadWorldCupMomentsCatalog();
-    const moment = pickDefaultGuessImageMoment(catalog);
+    const catalog = getWorldCupMomentsCatalog();
+    const moment = pickGuessImageMoment(catalog, { minDifficulty: "hard" });
     const fromCatalog = moment ? momentToGuessImageQuestion(moment) : null;
     if (fromCatalog) return fromCatalog;
   } catch {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { UsageFilters } from "@/components/usage/UsageFilters";
 import type { UsageDashboardData } from "@/lib/usage/queries";
 
 function formatDateTimeMadrid(iso: string | null): string {
@@ -25,25 +26,28 @@ const maxHourCount = (buckets: UsageDashboardData["hourlyBuckets"]) =>
 
 export function UsageDashboard({ data }: { data: UsageDashboardData }) {
   const hourPeak = maxHourCount(data.hourlyBuckets);
+  const scopeLabel = data.filters.day ? "en el dia seleccionado" : "en el periodo";
 
   return (
     <div className="space-y-4">
+      <UsageFilters filters={data.filters} users={data.filterUsers} />
+
       <div className="grid grid-cols-2 gap-3">
         <Card className="p-3">
           <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Usuarios activos</p>
           <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.activeUsers}</p>
         </Card>
         <Card className="p-3">
-          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Eventos hoy</p>
-          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.eventsToday}</p>
+          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Eventos</p>
+          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.eventsCount}</p>
         </Card>
         <Card className="p-3">
-          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Sesiones hoy</p>
-          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.sessionsToday}</p>
+          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Sesiones</p>
+          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.sessionsCount}</p>
         </Card>
         <Card className="p-3">
-          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Logins hoy</p>
-          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.loginsToday}</p>
+          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Logins</p>
+          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.loginsCount}</p>
         </Card>
       </div>
 
@@ -51,6 +55,7 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
         <h2 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
           Actividad por hora (Madrid)
         </h2>
+        <p className="mt-1 text-xs text-[var(--tm-muted)]">{scopeLabel}</p>
         <div className="mt-4 flex h-28 items-end gap-1">
           {data.hourlyBuckets.map((bucket) => {
             const height = Math.round((bucket.count / hourPeak) * 100);

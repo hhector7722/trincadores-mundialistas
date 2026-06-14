@@ -3,14 +3,20 @@ import { redirect } from "next/navigation";
 import { BarChart3 } from "lucide-react";
 import { UsageDashboard } from "@/components/usage/UsageDashboard";
 import { canAccessUsageAnalytics } from "@/lib/usage/access";
-import { getUsageDashboardData } from "@/lib/usage/queries";
+import { getUsageDashboardData, parseUsageDashboardFilters } from "@/lib/usage/queries";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsoPage() {
-  await requireActivePoolContext();
+type UsoPageProps = {
+  searchParams: Promise<{ dia?: string; usuario?: string }>;
+};
+
+export default async function UsoPage({ searchParams }: UsoPageProps) {
+  const ctx = await requireActivePoolContext();
+  const params = await searchParams;
+  const filters = parseUsageDashboardFilters(params);
 
   const supabase = await createClient();
   const {
@@ -31,7 +37,7 @@ export default async function UsoPage() {
     redirect("/profile");
   }
 
-  const data = await getUsageDashboardData();
+  const data = await getUsageDashboardData(ctx.activePoolId, filters);
 
   return (
     <div className="space-y-4 p-4 pb-4">

@@ -1,4 +1,17 @@
+import { quizDayClosesAt, quizDayOpensAt, todayQuizDate } from "@/lib/quiz/date";
 import { createClient } from "@/lib/supabase/server";
+
+export type UsageFilterUser = {
+  profileId: string;
+  username: string;
+  displayName: string;
+};
+
+export type UsageDashboardFilters = {
+  /** YYYY-MM-DD civil Madrid; null = todos los dias. */
+  day: string | null;
+  profileId: string | null;
+};
 
 export type UsageUserSummary = {
   profileId: string;
@@ -31,11 +44,13 @@ export type UsageDashboardData = {
   summaries: UsageUserSummary[];
   recentEvents: UsageRecentEvent[];
   hourlyBuckets: UsageHourBucket[];
+  filterUsers: UsageFilterUser[];
+  filters: UsageDashboardFilters;
   totals: {
     activeUsers: number;
-    eventsToday: number;
-    sessionsToday: number;
-    loginsToday: number;
+    eventsCount: number;
+    sessionsCount: number;
+    loginsCount: number;
   };
 };
 
@@ -81,20 +96,80 @@ function getMadridHour(iso: string): number {
   return hour ? Number(hour) : 0;
 }
 
-function isTodayMadrid(iso: string): boolean {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: MADRID_TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  return fmt.format(new Date(iso)) === fmt.format(new Date());
+type PoolMemberProfile = {
+  username: string;
+  display_name: string | null;
+};
+
+type PoolMemberRow = {
+  profile_id: string;
+  profiles: PoolMemberProfile | PoolMemberProfile[] | null;
+};
+
+function resolvePoolMemberProfile(
+  profiles: PoolMemberProfile | PoolMemberProfile[] | null | undefined
+): PoolMemberProfile | null {
+  if (!profiles) return null;
+  return Array.isArray(profiles) ? (profiles[0] ?? null) : profiles;
 }
 
-export async function getUsageDashboardData(): Promise<UsageDashboardData> {
+export function parseUsageDashboardFilters(searchParams: {
+  dia?: string;
+  usuario?: string;
+}): UsageDashboardFilters {
+  const dayParam = searchParams.dia?.trim();
+  const day =
+    !dayParam || dayParam === "todos"
+      ? null
+      : /^\d{4}-\d{2}-\d{2}$/.test(dayParam)
+        ? dayParam
+        : todayQuizDate();
+
+  const profileId = searchParams.usuario?.trim() || null;
+
+  return { day, profileId };
+}
+
+async function getPoolFilterUsers(poolId: string): Promise<UsageFilterUser[]> {
   const supabase = await createClient();
 
-  const { data: events, error } = await supabase
+  const { data: members, error } = await supabase
+    .from("pool_members")
+    .select(
+      `
+      profile_id,
+      profiles (
+        username,
+        display_name
+      )
+    `
+    )
+    .eq("pool_id", poolId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return ((members ?? []) as PoolMemberRow[])
+    .map((member) => {
+      const profile = resolvePoolMemberProfile(member.profiles);
+      const username = profile?.username ?? "?";
+      return {
+        profileId: member.profile_id,
+        username,
+        displayName: profile?.display_name ?? username,
+      };
+    })
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, "es"));
+}
+
+export async function getUsageDashboardData(
+  poolId: string,
+  filters: UsageDashboardFilters
+): Promise<UsageDashboardData> {
+  const supabase = await createClient();
+
+  let eventsQuery = supabase
     .from("app_usage_events")
     .select(
       `
@@ -112,6 +187,21 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
     .order("created_at", { ascending: false })
     .limit(2000);
 
+  if (filters.profileId) {
+    eventsQuery = eventsQuery.eq("profile_id", filters.profileId);
+  }
+
+  if (filters.day) {
+    eventsQuery = eventsQuery
+      .gte("created_at", quizDayOpensAt(filters.day))
+      .lte("created_at", quizDayClosesAt(filters.day));
+  }
+
+  const [{ data: events, error }, filterUsers] = await Promise.all([
+    eventsQuery,
+    getPoolFilterUsers(poolId),
+  ]);
+
   if (error) {
     throw new Error(error.message);
   }
@@ -120,9 +210,9 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
   const summaryMap = new Map<string, UsageUserSummary>();
   const hourly = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
 
-  let eventsToday = 0;
-  let sessionsToday = 0;
-  let loginsToday = 0;
+  let eventsCount = 0;
+  let sessionsCount = 0;
+  let loginsCount = 0;
 
   for (const row of rows) {
     const profile = resolveUsageEventProfile(row.profiles);
@@ -156,12 +246,9 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
     }
 
     hourly[getMadridHour(row.created_at)].count += 1;
-
-    if (isTodayMadrid(row.created_at)) {
-      eventsToday += 1;
-      if (row.event_type === "session") sessionsToday += 1;
-      if (row.event_type === "login") loginsToday += 1;
-    }
+    eventsCount += 1;
+    if (row.event_type === "session") sessionsCount += 1;
+    if (row.event_type === "login") loginsCount += 1;
   }
 
   const summaries = [...summaryMap.values()].sort((a, b) => {
@@ -187,11 +274,13 @@ export async function getUsageDashboardData(): Promise<UsageDashboardData> {
     summaries,
     recentEvents,
     hourlyBuckets: hourly,
+    filterUsers,
+    filters,
     totals: {
       activeUsers: summaries.length,
-      eventsToday,
-      sessionsToday,
-      loginsToday,
+      eventsCount,
+      sessionsCount,
+      loginsCount,
     },
   };
 }

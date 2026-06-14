@@ -16,10 +16,10 @@ import {
   DEFAULT_MOMENTS_PATH,
   loadWorldCupMomentsCatalog,
   momentImageExists,
-  parseWorldCupMomentsCatalog,
   syncMomentStatuses,
-  type WorldCupMoment,
-} from "@/lib/quiz/world-cup-moments";
+} from "@/lib/quiz/world-cup-moments.server";
+import { parseWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments";
+import type { WorldCupMomentDifficulty } from "@/lib/quiz/world-cup-moments";
 
 const PUBLIC_DIR = resolve(process.cwd(), "public");
 
@@ -30,11 +30,16 @@ function sleep(ms: number): Promise<void> {
 function shouldProcessMoment(
   moment: WorldCupMoment,
   force: boolean,
-  onlyPending: boolean
+  onlyPending: boolean,
+  minDifficulty: WorldCupMomentDifficulty | null
 ): boolean {
   if (momentImageExists(moment, PUBLIC_DIR)) return false;
   if (onlyPending && moment.status === "ready") return false;
   if (!force && moment.source_url?.startsWith("https://")) return false;
+  if (minDifficulty) {
+    const rank = { hard: 0, medium: 1, easy: 2 } as const;
+    if (rank[moment.difficulty] > rank[minDifficulty]) return false;
+  }
   return true;
 }
 
@@ -99,10 +104,15 @@ async function main() {
   const preview = argv.includes("--preview");
   const onlyPending = !argv.includes("--all");
   const delayMs = Number(readScriptArg(argv, "--delay") ?? "1200");
+  const minDifficultyRaw = readScriptArg(argv, "--difficulty");
+  const minDifficulty =
+    minDifficultyRaw === "easy" || minDifficultyRaw === "medium" || minDifficultyRaw === "hard"
+      ? minDifficultyRaw
+      : null;
 
   const catalog = loadWorldCupMomentsCatalog(catalogPath);
   let targets = catalog.moments.filter((moment) =>
-    shouldProcessMoment(moment, force, onlyPending)
+    shouldProcessMoment(moment, force, onlyPending, minDifficulty)
   );
 
   if (momentId) {

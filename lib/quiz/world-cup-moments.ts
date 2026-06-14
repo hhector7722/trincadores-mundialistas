@@ -1,8 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
 export const WORLD_CUP_MOMENTS_MIN_YEAR = 1970;
-
 export const WORLD_CUP_MOMENT_TYPES = [
   "goal",
   "celebration",
@@ -16,7 +12,14 @@ export type WorldCupMomentType = (typeof WORLD_CUP_MOMENT_TYPES)[number];
 
 export type WorldCupMomentStatus = "pending" | "ready";
 
-export type WorldCupMomentAnswerType = "year" | "team" | "player";
+export type WorldCupMomentDifficulty = "easy" | "medium" | "hard";
+
+export type WorldCupMomentAnswerType =
+  | "year"
+  | "team"
+  | "player"
+  | "opponent"
+  | "phase";
 
 export type WorldCupMomentQuizHints = {
   prompt: string;
@@ -35,6 +38,8 @@ export type WorldCupMoment = {
   teams: string[];
   players: string[];
   competition: string;
+  difficulty: WorldCupMomentDifficulty;
+  search_hint: string | null;
   local_path: string;
   source_url: string | null;
   source_label: string;
@@ -48,16 +53,21 @@ export type WorldCupMomentsCatalog = {
   moments: WorldCupMoment[];
 };
 
-export const DEFAULT_MOMENTS_PATH = resolve(
-  process.cwd(),
-  "data/quiz/images/world-cup-moments.json"
-);
-
-const PUBLIC_DIR = resolve(process.cwd(), "public");
-
-const MOMENT_TYPES = new Set<WorldCupMomentType>(WORLD_CUP_MOMENT_TYPES);
-const ANSWER_TYPES = new Set<WorldCupMomentAnswerType>(["year", "team", "player"]);
+const MOMENT_TYPES = new Set<WorldCupMomentType>(WORLD_CUP_MOMENT_TYPES);const ANSWER_TYPES = new Set<WorldCupMomentAnswerType>([
+  "year",
+  "team",
+  "player",
+  "opponent",
+  "phase",
+]);
 const STATUSES = new Set<WorldCupMomentStatus>(["pending", "ready"]);
+const DIFFICULTIES = new Set<WorldCupMomentDifficulty>(["easy", "medium", "hard"]);
+
+const DIFFICULTY_RANK: Record<WorldCupMomentDifficulty, number> = {
+  hard: 0,
+  medium: 1,
+  easy: 2,
+};
 
 function readString(row: Record<string, unknown>, key: string, index: number): string {
   const value = row[key];
@@ -169,6 +179,20 @@ export function validateWorldCupMoment(raw: unknown, index: number): WorldCupMom
     throw new Error(`moments[${index}].source_url debe ser https o null.`);
   }
 
+  const difficultyRaw = row.difficulty;
+  const difficulty =
+    typeof difficultyRaw === "string" && DIFFICULTIES.has(difficultyRaw as WorldCupMomentDifficulty)
+      ? (difficultyRaw as WorldCupMomentDifficulty)
+      : "medium";
+
+  const searchHintRaw = row.search_hint;
+  const searchHint =
+    searchHintRaw === null || searchHintRaw === undefined
+      ? null
+      : typeof searchHintRaw === "string" && searchHintRaw.trim()
+        ? searchHintRaw.trim()
+        : null;
+
   return {
     id,
     year,
@@ -177,6 +201,8 @@ export function validateWorldCupMoment(raw: unknown, index: number): WorldCupMom
     teams: readStringArray(row, "teams", index),
     players: readStringArray(row, "players", index),
     competition: readString(row, "competition", index),
+    difficulty,
+    search_hint: searchHint,
     local_path: readLocalPath(row.local_path, index),
     source_url: sourceUrl,
     source_label: readString(row, "source_label", index),
@@ -215,60 +241,69 @@ export function parseWorldCupMomentsCatalog(raw: unknown): WorldCupMomentsCatalo
   return { version: 1, moments };
 }
 
-export function loadWorldCupMomentsCatalog(path = DEFAULT_MOMENTS_PATH): WorldCupMomentsCatalog {
-  const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
-  return parseWorldCupMomentsCatalog(raw);
+export function filterCatalogReadyMoments(moments: WorldCupMoment[]): WorldCupMoment[] {
+  return moments.filter((moment) => moment.status === "ready");
 }
 
-export function momentImageExists(moment: WorldCupMoment, publicDir = PUBLIC_DIR): boolean {
-  const relative = moment.local_path.replace(/^\//, "");
-  return existsSync(resolve(publicDir, relative));
+export function resolveMomentImageUrl(moment: WorldCupMoment): string | null {
+  return moment.status === "ready" ? moment.local_path : null;
 }
 
-export function resolveMomentImageUrl(
-  moment: WorldCupMoment,
-  publicDir = PUBLIC_DIR
-): string | null {
-  if (!momentImageExists(moment, publicDir)) return null;
-  return moment.local_path;
+export function filterMomentsByDifficulty(
+  moments: WorldCupMoment[],
+  minDifficulty: WorldCupMomentDifficulty
+): WorldCupMoment[] {
+  const minRank = DIFFICULTY_RANK[minDifficulty];
+  return moments.filter((moment) => DIFFICULTY_RANK[moment.difficulty] <= minRank);
 }
 
-export function syncMomentStatuses(
+export function pickGuessImageMoment(
   catalog: WorldCupMomentsCatalog,
-  publicDir = PUBLIC_DIR
-): WorldCupMomentsCatalog {
-  return {
-    version: 1,
-    moments: catalog.moments.map((moment) => ({
-      ...moment,
-      status: momentImageExists(moment, publicDir) ? "ready" : "pending",
-    })),
-  };
+  opts?: {
+    seed?: number;
+    minDifficulty?: WorldCupMomentDifficulty;
+  }
+): WorldCupMoment | null {
+  const seed = opts?.seed ?? 0;
+  const minDifficulty = opts?.minDifficulty ?? "hard";
+
+  let ready = filterCatalogReadyMoments(catalog.moments);
+  ready = filterMomentsByDifficulty(ready, minDifficulty);
+
+  if (!ready.length && minDifficulty !== "easy") {
+    ready = filterMomentsByDifficulty(
+      filterCatalogReadyMoments(catalog.moments),
+      minDifficulty === "hard" ? "medium" : "easy"
+    );
+  }
+
+  if (!ready.length) return null;
+
+  ready.sort(
+    (a, b) =>
+      DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty] ||
+      a.id.localeCompare(b.id)
+  );
+
+  const index = Math.abs(seed) % ready.length;
+  return ready[index] ?? null;
 }
 
-export function filterReadyMoments(moments: WorldCupMoment[], publicDir = PUBLIC_DIR): WorldCupMoment[] {
-  return moments.filter((moment) => momentImageExists(moment, publicDir));
+/** @deprecated Usar pickGuessImageMoment con minDifficulty */
+export function pickDefaultGuessImageMoment(
+  catalog: WorldCupMomentsCatalog,
+  seed = 0
+): WorldCupMoment | null {
+  return pickGuessImageMoment(catalog, { seed, minDifficulty: "easy" });
 }
 
 export function pickMomentById(
   catalog: WorldCupMomentsCatalog,
   momentId: string,
-  opts?: { readyOnly?: boolean; publicDir?: string }
+  opts?: { readyOnly?: boolean }
 ): WorldCupMoment | null {
-  const publicDir = opts?.publicDir ?? PUBLIC_DIR;
   const moment = catalog.moments.find((item) => item.id === momentId) ?? null;
   if (!moment) return null;
-  if (opts?.readyOnly && !momentImageExists(moment, publicDir)) return null;
+  if (opts?.readyOnly && moment.status !== "ready") return null;
   return moment;
-}
-
-export function pickDefaultGuessImageMoment(
-  catalog: WorldCupMomentsCatalog,
-  seed = 0,
-  publicDir = PUBLIC_DIR
-): WorldCupMoment | null {
-  const ready = filterReadyMoments(catalog.moments, publicDir);
-  if (!ready.length) return null;
-  const index = Math.abs(seed) % ready.length;
-  return ready[index] ?? null;
 }

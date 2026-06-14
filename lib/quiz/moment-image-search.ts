@@ -94,13 +94,15 @@ export function buildMomentSearchQueries(moment: WorldCupMoment): string[] {
   const opponent = moment.teams.find((team) => team !== moment.teams[0]) ?? moment.teams[1] ?? "";
   const year = String(moment.year);
 
-  return uniqueQueries([
+  const base = uniqueQueries([
+    moment.search_hint ?? "",
     `${player} FIFA World Cup ${year} ${moment.competition} photo player action`,
-    `${player} Mundial ${year} foto jugador`,
+    `${player} Mundial ${year} foto jugador partido`,
     `${moment.teams[0]} ${opponent} World Cup ${year} ${moment.competition} match photo players`,
     `${moment.label} World Cup ${year} football player photo`,
-    `${player} ${year} world cup celebration players`,
   ]);
+
+  return base;
 }
 
 function hostFromUrl(url: string): string {
@@ -235,6 +237,8 @@ type CommonsSearchResponse = {
         title?: string;
         imageinfo?: Array<{
           url?: string;
+          width?: number;
+          height?: number;
           extmetadata?: { ImageDescription?: { value?: string } };
         }>;
       }
@@ -267,25 +271,25 @@ export async function searchCommonsImages(
   const payload = (await response.json()) as CommonsSearchResponse;
   const pages = payload.query?.pages ?? {};
 
-  return Object.values(pages)
-    .map((page) => {
+  return Object.values(pages).flatMap((page) => {
       const info = page.imageinfo?.[0];
       const imageUrl = info?.url;
-      if (!imageUrl?.startsWith("https://")) return null;
+      if (!info || !imageUrl?.startsWith("https://")) return [];
       const title = page.title?.replace(/^File:/, "") ?? query;
-      const description = info.extmetadata?.ImageDescription?.value ?? title;
-      return {
-        imageUrl,
-        pageUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title ?? "")}`,
-        title: description.replace(/<[^>]+>/g, " ").trim(),
-        width: typeof info.width === "number" ? info.width : null,
-        height: typeof info.height === "number" ? info.height : null,
-        source: "commons" as const,
-        query,
-        score: 0,
-      } satisfies ImageSearchCandidate;
-    })
-    .filter((item): item is ImageSearchCandidate => item !== null);
+      const description = info?.extmetadata?.ImageDescription?.value ?? title;
+      return [
+        {
+          imageUrl,
+          pageUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title ?? "")}`,
+          title: description.replace(/<[^>]+>/g, " ").trim(),
+          width: typeof info.width === "number" ? info.width : null,
+          height: typeof info.height === "number" ? info.height : null,
+          source: "commons" as const,
+          query,
+          score: 0,
+        },
+      ];
+    });
 }
 
 async function searchGoogleCseImages(

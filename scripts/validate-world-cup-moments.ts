@@ -8,7 +8,7 @@ import {
   DEFAULT_MOMENTS_PATH,
   loadWorldCupMomentsCatalog,
   syncMomentStatuses,
-} from "@/lib/quiz/world-cup-moments";
+} from "@/lib/quiz/world-cup-moments.server";
 
 async function main() {
   const argv = process.argv.slice(2);

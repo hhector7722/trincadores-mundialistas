@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { momentToGuessImageQuestion } from "@/lib/quiz/lab/from-moment";
 import {
+  filterMomentsByDifficulty,
   parseWorldCupMomentsCatalog,
-  syncMomentStatuses,
   validateWorldCupMoment,
   type WorldCupMoment,
 } from "@/lib/quiz/world-cup-moments";
+import { syncMomentStatuses } from "@/lib/quiz/world-cup-moments.server";
 
 const FIXTURE_MOMENT: WorldCupMoment = {
   id: "wc1986-maradona-cup",
@@ -16,6 +17,8 @@ const FIXTURE_MOMENT: WorldCupMoment = {
   teams: ["Argentina"],
   players: ["Diego Maradona"],
   competition: "Final",
+  difficulty: "easy",
+  search_hint: null,
   local_path: "/images/quiz/historic/1986/wc1986-maradona-cup.jpg",
   source_url: "https://example.com/photo.jpg",
   source_label: "Marca",
@@ -63,4 +66,12 @@ test("syncMomentStatuses marca pending sin archivo en disco", () => {
 test("momentToGuessImageQuestion devuelve null si falta archivo", () => {
   const question = momentToGuessImageQuestion(FIXTURE_MOMENT);
   assert.equal(question, null);
+});
+
+test("filterMomentsByDifficulty deja solo hard cuando min es hard", () => {
+  const easy: WorldCupMoment = { ...FIXTURE_MOMENT, id: "easy", difficulty: "easy" };
+  const hard: WorldCupMoment = { ...FIXTURE_MOMENT, id: "hard", difficulty: "hard" };
+  const result = filterMomentsByDifficulty([easy, hard], "hard");
+  assert.equal(result.length, 1);
+  assert.equal(result[0]?.id, "hard");
 });

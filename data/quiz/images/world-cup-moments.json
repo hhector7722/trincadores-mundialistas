@@ -2,6 +2,74 @@
   "version": 1,
   "moments": [
     {
+      "id": "wc1970-carlos-alberto-goal",
+      "year": 1970,
+      "label": "Carlos Alberto — gol en la final vs Italia",
+      "moment_type": "goal",
+      "teams": [
+        "Brasil",
+        "Italia"
+      ],
+      "players": [
+        "Carlos Alberto"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Carlos Alberto goal 1970 World Cup final Italy",
+      "local_path": "/images/quiz/historic/1970/wc1970-carlos-alberto-goal.jpg",
+      "source_url": "https://i2-prod.mirror.co.uk/incoming/article3849524.ece/ALTERNATES/s1227b/World-Cup-finals-Best-Pictures.jpg",
+      "source_label": "auto/mirror.co.uk",
+      "status": "ready",
+      "image_alt": "Carlos Alberto marca en la final de 1970",
+      "quiz": {
+        "prompt": "¿Quién marcó este gol?",
+        "answer_type": "player",
+        "correct_option": "Carlos Alberto",
+        "options": [
+          "Carlos Alberto",
+          "Jairzinho",
+          "Pelé",
+          "Rivelino"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc1970-jairzinho-goal",
+      "year": 1970,
+      "label": "Jairzinho — México 70",
+      "moment_type": "goal",
+      "teams": [
+        "Brasil",
+        "Inglaterra"
+      ],
+      "players": [
+        "Jairzinho"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Jairzinho goal World Cup 1970 quarter final",
+      "local_path": "/images/quiz/historic/1970/wc1970-jairzinho-goal.jpg",
+      "source_url": "https://cdn.plus.fifa.com/images/public/cms/4f/26/1b/92/4f261b92-b4dc-46cb-b3c4-18b54dfc100f.jpg?width=1200&height=630",
+      "source_label": "auto/plus.fifa.com",
+      "status": "ready",
+      "image_alt": "Jairzinho en el Mundial 1970",
+      "quiz": {
+        "prompt": "¿En qué fase del torneo fue esta jugada?",
+        "answer_type": "phase",
+        "correct_option": "Cuartos de final",
+        "options": [
+          "Fase de grupos",
+          "Octavos",
+          "Cuartos de final",
+          "Semifinal"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc1970-pelé-final",
       "year": 1970,
       "label": "Pelé en la final México 70",
@@ -14,6 +82,8 @@
         "Pelé"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1970/wc1970-pele-final.jpg",
       "source_url": "https://assets.goal.com/images/v3/bltaf5993a2bddfe395/Pel%C3%A9_1970.jpg?auto=webp&format=pjpg&width=3840&quality=60",
       "source_label": "auto/goal.com",
@@ -34,6 +104,108 @@
       }
     },
     {
+      "id": "wc1974-breitner-goal",
+      "year": 1974,
+      "label": "Paul Breitner — gol Alemania 74",
+      "moment_type": "goal",
+      "teams": [
+        "Alemania",
+        "Países Bajos"
+      ],
+      "players": [
+        "Paul Breitner"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Paul Breitner goal 1974 World Cup final",
+      "local_path": "/images/quiz/historic/1974/wc1974-breitner-goal.jpg",
+      "source_url": "https://media.gettyimages.com/id/1068808518/photo/1974-fifa-world-cup-final-west-germany-v-netherlands.jpg?s=1024x1024&w=gi&k=20&c=-riBe00awka3ugQ6pySzna5gMI14FkZbjjAGHGrhJms=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Paul Breitner en la final de 1974",
+      "quiz": {
+        "prompt": "¿Quién marcó este gol?",
+        "answer_type": "player",
+        "correct_option": "Paul Breitner",
+        "options": [
+          "Paul Breitner",
+          "Gerd Müller",
+          "Johan Neeskens",
+          "Franz Beckenbauer"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1974-cruyff-penalty",
+      "year": 1974,
+      "label": "Cruyff — penalti arranque final 74",
+      "moment_type": "action",
+      "teams": [
+        "Países Bajos",
+        "Alemania"
+      ],
+      "players": [
+        "Johan Cruyff"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Johan Cruyff penalty 1974 World Cup final",
+      "local_path": "/images/quiz/historic/1974/wc1974-cruyff-penalty.jpg",
+      "source_url": "https://c8.alamy.com/comp/FRY74E/german-international-football-player-franz-beckenbauer-right-germany-FRY74E.jpg",
+      "source_label": "auto/alamy.com",
+      "status": "ready",
+      "image_alt": "Cruyff en la final del Mundial 1974",
+      "quiz": {
+        "prompt": "¿Contra qué selección fue este partido?",
+        "answer_type": "opponent",
+        "correct_option": "Alemania",
+        "options": [
+          "Alemania",
+          "Brasil",
+          "Argentina",
+          "Italia"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc1978-kempes-celebration",
+      "year": 1978,
+      "label": "Mario Kempes — Argentina 78",
+      "moment_type": "celebration",
+      "teams": [
+        "Argentina",
+        "Países Bajos"
+      ],
+      "players": [
+        "Mario Kempes"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Mario Kempes 1978 World Cup final celebration",
+      "local_path": "/images/quiz/historic/1978/wc1978-kempes-celebration.jpg",
+      "source_url": "https://media.gettyimages.com/id/81345739/photo/argentina-mario-kempes-1978-world-cup-final.jpg?s=1024x1024&w=gi&k=20&c=v2QH_uHU_QIDURoy72Ua4vxNAwM-mXo1B1-tfW_IBac=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Mario Kempes en el Mundial 1978",
+      "quiz": {
+        "prompt": "¿Quién es el jugador?",
+        "answer_type": "player",
+        "correct_option": "Mario Kempes",
+        "options": [
+          "Mario Kempes",
+          "Daniel Passarella",
+          "Leopoldo Luque",
+          "Ricky Villa"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      }
+    },
+    {
       "id": "wc1982-rossi-final",
       "year": 1982,
       "label": "Paolo Rossi — España 82",
@@ -46,6 +218,8 @@
         "Paolo Rossi"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1982/wc1982-rossi-final.jpg",
       "source_url": "https://estaticos-cdn.sport.es/clip/f254e4a0-0906-4fc8-b113-849e9e17675a_alta-libre-aspect-ratio_default_0.jpg",
       "source_label": "auto/sport.es",
@@ -66,34 +240,72 @@
       }
     },
     {
-      "id": "wc1986-maradona-cup",
-      "year": 1986,
-      "label": "Maradona levanta la Copa — México 86",
-      "moment_type": "celebration",
+      "id": "wc1982-schumacher-foul",
+      "year": 1982,
+      "label": "Schumacher — entrada a Battiston",
+      "moment_type": "iconic",
       "teams": [
-        "Argentina"
+        "Alemania",
+        "Francia"
       ],
       "players": [
-        "Diego Maradona"
+        "Harald Schumacher",
+        "Patrick Battiston"
+      ],
+      "competition": "Semifinal",
+      "difficulty": "hard",
+      "search_hint": "Schumacher Battiston 1982 World Cup semi final",
+      "local_path": "/images/quiz/historic/1982/wc1982-schumacher-foul.jpg",
+      "source_url": "https://media.gettyimages.com/id/540704071/photo/1982-fifa-world-cup-in-spain-semi-final-in-sevilla-germany-8-7-france-scene-of-the-match.jpg?s=1024x1024&w=gi&k=20&c=oR82EEUdUGZiSOs3cLos9IK3LfH0Jv5zFa9FYWL5xzA=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Schumacher y Battiston en semifinal 1982",
+      "quiz": {
+        "prompt": "¿En qué fase del torneo ocurrió?",
+        "answer_type": "phase",
+        "correct_option": "Semifinal",
+        "options": [
+          "Octavos",
+          "Cuartos de final",
+          "Semifinal",
+          "Final"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1982-tardelli-goal",
+      "year": 1982,
+      "label": "Marco Tardelli — celebración final 82",
+      "moment_type": "celebration",
+      "teams": [
+        "Italia",
+        "Alemania"
+      ],
+      "players": [
+        "Marco Tardelli"
       ],
       "competition": "Final",
-      "local_path": "/images/quiz/historic/1986/wc1986-maradona-cup.jpg",
-      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2016/06/29/14672098812900.jpg",
+      "difficulty": "hard",
+      "search_hint": "Marco Tardelli goal celebration 1982 World Cup final",
+      "local_path": "/images/quiz/historic/1982/wc1982-tardelli-goal.jpg",
+      "source_url": "https://e00-xlk-ue-marca.uecdn.es/uploads/2024/10/17/17188076522369.jpeg",
       "source_label": "auto/marca.com",
       "status": "ready",
-      "image_alt": "Maradona levantando la copa en el Azteca",
+      "image_alt": "Marco Tardelli celebra en la final de 1982",
       "quiz": {
-        "prompt": "¿Qué selección ganó este Mundial?",
-        "answer_type": "team",
-        "correct_option": "Argentina",
+        "prompt": "¿Quién marcó y celebra?",
+        "answer_type": "player",
+        "correct_option": "Marco Tardelli",
         "options": [
-          "Argentina",
-          "Alemania",
-          "Brasil",
-          "Italia"
+          "Marco Tardelli",
+          "Paolo Rossi",
+          "Antonio Cabrini",
+          "Gaetano Scirea"
         ],
-        "blur_start_px": 24,
-        "reveal_seconds": 8
+        "blur_start_px": 34,
+        "reveal_seconds": 6
       }
     },
     {
@@ -109,6 +321,8 @@
         "Jorge Burruchaga"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1986/wc1986-burruchaga-goal.jpg",
       "source_url": "https://cdn.plus.fifa.com/images/public/cms/11/d7/e3/5e/11d7e35e-092f-4656-bef8-4191301440cc.jpg?width=935",
       "source_label": "auto/plus.fifa.com",
@@ -129,6 +343,141 @@
       }
     },
     {
+      "id": "wc1986-lineker-goal",
+      "year": 1986,
+      "label": "Gary Lineker — Inglaterra 86",
+      "moment_type": "goal",
+      "teams": [
+        "Inglaterra",
+        "Argentina"
+      ],
+      "players": [
+        "Gary Lineker"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "medium",
+      "search_hint": "Gary Lineker goal 1986 World Cup quarter final",
+      "local_path": "/images/quiz/historic/1986/wc1986-lineker-goal.jpg",
+      "source_url": "https://media.gettyimages.com/id/640466817/photo/gary-lineker-at-1986-world-cup.jpg?s=1024x1024&w=gi&k=20&c=VEH2YQ30RA4pXFKm4PqRUEM-NMwtZ4zr6683cU4Vo9U=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Gary Lineker en el Mundial 1986",
+      "quiz": {
+        "prompt": "¿Contra qué selección marcó?",
+        "answer_type": "opponent",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Alemania",
+          "Brasil",
+          "Francia"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc1986-maradona-cup",
+      "year": 1986,
+      "label": "Maradona levanta la Copa — México 86",
+      "moment_type": "celebration",
+      "teams": [
+        "Argentina"
+      ],
+      "players": [
+        "Diego Maradona"
+      ],
+      "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/1986/wc1986-maradona-cup.jpg",
+      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2016/06/29/14672098812900.jpg",
+      "source_label": "auto/marca.com",
+      "status": "ready",
+      "image_alt": "Maradona levantando la copa en el Azteca",
+      "quiz": {
+        "prompt": "¿Qué selección ganó este Mundial?",
+        "answer_type": "team",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Alemania",
+          "Brasil",
+          "Italia"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      }
+    },
+    {
+      "id": "wc1986-valdano-goal",
+      "year": 1986,
+      "label": "Jorge Valdano — México 86",
+      "moment_type": "goal",
+      "teams": [
+        "Argentina",
+        "Alemania"
+      ],
+      "players": [
+        "Jorge Valdano"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Jorge Valdano goal 1986 World Cup final",
+      "local_path": "/images/quiz/historic/1986/wc1986-valdano-goal.jpg",
+      "source_url": "https://media.gettyimages.com/id/79653555/photo/1986-world-cup-finals-mexico-city-mexico-2nd-june-argentina-3-v-south-korea-1-argentinas-jorge.jpg?s=1024x1024&w=gi&k=20&c=lLXpOKVvVq69lDTFcRPM3pxh2bx04VRseMZFub2mqss=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Jorge Valdano en la final de 1986",
+      "quiz": {
+        "prompt": "¿Quién es el jugador?",
+        "answer_type": "player",
+        "correct_option": "Jorge Valdano",
+        "options": [
+          "Jorge Valdano",
+          "Jorge Burruchaga",
+          "Claudio Caniggia",
+          "Sergio Batista"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1990-caniggia-brazil",
+      "year": 1990,
+      "label": "Caniggia — gol vs Brasil",
+      "moment_type": "goal",
+      "teams": [
+        "Argentina",
+        "Brasil"
+      ],
+      "players": [
+        "Claudio Caniggia"
+      ],
+      "competition": "Octavos",
+      "difficulty": "hard",
+      "search_hint": "Claudio Caniggia goal Brazil 1990 World Cup",
+      "local_path": "/images/quiz/historic/1990/wc1990-caniggia-brazil.jpg",
+      "source_url": "https://media.gettyimages.com/id/79039009/photo/1990-world-cup-finals-second-phase-turin-italy-24th-june-1990-argentina-1-v-brazil-0-brazils.jpg?s=1024x1024&w=gi&k=20&c=F739J9C95OT4bdSRNUBELVqvIJVULfg6pIF9IPWhU4k=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Claudio Caniggia ante Brasil en 1990",
+      "quiz": {
+        "prompt": "¿Quién marcó este gol?",
+        "answer_type": "player",
+        "correct_option": "Claudio Caniggia",
+        "options": [
+          "Claudio Caniggia",
+          "Diego Maradona",
+          "Gabriel Batistuta",
+          "Pedro Troglio"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc1990-maradona-tears",
       "year": 1990,
       "label": "Maradona tras Italia 90",
@@ -141,6 +490,8 @@
         "Diego Maradona"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1990/wc1990-maradona-tears.jpg",
       "source_url": "https://www.clarin.com/img/2018/05/15/maradona-vs-brasil-en-el___SyDjZrsAz_720x0__1.jpg",
       "source_label": "auto/telesolnoticias.com",
@@ -161,6 +512,39 @@
       }
     },
     {
+      "id": "wc1990-schillaci-celebration",
+      "year": 1990,
+      "label": "Toto Schillaci — Italia 90",
+      "moment_type": "celebration",
+      "teams": [
+        "Italia"
+      ],
+      "players": [
+        "Salvatore Schillaci"
+      ],
+      "competition": "Semifinal",
+      "difficulty": "medium",
+      "search_hint": "Salvatore Schillaci 1990 World Cup celebration",
+      "local_path": "/images/quiz/historic/1990/wc1990-schillaci-celebration.jpg",
+      "source_url": "https://static.independent.co.uk/2024/09/18/10/GettyImages-854634534.jpg",
+      "source_label": "auto/independent.co.uk",
+      "status": "ready",
+      "image_alt": "Toto Schillaci en Italia 90",
+      "quiz": {
+        "prompt": "¿Quién es el jugador?",
+        "answer_type": "player",
+        "correct_option": "Salvatore Schillaci",
+        "options": [
+          "Salvatore Schillaci",
+          "Roberto Baggio",
+          "Gianluca Vialli",
+          "Paolo Maldini"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      }
+    },
+    {
       "id": "wc1994-baggio-penalty",
       "year": 1994,
       "label": "Baggio — tanda USA 94",
@@ -173,6 +557,8 @@
         "Roberto Baggio"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1994/wc1994-baggio-penalty.jpg",
       "source_url": "https://c8.alamy.com/comp/G5MDXE/16-07-94-1994-world-cup-final-roberto-baggio-on-the-ball-against-brazil-G5MDXE.jpg",
       "source_label": "auto/alamy.com",
@@ -193,6 +579,175 @@
       }
     },
     {
+      "id": "wc1994-bebeto-celebration",
+      "year": 1994,
+      "label": "Bebeto — choncleta USA 94",
+      "moment_type": "celebration",
+      "teams": [
+        "Brasil"
+      ],
+      "players": [
+        "Bebeto"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "medium",
+      "search_hint": "Bebeto cradle celebration 1994 World Cup",
+      "local_path": "/images/quiz/historic/1994/wc1994-bebeto-celebration.jpg",
+      "source_url": "https://c8.alamy.com/comp/HAEJCM/taffarel-bebeto-mauro-silva-brazil-win-the-world-cup-17-july-1994-HAEJCM.jpg",
+      "source_label": "auto/alamy.com",
+      "status": "ready",
+      "image_alt": "Bebeto celebra en el Mundial 1994",
+      "quiz": {
+        "prompt": "¿Quién celebra?",
+        "answer_type": "player",
+        "correct_option": "Bebeto",
+        "options": [
+          "Bebeto",
+          "Romário",
+          "Rai",
+          "Dunga"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc1994-stoichkov-action",
+      "year": 1994,
+      "label": "Hristo Stoichkov — Bulgaria 94",
+      "moment_type": "action",
+      "teams": [
+        "Bulgaria",
+        "Alemania"
+      ],
+      "players": [
+        "Hristo Stoichkov"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Hristo Stoichkov 1994 World Cup quarter final",
+      "local_path": "/images/quiz/historic/1994/wc1994-stoichkov-action.jpg",
+      "source_url": "https://estaticos-cdn.sport.es/clip/96360fc1-4aee-44d6-85d9-12e65aecae1f_alta-libre-aspect-ratio_default_0.jpg",
+      "source_label": "auto/sport.es",
+      "status": "ready",
+      "image_alt": "Hristo Stoichkov en el Mundial 1994",
+      "quiz": {
+        "prompt": "¿Qué selección representa el jugador?",
+        "answer_type": "team",
+        "correct_option": "Bulgaria",
+        "options": [
+          "Bulgaria",
+          "Rumanía",
+          "Croacia",
+          "Rusia"
+        ],
+        "blur_start_px": 34,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1998-barthez-save",
+      "year": 1998,
+      "label": "Fabien Barthez — parada Francia 98",
+      "moment_type": "save",
+      "teams": [
+        "Francia",
+        "Italia"
+      ],
+      "players": [
+        "Fabien Barthez"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Fabien Barthez save 1998 World Cup Italy quarter final",
+      "local_path": "/images/quiz/historic/1998/wc1998-barthez-save.jpg",
+      "source_url": "https://cdn.plus.fifa.com/images/public/cms/b9/f6/0b/a8/b9f60ba8-0259-49ab-91aa-c9004d6b303b.jpg?width=1200&height=630",
+      "source_label": "auto/plus.fifa.com",
+      "status": "ready",
+      "image_alt": "Fabien Barthez en el Mundial 1998",
+      "quiz": {
+        "prompt": "¿Quién es el portero?",
+        "answer_type": "player",
+        "correct_option": "Fabien Barthez",
+        "options": [
+          "Fabien Barthez",
+          "Gianluigi Buffon",
+          "Peter Schmeichel",
+          "José Luis Chilavert"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1998-bergkamp-argentina",
+      "year": 1998,
+      "label": "Dennis Bergkamp — control vs Argentina",
+      "moment_type": "action",
+      "teams": [
+        "Países Bajos",
+        "Argentina"
+      ],
+      "players": [
+        "Dennis Bergkamp"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Dennis Bergkamp 1998 World Cup quarter final Argentina",
+      "local_path": "/images/quiz/historic/1998/wc1998-bergkamp-argentina.jpg",
+      "source_url": "https://media.gettyimages.com/id/2211832744/photo/netherlands-v-argentina-fifa-world-cup-finals-1998-quarter-final.jpg?s=1024x1024&w=gi&k=20&c=5VE2Y7qGXD2eeNFY9CsJ4oVKnDBB0c3gcb1ToyRTD9g=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Dennis Bergkamp ante Argentina en 1998",
+      "quiz": {
+        "prompt": "¿Contra qué selección fue este partido?",
+        "answer_type": "opponent",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Brasil",
+          "Alemania",
+          "Italia"
+        ],
+        "blur_start_px": 34,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1998-thuram-celebration",
+      "year": 1998,
+      "label": "Lilian Thuram — semifinal vs Croacia",
+      "moment_type": "celebration",
+      "teams": [
+        "Francia",
+        "Croacia"
+      ],
+      "players": [
+        "Lilian Thuram"
+      ],
+      "competition": "Semifinal",
+      "difficulty": "hard",
+      "search_hint": "Lilian Thuram goal celebration 1998 World Cup semi final Croatia",
+      "local_path": "/images/quiz/historic/1998/wc1998-thuram-celebration.jpg",
+      "source_url": "https://images.daznservices.com/di/library/GOAL/6c/b5/lillian-thuram-didier-deschamps-france-world-cup-1998_g5ete4xnfcac12qnfej75nnve.jpg?t=935585096&quality=60&w=1200",
+      "source_label": "auto/goal.com",
+      "status": "ready",
+      "image_alt": "Lilian Thuram celebra en 1998",
+      "quiz": {
+        "prompt": "¿Quién marcó? (pista: era defensa)",
+        "answer_type": "player",
+        "correct_option": "Lilian Thuram",
+        "options": [
+          "Lilian Thuram",
+          "Laurent Blanc",
+          "Marcel Desailly",
+          "Bixente Lizarazu"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc1998-zidane-final",
       "year": 1998,
       "label": "Zidane — final Francia 98",
@@ -205,6 +760,8 @@
         "Zinedine Zidane"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/1998/wc1998-zidane-final.jpg",
       "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2018/12/12/15445971586202.jpg",
       "source_label": "auto/marca.com",
@@ -225,6 +782,74 @@
       }
     },
     {
+      "id": "wc2002-ahn-italy-goal",
+      "year": 2002,
+      "label": "Ahn Jung-hwan — gol de oro vs Italia",
+      "moment_type": "goal",
+      "teams": [
+        "Corea del Sur",
+        "Italia"
+      ],
+      "players": [
+        "Ahn Jung-hwan"
+      ],
+      "competition": "Octavos",
+      "difficulty": "hard",
+      "search_hint": "Ahn Jung-hwan golden goal Italy 2002 World Cup",
+      "local_path": "/images/quiz/historic/2002/wc2002-ahn-italy-goal.jpg",
+      "source_url": "https://assets.goal.com/images/v3/blt56262ab9bdb64723/goal-2021-1-image--f6ac62df-6af4-4520-a900-0e690d55fc43.jpeg?format=pjpg&auto=webp&width=3840&quality=60",
+      "source_label": "auto/goal.com",
+      "status": "ready",
+      "image_alt": "Ahn Jung-hwan celebra contra Italia en 2002",
+      "quiz": {
+        "prompt": "¿Quién marcó el gol de la eliminación?",
+        "answer_type": "player",
+        "correct_option": "Ahn Jung-hwan",
+        "options": [
+          "Ahn Jung-hwan",
+          "Park Ji-sung",
+          "Lee Young-pyo",
+          "Hong Myung-bo"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2002-ronaldinho-freekick",
+      "year": 2002,
+      "label": "Ronaldinho — falta vs Inglaterra",
+      "moment_type": "goal",
+      "teams": [
+        "Brasil",
+        "Inglaterra"
+      ],
+      "players": [
+        "Ronaldinho"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "medium",
+      "search_hint": "Ronaldinho free kick England 2002 World Cup quarter final",
+      "local_path": "/images/quiz/historic/2002/wc2002-ronaldinho-freekick.jpg",
+      "source_url": "https://media.gettyimages.com/id/51527729/photo/ulsan-republic-of-korea-brazils-ronaldo-is-congratulated-by-teammate-ronaldinho-after-scoring-a.jpg?s=612x612&w=gi&k=20&c=W1X9vAaKu7KHPThnDRuLz-ufioAZbtLSskmtSM1qbKQ=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Ronaldinho en el partido vs Inglaterra 2002",
+      "quiz": {
+        "prompt": "¿En qué fase fue este partido?",
+        "answer_type": "phase",
+        "correct_option": "Cuartos de final",
+        "options": [
+          "Fase de grupos",
+          "Octavos",
+          "Cuartos de final",
+          "Semifinal"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
       "id": "wc2002-ronaldo-celebration",
       "year": 2002,
       "label": "Ronaldo — Corea/Japón 2002",
@@ -237,6 +862,8 @@
         "Ronaldo Nazário"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2002/wc2002-ronaldo-celebration.jpg",
       "source_url": "https://images.daznservices.com/di/library/GOAL/69/23/ronaldo-nazario-de-lima-brazil_1rujxaqy6z6fw13eivx23uecsp.jpg?quality=60&w=1600",
       "source_label": "auto/goal.com",
@@ -257,6 +884,107 @@
       }
     },
     {
+      "id": "wc2006-grosso-penalty",
+      "year": 2006,
+      "label": "Fabio Grosso — penalti final 2006",
+      "moment_type": "goal",
+      "teams": [
+        "Italia",
+        "Francia"
+      ],
+      "players": [
+        "Fabio Grosso"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Fabio Grosso penalty 2006 World Cup final",
+      "local_path": "/images/quiz/historic/2006/wc2006-grosso-penalty.jpg",
+      "source_url": "https://media.gettyimages.com/id/71403803/photo/final-italy-v-france-world-cup-2006.jpg?s=1024x1024&w=gi&k=20&c=e_hG0azOURZse1wX_g3pca0C0s4wvNGkSit4RFnlcNw=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Fabio Grosso en la tanda de 2006",
+      "quiz": {
+        "prompt": "¿Quién lanzó este penalti?",
+        "answer_type": "player",
+        "correct_option": "Fabio Grosso",
+        "options": [
+          "Fabio Grosso",
+          "Andrea Pirlo",
+          "Daniele De Rossi",
+          "Marco Materazzi"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2006-klose-header",
+      "year": 2006,
+      "label": "Miroslav Klose — remate Alemania 2006",
+      "moment_type": "goal",
+      "teams": [
+        "Alemania"
+      ],
+      "players": [
+        "Miroslav Klose"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "medium",
+      "search_hint": "Miroslav Klose header 2006 World Cup",
+      "local_path": "/images/quiz/historic/2006/wc2006-klose-header.jpg",
+      "source_url": "https://estaticos-cdn.sport.es/clip/ce178efe-e5bb-4ebc-a770-fa6dfcf8dddc_alta-libre-aspect-ratio_default_0.jpg",
+      "source_label": "auto/sport.es",
+      "status": "ready",
+      "image_alt": "Miroslav Klose en el Mundial 2006",
+      "quiz": {
+        "prompt": "¿Quién es el delantero?",
+        "answer_type": "player",
+        "correct_option": "Miroslav Klose",
+        "options": [
+          "Miroslav Klose",
+          "Lukas Podolski",
+          "Bastian Schweinsteiger",
+          "Michael Ballack"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc2006-lehmann-penalties",
+      "year": 2006,
+      "label": "Jens Lehmann — papelitos penaltis",
+      "moment_type": "iconic",
+      "teams": [
+        "Alemania",
+        "Argentina"
+      ],
+      "players": [
+        "Jens Lehmann"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Jens Lehmann penalty notes 2006 World Cup Argentina",
+      "local_path": "/images/quiz/historic/2006/wc2006-lehmann-penalties.jpg",
+      "source_url": "https://c8.alamy.com/comp/MCCNGG/olympiastadion-berlin-germany-3062006-fifa-world-cup-quarter-finals-germany-vs-argentina-42-after-penalties-goalkeeper-jens-lehmann-ger-studies-a-small-piece-of-note-paper-before-the-penalty-shoot-out-watched-by-andreas-koepke-MCCNGG.jpg",
+      "source_label": "auto/alamy.com",
+      "status": "ready",
+      "image_alt": "Jens Lehmann en la tanda de 2006",
+      "quiz": {
+        "prompt": "¿Contra qué selección fue esta tanda?",
+        "answer_type": "opponent",
+        "correct_option": "Argentina",
+        "options": [
+          "Argentina",
+          "Italia",
+          "España",
+          "Brasil"
+        ],
+        "blur_start_px": 34,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc2006-zidane-headbutt",
       "year": 2006,
       "label": "Zidane — Alemania 2006",
@@ -269,6 +997,8 @@
         "Zinedine Zidane"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2006/wc2006-zidane-headbutt.jpg",
       "source_url": "https://www.sopitas.com/wp-content/uploads/2015/09/zidane_2006.jpg",
       "source_label": "auto/sopitas.com",
@@ -289,6 +1019,40 @@
       }
     },
     {
+      "id": "wc2010-forlan-celebration",
+      "year": 2010,
+      "label": "Diego Forlán — Uruguay Sudáfrica",
+      "moment_type": "celebration",
+      "teams": [
+        "Uruguay",
+        "Países Bajos"
+      ],
+      "players": [
+        "Diego Forlán"
+      ],
+      "competition": "Semifinal",
+      "difficulty": "medium",
+      "search_hint": "Diego Forlan 2010 World Cup semi final",
+      "local_path": "/images/quiz/historic/2010/wc2010-forlan-celebration.jpg",
+      "source_url": "https://static0.givemesportimages.com/wordpress/wp-content/uploads/2022/11/2010-07-06T120000Z_539610380_LM2E6761KK301_RTRMADP_3_SOCCER-WORLD.jpg",
+      "source_label": "auto/givemesport.com",
+      "status": "ready",
+      "image_alt": "Diego Forlán en el Mundial 2010",
+      "quiz": {
+        "prompt": "¿Qué selección representa?",
+        "answer_type": "team",
+        "correct_option": "Uruguay",
+        "options": [
+          "Uruguay",
+          "Chile",
+          "Paraguay",
+          "Colombia"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      }
+    },
+    {
       "id": "wc2010-iniesta-goal",
       "year": 2010,
       "label": "Iniesta — gol final Sudáfrica",
@@ -301,6 +1065,8 @@
         "Andrés Iniesta"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2010/wc2010-iniesta-goal.jpg",
       "source_url": "https://media.gettyimages.com/id/102815158/photo/2010-fifa-world-cup-final.jpg?s=1024x1024&w=gi&k=20&c=rpE5WwgMcTKg9HUW8xfabiCYZRiZigYi2J27a6eER8c=",
       "source_label": "auto/gettyimages.com",
@@ -321,6 +1087,108 @@
       }
     },
     {
+      "id": "wc2010-sneijder-action",
+      "year": 2010,
+      "label": "Wesley Sneijder — Holanda 2010",
+      "moment_type": "action",
+      "teams": [
+        "Países Bajos",
+        "Brasil"
+      ],
+      "players": [
+        "Wesley Sneijder"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Wesley Sneijder 2010 World Cup quarter final Brazil",
+      "local_path": "/images/quiz/historic/2010/wc2010-sneijder-action.jpg",
+      "source_url": "https://media.gettyimages.com/id/102667912/photo/cape-town-south-africa-wesley-sneijder-of-the-netherlands-celebrates-victory-and-progressing.jpg?s=612x612&w=gi&k=20&c=iGuPt2Ce7X9doPG8FNnUknx2DFQsyM3kxlYE7hUwtM4=",
+      "source_label": "auto/gettyimages.com",
+      "status": "ready",
+      "image_alt": "Wesley Sneijder en Sudáfrica 2010",
+      "quiz": {
+        "prompt": "¿Quién es el jugador?",
+        "answer_type": "player",
+        "correct_option": "Wesley Sneijder",
+        "options": [
+          "Wesley Sneijder",
+          "Arjen Robben",
+          "Robin van Persie",
+          "Rafael van der Vaart"
+        ],
+        "blur_start_px": 34,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2014-cahill-volley",
+      "year": 2014,
+      "label": "Tim Cahill — volea vs Holanda",
+      "moment_type": "goal",
+      "teams": [
+        "Australia",
+        "Países Bajos"
+      ],
+      "players": [
+        "Tim Cahill"
+      ],
+      "competition": "Octavos",
+      "difficulty": "hard",
+      "search_hint": "Tim Cahill volley Netherlands 2014 World Cup",
+      "local_path": "/images/quiz/historic/2014/wc2014-cahill-volley.jpg",
+      "source_url": "https://e00-especiales-marca.uecdn.es/mundial-rusia-2018/images/estrellas/cahill.jpg",
+      "source_label": "auto/especiales.marca.com",
+      "status": "ready",
+      "image_alt": "Tim Cahill remata de volea en 2014",
+      "quiz": {
+        "prompt": "¿Quién marcó esta volea?",
+        "answer_type": "player",
+        "correct_option": "Tim Cahill",
+        "options": [
+          "Tim Cahill",
+          "Mile Jedinak",
+          "Mark Bresciano",
+          "Harry Kewell"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2014-gotze-goal",
+      "year": 2014,
+      "label": "Mario Götze — gol decisivo final 2014",
+      "moment_type": "goal",
+      "teams": [
+        "Alemania",
+        "Argentina"
+      ],
+      "players": [
+        "Mario Götze"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Mario Gotze goal 2014 World Cup final extra time",
+      "local_path": "/images/quiz/historic/2014/wc2014-gotze-goal.jpg",
+      "source_url": "https://www.nydailynews.com/wp-content/uploads/migration/2014/07/14/KAJCIZTNRYIL7MQJWSLSS2FRQY.jpg",
+      "source_label": "auto/nydailynews.com",
+      "status": "ready",
+      "image_alt": "Mario Götze marca en la final de 2014",
+      "quiz": {
+        "prompt": "¿Quién marcó el gol de la final?",
+        "answer_type": "player",
+        "correct_option": "Mario Götze",
+        "options": [
+          "Mario Götze",
+          "Thomas Müller",
+          "André Schürrle",
+          "Miroslav Klose"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      }
+    },
+    {
       "id": "wc2014-james-volley",
       "year": 2014,
       "label": "James Rodríguez — Brasil 2014",
@@ -333,6 +1201,8 @@
         "James Rodríguez"
       ],
       "competition": "Octavos",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2014/wc2014-james-volley.jpg",
       "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2016/07/01/14673876430215.jpg",
       "source_label": "auto/marca.com",
@@ -353,6 +1223,41 @@
       }
     },
     {
+      "id": "wc2014-schurrle-assist",
+      "year": 2014,
+      "label": "André Schürrle — asistencia final 2014",
+      "moment_type": "action",
+      "teams": [
+        "Alemania",
+        "Argentina"
+      ],
+      "players": [
+        "André Schürrle",
+        "Mario Götze"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Andre Schurrle cross Gotze 2014 World Cup final",
+      "local_path": "/images/quiz/historic/2014/wc2014-schurrle-assist.jpg",
+      "source_url": "https://c8.alamy.com/comp/G77ME7/germanys-mario-gotze-right-celebrates-scoring-the-winning-goal-of-G77ME7.jpg",
+      "source_label": "auto/alamy.com",
+      "status": "ready",
+      "image_alt": "André Schürrle en la jugada del gol de la final 2014",
+      "quiz": {
+        "prompt": "¿Quién dio la asistencia del gol?",
+        "answer_type": "player",
+        "correct_option": "André Schürrle",
+        "options": [
+          "André Schürrle",
+          "Thomas Müller",
+          "Mesut Özil",
+          "Toni Kroos"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc2018-mbappe-final",
       "year": 2018,
       "label": "Mbappé — final Rusia 2018",
@@ -365,6 +1270,8 @@
         "Kylian Mbappé"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2018/wc2018-mbappe-final.jpg",
       "source_url": "https://imgresizer.eurosport.com/unsafe/1200x0/filters:format(jpeg):focal(1196x415:1198x413)/origin-imgresizer.eurosport.com/2018/07/15/2373643-49371630-2560-1440.jpg",
       "source_label": "auto/eurosport.es",
@@ -385,6 +1292,175 @@
       }
     },
     {
+      "id": "wc2018-pavard-volley",
+      "year": 2018,
+      "label": "Benjamin Pavard — volea vs Argentina",
+      "moment_type": "goal",
+      "teams": [
+        "Francia",
+        "Argentina"
+      ],
+      "players": [
+        "Benjamin Pavard"
+      ],
+      "competition": "Octavos",
+      "difficulty": "hard",
+      "search_hint": "Benjamin Pavard volley Argentina 2018 World Cup",
+      "local_path": "/images/quiz/historic/2018/wc2018-pavard-volley.jpg",
+      "source_url": "https://static0.givemesportimages.com/wordpress/wp-content/uploads/2022/11/pavard.jpg",
+      "source_label": "auto/givemesport.com",
+      "status": "ready",
+      "image_alt": "Benjamin Pavard ante Argentina en 2018",
+      "quiz": {
+        "prompt": "¿Quién marcó este gol?",
+        "answer_type": "player",
+        "correct_option": "Benjamin Pavard",
+        "options": [
+          "Benjamin Pavard",
+          "Kylian Mbappé",
+          "Antoine Griezmann",
+          "Olivier Giroud"
+        ],
+        "blur_start_px": 34,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2018-perisic-final",
+      "year": 2018,
+      "label": "Ivan Perisic — final 2018",
+      "moment_type": "goal",
+      "teams": [
+        "Croacia",
+        "Francia"
+      ],
+      "players": [
+        "Ivan Perisic"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Ivan Perisic goal 2018 World Cup final France",
+      "local_path": "/images/quiz/historic/2018/wc2018-perisic-final.jpg",
+      "source_url": "https://imgk.timesnownews.com/story/1531672115-AP_18196567122478.jpg",
+      "source_label": "auto/timesnownews.com",
+      "status": "ready",
+      "image_alt": "Ivan Perisic en la final de 2018",
+      "quiz": {
+        "prompt": "¿Quién marcó para Croacia?",
+        "answer_type": "player",
+        "correct_option": "Ivan Perisic",
+        "options": [
+          "Ivan Perisic",
+          "Mario Mandžukić",
+          "Luka Modrić",
+          "Ante Rebić"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2022-dimaria-goal",
+      "year": 2022,
+      "label": "Ángel Di María — gol final 2022",
+      "moment_type": "goal",
+      "teams": [
+        "Argentina",
+        "Francia"
+      ],
+      "players": [
+        "Ángel Di María"
+      ],
+      "competition": "Final",
+      "difficulty": "medium",
+      "search_hint": "Angel Di Maria goal 2022 World Cup final France",
+      "local_path": "/images/quiz/historic/2022/wc2022-dimaria-goal.jpg",
+      "source_url": "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2022/12/20/16715498926513.jpg",
+      "source_label": "auto/marca.com",
+      "status": "ready",
+      "image_alt": "Ángel Di María en la final de Qatar 2022",
+      "quiz": {
+        "prompt": "¿Quién marcó este gol?",
+        "answer_type": "player",
+        "correct_option": "Ángel Di María",
+        "options": [
+          "Ángel Di María",
+          "Lionel Messi",
+          "Julián Álvarez",
+          "Enzo Fernández"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      }
+    },
+    {
+      "id": "wc2022-enzo-fernandez",
+      "year": 2022,
+      "label": "Enzo Fernández — Argentina 2022",
+      "moment_type": "action",
+      "teams": [
+        "Argentina"
+      ],
+      "players": [
+        "Enzo Fernández"
+      ],
+      "competition": "Fase de grupos",
+      "difficulty": "hard",
+      "search_hint": "Enzo Fernandez Argentina 2022 World Cup action",
+      "local_path": "/images/quiz/historic/2022/wc2022-enzo-fernandez.jpg",
+      "source_url": "https://assets.goal.com/images/v3/blt63cebce29f2061de/Enzo_Fernandez(1).jpg?auto=webp&format=pjpg&width=3840&quality=60",
+      "source_label": "auto/goal.com",
+      "status": "ready",
+      "image_alt": "Enzo Fernández en el Mundial 2022",
+      "quiz": {
+        "prompt": "¿Quién es el jugador?",
+        "answer_type": "player",
+        "correct_option": "Enzo Fernández",
+        "options": [
+          "Enzo Fernández",
+          "Alexis Mac Allister",
+          "Rodrigo De Paul",
+          "Leandro Paredes"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2022-martinez-save",
+      "year": 2022,
+      "label": "Emiliano Martínez — parada final 2022",
+      "moment_type": "save",
+      "teams": [
+        "Argentina",
+        "Francia"
+      ],
+      "players": [
+        "Emiliano Martínez"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Emiliano Martinez save Kolo Muani 2022 World Cup final",
+      "local_path": "/images/quiz/historic/2022/wc2022-martinez-save.jpg",
+      "source_url": "https://static0.givemesportimages.com/wordpress/wp-content/uploads/2022/12/GettyImages-1450134354.jpg",
+      "source_label": "auto/givemesport.com",
+      "status": "ready",
+      "image_alt": "Emiliano Martínez para en la final de 2022",
+      "quiz": {
+        "prompt": "¿Quién es el portero?",
+        "answer_type": "player",
+        "correct_option": "Emiliano Martínez",
+        "options": [
+          "Emiliano Martínez",
+          "Hugo Lloris",
+          "Thibaut Courtois",
+          "Alisson Becker"
+        ],
+        "blur_start_px": 36,
+        "reveal_seconds": 6
+      }
+    },
+    {
       "id": "wc2022-messi-cup",
       "year": 2022,
       "label": "Messi con la copa — Qatar 2022",
@@ -396,6 +1472,8 @@
         "Lionel Messi"
       ],
       "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
       "local_path": "/images/quiz/historic/2022/wc2022-messi-cup.jpg",
       "source_url": "https://cloudfront-us-east-2.images.arcpublishing.com/reuters/TVO76CDW5VOCXOIYBW67B76BVY.jpg",
       "source_label": "auto/reuters.com",

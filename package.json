@@ -21,6 +21,7 @@
     "test:pwa": "tsx --test lib/pwa/standalone.test.ts lib/pwa/onboarding-access-codes.test.ts lib/pwa/onboarding-phones.test.ts lib/pwa/app-update.test.ts lib/avatars/presets.test.ts lib/text/normalize-alias.test.ts lib/auth/onboarding-device.test.ts",
     "quiz:generate-day": "tsx --env-file=.env.local scripts/generate-quiz-day.ts",
     "quiz:validate-moments": "tsx scripts/validate-world-cup-moments.ts",
+    "quiz:seed-hard-moments": "tsx scripts/seed-hard-world-cup-moments.ts",
     "quiz:discover-moment-images": "tsx scripts/discover-world-cup-moment-images.ts",
     "quiz:import-moment-image": "tsx scripts/import-world-cup-moment-image.ts",
     "db:purge-demo": "tsx --env-file=.env.local scripts/purge-demo-data.ts",
