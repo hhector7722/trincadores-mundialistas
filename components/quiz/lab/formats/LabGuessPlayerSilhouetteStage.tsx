@@ -22,15 +22,20 @@ export function LabGuessPlayerSilhouetteStage({
   loading = false,
 }: LabGuessPlayerSilhouetteStageProps) {
   const hasImage = Boolean(question.imageUrl?.trim());
-  const displaySrc =
-    revealed && question.revealImageUrl ? question.revealImageUrl : question.imageUrl;
-  const isSilhouetteAsset = isSilhouetteAssetUrl(question.imageUrl);
-  const waitingForSilhouette = isSilhouetteAsset && (!revealed || !question.revealImageUrl);
-  const { assetLoading, assetError, onAssetLoad, onAssetError } = useLabAssetImageLoading(
-    question.imageUrl,
-    hasImage && !loading && waitingForSilhouette
-  );
-  const showAssetPlaceholder = hasImage && !loading && assetLoading && waitingForSilhouette;
+  const waitingForSilhouette =
+    isSilhouetteAssetUrl(question.imageUrl) && (!revealed || !question.revealImageUrl);
+  const { assetLoading, assetError, assetTimedOut, onAssetLoad, onAssetError } =
+    useLabAssetImageLoading(question.imageUrl, hasImage && !loading && waitingForSilhouette);
+
+  const showRevealPhoto = revealed && Boolean(question.revealImageUrl?.trim());
+  const useFallbackPhoto =
+    !showRevealPhoto && assetError && Boolean(question.revealImageUrl?.trim());
+  const activeSrc = showRevealPhoto
+    ? question.revealImageUrl!
+    : useFallbackPhoto
+      ? question.revealImageUrl!
+      : question.imageUrl;
+  const showLoadingOverlay = hasImage && !loading && assetLoading && waitingForSilhouette;
 
   return (
     <div className="overflow-hidden border-b border-[var(--lab-border)]">
@@ -43,27 +48,37 @@ export function LabGuessPlayerSilhouetteStage({
         ) : null}
       </div>
       <div className="relative aspect-[4/3] w-full bg-white">
-        {hasImage && !loading && !showAssetPlaceholder ? (
+        {hasImage && !loading ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={displaySrc}
+              src={activeSrc}
               alt=""
               onLoad={onAssetLoad}
               onError={onAssetError}
               className={cn(
                 "h-full w-full object-contain object-center transition-opacity duration-500",
-                assetLoading && waitingForSilhouette && "opacity-0",
-                revealed && !assetLoading && "opacity-95"
+                showLoadingOverlay && "opacity-0",
+                useFallbackPhoto && "opacity-80",
+                revealed && !useFallbackPhoto && !showLoadingOverlay && "opacity-95"
               )}
             />
-            {!revealed && !assetLoading ? (
+            {useFallbackPhoto ? (
+              <div className="absolute inset-x-0 top-2 text-center">
+                <span className="rounded-md bg-amber-700/85 px-2 py-0.5 text-[10px] text-white">
+                  {assetTimedOut
+                    ? "La IA tardó demasiado — foto original de respaldo"
+                    : "Silueta no disponible — foto original"}
+                </span>
+              </div>
+            ) : null}
+            {!revealed && !showLoadingOverlay && !useFallbackPhoto ? (
               <div className="absolute inset-x-0 top-3 text-center">
                 <span className="rounded-lg bg-black/70 px-3 py-1 font-display text-xs uppercase tracking-widest text-white">
                   {question.prompt}
                 </span>
               </div>
-            ) : revealed && question.revealImageUrl && !assetLoading ? (
+            ) : showRevealPhoto && !showLoadingOverlay ? (
               <div className="absolute inset-x-0 top-2 text-center">
                 <span className="rounded-md bg-black/55 px-2 py-0.5 text-[10px] text-white">
                   Foto completa
@@ -71,22 +86,27 @@ export function LabGuessPlayerSilhouetteStage({
               </div>
             ) : null}
           </>
-        ) : (
+        ) : loading || !hasImage ? (
           <LabGenerationPlaceholder
-            loading={loading || showAssetPlaceholder}
-            label={
-              loading
-                ? "Generando pregunta…"
-                : assetError
-                  ? "No se pudo generar la silueta. Pulsa «Generar» de nuevo."
-                  : "Generando silueta con IA… puede tardar hasta 1 minuto"
-            }
+            loading={loading}
+            label="Pulsa «Generar» — la silueta puede tardar un minuto"
           />
-        )}
-        {revealed && revealedPlayerName && !assetLoading ? (
+        ) : null}
+
+        {showLoadingOverlay ? (
+          <div className="absolute inset-0 z-10 bg-[var(--lab-bg-elevated)]">
+            <LabGenerationPlaceholder
+              loading
+              label="Generando silueta con IA… puede tardar hasta 1 minuto"
+              className="h-full"
+            />
+          </div>
+        ) : null}
+
+        {revealed && revealedPlayerName && !showLoadingOverlay ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-4 pt-12">
             <p className="text-center text-[10px] uppercase tracking-[0.25em] text-[var(--lab-accent)]">
-              {revealed && question.revealImageUrl ? "Así es" : "La silueta es"}
+              {showRevealPhoto ? "Así es" : "La silueta es"}
             </p>
             <p className="text-center font-display text-2xl uppercase tracking-wide text-white">
               {revealedPlayerName}

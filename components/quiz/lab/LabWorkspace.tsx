@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Play, Plus, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, Play, Plus, RotateCcw, SkipForward, Sparkles, Trash2 } from "lucide-react";
 import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
 import { LabShell } from "@/components/quiz/lab/LabShell";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
@@ -170,6 +170,19 @@ export function LabWorkspace() {
     setShowFeedback(false);
   }
 
+  function advancePlayQuestion() {
+    if (playIndex + 1 >= draft.questions.length) {
+      setMode("edit");
+      setPlayIndex(0);
+      setSelectedOptionId(null);
+      setShowFeedback(false);
+      return;
+    }
+    setPlayIndex((index) => index + 1);
+    setSelectedOptionId(null);
+    setShowFeedback(false);
+  }
+
   const headerActions = (
     <>
       <button
@@ -220,26 +233,27 @@ export function LabWorkspace() {
               loading={generatingIds.has(playQuestion.id)}
             />
           </div>
-          {showFeedback ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (playIndex + 1 >= draft.questions.length) {
-                  setMode("edit");
-                  setPlayIndex(0);
-                  setSelectedOptionId(null);
-                  setShowFeedback(false);
-                  return;
-                }
-                setPlayIndex((i) => i + 1);
-                setSelectedOptionId(null);
-                setShowFeedback(false);
-              }}
-              className="tm-lab-btn tm-lab-btn-primary mt-4 w-full shrink-0"
-            >
-              {playIndex + 1 >= draft.questions.length ? "Volver al editor" : "Siguiente"}
-            </button>
-          ) : null}
+          <div className="mt-4 flex shrink-0 gap-2">
+            {!showFeedback ? (
+              <button
+                type="button"
+                onClick={advancePlayQuestion}
+                className="tm-lab-btn tm-lab-btn-ghost inline-flex min-h-12 flex-1 items-center justify-center gap-1.5"
+              >
+                <SkipForward className="h-4 w-4" />
+                Saltar
+              </button>
+            ) : null}
+            {showFeedback ? (
+              <button
+                type="button"
+                onClick={advancePlayQuestion}
+                className="tm-lab-btn tm-lab-btn-primary min-h-12 flex-1"
+              >
+                {playIndex + 1 >= draft.questions.length ? "Volver al editor" : "Siguiente"}
+              </button>
+            ) : null}
+          </div>
         </div>
       </LabShell>
     );

@@ -57,53 +57,59 @@ export function LabGuessPlayerCropStage({
         ) : null}
       </div>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
-        {hasImage && !loading && !showAssetPlaceholder ? (
-          showFullImage ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={fullRevealSrc}
-              alt=""
-              className="h-full w-full object-contain object-center transition-opacity duration-500"
-            />
-          ) : useDerivedAsset ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={imageUrl}
-              alt=""
-              onLoad={onAssetLoad}
-              onError={onAssetError}
-              className={cn(
-                "h-full w-full object-contain object-center transition-opacity duration-300",
-                assetLoading && "opacity-0"
-              )}
-            />
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={{ clipPath: cropClipPath(focus) }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+        {hasImage && !loading ? (
+          <>
+            {showFullImage ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={fullRevealSrc}
+                alt=""
+                className="h-full w-full object-contain object-center transition-opacity duration-500"
+              />
+            ) : useDerivedAsset ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={imageUrl}
                 alt=""
-                className="h-full w-full object-cover"
-                style={{
-                  transform: `scale(${focus.scale})`,
-                  transformOrigin: `${focus.originX} ${focus.originY}`,
-                }}
+                onLoad={onAssetLoad}
+                onError={onAssetError}
+                className={cn(
+                  "h-full w-full object-contain object-center transition-opacity duration-300",
+                  assetLoading && "opacity-0"
+                )}
               />
-            </div>
-          )
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{ clipPath: cropClipPath(focus) }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{
+                    transform: `scale(${focus.scale})`,
+                    transformOrigin: `${focus.originX} ${focus.originY}`,
+                  }}
+                />
+              </div>
+            )}
+
+            {showAssetPlaceholder ? (
+              <div className="absolute inset-0 z-10 bg-[var(--lab-bg-elevated)]">
+                <LabGenerationPlaceholder
+                  loading
+                  label={`Creando recorte de ${cropLabel === "PEINADO" ? "peinado" : "ojos"}…`}
+                  className="h-full"
+                />
+              </div>
+            ) : null}
+          </>
         ) : (
           <LabGenerationPlaceholder
-            loading={loading || showAssetPlaceholder}
-            label={
-              loading
-                ? "Generando pregunta…"
-                : showAssetPlaceholder
-                  ? `Creando recorte de ${cropLabel === "PEINADO" ? "peinado" : "ojos"}…`
-                  : "Pulsa «Generar» para crear el recorte"
-            }
+            loading={loading}
+            label="Pulsa «Generar» para crear el recorte"
           />
         )}
         {hasImage && !loading && !showFullImage && !useDerivedAsset && cropLabel === "PEINADO" ? (
