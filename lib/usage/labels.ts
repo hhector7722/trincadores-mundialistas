@@ -22,6 +22,8 @@ const STATIC_ROUTE_LABELS: Record<string, string> = {
 const ACTION_LABELS: Record<string, string> = {
   tab_switch: "Cambio de pestaña",
   page_dwell: "Tiempo en pantalla",
+  modal_open: "Modal abierto",
+  modal_dwell: "Tiempo en modal",
   prediction_saved: "Pronostico guardado",
   quiz_started: "Quiz iniciado",
   quiz_submitted: "Quiz enviado",
@@ -42,6 +44,9 @@ export function deriveUsageLabel(
     }
     if (metadata.action === "tab_switch" && metadata.tabLabel) {
       return `${base}: ${metadata.tabLabel}`;
+    }
+    if (metadata.action === "modal_open" && metadata.modalLabel) {
+      return String(metadata.modalLabel);
     }
     return base;
   }

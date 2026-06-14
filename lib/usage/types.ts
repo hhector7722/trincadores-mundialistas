@@ -3,6 +3,8 @@ export type AppUsageEventType = "login" | "session" | "page_view" | "action";
 export type AppUsageActionKind =
   | "tab_switch"
   | "page_dwell"
+  | "modal_open"
+  | "modal_dwell"
   | "prediction_saved"
   | "quiz_started"
   | "quiz_submitted";
@@ -16,6 +18,8 @@ export type AppUsageMetadata = {
   homeGoals?: number;
   awayGoals?: number;
   score?: number;
+  modalId?: string;
+  modalLabel?: string;
   source?: "client" | "middleware" | "server";
   [key: string]: string | number | boolean | null | undefined;
 };

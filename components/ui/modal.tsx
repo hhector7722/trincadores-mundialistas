@@ -2,8 +2,10 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { ChevronLeft, X } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/spinner";
+import { trackUsageModalDwell, trackUsageModalOpen } from "@/lib/usage/client";
 import { cn } from "@/lib/utils";
 
 export type ModalPanelSlide = {
@@ -54,6 +56,10 @@ type ModalProps = {
   stackElevated?: boolean;
   /** Oculta el botón X de la cabecera (p. ej. cierre solo por backdrop). */
   hideCloseButton?: boolean;
+  /** Id estable para analytics de uso. */
+  usageId?: string;
+  /** Etiqueta legible para analytics (si title no es string). */
+  usageLabel?: string;
 };
 
 function lockPageScroll() {
@@ -298,13 +304,69 @@ export function Modal({
   opaque = false,
   stackElevated = false,
   hideCloseButton = false,
+  usageId,
+  usageLabel,
 }: ModalProps) {
   const titleId = useId();
+  const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const swipeHandledRef = useRef(false);
   const hasSwipe = Boolean(onSwipeLeft || onSwipeRight);
+  const openedAtRef = useRef<number | null>(null);
+  const trackedLabelRef = useRef<string | null>(null);
+
+  const resolvedUsageLabel =
+    usageLabel ??
+    (typeof title === "string" ? title : ariaLabel) ??
+    usageId ??
+    "Modal";
+  const resolvedUsageId =
+    usageId ??
+    resolvedUsageLabel
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  useEffect(() => {
+    if (!open) {
+      if (openedAtRef.current != null && trackedLabelRef.current) {
+        trackUsageModalDwell(
+          resolvedUsageId,
+          trackedLabelRef.current,
+          pathname,
+          Date.now() - openedAtRef.current
+        );
+      }
+      openedAtRef.current = null;
+      trackedLabelRef.current = null;
+      return;
+    }
+
+    const now = Date.now();
+    if (
+      openedAtRef.current != null &&
+      trackedLabelRef.current &&
+      trackedLabelRef.current !== resolvedUsageLabel
+    ) {
+      trackUsageModalDwell(
+        resolvedUsageId,
+        trackedLabelRef.current,
+        pathname,
+        now - openedAtRef.current
+      );
+      trackUsageModalOpen(resolvedUsageId, resolvedUsageLabel, pathname);
+      openedAtRef.current = now;
+    } else if (openedAtRef.current == null) {
+      trackUsageModalOpen(resolvedUsageId, resolvedUsageLabel, pathname);
+      openedAtRef.current = now;
+    }
+
+    trackedLabelRef.current = resolvedUsageLabel;
+  }, [open, pathname, resolvedUsageId, resolvedUsageLabel]);
 
   useEffect(() => {
     if (!open) return;

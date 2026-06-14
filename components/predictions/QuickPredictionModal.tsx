@@ -43,6 +43,7 @@ import {
 } from "@/lib/lineup/lineups-modal-copy";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { resolveMatchGoalScorers } from "@/lib/live/goal-scorers";
+import { entityModalUsageLabel, matchFixtureLabel } from "@/lib/usage/modal-labels";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
@@ -192,6 +193,12 @@ function quickPanelTitle(
     possibleLineupsConfirmed:
       view.kind === "possible-lineups" ? options?.possibleLineupsConfirmed : undefined,
   });
+}
+
+function quickUsageLabel(view: QuickPanelView, match: MatchWithPrediction): string {
+  const fixture = matchFixtureLabel(match.home_team, match.away_team);
+  if (view.kind === "prediction") return `Pronostico: ${fixture}`;
+  return entityModalUsageLabel(view);
 }
 
 export function QuickPredictionModal({
@@ -900,6 +907,8 @@ export function QuickPredictionModal({
     <Modal
       open={open}
       onClose={onClose}
+      usageId={`quick-prediction-${panelView.kind}`}
+      usageLabel={quickUsageLabel(panelView, viewMatch)}
       title={quickPanelTitle(panelView, {
         lineupFormation,
         possibleLineupsTitle:

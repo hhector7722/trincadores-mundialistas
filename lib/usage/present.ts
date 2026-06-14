@@ -56,6 +56,15 @@ export function formatUsageActivityTitle(
       const tabLabel = typeof meta.tabLabel === "string" ? meta.tabLabel : place;
       return `Pestaña ${tabLabel}`;
     }
+    if (action === "modal_open") {
+      const modalLabel = typeof meta.modalLabel === "string" ? meta.modalLabel : place;
+      return `Abrio ${modalLabel}`;
+    }
+    if (action === "modal_dwell") {
+      const modalLabel = typeof meta.modalLabel === "string" ? meta.modalLabel : place;
+      const duration = formatDurationMs(row.duration_ms);
+      return duration.trim() ? `${duration} en ${modalLabel}` : `Tiempo en ${modalLabel}`;
+    }
     if (action === "prediction_saved") return place;
     if (action === "quiz_started") return "Empezo un quiz";
     if (action === "quiz_submitted") return place;

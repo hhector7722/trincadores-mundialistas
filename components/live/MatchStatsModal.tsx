@@ -64,6 +64,8 @@ export function MatchStatsModal({
     <Modal
       open={open}
       onClose={onClose}
+      usageId="match-stats"
+      usageLabel={`Estadisticas: ${title}`}
       title={title}
       stackElevated
       opaque

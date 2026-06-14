@@ -65,3 +65,41 @@ export function trackUsageClientPageView(
     metadata: { source: "client" },
   });
 }
+
+export function trackUsageModalOpen(
+  modalId: string,
+  label: string,
+  pagePath: string
+): void {
+  void sendUsageEvent({
+    eventType: "action",
+    path: pagePath,
+    label,
+    metadata: {
+      action: "modal_open",
+      modalId,
+      modalLabel: label,
+    },
+  });
+}
+
+export function trackUsageModalDwell(
+  modalId: string,
+  label: string,
+  pagePath: string,
+  durationMs: number
+): void {
+  if (durationMs < 500) return;
+
+  void sendUsageEvent({
+    eventType: "action",
+    path: pagePath,
+    label,
+    durationMs,
+    metadata: {
+      action: "modal_dwell",
+      modalId,
+      modalLabel: label,
+    },
+  });
+}

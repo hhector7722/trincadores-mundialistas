@@ -11,6 +11,7 @@ import {
   type MvpModalFormations,
 } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
+import { entityModalUsageLabel } from "@/lib/usage/modal-labels";
 import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
@@ -248,6 +249,8 @@ export function EntityModalController({
     <Modal
       open={open}
       onClose={onClose}
+      usageId={`entity-modal-${current.kind}`}
+      usageLabel={entityModalUsageLabel(current)}
       title={entityModalTitleContent(current, {
         mvpFormations,
         lineupFormation: isLineupView ? lineupFormation : undefined,
