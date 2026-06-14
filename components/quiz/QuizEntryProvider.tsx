@@ -156,6 +156,7 @@ export function QuizEntryProvider({
         open={alreadyPlayedOpen}
         onClose={() => setAlreadyPlayedOpen(false)}
         message={ALREADY_PLAYED_MESSAGE}
+        hideCloseButton
       />
 
       <QuizWaitModal

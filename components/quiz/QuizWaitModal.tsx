@@ -7,9 +7,15 @@ type QuizWaitModalProps = {
   open: boolean;
   onClose: () => void;
   message: string;
+  hideCloseButton?: boolean;
 };
 
-export function QuizWaitModal({ open, onClose, message }: QuizWaitModalProps) {
+export function QuizWaitModal({
+  open,
+  onClose,
+  message,
+  hideCloseButton = false,
+}: QuizWaitModalProps) {
   return (
     <Modal
       open={open}
@@ -18,6 +24,7 @@ export function QuizWaitModal({ open, onClose, message }: QuizWaitModalProps) {
       hideTitle
       headerCompact
       hideHeaderDivider
+      hideCloseButton={hideCloseButton}
       ariaLabel={message}
       wrapperClassName="w-full max-w-[min(100vw-1rem,28rem)]"
     >
