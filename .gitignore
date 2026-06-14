@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/siluetas/
 
 # debug
 npm-debug.log*

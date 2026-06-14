@@ -82,6 +82,38 @@ npm run quiz:validate-moments
 - `materialize-lab-assets` genera JPG en `public/images/quiz/lab/generated/` (siluetas con OpenAI si hay `OPENAI_API_KEY`)
 - Commitea los JPG generados antes de desplegar
 
+### Siluetas (flujo recomendado)
+
+La pregunta usa la **silueta** (`imageUrl`); al responder se muestra la **foto original** (`revealImageUrl`).
+
+**Opción A — automático (API OpenAI, mismo prompt que ChatGPT):**
+
+```bash
+npm run quiz:materialize-lab-assets -- --variant=silhouette --force --moment-id=wc1998-zidane-final
+```
+
+**Opción B — manual en ChatGPT (como en la captura), desde terminal:**
+
+```bash
+# Un momento (abre foto, copia prompt, abre ChatGPT, importa al pulsar Enter)
+npm run quiz:chatgpt-silhouette -- --id=wc1998-zidane-final
+
+# Los 25 en lote interactivo
+npm run quiz:chatgpt-silhouette -- --all
+```
+
+Guarda cada descarga en `siluetas/{id}-silhouette.jpg`. Si ya tienes la carpeta llena:
+
+```bash
+npm run quiz:import-lab-silhouettes -- --from-dir=./siluetas
+```
+
+Solo el prompt:
+
+```bash
+npm run quiz:import-lab-silhouette -- --id=wc1998-zidane-final --print-prompt
+```
+
 ## Formato `quiz` por momento
 
 Cada entrada incluye `prompt`, `correct_option`, 4 `options`, `blur_start_px` y `reveal_seconds` para el formato `guess_image` del laboratorio.

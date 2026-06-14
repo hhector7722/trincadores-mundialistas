@@ -13,6 +13,12 @@ function readArg(prefix: string): string | null {
 
 const force = process.argv.includes("--force");
 const momentIdFilter = readArg("--moment-id");
+const variantFilter = readArg("--variant") as LabDeriveVariant | null;
+
+const ACTIVE_VARIANTS =
+  variantFilter && VARIANTS.includes(variantFilter) ? [variantFilter] : VARIANTS;
+
+const SILHOUETTE_PAUSE_MS = 3_000;
 
 async function main() {
   let moments = listPlayerMomentsForLab();
@@ -24,12 +30,17 @@ async function main() {
     }
   }
 
+  if (variantFilter && !VARIANTS.includes(variantFilter)) {
+    console.error(`Variante inválida: ${variantFilter}. Usa hair, eyes o silhouette.`);
+    process.exit(1);
+  }
+
   const results: Array<{ momentId: string; variant: string; status: string; url?: string }> =
     [];
   const failures: Array<{ momentId: string; variant: string; error: string }> = [];
 
   for (const moment of moments) {
-    for (const variant of VARIANTS) {
+    for (const variant of ACTIVE_VARIANTS) {
       const suitability = moment.lab_suitability;
       if (suitability?.length) {
         if (variant === "hair" || variant === "eyes") {
@@ -64,6 +75,9 @@ async function main() {
         console.log(
           `${result.skipped ? "SKIP" : "OK"} ${moment.id} ${variant} → ${result.publicUrl}`
         );
+        if (variant === "silhouette" && !result.skipped) {
+          await new Promise((resolve) => setTimeout(resolve, SILHOUETTE_PAUSE_MS));
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         failures.push({ momentId: moment.id, variant, error: message });

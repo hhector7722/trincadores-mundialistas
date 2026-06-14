@@ -83,23 +83,22 @@ async function renderSilhouetteBuffer(
   moment?: WorldCupMoment,
   forceOpenAi = false
 ): Promise<Buffer> {
-  if (forceOpenAi && moment && isOpenAiSilhouetteEnabled()) {
+  if (moment && isOpenAiSilhouetteEnabled()) {
     try {
-      const generated = await Promise.race([
-        generateSilhouetteWithOpenAi(sourceAbsolutePath, moment),
-        new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error("OpenAI silhouette timeout")), 55_000);
-        }),
-      ]);
-      return generated;
+      return await generateSilhouetteWithOpenAi(sourceAbsolutePath, moment);
     } catch (error) {
+      if (forceOpenAi) {
+        throw error;
+      }
       console.warn("[derive-images] Silueta OpenAI no disponible, usando fallback.", error);
       return renderSilhouetteFallback(sourceAbsolutePath, momentId);
     }
   }
 
-  if (moment && !isOpenAiSilhouetteEnabled()) {
-    return renderSilhouetteFallback(sourceAbsolutePath, momentId);
+  if (forceOpenAi) {
+    throw new Error(
+      "OPENAI_API_KEY no configurada. Usa quiz:import-lab-silhouette o configura la API para materializar siluetas reales."
+    );
   }
 
   return renderSilhouetteFallback(sourceAbsolutePath, momentId);
