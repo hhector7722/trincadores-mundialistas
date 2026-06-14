@@ -33,10 +33,7 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 7
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc1970-jairzinho-goal",
@@ -138,10 +135,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc1974-cruyff-penalty",
@@ -465,10 +459,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc1990-caniggia-brazil",
@@ -502,10 +493,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc1990-maradona-tears",
@@ -734,10 +722,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc1998-bergkamp-argentina",
@@ -808,8 +793,7 @@
       },
       "lab_suitability": [
         "hair",
-        "eyes",
-        "silhouette"
+        "eyes"
       ],
       "face_focus": {
         "x": 0.5,
@@ -885,10 +869,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2002-ronaldinho-freekick",
@@ -993,8 +974,7 @@
       },
       "lab_suitability": [
         "hair",
-        "eyes",
-        "silhouette"
+        "eyes"
       ],
       "face_focus": {
         "x": 0.5,
@@ -1032,10 +1012,7 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2006-lehmann-penalties",
@@ -1205,10 +1182,7 @@
         ],
         "blur_start_px": 34,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2014-cahill-volley",
@@ -1242,10 +1216,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2014-gotze-goal",
@@ -1282,8 +1253,7 @@
       },
       "lab_suitability": [
         "hair",
-        "eyes",
-        "silhouette"
+        "eyes"
       ],
       "face_focus": {
         "x": 0.52,
@@ -1360,10 +1330,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2018-mbappe-final",
@@ -1434,8 +1401,7 @@
       },
       "lab_suitability": [
         "hair",
-        "eyes",
-        "silhouette"
+        "eyes"
       ],
       "face_focus": {
         "x": 0.48,
@@ -1474,10 +1440,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2022-dimaria-goal",
@@ -1511,10 +1474,7 @@
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2022-enzo-fernandez",
@@ -1547,10 +1507,7 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2022-martinez-save",
@@ -1584,10 +1541,135 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc1997-roberto-carlos-freekick",
+      "year": 1997,
+      "label": "Roberto Carlos — falta imposible vs Francia",
+      "moment_type": "iconic",
+      "teams": [
+        "Brasil",
+        "Francia"
+      ],
+      "players": [
+        "Roberto Carlos",
+        "Fabien Barthez",
+        "Patrick Vieira"
+      ],
+      "competition": "Tournoi de France",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/1997/wc1997-roberto-carlos-freekick.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Roberto Carlos lanza la falta contra Francia en 1997",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Roberto Carlos",
+        "options": [
+          "Roberto Carlos",
+          "Cafu",
+          "Rivaldo",
+          "Dunga"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.3
+      }
+    },
+    {
+      "id": "wc2014-van-persie-flying-header",
+      "year": 2014,
+      "label": "Van Persie — cabeza voladora vs España",
+      "moment_type": "goal",
+      "teams": [
+        "Países Bajos",
+        "España"
+      ],
+      "players": [
+        "Robin van Persie",
+        "Iker Casillas"
+      ],
+      "competition": "Fase de grupos",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/2014/wc2014-van-persie-flying-header.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Robin van Persie marca de cabeza contra España en Brasil 2014",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Robin van Persie",
+        "options": [
+          "Robin van Persie",
+          "Arjen Robben",
+          "Wesley Sneijder",
+          "Dirk Kuyt"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
       },
       "lab_suitability": [
         "silhouette"
       ]
+    },
+    {
+      "id": "wc2010-spain-xi-silhouette",
+      "year": 2010,
+      "label": "España 2010 — once titular",
+      "moment_type": "iconic",
+      "teams": [
+        "España"
+      ],
+      "players": [
+        "David Silva",
+        "Andrés Iniesta",
+        "Xavi Hernández",
+        "Iker Casillas"
+      ],
+      "competition": "Mundial",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/2010/wc2010-spain-xi-silhouette.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Foto de equipo de España en el Mundial 2010 con un jugador en silueta",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "David Silva",
+        "options": [
+          "David Silva",
+          "Jesús Navas",
+          "Pedro Rodríguez",
+          "Cesc Fàbregas"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.24
+      }
     },
     {
       "id": "wc2022-messi-cup",

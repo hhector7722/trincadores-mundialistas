@@ -56,7 +56,7 @@ export function createSilhouetteFromCatalog(
   const moment = pickSilhouetteSourceMoment({
     seed: opts?.seed ?? Date.now(),
     excludeIds: opts?.excludeMomentIds,
-    minDifficulty: opts?.minDifficulty ?? "medium",
+    minDifficulty: opts?.minDifficulty ?? "easy",
   });
   if (!moment) return null;
   return momentToSilhouetteQuestion(moment, opts?.questionId ?? crypto.randomUUID());
@@ -64,7 +64,7 @@ export function createSilhouetteFromCatalog(
 
 export function reloadSilhouetteFromCatalog(
   question: LabQuestionGuessPlayerSilhouette,
-  minDifficulty: WorldCupMomentDifficulty = "medium"
+  minDifficulty: WorldCupMomentDifficulty = "easy"
 ): LabQuestionGuessPlayerSilhouette | null {
   const exclude = question.momentId ? [question.momentId] : undefined;
   let fresh = createSilhouetteFromCatalog({

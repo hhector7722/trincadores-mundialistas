@@ -43,6 +43,7 @@
     "quiz:import-lab-silhouettes": "tsx --env-file=.env.local scripts/import-lab-silhouettes-batch.ts",
     "quiz:chatgpt-silhouette": "tsx --env-file=.env.local scripts/chatgpt-silhouette-workflow.ts",
     "quiz:list-lab-silhouette-batch": "tsx --env-file=.env.local scripts/list-lab-silhouette-batch.ts",
+    "quiz:seed-easy-silhouette-assets": "tsx scripts/seed-easy-silhouette-assets.ts",
     "lineup:prewarm": "tsx --env-file=.env.local scripts/prewarm-lineups.ts",
     "live:sync": "tsx --env-file=.env.local scripts/sync-live-matches.ts",
     "test:push": "tsx --test lib/push/urls.test.ts lib/notifications/match-highlight-notifications.test.ts",

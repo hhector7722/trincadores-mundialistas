@@ -62,7 +62,7 @@ export async function generateLabQuestion(
   }
 
   if (input.format === "guess_player_silhouette") {
-    const moment = pickSilhouetteSourceMoment(pickerOpts);
+    const moment = pickSilhouetteSourceMoment({ ...pickerOpts, minDifficulty: "easy" });
     if (!moment) return null;
 
     const sourcePath = resolveMomentImageUrl(moment);

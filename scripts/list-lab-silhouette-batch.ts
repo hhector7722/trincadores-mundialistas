@@ -6,9 +6,14 @@
 import { join } from "node:path";
 import { buildSilhouetteImagePrompt } from "@/lib/quiz/lab/openai-silhouette.server";
 import { listPlayerMomentsForLab } from "@/lib/quiz/lab/materialize-assets.server";
+import { SILHOUETTE_LAB_MOMENT_IDS } from "@/lib/quiz/lab/silhouette-lab-pool";
 import { resolveMomentImageUrl } from "@/lib/quiz/world-cup-moments";
+import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
 
-const moments = listPlayerMomentsForLab().sort((a, b) => a.year - b.year || a.id.localeCompare(b.id));
+const catalog = getWorldCupMomentsCatalog();
+const moments = SILHOUETTE_LAB_MOMENT_IDS.map((id) =>
+  catalog.moments.find((moment) => moment.id === id)
+).filter((moment): moment is NonNullable<typeof moment> => Boolean(moment));
 
 console.log(`# Lote siluetas laboratorio (${moments.length} momentos)\n`);
 console.log("## Flujo por imagen\n");

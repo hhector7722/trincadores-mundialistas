@@ -7,6 +7,10 @@ import {
   type WorldCupMomentDifficulty,
 } from "@/lib/quiz/world-cup-moments";
 import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
+import {
+  hasMaterializedSilhouette,
+  SILHOUETTE_LAB_MOMENT_ID_SET,
+} from "@/lib/quiz/lab/silhouette-lab-pool";
 
 export type PickMomentOptions = {
   seed?: number;
@@ -96,10 +100,26 @@ export function pickPlayerMoment(
 }
 
 export function pickSilhouetteSourceMoment(opts?: PickMomentOptions): WorldCupMoment | null {
-  return pickCatalogMoment({
-    ...opts,
-    preferMultiplePlayers: true,
-    answerTypes: ["player"],
-    labSuitability: "silhouette",
-  });
+  const catalog = getWorldCupMomentsCatalog();
+  const seed = opts?.seed ?? Math.floor(Math.random() * 1_000_000);
+  const exclude = new Set(opts?.excludeIds ?? []);
+
+  let ready = filterCatalogReadyMoments(catalog.moments).filter(
+    (moment) =>
+      moment.quiz.answer_type === "player" &&
+      SILHOUETTE_LAB_MOMENT_ID_SET.has(moment.id) &&
+      momentSupportsLabFormat(moment, "silhouette") &&
+      hasMaterializedSilhouette(moment.id)
+  );
+
+  ready = filterMomentsByDifficulty(ready, opts?.minDifficulty ?? "easy");
+
+  if (exclude.size) {
+    ready = ready.filter((moment) => !exclude.has(moment.id));
+  }
+
+  if (!ready.length) return null;
+
+  ready.sort((a, b) => a.id.localeCompare(b.id));
+  return ready[Math.abs(seed) % ready.length] ?? null;
 }
