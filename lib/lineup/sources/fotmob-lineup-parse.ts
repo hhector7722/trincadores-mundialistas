@@ -104,7 +104,7 @@ export function parseFotmobConfirmedTeamLineup(
         { excludeIdentities: usedSquadIdentities }
       );
       if (squadPlayer?.shirt_number) {
-        usedShirtNumbers.add(squadPlayer.shirtNumber);
+        usedShirtNumbers.add(squadPlayer.shirt_number);
         reserveSquadPlayerIdentity(squadPlayer, usedSquadIdentities);
       }
 

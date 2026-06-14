@@ -1,4 +1,4 @@
-import { loadOfficialSquad } from "@/lib/lineup/lineup-queries";
+import { loadOfficialSquadFromClient } from "@/lib/lineup/lineup-queries";
 import { teamNamesMatch } from "@/lib/lineup/sources/api-football-names";
 import {
   fetchFotmobMatchDetails,
@@ -59,7 +59,7 @@ export async function fetchConfirmedLineupFromFotmob(
     teamPayload,
     params.players,
     new Date().toISOString(),
-    await loadOfficialSquad(params.supabase, params.teamName)
+    await loadOfficialSquadFromClient(params.supabase, params.teamName)
   );
 }
 
