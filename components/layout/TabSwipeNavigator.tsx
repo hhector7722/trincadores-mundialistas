@@ -14,6 +14,7 @@ import { TabAdjacentPanel } from "@/components/layout/TabAdjacentPanel";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { getMainTabIndex, isMainTabActive, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
+import { trackUsageTabSwitch } from "@/lib/usage/client";
 import { saveTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
 import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import {
@@ -291,6 +292,11 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       const width = widthRef.current;
       const href = MAIN_TABS[nextIndex]?.href;
       if (!href) return;
+
+      const tab = MAIN_TABS[nextIndex];
+      if (tab && activeIndex != null) {
+        trackUsageTabSwitch(MAIN_TABS[activeIndex]?.href ?? pathname, href, tab.label);
+      }
 
       router.prefetch(href);
 

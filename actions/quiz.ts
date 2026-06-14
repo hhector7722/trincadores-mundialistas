@@ -6,6 +6,7 @@ import { getQuizResult, startQuizSession } from "@/lib/quiz/queries";
 import type { QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
+import { trackUsageAction } from "@/lib/usage/track-action";
 
 export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -70,6 +71,23 @@ export async function startQuiz(
 
   try {
     const session = await startQuizSession(quizId);
+
+    const { data: quizMeta } = await supabase
+      .from("quizzes")
+      .select("quiz_day")
+      .eq("id", quizId)
+      .maybeSingle();
+
+    void trackUsageAction(user.id, {
+      path: "/quiz/play",
+      label: "Quiz iniciado",
+      metadata: {
+        action: "quiz_started",
+        quizId,
+        quizDay: quizMeta?.quiz_day ?? undefined,
+      },
+    });
+
     return { ok: true, data: session };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Error al iniciar el quiz.";
@@ -153,11 +171,23 @@ export async function submitQuiz(
   revalidatePath("/quiz/result");
   revalidatePath("/quiz/leaderboard");
 
+  const scoreValue = typeof score === "number" ? score : result.score;
+
+  void trackUsageAction(user.id, {
+    path: "/quiz/result",
+    label: `Quiz enviado (${scoreValue} pts)`,
+    metadata: {
+      action: "quiz_submitted",
+      quizId: attempt.quiz_id,
+      score: scoreValue,
+    },
+  });
+
   return {
     ok: true,
     data: {
       ...result,
-      score: typeof score === "number" ? score : result.score,
+      score: scoreValue,
     },
   };
 }

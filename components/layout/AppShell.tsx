@@ -15,6 +15,7 @@ import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
+import { UsagePageTracker } from "@/components/usage/UsagePageTracker";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
 export function AppShell({
@@ -54,6 +55,7 @@ export function AppShell({
                 </div>
                 <PullToRefresh />
                 <TabBarWrapper />
+                <UsagePageTracker />
                 <VisualViewportSync />
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />

@@ -42,7 +42,11 @@ async function finishSession(
   }
 
   await setOnboardedDeviceCookie(username);
-  void recordAppUsageEventWithClient(supabase, userId, "login", "/api/auth/phone-login");
+  void recordAppUsageEventWithClient(supabase, userId, {
+    eventType: "login",
+    path: "/api/auth/phone-login",
+    metadata: { source: "server" },
+  });
   return { ok: true, username };
 }
 

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { UsageFilters } from "@/components/usage/UsageFilters";
+import { formatDurationMs } from "@/lib/usage/labels";
+import type { AppUsageEventType } from "@/lib/usage/types";
 import type { UsageDashboardData } from "@/lib/usage/queries";
 
 function formatDateTimeMadrid(iso: string | null): string {
@@ -12,13 +14,15 @@ function formatDateTimeMadrid(iso: string | null): string {
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   }).format(new Date(iso));
 }
 
-function eventLabel(type: "login" | "session" | "page_view"): string {
+function eventTypeLabel(type: AppUsageEventType): string {
   if (type === "login") return "Login";
   if (type === "session") return "Sesion";
+  if (type === "action") return "Accion";
   return "Pagina";
 }
 
@@ -49,8 +53,8 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
           <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.sessionsCount}</p>
         </Card>
         <Card className="p-3">
-          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Logins</p>
-          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.loginsCount}</p>
+          <p className="text-xs uppercase tracking-wide text-[var(--tm-muted)]">Acciones</p>
+          <p className="mt-1 font-display text-2xl text-[var(--tm-fg)]">{data.totals.actionsCount}</p>
         </Card>
       </div>
 
@@ -111,6 +115,9 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
                   <span className="rounded-full border border-[var(--tm-border)] px-2 py-0.5">
                     {user.pageViewCount} paginas
                   </span>
+                  <span className="rounded-full border border-[var(--tm-border)] px-2 py-0.5">
+                    {user.actionCount} acciones
+                  </span>
                 </div>
               </div>
             ))}
@@ -129,16 +136,23 @@ export function UsageDashboard({ data }: { data: UsageDashboardData }) {
         ) : (
           <div className="divide-y divide-[var(--tm-border)]">
             {data.recentEvents.map((event) => (
-              <div key={event.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
+              <div key={event.id} className="flex items-start justify-between gap-3 px-4 py-2.5">
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-[var(--tm-fg)]">{event.displayName}</p>
+                  <p className="truncate text-sm font-medium text-[var(--tm-fg)]">{event.label}</p>
                   <p className="truncate text-xs text-[var(--tm-muted)]">
-                    {eventLabel(event.eventType)}
-                    {event.path ? ` · ${event.path}` : ""}
+                    {event.displayName} · {eventTypeLabel(event.eventType)}
                   </p>
+                  {event.detail.trim() ? (
+                    <p className="truncate text-[11px] text-[var(--tm-muted)]/80">{event.detail}</p>
+                  ) : null}
+                  {event.durationMs != null && event.durationMs > 0 ? (
+                    <p className="text-[11px] text-[var(--tm-primary)]">
+                      {formatDurationMs(event.durationMs)}
+                    </p>
+                  ) : null}
                 </div>
-                <p className="shrink-0 text-xs text-[var(--tm-muted)]">
-                  {formatDateTimeMadrid(event.createdAt)}
+                <p className="shrink-0 text-xs tabular-nums text-[var(--tm-muted)]">
+                  {event.timeLabel}
                 </p>
               </div>
             ))}

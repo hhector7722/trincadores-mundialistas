@@ -16,7 +16,9 @@ import {
   getMainTabIndexForHref,
   getMainTabSectionIndex,
   isMainTabRoot,
+  MAIN_TABS,
 } from "@/lib/layout/main-tabs";
+import { trackUsageTabSwitch } from "@/lib/usage/client";
 
 export type TabNavigatorApi = {
   commitToTab: (targetIndex: number) => void;
@@ -56,6 +58,11 @@ export function TabNavigationProvider({ children }: { children: ReactNode }) {
       if (currentIndex != null && isMainTabRoot(pathname) && navigatorRef.current) {
         navigatorRef.current.commitToTab(targetIndex);
         return;
+      }
+
+      const tab = MAIN_TABS[targetIndex];
+      if (tab) {
+        trackUsageTabSwitch(pathname, href, tab.label);
       }
 
       navigateTab(href);

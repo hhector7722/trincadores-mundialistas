@@ -141,7 +141,7 @@ export async function updateSession(request: NextRequest) {
 
     try {
       const flags = await trackAppUsageInMiddleware(request, supabase, user.id, pathname);
-      applyUsageTrackingCookies(supabaseResponse, pathname, flags);
+      applyUsageTrackingCookies(supabaseResponse, pathname, request.nextUrl.search, flags);
     } catch {
       // No bloquear navegacion si falla el tracking.
     }

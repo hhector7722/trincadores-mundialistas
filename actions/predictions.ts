@@ -10,6 +10,7 @@ import {
 } from "@/lib/predictions/queries";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
 import { createClient } from "@/lib/supabase/server";
+import { trackUsageAction } from "@/lib/usage/track-action";
 
 export type PredictionActionResult =
   | { ok: true; home: number; away: number; updatedAt: string }
@@ -178,6 +179,18 @@ export async function savePrediction(
   revalidatePath("/predictions");
   revalidatePath(`/predictions/${matchId}`);
   revalidatePath("/");
+
+  void trackUsageAction(user.id, {
+    path: `/predictions/${matchId}`,
+    label: `Pronostico: ${validated.home}-${validated.away}`,
+    metadata: {
+      action: "prediction_saved",
+      matchId,
+      homeGoals: validated.home,
+      awayGoals: validated.away,
+    },
+  });
+
   return {
     ok: true,
     home: saved.home_goals,
