@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { fetchRankingEvolutionAction } from "@/actions/ranking";
-import { RankingEvolutionChart } from "@/components/ranking/RankingEvolutionChart";
+import {
+  RANKING_EVOLUTION_MEMBER_SLOTS,
+  RankingEvolutionChart,
+  rankingEvolutionChartHeight,
+} from "@/components/ranking/RankingEvolutionChart";
 import { Modal } from "@/components/ui/modal";
 import { RangeSlider } from "@/components/ui/range-slider";
 import type { RankingEvolutionData } from "@/lib/ranking/evolution";
@@ -15,6 +19,13 @@ type RankingEvolutionModalProps = {
 
 const MODAL_PANEL_CLASS =
   "flex max-h-[min(94dvh,48rem)] w-full max-w-lg flex-col";
+
+/** Altura reservada del slider con bandera (`.tm-flag-range-slider`). */
+const EVOLUTION_SLIDER_RESERVED_HEIGHT = "calc(56px + 0.5rem)";
+
+const LOADING_CHART_HEIGHT_PX = rankingEvolutionChartHeight(
+  RANKING_EVOLUTION_MEMBER_SLOTS
+);
 
 export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutionModalProps) {
   const [data, setData] = useState<RankingEvolutionData | null>(null);
@@ -43,6 +54,12 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
     void loadData();
   }, [open, loadData]);
 
+  const hasMatchdayData = Boolean(data && data.matchdays.length > 0);
+  const showFullLayout = loading || hasMatchdayData;
+  const chartHeightPx = data
+    ? rankingEvolutionChartHeight(data.members.length)
+    : LOADING_CHART_HEIGHT_PX;
+
   return (
     <Modal
       open={open}
@@ -58,26 +75,39 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
           <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
         ) : null}
 
-        <div className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-1">
-          {data && data.matchdays.length > 0 ? (
-            <RankingEvolutionChart data={data} endMatchdayIndex={endMatchdayIndex} />
-          ) : !loading && !error ? (
+        <div
+          className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-1"
+          style={showFullLayout ? { minHeight: chartHeightPx + 12 } : undefined}
+        >
+          {hasMatchdayData ? (
+            <RankingEvolutionChart data={data!} endMatchdayIndex={endMatchdayIndex} />
+          ) : showFullLayout ? (
+            <div
+              className="w-full"
+              style={{ height: chartHeightPx }}
+              aria-hidden="true"
+            />
+          ) : !error ? (
             <div className="flex h-full min-h-[12rem] items-center justify-center px-4 text-center text-sm text-[var(--tm-muted)]">
               Aun no hay jornadas con partidos finalizados.
             </div>
           ) : null}
         </div>
 
-        {data && data.matchdays.length > 0 ? (
-          <div className="shrink-0 px-1">
-            <RangeSlider
-              min={0}
-              max={data.matchdays.length - 1}
-              value={endMatchdayIndex}
-              onChange={setEndMatchdayIndex}
-              thumbImageSrc="/icons/slider.png?v=3"
-              aria-label="Jornada final visible en el grafico"
-            />
+        {showFullLayout ? (
+          <div className="shrink-0 px-1" style={{ minHeight: EVOLUTION_SLIDER_RESERVED_HEIGHT }}>
+            {hasMatchdayData ? (
+              <RangeSlider
+                min={0}
+                max={data!.matchdays.length - 1}
+                value={endMatchdayIndex}
+                onChange={setEndMatchdayIndex}
+                thumbImageSrc="/icons/slider.png?v=3"
+                aria-label="Jornada final visible en el grafico"
+              />
+            ) : (
+              <div className="tm-flag-range-slider" aria-hidden="true" />
+            )}
           </div>
         ) : null}
       </div>

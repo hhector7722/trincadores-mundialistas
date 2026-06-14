@@ -35,6 +35,13 @@ const AVATAR_X = 42;
 const PLOT_START_X = 64;
 const LABEL_OFFSET = 12;
 
+/** Slots de la tabla (pool fijo de participantes). */
+export const RANKING_EVOLUTION_MEMBER_SLOTS = 11;
+
+export function rankingEvolutionChartHeight(memberCount: number): number {
+  return chartHeightForMemberCount(memberCount);
+}
+
 function chartHeightForMemberCount(memberCount: number): number {
   const plotH = memberCount <= 1 ? ROW_GAP_PX : (memberCount - 1) * ROW_GAP_PX;
   return MARGIN_TOP + plotH + MARGIN_BOTTOM;
