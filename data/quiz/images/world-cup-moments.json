@@ -832,10 +832,7 @@
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
-      },
-      "lab_suitability": [
-        "silhouette"
-      ]
+      }
     },
     {
       "id": "wc2002-ahn-italy-goal",
@@ -1541,6 +1538,128 @@
         ],
         "blur_start_px": 36,
         "reveal_seconds": 6
+      }
+    },
+    {
+      "id": "wc2022-dimaria-cup-kiss",
+      "year": 2022,
+      "label": "Di María besa la Copa — Qatar 2022",
+      "moment_type": "iconic",
+      "teams": [
+        "Argentina"
+      ],
+      "players": [
+        "Ángel Di María"
+      ],
+      "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/2022/wc2022-dimaria-cup-kiss.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Ángel Di María besa la Copa del Mundo en Qatar 2022",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Ángel Di María",
+        "options": [
+          "Ángel Di María",
+          "Lionel Messi",
+          "Julián Álvarez",
+          "Enzo Fernández"
+        ],
+        "blur_start_px": 24,
+        "reveal_seconds": 8
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.24
+      }
+    },
+    {
+      "id": "wc1994-stoichkov-greece",
+      "year": 1994,
+      "label": "Stoichkov — Bulgaria vs Grecia",
+      "moment_type": "action",
+      "teams": [
+        "Bulgaria",
+        "Grecia"
+      ],
+      "players": [
+        "Hristo Stoichkov"
+      ],
+      "competition": "Fase de grupos",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/1994/wc1994-stoichkov-greece.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Hristo Stoichkov ante Grecia en USA 94",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Hristo Stoichkov",
+        "options": [
+          "Hristo Stoichkov",
+          "Yordan Lechkov",
+          "Emil Kostadinov",
+          "Trifon Ivanov"
+        ],
+        "blur_start_px": 30,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc2006-zidane-trophy-walk",
+      "year": 2006,
+      "label": "Zidane pasa junto a la Copa — Berlín 2006",
+      "moment_type": "iconic",
+      "teams": [
+        "Francia",
+        "Italia"
+      ],
+      "players": [
+        "Zinedine Zidane"
+      ],
+      "competition": "Final",
+      "difficulty": "easy",
+      "search_hint": null,
+      "local_path": "/images/quiz/historic/2006/wc2006-zidane-trophy-walk.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Zinedine Zidane pasa junto al trofeo en la final de 2006",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Zinedine Zidane",
+        "options": [
+          "Zinedine Zidane",
+          "Thierry Henry",
+          "Lilian Thuram",
+          "David Trezeguet"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 8
+      },
+      "lab_suitability": [
+        "hair",
+        "eyes",
+        "silhouette"
+      ],
+      "face_focus": {
+        "x": 0.5,
+        "y": 0.28
       }
     },
     {

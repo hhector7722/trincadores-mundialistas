@@ -4,7 +4,9 @@ export const SILHOUETTE_LAB_MOMENT_IDS = [
   "wc2014-van-persie-flying-header",
   "wc2010-spain-xi-silhouette",
   "wc2014-james-volley",
-  "wc1998-zidane-final",
+  "wc2022-dimaria-cup-kiss",
+  "wc1994-stoichkov-greece",
+  "wc2006-zidane-trophy-walk",
   "wc1994-baggio-penalty",
   "wc1990-schillaci-celebration",
   "wc1994-bebeto-celebration",
@@ -25,6 +27,9 @@ export const SILHOUETTE_LAB_READY_IDS = [
   "wc2014-van-persie-flying-header",
   "wc2010-spain-xi-silhouette",
   "wc2014-james-volley",
+  "wc2022-dimaria-cup-kiss",
+  "wc1994-stoichkov-greece",
+  "wc2006-zidane-trophy-walk",
 ] as const;
 
 export const SILHOUETTE_LAB_READY_ID_SET = new Set<string>(SILHOUETTE_LAB_READY_IDS);
