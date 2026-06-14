@@ -53,7 +53,6 @@ function MatchPredictionsBoardContent({
         currentProfileId={currentProfileId}
         homeTeam={board.homeTeam}
         awayTeam={board.awayTeam}
-        playerIncidents={board.playerIncidents}
         showOutcomes={board.showOutcomes}
       />
       {board.showOutcomes ? (

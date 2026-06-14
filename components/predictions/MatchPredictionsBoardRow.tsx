@@ -9,7 +9,6 @@ import {
   MatchPredictionsBoardPointsLabel,
 } from "@/components/predictions/MatchPredictionsBoardOutcomeIcons";
 import { matchPredictionsSubgridRow } from "@/components/predictions/match-predictions-grid";
-import type { MatchPlayerIncident } from "@/lib/live/types";
 import type { MatchPredictionsBoardRow as MatchPredictionsBoardRowType } from "@/lib/predictions/queries";
 import { cn } from "@/lib/utils";
 
@@ -30,12 +29,10 @@ export function MatchPredictionsBoardRow({
   row,
   isCurrentUser,
   showOutcomes,
-  playerIncidents,
 }: {
   row: MatchPredictionsBoardRowType;
   isCurrentUser: boolean;
   showOutcomes: boolean;
-  playerIncidents: MatchPlayerIncident[];
 }) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const canPreview = Boolean(row.avatarUrl);
@@ -99,10 +96,7 @@ export function MatchPredictionsBoardRow({
         ) : null}
         <CellValue value={formatGoalCell(row.homeGoals)} />
         <CellValue value={formatGoalCell(row.awayGoals)} />
-        <MatchPredictionsBoardMvpLabel
-          playerName={row.mvpPlayerName}
-          playerIncidents={playerIncidents}
-        />
+        <MatchPredictionsBoardMvpLabel playerName={row.mvpPlayerName} />
       </div>
       {canPreview ? (
         <AvatarPreviewModal
