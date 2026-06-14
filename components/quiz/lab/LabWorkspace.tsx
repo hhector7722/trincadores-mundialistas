@@ -1,20 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Play, Plus, RotateCcw, Save, Shuffle, Trash2 } from "lucide-react";
-import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Play,
+  Plus,
+  RotateCcw,
+  Save,
+  Sparkles,
+  Trash2,
+} from "lucide-react";import { LabQuestionPreview } from "@/components/quiz/lab/formats/LabQuestionPreview";
 import { LabShell } from "@/components/quiz/lab/LabShell";
 import { FORMATION_IDS } from "@/lib/lineup/formation-coordinates";
 import { resolveClubCrestUrl } from "@/lib/quiz/lab/club-crests";
 import { LAB_DEMO_VIDEO_SRC } from "@/lib/quiz/lab/demo-video";
-import { createLabQuestion } from "@/lib/quiz/lab/defaults";
+import { createLabQuestionStub } from "@/lib/quiz/lab/defaults";
+import { generateLabQuestionContent } from "@/lib/quiz/lab/generate-content.client";
 import {
-  canAutoGenerateLabFormat,
-  questionNeedsAutoGeneration,
-} from "@/lib/quiz/lab/auto-formats";
-import { fetchGeneratedLabQuestion } from "@/lib/quiz/lab/generate-question.client";
-import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
-import { canReloadLabQuestion, reloadLabQuestion } from "@/lib/quiz/lab/reload-question";
+  canGenerateLabQuestion,
+  labQuestionIsReady,
+  labQuestionNeedsGeneration,
+} from "@/lib/quiz/lab/question-status";import { selectionSlotsForFormation } from "@/lib/quiz/lab/hydrate";
 import { readLabDraft, resetLabDraft, writeLabDraft } from "@/lib/quiz/lab/storage";
 import {
   isLabPlayerCropQuestion,
@@ -51,8 +59,8 @@ export function LabWorkspace() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
   const [savedFlash, setSavedFlash] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [generatingIds, setGeneratingIds] = useState<Set<string>>(() => new Set());
+  const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
   const [catalogDifficulty, setCatalogDifficulty] =
     useState<WorldCupMomentDifficulty>("medium");
 
@@ -91,58 +99,59 @@ export function LabWorkspace() {
     return () => window.clearInterval(interval);
   }, [mode, playQuestion, playIndex, selectedOptionId]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function autoGenerateInitialQuestions() {
-      const pending = draft.questions.filter(questionNeedsAutoGeneration);
-      if (!pending.length) return;
-
-      setGenerating(true);
-      setGenerateError(null);
-
-      try {
-        for (const question of pending) {
-          if (cancelled) return;
-          const generated = await fetchGeneratedLabQuestion({
-            format: question.format,
-            questionId: question.id,
-            excludeMomentId:
-              "momentId" in question && question.momentId ? question.momentId : null,
-            minDifficulty: catalogDifficulty,
-          });
-          if (cancelled) return;
-          persist((prev) => ({
-            ...prev,
-            questions: prev.questions.map((item) =>
-              item.id === question.id ? generated : item
-            ),
-          }));
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setGenerateError(
-            error instanceof Error
-              ? error.message
-              : "No se pudieron generar las imagenes automaticamente."
-          );
-        }
-      } finally {
-        if (!cancelled) setGenerating(false);
-      }
-    }
-
-    void autoGenerateInitialQuestions();
-
-    return () => {
-      cancelled = true;
-    };
-    // Solo al montar: genera assets para el borrador cargado desde localStorage.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const setQuestionGenerating = useCallback((questionId: string, active: boolean) => {
+    setGeneratingIds((prev) => {
+      const next = new Set(prev);
+      if (active) next.add(questionId);
+      else next.delete(questionId);
+      return next;
+    });
   }, []);
 
-  function handleSave() {
-    writeLabDraft(draft);
+  const generateQuestion = useCallback(
+    async (question: LabQuestion, force = false) => {
+      if (!canGenerateLabQuestion(question.format)) return;
+
+      setQuestionGenerating(question.id, true);
+      setQuestionErrors((prev) => {
+        const next = { ...prev };
+        delete next[question.id];
+        return next;
+      });
+
+      try {
+        const generated = await generateLabQuestionContent(question, {
+          minDifficulty: catalogDifficulty,
+          force,
+        });
+        persist((prev) => ({
+          ...prev,
+          questions: prev.questions.map((item) =>
+            item.id === question.id ? generated : item
+          ),
+        }));
+      } catch (error) {
+        setQuestionErrors((prev) => ({
+          ...prev,
+          [question.id]:
+            error instanceof Error ? error.message : "No se pudo generar la pregunta.",
+        }));
+      } finally {
+        setQuestionGenerating(question.id, false);
+      }
+    },
+    [catalogDifficulty, persist, setQuestionGenerating]
+  );
+
+  const generateAllQuestions = useCallback(() => {
+    for (const question of draft.questions) {
+      if (canGenerateLabQuestion(question.format)) {
+        void generateQuestion(question, labQuestionNeedsGeneration(question));
+      }
+    }
+  }, [draft.questions, generateQuestion]);
+
+  function handleSave() {    writeLabDraft(draft);
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 1500);
   }
@@ -154,30 +163,11 @@ export function LabWorkspace() {
     setMode("edit");
   }
 
-  async function addQuestion(format: LabQuestionFormat) {
-    setGenerateError(null);
-    let question = createLabQuestion(format);
-
-    if (canAutoGenerateLabFormat(format)) {
-      setGenerating(true);
-      try {
-        question = await fetchGeneratedLabQuestion({
-          format,
-          minDifficulty: catalogDifficulty,
-        });
-      } catch (error) {
-        setGenerateError(
-          error instanceof Error ? error.message : "No se pudo generar la pregunta."
-        );
-      } finally {
-        setGenerating(false);
-      }
-    }
-
+  function addQuestion(format: LabQuestionFormat) {
+    const question = createLabQuestionStub(format);
     persist((prev) => ({ ...prev, questions: [...prev.questions, question] }));
     setActiveQuestionId(question.id);
   }
-
   function removeQuestion(id: string) {
     let nextActiveId: string | null | undefined;
     persist((prev) => {
@@ -208,47 +198,10 @@ export function LabWorkspace() {
     persist((prev) => updateQuestion(prev, questionId, patch));
   }
 
-  async function reloadActiveQuestion() {
+  function reloadActiveQuestion() {
     if (!activeQuestion) return;
-
-    setGenerateError(null);
-    setGenerating(true);
-
-    try {
-      let reloaded: LabQuestion;
-
-      if (canAutoGenerateLabFormat(activeQuestion.format)) {
-        reloaded = await fetchGeneratedLabQuestion({
-          format: activeQuestion.format,
-          questionId: activeQuestion.id,
-          excludeMomentId:
-            "momentId" in activeQuestion && activeQuestion.momentId
-              ? activeQuestion.momentId
-              : null,
-          minDifficulty: catalogDifficulty,
-          force: true,
-        });
-      } else if (canReloadLabQuestion(activeQuestion.format)) {
-        reloaded = reloadLabQuestion(activeQuestion, {
-          minDifficulty: catalogDifficulty,
-        });
-      } else {
-        return;
-      }
-
-      persist((prev) => ({
-        ...prev,
-        questions: prev.questions.map((q) => (q.id === activeQuestion.id ? reloaded : q)),
-      }));
-    } catch (error) {
-      setGenerateError(
-        error instanceof Error ? error.message : "No se pudo actualizar la pregunta."
-      );
-    } finally {
-      setGenerating(false);
-    }
+    void generateQuestion(activeQuestion, true);
   }
-
   function startPreview() {
     if (draft.questions.length === 0) return;
     setMode("preview");
@@ -342,8 +295,22 @@ export function LabWorkspace() {
             <p className="mb-2 text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
               Preguntas ({draft.questions.length})
             </p>
+            <button
+              type="button"
+              onClick={generateAllQuestions}
+              disabled={draft.questions.length === 0 || generatingIds.size > 0}
+              className="mb-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[var(--lab-accent)] text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
+            >
+              <Sparkles className="size-4" aria-hidden />
+              Generar todas en segundo plano
+            </button>
             <div className="mb-4 space-y-2">
-              {draft.questions.map((q, index) => (
+              {draft.questions.map((q, index) => {
+                const isGenerating = generatingIds.has(q.id);
+                const isReady = labQuestionIsReady(q);
+                const error = questionErrors[q.id];
+
+                return (
                 <div
                   key={q.id}
                   className={cn(
@@ -358,14 +325,44 @@ export function LabWorkspace() {
                     onClick={() => setActiveQuestionId(q.id)}
                     className="min-w-0 flex-1 text-left"
                   >
-                    <span className="block text-[10px] uppercase text-[var(--lab-muted)]">
-                      {index + 1}. {LAB_FORMAT_LABELS[q.format]}
+                    <span className="flex items-center gap-2 text-[10px] uppercase text-[var(--lab-muted)]">
+                      <span>
+                        {index + 1}. {LAB_FORMAT_LABELS[q.format]}
+                      </span>
+                      {isGenerating ? (
+                        <span className="inline-flex items-center gap-1 text-[var(--lab-accent)]">
+                          <Loader2 className="size-3 animate-spin" aria-hidden />
+                          Generando
+                        </span>
+                      ) : isReady ? (
+                        <span className="text-[var(--lab-accent)]">Lista</span>
+                      ) : (
+                        <span>Pendiente</span>
+                      )}
                     </span>
                     <span className="block truncate text-sm text-[var(--lab-fg)]">
                       {q.prompt || "(sin enunciado)"}
                     </span>
+                    {error ? (
+                      <span className="block truncate text-[11px] text-red-400">{error}</span>
+                    ) : null}
                   </button>
-                  <div className="flex shrink-0 flex-col gap-1">
+                  {canGenerateLabQuestion(q.format) ? (
+                    <button
+                      type="button"
+                      aria-label="Generar pregunta"
+                      disabled={isGenerating}
+                      onClick={() => void generateQuestion(q, true)}
+                      className="flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border border-[var(--lab-accent)] px-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="size-4 animate-spin" aria-hidden />
+                      ) : (
+                        <Sparkles className="size-4" aria-hidden />
+                      )}
+                      Generar
+                    </button>
+                  ) : null}                  <div className="flex shrink-0 flex-col gap-1">
                     <button
                       type="button"
                       aria-label="Subir"
@@ -392,9 +389,9 @@ export function LabWorkspace() {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-              ))}
+                );
+              })}
             </div>
-
             <p className="mb-2 text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
               Añadir formato
             </p>
@@ -425,24 +422,26 @@ export function LabWorkspace() {
                   Editar · {LAB_FORMAT_LABELS[activeQuestion.format]}
                 </p>
 
-                {(canReloadLabQuestion(activeQuestion.format) ||
-                  canAutoGenerateLabFormat(activeQuestion.format)) ? (
+                {canGenerateLabQuestion(activeQuestion.format) ? (
                   <div className="rounded-xl border border-[var(--lab-border)] bg-[var(--lab-surface)] p-3 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-[10px] uppercase tracking-wider text-[var(--lab-muted)]">
-                        Contenido generado
+                        Contenido de la pregunta
                       </p>
                       <button
                         type="button"
-                        onClick={() => void reloadActiveQuestion()}
-                        disabled={generating}
+                        onClick={reloadActiveQuestion}
+                        disabled={generatingIds.has(activeQuestion.id)}
                         className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-[var(--lab-accent)] px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--lab-fg)] disabled:opacity-50"
                       >
-                        <Shuffle className="size-4" aria-hidden />
-                        {generating ? "Generando…" : "Actualizar"}
+                        {generatingIds.has(activeQuestion.id) ? (
+                          <Loader2 className="size-4 animate-spin" aria-hidden />
+                        ) : (
+                          <Sparkles className="size-4" aria-hidden />
+                        )}
+                        {generatingIds.has(activeQuestion.id) ? "Generando…" : "Generar"}
                       </button>
-                    </div>
-                    {activeQuestion.format === "image_trivia" ||
+                    </div>                    {activeQuestion.format === "image_trivia" ||
                     activeQuestion.format === "guess_player_hair" ||
                     activeQuestion.format === "guess_player_eyes" ? (
                       <div className="flex flex-wrap gap-2">
@@ -502,12 +501,11 @@ export function LabWorkspace() {
                   </div>
                 ) : null}
 
-                {generateError ? (
+                {questionErrors[activeQuestion.id] ? (
                   <p className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
-                    {generateError}
+                    {questionErrors[activeQuestion.id]}
                   </p>
                 ) : null}
-
                 <label className="block space-y-1">
                   <span className="text-[10px] uppercase text-[var(--lab-muted)]">Enunciado</span>
                   <input
@@ -774,9 +772,12 @@ export function LabWorkspace() {
 
                 <div className="rounded-xl border border-[var(--lab-border)] bg-black/30 p-3">
                   <p className="mb-2 text-[10px] uppercase text-[var(--lab-muted)]">Vista previa</p>
-                  <LabQuestionPreview question={activeQuestion} mode="editor" />
-                </div>
-              </div>
+                  <LabQuestionPreview
+                    question={activeQuestion}
+                    mode="editor"
+                    loading={generatingIds.has(activeQuestion.id)}
+                  />
+                </div>              </div>
             ) : null}
           </div>
         </div>
@@ -798,8 +799,8 @@ export function LabWorkspace() {
                   secondsLeft={secondsLeft}
                   showFeedback={showFeedback}
                   onSelect={handlePlaySelect}
-                />
-              </div>
+                  loading={generatingIds.has(playQuestion.id)}
+                />              </div>
               {showFeedback ? (
                 <button
                   type="button"

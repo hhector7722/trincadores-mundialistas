@@ -9,6 +9,10 @@ import {
 } from "@/lib/quiz/lab/derive-images.server";
 import { generateLabQuestion } from "@/lib/quiz/lab/generate-question.server";
 import type { LabQuestion } from "@/lib/quiz/lab/types";
+import {
+  isLabPlayerCropQuestion,
+  isLabPlayerSilhouetteQuestion,
+} from "@/lib/quiz/lab/types";
 import { seedFromQuizDate } from "@/lib/quiz/rng";
 import { pickMomentById } from "@/lib/quiz/world-cup-moments";
 import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog";
@@ -57,7 +61,7 @@ async function materializeQuestion(question: LabQuestion): Promise<LabQuestion> 
   const catalog = getWorldCupMomentsCatalog();
   const moment = pickMomentById(catalog, momentId, { readyOnly: true });
   const historicPath = moment ? resolveMomentImageUrl(moment) : null;
-  if (!historicPath) return question;
+  if (!moment || !historicPath) return question;
 
   const buffer = await getDerivedLabAssetBuffer(
     momentSourceAbsolutePath(historicPath),
@@ -72,7 +76,10 @@ async function materializeQuestion(question: LabQuestion): Promise<LabQuestion> 
   await persistDerivedAssetToDisk(momentId, variant, buffer);
   const staticUrl = persistedDerivedAssetPublicUrl(momentId, variant);
 
-  return { ...question, imageUrl: staticUrl };
+  if (isLabPlayerCropQuestion(question) || isLabPlayerSilhouetteQuestion(question)) {
+    return { ...question, imageUrl: staticUrl };
+  }
+  return question;
 }
 
 export async function readQuizLabDailyPack(

@@ -20,6 +20,7 @@ type LabQuestionPreviewProps = {
   secondsLeft?: number;
   showFeedback?: boolean;
   onSelect?: (optionId: string) => void;
+  loading?: boolean;
 };
 
 export function LabQuestionPreview({
@@ -29,6 +30,7 @@ export function LabQuestionPreview({
   secondsLeft,
   showFeedback = false,
   onSelect,
+  loading = false,
 }: LabQuestionPreviewProps) {
   const playing = mode === "play";
   const correctLabel =
@@ -54,7 +56,7 @@ export function LabQuestionPreview({
       ) : null}
 
       {question.format === "image_trivia" ? (
-        <LabImageTriviaStage question={question} />
+        <LabImageTriviaStage question={question} loading={loading} />
       ) : null}
 
       {question.format === "guess_selection" ? (
@@ -73,6 +75,7 @@ export function LabQuestionPreview({
           sceneHint={question.sceneHint}
           revealed={showFeedback}
           revealedPlayerName={showFeedback ? correctLabel : null}
+          loading={loading}
         />
       ) : null}
 
@@ -81,6 +84,7 @@ export function LabQuestionPreview({
           question={question}
           revealed={showFeedback}
           revealedPlayerName={showFeedback ? correctLabel : null}
+          loading={loading}
         />
       ) : null}
 

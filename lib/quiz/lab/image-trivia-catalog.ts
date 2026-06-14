@@ -69,10 +69,3 @@ export function reloadImageTriviaFromCatalog(
   return fresh ?? question;
 }
 
-/** @deprecated Usar createImageTriviaFromCatalog */
-export const createGuessImageFromCatalog = createImageTriviaFromCatalog;
-
-/** @deprecated Usar reloadImageTriviaFromCatalog */
-export const reloadGuessImageFromCatalog = reloadImageTriviaFromCatalog;
-
-export type GuessImageCatalogOptions = ImageTriviaCatalogOptions;

@@ -1,5 +1,6 @@
 "use client";
 
+import { LabGenerationPlaceholder } from "@/components/quiz/lab/LabGenerationPlaceholder";
 import {
   cropClipPath,
   cropFocusForKind,
@@ -14,6 +15,7 @@ type LabGuessPlayerCropStageProps = {
   sceneHint?: string | null;
   revealed?: boolean;
   revealedPlayerName?: string | null;
+  loading?: boolean;
 };
 
 function cropKindFromLabel(cropLabel: "PEINADO" | "OJOS"): LabCropKind {
@@ -27,9 +29,11 @@ export function LabGuessPlayerCropStage({
   sceneHint,
   revealed = false,
   revealedPlayerName,
+  loading = false,
 }: LabGuessPlayerCropStageProps) {
   const focus = cropFocusForKind(cropKindFromLabel(cropLabel));
   const useDerivedAsset = isDerivedLabAssetUrl(imageUrl);
+  const hasImage = Boolean(imageUrl?.trim());
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[var(--lab-border)] bg-black">
@@ -44,32 +48,39 @@ export function LabGuessPlayerCropStage({
         ) : null}
       </div>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0a0a0a]">
-        {useDerivedAsset ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={imageUrl} alt="" className="h-full w-full object-contain object-center" />
+        {hasImage && !loading ? (
+          useDerivedAsset ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={imageUrl} alt="" className="h-full w-full object-contain object-center" />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{ clipPath: cropClipPath(focus) }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt=""
+                className="h-full w-full object-cover"
+                style={{
+                  transform: `scale(${focus.scale})`,
+                  transformOrigin: `${focus.originX} ${focus.originY}`,
+                }}
+              />
+            </div>
+          )
         ) : (
-          <div
-            className="absolute inset-0"
-            style={{ clipPath: cropClipPath(focus) }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imageUrl}
-              alt=""
-              className="h-full w-full object-cover"
-              style={{
-                transform: `scale(${focus.scale})`,
-                transformOrigin: `${focus.originX} ${focus.originY}`,
-              }}
-            />
-          </div>
+          <LabGenerationPlaceholder
+            loading={loading}
+            label="Pulsa «Generar» para crear el recorte"
+          />
         )}
-        {!useDerivedAsset && cropLabel === "PEINADO" ? (
+        {hasImage && !loading && !useDerivedAsset && cropLabel === "PEINADO" ? (
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent"
             aria-hidden
           />
-        ) : !useDerivedAsset && cropLabel === "OJOS" ? (
+        ) : hasImage && !loading && !useDerivedAsset && cropLabel === "OJOS" ? (
           <>
             <div
               className="pointer-events-none absolute inset-x-0 top-0 h-[28%] bg-gradient-to-b from-[#0a0a0a] to-transparent"
@@ -81,7 +92,7 @@ export function LabGuessPlayerCropStage({
             />
           </>
         ) : null}
-        {!revealed ? (
+        {hasImage && !loading && !revealed ? (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-8">
             <p className="text-center font-display text-sm uppercase tracking-wider text-white">
               {prompt}

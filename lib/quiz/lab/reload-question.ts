@@ -12,6 +12,7 @@ import type {
   LabQuestionGuessPlayerCrop,
   LabQuestionGuessPlayerSilhouette,
   LabQuestionGuessSelection,
+  LabQuestionMultipleChoice,
   LabQuestionVideoPlayEnd,
 } from "@/lib/quiz/lab/types";
 import { shuffleWithRng } from "@/lib/quiz/rng";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/quiz/world-cup-moments";
 
 const RELOADABLE_FORMATS = new Set<LabQuestionFormat>([
+  "multiple_choice",
   "image_trivia",
   "guess_selection",
   "guess_player_hair",
@@ -214,6 +216,35 @@ export type ReloadLabQuestionOptions = {
   minDifficulty?: WorldCupMomentDifficulty;
 };
 
+function reloadMultipleChoice(question: LabQuestionMultipleChoice): LabQuestionMultipleChoice {
+  const demos = [
+    {
+      prompt: "¿En qué año ganó España su primer Mundial?",
+      options: ["2010", "2006", "1998", "1982"],
+      correctIndex: 0,
+    },
+    {
+      prompt: "¿Cuántas Copas del Mundo ha ganado Brasil?",
+      options: ["5", "4", "3", "6"],
+      correctIndex: 0,
+    },
+    {
+      prompt: "¿En qué país se jugó el Mundial 2014?",
+      options: ["Brasil", "Rusia", "Sudáfrica", "Alemania"],
+      correctIndex: 0,
+    },
+  ] as const;
+
+  const pick = demos[Math.abs(Date.now()) % demos.length] ?? demos[0];
+  return {
+    ...question,
+    prompt: pick.prompt,
+    options: defaultOptions([...pick.options]),
+    correctOptionId: `opt_${pick.correctIndex + 1}`,
+    imageUrl: null,
+  };
+}
+
 export function reloadLabQuestion(
   question: LabQuestion,
   opts?: ReloadLabQuestionOptions
@@ -221,6 +252,8 @@ export function reloadLabQuestion(
   const minDifficulty = opts?.minDifficulty ?? "hard";
 
   switch (question.format) {
+    case "multiple_choice":
+      return reloadMultipleChoice(question);
     case "image_trivia":
       return reloadImageTriviaFromCatalog(question as LabQuestionImageTrivia, minDifficulty);
     case "guess_selection":

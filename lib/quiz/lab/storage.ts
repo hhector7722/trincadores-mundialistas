@@ -2,7 +2,7 @@ import { createDefaultLabDraft } from "@/lib/quiz/lab/defaults";
 import { hydrateLabDraft } from "@/lib/quiz/lab/hydrate";
 import type { LabDraft } from "@/lib/quiz/lab/types";
 
-const STORAGE_KEY = "tm-quiz-lab-draft-v1";
+const STORAGE_KEY = "tm-quiz-lab-draft-v2";
 
 function isLabDraft(value: unknown): value is LabDraft {
   if (!value || typeof value !== "object") return false;
