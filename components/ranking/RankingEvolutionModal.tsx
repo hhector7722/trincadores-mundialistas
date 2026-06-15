@@ -76,7 +76,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
         ) : null}
 
         <div
-          className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-1"
+          className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-2"
           style={showFullLayout ? { minHeight: chartHeightPx + 12 } : undefined}
         >
           {hasMatchdayData ? (

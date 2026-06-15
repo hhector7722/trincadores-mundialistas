@@ -13,8 +13,11 @@ export type UsageFilterUser = {
 export type UsageDashboardFilters = {
   /** YYYY-MM-DD civil Madrid; null = todos los dias. */
   day: string | null;
-  profileId: string | null;
+  /** null = todos los usuarios del pool; [] = ninguno; array = subconjunto. */
+  profileIds: string[] | null;
 };
+
+export const USAGE_RECENT_ACTIVITY_PAGE_SIZE = 40;
 
 export type UsageUserSummary = {
   profileId: string;
@@ -31,6 +34,7 @@ export type UsageUserSummary = {
 
 export type UsageRecentEvent = {
   id: string;
+  profileId: string;
   username: string;
   displayName: string;
   title: string;
@@ -46,6 +50,7 @@ export type UsageHourBucket = {
 export type UsageDashboardData = {
   summaries: UsageUserSummary[];
   recentEvents: UsageRecentEvent[];
+  recentEventsHasMore: boolean;
   hourlyBuckets: UsageHourBucket[];
   filterUsers: UsageFilterUser[];
   filters: UsageDashboardFilters;
@@ -128,6 +133,7 @@ function resolvePoolMemberProfile(
 export function parseUsageDashboardFilters(searchParams: {
   dia?: string;
   usuario?: string;
+  usuarios?: string;
 }): UsageDashboardFilters {
   const dayParam = searchParams.dia?.trim();
   const day =
@@ -137,9 +143,123 @@ export function parseUsageDashboardFilters(searchParams: {
         ? dayParam
         : todayQuizDate();
 
-  const profileId = searchParams.usuario?.trim() || null;
+  const usersParam = searchParams.usuarios?.trim();
+  if (usersParam !== undefined) {
+    if (!usersParam || usersParam === "ninguno") {
+      return { day, profileIds: [] };
+    }
+    const ids = usersParam
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+    return { day, profileIds: ids.length > 0 ? ids : [] };
+  }
 
-  return { day, profileId };
+  const legacyUser = searchParams.usuario?.trim();
+  if (legacyUser) {
+    return { day, profileIds: [legacyUser] };
+  }
+
+  return { day, profileIds: null };
+}
+
+function applyUsageProfileFilter<T extends { eq: (col: string, val: string) => T; in: (col: string, vals: string[]) => T }>(
+  query: T,
+  profileIds: string[] | null
+): T | null {
+  if (profileIds === null) return query;
+  if (profileIds.length === 0) return null;
+  if (profileIds.length === 1) return query.eq("profile_id", profileIds[0]!);
+  return query.in("profile_id", profileIds);
+}
+
+async function fetchUsageEventRows(
+  poolId: string,
+  filters: UsageDashboardFilters
+): Promise<UsageEventRow[]> {
+  const supabase = await createClient();
+
+  let eventsQuery = supabase
+    .from("app_usage_events")
+    .select(
+      `
+      id,
+      event_type,
+      path,
+      search,
+      label,
+      duration_ms,
+      metadata,
+      created_at,
+      profile_id,
+      profiles (
+        username,
+        display_name
+      )
+    `
+    )
+    .order("created_at", { ascending: false })
+    .limit(2000);
+
+  const filteredQuery = applyUsageProfileFilter(eventsQuery, filters.profileIds);
+  if (!filteredQuery) return [];
+
+  eventsQuery = filteredQuery;
+
+  if (filters.day) {
+    eventsQuery = eventsQuery
+      .gte("created_at", quizDayOpensAt(filters.day))
+      .lte("created_at", quizDayClosesAt(filters.day));
+  }
+
+  const { data: events, error } = await eventsQuery;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (events ?? []) as UsageEventRow[];
+}
+
+function mapRecentFeedToEvents(
+  feedItems: Array<{ id: string; title: string; createdAt: string }>,
+  rowById: Map<string, UsageEventRow>
+): UsageRecentEvent[] {
+  return feedItems.map((item) => {
+    const row = rowById.get(item.id);
+    const profile = row ? resolveUsageEventProfile(row.profiles) : null;
+
+    return {
+      id: item.id,
+      profileId: row?.profile_id ?? "",
+      username: profile?.username ?? "?",
+      displayName: profile?.display_name ?? profile?.username ?? "?",
+      title: item.title,
+      createdAt: item.createdAt,
+      timeLabel: formatDateTimeMadrid(item.createdAt),
+    };
+  });
+}
+
+export async function getUsageRecentEventsPage(
+  poolId: string,
+  filters: UsageDashboardFilters,
+  options: { offset: number; limit?: number }
+): Promise<{ events: UsageRecentEvent[]; hasMore: boolean }> {
+  const limit = options.limit ?? USAGE_RECENT_ACTIVITY_PAGE_SIZE;
+  const rows = await fetchUsageEventRows(poolId, filters);
+  const supabase = await createClient();
+  const contextMaps = await buildUsageContextMaps(supabase, rows);
+  const rowById = new Map(rows.map((row) => [row.id, row]));
+  const feed = buildUsageRecentFeed(rows, contextMaps, {
+    offset: options.offset,
+    limit,
+  });
+
+  return {
+    events: mapRecentFeedToEvents(feed.items, rowById),
+    hasMore: feed.hasMore,
+  };
 }
 
 async function getPoolFilterUsers(poolId: string): Promise<UsageFilterUser[]> {
@@ -181,48 +301,11 @@ export async function getUsageDashboardData(
 ): Promise<UsageDashboardData> {
   const supabase = await createClient();
 
-  let eventsQuery = supabase
-    .from("app_usage_events")
-    .select(
-      `
-      id,
-      event_type,
-      path,
-      search,
-      label,
-      duration_ms,
-      metadata,
-      created_at,
-      profile_id,
-      profiles (
-        username,
-        display_name
-      )
-    `
-    )
-    .order("created_at", { ascending: false })
-    .limit(2000);
-
-  if (filters.profileId) {
-    eventsQuery = eventsQuery.eq("profile_id", filters.profileId);
-  }
-
-  if (filters.day) {
-    eventsQuery = eventsQuery
-      .gte("created_at", quizDayOpensAt(filters.day))
-      .lte("created_at", quizDayClosesAt(filters.day));
-  }
-
-  const [{ data: events, error }, filterUsers] = await Promise.all([
-    eventsQuery,
+  const [rows, filterUsers] = await Promise.all([
+    fetchUsageEventRows(poolId, filters),
     getPoolFilterUsers(poolId),
   ]);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const rows = (events ?? []) as UsageEventRow[];
   const contextMaps = await buildUsageContextMaps(supabase, rows);
   const summaryMap = new Map<string, UsageUserSummary>();
   const hourly = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
@@ -279,25 +362,17 @@ export async function getUsageDashboardData(
   });
 
   const rowById = new Map(rows.map((row) => [row.id, row]));
-  const recentFeed = buildUsageRecentFeed(rows, contextMaps, 80);
-
-  const recentEvents: UsageRecentEvent[] = recentFeed.map((item) => {
-    const row = rowById.get(item.id);
-    const profile = row ? resolveUsageEventProfile(row.profiles) : null;
-
-    return {
-      id: item.id,
-      username: profile?.username ?? "?",
-      displayName: profile?.display_name ?? profile?.username ?? "?",
-      title: item.title,
-      createdAt: item.createdAt,
-      timeLabel: formatDateTimeMadrid(item.createdAt),
-    };
+  const recentFeed = buildUsageRecentFeed(rows, contextMaps, {
+    limit: USAGE_RECENT_ACTIVITY_PAGE_SIZE,
+    offset: 0,
   });
+
+  const recentEvents = mapRecentFeedToEvents(recentFeed.items, rowById);
 
   return {
     summaries,
     recentEvents,
+    recentEventsHasMore: recentFeed.hasMore,
     hourlyBuckets: hourly,
     filterUsers,
     filters,

@@ -107,7 +107,7 @@ export function getQuizPlayCta(
     const attemptId = options?.resultAttemptId?.trim();
     if (attemptId) {
       return {
-        label: "Ver resultado",
+        label: "Jugar",
         href: `/quiz/result?attempt=${attemptId}`,
         entersPlay: false,
       };

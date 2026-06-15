@@ -121,14 +121,29 @@ function isDuplicateEvent(
   return false;
 }
 
+export type UsageRecentFeedItem = {
+  id: string;
+  title: string;
+  timeLabel: string;
+  createdAt: string;
+};
+
+export type UsageRecentFeedPage = {
+  items: UsageRecentFeedItem[];
+  hasMore: boolean;
+  total: number;
+};
+
 /** Lista legible: sin ruido tecnico ni duplicados de navegacion rapida. */
 export function buildUsageRecentFeed(
   rows: UsageEventRowForPresent[],
   maps: UsageContextMaps,
-  limit = 80
-): Array<{ id: string; title: string; timeLabel: string; createdAt: string }> {
+  options?: { limit?: number; offset?: number }
+): UsageRecentFeedPage {
+  const limit = options?.limit ?? 80;
+  const offset = options?.offset ?? 0;
   const included: UsageEventRowForPresent[] = [];
-  const feed: Array<{ id: string; title: string; timeLabel: string; createdAt: string }> = [];
+  const feed: UsageRecentFeedItem[] = [];
 
   for (const row of rows) {
     if (isNoiseUsagePath(row.path)) continue;
@@ -141,9 +156,12 @@ export function buildUsageRecentFeed(
       timeLabel: "",
       createdAt: row.created_at,
     });
-
-    if (feed.length >= limit) break;
   }
 
-  return feed;
+  const items = feed.slice(offset, offset + limit);
+  return {
+    items,
+    hasMore: offset + limit < feed.length,
+    total: feed.length,
+  };
 }

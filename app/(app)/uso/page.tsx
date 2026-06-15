@@ -10,7 +10,7 @@ import { requireActivePoolContext } from "@/lib/pool/require-context";
 export const dynamic = "force-dynamic";
 
 type UsoPageProps = {
-  searchParams: Promise<{ dia?: string; usuario?: string }>;
+  searchParams: Promise<{ dia?: string; usuario?: string; usuarios?: string }>;
 };
 
 export default async function UsoPage({ searchParams }: UsoPageProps) {
@@ -54,7 +54,7 @@ export default async function UsoPage({ searchParams }: UsoPageProps) {
           </p>
         </div>
       </div>
-      <UsageDashboard data={data} />
+      <UsageDashboard data={data} poolId={ctx.activePoolId} />
     </div>
   );
 }

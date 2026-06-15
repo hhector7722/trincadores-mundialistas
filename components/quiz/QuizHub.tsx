@@ -7,7 +7,7 @@ import { getLatestSubmittedAttemptId, getQuizPlayCta } from "@/lib/quiz/slot-sta
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
 
 const playButtonClass =
-  "inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)] transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[var(--tm-accent)] px-6 text-sm font-semibold text-[var(--tm-primary-fg)] transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
 
 type QuizHubProps = {
   hub: QuizDayHub;
@@ -37,7 +37,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         </section>
 
         <section
-          className="tm-quiz-hub-actions shrink-0 space-y-3 px-3 pt-3"
+          className="tm-quiz-hub-actions flex shrink-0 flex-col items-center space-y-3 px-3 pt-3"
           aria-label="Jugar quiz diario"
         >
           <button
@@ -45,7 +45,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             onClick={requestQuizEntry}
             className={playButtonClass}
           >
-            {playCta?.label ?? "JUGAR"}
+            {playCta?.label ?? "Jugar"}
           </button>
 
           {hub.publishHeld && (

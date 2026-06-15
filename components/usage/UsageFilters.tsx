@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   applyVisualViewportChrome,
@@ -23,6 +23,22 @@ function resyncViewportChromeAfterFormControl() {
   window.setTimeout(resyncViewportChrome, 320);
 }
 
+function selectedIdsFromFilters(
+  filters: UsageDashboardFilters,
+  users: UsageFilterUser[]
+): Set<string> {
+  if (filters.profileIds === null) {
+    return new Set(users.map((user) => user.profileId));
+  }
+  return new Set(filters.profileIds);
+}
+
+function serializeUsersParam(allUserIds: string[], selected: Set<string>): string | undefined {
+  if (selected.size === allUserIds.length) return undefined;
+  if (selected.size === 0) return "ninguno";
+  return [...selected].join(",");
+}
+
 type UsageFiltersProps = {
   filters: UsageDashboardFilters;
   users: UsageFilterUser[];
@@ -31,24 +47,28 @@ type UsageFiltersProps = {
 export function UsageFilters({ filters, users }: UsageFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const allUserIds = useMemo(() => users.map((user) => user.profileId), [users]);
 
   const [day, setDay] = useState(filters.day ?? "");
-  const [profileId, setProfileId] = useState(filters.profileId ?? "");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() =>
+    selectedIdsFromFilters(filters, users)
+  );
 
   useEffect(() => {
     setDay(filters.day ?? "");
-    setProfileId(filters.profileId ?? "");
-  }, [filters.day, filters.profileId]);
+    setSelectedIds(selectedIdsFromFilters(filters, users));
+  }, [filters.day, filters.profileIds, users]);
 
   useEffect(() => {
     resyncViewportChrome();
     requestAnimationFrame(resyncViewportChrome);
   }, [searchParams]);
 
-  function applyFilters(nextDay: string, nextProfileId: string) {
+  function applyFilters(nextDay: string, nextSelected: Set<string>) {
     const params = new URLSearchParams();
     if (nextDay) params.set("dia", nextDay);
-    if (nextProfileId) params.set("usuario", nextProfileId);
+    const usersParam = serializeUsersParam(allUserIds, nextSelected);
+    if (usersParam) params.set("usuarios", usersParam);
     const query = params.toString();
     router.push(query ? `/uso?${query}` : "/uso");
     resyncViewportChromeAfterFormControl();
@@ -56,68 +76,123 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    applyFilters(day, profileId);
+    applyFilters(day, selectedIds);
   }
 
+  function toggleUser(profileId: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(profileId)) next.delete(profileId);
+      else next.add(profileId);
+      return next;
+    });
+  }
+
+  function selectAllUsers() {
+    setSelectedIds(new Set(allUserIds));
+  }
+
+  function clearAllUsers() {
+    setSelectedIds(new Set());
+  }
+
+  const allSelected = selectedIds.size === allUserIds.length && allUserIds.length > 0;
+  const noneSelected = selectedIds.size === 0;
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      data-block-tab-swipe=""
-      className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      <input
-        id="usage-day"
-        name="dia"
-        type="date"
-        aria-label="Dia"
-        value={day}
-        onChange={(event) => setDay(event.target.value)}
-        onBlur={resyncViewportChromeAfterFormControl}
-        className={cn(
-          "box-border h-10 w-[6.85rem] max-w-[6.85rem] shrink-0 rounded-lg border border-[var(--tm-border)]/70 bg-transparent px-1 text-xs text-[var(--tm-fg)] outline-none",
-          "focus:border-[var(--tm-accent-muted)] [color-scheme:dark]",
-          "[&::-webkit-calendar-picker-indicator]:ml-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-        )}
-      />
+    <form onSubmit={handleSubmit} data-block-tab-swipe="" className="space-y-3">
+      <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <input
+          id="usage-day"
+          name="dia"
+          type="date"
+          aria-label="Dia"
+          value={day}
+          onChange={(event) => setDay(event.target.value)}
+          onBlur={resyncViewportChromeAfterFormControl}
+          className={cn(
+            "box-border h-10 w-[6.85rem] max-w-[6.85rem] shrink-0 rounded-lg border border-[var(--tm-border)]/70 bg-transparent px-1 text-xs text-[var(--tm-fg)] outline-none",
+            "focus:border-[var(--tm-accent-muted)] [color-scheme:dark]",
+            "[&::-webkit-calendar-picker-indicator]:ml-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+          )}
+        />
 
-      <select
-        id="usage-user"
-        name="usuario"
-        aria-label="Usuario"
-        value={profileId}
-        onChange={(event) => setProfileId(event.target.value)}
-        onBlur={resyncViewportChromeAfterFormControl}
-        className={cn(
-          "h-10 min-w-[7.5rem] flex-1 shrink-0 rounded-lg border border-[var(--tm-border)]/70 bg-transparent px-2 text-xs text-[var(--tm-fg)] outline-none",
-          "focus:border-[var(--tm-accent-muted)]"
-        )}
-      >
-        <option value="">Todos</option>
-        {users.map((user) => (
-          <option key={user.profileId} value={user.profileId}>
-            {user.displayName}
-          </option>
-        ))}
-      </select>
+        <Button type="submit" className="h-10 shrink-0 px-3 text-xs">
+          OK
+        </Button>
 
-      <Button type="submit" className="h-10 shrink-0 px-3 text-xs">
-        OK
-      </Button>
+        <Link
+          href="/uso"
+          onClick={() => {
+            setDay("");
+            setSelectedIds(new Set(allUserIds));
+            resyncViewportChromeAfterFormControl();
+          }}
+          className={cn(
+            "inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-[var(--tm-border)]/70 px-2.5 text-xs text-[var(--tm-muted)]",
+            "hover:border-[var(--tm-primary)]/40 hover:text-[var(--tm-primary)]"
+          )}
+        >
+          ×
+        </Link>
+      </div>
 
-      <Link
-        href="/uso"
-        onClick={() => {
-          setDay("");
-          setProfileId("");
-          resyncViewportChromeAfterFormControl();
-        }}
-        className={cn(
-          "inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-[var(--tm-border)]/70 px-2.5 text-xs text-[var(--tm-muted)]",
-          "hover:border-[var(--tm-primary)]/40 hover:text-[var(--tm-primary)]"
-        )}
-      >
-        ×
-      </Link>
+      <div className="rounded-xl border border-[var(--tm-border)]/50 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--tm-muted)]">
+            Usuarios
+          </p>
+          <div className="flex items-center gap-2 text-[10px]">
+            <button
+              type="button"
+              onClick={selectAllUsers}
+              disabled={allSelected}
+              className="text-[var(--tm-primary)] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Seleccionar todos
+            </button>
+            <span className="text-[var(--tm-border)]" aria-hidden>
+              |
+            </span>
+            <button
+              type="button"
+              onClick={clearAllUsers}
+              disabled={noneSelected}
+              className="text-[var(--tm-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Quitar todos
+            </button>
+          </div>
+        </div>
+
+        <div className="grid max-h-40 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
+          {users.map((user) => {
+            const checked = selectedIds.has(user.profileId);
+            return (
+              <label
+                key={user.profileId}
+                className={cn(
+                  "flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-colors",
+                  checked
+                    ? "border-[var(--tm-accent-muted)]/50 bg-[var(--tm-accent-soft)]/20 text-[var(--tm-fg)]"
+                    : "border-[var(--tm-border)]/40 text-[var(--tm-muted)]"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleUser(user.profileId)}
+                  className="size-4 shrink-0 accent-[var(--tm-accent)]"
+                />
+                <span className="min-w-0 truncate">
+                  {user.displayName}
+                  <span className="text-[var(--tm-muted)]"> @{user.username}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
     </form>
   );
 }
