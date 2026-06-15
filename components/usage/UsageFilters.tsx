@@ -204,14 +204,14 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
             </div>
           </div>
 
-          <div className="grid max-h-40 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
+          <div className="flex max-h-40 flex-wrap content-start gap-1.5 overflow-y-auto">
             {users.map((user) => {
               const checked = selectedIds.has(user.profileId);
               return (
                 <label
                   key={user.profileId}
                   className={cn(
-                    "flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-colors",
+                    "inline-flex min-h-10 shrink-0 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-colors",
                     checked
                       ? "border-[var(--tm-accent-muted)]/50 bg-[var(--tm-accent-soft)]/20 text-[var(--tm-fg)]"
                       : "border-[var(--tm-border)]/40 text-[var(--tm-muted)]"
@@ -223,10 +223,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
                     onChange={() => toggleUser(user.profileId)}
                     className="size-4 shrink-0 accent-[var(--tm-accent)]"
                   />
-                  <span className="min-w-0 truncate">
-                    {user.displayName}
-                    <span className="text-[var(--tm-muted)]"> @{user.username}</span>
-                  </span>
+                  <span className="whitespace-nowrap">{user.displayName}</span>
                 </label>
               );
             })}
