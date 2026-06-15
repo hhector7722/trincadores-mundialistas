@@ -4,6 +4,7 @@ import { Fragment, useState, useTransition } from "react";
 import { fetchMoreUsageActivityAction } from "@/actions/usage";
 import { Button } from "@/components/ui/button";
 import type { UsageRecentEvent } from "@/lib/usage/queries";
+import { cn } from "@/lib/utils";
 
 type UsageRecentActivityProps = {
   poolId: string;
@@ -56,32 +57,23 @@ export function UsageRecentActivity({
         {events.map((event, index) => {
           const previous = index > 0 ? events[index - 1] : null;
           const isNewUser = !previous || previous.profileId !== event.profileId;
-          const isFirstOverall = index === 0;
 
           return (
             <Fragment key={event.id}>
-              {isNewUser && !isFirstOverall ? (
-                <div className="border-t border-[var(--tm-border)]/60 py-2">
-                  <p className="text-xs font-semibold text-[var(--tm-fg)]">
+              {isNewUser ? (
+                <div
+                  className={cn(
+                    "rounded-lg bg-[var(--tm-accent)] px-2.5 py-1.5",
+                    index > 0 && "mt-2"
+                  )}
+                >
+                  <p className="truncate text-xs font-semibold text-[var(--tm-primary-fg)]">
                     {event.displayName}
-                    <span className="font-normal text-[var(--tm-muted)]">
-                      {" "}
-                      @{event.username}
-                    </span>
                   </p>
                 </div>
               ) : null}
 
               <div className="flex min-h-9 items-center gap-2 py-1 text-xs">
-                {isNewUser && isFirstOverall ? (
-                  <p className="max-w-[42%] shrink-0 truncate font-semibold text-[var(--tm-fg)]">
-                    {event.displayName}
-                    <span className="font-normal text-[var(--tm-muted)]">
-                      {" "}
-                      @{event.username}
-                    </span>
-                  </p>
-                ) : null}
                 <p className="min-w-0 flex-1 truncate font-medium text-[var(--tm-fg)]">
                   {event.title}
                 </p>
