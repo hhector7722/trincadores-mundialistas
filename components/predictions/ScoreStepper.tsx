@@ -84,8 +84,8 @@ export function ScoreStepper({
           {isUnset ? (
             <span
               className={cn(
-                "block bg-white/35",
-                isFloating ? "h-[1.125rem] w-px sm:h-[1.25rem]" : "h-6 w-px"
+                "block rounded-full bg-white/35",
+                isFloating ? "h-px w-[0.4rem] sm:w-[0.45rem]" : "h-px w-3"
               )}
               aria-hidden="true"
             />
