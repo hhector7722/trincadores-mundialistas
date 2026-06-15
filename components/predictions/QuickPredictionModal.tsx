@@ -871,11 +871,18 @@ export function QuickPredictionModal({
                 {pending ? "Guardando..." : "Guardar"}
               </Button>
             </div>
-            {error ? (
-              <p className="mt-2 text-center text-sm text-[var(--tm-danger)]" role="alert">
-                {error}
-              </p>
-            ) : null}
+            <div
+              className={cn(
+                "flex items-center justify-center",
+                error ? "min-h-[2.75rem]" : "h-0",
+              )}
+            >
+              {error ? (
+                <p className="text-center text-sm text-[var(--tm-danger)]" role="alert">
+                  {error}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
       );
