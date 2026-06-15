@@ -41,6 +41,7 @@ type MatchAddPillButtonProps = {
   onClick?: () => void;
   className?: string;
   inactive?: boolean;
+  title?: string;
 };
 
 export function MatchAddPillButton({
@@ -48,10 +49,12 @@ export function MatchAddPillButton({
   onClick,
   className,
   inactive = false,
+  title,
 }: MatchAddPillButtonProps) {
   return (
     <button
       type="button"
+      title={title}
       aria-disabled={inactive || undefined}
       onClick={
         inactive
