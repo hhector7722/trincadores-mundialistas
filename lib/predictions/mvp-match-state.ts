@@ -89,3 +89,24 @@ export function mvpOverridesFromMatchListAndActive(
   if (activeSnapshot) overrides[active.id] = activeSnapshot;
   return overrides;
 }
+
+function mvpSnapshotsEqual(a: MvpSnapshot, b: MvpSnapshot): boolean {
+  return (
+    a.player_name === b.player_name &&
+    a.team_name === b.team_name &&
+    (a.shirt_number ?? null) === (b.shirt_number ?? null)
+  );
+}
+
+/** Borrador MVP (override local) distinto del guardado en servidor. */
+export function mvpDraftDirty(
+  match: MatchWithPrediction,
+  draft?: MvpSnapshot | null
+): boolean {
+  const saved = mvpSnapshotFromMatch(match);
+  if (!draft?.player_name?.trim() || !draft.team_name?.trim()) {
+    return Boolean(saved);
+  }
+  if (!saved) return true;
+  return !mvpSnapshotsEqual(saved, draft);
+}

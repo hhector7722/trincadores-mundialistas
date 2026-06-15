@@ -49,6 +49,7 @@ import { entityModalUsageLabel, matchFixtureLabel } from "@/lib/usage/modal-labe
 import { formatListScore, hasFilledPredictionScore, resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
+  mvpDraftDirty,
   mvpOverridesFromMatchListAndActive,
   mvpPlayerNameFromMatch,
   preferMatchMvpData,
@@ -348,6 +349,7 @@ export function QuickPredictionModal({
   }, [viewMatch.id, savedHome, savedAway, reset]);
 
   const draftDirty = home !== savedHome || away !== savedAway;
+  const mvpDirty = mvpDraftDirty(baseViewMatch, mvpOverrides[baseViewMatch.id]);
   const scoreFilled =
     hasFilledPredictionScore(savedHome, savedAway) ||
     hasFilledPredictionScore(home, away);
@@ -372,7 +374,7 @@ export function QuickPredictionModal({
   const canSave =
     uiState !== "locked" &&
     !pending &&
-    (partialFill || (bothFilled && (uiState !== "saved" || draftDirty)));
+    (partialFill || (bothFilled && (uiState !== "saved" || draftDirty || mvpDirty)));
 
   function onSave() {
     setError(null);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { MatchWithPrediction } from "./queries";
 import {
+  mvpDraftDirty,
   mvpOverridesFromMatchListAndActive,
   preferMatchMvpData,
 } from "./mvp-match-state";
@@ -48,6 +49,36 @@ test("preferMatchMvpData usa el MVP del partido activo cuando la lista está des
 
   const merged = preferMatchMvpData(listed, preferred);
   assert.equal(merged.mvpPrediction?.player_name, "Lamine Yamal");
+});
+
+test("mvpDraftDirty detecta cambio de MVP con marcador ya guardado", () => {
+  const saved = baseMatch({
+    mvpPrediction: {
+      id: "mvp-1",
+      player_name: "Lamine Yamal",
+      team_name: "España",
+      shirt_number: 19,
+      points_awarded: null,
+      updated_at: "2026-06-10T10:00:00.000Z",
+    },
+  });
+
+  assert.equal(
+    mvpDraftDirty(saved, {
+      player_name: "Lamine Yamal",
+      team_name: "España",
+      shirt_number: 19,
+    }),
+    false
+  );
+  assert.equal(
+    mvpDraftDirty(saved, {
+      player_name: "Pedri",
+      team_name: "España",
+      shirt_number: 8,
+    }),
+    true
+  );
 });
 
 test("mvpOverridesFromMatchListAndActive incluye el MVP del partido activo", () => {
