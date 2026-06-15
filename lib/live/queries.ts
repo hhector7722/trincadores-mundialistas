@@ -16,16 +16,22 @@ function payloadFromRow(row: LiveStateRow): MatchLivePayload {
   return (row.live_payload ?? {}) as MatchLivePayload;
 }
 
+function normalizeMinuteLabel(label: string): string {
+  if (label.trim().toLowerCase() === "descanso") return "Desc";
+  return label;
+}
+
 export function rowToMatchLiveSnapshot(row: LiveStateRow): MatchLiveSnapshot {
   const payload = payloadFromRow(row);
-  const minuteLabel =
+  const minuteLabel = normalizeMinuteLabel(
     row.time_elapsed && row.time_elapsed !== "notstarted"
       ? row.time_elapsed
       : formatBsdMinuteLabel({
           current_minute: payload.currentMinute ?? null,
           period: payload.period ?? null,
           status: row.finished ? "finished" : "inprogress",
-        });
+        })
+  );
 
   return {
     matchId: row.match_id,

@@ -144,7 +144,7 @@ export function formatBsdMinuteLabel(
   detail: Pick<BsdEventDetail, "current_minute" | "period" | "status"> | null,
 ): string {
   if (!detail) return "—";
-  if (detail.period === "halftime" || detail.period === "HT") return "Descanso";
+  if (detail.period === "halftime" || detail.period === "HT") return "Desc";
   if (detail.period === "FT" || detail.status === "finished") return "Final";
   if (detail.current_minute != null && detail.current_minute > 0) {
     return `${detail.current_minute}'`;
