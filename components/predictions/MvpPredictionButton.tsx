@@ -223,9 +223,10 @@ export function MvpPredictionButton({
       onClick={onClick ?? (() => {})}
       savedValue={savedLabel}
       showEdit={!readOnly}
-      addIcon={!compact}
+      addIcon
       hideCaption={compact}
       emptyLabel={compact ? "Añadir MVP" : undefined}
+      emptyVariant={compact ? "pill" : "text"}
       className={className}
     />
   );

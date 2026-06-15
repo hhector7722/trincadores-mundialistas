@@ -5,24 +5,33 @@ export type PredictionUiState = "empty" | "draft" | "saved" | "locked";
 export type PredictionUiInput = {
   savedHome: number | null;
   savedAway: number | null;
-  draftHome: number;
-  draftAway: number;
+  draftHome: number | null;
+  draftAway: number | null;
   draftDirty: boolean;
   matchStatus: MatchStatus;
   serverEditable: boolean;
 };
 
+export function hasFilledPredictionScore(
+  home: number | null,
+  away: number | null
+): boolean {
+  return (
+    home !== null &&
+    away !== null &&
+    Number.isInteger(home) &&
+    Number.isInteger(away)
+  );
+}
+
 export function resolvePredictionUiState(input: PredictionUiInput): PredictionUiState {
   if (!input.serverEditable) {
     return "locked";
   }
-  const hasSaved =
-    input.savedHome !== null &&
-    input.savedAway !== null &&
-    Number.isInteger(input.savedHome) &&
-    Number.isInteger(input.savedAway);
+  const hasSaved = hasFilledPredictionScore(input.savedHome, input.savedAway);
+  const hasDraftScore = hasFilledPredictionScore(input.draftHome, input.draftAway);
 
-  if (input.draftDirty || (!hasSaved && (input.draftHome > 0 || input.draftAway > 0))) {
+  if (input.draftDirty || (!hasSaved && hasDraftScore)) {
     return "draft";
   }
   if (hasSaved) {

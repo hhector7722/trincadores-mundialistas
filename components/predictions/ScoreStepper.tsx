@@ -4,6 +4,8 @@ import { Minus, Plus } from "lucide-react";
 import { MAX_GOALS } from "@/lib/predictions/validation";
 import { cn } from "@/lib/utils";
 
+const UNSET_SCORE_LABEL = "—";
+
 export function ScoreStepper({
   label,
   value,
@@ -13,13 +15,14 @@ export function ScoreStepper({
   hideLabel = false,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   disabled?: boolean;
-  onChange: (next: number) => void;
+  onChange: (next: number | null) => void;
   variant?: "default" | "floating";
   hideLabel?: boolean;
 }) {
   const isFloating = variant === "floating";
+  const isUnset = value === null;
 
   const defaultControlClass =
     "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface-elevated)] text-[var(--tm-fg)] active:border-[var(--tm-accent-muted)]";
@@ -47,13 +50,20 @@ export function ScoreStepper({
       >
         <button
           type="button"
-          disabled={disabled || value <= 0}
+          disabled={disabled || isUnset || value <= 0}
           aria-label={`Menos goles ${label}`}
-          onClick={() => onChange(Math.max(0, value - 1))}
+          onClick={() => {
+            if (value === null) return;
+            onChange(value === 0 ? null : value - 1);
+          }}
           className={
             isFloating
-              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(178,68,68,0.55)]")
-              : cn(defaultControlClass, (disabled || value <= 0) && "opacity-40")
+              ? cn(
+                  floatingControlBase,
+                  "h-[1.125rem] w-[1.125rem] bg-[rgba(178,68,68,0.55)]",
+                  (disabled || isUnset || value <= 0) && "opacity-40"
+                )
+              : cn(defaultControlClass, (disabled || isUnset || value <= 0) && "opacity-40")
           }
         >
           <Minus
@@ -71,17 +81,24 @@ export function ScoreStepper({
               : "text-3xl"
           )}
         >
-          {value}
+          {isUnset ? UNSET_SCORE_LABEL : value}
         </span>
         <button
           type="button"
-          disabled={disabled || value >= MAX_GOALS}
+          disabled={disabled || (!isUnset && value >= MAX_GOALS)}
           aria-label={`Mas goles ${label}`}
-          onClick={() => onChange(Math.min(MAX_GOALS, value + 1))}
+          onClick={() => onChange(isUnset ? 0 : Math.min(MAX_GOALS, value! + 1))}
           className={
             isFloating
-              ? cn(floatingControlBase, "h-[1.125rem] w-[1.125rem] bg-[rgba(62,138,82,0.55)]")
-              : cn(defaultControlClass, (disabled || value >= MAX_GOALS) && "opacity-40")
+              ? cn(
+                  floatingControlBase,
+                  "h-[1.125rem] w-[1.125rem] bg-[rgba(62,138,82,0.55)]",
+                  (disabled || (!isUnset && value >= MAX_GOALS)) && "opacity-40"
+                )
+              : cn(
+                  defaultControlClass,
+                  (disabled || (!isUnset && value >= MAX_GOALS)) && "opacity-40"
+                )
           }
         >
           <Plus

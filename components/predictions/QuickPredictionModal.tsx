@@ -44,8 +44,7 @@ import {
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
 import { resolveMatchGoalScorers } from "@/lib/live/goal-scorers";
 import { entityModalUsageLabel, matchFixtureLabel } from "@/lib/usage/modal-labels";
-import { formatListScore } from "@/lib/predictions/edit-state";
-import { resolvePredictionUiState } from "@/lib/predictions/edit-state";
+import { formatListScore, hasFilledPredictionScore, resolvePredictionUiState } from "@/lib/predictions/edit-state";
 import {
   mergeMvpIntoMatch,
   mvpOverridesFromMatchListAndActive,
@@ -329,8 +328,8 @@ export function QuickPredictionModal({
 
   const savedHome = viewMatch.prediction?.home_goals ?? null;
   const savedAway = viewMatch.prediction?.away_goals ?? null;
-  const [home, setHome] = useState(savedHome ?? 0);
-  const [away, setAway] = useState(savedAway ?? 0);
+  const [home, setHome] = useState<number | null>(savedHome);
+  const [away, setAway] = useState<number | null>(savedAway);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -338,12 +337,18 @@ export function QuickPredictionModal({
 
   useEffect(() => {
     reset({ kind: "prediction" });
-    setHome(savedHome ?? 0);
-    setAway(savedAway ?? 0);
+    setHome(savedHome);
+    setAway(savedAway);
     setError(null);
   }, [viewMatch.id, savedHome, savedAway, reset]);
 
-  const draftDirty = home !== (savedHome ?? 0) || away !== (savedAway ?? 0);
+  const draftDirty = home !== savedHome || away !== savedAway;
+  const scoreFilled =
+    hasFilledPredictionScore(savedHome, savedAway) ||
+    hasFilledPredictionScore(home, away);
+  const mvpFilled = Boolean(mvpPlayerName?.trim());
+  const bothFilled = scoreFilled && mvpFilled;
+  const partialFill = (scoreFilled && !mvpFilled) || (mvpFilled && !scoreFilled);
   const uiState = useMemo(
     () =>
       resolvePredictionUiState({
@@ -359,7 +364,43 @@ export function QuickPredictionModal({
   );
 
   const controlsDisabled = uiState === "locked" || pending;
-  const canSave = uiState !== "locked" && (uiState !== "saved" || draftDirty);
+  const canSave =
+    uiState !== "locked" &&
+    !pending &&
+    (partialFill || (bothFilled && (uiState !== "saved" || draftDirty)));
+
+  function onSave() {
+    setError(null);
+
+    const draftScoreFilled = hasFilledPredictionScore(home, away);
+    const savedScoreFilled = hasFilledPredictionScore(savedHome, savedAway);
+    const hasScore = savedScoreFilled || draftScoreFilled;
+    const hasMvp = mvpFilled;
+
+    if (hasScore && !hasMvp) {
+      setError("Añade quien crees que será el mvp del partido.");
+      return;
+    }
+    if (hasMvp && !hasScore) {
+      setError("Añade tu pronóstico del partido.");
+      return;
+    }
+    if (!hasScore || !hasMvp) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await savePrediction(poolId, viewMatch.id, home!, away!);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setHome(result.home);
+      setAway(result.away);
+      onClose();
+      router.refresh();
+    });
+  }
 
   const clearMatchSlideTimer = useCallback(() => {
     if (matchSlideTimerRef.current !== null) {
@@ -501,21 +542,6 @@ export function QuickPredictionModal({
       orderedMatches,
     ]
   );
-
-  function onSave() {
-    setError(null);
-    startTransition(async () => {
-      const result = await savePrediction(poolId, viewMatch.id, home, away);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      setHome(result.home);
-      setAway(result.away);
-      onClose();
-      router.refresh();
-    });
-  }
 
   function renderMvpCenterSlot(targetMatch: MatchWithPrediction) {
     const isFinished = targetMatch.status === "finished";
@@ -805,11 +831,6 @@ export function QuickPredictionModal({
               </div>
             </div>
 
-            {error ? (
-              <p className="mt-3 text-center text-sm text-[var(--tm-danger)]" role="alert">
-                {error}
-              </p>
-            ) : null}
           </div>
 
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.38rem]">
@@ -822,6 +843,11 @@ export function QuickPredictionModal({
                 {pending ? "Guardando..." : "Guardar"}
               </Button>
             </div>
+            {error ? (
+              <p className="mt-2 text-center text-sm text-[var(--tm-danger)]" role="alert">
+                {error}
+              </p>
+            ) : null}
           </div>
         </div>
       );
@@ -855,6 +881,8 @@ export function QuickPredictionModal({
           savedPlayerName={view.savedPlayerName}
           savedTeamName={view.savedTeamName}
           savedShirtNumber={view.savedShirtNumber}
+          requirePredictionScore
+          predictionScoreFilled={scoreFilled}
           onSaved={(playerName, teamName, shirtNumber) =>
             handleMvpSaved(view.matchId, playerName, teamName, shirtNumber)
           }

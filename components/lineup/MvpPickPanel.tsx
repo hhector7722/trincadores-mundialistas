@@ -26,6 +26,9 @@ type MvpPickPanelProps = {
   savedShirtNumber?: number | null;
   onSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   onFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
+  /** Bloquea guardar MVP si aún no hay marcador pronosticado. */
+  requirePredictionScore?: boolean;
+  predictionScoreFilled?: boolean;
 };
 
 type SquadPlayerOption = {
@@ -75,6 +78,8 @@ export function MvpPickPanel({
   savedShirtNumber,
   onSaved,
   onFormationsChange,
+  requirePredictionScore = false,
+  predictionScoreFilled = true,
 }: MvpPickPanelProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -200,6 +205,11 @@ export function MvpPickPanel({
     const selected = resolveMvpSelection(options, selectedKey, lineupPlayers);
     if (!selected) {
       setError("Selecciona un jugador.");
+      return;
+    }
+
+    if (requirePredictionScore && !predictionScoreFilled) {
+      setError("Añade tu pronóstico del partido.");
       return;
     }
 

@@ -14,7 +14,7 @@ import {
 } from "@/components/lineup/EntityModalController";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsRow";
-import { HomeSquadFooterLink } from "@/components/lineup/MatchContextActionButton";
+import { HomeSquadFooterLink, MatchAddPillButton } from "@/components/lineup/MatchContextActionButton";
 import { HomeFinishedMatchPanel } from "@/components/home/HomeFinishedMatchPanel";
 import {
   HOME_CARD_HEADER_CLASS,
@@ -376,33 +376,23 @@ export function HomeMatchCard({
                   />
                 ) : (
                   <div className="flex w-full justify-center">
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openScoreModal();
-                      }}
-                      className={cn(
-                        "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-                        "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
-                        "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
-                        "transition-opacity hover:opacity-90 active:opacity-80",
-                      )}
-                    >
+                    <MatchAddPillButton onClick={openScoreModal}>
                       <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
                       Añadir
-                    </button>
+                    </MatchAddPillButton>
                   </div>
                 )
               }
-                predictionSlot={
+              predictionSlot={
+                saved ? (
                   <MvpPredictionButton
                     savedPlayerName={displayMatch.mvpPrediction?.player_name}
                     onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
                     variant="compact"
                     className="w-full"
                   />
-                }
+                ) : null
+              }
                 onOpenHomeLineup={() =>
                   openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
                 }

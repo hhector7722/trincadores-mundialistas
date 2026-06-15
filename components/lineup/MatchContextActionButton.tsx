@@ -28,6 +28,35 @@ type MatchContextTextActionButtonProps = {
   title?: string;
 };
 
+/** Botón pill amarillo compartido (p. ej. «+ Añadir», «Añadir MVP»). */
+export const MATCH_ADD_PILL_BUTTON_CLASS = cn(
+  "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
+  "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+  "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
+  "transition-opacity hover:opacity-90 active:opacity-80"
+);
+
+type MatchAddPillButtonProps = {
+  children: ReactNode;
+  onClick?: () => void;
+  className?: string;
+};
+
+export function MatchAddPillButton({ children, onClick, className }: MatchAddPillButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onClick?.();
+      }}
+      className={cn(MATCH_ADD_PILL_BUTTON_CLASS, className)}
+    >
+      {children}
+    </button>
+  );
+}
+
 /** Botón de texto amarillo compartido (p. ej. «Añadir MVP», «Guardar MVP»). */
 export function MatchContextTextActionButton({
   children,
@@ -94,6 +123,8 @@ type MatchContextActionButtonProps = {
   showConfirmedBadge?: boolean;
   hideCaption?: boolean;
   emptyLabel?: string;
+  /** `pill` = botón relleno amarillo (card inicio / modal pronóstico). */
+  emptyVariant?: "text" | "pill";
   /** `muted` = enlace secundario (modal detalle partido). */
   tone?: "accent" | "muted";
   className?: string;
@@ -108,6 +139,7 @@ export function MatchContextActionButton({
   showConfirmedBadge = false,
   hideCaption = false,
   emptyLabel,
+  emptyVariant = "text",
   tone = "accent",
   className,
 }: MatchContextActionButtonProps) {
@@ -202,6 +234,15 @@ export function MatchContextActionButton({
               />
             </button>
           ) : null}
+        </div>
+      ) : emptyVariant === "pill" ? (
+        <div className="flex w-full justify-center">
+          <MatchAddPillButton onClick={onClick}>
+            {addIcon ? (
+              <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+            ) : null}
+            {emptyText}
+          </MatchAddPillButton>
         </div>
       ) : (
         <MatchContextTextActionButton

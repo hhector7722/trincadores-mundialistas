@@ -110,14 +110,14 @@ export function PredictionForm({
             label="Local"
             value={home}
             disabled={controlsDisabled}
-            onChange={setHome}
+            onChange={(next) => setHome(next ?? 0)}
           />
           <span className="self-center pt-6 text-lg text-[var(--tm-muted)]">:</span>
           <ScoreStepper
             label="Visitante"
             value={away}
             disabled={controlsDisabled}
-            onChange={setAway}
+            onChange={(next) => setAway(next ?? 0)}
           />
         </div>
 
