@@ -1,4 +1,7 @@
 import { quizDayClosesAt, quizDayOpensAt, todayQuizDate } from "@/lib/quiz/date";
+import {
+  getDefaultUsageSelectedProfileIds,
+} from "@/lib/usage/default-filters";
 import { buildUsageRecentFeed } from "@/lib/usage/present";
 import { buildUsageContextMaps } from "@/lib/usage/resolve-context";
 import type { AppUsageEventType } from "@/lib/usage/types";
@@ -13,7 +16,7 @@ export type UsageFilterUser = {
 export type UsageDashboardFilters = {
   /** YYYY-MM-DD civil Madrid; null = todos los dias. */
   day: string | null;
-  /** null = todos los usuarios del pool; [] = ninguno; array = subconjunto. */
+  /** null = seleccion por defecto (todos menos excluidos); [] = ninguno; array = subconjunto. */
   profileIds: string[] | null;
 };
 
@@ -163,6 +166,17 @@ export function parseUsageDashboardFilters(searchParams: {
   return { day, profileIds: null };
 }
 
+function resolveUsageFilters(
+  filters: UsageDashboardFilters,
+  filterUsers: UsageFilterUser[]
+): UsageDashboardFilters {
+  if (filters.profileIds !== null) return filters;
+  return {
+    ...filters,
+    profileIds: getDefaultUsageSelectedProfileIds(filterUsers),
+  };
+}
+
 function applyUsageProfileFilter<T extends { eq: (col: string, val: string) => T; in: (col: string, vals: string[]) => T }>(
   query: T,
   profileIds: string[] | null
@@ -247,7 +261,9 @@ export async function getUsageRecentEventsPage(
   options: { offset: number; limit?: number }
 ): Promise<{ events: UsageRecentEvent[]; hasMore: boolean }> {
   const limit = options.limit ?? USAGE_RECENT_ACTIVITY_PAGE_SIZE;
-  const rows = await fetchUsageEventRows(poolId, filters);
+  const filterUsers = await getPoolFilterUsers(poolId);
+  const resolvedFilters = resolveUsageFilters(filters, filterUsers);
+  const rows = await fetchUsageEventRows(poolId, resolvedFilters);
   const supabase = await createClient();
   const contextMaps = await buildUsageContextMaps(supabase, rows);
   const rowById = new Map(rows.map((row) => [row.id, row]));
@@ -300,11 +316,9 @@ export async function getUsageDashboardData(
   filters: UsageDashboardFilters
 ): Promise<UsageDashboardData> {
   const supabase = await createClient();
-
-  const [rows, filterUsers] = await Promise.all([
-    fetchUsageEventRows(poolId, filters),
-    getPoolFilterUsers(poolId),
-  ]);
+  const filterUsers = await getPoolFilterUsers(poolId);
+  const resolvedFilters = resolveUsageFilters(filters, filterUsers);
+  const rows = await fetchUsageEventRows(poolId, resolvedFilters);
 
   const contextMaps = await buildUsageContextMaps(supabase, rows);
   const summaryMap = new Map<string, UsageUserSummary>();

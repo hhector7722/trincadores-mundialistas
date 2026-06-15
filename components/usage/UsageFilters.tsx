@@ -10,6 +10,10 @@ import {
   VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 import type { UsageDashboardFilters, UsageFilterUser } from "@/lib/usage/queries";
+import {
+  getDefaultUsageSelectedProfileIds,
+  usageProfileIdSetsMatch,
+} from "@/lib/usage/default-filters";
 import { cn } from "@/lib/utils";
 
 function resyncViewportChrome() {
@@ -29,15 +33,17 @@ function selectedIdsFromFilters(
   users: UsageFilterUser[]
 ): Set<string> {
   if (filters.profileIds === null) {
-    return new Set(users.map((user) => user.profileId));
+    return new Set(getDefaultUsageSelectedProfileIds(users));
   }
   return new Set(filters.profileIds);
 }
 
-function serializeUsersParam(allUserIds: string[], selected: Set<string>): string | undefined {
-  if (selected.size === allUserIds.length) return undefined;
+function serializeUsersParam(users: UsageFilterUser[], selected: Set<string>): string | undefined {
+  const selectedIds = [...selected];
+  const defaultIds = getDefaultUsageSelectedProfileIds(users);
+  if (usageProfileIdSetsMatch(selectedIds, defaultIds)) return undefined;
   if (selected.size === 0) return "ninguno";
-  return [...selected].join(",");
+  return selectedIds.join(",");
 }
 
 function usersFilterLabel(selectedCount: number, totalCount: number): string {
@@ -76,7 +82,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
   function applyFilters(nextDay: string, nextSelected: Set<string>) {
     const params = new URLSearchParams();
     if (nextDay) params.set("dia", nextDay);
-    const usersParam = serializeUsersParam(allUserIds, nextSelected);
+    const usersParam = serializeUsersParam(users, nextSelected);
     if (usersParam) params.set("usuarios", usersParam);
     const query = params.toString();
     router.push(query ? `/uso?${query}` : "/uso");
@@ -159,7 +165,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
           href="/uso"
           onClick={() => {
             setDay("");
-            setSelectedIds(new Set(allUserIds));
+            setSelectedIds(new Set(getDefaultUsageSelectedProfileIds(users)));
             setUsersOpen(false);
             resyncViewportChromeAfterFormControl();
           }}
