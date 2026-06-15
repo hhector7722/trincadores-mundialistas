@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { saveMvpPrediction } from "@/actions/mvp-predictions";
 import { MvpTacticalFieldBody } from "@/components/lineup/MvpTacticalFieldBody";
-import { MatchContextTextActionButton } from "@/components/lineup/MatchContextActionButton";
+import { MatchAddPillButton, MatchContextTextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { TacticalLineupsPanelShell } from "@/components/lineup/TacticalLineupsPanelShell";
 import {
   findMvpOptionBySaved,
@@ -26,9 +26,8 @@ type MvpPickPanelProps = {
   savedShirtNumber?: number | null;
   onSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   onFormationsChange?: (awayFormation?: string, homeFormation?: string) => void;
-  /** Bloquea guardar MVP si aún no hay marcador pronosticado. */
-  requirePredictionScore?: boolean;
-  predictionScoreFilled?: boolean;
+  /** `draft` = solo estado local hasta guardar el pronóstico completo; `immediate` = persiste en BD. */
+  persistMode?: "draft" | "immediate";
 };
 
 type SquadPlayerOption = {
@@ -78,9 +77,9 @@ export function MvpPickPanel({
   savedShirtNumber,
   onSaved,
   onFormationsChange,
-  requirePredictionScore = false,
-  predictionScoreFilled = true,
+  persistMode = "immediate",
 }: MvpPickPanelProps) {
+  const isDraftMode = persistMode === "draft";
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -208,8 +207,9 @@ export function MvpPickPanel({
       return;
     }
 
-    if (requirePredictionScore && !predictionScoreFilled) {
-      setError("Añade tu pronóstico del partido.");
+    if (isDraftMode) {
+      setError(null);
+      onSaved?.(selected.name, selected.teamName, selected.shirtNumber);
       return;
     }
 
@@ -259,6 +259,14 @@ export function MvpPickPanel({
           ) : null}
           {!serverEditable ? (
             <p className="text-center text-[9px] text-[var(--tm-muted)]">Predicción cerrada.</p>
+          ) : isDraftMode ? (
+            <MatchAddPillButton
+              inactive={!selectedOption}
+              onClick={onSave}
+              title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
+            >
+              {savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
+            </MatchAddPillButton>
           ) : (
             <MatchContextTextActionButton
               inactive={!selectedOption || pending}

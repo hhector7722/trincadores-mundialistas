@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
-import { fetchSavedMvpPlayerName } from "@/actions/mvp-predictions";
+import { deleteMvpPrediction, saveMvpPrediction } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
 import {
   buildLineupView,
@@ -226,7 +226,6 @@ export function QuickPredictionModal({
     POSSIBLE_LINEUPS_ACTION_CAPTION,
   );
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
-  const [mvpPlayerName, setMvpPlayerName] = useState<string | null>(null);
   const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
@@ -234,6 +233,8 @@ export function QuickPredictionModal({
   const matchSlideTimerRef = useRef<number | null>(null);
   const onMatchChangeRef = useRef(onMatchChange);
   const wasOpenRef = useRef(false);
+  const mvpOverridesRef = useRef<Record<string, MvpSnapshot>>({});
+  const sessionBaselinesRef = useRef<Record<string, { scoreFilled: boolean }>>({});
 
   const baseViewMatch = useMemo(
     () => preferMatchMvpData(orderedMatches[activeIndex] ?? match, match),
@@ -333,6 +334,8 @@ export function QuickPredictionModal({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  mvpOverridesRef.current = mvpOverrides;
+
   onMatchChangeRef.current = onMatchChange;
 
   useEffect(() => {
@@ -346,7 +349,7 @@ export function QuickPredictionModal({
   const scoreFilled =
     hasFilledPredictionScore(savedHome, savedAway) ||
     hasFilledPredictionScore(home, away);
-  const mvpFilled = Boolean(mvpPlayerName?.trim());
+  const mvpFilled = Boolean(mvpPlayerNameFromMatch(viewMatch)?.trim());
   const bothFilled = scoreFilled && mvpFilled;
   const partialFill = (scoreFilled && !mvpFilled) || (mvpFilled && !scoreFilled);
   const uiState = useMemo(
@@ -390,17 +393,72 @@ export function QuickPredictionModal({
     }
 
     startTransition(async () => {
+      const mvpSnap =
+        mvpOverrides[viewMatch.id] ??
+        (viewMatch.mvpPrediction?.player_name?.trim()
+          ? {
+              player_name: viewMatch.mvpPrediction.player_name,
+              team_name: viewMatch.mvpPrediction.team_name,
+              shirt_number: viewMatch.mvpPrediction.shirt_number ?? null,
+            }
+          : null);
+
       const result = await savePrediction(poolId, viewMatch.id, home!, away!);
       if (!result.ok) {
         setError(result.error);
         return;
       }
+
+      if (mvpSnap) {
+        const mvpResult = await saveMvpPrediction(
+          poolId,
+          viewMatch.id,
+          mvpSnap.player_name,
+          mvpSnap.team_name,
+          mvpSnap.shirt_number
+        );
+        if (!mvpResult.ok) {
+          setError(mvpResult.error);
+          return;
+        }
+        onMvpSaved?.(
+          viewMatch.id,
+          mvpResult.playerName,
+          mvpResult.teamName,
+          mvpResult.shirtNumber
+        );
+      }
+
       setHome(result.home);
       setAway(result.away);
       onClose();
       router.refresh();
     });
   }
+
+  const handleDismiss = useCallback(() => {
+    const overrides = mvpOverridesRef.current;
+    const matchesToClean = orderedMatches.filter((m) => {
+      const baseline = sessionBaselinesRef.current[m.id];
+      if (baseline?.scoreFilled) return false;
+      const hadMvp =
+        Boolean(overrides[m.id]?.player_name?.trim()) ||
+        Boolean(m.mvpPrediction?.player_name?.trim());
+      return hadMvp;
+    });
+
+    void (async () => {
+      let didMutate = false;
+      for (const m of matchesToClean) {
+        const result = await deleteMvpPrediction(poolId, m.id);
+        if (result.ok) didMutate = true;
+      }
+      onClose();
+      if (didMutate || Object.keys(overrides).length > 0) {
+        router.refresh();
+      }
+    })();
+  }, [onClose, orderedMatches, poolId, router]);
 
   const clearMatchSlideTimer = useCallback(() => {
     if (matchSlideTimerRef.current !== null) {
@@ -433,7 +491,6 @@ export function QuickPredictionModal({
       teamName: string,
       shirtNumber?: number | null
     ) => {
-      const trimmedName = playerName.trim();
       setMvpOverrides((current) => ({
         ...current,
         [matchId]: {
@@ -442,20 +499,11 @@ export function QuickPredictionModal({
           shirt_number: shirtNumber ?? null,
         },
       }));
-      if (matchId === viewMatch.id && trimmedName) {
-        setMvpPlayerName(trimmedName);
-      }
-      onMvpSaved?.(matchId, playerName, teamName, shirtNumber);
       if (panelView.kind === "mvp" && panelView.matchId === matchId) {
-        replaceCurrent({
-          ...panelView,
-          savedPlayerName: playerName,
-          savedTeamName: teamName,
-          savedShirtNumber: shirtNumber ?? null,
-        });
+        pop();
       }
     },
-    [onMvpSaved, panelView, replaceCurrent, viewMatch.id]
+    [panelView, pop]
   );
 
   useEffect(() => {
@@ -465,7 +513,6 @@ export function QuickPredictionModal({
       matchSlideLockRef.current = false;
       setMatchSlide(null);
       setMvpOverrides({});
-      setMvpPlayerName(null);
       setPredictionsBoardOpen(false);
       setStatsModalOpen(false);
       return;
@@ -479,34 +526,24 @@ export function QuickPredictionModal({
       setMatchSlide(null);
       matchSlideLockRef.current = false;
       setMvpOverrides(mvpOverridesFromMatchListAndActive(orderedMatches, match));
+      sessionBaselinesRef.current = Object.fromEntries(
+        orderedMatches.map((m) => [
+          m.id,
+          {
+            scoreFilled: hasFilledPredictionScore(
+              m.prediction?.home_goals ?? null,
+              m.prediction?.away_goals ?? null
+            ),
+          },
+        ])
+      );
     }
   }, [open, match, orderedMatches, clearMatchSlideTimer]);
 
   useEffect(() => {
-    if (!open) return;
-
-    const fromView = mvpPlayerNameFromMatch(viewMatch);
-    setMvpPlayerName(fromView);
-
-    let cancelled = false;
-    void fetchSavedMvpPlayerName(poolId, viewMatch.id)
-      .then((name) => {
-        if (!cancelled) setMvpPlayerName(name);
-      })
-      .catch(() => {
-        if (!cancelled) setMvpPlayerName(fromView);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    open,
-    poolId,
-    viewMatch.id,
-    viewMatch.mvpPrediction?.player_name,
-    viewMatch.mvpPrediction?.updated_at,
-  ]);
+    if (open) return;
+    sessionBaselinesRef.current = {};
+  }, [open]);
 
   useEffect(() => () => clearMatchSlideTimer(), [clearMatchSlideTimer]);
 
@@ -545,34 +582,20 @@ export function QuickPredictionModal({
 
   function renderMvpCenterSlot(targetMatch: MatchWithPrediction) {
     const isFinished = targetMatch.status === "finished";
-    const savedTeamName = targetMatch.mvpPrediction?.team_name ?? null;
+    const displayMatch = mergeMvpIntoMatch(targetMatch, mvpOverrides[targetMatch.id]);
+    const displayName = mvpPlayerNameFromMatch(displayMatch);
+    const savedTeamName = displayMatch.mvpPrediction?.team_name ?? null;
 
     return (
       <MvpPredictionButton
-        savedPlayerName={mvpPlayerName}
+        savedPlayerName={displayName}
         savedTeamName={savedTeamName}
         readOnly={targetMatch.status === "live" || isFinished}
         officialPlayerName={isFinished ? targetMatch.officialMvpPlayerName : undefined}
         officialTeamName={isFinished ? targetMatch.officialMvpTeamName : undefined}
         onClick={
           targetMatch.status === "scheduled"
-            ? () =>
-                push(
-                  buildMvpView(poolId, {
-                    ...targetMatch,
-                    mvpPrediction: mvpPlayerName
-                      ? {
-                          id: targetMatch.mvpPrediction?.id ?? "",
-                          player_name: mvpPlayerName,
-                          team_name: savedTeamName ?? "",
-                          shirt_number: targetMatch.mvpPrediction?.shirt_number ?? null,
-                          points_awarded: targetMatch.mvpPrediction?.points_awarded ?? null,
-                          updated_at:
-                            targetMatch.mvpPrediction?.updated_at ?? new Date().toISOString(),
-                        }
-                      : targetMatch.mvpPrediction,
-                  })
-                )
+            ? () => push(buildMvpView(poolId, displayMatch))
             : undefined
         }
         variant="compact"
@@ -836,7 +859,7 @@ export function QuickPredictionModal({
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.38rem]">
             <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
             <div className="mt-3 flex gap-2">
-              <Button variant="outline" className="flex-1" disabled={pending} onClick={onClose}>
+              <Button variant="outline" className="flex-1" disabled={pending} onClick={handleDismiss}>
                 Cancelar
               </Button>
               <Button className="flex-1" disabled={!canSave || pending} onClick={onSave}>
@@ -881,8 +904,7 @@ export function QuickPredictionModal({
           savedPlayerName={view.savedPlayerName}
           savedTeamName={view.savedTeamName}
           savedShirtNumber={view.savedShirtNumber}
-          requirePredictionScore
-          predictionScoreFilled={scoreFilled}
+          persistMode="draft"
           onSaved={(playerName, teamName, shirtNumber) =>
             handleMvpSaved(view.matchId, playerName, teamName, shirtNumber)
           }
@@ -935,7 +957,7 @@ export function QuickPredictionModal({
     <>
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleDismiss}
       usageId={`quick-prediction-${panelView.kind}`}
       usageLabel={quickUsageLabel(panelView, viewMatch)}
       title={quickPanelTitle(panelView, {

@@ -152,3 +152,46 @@ export async function saveMvpPrediction(
     updatedAt: saved.updated_at,
   };
 }
+
+export type DeleteMvpPredictionResult = { ok: true } | { ok: false; error: string };
+
+/** Elimina el MVP pronosticado del usuario para un partido (p. ej. al cancelar sin marcador). */
+export async function deleteMvpPrediction(
+  poolId: string,
+  matchId: string
+): Promise<DeleteMvpPredictionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesión no válida. Vuelve a iniciar sesión." };
+  }
+
+  const member = await assertPoolMembership(user.id, poolId);
+  if (!member) {
+    return { ok: false, error: "No perteneces a esta porra." };
+  }
+
+  const inPool = await assertMatchInPool(poolId, matchId);
+  if (!inPool) {
+    return { ok: false, error: "Partido no encontrado en esta porra." };
+  }
+
+  const { error } = await supabase
+    .from("match_mvp_predictions")
+    .delete()
+    .eq("pool_id", poolId)
+    .eq("match_id", matchId)
+    .eq("profile_id", user.id);
+
+  if (error) {
+    return { ok: false, error: mapMvpDbError(error.message) };
+  }
+
+  revalidatePath("/predictions");
+  revalidatePath(`/predictions/${matchId}`);
+  revalidatePath("/");
+  return { ok: true };
+}

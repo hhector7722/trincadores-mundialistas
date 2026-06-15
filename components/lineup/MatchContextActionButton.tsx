@@ -40,17 +40,28 @@ type MatchAddPillButtonProps = {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  inactive?: boolean;
 };
 
-export function MatchAddPillButton({ children, onClick, className }: MatchAddPillButtonProps) {
+export function MatchAddPillButton({
+  children,
+  onClick,
+  className,
+  inactive = false,
+}: MatchAddPillButtonProps) {
   return (
     <button
       type="button"
-      onClick={(event: MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-        onClick?.();
-      }}
-      className={cn(MATCH_ADD_PILL_BUTTON_CLASS, className)}
+      aria-disabled={inactive || undefined}
+      onClick={
+        inactive
+          ? undefined
+          : (event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              onClick?.();
+            }
+      }
+      className={cn(MATCH_ADD_PILL_BUTTON_CLASS, inactive && "pointer-events-none opacity-40", className)}
     >
       {children}
     </button>

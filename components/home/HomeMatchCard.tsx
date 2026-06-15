@@ -378,7 +378,7 @@ export function HomeMatchCard({
                   <div className="flex w-full justify-center">
                     <MatchAddPillButton onClick={openScoreModal}>
                       <Plus className="mr-0.5 h-2.5 w-2.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                      Añadir
+                      Añadir pronóstico
                     </MatchAddPillButton>
                   </div>
                 )

@@ -4,8 +4,6 @@ import { Minus, Plus } from "lucide-react";
 import { MAX_GOALS } from "@/lib/predictions/validation";
 import { cn } from "@/lib/utils";
 
-const UNSET_SCORE_LABEL = "—";
-
 export function ScoreStepper({
   label,
   value,
@@ -75,13 +73,25 @@ export function ScoreStepper({
         </button>
         <span
           className={cn(
-            "font-display min-w-[1.25ch] text-center text-[var(--tm-fg)] tabular-nums",
+            "font-display text-center text-[var(--tm-fg)] tabular-nums",
             isFloating
-              ? "text-[2.5rem] leading-none sm:text-[2.75rem]"
-              : "text-3xl"
+              ? isUnset
+                ? "flex min-w-0 items-center justify-center"
+                : "min-w-[1.25ch] text-[2.5rem] leading-none sm:text-[2.75rem]"
+              : "min-w-[1.25ch] text-3xl"
           )}
         >
-          {isUnset ? UNSET_SCORE_LABEL : value}
+          {isUnset ? (
+            <span
+              className={cn(
+                "block bg-white/35",
+                isFloating ? "h-[1.125rem] w-px sm:h-[1.25rem]" : "h-6 w-px"
+              )}
+              aria-hidden="true"
+            />
+          ) : (
+            value
+          )}
         </span>
         <button
           type="button"
