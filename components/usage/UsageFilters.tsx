@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
@@ -39,6 +40,13 @@ function serializeUsersParam(allUserIds: string[], selected: Set<string>): strin
   return [...selected].join(",");
 }
 
+function usersFilterLabel(selectedCount: number, totalCount: number): string {
+  if (totalCount === 0) return "Usuarios";
+  if (selectedCount === 0) return "Ninguno";
+  if (selectedCount === totalCount) return "Todos";
+  return `${selectedCount} de ${totalCount}`;
+}
+
 type UsageFiltersProps = {
   filters: UsageDashboardFilters;
   users: UsageFilterUser[];
@@ -53,6 +61,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() =>
     selectedIdsFromFilters(filters, users)
   );
+  const [usersOpen, setUsersOpen] = useState(false);
 
   useEffect(() => {
     setDay(filters.day ?? "");
@@ -71,6 +80,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
     if (usersParam) params.set("usuarios", usersParam);
     const query = params.toString();
     router.push(query ? `/uso?${query}` : "/uso");
+    setUsersOpen(false);
     resyncViewportChromeAfterFormControl();
   }
 
@@ -98,9 +108,10 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
 
   const allSelected = selectedIds.size === allUserIds.length && allUserIds.length > 0;
   const noneSelected = selectedIds.size === 0;
+  const usersLabel = usersFilterLabel(selectedIds.size, allUserIds.length);
 
   return (
-    <form onSubmit={handleSubmit} data-block-tab-swipe="" className="space-y-3">
+    <form onSubmit={handleSubmit} data-block-tab-swipe="" className="space-y-2">
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <input
           id="usage-day"
@@ -117,6 +128,29 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
           )}
         />
 
+        <button
+          type="button"
+          onClick={() => setUsersOpen((value) => !value)}
+          aria-expanded={usersOpen}
+          aria-controls="usage-users-panel"
+          className={cn(
+            "inline-flex h-10 min-w-0 flex-1 items-center justify-between gap-1.5 rounded-lg border px-2.5 text-xs outline-none",
+            usersOpen
+              ? "border-[var(--tm-accent-muted)] text-[var(--tm-fg)]"
+              : "border-[var(--tm-border)]/70 text-[var(--tm-muted)]",
+            "focus:border-[var(--tm-accent-muted)]"
+          )}
+        >
+          <span className="truncate">{usersLabel}</span>
+          <ChevronDown
+            className={cn(
+              "size-3.5 shrink-0 transition-transform",
+              usersOpen && "rotate-180"
+            )}
+            aria-hidden
+          />
+        </button>
+
         <Button type="submit" className="h-10 shrink-0 px-3 text-xs">
           OK
         </Button>
@@ -126,6 +160,7 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
           onClick={() => {
             setDay("");
             setSelectedIds(new Set(allUserIds));
+            setUsersOpen(false);
             resyncViewportChromeAfterFormControl();
           }}
           className={cn(
@@ -137,62 +172,67 @@ export function UsageFilters({ filters, users }: UsageFiltersProps) {
         </Link>
       </div>
 
-      <div className="rounded-xl border border-[var(--tm-border)]/50 p-3">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--tm-muted)]">
-            Usuarios
-          </p>
-          <div className="flex items-center gap-2 text-[10px]">
-            <button
-              type="button"
-              onClick={selectAllUsers}
-              disabled={allSelected}
-              className="text-[var(--tm-primary)] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Seleccionar todos
-            </button>
-            <span className="text-[var(--tm-border)]" aria-hidden>
-              |
-            </span>
-            <button
-              type="button"
-              onClick={clearAllUsers}
-              disabled={noneSelected}
-              className="text-[var(--tm-muted)] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Quitar todos
-            </button>
+      {usersOpen ? (
+        <div
+          id="usage-users-panel"
+          className="rounded-xl border border-[var(--tm-border)]/50 p-3"
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--tm-muted)]">
+              Usuarios
+            </p>
+            <div className="flex items-center gap-2 text-[10px]">
+              <button
+                type="button"
+                onClick={selectAllUsers}
+                disabled={allSelected}
+                className="text-[var(--tm-primary)] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Seleccionar todos
+              </button>
+              <span className="text-[var(--tm-border)]" aria-hidden>
+                |
+              </span>
+              <button
+                type="button"
+                onClick={clearAllUsers}
+                disabled={noneSelected}
+                className="text-[var(--tm-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Quitar todos
+              </button>
+            </div>
+          </div>
+
+          <div className="grid max-h-40 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
+            {users.map((user) => {
+              const checked = selectedIds.has(user.profileId);
+              return (
+                <label
+                  key={user.profileId}
+                  className={cn(
+                    "flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-colors",
+                    checked
+                      ? "border-[var(--tm-accent-muted)]/50 bg-[var(--tm-accent-soft)]/20 text-[var(--tm-fg)]"
+                      : "border-[var(--tm-border)]/40 text-[var(--tm-muted)]"
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleUser(user.profileId)}
+                    className="size-4 shrink-0 accent-[var(--tm-accent)]"
+                  />
+                  <span className="min-w-0 truncate">
+                    {user.displayName}
+                    <span className="text-[var(--tm-muted)]"> @{user.username}</span>
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
-
-        <div className="grid max-h-40 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
-          {users.map((user) => {
-            const checked = selectedIds.has(user.profileId);
-            return (
-              <label
-                key={user.profileId}
-                className={cn(
-                  "flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-colors",
-                  checked
-                    ? "border-[var(--tm-accent-muted)]/50 bg-[var(--tm-accent-soft)]/20 text-[var(--tm-fg)]"
-                    : "border-[var(--tm-border)]/40 text-[var(--tm-muted)]"
-                )}
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => toggleUser(user.profileId)}
-                  className="size-4 shrink-0 accent-[var(--tm-accent)]"
-                />
-                <span className="min-w-0 truncate">
-                  {user.displayName}
-                  <span className="text-[var(--tm-muted)]"> @{user.username}</span>
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
+      ) : null}
     </form>
   );
 }
