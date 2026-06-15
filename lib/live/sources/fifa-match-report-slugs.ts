@@ -5,7 +5,7 @@ const FIFA_ARTICLE_SLUG_OVERRIDES: Record<string, string> = {
   "South Korea": "korea-republic",
   "Czech Republic": "czechia",
   "Bosnia & Herzegovina": "bosnia-and-herzegovina",
-  "Ivory Coast": "cote-divoire",
+  "Ivory Coast": "cote-d-ivoire",
   "DR Congo": "dr-congo",
   "Cape Verde": "cape-verde",
   "Iran": "ir-iran",

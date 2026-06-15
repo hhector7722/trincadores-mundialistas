@@ -80,8 +80,13 @@ const ALIAS_TO_CANONICAL: Record<string, string> = {
 
 /** Resuelve nombre FIFA/OpenFootball/Fjelstul al canónico de catálogo. */
 export function openFootballTeamName(input: string): string {
-  const trimmed = input.trim();
-  const key = trimmed.toLowerCase();
+  const trimmed = input
+    .trim()
+    .replace(/[\u2018\u2019\u201B`´]/g, "'");
+  const key = trimmed
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
   if (ALIAS_TO_CANONICAL[key]) return ALIAS_TO_CANONICAL[key];
   return trimmed;
 }
