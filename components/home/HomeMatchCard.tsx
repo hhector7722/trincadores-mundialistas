@@ -392,9 +392,13 @@ export function HomeMatchCard({
                 saved ? (
                   <MvpPredictionButton
                     savedPlayerName={displayMatch.mvpPrediction?.player_name}
-                    onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
+                    readOnly={savedMvp}
+                    onClick={
+                      savedMvp
+                        ? undefined
+                        : () => openEntityModal(buildMvpView(poolId, displayMatch))
+                    }
                     variant="compact"
-                    showEdit={false}
                     className="w-full"
                   />
                 ) : null
