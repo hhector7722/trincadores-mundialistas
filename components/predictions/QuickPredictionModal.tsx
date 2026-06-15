@@ -24,6 +24,8 @@ import {
   MatchTeamsDisplay,
   PREDICTION_MODAL_ACTIONS_ROW_CLASS,
   PREDICTION_MODAL_ACTIONS_STACKED_CLASS,
+  PREDICTION_MODAL_LIVE_ACTIONS_TOP_CLASS,
+  PREDICTION_MODAL_NAMES_BOTTOM_CLASS,
   PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS,
 } from "@/components/matches/MatchTeamsDisplay";
 import { PredictionDeadlineCountdown } from "@/components/predictions/PredictionDeadlineCountdown";
@@ -758,14 +760,17 @@ export function QuickPredictionModal({
               ) : null}
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", predictionModalActionsClass)}
+                className={cn(
+                  "absolute inset-x-0 bottom-0",
+                  targetMatch.prediction?.home_goals != null
+                    ? PREDICTION_MODAL_LIVE_ACTIONS_TOP_CLASS
+                    : PREDICTION_MODAL_NAMES_BOTTOM_CLASS,
+                )}
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
                   compact
-                  layout="homeCardStacked"
-                  homeAnchor="10%"
-                  awayAnchor="90%"
+                  layout="predictionModalLiveStacked"
                   lineupActionTone="muted"
                   className="h-full"
                   hideLineupButtons

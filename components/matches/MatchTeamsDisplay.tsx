@@ -14,6 +14,10 @@ export const PREDICTION_MODAL_ACTIONS_ROW_CLASS = "h-8";
 /** Modal pronóstico: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const PREDICTION_MODAL_ACTIONS_STACKED_CLASS = "h-16";
 
+/** Modal partido en juego: zona MVP + alineaciones bajo el pronóstico. */
+export const PREDICTION_MODAL_LIVE_ACTIONS_TOP_CLASS =
+  "top-[calc(1.15rem+2.5rem+0.25rem+0.625rem+2.25rem)] sm:top-[calc(1.15rem+2.75rem+0.25rem+0.625rem+2.25rem)]";
+
 /** Altura mínima del bloque equipos + acciones en modal pronóstico. */
 export const PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS = "min-h-[10.5rem]";
 

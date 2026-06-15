@@ -19,7 +19,8 @@ type MatchContextActionsRowProps = {
     | "predictionModalStacked"
     | "homeCardStacked"
     | "homeCardCompactStacked"
-    | "homeCardScheduledStacked";
+    | "homeCardScheduledStacked"
+    | "predictionModalLiveStacked";
   /** Centro de la fila superior (p. ej. MVP en card inicio). */
   centerSlot?: ReactNode;
   /** Fila central: pronóstico de marcador (entre MVP y alineaciones). */
@@ -61,7 +62,9 @@ export function MatchContextActionsRow({
     return (
       <div className={cn("flex h-full w-full flex-col items-stretch justify-evenly gap-0 leading-none", className)}>
         <div className="flex h-max w-full shrink-0 items-center justify-center">{centerSlot}</div>
-        <div className="flex w-full shrink-0 items-center justify-center">{predictionSlot}</div>
+        {predictionSlot ? (
+          <div className="flex w-full shrink-0 items-center justify-center">{predictionSlot}</div>
+        ) : null}
         {bottomSlot ? (
           <div className="flex w-full shrink-0 items-center justify-center">{bottomSlot}</div>
         ) : hidePossibleLineups ? null : (
@@ -70,6 +73,27 @@ export function MatchContextActionsRow({
               caption={possibleLineupsCaption}
               hideCaption={compact}
               showConfirmedBadge={possibleLineupsConfirmed}
+              onClick={onOpenPossibleLineups}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (layout === "predictionModalLiveStacked") {
+    return (
+      <div className={cn("flex h-full w-full flex-col items-stretch justify-evenly gap-0 leading-none", className)}>
+        {centerSlot ? (
+          <div className="flex w-full items-center justify-center px-1">{centerSlot}</div>
+        ) : null}
+        {hidePossibleLineups ? null : (
+          <div className="flex w-full items-center justify-center px-1">
+            <MatchContextActionButton
+              caption={possibleLineupsCaption}
+              hideCaption={compact}
+              showConfirmedBadge={possibleLineupsConfirmed}
+              tone={lineupActionTone}
               onClick={onOpenPossibleLineups}
             />
           </div>
