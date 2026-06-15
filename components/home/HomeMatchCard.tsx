@@ -155,6 +155,10 @@ function hasSavedPrediction(match: MatchWithPrediction): boolean {
   return home !== null && away !== null && Number.isInteger(home) && Number.isInteger(away);
 }
 
+function hasSavedMvp(match: MatchWithPrediction): boolean {
+  return Boolean(match.mvpPrediction?.player_name?.trim());
+}
+
 export function HomeMatchCard({
   poolId,
   match,
@@ -209,6 +213,7 @@ export function HomeMatchCard({
   }, [scoreModalOpen, entityModal.open, predictionsBoardOpen, onOpenChange]);
 
   const saved = hasSavedPrediction(displayMatch);
+  const savedMvp = hasSavedMvp(displayMatch);
   const scoreText = formatListScore(
     displayMatch.prediction?.home_goals ?? null,
     displayMatch.prediction?.away_goals ?? null,
@@ -389,6 +394,7 @@ export function HomeMatchCard({
                     savedPlayerName={displayMatch.mvpPrediction?.player_name}
                     onClick={() => openEntityModal(buildMvpView(poolId, displayMatch))}
                     variant="compact"
+                    showEdit={false}
                     className="w-full"
                   />
                 ) : null
@@ -409,7 +415,7 @@ export function HomeMatchCard({
         </div>
       </div>
         )}
-      {!isLive && !isFinished && saved ? (
+      {!isLive && !isFinished && saved && !savedMvp ? (
         <p
           className={cn(
             "pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 -translate-y-1/2",

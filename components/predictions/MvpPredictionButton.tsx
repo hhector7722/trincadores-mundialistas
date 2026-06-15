@@ -110,6 +110,8 @@ type MvpPredictionButtonProps = {
   officialTeamName?: string | null;
   /** Partido finalizado en card compacta: MVP pronosticado y real en la misma fila. */
   finishedInline?: boolean;
+  /** Muestra lápiz de edición junto al valor guardado. */
+  showEdit?: boolean;
 };
 
 /** Selector o visualización del MVP pronosticado del partido. */
@@ -123,6 +125,7 @@ export function MvpPredictionButton({
   officialPlayerName,
   officialTeamName,
   finishedInline = false,
+  showEdit = true,
 }: MvpPredictionButtonProps) {
   const compact = variant === "compact";
   const savedLabel =
@@ -222,7 +225,7 @@ export function MvpPredictionButton({
       caption={compact ? "MVP" : "MVP +"}
       onClick={onClick ?? (() => {})}
       savedValue={savedLabel}
-      showEdit={!readOnly}
+      showEdit={showEdit && !readOnly}
       addIcon
       hideCaption={compact}
       emptyLabel={compact ? "Añadir MVP" : undefined}
