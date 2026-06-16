@@ -162,7 +162,7 @@ export function HomeFinishedMatchPanel({
 
       <div
         className={cn(
-          "absolute inset-x-0 pointer-events-none",
+          "absolute inset-x-0 overflow-visible pointer-events-none",
           HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
           HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
         )}

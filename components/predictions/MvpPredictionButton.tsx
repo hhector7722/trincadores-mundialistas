@@ -52,12 +52,14 @@ function FinishedInlineMvpCorrect({
     <div
       ref={containerRef}
       className={cn(
-        "relative w-full text-[9px] font-semibold leading-none",
+        "relative w-full text-[10px] font-semibold leading-none sm:text-xs",
         className,
       )}
     >
-      <span ref={labelRef} className="block w-full truncate text-center text-white">
-        {savedLabel}
+      <span className="block w-full text-center text-white">
+        <span ref={labelRef} className="inline-block max-w-full truncate whitespace-nowrap">
+          {savedLabel}
+        </span>
       </span>
       {checkPos != null ? (
         <span

@@ -317,7 +317,7 @@ export function HomeMatchCard({
           <div className="cursor-pointer" onClick={() => openScoreModal()}>
             <HomeFinishedMatchPanel
               match={displayMatch}
-              teamsBlockClassName={teamsBlockClassName}
+              teamsBlockClassName={cn(teamsBlockClassName, "overflow-visible")}
               onOpenHomeLineup={() =>
                 openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
               }
