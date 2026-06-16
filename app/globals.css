@@ -1222,6 +1222,30 @@ html:has(.tm-app-shell) body {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
+/* Play: imagen + 4 opciones visibles sin scroll */
+.tm-quiz-play-scroll--fit {
+  overflow: hidden;
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+}
+
+.tm-quiz-stage--fit-viewport {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+.tm-quiz-stage__media {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+.tm-quiz-stage__options {
+  flex-shrink: 0;
+}
+
+.tm-quiz-timer--compact {
+  min-height: 2.75rem;
+}
+
 .tm-quiz-play-title {
   margin-bottom: 1rem;
   padding-top: 0.25rem;

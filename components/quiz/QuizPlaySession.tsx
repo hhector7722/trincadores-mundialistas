@@ -114,6 +114,9 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
 
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;
+  const fitViewport =
+    currentQuestion?.format === "guess_player_silhouette" ||
+    Boolean(currentQuestion?.image_url?.trim());
 
   const handleSubmit = useCallback(
     (finalAnswers: Record<string, string>) => {
@@ -281,31 +284,36 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
       <div className="tm-quiz-play-session flex min-h-0 flex-1 flex-col">
         <div
           ref={playScrollRef}
-          className="tm-quiz-play-scroll flex min-h-0 flex-1 flex-col gap-4"
+          className={cn(
+            "tm-quiz-play-scroll flex min-h-0 flex-1 flex-col gap-2",
+            fitViewport && "tm-quiz-play-scroll--fit"
+          )}
         >
-          <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-base uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-lg">
+          <h1 className="tm-quiz-play-title shrink-0 text-center font-display text-sm uppercase leading-snug tracking-wide text-[var(--tm-accent)] sm:text-base">
             {PLAY_TITLE}
           </h1>
 
-          {currentQuestion.format === "guess_player_silhouette" ? (
-            <QuizSilhouetteQuestionStage
-              question={currentQuestion}
-              selectedOptionId={answers[currentQuestion.id] ?? null}
-              phase={phase}
-              secondsLeft={secondsLeft}
-              locked={phase === "feedback"}
-              onSelect={resolveAnswer}
-            />
-          ) : (
-            <QuizQuestionStage
-              question={currentQuestion}
-              selectedOptionId={answers[currentQuestion.id] ?? null}
-              phase={phase}
-              secondsLeft={secondsLeft}
-              locked={phase === "feedback"}
-              onSelect={resolveAnswer}
-            />
-          )}
+          <div className="flex min-h-0 flex-1 flex-col">
+            {currentQuestion.format === "guess_player_silhouette" ? (
+              <QuizSilhouetteQuestionStage
+                question={currentQuestion}
+                selectedOptionId={answers[currentQuestion.id] ?? null}
+                phase={phase}
+                secondsLeft={secondsLeft}
+                locked={phase === "feedback"}
+                onSelect={resolveAnswer}
+              />
+            ) : (
+              <QuizQuestionStage
+                question={currentQuestion}
+                selectedOptionId={answers[currentQuestion.id] ?? null}
+                phase={phase}
+                secondsLeft={secondsLeft}
+                locked={phase === "feedback"}
+                onSelect={resolveAnswer}
+              />
+            )}
+          </div>
         </div>
       </div>
     );

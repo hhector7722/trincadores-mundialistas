@@ -10,6 +10,10 @@
       "schedule": "59 * * * *"
     },
     {
+      "path": "/api/cron/quiz-daily",
+      "schedule": "*/5 22-23 * * *"
+    },
+    {
       "path": "/api/cron/quiz-daily-reminder",
       "schedule": "0 * * * *"
     },

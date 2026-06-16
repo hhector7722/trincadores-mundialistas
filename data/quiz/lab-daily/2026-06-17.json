@@ -1,0 +1,71 @@
+{
+  "quizDate": "2026-06-17",
+  "generatedAt": "2026-06-16T22:14:53.335Z",
+  "momentIds": [
+    "wc2006-lehmann-penalties",
+    "wc2014-james-volley"
+  ],
+  "questions": [
+    {
+      "id": "daily-2026-06-17-image_trivia",
+      "format": "image_trivia",
+      "prompt": "¿Contra qué selección fue esta tanda?",
+      "imageUrl": "/images/quiz/historic/2006/wc2006-lehmann-penalties.jpg",
+      "timerSeconds": 10,
+      "momentId": "wc2006-lehmann-penalties",
+      "momentLabel": "Jens Lehmann — papelitos penaltis",
+      "momentDifficulty": "hard",
+      "answerType": "opponent",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Argentina"
+        },
+        {
+          "id": "opt_2",
+          "label": "Italia"
+        },
+        {
+          "id": "opt_3",
+          "label": "España"
+        },
+        {
+          "id": "opt_4",
+          "label": "Brasil"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    },
+    {
+      "id": "daily-2026-06-17-guess_player_silhouette",
+      "format": "guess_player_silhouette",
+      "prompt": "¿QUÉ JUGADOR ES LA SILUETA?",
+      "imageUrl": "/images/quiz/lab/generated/wc2014-james-volley-silhouette.jpg",
+      "revealImageUrl": "/images/quiz/historic/2014/wc2014-james-volley.jpg",
+      "sceneLabel": "2014 — Colombia vs Uruguay",
+      "timerSeconds": 10,
+      "silhouetteDemoId": null,
+      "momentId": "wc2014-james-volley",
+      "momentLabel": "James Rodríguez — Brasil 2014",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "James Rodríguez"
+        },
+        {
+          "id": "opt_2",
+          "label": "Neymar"
+        },
+        {
+          "id": "opt_3",
+          "label": "Luis Suárez"
+        },
+        {
+          "id": "opt_4",
+          "label": "Thomas Müller"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    }
+  ]
+}

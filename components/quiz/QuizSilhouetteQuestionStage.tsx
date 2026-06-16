@@ -33,38 +33,38 @@ export function QuizSilhouetteQuestionStage({
     question.options.find((option) => option.id === question.correct_option_id)?.label ?? null;
 
   return (
-    <div className="tm-quiz-stage flex flex-col gap-4">
+    <div className="tm-quiz-stage tm-quiz-stage--fit-viewport flex min-h-0 flex-1 flex-col gap-2">
       <div
         className={cn(
-          "tm-quiz-timer flex items-center justify-center rounded-2xl px-4 py-3",
+          "tm-quiz-timer tm-quiz-timer--compact shrink-0 flex items-center justify-center rounded-2xl px-4 py-2",
           timerUrgent && "tm-quiz-timer--urgent"
         )}
         aria-live="polite"
         aria-label={`Tiempo restante: ${secondsLeft} segundos`}
       >
-        <span className="tm-quiz-timer-value font-display text-3xl tabular-nums tracking-wide">
+        <span className="tm-quiz-timer-value font-display text-2xl tabular-nums tracking-wide">
           {secondsLeft}
         </span>
       </div>
 
-      <div className="relative">
-        <QuizImage src={revealSrc} alt="" />
+      <div className="tm-quiz-stage__media relative min-h-0 flex-1">
+        <QuizImage src={revealSrc} alt="" fitContainer className="absolute inset-0" />
         {!revealed ? (
-          <div className="pointer-events-none absolute inset-x-0 top-3 text-center">
+          <div className="pointer-events-none absolute inset-x-0 top-2 text-center">
             <span className="rounded-lg bg-black/70 px-3 py-1 font-display text-xs uppercase tracking-widest text-white">
               {question.prompt}
             </span>
           </div>
         ) : correctName ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-4 pt-12">
-            <p className="text-center font-display text-2xl uppercase tracking-wide text-white">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black via-black/90 to-transparent px-4 pb-3 pt-10">
+            <p className="text-center font-display text-xl uppercase tracking-wide text-white">
               {correctName}
             </p>
           </div>
         ) : null}
       </div>
 
-      <div className="grid gap-2">
+      <div className="tm-quiz-stage__options grid shrink-0 gap-1.5">
         {question.options.map((option) => (
           <QuizOptionButton
             key={option.id}

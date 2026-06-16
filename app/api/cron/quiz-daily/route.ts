@@ -8,11 +8,11 @@ import {
   isQuizOpenWindow,
   quizDateForCron,
 } from "@/lib/quiz/cron";
-import { publishQuizDay } from "@/lib/quiz/publish-day";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   if (!assertCronAuthorized(request)) {
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
   if (!shouldOpen && !shouldClose) {
     return NextResponse.json({
       skipped: true,
-      reason: "Fuera de ventana (00:00 abrir, 23:59 cerrar Europe/Madrid)",
+      reason: "Fuera de ventana (00:00–00:58 abrir, 23:58–23:59 cerrar Europe/Madrid)",
       madridClock: formatMadridClock(),
     });
   }
@@ -53,6 +53,7 @@ export async function GET(request: Request) {
       });
     }
 
+    const { publishQuizDay } = await import("@/lib/quiz/publish-day");
     const result = await publishQuizDay({
       admin,
       quizDate,

@@ -70,12 +70,12 @@ export async function materializeLabAsset(
     }
   );
 
-  await persistDerivedAssetToDisk(momentId, variant, buffer);
+  const publicUrl = await persistDerivedAssetToDisk(momentId, variant, buffer);
 
   return {
     momentId,
     variant,
-    publicUrl: persistedDerivedAssetPublicUrl(momentId, variant),
+    publicUrl,
     skipped: false,
   };
 }
@@ -114,11 +114,11 @@ export async function materializeLabQuestionAssets(
   if (!moment) return question;
 
   const silhouetteForce = variant === "silhouette" && !(await labAssetExistsOnDisk(momentId, variant));
-  await materializeLabAsset(moment, variant, {
+  const materialized = await materializeLabAsset(moment, variant, {
     force: options?.force ?? silhouetteForce,
   });
 
-  const staticUrl = persistedDerivedAssetPublicUrl(momentId, variant);
+  const staticUrl = materialized.publicUrl;
 
   if (isLabPlayerCropQuestion(question) || isLabPlayerSilhouetteQuestion(question)) {
     return { ...question, imageUrl: staticUrl };

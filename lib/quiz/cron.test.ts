@@ -22,6 +22,16 @@ describe("quiz cron", () => {
     assert.equal(quizCronAction(atMidnight), "open");
   });
 
+  it("isQuizOpenWindow sigue activo a las 00:30 Madrid (CEST)", () => {
+    const atHalfPast = new Date("2026-06-08T22:30:00.000Z");
+    assert.equal(isQuizOpenWindow(atHalfPast), true);
+  });
+
+  it("isQuizOpenWindow es false a las 00:59 Madrid (CEST)", () => {
+    const atLastMinute = new Date("2026-06-08T22:59:00.000Z");
+    assert.equal(isQuizOpenWindow(atLastMinute), false);
+  });
+
   it("isQuizCloseWindow es true a las 23:59 Madrid (CEST)", () => {
     const atClose = new Date("2026-06-09T21:59:00.000Z");
     assert.equal(isQuizCloseWindow(atClose), true);

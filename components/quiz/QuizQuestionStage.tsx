@@ -27,29 +27,53 @@ export function QuizQuestionStage({
   onSelect,
 }: QuizQuestionStageProps) {
   const timerUrgent = secondsLeft <= 5 && phase === "answering";
+  const hasImage = Boolean(question.image_url?.trim());
 
   return (
-    <div className="tm-quiz-stage flex flex-col gap-4">
+    <div
+      className={cn(
+        "tm-quiz-stage flex flex-col gap-2",
+        hasImage && "tm-quiz-stage--fit-viewport min-h-0 flex-1"
+      )}
+    >
       <div
         className={cn(
-          "tm-quiz-timer flex items-center justify-center rounded-2xl px-4 py-3",
+          "tm-quiz-timer shrink-0 flex items-center justify-center rounded-2xl px-4 py-2",
+          hasImage && "tm-quiz-timer--compact",
           timerUrgent && "tm-quiz-timer--urgent"
         )}
         aria-live="polite"
         aria-label={`Tiempo restante: ${secondsLeft} segundos`}
       >
-        <span className="tm-quiz-timer-value font-display text-3xl tabular-nums tracking-wide">
+        <span
+          className={cn(
+            "tm-quiz-timer-value font-display tabular-nums tracking-wide",
+            hasImage ? "text-2xl" : "text-3xl"
+          )}
+        >
           {secondsLeft}
         </span>
       </div>
 
-      <QuizImage src={question.image_url} alt="" />
+      {hasImage ? (
+        <div className="tm-quiz-stage__body flex min-h-0 flex-1 flex-col gap-2">
+          <div className="tm-quiz-stage__media relative min-h-0 flex-1">
+            <QuizImage src={question.image_url} alt="" fitContainer className="absolute inset-0" />
+          </div>
+          <p className="shrink-0 font-display text-base leading-snug text-[var(--tm-fg)] line-clamp-2">
+            {question.prompt}
+          </p>
+        </div>
+      ) : (
+        <>
+          <QuizImage src={question.image_url} alt="" />
+          <p className="font-display text-lg leading-snug text-[var(--tm-fg)]">
+            {question.prompt}
+          </p>
+        </>
+      )}
 
-      <p className="font-display text-lg leading-snug text-[var(--tm-fg)]">
-        {question.prompt}
-      </p>
-
-      <div className="grid gap-2">
+      <div className="tm-quiz-stage__options grid shrink-0 gap-1.5">
         {question.options.map((option) => (
           <QuizOptionButton
             key={option.id}

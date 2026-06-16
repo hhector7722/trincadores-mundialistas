@@ -5,9 +5,11 @@ type QuizImageProps = {
   src: string | null;
   alt: string;
   className?: string;
+  /** La imagen se adapta al alto del contenedor (play sin scroll). */
+  fitContainer?: boolean;
 };
 
-export function QuizImage({ src, alt, className }: QuizImageProps) {
+export function QuizImage({ src, alt, className, fitContainer = false }: QuizImageProps) {
   if (!src) {
     return null;
   }
@@ -15,7 +17,8 @@ export function QuizImage({ src, alt, className }: QuizImageProps) {
   return (
     <div
       className={cn(
-        "relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)]",
+        "relative w-full overflow-hidden rounded-2xl border border-[var(--tm-border)] bg-[var(--tm-surface)]",
+        fitContainer ? "h-full min-h-0" : "aspect-[4/3]",
         className
       )}
     >

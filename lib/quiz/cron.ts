@@ -12,10 +12,10 @@ export function madridMinute(now = new Date()): number {
   return madridLocalParts(now).minute;
 }
 
-/** Minutos tras 00:00 Madrid en los que el cron horario puede abrir el día (latencia Vercel). */
-export const QUIZ_CRON_OPEN_GRACE_MINUTES = 15;
+/** Minutos tras 00:00 Madrid en los que el cron puede abrir el día (latencia Vercel). */
+export const QUIZ_CRON_OPEN_GRACE_MINUTES = 59;
 
-/** 00:00–00:14 Europe/Madrid — publicar y abrir el quiz del dia en curso. */
+/** 00:00–00:58 Europe/Madrid — publicar y abrir el quiz del dia en curso. */
 export function isQuizOpenWindow(now = new Date()): boolean {
   const { hour, minute } = madridLocalParts(now);
   return hour === 0 && minute < QUIZ_CRON_OPEN_GRACE_MINUTES;
@@ -45,9 +45,15 @@ export function quizDateForCron(now = new Date()): string {
 
 export function assertCronAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  const auth = request.headers.get("authorization");
-  return auth === `Bearer ${secret}`;
+  if (secret) {
+    const auth = request.headers.get("authorization");
+    if (auth === `Bearer ${secret}`) return true;
+  }
+  // Fallback: invocaciones nativas de Vercel Cron (x-vercel-cron: 1).
+  if (process.env.VERCEL === "1" && request.headers.get("x-vercel-cron") === "1") {
+    return true;
+  }
+  return false;
 }
 
 export function formatMadridClock(now = new Date()): string {

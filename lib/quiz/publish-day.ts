@@ -2,10 +2,7 @@ import { isQuizPublishHeld, resolveQuizPublishWindow, todayQuizDate } from "@/li
 import { composeOfficialQuizDay } from "@/lib/quiz/compose-official-day";
 import { generateQuizDayFromSources } from "@/lib/quiz/generate-day";
 import { loadRecentFactIds } from "@/lib/quiz/generate-day";
-import {
-  labDailyPackSettingsSummary,
-  pregenerateQuizLabDailyPack,
-} from "@/lib/quiz/lab/daily-pack.server";
+import { labDailyPackSettingsSummary } from "@/lib/quiz/lab/daily-pack-types";
 import {
   factIdsFromSettings,
   loadRecentFactIdsFromDb,
@@ -77,9 +74,17 @@ export async function publishQuizDay(
 
   const shouldPregenerateLab = options.pregenerateLabAssets !== false;
   const labResult = shouldPregenerateLab
-    ? await pregenerateQuizLabDailyPack(quizDate, {
-        force: Boolean(options.allowReseed),
-      })
+    ? process.env.VERCEL === "1"
+      ? await (
+          await import("@/lib/quiz/lab/daily-pack-light.server")
+        ).pregenerateQuizLabDailyPackLight(quizDate, {
+          force: Boolean(options.allowReseed),
+        })
+      : await (
+          await import("@/lib/quiz/lab/daily-pack.server")
+        ).pregenerateQuizLabDailyPack(quizDate, {
+          force: Boolean(options.allowReseed),
+        })
     : null;
 
   const existingId = await findQuizForDate(

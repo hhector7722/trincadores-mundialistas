@@ -213,11 +213,23 @@ export async function persistDerivedAssetToDisk(
   variant: LabDeriveVariant,
   buffer: Buffer
 ): Promise<string> {
+  const publicUrl = persistedDerivedAssetPublicUrl(momentId, variant);
+
+  // En Vercel el FS del deploy es de solo lectura; los JPG van commiteados o vía API.
+  if (process.env.VERCEL === "1") {
+    try {
+      await access(persistedDerivedAssetAbsolutePath(momentId, variant));
+      return publicUrl;
+    } catch {
+      return labGeneratedAssetApiUrl(momentId, variant);
+    }
+  }
+
   const dir = join(process.cwd(), "public", GENERATED_REL_DIR);
   await mkdir(dir, { recursive: true });
   const filePath = persistedDerivedAssetAbsolutePath(momentId, variant);
   await writeFile(filePath, buffer);
-  return persistedDerivedAssetPublicUrl(momentId, variant);
+  return publicUrl;
 }
 
 export async function tryReadPersistedDerivedAsset(
