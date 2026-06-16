@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { closeQuizDay } from "@/lib/quiz/close-day";
+import { needsQuizCatchUpPublish } from "@/lib/quiz/catch-up-publish";
 import {
   assertCronAuthorized,
   formatMadridClock,
@@ -23,7 +24,9 @@ export async function GET(request: Request) {
   const forceOpen = force === "1" || force === "open";
   const forceClose = force === "close";
 
-  const shouldOpen = forceOpen || (!forceClose && isQuizOpenWindow());
+  const admin = createAdminClient();
+  const catchUp = !forceClose && (await needsQuizCatchUpPublish(admin));
+  const shouldOpen = forceOpen || (!forceClose && (isQuizOpenWindow() || catchUp));
   const shouldClose = forceClose || (!forceOpen && isQuizCloseWindow());
 
   if (!shouldOpen && !shouldClose) {
@@ -37,8 +40,6 @@ export async function GET(request: Request) {
   const quizDate = quizDateForCron();
 
   try {
-    const admin = createAdminClient();
-
     if (shouldClose) {
       const result = await closeQuizDay({ admin, quizDate });
 
@@ -56,11 +57,12 @@ export async function GET(request: Request) {
       admin,
       quizDate,
       allowReseed: false,
+      includeFilesystemHistory: true,
     });
 
     return NextResponse.json({
       ok: true,
-      action: "open",
+      action: catchUp && !isQuizOpenWindow() ? "catch_up" : "open",
       quizDate: result.quizDate,
       quizId: result.quizId,
       scoringMode: result.scoringMode,

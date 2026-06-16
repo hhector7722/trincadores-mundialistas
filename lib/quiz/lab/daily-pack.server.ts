@@ -57,8 +57,18 @@ export async function readQuizLabDailyPack(
 }
 
 export async function writeQuizLabDailyPack(pack: QuizLabDailyPack): Promise<void> {
-  await mkdir(MANIFEST_DIR, { recursive: true });
-  await writeFile(manifestPath(pack.quizDate), JSON.stringify(pack, null, 2), "utf8");
+  // En Vercel el filesystem del deploy es de solo lectura; el pack queda en memoria/BD.
+  if (process.env.VERCEL === "1") return;
+
+  try {
+    await mkdir(MANIFEST_DIR, { recursive: true });
+    await writeFile(manifestPath(pack.quizDate), JSON.stringify(pack, null, 2), "utf8");
+  } catch (error) {
+    console.warn(
+      "[quiz/lab-daily] No se pudo escribir manifest en disco:",
+      error instanceof Error ? error.message : error
+    );
+  }
 }
 
 export async function pregenerateQuizLabDailyPack(

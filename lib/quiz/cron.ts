@@ -12,16 +12,19 @@ export function madridMinute(now = new Date()): number {
   return madridLocalParts(now).minute;
 }
 
-/** 00:00 Europe/Madrid — publicar y abrir el quiz del dia en curso. */
+/** Minutos tras 00:00 Madrid en los que el cron horario puede abrir el día (latencia Vercel). */
+export const QUIZ_CRON_OPEN_GRACE_MINUTES = 15;
+
+/** 00:00–00:14 Europe/Madrid — publicar y abrir el quiz del dia en curso. */
 export function isQuizOpenWindow(now = new Date()): boolean {
   const { hour, minute } = madridLocalParts(now);
-  return hour === 0 && minute === 0;
+  return hour === 0 && minute < QUIZ_CRON_OPEN_GRACE_MINUTES;
 }
 
-/** 23:59 Europe/Madrid — cerrar el quiz del dia en curso. */
+/** 23:58–23:59 Europe/Madrid — cerrar el quiz del dia en curso. */
 export function isQuizCloseWindow(now = new Date()): boolean {
   const { hour, minute } = madridLocalParts(now);
-  return hour === 23 && minute === 59;
+  return hour === 23 && minute >= 58;
 }
 
 /** 20:00 Europe/Madrid — recordatorio a quien no haya completado el quiz del día. */
