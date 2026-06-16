@@ -26,6 +26,7 @@ function finishedMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithP
     mvpPrediction: null,
     playerIncidents: [],
     serverEditable: false,
+    editUntilKickoff: false,
     ...overrides,
   };
 }

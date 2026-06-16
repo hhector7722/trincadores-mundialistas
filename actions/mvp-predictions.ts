@@ -7,6 +7,8 @@ import {
   fetchMatchEditableFromDb,
 } from "@/lib/predictions/queries";
 import { getMvpPredictionForMatch } from "@/lib/predictions/mvp-queries";
+import { predictionEditClosedMessage } from "@/lib/predictions/deadline";
+import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
 import { createClient } from "@/lib/supabase/server";
 
 export type MvpPredictionActionResult =
@@ -16,9 +18,9 @@ export type MvpPredictionActionResult =
 function mapMvpDbError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes("permission") || lower.includes("policy") || lower.includes("42501")) {
-    return "Predicción cerrada. Ya no puedes editar el MVP de este partido.";
+    return "Predicci?n cerrada. Ya no puedes editar el MVP de este partido.";
   }
-  return "No se pudo guardar el MVP. Comprueba la conexión e inténtalo otra vez.";
+  return "No se pudo guardar el MVP. Comprueba la conexi?n e int?ntalo otra vez.";
 }
 
 export async function fetchSavedMvpPrediction(poolId: string, matchId: string) {
@@ -57,7 +59,7 @@ export async function saveMvpPrediction(
   const normalizedShirt =
     shirtNumber != null && shirtNumber > 0 && Number.isInteger(shirtNumber) ? shirtNumber : null;
   if (!trimmedPlayer || !trimmedTeam) {
-    return { ok: false, error: "Selecciona un jugador válido." };
+    return { ok: false, error: "Selecciona un jugador v?lido." };
   }
 
   const supabase = await createClient();
@@ -66,7 +68,7 @@ export async function saveMvpPrediction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, error: "Sesión no válida. Vuelve a iniciar sesión." };
+    return { ok: false, error: "Sesi?n no v?lida. Vuelve a iniciar sesi?n." };
   }
 
   const member = await assertPoolMembership(user.id, poolId);
@@ -81,9 +83,16 @@ export async function saveMvpPrediction(
 
   const editable = await fetchMatchEditableFromDb(matchId);
   if (!editable) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
     return {
       ok: false,
-      error: "Predicción cerrada. El plazo terminó 5 minutos antes del pitido.",
+      error: predictionEditClosedMessage(
+        canEditPredictionsUntilKickoff(profile?.username)
+      ),
     };
   }
 
@@ -138,7 +147,7 @@ export async function saveMvpPrediction(
     .single();
 
   if (savedError || !saved) {
-    return { ok: false, error: "Guardado pero no se pudo leer el MVP. Recarga la página." };
+    return { ok: false, error: "Guardado pero no se pudo leer el MVP. Recarga la p?gina." };
   }
 
   revalidatePath("/predictions");
@@ -166,7 +175,7 @@ export async function deleteMvpPrediction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, error: "Sesión no válida. Vuelve a iniciar sesión." };
+    return { ok: false, error: "Sesi?n no v?lida. Vuelve a iniciar sesi?n." };
   }
 
   const member = await assertPoolMembership(user.id, poolId);

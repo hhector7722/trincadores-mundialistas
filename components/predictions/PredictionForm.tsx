@@ -12,6 +12,10 @@ import {
   resolvePredictionUiState,
   type PredictionUiState,
 } from "@/lib/predictions/edit-state";
+import {
+  predictionEditClosedMessage,
+  predictionEditOpenHint,
+} from "@/lib/predictions/deadline";
 import type { MatchDetail } from "@/lib/predictions/queries";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { cn } from "@/lib/utils";
@@ -95,13 +99,13 @@ export function PredictionForm({
 
         {uiState === "locked" && (
           <p className="text-sm text-[var(--tm-muted)]">
-            Prediccion cerrada. El plazo termina 5 minutos antes del pitido.
+            {predictionEditClosedMessage(match.editUntilKickoff)}
           </p>
         )}
 
         {uiState !== "locked" && match.serverEditable && (
           <p className="text-sm text-[var(--tm-muted)]">
-            Puedes editar hasta 5 minutos antes del pitido.
+            {predictionEditOpenHint(match.editUntilKickoff)}
           </p>
         )}
 

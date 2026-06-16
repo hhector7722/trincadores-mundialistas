@@ -42,6 +42,7 @@ function baseDemoMatch(
     mvpPrediction: overrides.mvpPrediction,
     playerIncidents: [],
     serverEditable: false,
+    editUntilKickoff: false,
   };
 }
 

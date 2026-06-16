@@ -9,6 +9,8 @@ import {
   type MatchPredictionsBoard,
 } from "@/lib/predictions/queries";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
+import { predictionEditClosedMessage } from "@/lib/predictions/deadline";
+import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
 import { createClient } from "@/lib/supabase/server";
 import { trackUsageAction } from "@/lib/usage/track-action";
 
@@ -104,7 +106,17 @@ export async function savePrediction(
 
   const editable = await fetchMatchEditableFromDb(matchId);
   if (!editable) {
-    return { ok: false, error: "Prediccion cerrada. El plazo termino 5 minutos antes del pitido." };
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
+    return {
+      ok: false,
+      error: predictionEditClosedMessage(
+        canEditPredictionsUntilKickoff(profile?.username)
+      ),
+    };
   }
 
   const { data: existing, error: readError } = await supabase

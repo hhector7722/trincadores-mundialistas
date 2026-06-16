@@ -13,6 +13,8 @@ import {
   resolveScoreOutcome,
   type ScoreOutcome,
 } from "@/lib/predictions/prediction-outcome";
+import { predictionEditDeadlineMs } from "@/lib/predictions/deadline";
+import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
 import {
   compareLeaderboardRows,
   loadRankingSnapshotThroughKickoff,
@@ -46,6 +48,7 @@ export type MatchWithPrediction = {
   mvpPrediction: MvpPrediction | null;
   playerIncidents: MatchPlayerIncident[];
   serverEditable: boolean;
+  editUntilKickoff: boolean;
 };
 
 export type MatchDetail = MatchWithPrediction & {
@@ -75,6 +78,17 @@ async function getMatchdayMap(poolId: string) {
   };
 }
 
+async function fetchProfileUsername(profileId: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  return data?.username ?? null;
+}
+
 async function fetchPoolMatchesWithPredictions(
   poolId: string,
   profileId: string,
@@ -86,6 +100,9 @@ async function fetchPoolMatchesWithPredictions(
     matchdayFilter(externalKeyMap.get(id) ?? null)
   );
   if (!filteredDayIds.length) return [];
+
+  const username = await fetchProfileUsername(profileId);
+  const editUntilKickoff = canEditPredictionsUntilKickoff(username);
 
   const { data: matches } = await supabase
     .from("matches")
@@ -162,7 +179,10 @@ async function fetchPoolMatchesWithPredictions(
         : null,
       mvpPrediction: mvpByMatch.get(m.id) ?? null,
       playerIncidents: incidentsByMatch.get(m.id) ?? [],
-      serverEditable: computePredictionEditableLocally(status, m.kickoff_at),
+      serverEditable: computePredictionEditableLocally(status, m.kickoff_at, {
+        untilKickoff: editUntilKickoff,
+      }),
+      editUntilKickoff,
     };
   });
 }
@@ -191,16 +211,16 @@ export async function fetchMatchEditableFromDb(matchId: string): Promise<boolean
   return data === true;
 }
 
-const PREDICTION_LOCK_MS = 5 * 60 * 1000;
-
-/** Misma regla que RPC `prediction_edit_allowed`: scheduled y T-5 min. */
+/** Misma regla que RPC `prediction_edit_allowed`: scheduled y T-5 min (o pitido para Hector). */
 export function computePredictionEditableLocally(
   status: MatchStatus,
   kickoffAtIso: string,
-  nowMs: number = Date.now()
+  options?: { nowMs?: number; untilKickoff?: boolean }
 ): boolean {
   if (status !== "scheduled") return false;
-  return nowMs < new Date(kickoffAtIso).getTime() - PREDICTION_LOCK_MS;
+  const nowMs = options?.nowMs ?? Date.now();
+  const untilKickoff = options?.untilKickoff ?? false;
+  return nowMs < predictionEditDeadlineMs(kickoffAtIso, untilKickoff);
 }
 
 export async function getPoolMatchesWithPredictions(
@@ -243,6 +263,9 @@ export async function getMatchPredictionDetail(
     .maybeSingle();
 
   if (!match) return null;
+
+  const username = await fetchProfileUsername(profileId);
+  const editUntilKickoff = canEditPredictionsUntilKickoff(username);
 
   const { data: prediction } = await supabase
     .from("predictions")
@@ -292,6 +315,7 @@ export async function getMatchPredictionDetail(
       : null,
     mvpPrediction,
     serverEditable,
+    editUntilKickoff,
     hasOfficialResult: !!result,
     officialHome: result?.home_goals ?? null,
     officialAway: result?.away_goals ?? null,

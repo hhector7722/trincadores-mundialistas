@@ -1,4 +1,6 @@
 import { PredictionsCalendar } from "@/components/predictions/PredictionsCalendar";
+import { predictionEditOpenHint } from "@/lib/predictions/deadline";
+import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
 import { getPoolGroupStageMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +16,13 @@ export default async function PredictionsPage() {
 
   const matches = await getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id);
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user!.id)
+    .maybeSingle();
+  const editUntilKickoff = canEditPredictionsUntilKickoff(profile?.username);
+
   return (
     <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
       <div className="hidden shrink-0 px-4 pt-4 sm:block">
@@ -21,7 +30,7 @@ export default async function PredictionsPage() {
           Porra
         </h1>
         <p className="mt-1 text-sm text-[var(--tm-muted)]">
-          Fase de grupos (junio). Toca un partido para marcar. Cierra 5 min antes del pitido.
+          Fase de grupos (junio). Toca un partido para marcar. {predictionEditOpenHint(editUntilKickoff)}.
         </p>
       </div>
 

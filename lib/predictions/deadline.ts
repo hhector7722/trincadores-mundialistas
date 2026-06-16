@@ -4,6 +4,26 @@ export function predictionLockDeadlineMs(kickoffAtIso: string): number {
   return new Date(kickoffAtIso).getTime() - PREDICTION_LOCK_MINUTES * 60 * 1000;
 }
 
+export function predictionEditDeadlineMs(
+  kickoffAtIso: string,
+  untilKickoff = false
+): number {
+  const kickoffMs = new Date(kickoffAtIso).getTime();
+  return untilKickoff ? kickoffMs : predictionLockDeadlineMs(kickoffAtIso);
+}
+
+export function predictionEditClosedMessage(untilKickoff: boolean): string {
+  return untilKickoff
+    ? "Prediccion cerrada. El plazo termina al inicio del partido."
+    : "Prediccion cerrada. El plazo termina 5 minutos antes del pitido.";
+}
+
+export function predictionEditOpenHint(untilKickoff: boolean): string {
+  return untilKickoff
+    ? "Puedes editar hasta el inicio del partido."
+    : "Puedes editar hasta 5 minutos antes del pitido.";
+}
+
 export function formatPredictionCountdown(remainingMs: number): string {
   if (remainingMs <= 0) return "0s";
 

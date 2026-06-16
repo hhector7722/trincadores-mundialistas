@@ -30,6 +30,7 @@ function baseMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithPredi
     mvpPrediction: null,
     playerIncidents: [],
     serverEditable: true,
+    editUntilKickoff: false,
     ...overrides,
   };
 }
