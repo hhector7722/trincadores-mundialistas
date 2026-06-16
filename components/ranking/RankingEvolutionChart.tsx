@@ -22,18 +22,17 @@ const LINE_COLORS = [
 const CHART_BG = "var(--tm-bg-elevated)";
 
 /** Espacio vertical entre posiciones (filas ampliadas para avatar + alias). */
-const ROW_GAP_PX = 56;
+const ROW_GAP_PX = 48;
 const CHART_WIDTH = 380;
 const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
+const MARGIN_TOP = 14;
+/** Fila inferior dedicada a etiquetas de jornada (J1, J2…). */
+const MATCHDAY_LABEL_ROW_PX = 14;
+/** Separación entre el trazado y las etiquetas de jornada. */
+const PLOT_LABEL_GAP = 6;
+const MARGIN_BOTTOM = PLOT_LABEL_GAP + MATCHDAY_LABEL_ROW_PX;
 const AVATAR_RADIUS = 13;
-/** Margen superior = radio avatar (1.ª fila pegada al borde sin recortar). */
-const MARGIN_TOP = AVATAR_RADIUS;
-/** Separación mínima entre el trazado y la baseline de J1/J2…. */
-const PLOT_LABEL_GAP = 1;
-/** Baseline J1/J2… desde el borde inferior del trazado (deja ~4px bajo números de posición). */
-const MATCHDAY_LABEL_Y_OFFSET = 9;
-const MARGIN_BOTTOM = PLOT_LABEL_GAP + MATCHDAY_LABEL_Y_OFFSET + 1;
 const AVATAR_X = 44;
 const PLOT_START_X = 68;
 const LABEL_OFFSET = 14;
@@ -211,7 +210,7 @@ export function RankingEvolutionChart({
             ? PLOT_START_X + plotWidth / 2
             : PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
         const matchdayLabelY =
-          MARGIN_TOP + plotHeight + PLOT_LABEL_GAP + MATCHDAY_LABEL_Y_OFFSET;
+          MARGIN_TOP + plotHeight + PLOT_LABEL_GAP + 10;
         return (
           <text
             key={`x-label-${matchday.id}`}

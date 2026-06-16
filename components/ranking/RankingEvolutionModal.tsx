@@ -23,6 +23,9 @@ const MODAL_PANEL_CLASS =
 /** Altura reservada del slider con bandera (`.tm-flag-range-slider`). */
 const EVOLUTION_SLIDER_RESERVED_HEIGHT = "calc(56px + 0.5rem)";
 
+/** Espacio mínimo entre la barra del slider y el borde inferior del modal. */
+const EVOLUTION_SLIDER_BOTTOM_PADDING = "0.75rem";
+
 const LOADING_CHART_HEIGHT_PX = rankingEvolutionChartHeight(
   RANKING_EVOLUTION_MEMBER_SLOTS
 );
@@ -70,7 +73,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
       loading={loading}
       scrollContent={false}
     >
-      <div className="flex flex-col gap-3 px-3 pb-3 pt-1">
+      <div className="flex flex-col gap-3 px-3 pt-1 pb-0">
         {error ? (
           <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
         ) : null}
@@ -95,7 +98,13 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
         </div>
 
         {showFullLayout ? (
-          <div className="shrink-0 px-1" style={{ minHeight: EVOLUTION_SLIDER_RESERVED_HEIGHT }}>
+          <div
+            className="shrink-0 px-1"
+            style={{
+              minHeight: EVOLUTION_SLIDER_RESERVED_HEIGHT,
+              paddingBottom: EVOLUTION_SLIDER_BOTTOM_PADDING,
+            }}
+          >
             {hasMatchdayData ? (
               <RangeSlider
                 min={0}
