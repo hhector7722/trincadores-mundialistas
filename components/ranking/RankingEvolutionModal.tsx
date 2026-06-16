@@ -18,7 +18,7 @@ type RankingEvolutionModalProps = {
 };
 
 const MODAL_PANEL_CLASS =
-  "flex max-h-[min(94dvh,52rem)] w-full max-w-lg flex-col";
+  "flex max-h-[min(94dvh,46rem)] w-full max-w-lg flex-col";
 
 /** Altura reservada del slider con bandera (`.tm-flag-range-slider`). */
 const EVOLUTION_SLIDER_RESERVED_HEIGHT = "calc(56px + 0.5rem)";
@@ -76,8 +76,8 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
         ) : null}
 
         <div
-          className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-2 pb-2"
-          style={showFullLayout ? { minHeight: chartHeightPx + 12 } : undefined}
+          className="shrink-0 overflow-hidden rounded-xl border border-[var(--tm-border)] bg-[var(--tm-bg-elevated)] px-2 pt-1 pb-1"
+          style={showFullLayout ? { minHeight: chartHeightPx + 4 } : undefined}
         >
           {hasMatchdayData ? (
             <RankingEvolutionChart data={data!} endMatchdayIndex={endMatchdayIndex} />
