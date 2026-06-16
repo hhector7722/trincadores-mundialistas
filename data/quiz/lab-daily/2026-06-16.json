@@ -1,0 +1,71 @@
+{
+  "quizDate": "2026-06-16",
+  "generatedAt": "2026-06-16T12:10:13.229Z",
+  "momentIds": [
+    "wc1974-cruyff-penalty",
+    "wc2022-dimaria-cup-kiss"
+  ],
+  "questions": [
+    {
+      "id": "daily-2026-06-16-image_trivia",
+      "format": "image_trivia",
+      "prompt": "¿Contra qué selección fue este partido?",
+      "imageUrl": "/images/quiz/historic/1974/wc1974-cruyff-penalty.jpg",
+      "timerSeconds": 10,
+      "momentId": "wc1974-cruyff-penalty",
+      "momentLabel": "Cruyff — penalti arranque final 74",
+      "momentDifficulty": "medium",
+      "answerType": "opponent",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Alemania"
+        },
+        {
+          "id": "opt_2",
+          "label": "Brasil"
+        },
+        {
+          "id": "opt_3",
+          "label": "Argentina"
+        },
+        {
+          "id": "opt_4",
+          "label": "Italia"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    },
+    {
+      "id": "daily-2026-06-16-guess_player_silhouette",
+      "format": "guess_player_silhouette",
+      "prompt": "¿QUÉ JUGADOR ES LA SILUETA?",
+      "imageUrl": "/images/quiz/lab/generated/wc2022-dimaria-cup-kiss-silhouette.jpg",
+      "revealImageUrl": "/images/quiz/historic/2022/wc2022-dimaria-cup-kiss.jpg",
+      "sceneLabel": "2022 — Argentina",
+      "timerSeconds": 10,
+      "silhouetteDemoId": null,
+      "momentId": "wc2022-dimaria-cup-kiss",
+      "momentLabel": "Di María besa la Copa — Qatar 2022",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Ángel Di María"
+        },
+        {
+          "id": "opt_2",
+          "label": "Lionel Messi"
+        },
+        {
+          "id": "opt_3",
+          "label": "Julián Álvarez"
+        },
+        {
+          "id": "opt_4",
+          "label": "Enzo Fernández"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    }
+  ]
+}
