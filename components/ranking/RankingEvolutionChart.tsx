@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
 import type { RankingEvolutionData } from "@/lib/ranking/evolution";
 
 const LINE_COLORS = [
@@ -20,21 +21,23 @@ const LINE_COLORS = [
 /** Fondo del área de trazado: morado oscuro de la app. */
 const CHART_BG = "var(--tm-bg-elevated)";
 
-/** Espacio vertical entre posiciones (~altura fila ranking: 2.375rem). */
-const ROW_GAP_PX = 38;
+/** Espacio vertical entre posiciones (filas ampliadas para avatar + alias). */
+const ROW_GAP_PX = 56;
 const CHART_WIDTH = 380;
 const MARGIN_LEFT = 18;
 const MARGIN_RIGHT = 12;
-const MARGIN_TOP = 20;
+const MARGIN_TOP = 24;
 /** Fila inferior dedicada a etiquetas de jornada (J1, J2…). */
-const MATCHDAY_LABEL_ROW_PX = 26;
+const MATCHDAY_LABEL_ROW_PX = 28;
 /** Separación entre el trazado y las etiquetas de jornada. */
-const PLOT_LABEL_GAP = 22;
+const PLOT_LABEL_GAP = 24;
 const MARGIN_BOTTOM = PLOT_LABEL_GAP + MATCHDAY_LABEL_ROW_PX;
-const AVATAR_RADIUS = 11;
-const AVATAR_X = 42;
-const PLOT_START_X = 64;
-const LABEL_OFFSET = 12;
+const AVATAR_RADIUS = 13;
+const AVATAR_X = 44;
+const PLOT_START_X = 68;
+const LABEL_OFFSET = 14;
+const ALIAS_FONT_SIZE = 8;
+const ALIAS_MAX_CHARS = 10;
 
 /** Slots de la tabla (pool fijo de participantes). */
 export const RANKING_EVOLUTION_MEMBER_SLOTS = 11;
@@ -56,6 +59,12 @@ function avatarInitials(label: string): string {
     return (parts[0]![0]! + parts[1]![0]!).toUpperCase();
   }
   return trimmed.slice(0, 1).toUpperCase();
+}
+
+function aliasShortLabel(label: string): string {
+  const trimmed = label.trim();
+  if (trimmed.length <= ALIAS_MAX_CHARS) return trimmed;
+  return `${trimmed.slice(0, ALIAS_MAX_CHARS - 1)}…`;
 }
 
 type ChartSeries = {
@@ -84,6 +93,10 @@ export function RankingEvolutionChart({
   data,
   endMatchdayIndex,
 }: RankingEvolutionChartProps) {
+  const [previewAvatar, setPreviewAvatar] = useState<{
+    avatarUrl: string;
+    label: string;
+  } | null>(null);
   const memberCount = data.members.length;
   const chartHeight = chartHeightForMemberCount(memberCount);
 
@@ -150,6 +163,7 @@ export function RankingEvolutionChart({
   }
 
   return (
+    <>
     <svg
       viewBox={`0 0 ${CHART_WIDTH} ${chartHeight}`}
       width="100%"
@@ -182,7 +196,7 @@ export function RankingEvolutionChart({
             y={y + 4}
             textAnchor="end"
             fill="rgba(255,255,255,0.55)"
-            fontSize={10}
+            fontSize={11}
             fontWeight={600}
           >
             {position}
@@ -204,7 +218,7 @@ export function RankingEvolutionChart({
             y={matchdayLabelY}
             textAnchor="middle"
             fill="rgba(255,255,255,0.65)"
-            fontSize={10}
+            fontSize={11}
             fontWeight={600}
           >
             {matchday.shortLabel}
@@ -223,55 +237,100 @@ export function RankingEvolutionChart({
             d={pathParts.join(" ")}
             fill="none"
             stroke={item.color}
-            strokeWidth={2}
+            strokeWidth={2.5}
             strokeLinejoin="round"
             strokeLinecap="round"
           />
         );
       })}
 
-      {series.map((item) => (
-        <g key={`avatar-${item.profileId}`}>
-          <circle
-            cx={AVATAR_X}
-            cy={item.initialY}
-            r={AVATAR_RADIUS + 1}
-            fill={CHART_BG}
-            stroke={item.color}
-            strokeWidth={1.5}
-          />
-          {item.avatarUrl ? (
-            <image
-              href={item.avatarUrl}
-              x={AVATAR_X - AVATAR_RADIUS}
-              y={item.initialY - AVATAR_RADIUS}
-              width={AVATAR_RADIUS * 2}
-              height={AVATAR_RADIUS * 2}
-              clipPath={`url(#evo-clip-${item.profileId})`}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          ) : (
-            <>
-              <circle
-                cx={AVATAR_X}
-                cy={item.initialY}
-                r={AVATAR_RADIUS}
-              fill="var(--tm-surface-elevated)"
-              />
-              <text
-                x={AVATAR_X}
-                y={item.initialY + 4}
-                textAnchor="middle"
-                fill="rgba(255,255,255,0.85)"
-                fontSize={8}
-                fontWeight={700}
-              >
-                {avatarInitials(item.label)}
-              </text>
-            </>
-          )}
-        </g>
-      ))}
+      {series.map((item) => {
+        const aliasY = item.initialY + AVATAR_RADIUS + 10;
+        const canPreview = Boolean(item.avatarUrl);
+
+        return (
+          <g key={`avatar-${item.profileId}`}>
+            <g
+              role={canPreview ? "button" : undefined}
+              tabIndex={canPreview ? 0 : undefined}
+              aria-label={canPreview ? `Ver avatar de ${item.label}` : undefined}
+              style={{ cursor: canPreview ? "pointer" : undefined }}
+              onClick={
+                canPreview
+                  ? () =>
+                      setPreviewAvatar({
+                        avatarUrl: item.avatarUrl!,
+                        label: item.label,
+                      })
+                  : undefined
+              }
+              onKeyDown={
+                canPreview
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setPreviewAvatar({
+                          avatarUrl: item.avatarUrl!,
+                          label: item.label,
+                        });
+                      }
+                    }
+                  : undefined
+              }
+            >
+              {canPreview ? (
+                <circle
+                  cx={AVATAR_X}
+                  cy={item.initialY}
+                  r={24}
+                  fill="transparent"
+                  pointerEvents="all"
+                />
+              ) : null}
+              {item.avatarUrl ? (
+                <image
+                  href={item.avatarUrl}
+                  x={AVATAR_X - AVATAR_RADIUS}
+                  y={item.initialY - AVATAR_RADIUS}
+                  width={AVATAR_RADIUS * 2}
+                  height={AVATAR_RADIUS * 2}
+                  clipPath={`url(#evo-clip-${item.profileId})`}
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              ) : (
+                <>
+                  <circle
+                    cx={AVATAR_X}
+                    cy={item.initialY}
+                    r={AVATAR_RADIUS}
+                    fill="var(--tm-surface-elevated)"
+                  />
+                  <text
+                    x={AVATAR_X}
+                    y={item.initialY + 4}
+                    textAnchor="middle"
+                    fill="rgba(255,255,255,0.85)"
+                    fontSize={9}
+                    fontWeight={700}
+                  >
+                    {avatarInitials(item.label)}
+                  </text>
+                </>
+              )}
+            </g>
+            <text
+              x={AVATAR_X}
+              y={aliasY}
+              textAnchor="middle"
+              fill="rgba(255,255,255,0.7)"
+              fontSize={ALIAS_FONT_SIZE}
+              fontWeight={500}
+            >
+              {aliasShortLabel(item.label)}
+            </text>
+          </g>
+        );
+      })}
 
       {series.flatMap((item) =>
         item.points.map((point, pointIndex) => (
@@ -281,7 +340,7 @@ export function RankingEvolutionChart({
               y={point.y - LABEL_OFFSET}
               textAnchor="middle"
               fill={item.color}
-              fontSize={9}
+              fontSize={10}
               fontWeight={700}
             >
               {point.position}
@@ -289,7 +348,7 @@ export function RankingEvolutionChart({
             <circle
               cx={point.x}
               cy={point.y}
-              r={3}
+              r={3.5}
               fill={item.color}
               stroke={CHART_BG}
               strokeWidth={1}
@@ -298,5 +357,14 @@ export function RankingEvolutionChart({
         ))
       )}
     </svg>
+    {previewAvatar ? (
+      <AvatarPreviewModal
+        open
+        onClose={() => setPreviewAvatar(null)}
+        avatarUrl={previewAvatar.avatarUrl}
+        label={previewAvatar.label}
+      />
+    ) : null}
+    </>
   );
 }

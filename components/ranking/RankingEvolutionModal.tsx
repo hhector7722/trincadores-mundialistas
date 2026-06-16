@@ -18,7 +18,7 @@ type RankingEvolutionModalProps = {
 };
 
 const MODAL_PANEL_CLASS =
-  "flex max-h-[min(94dvh,48rem)] w-full max-w-lg flex-col";
+  "flex max-h-[min(94dvh,52rem)] w-full max-w-lg flex-col";
 
 /** Altura reservada del slider con bandera (`.tm-flag-range-slider`). */
 const EVOLUTION_SLIDER_RESERVED_HEIGHT = "calc(56px + 0.5rem)";
