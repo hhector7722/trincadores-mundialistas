@@ -1242,6 +1242,12 @@ html:has(.tm-app-shell) body {
   flex-shrink: 0;
 }
 
+.tm-quiz-stage__options--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
 .tm-quiz-timer--compact {
   min-height: 2.75rem;
 }

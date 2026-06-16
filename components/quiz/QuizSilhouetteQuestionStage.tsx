@@ -64,10 +64,11 @@ export function QuizSilhouetteQuestionStage({
         ) : null}
       </div>
 
-      <div className="tm-quiz-stage__options grid shrink-0 gap-1.5">
+      <div className="tm-quiz-stage__options tm-quiz-stage__options--grid shrink-0">
         {question.options.map((option) => (
           <QuizOptionButton
             key={option.id}
+            compact
             optionId={option.id}
             label={option.label}
             visualState={resolveOptionVisualState({
