@@ -112,17 +112,14 @@ function HomeFinishedPredictedScore({
   }, [predictedText, showTick]);
 
   return (
-    <div
-      ref={containerRef}
-      className="pointer-events-auto relative flex h-full w-full items-center leading-none"
-    >
+    <div ref={containerRef} className="pointer-events-auto relative w-full leading-none">
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
           onOpenDetail();
         }}
-        className="block w-full text-center font-display text-[11px] font-semibold normal-case tabular-nums text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+        className="block w-full text-center font-display text-[11px] font-semibold leading-none normal-case tabular-nums text-[var(--tm-accent)] transition-opacity hover:opacity-80"
       >
         <span ref={labelRef} className="inline-block whitespace-nowrap">
           {predictedText}
@@ -130,10 +127,10 @@ function HomeFinishedPredictedScore({
       </button>
       {showTick && checkPos != null ? (
         <span
-          className="pointer-events-none absolute -translate-y-1/2"
+          className="pointer-events-none absolute flex -translate-y-1/2 items-center leading-none"
           style={{ left: checkPos.left, top: checkPos.top }}
         >
-          <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+          <PredictionOutcomeIcon variant="success" className="text-[11px] leading-none" />
         </span>
       ) : null}
     </div>
@@ -197,7 +194,7 @@ export function HomeFinishedMatchPanel({
       />
 
       {hasScore && hasPrediction ? (
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] h-10 sm:h-11">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] flex h-10 items-center sm:h-11">
           <HomeFinishedPredictedScore
             predictedHome={predictedHome}
             predictedAway={predictedAway}
