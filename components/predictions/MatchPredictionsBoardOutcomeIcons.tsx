@@ -25,7 +25,7 @@ export function MatchPredictionsBoardOutcomeIconTicks({
   scoreOutcome,
   mvpCorrect,
 }: MatchPredictionsBoardOutcomeProps) {
-  const tickCount = scoreOutcome === "exact" ? 2 : scoreOutcome === "sign" ? 1 : 0;
+  const tickCount = scoreOutcome === "exact" ? 2 : 0;
   if (tickCount === 0 && !mvpCorrect) return null;
 
   return (
@@ -38,7 +38,7 @@ export function MatchPredictionsBoardOutcomeIconTicks({
   );
 }
 
-/** Columna de aciertos: total en amarillo, ticks verdes (signo ×1, exacto ×2) y estrella MVP. */
+/** Columna de aciertos: total en amarillo, ticks verdes solo en exacto (×2) y estrella MVP. */
 export function MatchPredictionsBoardOutcomeIcons({
   scoreOutcome,
   mvpCorrect,

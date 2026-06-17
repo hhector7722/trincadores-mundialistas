@@ -78,7 +78,7 @@ function HomeFinishedPredictedScore({
     resultAway: awayGoals,
   });
   const predictedText = formatListScore(predictedHome, predictedAway);
-  const showTick = outcome === "sign" || outcome === "exact";
+  const showTick = outcome === "exact";
 
   useLayoutEffect(() => {
     if (!showTick) {
