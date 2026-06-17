@@ -1773,6 +1773,8 @@ html:has(.tm-app-shell) body {
   --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
   --tm-cal-match-card-bg: #5b537d;
   --tm-cal-match-card-border: #5b537d;
+  --tm-cal-match-card-finished-bg: #6d6591;
+  --tm-cal-match-card-finished-border: #6d6591;
   --tm-cal-outcome-exact: #22c55e;
   --tm-cal-outcome-sign: #60a5fa;
   --tm-cal-outcome-miss: var(--tm-danger);
@@ -2131,6 +2133,15 @@ html:has(.tm-app-shell) body {
   background: var(--tm-cal-match-card-bg);
 }
 
+.tm-porra-calendar .tm-cal-match-card--finished {
+  background: var(--tm-cal-match-card-finished-bg);
+  border-color: var(--tm-cal-match-card-finished-border);
+}
+
+.tm-porra-calendar .tm-cal-match-card--finished:hover {
+  background: var(--tm-cal-match-card-finished-bg);
+}
+
 .tm-porra-calendar.tm-cal-guide-preview {
   container-type: inline-size;
   width: var(--tm-cal-guide-preview-w, 3.25rem);
@@ -2162,6 +2173,11 @@ html:has(.tm-app-shell) body {
 .tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card {
   background: var(--tm-cal-match-card-bg);
   border-color: var(--tm-cal-match-card-border);
+}
+
+.tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card--finished {
+  background: var(--tm-cal-match-card-finished-bg);
+  border-color: var(--tm-cal-match-card-finished-border);
 }
 
 /* Guía modal: iconos de acierto alineados como en calendario */

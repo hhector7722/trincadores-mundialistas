@@ -42,7 +42,7 @@ export function CalendarFinishedMatchCardVisual({
   });
 
   const cardClassName = cn(
-    "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
+    "tm-cal-match-card tm-cal-match-card--finished relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
     className,
   );
 
