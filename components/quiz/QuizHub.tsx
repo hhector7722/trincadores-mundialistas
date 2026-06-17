@@ -21,6 +21,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
   const quizAvailable = Boolean(hub.official);
   const playCta = getQuizPlayCta(hub.official, {
     resultAttemptId: getLatestSubmittedAttemptId(hub.official),
+    practiceReplayAllowed: hub.practiceReplayAllowed,
   });
 
   return (
@@ -61,7 +62,9 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           )}
 
           <p className="text-center text-xs text-[var(--tm-muted)]">
-            Un intento por día.
+            {hub.practiceReplayAllowed
+              ? "Tienes un intento de prueba extra hoy (no puntúa)."
+              : "Un intento por día."}
           </p>
         </section>
       </div>

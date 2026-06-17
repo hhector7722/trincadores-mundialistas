@@ -35,7 +35,9 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
     notFound();
   }
 
-  const canReplay = canReplayQuiz(hub.official);
+  const canReplay = canReplayQuiz(hub.official, {
+    practiceReplayAllowed: hub.practiceReplayAllowed,
+  });
 
   return (
     <QuizPageShell>
@@ -53,6 +55,7 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
         scoringMode={result.scoringMode}
         kind={result.kind}
         canReplay={canReplay}
+        practiceAttempt={!result.countsForScore}
       />
     </QuizPageShell>
   );

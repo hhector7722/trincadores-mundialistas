@@ -8,6 +8,7 @@ type QuizResultSummaryProps = {
   scoringMode: "training" | "competitive";
   kind: "official" | "bonus";
   canReplay: boolean;
+  practiceAttempt?: boolean;
 };
 
 export function QuizResultSummary({
@@ -16,8 +17,10 @@ export function QuizResultSummary({
   scoringMode,
   kind,
   canReplay,
+  practiceAttempt = false,
 }: QuizResultSummaryProps) {
-  const countsForScore = kind === "official" && scoringMode === "competitive";
+  const countsForScore =
+    kind === "official" && scoringMode === "competitive" && !practiceAttempt;
 
   return (
     <div className="space-y-4">
@@ -33,9 +36,11 @@ export function QuizResultSummary({
           <p className="font-display text-2xl text-[var(--tm-fg)]">Entrenamiento</p>
         )}
         <p className="text-sm text-[var(--tm-muted)]">
-          {countsForScore
-            ? "Puntos sumados al ranking del quiz"
-            : "Este intento no suma puntos"}
+          {practiceAttempt
+            ? "Intento de prueba: no suma puntos ni modifica tu puntuación oficial de hoy."
+            : countsForScore
+              ? "Puntos sumados al ranking del quiz"
+              : "Este intento no suma puntos"}
         </p>
         {countsForScore && (
           <p className="text-xs text-[var(--tm-muted)]">

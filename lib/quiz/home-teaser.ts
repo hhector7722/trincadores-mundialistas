@@ -48,6 +48,7 @@ export function homeQuizSlideFromHub(hub: QuizDayHub): HomeQuizSlide | null {
   const cta =
     getQuizPlayCta(hub.official, {
       resultAttemptId: resultId,
+      practiceReplayAllowed: hub.practiceReplayAllowed,
     }) ?? { label: "Ir al quiz", href: "/quiz", entersPlay: false };
   const replayable = status === "completed" && cta.entersPlay;
   const score =

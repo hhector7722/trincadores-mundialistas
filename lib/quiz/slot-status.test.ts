@@ -63,3 +63,14 @@ test("training completed still allows replay consistently", () => {
   assert.equal(cta?.entersPlay, true);
   assert.equal(shouldShowQuizAlreadyPlayedModal(s), false);
 });
+
+test("competitive completed allows practice replay when flagged", () => {
+  const s = slot("competitive", "submitted");
+  const options = { practiceReplayAllowed: true, resultAttemptId: "a1" };
+  assert.equal(canOpenQuizPlay(s, undefined, options), true);
+  assert.equal(canReplayQuiz(s, options), true);
+  assert.equal(shouldShowQuizAlreadyPlayedModal(s, options), false);
+  const cta = getQuizPlayCta(s, options);
+  assert.equal(cta?.entersPlay, true);
+  assert.equal(cta?.label, "Probar de nuevo");
+});

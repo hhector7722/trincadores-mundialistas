@@ -1,5 +1,6 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
+import { canHectorPracticeReplay } from "@/lib/quiz/hector-practice-replay";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
 import { parseQuizOptions } from "@/lib/quiz/options";
@@ -38,6 +39,7 @@ type AttemptDbRow = {
   started_at: string;
   submitted_at: string | null;
   expires_at: string | null;
+  counts_for_score?: boolean;
 };
 
 function mapQuizRow(row: QuizDbRow): QuizRow {
@@ -65,7 +67,38 @@ function mapAttemptRow(row: AttemptDbRow): QuizAttemptRow {
     started_at: row.started_at,
     submitted_at: row.submitted_at,
     expires_at: row.expires_at,
+    counts_for_score: row.counts_for_score ?? true,
   };
+}
+
+function pickOfficialSlotAttempt(
+  quizId: string,
+  attempts: QuizAttemptRow[]
+): Pick<QuizDaySlot, "attempt" | "countingSubmittedAttemptId"> {
+  const forQuiz = attempts.filter((a) => a.quiz_id === quizId);
+  const countingSubmitted = forQuiz.find(
+    (a) => a.status === "submitted" && a.counts_for_score !== false
+  );
+
+  const inProgress = forQuiz.find((a) => a.status === "in_progress");
+  if (inProgress) {
+    return {
+      attempt: inProgress,
+      countingSubmittedAttemptId: countingSubmitted?.id ?? null,
+    };
+  }
+
+  if (countingSubmitted) {
+    return {
+      attempt: countingSubmitted,
+      countingSubmittedAttemptId: countingSubmitted.id,
+    };
+  }
+
+  const attempt =
+    forQuiz.find((a) => a.status !== "expired") ?? forQuiz[0] ?? null;
+
+  return { attempt, countingSubmittedAttemptId: null };
 }
 
 function slotFrom(
@@ -73,11 +106,19 @@ function slotFrom(
   attempts: QuizAttemptRow[]
 ): QuizDaySlot | null {
   if (!quiz) return null;
-  const attempt =
-    attempts.find((a) => a.quiz_id === quiz.id && a.status !== "expired") ??
-    attempts.find((a) => a.quiz_id === quiz.id) ??
-    null;
-  return { quiz, attempt };
+  return { quiz, ...pickOfficialSlotAttempt(quiz.id, attempts) };
+}
+
+async function getProfileUsername(profileId: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return (data?.username as string | null) ?? null;
 }
 
 export async function getQuizzesForDate(
@@ -107,7 +148,7 @@ export async function getQuizAttemptsForProfile(
   const { data, error } = await supabase
     .from("quiz_attempts")
     .select(
-      "id, quiz_id, profile_id, status, score, started_at, submitted_at, expires_at"
+      "id, quiz_id, profile_id, status, score, started_at, submitted_at, expires_at, counts_for_score"
     )
     .in("quiz_id", quizIds)
     .eq("profile_id", profileId)
@@ -122,9 +163,10 @@ export async function getQuizDayHub(
   profileId: string,
   quizDate = todayQuizDate()
 ): Promise<QuizDayHub> {
-  const [quizzes, competitive] = await Promise.all([
+  const [quizzes, competitive, username] = await Promise.all([
     getQuizzesForDate(poolId, quizDate),
     isPoolCompetitive(poolId),
+    getProfileUsername(profileId),
   ]);
 
   const attempts = await getQuizAttemptsForProfile(
@@ -148,11 +190,15 @@ export async function getQuizDayHub(
     !officialAttempt;
 
   const publishHeld = isQuizPublishHeld(quizDate) || windowPending;
+  const practiceReplayAllowed =
+    Boolean(officialQuiz) &&
+    canHectorPracticeReplay(username, quizDate, attempts, officialQuiz!.id);
 
   return {
     quizDate,
     competitive,
     publishHeld,
+    practiceReplayAllowed,
     official: publishHeld ? null : slotFrom(officialQuiz, attempts),
     bonus: null,
   };
@@ -176,6 +222,24 @@ export async function startQuizSession(quizId: string): Promise<QuizStartSession
   return session;
 }
 
+export async function startQuizPracticeSession(quizId: string): Promise<QuizStartSession> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("start_quiz_practice_attempt", {
+    p_quiz_id: quizId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const session = parseQuizStartSession(data);
+  if (!session) {
+    throw new Error("Respuesta de quiz invalida.");
+  }
+
+  return session;
+}
+
 export async function getQuizResult(
   attemptId: string,
   profileId: string
@@ -184,7 +248,7 @@ export async function getQuizResult(
 
   const { data: attempt, error: attemptError } = await supabase
     .from("quiz_attempts")
-    .select("id, quiz_id, profile_id, status, score")
+    .select("id, quiz_id, profile_id, status, score, counts_for_score")
     .eq("id", attemptId)
     .eq("profile_id", profileId)
     .eq("status", "submitted")
@@ -209,6 +273,8 @@ export async function getQuizResult(
 
   if (responsesError) throw new Error(responsesError.message);
 
+  const countsForScore = (attempt.counts_for_score as boolean | null) ?? true;
+
   const questionIds = (responses ?? []).map((r) => r.question_id);
   if (!questionIds.length) {
     return {
@@ -217,6 +283,7 @@ export async function getQuizResult(
       maxPoints: quiz.max_points,
       scoringMode: quiz.scoring_mode,
       kind: quiz.kind,
+      countsForScore,
       responses: [],
     };
   }
@@ -263,6 +330,7 @@ export async function getQuizResult(
     maxPoints: quiz.max_points,
     scoringMode: quiz.scoring_mode,
     kind: quiz.kind,
+    countsForScore,
     responses: mappedResponses,
   };
 }

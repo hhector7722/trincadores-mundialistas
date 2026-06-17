@@ -41,6 +41,7 @@ function hub(overrides: Partial<QuizDayHub> = {}): QuizDayHub {
     quizDate: "2026-06-06",
     competitive: true,
     publishHeld: false,
+    practiceReplayAllowed: false,
     official: slot("competitive", null),
     bonus: null,
     ...overrides,
@@ -58,6 +59,18 @@ test("resolveQuizEntryAction sin quiz publicado va al hub", () => {
     type: "navigate",
     href: "/quiz",
   });
+});
+
+test("resolveQuizEntryAction competitivo completado con practica permite jugar", () => {
+  assert.deepEqual(
+    resolveQuizEntryAction(
+      hub({
+        official: slot("competitive", "submitted"),
+        practiceReplayAllowed: true,
+      })
+    ),
+    { type: "confirm_start", href: "/quiz/play?start=1" }
+  );
 });
 
 test("resolveQuizEntryAction competitivo completado muestra ya jugado", () => {

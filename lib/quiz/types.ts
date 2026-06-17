@@ -67,11 +67,15 @@ export type QuizAttemptRow = {
   started_at: string;
   submitted_at: string | null;
   expires_at: string | null;
+  /** false en intentos de práctica que no afectan al ranking. */
+  counts_for_score?: boolean;
 };
 
 export type QuizDaySlot = {
   quiz: QuizRow;
   attempt: QuizAttemptRow | null;
+  /** Intent submitted que cuenta para ranking (si hay replay de práctica). */
+  countingSubmittedAttemptId?: string | null;
 };
 
 export type QuizDayHub = {
@@ -79,6 +83,8 @@ export type QuizDayHub = {
   competitive: boolean;
   /** true cuando el dia esta en pausa editorial (sin quiz jugable). */
   publishHeld: boolean;
+  /** Intento extra de prueba sin puntuar (solo hector, fecha acotada). */
+  practiceReplayAllowed: boolean;
   official: QuizDaySlot | null;
   bonus: QuizDaySlot | null;
 };
@@ -99,6 +105,7 @@ export type QuizResultResponse = {
   maxPoints: number;
   scoringMode: QuizScoringMode;
   kind: QuizKind;
+  countsForScore: boolean;
   responses: Array<{
     questionId: string;
     prompt: string;

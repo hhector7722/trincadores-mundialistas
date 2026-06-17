@@ -6,7 +6,12 @@ import {
   enrichQuestionsWithPlayFormats,
   parsePlayFormats,
 } from "@/lib/quiz/play-formats";
-import { getQuizResult, getQuizDayHub, startQuizSession } from "@/lib/quiz/queries";
+import {
+  getQuizDayHub,
+  getQuizResult,
+  startQuizPracticeSession,
+  startQuizSession,
+} from "@/lib/quiz/queries";
 import type { QuizDayHub, QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
 import { createClient } from "@/lib/supabase/server";
@@ -16,6 +21,12 @@ export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; error: st
 
 function mapQuizRpcError(message: string): string {
   const lower = message.toLowerCase();
+  if (lower.includes("practice replay already used")) {
+    return "Ya usaste el intento de prueba de hoy.";
+  }
+  if (lower.includes("practice replay not allowed")) {
+    return "El intento de prueba no esta disponible.";
+  }
   if (lower.includes("quiz already completed")) {
     return "Ya completaste este quiz de hoy.";
   }
@@ -74,7 +85,16 @@ export async function startQuiz(
   }
 
   try {
-    const session = await startQuizSession(quizId);
+    const hub = await getQuizDayHub(poolId, user.id);
+    const attempt = hub.official?.attempt;
+    const usePractice =
+      hub.official?.quiz.id === quizId &&
+      (attempt?.counts_for_score === false ||
+        (hub.practiceReplayAllowed && attempt?.status === "submitted"));
+
+    const session = usePractice
+      ? await startQuizPracticeSession(quizId)
+      : await startQuizSession(quizId);
 
     const { data: quizRow, error: quizError } = await supabase
       .from("quizzes")

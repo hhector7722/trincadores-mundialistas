@@ -12,6 +12,14 @@ export function buildQuizStartConfirmCopy(hub: QuizDayHub): { title: string; bod
     };
   }
 
+  if (hub.practiceReplayAllowed) {
+    return {
+      title: "Quiz diario — prueba",
+      body:
+        "Intento extra solo para comprobar la experiencia. No suma puntos ni cambia tu resultado oficial de hoy.",
+    };
+  }
+
   const competitive =
     hub.competitive && hub.official?.quiz.scoring_mode === "competitive";
 

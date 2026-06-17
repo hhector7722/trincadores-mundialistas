@@ -33,7 +33,7 @@ export default async function QuizPlayPage({ searchParams }: QuizPlayPageProps) 
     redirect("/quiz");
   }
 
-  if (!canOpenQuizPlay(slot)) {
+  if (!canOpenQuizPlay(slot, undefined, { practiceReplayAllowed: hub.practiceReplayAllowed })) {
     const attemptId = getLatestSubmittedAttemptId(slot);
     redirect(attemptId ? `/quiz/result?attempt=${attemptId}` : "/quiz");
   }
