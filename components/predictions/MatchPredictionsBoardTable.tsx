@@ -15,6 +15,7 @@ type MatchPredictionsBoardTableProps = {
   homeTeam: string;
   awayTeam: string;
   showOutcomes?: boolean;
+  showSignOutcomeTicks?: boolean;
   loading?: boolean;
 };
 
@@ -93,6 +94,7 @@ export function MatchPredictionsBoardTable({
   homeTeam,
   awayTeam,
   showOutcomes = false,
+  showSignOutcomeTicks = false,
   loading = false,
 }: MatchPredictionsBoardTableProps) {
   const dataRows = loading ? [] : rows;
@@ -125,6 +127,7 @@ export function MatchPredictionsBoardTable({
                   row={row}
                   isCurrentUser={row.profileId === currentProfileId}
                   showOutcomes={showOutcomes}
+                  showSignOutcomeTicks={showSignOutcomeTicks}
                 />
               );
             })}

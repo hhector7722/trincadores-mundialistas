@@ -466,6 +466,7 @@ export function HomeMatchCard({
           awayTeam={displayMatch.away_team}
           currentProfileId={currentProfileId}
           carouselMatches={boardCarouselMatches}
+          showSignOutcomeTicks
         />
       ) : null}
     </>

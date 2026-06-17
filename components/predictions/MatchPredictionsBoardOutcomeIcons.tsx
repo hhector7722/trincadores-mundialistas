@@ -5,6 +5,8 @@ import { computeBoardRowTotalPoints } from "@/lib/predictions/scoring";
 type MatchPredictionsBoardOutcomeProps = {
   scoreOutcome: ScoreOutcome | null;
   mvpCorrect: boolean;
+  /** Inicio: tick verde también en acierto de signo (1X2). Calendario: solo exacto. */
+  showSignOutcomeTicks?: boolean;
 };
 
 export function MatchPredictionsBoardPointsLabel({
@@ -24,9 +26,14 @@ export function MatchPredictionsBoardPointsLabel({
 export function MatchPredictionsBoardOutcomeIconTicks({
   scoreOutcome,
   mvpCorrect,
+  showSignOutcomeTicks = false,
 }: MatchPredictionsBoardOutcomeProps) {
   const tickCount =
-    scoreOutcome === "exact" ? 2 : scoreOutcome === "sign" ? 1 : 0;
+    scoreOutcome === "exact"
+      ? 2
+      : showSignOutcomeTicks && scoreOutcome === "sign"
+        ? 1
+        : 0;
   if (tickCount === 0 && !mvpCorrect) return null;
 
   return (
@@ -39,10 +46,11 @@ export function MatchPredictionsBoardOutcomeIconTicks({
   );
 }
 
-/** Columna de aciertos: total en amarillo, ticks verdes en signo (×1) o exacto (×2) y estrella MVP. */
+/** Columna de aciertos: total en amarillo, ticks verdes (signo ×1 si aplica, exacto ×2) y estrella MVP. */
 export function MatchPredictionsBoardOutcomeIcons({
   scoreOutcome,
   mvpCorrect,
+  showSignOutcomeTicks = false,
 }: MatchPredictionsBoardOutcomeProps) {
   const totalPoints = computeBoardRowTotalPoints(scoreOutcome, mvpCorrect);
   if (totalPoints === 0) return null;
@@ -50,7 +58,11 @@ export function MatchPredictionsBoardOutcomeIcons({
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5" aria-hidden>
       <MatchPredictionsBoardPointsLabel scoreOutcome={scoreOutcome} mvpCorrect={mvpCorrect} />
-      <MatchPredictionsBoardOutcomeIconTicks scoreOutcome={scoreOutcome} mvpCorrect={mvpCorrect} />
+      <MatchPredictionsBoardOutcomeIconTicks
+        scoreOutcome={scoreOutcome}
+        mvpCorrect={mvpCorrect}
+        showSignOutcomeTicks={showSignOutcomeTicks}
+      />
     </span>
   );
 }

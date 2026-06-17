@@ -29,10 +29,12 @@ export function MatchPredictionsBoardRow({
   row,
   isCurrentUser,
   showOutcomes,
+  showSignOutcomeTicks = false,
 }: {
   row: MatchPredictionsBoardRowType;
   isCurrentUser: boolean;
   showOutcomes: boolean;
+  showSignOutcomeTicks?: boolean;
 }) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const canPreview = Boolean(row.avatarUrl);
@@ -90,6 +92,7 @@ export function MatchPredictionsBoardRow({
               <MatchPredictionsBoardOutcomeIconTicks
                 scoreOutcome={row.scoreOutcome}
                 mvpCorrect={row.mvpCorrect}
+                showSignOutcomeTicks={showSignOutcomeTicks}
               />
             </div>
           </>

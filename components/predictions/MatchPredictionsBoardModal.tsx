@@ -27,6 +27,8 @@ type MatchPredictionsBoardModalProps = {
   carouselMatches?: MatchPredictionsBoardCarouselMatch[];
   /** @deprecated Usar `carouselMatches`. */
   finishedMatches?: MatchPredictionsBoardCarouselMatch[];
+  /** Inicio: tick verde en aciertos de signo (1X2). Calendario/modal partido: solo exacto. */
+  showSignOutcomeTicks?: boolean;
 };
 
 const MODAL_PANEL_CLASS =
@@ -42,9 +44,11 @@ type LoadedBoardState = {
 function MatchPredictionsBoardContent({
   board,
   currentProfileId,
+  showSignOutcomeTicks,
 }: {
   board: MatchPredictionsBoard;
   currentProfileId: string;
+  showSignOutcomeTicks: boolean;
 }) {
   return (
     <>
@@ -54,10 +58,11 @@ function MatchPredictionsBoardContent({
         homeTeam={board.homeTeam}
         awayTeam={board.awayTeam}
         showOutcomes={board.showOutcomes}
+        showSignOutcomeTicks={showSignOutcomeTicks}
       />
       {board.showOutcomes ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">
-          <MatchPredictionsBoardLegend />
+          <MatchPredictionsBoardLegend showSignOutcomeTicks={showSignOutcomeTicks} />
         </div>
       ) : null}
     </>
@@ -74,6 +79,7 @@ export function MatchPredictionsBoardModal({
   currentProfileId,
   carouselMatches: carouselMatchesProp,
   finishedMatches,
+  showSignOutcomeTicks = false,
 }: MatchPredictionsBoardModalProps) {
   const fallbackMatch = useMemo(
     () => ({ id: matchId, homeTeam, awayTeam }),
@@ -256,6 +262,7 @@ export function MatchPredictionsBoardModal({
           <MatchPredictionsBoardContent
             board={activeBoard}
             currentProfileId={currentProfileId}
+            showSignOutcomeTicks={showSignOutcomeTicks}
           />
         ) : (
           <div className={cn("flex-1", MODAL_LOADING_MIN_H)} aria-hidden="true" />

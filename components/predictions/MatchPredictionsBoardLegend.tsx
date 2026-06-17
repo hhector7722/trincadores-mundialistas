@@ -14,12 +14,27 @@ function LegendItem({ icons, label }: { icons: ReactNode; label: string }) {
 }
 
 /** Leyenda compacta de iconos de acierto en partidos finalizados. */
-export function MatchPredictionsBoardLegend({ className }: { className?: string }) {
+export function MatchPredictionsBoardLegend({
+  className,
+  showSignOutcomeTicks = false,
+}: {
+  className?: string;
+  showSignOutcomeTicks?: boolean;
+}) {
   return (
     <div className={cn("shrink-0 px-3", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] leading-tight text-[var(--tm-muted)]">
         <LegendItem
-          icons={<PredictionOutcomeIcon variant="success" className="text-[10px]" />}
+          icons={
+            showSignOutcomeTicks ? (
+              <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+            ) : (
+              <span
+                className="inline-block h-3 w-1 rounded-full bg-[var(--tm-cal-outcome-sign)]"
+                aria-hidden
+              />
+            )
+          }
           label="Signo 1 x 2"
         />
         <LegendItem
