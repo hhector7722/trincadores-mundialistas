@@ -15,13 +15,13 @@ export function CalendarFinishedOutcomeIcons({
   return (
     <div
       className={cn(
-        "tm-cal-finished-outcome-slot relative h-3 w-full shrink-0 pt-px",
+        "tm-cal-finished-outcome-slot relative h-3 w-full shrink-0",
         className,
       )}
       aria-hidden={icons.length === 0}
     >
       {icons.length > 0 ? (
-        <span className="pointer-events-none absolute inset-x-0 top-px z-[3] flex items-center justify-center gap-0.5">
+        <span className="pointer-events-none absolute inset-x-0 top-[3px] z-[3] flex items-center justify-center gap-0.5">
           {icons.map((variant, index) => (
             <PredictionOutcomeIcon
               key={`${variant}-${index}`}

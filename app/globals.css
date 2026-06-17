@@ -1773,8 +1773,8 @@ html:has(.tm-app-shell) body {
   --tm-cal-cell-bg: rgba(30, 10, 62, 0.78);
   --tm-cal-match-card-bg: #5b537d;
   --tm-cal-match-card-border: #5b537d;
-  --tm-cal-match-card-finished-bg: #6d6591;
-  --tm-cal-match-card-finished-border: #6d6591;
+  --tm-cal-match-card-finished-bg: #7d759e;
+  --tm-cal-match-card-finished-border: #7d759e;
   --tm-cal-outcome-exact: #22c55e;
   --tm-cal-outcome-sign: #60a5fa;
   --tm-cal-outcome-miss: var(--tm-danger);
