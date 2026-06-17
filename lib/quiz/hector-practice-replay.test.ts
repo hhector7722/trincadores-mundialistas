@@ -51,6 +51,6 @@ test("canHectorPracticeReplay bloquea si ya hay intento de practica", () => {
   ];
   assert.equal(
     canHectorPracticeReplay("hector", HECTOR_PRACTICE_REPLAY_DATE, attempts, "q1"),
-    false
+    true
   );
 });

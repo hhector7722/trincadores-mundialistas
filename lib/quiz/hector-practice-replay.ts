@@ -21,7 +21,5 @@ export function canHectorPracticeReplay(
   const hasCountingSubmitted = forQuiz.some(
     (a) => a.status === "submitted" && a.counts_for_score !== false
   );
-  const hasPracticeAttempt = forQuiz.some((a) => a.counts_for_score === false);
-
-  return hasCountingSubmitted && !hasPracticeAttempt;
+  return hasCountingSubmitted;
 }
