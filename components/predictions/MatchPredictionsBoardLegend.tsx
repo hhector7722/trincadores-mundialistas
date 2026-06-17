@@ -19,12 +19,7 @@ export function MatchPredictionsBoardLegend({ className }: { className?: string 
     <div className={cn("shrink-0 px-3", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] leading-tight text-[var(--tm-muted)]">
         <LegendItem
-          icons={
-            <span
-              className="inline-block h-3 w-1 rounded-full bg-[var(--tm-cal-outcome-sign)]"
-              aria-hidden
-            />
-          }
+          icons={<PredictionOutcomeIcon variant="success" className="text-[10px]" />}
           label="Signo 1 x 2"
         />
         <LegendItem
