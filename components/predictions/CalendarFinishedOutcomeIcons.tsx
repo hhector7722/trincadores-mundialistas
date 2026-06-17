@@ -28,8 +28,8 @@ export function CalendarFinishedOutcomeIcons({
               variant={variant}
               className={
                 variant === "mvp"
-                  ? "h-2 w-2"
-                  : "!min-h-0 !min-w-0 text-[9px]"
+                  ? "h-[7px] w-[7px]"
+                  : "!min-h-0 !min-w-0 text-[10px]"
               }
             />
           ))}

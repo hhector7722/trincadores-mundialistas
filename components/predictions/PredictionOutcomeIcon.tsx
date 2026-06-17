@@ -1,4 +1,4 @@
-import { Check, Star, X } from "lucide-react";
+import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type PredictionOutcomeIconProps = {
@@ -6,7 +6,53 @@ type PredictionOutcomeIconProps = {
   className?: string;
 };
 
-/** Icono compacto de resultado: estrella MVP (12px) o tick/cruz escalables con el contenedor. */
+const DISC_ICON_CLASS =
+  "inline-block h-[1em] w-[1em] min-h-[10px] min-w-[10px] shrink-0";
+
+/** Círculo + cruz en un solo SVG; el cruce queda en el centro geométrico del disco. */
+function ErrorOutcomeDisc({ className }: { className?: string }) {
+  return (
+    <svg
+      data-outcome="error"
+      viewBox="0 0 12 12"
+      className={cn(DISC_ICON_CLASS, className)}
+      aria-hidden
+    >
+      <circle cx="6" cy="6" r="6" fill="#ef4444" />
+      <path
+        d="M4 4 8 8 M8 4 4 8"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="1.65"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** Círculo + tick en un solo SVG, proporciones alineadas con el disco de error. */
+function SuccessOutcomeDisc({ className }: { className?: string }) {
+  return (
+    <svg
+      data-outcome="success"
+      viewBox="0 0 12 12"
+      className={cn(DISC_ICON_CLASS, className)}
+      aria-hidden
+    >
+      <circle cx="6" cy="6" r="6" fill="#22c55e" />
+      <path
+        d="M3.4 6.15 5.15 7.9 8.6 4.1"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="1.65"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Icono compacto de resultado: estrella MVP o disco con tick/cruz. */
 export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeIconProps) {
   if (variant === "mvp") {
     return (
@@ -18,27 +64,9 @@ export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeI
     );
   }
 
-  const isSuccess = variant === "success";
+  if (variant === "error") {
+    return <ErrorOutcomeDisc className={className} />;
+  }
 
-  return (
-    <span
-      data-outcome={variant}
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full leading-none",
-        "h-[1em] w-[1em] min-h-[10px] min-w-[10px]",
-        isSuccess ? "bg-emerald-500" : "bg-red-500",
-        className,
-      )}
-      aria-hidden
-    >
-      {isSuccess ? (
-        <Check className="block h-[0.66em] w-[0.66em] shrink-0 text-white" strokeWidth={3} />
-      ) : (
-        <X
-          className="block h-[0.56em] w-[0.56em] shrink-0 text-white"
-          strokeWidth={2.75}
-        />
-      )}
-    </span>
-  );
+  return <SuccessOutcomeDisc className={className} />;
 }

@@ -2185,10 +2185,6 @@ html:has(.tm-app-shell) body {
   overflow: visible;
 }
 
-.tm-porra-calendar .tm-cal-finished-outcome-slot [data-outcome="error"] {
-  line-height: 0;
-}
-
 .tm-cal-guide-entries .tm-porra-calendar.tm-cal-guide-preview .tm-cal-match-card-body {
   justify-content: flex-end;
   gap: 1px;
