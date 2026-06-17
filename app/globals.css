@@ -2366,12 +2366,13 @@ html:has(.tm-app-shell) body {
 .tm-porra-calendar .tm-cal-sidebar-card-inner {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  gap: 4px;
   min-height: 0;
   min-width: 0;
   flex: 1 1 auto;
   height: 100%;
-  padding-bottom: var(--tm-cal-sidebar-card-bottom-pad, 6px);
+  padding-bottom: var(--tm-cal-sidebar-card-bottom-pad, 4px);
   box-sizing: border-box;
   overflow: hidden;
   border-radius: inherit;

@@ -1,5 +1,4 @@
 import { CalendarGroupsPanel } from "@/components/predictions/CalendarGroupsPanel";
-import { CalendarGuideAccess } from "@/components/predictions/CalendarGuideAccess";
 import { CalendarSidebarAccessDock } from "@/components/predictions/CalendarSidebarAccessDock";
 
 import type { GroupStandingRow } from "@/lib/pool/group-standings";
@@ -111,8 +110,6 @@ export function CalendarSidebarSlot({
               onOpenSquads={(options) => onOpenSquads?.(options)}
 
             />
-
-            <CalendarGuideAccess />
 
           </div>
 
