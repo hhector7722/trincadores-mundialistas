@@ -9,7 +9,7 @@ type QuizOptionButtonProps = {
   visualState: OptionVisualState;
   locked: boolean;
   onSelect: () => void;
-  /** Grid 2×2: botón compacto centrado. */
+  /** Grid 2×2: letra y texto en una fila. */
   compact?: boolean;
 };
 
@@ -29,10 +29,8 @@ export function QuizOptionButton({
       className={cn(
         "tm-quiz-option w-full rounded-xl border font-medium transition-colors",
         compact
-          ? "flex min-h-12 flex-col items-center justify-center gap-1 px-2 py-2 text-center"
+          ? "flex min-h-12 items-center gap-2 px-3 py-2 text-left text-xs"
           : "flex min-h-12 items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm",
-        !compact && "text-sm",
-        compact && "text-xs",
         visualState === "default" &&
           "border-[var(--tm-border)] bg-[var(--tm-surface)] text-[var(--tm-fg)] hover:border-[var(--tm-accent-muted)]",
         visualState === "correct" &&
@@ -56,9 +54,7 @@ export function QuizOptionButton({
       >
         {optionId}
       </span>
-      <span className={cn("min-w-0", compact ? "line-clamp-2 leading-tight" : "flex-1")}>
-        {label}
-      </span>
+      <span className="min-w-0 flex-1 truncate leading-tight">{label}</span>
     </button>
   );
 }
