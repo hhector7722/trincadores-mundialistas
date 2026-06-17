@@ -1,7 +1,7 @@
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
 import type { ScoreOutcome } from "@/lib/predictions/prediction-outcome";
+import { resolvePredictionOutcomeIcons } from "@/lib/predictions/prediction-outcome-icons";
 import { computeBoardRowTotalPoints } from "@/lib/predictions/scoring";
-
 type MatchPredictionsBoardOutcomeProps = {
   scoreOutcome: ScoreOutcome | null;
   mvpCorrect: boolean;
@@ -28,20 +28,19 @@ export function MatchPredictionsBoardOutcomeIconTicks({
   mvpCorrect,
   showSignOutcomeTicks = false,
 }: MatchPredictionsBoardOutcomeProps) {
-  const tickCount =
-    scoreOutcome === "exact"
-      ? 2
-      : showSignOutcomeTicks && scoreOutcome === "sign"
-        ? 1
-        : 0;
-  if (tickCount === 0 && !mvpCorrect) return null;
+  const icons = resolvePredictionOutcomeIcons({
+    scoreOutcome,
+    mvpCorrect,
+    showMissIndicator: false,
+    showSignOutcomeTicks,
+  });
+  if (icons.length === 0) return null;
 
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5" aria-hidden>
-      {Array.from({ length: tickCount }, (_, index) => (
-        <PredictionOutcomeIcon key={`tick-${index}`} variant="success" className="text-[10px]" />
+      {icons.map((variant, index) => (
+        <PredictionOutcomeIcon key={`${variant}-${index}`} variant={variant} className="text-[10px]" />
       ))}
-      {mvpCorrect ? <PredictionOutcomeIcon variant="mvp" /> : null}
     </span>
   );
 }

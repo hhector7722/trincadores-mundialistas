@@ -37,7 +37,6 @@ describe("resolveCalendarFinishedCard", () => {
     assert.equal(state?.variant, "exact");
     assert.equal(state?.scoreOutcome, "exact");
     assert.equal(state?.mvpCorrect, false);
-    assert.equal(state?.showPredictedInKickoffSlot, true);
   });
 
   it("marcador exacto y mvp", () => {
@@ -67,7 +66,6 @@ describe("resolveCalendarFinishedCard", () => {
     assert.equal(state?.variant, "sign");
     assert.equal(state?.scoreOutcome, "sign");
     assert.equal(state?.mvpCorrect, false);
-    assert.equal(state?.showPredictedInKickoffSlot, true);
   });
 
   it("signo y mvp", () => {
@@ -106,7 +104,6 @@ describe("resolveCalendarFinishedCard", () => {
     assert.equal(state?.variant, "mvp-only");
     assert.equal(state?.scoreOutcome, "miss");
     assert.equal(state?.mvpCorrect, true);
-    assert.equal(state?.showPredictedInKickoffSlot, true);
   });
 
   it("fallo total", () => {

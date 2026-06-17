@@ -13,16 +13,15 @@ export type CalendarFinishedCardVariant =
   | "mvp-only"
   | "miss";
 
-/** Partido pasado: desatura banderas, grupo y marcadores del wrapper exterior visual. */
+/** Partido pasado: desatura banderas, grupo, marcador oficial e iconos de acierto. */
 export const CAL_FINISHED_OUTER_MUTED_CLASS =
-  "[&_.tm-cal-flags_.tm-cal-flag]:opacity-60 [&_.tm-cal-flags_.tm-cal-flag]:saturate-50 [&_.tm-cal-match-group--under-score]:opacity-60 [&_.tm-cal-match-group--under-score]:saturate-50 [&_.tm-cal-kickoff]:opacity-60 [&_.tm-cal-kickoff]:saturate-50 [&_.tm-cal-flags_.tm-cal-prediction]:opacity-60 [&_.tm-cal-flags_.tm-cal-prediction]:saturate-50";
+  "[&_.tm-cal-flags_.tm-cal-flag]:opacity-60 [&_.tm-cal-flags_.tm-cal-flag]:saturate-50 [&_.tm-cal-match-group--under-score]:opacity-60 [&_.tm-cal-match-group--under-score]:saturate-50 [&_.tm-cal-flags_.tm-cal-prediction]:opacity-60 [&_.tm-cal-flags_.tm-cal-prediction]:saturate-50 [&_.tm-cal-finished-outcome-slot]:opacity-60 [&_.tm-cal-finished-outcome-slot]:saturate-50";
 
 export type CalendarFinishedCardState = {
   variant: CalendarFinishedCardVariant;
   scoreOutcome: ScoreOutcome | null;
   mvpCorrect: boolean;
   hasPrediction: boolean;
-  showPredictedInKickoffSlot: boolean;
 };
 
 function hasOfficialScore(match: MatchWithPrediction): boolean {
@@ -77,6 +76,5 @@ export function resolveCalendarFinishedCard(
     scoreOutcome,
     mvpCorrect,
     hasPrediction,
-    showPredictedInKickoffSlot: hasPrediction,
   };
 }

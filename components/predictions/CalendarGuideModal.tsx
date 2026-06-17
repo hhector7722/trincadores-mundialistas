@@ -41,8 +41,6 @@ function CalendarGuideMiniCard({
         homeTeam={entry.match.home_team}
         awayTeam={entry.match.away_team}
         groupCode={entry.match.group_code}
-        predictionHome={entry.match.prediction!.home_goals}
-        predictionAway={entry.match.prediction!.away_goals}
         officialHome={entry.match.officialHome!}
         officialAway={entry.match.officialAway!}
         finishedState={finishedState}

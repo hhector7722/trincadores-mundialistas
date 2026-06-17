@@ -116,9 +116,6 @@ function CalendarMatchCard({
     : `${time} · ${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · ${predictionLabel}`;
 
   if (finishedState) {
-    const predictionHome = match.prediction?.home_goals ?? 0;
-    const predictionAway = match.prediction?.away_goals ?? 0;
-
     return (
       <CalendarFinishedMatchCardVisual
         interactive
@@ -129,8 +126,6 @@ function CalendarMatchCard({
         homeTeam={match.home_team}
         awayTeam={match.away_team}
         groupCode={match.group_code}
-        predictionHome={predictionHome}
-        predictionAway={predictionAway}
         officialHome={match.officialHome!}
         officialAway={match.officialAway!}
         finishedState={finishedState}
