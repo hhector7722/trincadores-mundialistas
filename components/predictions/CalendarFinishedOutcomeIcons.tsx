@@ -26,7 +26,11 @@ export function CalendarFinishedOutcomeIcons({
             <PredictionOutcomeIcon
               key={`${variant}-${index}`}
               variant={variant}
-              className="text-[10px]"
+              className={
+                variant === "mvp"
+                  ? "h-2.5 w-2.5"
+                  : "!min-h-0 !min-w-0 text-[8px]"
+              }
             />
           ))}
         </span>
