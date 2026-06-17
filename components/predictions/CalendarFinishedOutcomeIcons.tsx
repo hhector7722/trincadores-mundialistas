@@ -7,6 +7,9 @@ type CalendarFinishedOutcomeIconsProps = {
   className?: string;
 };
 
+/** Altura unificada: discos (tick/cruz) y estrella comparten el mismo tamaño en calendario. */
+const CALENDAR_OUTCOME_ICON_CLASS = "h-[10px] w-[10px] shrink-0 !min-h-0 !min-w-0";
+
 /** Conjunto de iconos de acierto centrado en la card del calendario (partidos finalizados). */
 export function CalendarFinishedOutcomeIcons({
   icons,
@@ -26,11 +29,7 @@ export function CalendarFinishedOutcomeIcons({
             <PredictionOutcomeIcon
               key={`${variant}-${index}`}
               variant={variant}
-              className={
-                variant === "mvp"
-                  ? "h-[7px] w-[7px]"
-                  : "!min-h-0 !min-w-0 text-[10px]"
-              }
+              className={CALENDAR_OUTCOME_ICON_CLASS}
             />
           ))}
         </span>
