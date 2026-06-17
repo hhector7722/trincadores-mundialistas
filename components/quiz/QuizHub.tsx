@@ -3,7 +3,6 @@
 import { QuizLeaderboardTable } from "@/components/quiz/QuizLeaderboardTable";
 import { useQuizEntry } from "@/components/quiz/QuizEntryProvider";
 import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
-import { getLatestSubmittedAttemptId, getQuizPlayCta } from "@/lib/quiz/slot-status";
 import type { QuizDayHub, QuizLeaderboardRow } from "@/lib/quiz/types";
 
 const playButtonClass =
@@ -19,10 +18,6 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
   const { requestQuizEntry } = useQuizEntry();
 
   const quizAvailable = Boolean(hub.official);
-  const playCta = getQuizPlayCta(hub.official, {
-    resultAttemptId: getLatestSubmittedAttemptId(hub.official),
-    practiceReplayAllowed: hub.practiceReplayAllowed,
-  });
 
   return (
     <div className="tm-quiz-hub">
@@ -45,8 +40,9 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
             type="button"
             onClick={requestQuizEntry}
             className={playButtonClass}
+            disabled={!quizAvailable}
           >
-            {playCta?.label ?? "Jugar"}
+            Jugar
           </button>
 
           {hub.publishHeld && (
@@ -62,9 +58,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
           )}
 
           <p className="text-center text-xs text-[var(--tm-muted)]">
-            {hub.practiceReplayAllowed
-              ? "Tienes un intento de prueba extra hoy (no puntúa)."
-              : "Un intento por día."}
+            Un intento por día.
           </p>
         </section>
       </div>

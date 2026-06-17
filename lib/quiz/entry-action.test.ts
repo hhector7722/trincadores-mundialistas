@@ -62,8 +62,12 @@ test("resolveQuizEntryAction sin quiz publicado va al hub", () => {
 });
 
 test("resolveQuizEntryAction competitivo completado muestra ya jugado", () => {
+  const official = {
+    ...slot("competitive", "submitted"),
+    countingSubmittedAttemptId: "a1",
+  };
   assert.deepEqual(
-    resolveQuizEntryAction(hub({ official: slot("competitive", "submitted") })),
+    resolveQuizEntryAction(hub({ official, drillAvailable: true })),
     { type: "already_played" },
   );
 });

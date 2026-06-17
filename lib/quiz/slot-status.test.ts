@@ -4,10 +4,12 @@ import {
   canOpenQuizDrill,
   canOpenQuizPlay,
   canReplayQuiz,
+  canStartQuizDrill,
+  getQuizHubActions,
   getQuizPlayCta,
   shouldShowQuizAlreadyPlayedModal,
 } from "./slot-status";
-import type { QuizDaySlot } from "./types";
+import type { QuizDayHub, QuizDaySlot } from "./types";
 
 import { todayQuizDate } from "./date";
 
@@ -81,4 +83,23 @@ test("competitive completado permite entrenar si hay intento oficial", () => {
 
 test("competitive sin completar no permite entrenar", () => {
   assert.equal(canOpenQuizDrill(slot("competitive", null)), false);
+});
+
+test("hub competitivo completado ofrece entrenar y ver resultado", () => {
+  const official = {
+    ...slot("competitive", "submitted"),
+    countingSubmittedAttemptId: "a1",
+  };
+  const hub: Pick<QuizDayHub, "drillAvailable" | "official"> = {
+    drillAvailable: true,
+    official,
+  };
+
+  assert.equal(canStartQuizDrill(hub), true);
+
+  const actions = getQuizHubActions(hub);
+  assert.equal(actions[0]?.action, "drill");
+  assert.equal(actions[0]?.label, "Entrenar");
+  assert.equal(actions[1]?.action, "result");
+  assert.equal(actions[1]?.href, "/quiz/result?attempt=a1");
 });

@@ -9,6 +9,8 @@ type QuizResultSummaryProps = {
   kind: "official" | "bonus";
   canReplay: boolean;
   practiceAttempt?: boolean;
+  canDrill?: boolean;
+  drillHref?: string | null;
 };
 
 export function QuizResultSummary({
@@ -18,6 +20,8 @@ export function QuizResultSummary({
   kind,
   canReplay,
   practiceAttempt = false,
+  canDrill = false,
+  drillHref,
 }: QuizResultSummaryProps) {
   const countsForScore =
     kind === "official" && scoringMode === "competitive" && !practiceAttempt;
@@ -54,6 +58,14 @@ export function QuizResultSummary({
       </Card>
 
       <div className="tm-quiz-actions flex flex-col gap-2">
+        {canDrill && drillHref ? (
+          <Link
+            href={drillHref}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--tm-accent)] px-5 text-sm font-semibold text-[var(--tm-primary-fg)]"
+          >
+            Entrenar
+          </Link>
+        ) : null}
         {canReplay && <QuizReplayButton />}
         <Link
           href="/quiz"

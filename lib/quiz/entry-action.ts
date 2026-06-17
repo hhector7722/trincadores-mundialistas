@@ -24,15 +24,12 @@ export function resolveQuizEntryAction(hub: QuizDayHub): QuizEntryAction {
 
   const slot = hub.official;
 
-  if (shouldShowQuizAlreadyPlayedModal(slot, {
-    practiceReplayAllowed: hub.practiceReplayAllowed,
-  })) {
+  if (shouldShowQuizAlreadyPlayedModal(slot)) {
     return { type: "already_played" };
   }
 
   const playCta = getQuizPlayCta(slot, {
     resultAttemptId: getLatestSubmittedAttemptId(slot),
-    practiceReplayAllowed: hub.practiceReplayAllowed,
   });
 
   if (!playCta?.entersPlay) {

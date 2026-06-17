@@ -9,7 +9,9 @@ export type AppUsageActionKind =
   | "highlight_watch"
   | "prediction_saved"
   | "quiz_started"
-  | "quiz_submitted";
+  | "quiz_drill_started"
+  | "quiz_submitted"
+  | "quiz_drill_submitted";
 
 export type AppUsageMetadata = {
   action?: AppUsageActionKind;

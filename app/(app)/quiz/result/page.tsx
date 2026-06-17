@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizResultSummary } from "@/components/quiz/QuizResultSummary";
 import { getQuizDayHub, getQuizResult } from "@/lib/quiz/queries";
-import { canReplayQuiz } from "@/lib/quiz/slot-status";
+import { QUIZ_DRILL_PLAY_HREF } from "@/lib/quiz/play-routes";
+import { canReplayQuiz, canStartQuizDrill } from "@/lib/quiz/slot-status";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,9 +36,8 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
     notFound();
   }
 
-  const canReplay = canReplayQuiz(hub.official, {
-    practiceReplayAllowed: hub.practiceReplayAllowed,
-  });
+  const canReplay = canReplayQuiz(hub.official);
+  const canDrill = canStartQuizDrill(hub);
 
   return (
     <QuizPageShell>
@@ -56,6 +56,8 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
         kind={result.kind}
         canReplay={canReplay}
         practiceAttempt={!result.countsForScore}
+        canDrill={canDrill}
+        drillHref={canDrill ? QUIZ_DRILL_PLAY_HREF : null}
       />
     </QuizPageShell>
   );

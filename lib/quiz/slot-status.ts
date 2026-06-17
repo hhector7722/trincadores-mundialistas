@@ -1,6 +1,11 @@
 import { isQuizWindowOpen } from "@/lib/quiz/date";
-import { QUIZ_PLAY_HREF, QUIZ_PLAY_RESUME_HREF } from "@/lib/quiz/play-routes";
-import type { QuizDaySlot, QuizScoringMode } from "@/lib/quiz/types";
+import {
+  QUIZ_DRILL_PLAY_HREF,
+  QUIZ_DRILL_PLAY_RESUME_HREF,
+  QUIZ_PLAY_HREF,
+  QUIZ_PLAY_RESUME_HREF,
+} from "@/lib/quiz/play-routes";
+import type { QuizDayHub, QuizDaySlot, QuizScoringMode } from "@/lib/quiz/types";
 
 export type QuizSlotStatus =
   | "unavailable"
@@ -129,6 +134,78 @@ export function canOpenQuizDrill(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
   if (!isQuizWindowOpen(slot.quiz)) return false;
   return Boolean(slot.countingSubmittedAttemptId);
+}
+
+export function canStartQuizDrill(
+  hub: Pick<QuizDayHub, "drillAvailable" | "official">,
+): boolean {
+  return hub.drillAvailable && hub.official != null && canOpenQuizDrill(hub.official);
+}
+
+export type QuizHubAction = QuizPlayCta & {
+  action: "play" | "drill" | "result" | "hub";
+};
+
+/** CTAs del hub cuando el diario ya esta jugado o listo para jugar/entrenar. */
+export function getQuizHubActions(
+  hub: Pick<QuizDayHub, "drillAvailable" | "official">,
+): QuizHubAction[] {
+  const slot = hub.official;
+  if (!slot) {
+    return [{ action: "hub", label: "Ir al quiz", href: "/quiz", entersPlay: false }];
+  }
+
+  const status = getQuizSlotStatus(slot);
+  const resultAttemptId = getLatestSubmittedAttemptId(slot);
+
+  if (canStartQuizDrill(hub)) {
+    const drillInProgress =
+      slot.drillAttempt?.status === "in_progress" &&
+      slot.drillAttempt.expires_at &&
+      Date.now() < new Date(slot.drillAttempt.expires_at).getTime();
+
+    const actions: QuizHubAction[] = [
+      {
+        action: "drill",
+        label: drillInProgress ? "Continuar entreno" : "Entrenar",
+        href: drillInProgress ? QUIZ_DRILL_PLAY_RESUME_HREF : QUIZ_DRILL_PLAY_HREF,
+        entersPlay: true,
+      },
+    ];
+
+    if (resultAttemptId) {
+      actions.push({
+        action: "result",
+        label: "Ver resultado",
+        href: `/quiz/result?attempt=${resultAttemptId}`,
+        entersPlay: false,
+      });
+    }
+
+    return actions;
+  }
+
+  const playCta = getQuizPlayCta(slot, { resultAttemptId });
+  if (!playCta) {
+    return [{ action: "hub", label: "Ir al quiz", href: "/quiz", entersPlay: false }];
+  }
+
+  if (playCta.entersPlay) {
+    return [{ action: "play", ...playCta }];
+  }
+
+  if (status === "completed" && resultAttemptId) {
+    return [
+      {
+        action: "result",
+        label: "Ver resultado",
+        href: `/quiz/result?attempt=${resultAttemptId}`,
+        entersPlay: false,
+      },
+    ];
+  }
+
+  return [{ action: playCta.href.startsWith("/quiz/result") ? "result" : "hub", ...playCta }];
 }
 
 /** Modal "ya jugado hoy" — competitivo completado sin rejugada. */

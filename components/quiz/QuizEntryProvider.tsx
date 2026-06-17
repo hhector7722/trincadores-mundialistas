@@ -18,7 +18,7 @@ import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
 import { resolveQuizEntryAction } from "@/lib/quiz/entry-action";
 import { QUIZ_DRILL_PLAY_HREF } from "@/lib/quiz/play-routes";
 import { buildQuizStartConfirmCopy } from "@/lib/quiz/start-confirm-copy";
-import { canOpenQuizDrill } from "@/lib/quiz/slot-status";
+import { canStartQuizDrill } from "@/lib/quiz/slot-status";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import { QUIZ_ACTIVE_NOTIFICATION_QUERY } from "@/lib/push/urls";
 
@@ -71,6 +71,7 @@ export function QuizEntryProvider({
   const [quizHub, setQuizHub] = useState(initialQuizHub);
   const [startConfirmOpen, setStartConfirmOpen] = useState(false);
   const [alreadyPlayedOpen, setAlreadyPlayedOpen] = useState(false);
+  const [alreadyPlayedHub, setAlreadyPlayedHub] = useState<QuizDayHub | null>(null);
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [pendingPlayHref, setPendingPlayHref] = useState<string | null>(null);
   const [confirmHub, setConfirmHub] = useState<QuizDayHub | null>(null);
@@ -95,6 +96,7 @@ export function QuizEntryProvider({
           setComingSoonOpen(true);
           return;
         case "already_played":
+          setAlreadyPlayedHub(hub);
           setAlreadyPlayedOpen(true);
           return;
         case "navigate":
@@ -137,20 +139,23 @@ export function QuizEntryProvider({
     setConfirmHub(null);
   }, []);
 
+  const startQuizDrill = useCallback(() => {
+    setAlreadyPlayedOpen(false);
+    setAlreadyPlayedHub(null);
+    router.push(QUIZ_DRILL_PLAY_HREF);
+  }, [router]);
+
   const value = useMemo(
     () => ({ requestQuizEntry, navigateQuizHub }),
     [navigateQuizHub, requestQuizEntry]
   );
 
-  const showDrillCta =
-    quizHub.drillAvailable &&
-    quizHub.official != null &&
-    canOpenQuizDrill(quizHub.official);
+  const showDrillCta = canStartQuizDrill(alreadyPlayedHub ?? quizHub);
 
-  const startDrill = useCallback(() => {
+  const closeAlreadyPlayed = useCallback(() => {
     setAlreadyPlayedOpen(false);
-    router.push(QUIZ_DRILL_PLAY_HREF);
-  }, [router]);
+    setAlreadyPlayedHub(null);
+  }, []);
 
   return (
     <QuizEntryContext.Provider value={value}>
@@ -167,15 +172,14 @@ export function QuizEntryProvider({
 
       <QuizWaitModal
         open={alreadyPlayedOpen}
-        onClose={() => setAlreadyPlayedOpen(false)}
+        onClose={closeAlreadyPlayed}
         message={ALREADY_PLAYED_MESSAGE}
-        hideCloseButton
         imageSrc="/images/quiz/quiz-already-played.png"
         imageAlt="Crack en caída libre con los brazos en cruz"
       >
         {showDrillCta ? (
           <>
-            <MatchAddPillButton onClick={startDrill}>Entrenar</MatchAddPillButton>
+            <MatchAddPillButton onClick={startQuizDrill}>Entrenar</MatchAddPillButton>
             <p className="text-center text-xs text-[var(--tm-muted)]">
               Pulsa para jugar con preguntas repetidas.
             </p>
