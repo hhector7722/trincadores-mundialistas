@@ -11,11 +11,14 @@ import {
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { fetchQuizDayHubAction } from "@/actions/quiz";
+import { MatchAddPillButton } from "@/components/lineup/MatchContextActionButton";
 import { QuizStartConfirmModal } from "@/components/quiz/QuizStartConfirmModal";
 import { QuizWaitModal } from "@/components/quiz/QuizWaitModal";
 import { QUIZ_COMING_SOON_MESSAGE } from "@/lib/quiz/date";
 import { resolveQuizEntryAction } from "@/lib/quiz/entry-action";
+import { QUIZ_DRILL_PLAY_HREF } from "@/lib/quiz/play-routes";
 import { buildQuizStartConfirmCopy } from "@/lib/quiz/start-confirm-copy";
+import { canOpenQuizDrill } from "@/lib/quiz/slot-status";
 import type { QuizDayHub } from "@/lib/quiz/types";
 import { QUIZ_ACTIVE_NOTIFICATION_QUERY } from "@/lib/push/urls";
 
@@ -139,6 +142,16 @@ export function QuizEntryProvider({
     [navigateQuizHub, requestQuizEntry]
   );
 
+  const showDrillCta =
+    quizHub.drillAvailable &&
+    quizHub.official != null &&
+    canOpenQuizDrill(quizHub.official);
+
+  const startDrill = useCallback(() => {
+    setAlreadyPlayedOpen(false);
+    router.push(QUIZ_DRILL_PLAY_HREF);
+  }, [router]);
+
   return (
     <QuizEntryContext.Provider value={value}>
       {children}
@@ -159,7 +172,17 @@ export function QuizEntryProvider({
         hideCloseButton
         imageSrc="/images/quiz/quiz-already-played.png"
         imageAlt="Crack en caída libre con los brazos en cruz"
-      />
+      >
+        {showDrillCta ? (
+          <>
+            <MatchAddPillButton onClick={startDrill}>Entrenar</MatchAddPillButton>
+            <p className="text-center text-xs text-[var(--tm-muted)]">
+              Pulsa para jugar con preguntas repetidas.
+            </p>
+            <p className="text-center text-xs text-[var(--tm-muted)]">No puntua.</p>
+          </>
+        ) : null}
+      </QuizWaitModal>
 
       <QuizWaitModal
         open={comingSoonOpen}

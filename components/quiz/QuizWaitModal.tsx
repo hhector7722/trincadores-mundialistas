@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ type QuizWaitModalProps = {
   hideCloseButton?: boolean;
   imageSrc?: string;
   imageAlt?: string;
+  children?: ReactNode;
 };
 
 export function QuizWaitModal({
@@ -20,6 +22,7 @@ export function QuizWaitModal({
   hideCloseButton = false,
   imageSrc,
   imageAlt = "",
+  children,
 }: QuizWaitModalProps) {
   const hasImage = Boolean(imageSrc);
 
@@ -66,6 +69,7 @@ export function QuizWaitModal({
         >
           {message}
         </p>
+        {children ? <div className="flex w-full flex-col items-center gap-2">{children}</div> : null}
       </div>
     </Modal>
   );

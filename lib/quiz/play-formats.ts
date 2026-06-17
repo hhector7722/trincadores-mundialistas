@@ -89,6 +89,35 @@ export function defaultClassicPlayFormats(questionCount: number): QuizPlayFormat
   }));
 }
 
+import type { DrillQuestionPick } from "@/lib/quiz/compose-drill-session";
+
+/** Aplica formatos y política de imagen por quiz origen (modo entrenar). */
+export function enrichDrillQuestions(
+  questions: QuizQuestionPlay[],
+  picks: DrillQuestionPick[]
+): QuizQuestionPlay[] {
+  const byQuestionId = new Map(picks.map((pick) => [pick.questionId, pick]));
+
+  const withFormats = questions.map((question) => {
+    const pick = byQuestionId.get(question.id);
+    if (!pick) return question;
+    return {
+      ...question,
+      sort_order: pick.displaySortOrder,
+      format: pick.format,
+      reveal_image_url: pick.revealImageUrl,
+    };
+  });
+
+  return withFormats.map((question) => {
+    const pick = byQuestionId.get(question.id);
+    if (!pick || question.format !== "classic") return question;
+    const showImage = classicQuizQuestionShowsImage(pick.quizDate);
+    if (showImage || question.sort_order !== 1) return question;
+    return { ...question, image_url: null };
+  });
+}
+
 export function labOptionIdsToSeed(
   options: Array<{ id: string; label: string }>,
   correctOptionId: string

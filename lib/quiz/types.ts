@@ -67,15 +67,19 @@ export type QuizAttemptRow = {
   started_at: string;
   submitted_at: string | null;
   expires_at: string | null;
-  /** false en intentos de práctica que no afectan al ranking. */
+  /** false en intentos de entrenamiento que no afectan al ranking. */
   counts_for_score?: boolean;
+  /** Preguntas mezcladas del histórico en modo entrenar. */
+  drill_question_ids?: string[] | null;
 };
 
 export type QuizDaySlot = {
   quiz: QuizRow;
   attempt: QuizAttemptRow | null;
-  /** Intent submitted que cuenta para ranking (si hay replay de práctica). */
+  /** Intent submitted que cuenta para ranking. */
   countingSubmittedAttemptId?: string | null;
+  /** Entrenamiento en curso (no bloquea estado completado del oficial). */
+  drillAttempt?: QuizAttemptRow | null;
 };
 
 export type QuizDayHub = {
@@ -83,8 +87,8 @@ export type QuizDayHub = {
   competitive: boolean;
   /** true cuando el dia esta en pausa editorial (sin quiz jugable). */
   publishHeld: boolean;
-  /** Intento extra de prueba sin puntuar (solo hector, fecha acotada). */
-  practiceReplayAllowed: boolean;
+  /** Hay quizzes historicos para modo entrenar. */
+  drillAvailable: boolean;
   official: QuizDaySlot | null;
   bonus: QuizDaySlot | null;
 };

@@ -39,7 +39,6 @@ export function getQuizSlotStatus(slot: QuizDaySlot | null): QuizSlotStatus {
 
 export type QuizPlayOptions = {
   resultAttemptId?: string | null;
-  practiceReplayAllowed?: boolean;
 };
 
 export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | null {
@@ -53,27 +52,22 @@ export function getLatestSubmittedAttemptId(slot: QuizDaySlot | null): string | 
 export function canOpenQuizPlay(
   slot: QuizDaySlot | null,
   scoringMode?: QuizScoringMode,
-  options?: Pick<QuizPlayOptions, "practiceReplayAllowed">
 ): boolean {
   if (!slot) return false;
   const mode = scoringMode ?? slot.quiz.scoring_mode;
   const status = getQuizSlotStatus(slot);
 
   if (status === "completed") {
-    if (options?.practiceReplayAllowed) return true;
     return mode === "training";
   }
 
   return status === "ready" || status === "in_progress" || status === "expired";
 }
 
-export function canReplayQuiz(
-  slot: QuizDaySlot | null,
-  options?: Pick<QuizPlayOptions, "practiceReplayAllowed">
-): boolean {
+export function canReplayQuiz(slot: QuizDaySlot | null): boolean {
   if (!slot) return false;
   if (getQuizSlotStatus(slot) !== "completed") return false;
-  return canOpenQuizPlay(slot, undefined, options);
+  return canOpenQuizPlay(slot);
 }
 
 export type QuizPlayCta = {
@@ -89,7 +83,7 @@ export function getQuizPlayCta(
   if (!slot) return null;
 
   const status = getQuizSlotStatus(slot);
-  const canPlay = canOpenQuizPlay(slot, undefined, options);
+  const canPlay = canOpenQuizPlay(slot);
 
   if (canPlay) {
     if (status === "in_progress") {
@@ -101,7 +95,7 @@ export function getQuizPlayCta(
     }
     if (status === "completed") {
       return {
-        label: options?.practiceReplayAllowed ? "Probar de nuevo" : "Jugar de nuevo",
+        label: "Jugar de nuevo",
         href: QUIZ_PLAY_HREF,
         entersPlay: true,
       };
@@ -131,15 +125,20 @@ export function getQuizPlayCta(
   return { label: "Ir al quiz", href: "/quiz", entersPlay: false };
 }
 
+export function canOpenQuizDrill(slot: QuizDaySlot | null): boolean {
+  if (!slot) return false;
+  if (!isQuizWindowOpen(slot.quiz)) return false;
+  return Boolean(slot.countingSubmittedAttemptId);
+}
+
 /** Modal "ya jugado hoy" — competitivo completado sin rejugada. */
 export function shouldShowQuizAlreadyPlayedModal(
   slot: QuizDaySlot | null,
-  options?: Pick<QuizPlayOptions, "practiceReplayAllowed">
 ): boolean {
   if (!slot) return false;
   return (
     getQuizSlotStatus(slot) === "completed" &&
-    !canOpenQuizPlay(slot, undefined, options)
+    !canOpenQuizPlay(slot)
   );
 }
 

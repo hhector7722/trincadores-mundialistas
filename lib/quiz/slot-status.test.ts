@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  canOpenQuizDrill,
   canOpenQuizPlay,
   canReplayQuiz,
   getQuizPlayCta,
@@ -8,13 +9,18 @@ import {
 } from "./slot-status";
 import type { QuizDaySlot } from "./types";
 
-function slot(scoringMode: "training" | "competitive", status: "submitted" | "in_progress"): QuizDaySlot {
+import { todayQuizDate } from "./date";
+
+function slot(
+  scoringMode: "training" | "competitive",
+  status: "submitted" | "in_progress" | null
+): QuizDaySlot {
   return {
     quiz: {
       id: "q1",
       pool_id: "p1",
       title: "Quiz",
-      quiz_date: "2026-06-06",
+      quiz_date: todayQuizDate(),
       kind: "official",
       scoring_mode: scoringMode,
       max_points: scoringMode === "competitive" ? 3 : 0,
@@ -22,16 +28,19 @@ function slot(scoringMode: "training" | "competitive", status: "submitted" | "in
       opens_at: null,
       closes_at: null,
     },
-    attempt: {
-      id: "a1",
-      quiz_id: "q1",
-      profile_id: "u1",
-      status,
-      score: 0,
-      started_at: new Date().toISOString(),
-      submitted_at: status === "submitted" ? new Date().toISOString() : null,
-      expires_at: null,
-    },
+    attempt:
+      status === null
+        ? null
+        : {
+            id: "a1",
+            quiz_id: "q1",
+            profile_id: "u1",
+            status,
+            score: 0,
+            started_at: new Date().toISOString(),
+            submitted_at: status === "submitted" ? new Date().toISOString() : null,
+            expires_at: null,
+          },
   };
 }
 
@@ -64,13 +73,12 @@ test("training completed still allows replay consistently", () => {
   assert.equal(shouldShowQuizAlreadyPlayedModal(s), false);
 });
 
-test("competitive completed allows practice replay when flagged", () => {
+test("competitive completado permite entrenar si hay intento oficial", () => {
   const s = slot("competitive", "submitted");
-  const options = { practiceReplayAllowed: true, resultAttemptId: "a1" };
-  assert.equal(canOpenQuizPlay(s, undefined, options), true);
-  assert.equal(canReplayQuiz(s, options), true);
-  assert.equal(shouldShowQuizAlreadyPlayedModal(s, options), false);
-  const cta = getQuizPlayCta(s, options);
-  assert.equal(cta?.entersPlay, true);
-  assert.equal(cta?.label, "Probar de nuevo");
+  const drillSlot: QuizDaySlot = { ...s, countingSubmittedAttemptId: "a1" };
+  assert.equal(canOpenQuizDrill(drillSlot), true);
+});
+
+test("competitive sin completar no permite entrenar", () => {
+  assert.equal(canOpenQuizDrill(slot("competitive", null)), false);
 });

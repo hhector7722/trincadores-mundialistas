@@ -1,6 +1,11 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
+import {
+  buildDrillPicksFromSnapshot,
+  composeDrillSessionPicks,
+  type DrillHistoricalQuiz,
+  type DrillQuestionPick,
+} from "@/lib/quiz/compose-drill-session";
 import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
-import { canHectorPracticeReplay } from "@/lib/quiz/hector-practice-replay";
 import { isPoolCompetitive } from "@/lib/quiz/mode";
 import { computeQuizReliabilityPct } from "@/lib/quiz/reliability";
 import { parseQuizOptions } from "@/lib/quiz/options";
@@ -40,6 +45,7 @@ type AttemptDbRow = {
   submitted_at: string | null;
   expires_at: string | null;
   counts_for_score?: boolean;
+  drill_question_ids?: string[] | null;
 };
 
 function mapQuizRow(row: QuizDbRow): QuizRow {
@@ -68,23 +74,33 @@ function mapAttemptRow(row: AttemptDbRow): QuizAttemptRow {
     submitted_at: row.submitted_at,
     expires_at: row.expires_at,
     counts_for_score: row.counts_for_score ?? true,
+    drill_question_ids: row.drill_question_ids ?? null,
   };
 }
 
 function pickOfficialSlotAttempt(
   quizId: string,
   attempts: QuizAttemptRow[]
-): Pick<QuizDaySlot, "attempt" | "countingSubmittedAttemptId"> {
+): Pick<QuizDaySlot, "attempt" | "countingSubmittedAttemptId" | "drillAttempt"> {
   const forQuiz = attempts.filter((a) => a.quiz_id === quizId);
   const countingSubmitted = forQuiz.find(
     (a) => a.status === "submitted" && a.counts_for_score !== false
   );
+  const competitiveInProgress = forQuiz.find(
+    (a) =>
+      a.status === "in_progress" &&
+      a.counts_for_score !== false &&
+      !a.drill_question_ids?.length
+  );
+  const drillInProgress = forQuiz.find(
+    (a) => a.status === "in_progress" && Boolean(a.drill_question_ids?.length)
+  );
 
-  const inProgress = forQuiz.find((a) => a.status === "in_progress");
-  if (inProgress) {
+  if (competitiveInProgress) {
     return {
-      attempt: inProgress,
+      attempt: competitiveInProgress,
       countingSubmittedAttemptId: countingSubmitted?.id ?? null,
+      drillAttempt: drillInProgress ?? null,
     };
   }
 
@@ -92,13 +108,22 @@ function pickOfficialSlotAttempt(
     return {
       attempt: countingSubmitted,
       countingSubmittedAttemptId: countingSubmitted.id,
+      drillAttempt: drillInProgress ?? null,
+    };
+  }
+
+  if (drillInProgress) {
+    return {
+      attempt: drillInProgress,
+      countingSubmittedAttemptId: null,
+      drillAttempt: drillInProgress,
     };
   }
 
   const attempt =
     forQuiz.find((a) => a.status !== "expired") ?? forQuiz[0] ?? null;
 
-  return { attempt, countingSubmittedAttemptId: null };
+  return { attempt, countingSubmittedAttemptId: null, drillAttempt: null };
 }
 
 function slotFrom(
@@ -107,18 +132,6 @@ function slotFrom(
 ): QuizDaySlot | null {
   if (!quiz) return null;
   return { quiz, ...pickOfficialSlotAttempt(quiz.id, attempts) };
-}
-
-async function getProfileUsername(profileId: string): Promise<string | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", profileId)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  return (data?.username as string | null) ?? null;
 }
 
 export async function getQuizzesForDate(
@@ -148,7 +161,7 @@ export async function getQuizAttemptsForProfile(
   const { data, error } = await supabase
     .from("quiz_attempts")
     .select(
-      "id, quiz_id, profile_id, status, score, started_at, submitted_at, expires_at, counts_for_score"
+      "id, quiz_id, profile_id, status, score, started_at, submitted_at, expires_at, counts_for_score, drill_question_ids"
     )
     .in("quiz_id", quizIds)
     .eq("profile_id", profileId)
@@ -163,10 +176,9 @@ export async function getQuizDayHub(
   profileId: string,
   quizDate = todayQuizDate()
 ): Promise<QuizDayHub> {
-  const [quizzes, competitive, username] = await Promise.all([
+  const [quizzes, competitive] = await Promise.all([
     getQuizzesForDate(poolId, quizDate),
     isPoolCompetitive(poolId),
-    getProfileUsername(profileId),
   ]);
 
   const attempts = await getQuizAttemptsForProfile(
@@ -190,18 +202,79 @@ export async function getQuizDayHub(
     !officialAttempt;
 
   const publishHeld = isQuizPublishHeld(quizDate) || windowPending;
-  const practiceReplayAllowed =
-    Boolean(officialQuiz) &&
-    canHectorPracticeReplay(username, quizDate, attempts, officialQuiz!.id);
+  const drillAvailable = officialQuiz
+    ? await isDrillAvailable(poolId, quizDate)
+    : false;
 
   return {
     quizDate,
     competitive,
     publishHeld,
-    practiceReplayAllowed,
+    drillAvailable,
     official: publishHeld ? null : slotFrom(officialQuiz, attempts),
     bonus: null,
   };
+}
+
+async function isDrillAvailable(poolId: string, todayQuizDate: string): Promise<boolean> {
+  try {
+    const historical = await loadHistoricalQuizzesForDrill(poolId, todayQuizDate);
+    composeDrillSessionPicks({
+      todayQuizId: "",
+      todayQuizDate,
+      historicalQuizzes: historical,
+      rng: () => 0,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function loadHistoricalQuizzesForDrill(
+  poolId: string,
+  beforeQuizDate: string
+): Promise<DrillHistoricalQuiz[]> {
+  const supabase = await createClient();
+  const { data: quizzes, error: quizError } = await supabase
+    .from("quizzes")
+    .select("id, quiz_date, settings_json")
+    .eq("pool_id", poolId)
+    .eq("kind", "official")
+    .lt("quiz_date", beforeQuizDate);
+
+  if (quizError) throw new Error(quizError.message);
+  if (!quizzes?.length) return [];
+
+  const quizIds = quizzes.map((q) => q.id as string);
+  const { data: questions, error: questionError } = await supabase
+    .from("quiz_questions_public")
+    .select("id, quiz_id, sort_order")
+    .in("quiz_id", quizIds);
+
+  if (questionError) throw new Error(questionError.message);
+
+  const questionsByQuiz = new Map<string, DrillHistoricalQuiz["questions"]>();
+  for (const row of questions ?? []) {
+    const quizId = row.quiz_id as string;
+    const list = questionsByQuiz.get(quizId) ?? [];
+    list.push({
+      id: row.id as string,
+      sort_order: row.sort_order as number,
+    });
+    questionsByQuiz.set(quizId, list);
+  }
+
+  return quizzes
+    .map((quiz) => ({
+      id: quiz.id as string,
+      quizDate: (quiz.quiz_date as string).slice(0, 10),
+      settingsJson: quiz.settings_json,
+      questions: (questionsByQuiz.get(quiz.id as string) ?? []).sort(
+        (a, b) => a.sort_order - b.sort_order
+      ),
+    }))
+    .filter((quiz) => quiz.questions.length > 0);
 }
 
 export async function startQuizSession(quizId: string): Promise<QuizStartSession> {
@@ -222,22 +295,96 @@ export async function startQuizSession(quizId: string): Promise<QuizStartSession
   return session;
 }
 
-export async function startQuizPracticeSession(quizId: string): Promise<QuizStartSession> {
+export async function startQuizDrillSession(
+  quizId: string,
+  todayQuizDate: string,
+  poolId: string
+): Promise<{ session: QuizStartSession; picks: DrillQuestionPick[] }> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("start_quiz_practice_attempt", {
+
+  const tryResume = await supabase.rpc("start_quiz_drill_attempt", {
     p_quiz_id: quizId,
+    p_question_ids: null,
   });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!tryResume.error) {
+    const session = parseQuizStartSession(tryResume.data);
+    if (!session) throw new Error("Respuesta de entrenamiento invalida.");
+
+    const { data: attempt, error: attemptError } = await supabase
+      .from("quiz_attempts")
+      .select("drill_question_ids")
+      .eq("id", session.attempt_id)
+      .maybeSingle();
+
+    if (attemptError) throw new Error(attemptError.message);
+    const questionIds = (attempt?.drill_question_ids as string[] | null) ?? [];
+    const picks = await loadDrillPicksForQuestionIds(questionIds);
+    return { session, picks };
   }
+
+  const resumeMsg = tryResume.error.message.toLowerCase();
+  if (resumeMsg.includes("drill not allowed")) {
+    throw new Error(tryResume.error.message);
+  }
+  if (!resumeMsg.includes("drill invalid questions")) {
+    throw new Error(tryResume.error.message);
+  }
+
+  const historical = await loadHistoricalQuizzesForDrill(poolId, todayQuizDate);
+  const picks = composeDrillSessionPicks({
+    todayQuizId: quizId,
+    todayQuizDate,
+    historicalQuizzes: historical,
+  });
+
+  const { data, error } = await supabase.rpc("start_quiz_drill_attempt", {
+    p_quiz_id: quizId,
+    p_question_ids: picks.map((pick) => pick.questionId),
+  });
+
+  if (error) throw new Error(error.message);
 
   const session = parseQuizStartSession(data);
-  if (!session) {
-    throw new Error("Respuesta de quiz invalida.");
+  if (!session) throw new Error("Respuesta de entrenamiento invalida.");
+
+  return { session, picks };
+}
+
+async function loadDrillPicksForQuestionIds(questionIds: string[]) {
+  if (questionIds.length !== 3) {
+    throw new Error("Sesion de entrenamiento invalida.");
   }
 
-  return session;
+  const supabase = await createClient();
+  const { data: questions, error: questionError } = await supabase
+    .from("quiz_questions_public")
+    .select("id, quiz_id, sort_order")
+    .in("id", questionIds);
+
+  if (questionError) throw new Error(questionError.message);
+
+  const quizIds = [...new Set((questions ?? []).map((q) => q.quiz_id as string))];
+  const { data: quizzes, error: quizError } = await supabase
+    .from("quizzes")
+    .select("id, quiz_date, settings_json")
+    .in("id", quizIds);
+
+  if (quizError) throw new Error(quizError.message);
+
+  return buildDrillPicksFromSnapshot({
+    questionIds,
+    questions: (questions ?? []).map((q) => ({
+      id: q.id as string,
+      quiz_id: q.quiz_id as string,
+      sort_order: q.sort_order as number,
+    })),
+    quizzes: (quizzes ?? []).map((q) => ({
+      id: q.id as string,
+      quiz_date: q.quiz_date as string | null,
+      settings_json: q.settings_json,
+    })),
+  });
 }
 
 export async function getQuizResult(

@@ -26,11 +26,19 @@ type QuizPlaySessionProps = {
   quizId: string;
   /** Sin entradilla al reanudar un intento en curso. */
   skipIntro?: boolean;
+  /** Modo entrenar con preguntas mezcladas del histórico. */
+  drill?: boolean;
 };
 
 const PLAY_TITLE = "¿QUIEN SHANELA MÁS DE LOS MUNDIALES?";
+const DRILL_TITLE = "ENTRENAMIENTO";
 
-export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlaySessionProps) {
+export function QuizPlaySession({
+  poolId,
+  quizId,
+  skipIntro = false,
+  drill = false,
+}: QuizPlaySessionProps) {
   const router = useRouter();
   const { navigate } = useAppNavigation();
   const [introDone, setIntroDone] = useState(skipIntro);
@@ -102,7 +110,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
     if (!sessionStarted) return;
 
     startLoading(async () => {
-      const result = await startQuiz(poolId, quizId);
+      const result = await startQuiz(poolId, quizId, { drill });
       if (!result.ok) {
         setLoadError(result.error);
         return;
@@ -110,7 +118,7 @@ export function QuizPlaySession({ poolId, quizId, skipIntro = false }: QuizPlayS
       setSession(result.data);
       setLoadError(null);
     });
-  }, [poolId, quizId, sessionStarted]);
+  }, [drill, poolId, quizId, sessionStarted]);
 
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;

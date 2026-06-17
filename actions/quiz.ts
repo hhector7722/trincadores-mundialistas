@@ -2,14 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { validateQuizAnswers } from "@/lib/quiz/options";
-import {
-  enrichQuestionsWithPlayFormats,
-  parsePlayFormats,
-} from "@/lib/quiz/play-formats";
+import { enrichDrillQuestions, enrichQuestionsWithPlayFormats, parsePlayFormats } from "@/lib/quiz/play-formats";
 import {
   getQuizDayHub,
   getQuizResult,
-  startQuizPracticeSession,
+  startQuizDrillSession,
   startQuizSession,
 } from "@/lib/quiz/queries";
 import type { QuizDayHub, QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
@@ -21,11 +18,11 @@ export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; error: st
 
 function mapQuizRpcError(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes("practice replay already used")) {
-    return "Ya usaste el intento de prueba de hoy.";
+  if (lower.includes("drill not allowed")) {
+    return "El entrenamiento no esta disponible todavia.";
   }
-  if (lower.includes("practice replay not allowed")) {
-    return "El intento de prueba no esta disponible.";
+  if (lower.includes("drill invalid questions")) {
+    return "No se pudo preparar el entrenamiento. Intentalo otra vez.";
   }
   if (lower.includes("quiz already completed")) {
     return "Ya completaste este quiz de hoy.";
@@ -63,7 +60,8 @@ async function assertQuizInPool(quizId: string, poolId: string): Promise<boolean
 
 export async function startQuiz(
   poolId: string,
-  quizId: string
+  quizId: string,
+  options?: { drill?: boolean }
 ): Promise<QuizActionResult<QuizStartSession>> {
   const supabase = await createClient();
   const {
@@ -85,16 +83,37 @@ export async function startQuiz(
   }
 
   try {
-    const hub = await getQuizDayHub(poolId, user.id);
-    const attempt = hub.official?.attempt;
-    const usePractice =
-      hub.official?.quiz.id === quizId &&
-      (attempt?.counts_for_score === false ||
-        (hub.practiceReplayAllowed && attempt?.status === "submitted"));
+    if (options?.drill) {
+      const hub = await getQuizDayHub(poolId, user.id);
+      if (!hub.drillAvailable || !hub.official) {
+        return { ok: false, error: "El entrenamiento no esta disponible." };
+      }
 
-    const session = usePractice
-      ? await startQuizPracticeSession(quizId)
-      : await startQuizSession(quizId);
+      const { session, picks } = await startQuizDrillSession(
+        quizId,
+        hub.quizDate,
+        poolId
+      );
+
+      const enrichedSession: QuizStartSession = {
+        ...session,
+        questions: enrichDrillQuestions(session.questions, picks),
+      };
+
+      void trackUsageAction(user.id, {
+        path: "/quiz/play",
+        label: "Quiz entrenamiento iniciado",
+        metadata: {
+          action: "quiz_drill_started",
+          quizId,
+          quizDay: hub.quizDate,
+        },
+      });
+
+      return { ok: true, data: enrichedSession };
+    }
+
+    const session = await startQuizSession(quizId);
 
     const { data: quizRow, error: quizError } = await supabase
       .from("quizzes")
@@ -154,7 +173,7 @@ export async function submitQuiz(
 
   const { data: attempt, error: attemptError } = await supabase
     .from("quiz_attempts")
-    .select("id, quiz_id, profile_id, status")
+    .select("id, quiz_id, profile_id, status, drill_question_ids")
     .eq("id", attemptId)
     .eq("profile_id", user.id)
     .maybeSingle();
@@ -172,16 +191,24 @@ export async function submitQuiz(
     return { ok: false, error: "Quiz no valido para esta porra." };
   }
 
-  const { data: questions, error: questionsError } = await supabase
-    .from("quiz_questions_public")
-    .select("id")
-    .eq("quiz_id", attempt.quiz_id);
+  const drillQuestionIds = (attempt.drill_question_ids as string[] | null) ?? null;
+  let questionIds: string[];
 
-  if (questionsError) {
-    return { ok: false, error: mapQuizRpcError(questionsError.message) };
+  if (drillQuestionIds?.length) {
+    questionIds = drillQuestionIds;
+  } else {
+    const { data: questions, error: questionsError } = await supabase
+      .from("quiz_questions_public")
+      .select("id")
+      .eq("quiz_id", attempt.quiz_id);
+
+    if (questionsError) {
+      return { ok: false, error: mapQuizRpcError(questionsError.message) };
+    }
+
+    questionIds = (questions ?? []).map((q) => q.id as string);
   }
 
-  const questionIds = (questions ?? []).map((q) => q.id as string);
   const validated = validateQuizAnswers(questionIds, answers);
   if (!validated.ok) {
     return validated;
@@ -213,9 +240,11 @@ export async function submitQuiz(
 
   void trackUsageAction(user.id, {
     path: "/quiz/result",
-    label: `Quiz enviado (${scoreValue} pts)`,
+    label: drillQuestionIds?.length
+      ? "Quiz entrenamiento enviado"
+      : `Quiz enviado (${scoreValue} pts)`,
     metadata: {
-      action: "quiz_submitted",
+      action: drillQuestionIds?.length ? "quiz_drill_submitted" : "quiz_submitted",
       quizId: attempt.quiz_id,
       score: scoreValue,
     },
