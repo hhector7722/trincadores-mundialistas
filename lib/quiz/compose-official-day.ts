@@ -1,4 +1,5 @@
 import type { GeneratedQuizQuestion } from "@/lib/quiz/generate-question";
+import { classicQuizQuestionShowsImage } from "@/lib/quiz/date";
 import { toSeedQuestion } from "@/lib/quiz/generated-day";
 import {
   labOptionIdsToSeed,
@@ -66,6 +67,9 @@ export function composeOfficialQuizDay(args: {
   }
 
   const classicSeed = toSeedQuestion({ ...args.classicQuestion, sort_order: 1 });
+  if (!classicQuizQuestionShowsImage(args.quizDate)) {
+    classicSeed.image_url = null;
+  }
   const playFormats: QuizPlayFormatMeta[] = [
     { sort_order: 1, format: "classic" },
   ];

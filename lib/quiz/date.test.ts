@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  classicQuizQuestionShowsImage,
   isQuizPublishHeld,
+  QUIZ_CLASSIC_NO_IMAGE_FROM_DATE,
   QUIZ_PUBLISH_HOLD_DATES,
   resolveQuizPublishWindow,
   todayQuizDate,
@@ -36,4 +38,10 @@ test("resolveQuizPublishWindow permite catch-up del dia si no hay reseed", () =>
   const afternoon = new Date("2026-06-15T14:00:00.000Z");
   const result = resolveQuizPublishWindow("2026-06-15", afternoon, false);
   assert.equal(result.quizDate, "2026-06-15");
+});
+
+test("classicQuizQuestionShowsImage sin imagen desde fecha acotada", () => {
+  assert.equal(classicQuizQuestionShowsImage("2026-06-17"), true);
+  assert.equal(classicQuizQuestionShowsImage(QUIZ_CLASSIC_NO_IMAGE_FROM_DATE), false);
+  assert.equal(classicQuizQuestionShowsImage("2026-06-20"), false);
 });

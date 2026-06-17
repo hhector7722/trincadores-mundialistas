@@ -1,4 +1,5 @@
 import type { QuizQuestionPlay } from "@/lib/quiz/types";
+import { classicQuizQuestionShowsImage } from "@/lib/quiz/date";
 
 export type QuizPlayQuestionFormat =
   | "classic"
@@ -47,21 +48,38 @@ export function parsePlayFormats(settings: unknown): QuizPlayFormatMeta[] {
 
 export function enrichQuestionsWithPlayFormats(
   questions: QuizQuestionPlay[],
-  formats: QuizPlayFormatMeta[]
+  formats: QuizPlayFormatMeta[],
+  quizDate?: string | null
 ): QuizQuestionPlay[] {
-  if (!formats.length) return questions;
+  const withFormats = (() => {
+    if (!formats.length) return questions;
 
-  const bySort = new Map(formats.map((f) => [f.sort_order, f]));
+    const bySort = new Map(formats.map((f) => [f.sort_order, f]));
 
-  return questions.map((question) => {
-    const meta = bySort.get(question.sort_order);
-    if (!meta) return question;
-    return {
-      ...question,
-      format: meta.format,
-      reveal_image_url: meta.reveal_image_url ?? null,
-    };
-  });
+    return questions.map((question) => {
+      const meta = bySort.get(question.sort_order);
+      if (!meta) return question;
+      return {
+        ...question,
+        format: meta.format,
+        reveal_image_url: meta.reveal_image_url ?? null,
+      };
+    });
+  })();
+
+  return applyClassicQuestionImagePolicy(withFormats, quizDate);
+}
+
+/** Pregunta 1 sin imagen a partir de QUIZ_CLASSIC_NO_IMAGE_FROM_DATE. */
+export function applyClassicQuestionImagePolicy(
+  questions: QuizQuestionPlay[],
+  quizDate?: string | null
+): QuizQuestionPlay[] {
+  if (!quizDate || classicQuizQuestionShowsImage(quizDate)) return questions;
+
+  return questions.map((question) =>
+    question.sort_order === 1 ? { ...question, image_url: null } : question
+  );
 }
 
 export function defaultClassicPlayFormats(questionCount: number): QuizPlayFormatMeta[] {

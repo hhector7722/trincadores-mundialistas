@@ -109,7 +109,11 @@ export async function startQuiz(
     const playFormats = parsePlayFormats(quizRow?.settings_json);
     const enrichedSession: QuizStartSession = {
       ...session,
-      questions: enrichQuestionsWithPlayFormats(session.questions, playFormats),
+      questions: enrichQuestionsWithPlayFormats(
+        session.questions,
+        playFormats,
+        quizRow?.quiz_date ?? null
+      ),
     };
 
     void trackUsageAction(user.id, {

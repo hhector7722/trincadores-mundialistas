@@ -3,6 +3,13 @@ const MADRID_TZ = "Europe/Madrid";
 /** Primer dia con puntuacion oficial del quiz diario (fecha civil Madrid). */
 export const QUIZ_COMPETITIVE_START_DATE = "2026-06-11";
 
+/** A partir de esta fecha civil, la pregunta 1 (test clasico) va sin imagen. */
+export const QUIZ_CLASSIC_NO_IMAGE_FROM_DATE = "2026-06-18";
+
+export function classicQuizQuestionShowsImage(quizDate: string): boolean {
+  return quizDate < QUIZ_CLASSIC_NO_IMAGE_FROM_DATE;
+}
+
 /** Fechas civiles Madrid sin publicacion automatica (cron 00:00) ni acceso en app. */
 export const QUIZ_PUBLISH_HOLD_DATES = [] as const;
 
