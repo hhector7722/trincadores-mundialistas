@@ -22,8 +22,9 @@ export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeI
 
   return (
     <span
+      data-outcome={variant}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full",
+        "inline-flex shrink-0 items-center justify-center rounded-full leading-none",
         "h-[1em] w-[1em] min-h-[10px] min-w-[10px]",
         isSuccess ? "bg-emerald-500" : "bg-red-500",
         className,
@@ -31,9 +32,12 @@ export function PredictionOutcomeIcon({ variant, className }: PredictionOutcomeI
       aria-hidden
     >
       {isSuccess ? (
-        <Check className="h-[0.62em] w-[0.62em] text-white" strokeWidth={3} />
+        <Check className="block h-[0.66em] w-[0.66em] shrink-0 text-white" strokeWidth={3} />
       ) : (
-        <X className="h-[0.62em] w-[0.62em] text-white" strokeWidth={3} />
+        <X
+          className="block h-[0.56em] w-[0.56em] shrink-0 text-white"
+          strokeWidth={2.75}
+        />
       )}
     </span>
   );
