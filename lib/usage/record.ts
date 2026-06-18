@@ -13,7 +13,7 @@ export async function recordAppUsageEventWithClient(
   const path = input.path ?? null;
   const label =
     input.label ??
-    deriveUsageLabel(path ?? "", input.metadata ?? null, input.eventType);
+    deriveUsageLabel(path ?? "", input.metadata ?? null, input.eventType, input.search ?? null);
 
   const { error } = await supabase.from("app_usage_events").insert({
     profile_id: profileId,

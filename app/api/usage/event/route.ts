@@ -65,7 +65,9 @@ export async function POST(request: Request) {
   await recordAppUsageEventWithClient(supabase, user.id, {
     eventType: body.eventType,
     path,
-    label: sanitizeOptionalText(body.label) ?? (path ? deriveUsageLabel(path, metadata, body.eventType) : null),
+    label:
+      sanitizeOptionalText(body.label) ??
+      (path ? deriveUsageLabel(path, metadata, body.eventType, sanitizeOptionalText(body.search, 1024)) : null),
     search: sanitizeOptionalText(body.search, 1024),
     referrerPath: sanitizePath(body.referrerPath),
     durationMs: sanitizeDuration(body.durationMs),

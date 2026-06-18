@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { deriveUsageLabel } from "@/lib/usage/labels";
+import { deriveUsageLabel, isQuizDrillAction, isQuizDrillSearch } from "@/lib/usage/labels";
 
 export type UsageContextMaps = {
   matchLabels: Map<string, string>;
@@ -82,11 +82,28 @@ export async function buildUsageContextMaps(
   return { matchLabels, profileLabels, quizDays };
 }
 
+function formatQuizUsageLabel(
+  quizDay: string,
+  metadata: Record<string, unknown>,
+  drill: boolean
+): string {
+  const prefix = drill ? "Quiz entreno del" : "Quiz del";
+  const action = typeof metadata.action === "string" ? metadata.action : null;
+  const scoreSuffix =
+    (action === "quiz_submitted" || action === "quiz_drill_submitted") &&
+    metadata.score != null
+      ? ` (${metadata.score} pts)`
+      : "";
+
+  return `${prefix} ${quizDay}${scoreSuffix}`;
+}
+
 export function resolveUsageEventLabel(
   path: string | null,
   label: string | null,
   metadata: Record<string, unknown> | null,
-  maps: UsageContextMaps
+  maps: UsageContextMaps,
+  search?: string | null
 ): string {
   const meta = metadata ?? {};
 
@@ -121,11 +138,21 @@ export function resolveUsageEventLabel(
 
   if (typeof meta.quizId === "string") {
     const quizDay = maps.quizDays.get(meta.quizId) ?? meta.quizDay;
-    if (quizDay) return `Quiz del ${quizDay}`;
+    if (quizDay) {
+      const drill =
+        isQuizDrillAction(typeof meta.action === "string" ? meta.action : null) ||
+        (path === "/quiz/play" && isQuizDrillSearch(search));
+      return formatQuizUsageLabel(String(quizDay), meta, drill);
+    }
   }
 
   if (path) {
-    const derived = deriveUsageLabel(path, meta as never, typeof meta.action === "string" ? "action" : "page_view");
+    const derived = deriveUsageLabel(
+      path,
+      meta as never,
+      typeof meta.action === "string" ? "action" : "page_view",
+      search
+    );
     if (derived !== path) return derived;
   }
 

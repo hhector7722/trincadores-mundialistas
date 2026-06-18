@@ -1,5 +1,15 @@
 import type { AppUsageMetadata } from "@/lib/usage/types";
 
+export function isQuizDrillSearch(search: string | null | undefined): boolean {
+  if (!search) return false;
+  const query = search.startsWith("?") ? search.slice(1) : search;
+  return new URLSearchParams(query).get("drill") === "1";
+}
+
+export function isQuizDrillAction(action: string | null | undefined): boolean {
+  return action === "quiz_drill_started" || action === "quiz_drill_submitted";
+}
+
 const STATIC_ROUTE_LABELS: Record<string, string> = {
   "/": "Inicio",
   "/quiz": "Quiz",
@@ -28,20 +38,26 @@ const ACTION_LABELS: Record<string, string> = {
   highlight_watch: "Tiempo en resumen",
   prediction_saved: "Pronostico guardado",
   quiz_started: "Quiz iniciado",
+  quiz_drill_started: "Quiz entreno iniciado",
   quiz_submitted: "Quiz enviado",
+  quiz_drill_submitted: "Quiz entreno enviado",
 };
 
 export function deriveUsageLabel(
   pathname: string,
   metadata?: AppUsageMetadata | null,
-  eventType?: string
+  eventType?: string,
+  search?: string | null
 ): string {
   if (eventType === "action" && metadata?.action) {
     const base = ACTION_LABELS[metadata.action] ?? "Accion";
     if (metadata.action === "prediction_saved" && metadata.homeGoals != null && metadata.awayGoals != null) {
       return `${base}: ${metadata.homeGoals}-${metadata.awayGoals}`;
     }
-    if (metadata.action === "quiz_submitted" && metadata.score != null) {
+    if (
+      (metadata.action === "quiz_submitted" || metadata.action === "quiz_drill_submitted") &&
+      metadata.score != null
+    ) {
       return `${base} (${metadata.score} pts)`;
     }
     if (metadata.action === "tab_switch" && metadata.tabLabel) {
@@ -57,6 +73,10 @@ export function deriveUsageLabel(
       return String(metadata.videoLabel);
     }
     return base;
+  }
+
+  if (pathname === "/quiz/play" && isQuizDrillSearch(search)) {
+    return "Jugando quiz (entreno)";
   }
 
   if (STATIC_ROUTE_LABELS[pathname]) {

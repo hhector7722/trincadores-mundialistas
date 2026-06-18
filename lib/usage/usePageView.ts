@@ -24,7 +24,7 @@ export function usePageView() {
   useEffect(() => {
     const now = Date.now();
     const previous = previousRef.current;
-    const label = deriveUsageLabel(pathname);
+    const label = deriveUsageLabel(pathname, null, undefined, searchSuffix || null);
 
     if (previous) {
       const durationMs = now - previous.startedAt;

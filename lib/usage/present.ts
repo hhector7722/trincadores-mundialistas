@@ -22,15 +22,16 @@ export function isNoiseUsagePath(path: string | null): boolean {
 
 function resolvePlaceName(
   path: string | null,
+  search: string | null,
   label: string | null,
   metadata: Record<string, unknown> | null,
   eventType: AppUsageEventType,
   maps: UsageContextMaps
 ): string {
-  const resolved = resolveUsageEventLabel(path, label, metadata, maps);
+  const resolved = resolveUsageEventLabel(path, label, metadata, maps, search);
   if (resolved.trim() && resolved !== path) return resolved;
   if (path) {
-    const derived = deriveUsageLabel(path, metadata as never, eventType);
+    const derived = deriveUsageLabel(path, metadata as never, eventType, search);
     if (derived !== path) return derived;
   }
   return resolved.trim() || " ";
@@ -42,7 +43,7 @@ export function formatUsageActivityTitle(
 ): string {
   const meta = row.metadata ?? {};
   const action = typeof meta.action === "string" ? meta.action : null;
-  const place = resolvePlaceName(row.path, row.label, meta, row.event_type, maps);
+  const place = resolvePlaceName(row.path, row.search, row.label, meta, row.event_type, maps);
 
   if (row.event_type === "login") return "Inicio de sesion";
   if (row.event_type === "session") return "Abrio la app";
@@ -82,7 +83,8 @@ export function formatUsageActivityTitle(
     }
     if (action === "prediction_saved") return place;
     if (action === "quiz_started") return "Empezo un quiz";
-    if (action === "quiz_submitted") return place;
+    if (action === "quiz_drill_started") return "Empezo quiz en modo entreno";
+    if (action === "quiz_submitted" || action === "quiz_drill_submitted") return place;
     return place;
   }
 
