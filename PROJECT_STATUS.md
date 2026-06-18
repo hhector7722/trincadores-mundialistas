@@ -57,6 +57,8 @@
 - [x] Quiz competitivo: un solo intento por dia (sin excepcion owner)
 - [x] Quiz cron diario 00:00 abrir / 23:59 cerrar Madrid (`/api/cron/quiz-daily` + `publishQuizDay` + `closeQuizDay`)
 - [x] Quiz competitivo oficial desde 2026-06-11 (fecha civil Madrid)
+- [x] Quiz modo entrenar (drill): 3 preguntas historicas mezcladas, sin puntuar, tras completar el oficial del dia
+- [x] Uso de la app: distingue quiz en modo entreno en actividad reciente
 - [x] Quiz entradilla TV: animacion + video gabri + barra de carga antes del play
 - [x] Alineaciones: optimización carga (bundle actions, ventana confirmada, BSD lookup acotado)
 - [x] Alineaciones: plantilla visual fija por formación + relayout al leer caché (coords consistentes entre equipos)
