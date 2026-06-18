@@ -15,6 +15,7 @@ import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsR
 import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
 import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
 import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
+import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
@@ -996,6 +997,16 @@ export function QuickPredictionModal({
               )
             : formatKickoff(viewMatch.kickoff_at)
           : undefined
+      }
+      headerTrailing={
+        atPredictionRoot ? (
+          <AiPredictionTrigger
+            matchId={viewMatch.id}
+            homeTeam={viewMatch.home_team}
+            awayTeam={viewMatch.away_team}
+            className="min-h-10 min-w-10"
+          />
+        ) : undefined
       }
       headerTitleAlign={isMvpView || isPossibleLineupsView ? "left" : "default"}
       headerCompact={isCompactModal}

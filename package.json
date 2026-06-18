@@ -51,7 +51,7 @@
     "test:push": "tsx --test lib/push/urls.test.ts lib/notifications/match-highlight-notifications.test.ts",
     "notify:match-highlight": "tsx --env-file=.env.local scripts/notify-match-highlight.ts",
     "notify:quiz-active": "tsx --env-file=.env.local scripts/notify-quiz-active.ts",
-    "llm-context": "tsx scripts/generate-llm-context.ts",
+    "db:generate-prediction-insights": "tsx --env-file=.env.local scripts/generate-prediction-insights.ts",
     "llm-context:install-hook": "node scripts/install-llm-hook.mjs"
   },
   "dependencies": {

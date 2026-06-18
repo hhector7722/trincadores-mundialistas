@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { savePrediction } from "@/actions/predictions";
 import { ScoreStepper } from "@/components/predictions/ScoreStepper";
+import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { PredictionEditStateBadge } from "@/components/predictions/PredictionStatusBadge";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/spinner";
@@ -82,9 +83,16 @@ export function PredictionForm({
           {match.matchday_name && (
             <p className="text-xs text-[var(--tm-muted)]">{match.matchday_name}</p>
           )}
-          <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
-            {match.home_team} — {match.away_team}
-          </h1>
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="min-w-0 font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+              {match.home_team} — {match.away_team}
+            </h1>
+            <AiPredictionTrigger
+              matchId={match.id}
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
+            />
+          </div>
           <p className="mt-1 text-sm text-[var(--tm-subtle)]">{formatKickoff(match.kickoff_at)}</p>
         </div>
 

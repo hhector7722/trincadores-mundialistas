@@ -24,6 +24,7 @@ import {
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
+import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
@@ -266,12 +267,21 @@ export function HomeMatchCard({
             {scheduledHeaderLabel(slidePosition, hasLiveInCarousel)}
           </p>
         )}
-        <Link
-          href="/predictions"
-          className="relative z-10 text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-        >
-          Ver todos
-        </Link>
+        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-0.5">
+          <AiPredictionTrigger
+            matchId={displayMatch.id}
+            homeTeam={displayMatch.home_team}
+            awayTeam={displayMatch.away_team}
+            className="min-h-8 min-w-8"
+            iconClassName="h-3 w-3"
+          />
+          <Link
+            href="/predictions"
+            className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+          >
+            Ver todos
+          </Link>
+        </div>
         {isLive || isFinished ? (
           <button
             type="button"

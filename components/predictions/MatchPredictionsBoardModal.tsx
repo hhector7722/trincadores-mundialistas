@@ -7,6 +7,7 @@ import {
   matchPredictionsBoardAriaTitle,
 } from "@/components/predictions/MatchPredictionsBoardHeaderTitle";
 import { MatchPredictionsBoardLegend } from "@/components/predictions/MatchPredictionsBoardLegend";
+import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { MatchPredictionsBoardTable } from "@/components/predictions/MatchPredictionsBoardTable";
 import { Modal } from "@/components/ui/modal";
 import { LoadingCenter } from "@/components/ui/spinner";
@@ -242,6 +243,14 @@ export function MatchPredictionsBoardModal({
       className={MODAL_PANEL_CLASS}
       scrollContent={false}
       loading={isLoading}
+      headerTrailing={
+        <AiPredictionTrigger
+          matchId={displayMatch.id}
+          homeTeam={displayMatch.homeTeam}
+          awayTeam={displayMatch.awayTeam}
+          className="min-h-10 min-w-10"
+        />
+      }
       onSwipeLeft={canSwipe && !carouselPanelSlide ? () => handleStartSlide(1) : undefined}
       onSwipeRight={canSwipe && !carouselPanelSlide ? () => handleStartSlide(-1) : undefined}
       belowPanel={

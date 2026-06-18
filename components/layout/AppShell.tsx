@@ -16,6 +16,7 @@ import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
+import { CurrentUsernameProvider } from "@/lib/auth/current-username-context";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import { UsagePageTracker } from "@/components/usage/UsagePageTracker";
 import type { AppShellContext } from "@/lib/pool/active-pool";
@@ -37,6 +38,7 @@ export function AppShell({
         <QuizEntryProvider quizHub={quizHub} poolId={ctx.activePoolId}>
           <QuizActiveNotificationProvider>
             <PushNotificationProvider vapidPublicKey={vapidPublicKey}>
+            <CurrentUsernameProvider username={ctx.username}>
             <HighlightScorelineVisibilityProvider
               poolId={ctx.activePoolId}
               username={ctx.username}
@@ -67,6 +69,7 @@ export function AppShell({
                 </Suspense>
               </TabNavigationProvider>
             </HighlightScorelineVisibilityProvider>
+            </CurrentUsernameProvider>
             </PushNotificationProvider>
           </QuizActiveNotificationProvider>
         </QuizEntryProvider>
