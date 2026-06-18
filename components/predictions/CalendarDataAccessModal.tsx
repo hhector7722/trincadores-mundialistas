@@ -1,7 +1,6 @@
 "use client";
 
 import { Modal } from "@/components/ui/modal";
-import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { cn } from "@/lib/utils";
 
 type CalendarDataAccessModalProps = {
@@ -13,7 +12,6 @@ type CalendarDataAccessModalProps = {
 };
 
 const ACCESS_ACTIONS = [
-  { id: "knockout", label: "CUADRO FASE FINAL" },
   { id: "groups", label: "CLASIFICACIONES" },
   { id: "stats", label: "ESTADÍSTICAS" },
   { id: "squads", label: "PLANTILLAS" },
@@ -26,14 +24,8 @@ export function CalendarDataAccessModal({
   onOpenStats,
   onOpenSquads,
 }: CalendarDataAccessModalProps) {
-  const { navigate } = useAppNavigation();
-
   function handleAction(actionId: (typeof ACCESS_ACTIONS)[number]["id"]) {
     switch (actionId) {
-      case "knockout":
-        onClose();
-        navigate("/predictions/knockout");
-        break;
       case "groups":
         onOpenAllGroups();
         break;

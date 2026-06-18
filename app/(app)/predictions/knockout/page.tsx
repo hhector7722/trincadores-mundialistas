@@ -16,6 +16,12 @@ export default async function KnockoutPredictionsPage() {
 
   return (
     <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
+      <div className="hidden shrink-0 px-4 pt-4 sm:block">
+        <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
+          Fase final
+        </h1>
+      </div>
+
       <KnockoutBracket
         poolId={ctx.activePoolId}
         matches={matches}

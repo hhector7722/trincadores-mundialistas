@@ -1929,17 +1929,16 @@ html:has(.tm-app-shell) body {
 .tm-ko-groups-nav-btn {
   pointer-events: auto;
   display: inline-flex;
-  min-height: 48px;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
   border: none;
   border-radius: 9999px;
   background: #ccff00;
-  padding: clamp(6px, 1.5cqw, 10px) clamp(14px, 4cqw, 22px);
+  padding: 3px clamp(12px, 3.5cqw, 18px);
   font-size: clamp(10px, 2.6cqw, 12px);
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.15;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #000;
