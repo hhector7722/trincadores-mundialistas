@@ -2,6 +2,7 @@ import {
   fetchBsdPredictedLineup,
   getBsdApiKey,
   isBsdConfigured,
+  type BsdPredictedPlayer,
 } from "@/lib/lineup/sources/bsd-client";
 import {
   BSD_API_BASE_URL,
@@ -29,6 +30,7 @@ type BsdPredictionPayload = {
     id?: number;
     home_team?: string;
     away_team?: string;
+    event_date?: string;
   };
   markets?: {
     match_result?: BsdPredictionMarket;
@@ -46,14 +48,6 @@ type BsdPredictionPayload = {
 type BsdPredictionsListPayload = {
   count?: number;
   results?: BsdPredictionPayload[];
-};
-
-type PredictedLineupPlayer = {
-  name?: string;
-  short_name?: string;
-  position?: string;
-  ai_score?: number;
-  predicted_slot?: string;
 };
 
 async function bsdFetch<T>(path: string): Promise<T | null> {
@@ -156,8 +150,8 @@ async function resolveMvpPlayerName(eventId: number): Promise<string> {
   const payload = await fetchBsdPredictedLineup(eventId);
   const sides = [payload?.lineups?.home, payload?.lineups?.away];
 
-  let best: PredictedLineupPlayer | null = null;
-  let fallback: PredictedLineupPlayer | null = null;
+  let best: BsdPredictedPlayer | null = null;
+  let fallback: BsdPredictedPlayer | null = null;
   for (const side of sides) {
     for (const player of side?.starters ?? []) {
       if (!player?.name?.trim()) continue;

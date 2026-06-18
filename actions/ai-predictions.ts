@@ -1,3 +1,5 @@
+"use server";
+
 import { canAccessAiPrediction } from "@/lib/ai-predictions/access";
 import { resolvePredictionInsightForMatch } from "@/lib/ai-predictions/generate-for-match";
 import { resolvePredictionInsightSource } from "@/lib/ai-predictions/source-config";

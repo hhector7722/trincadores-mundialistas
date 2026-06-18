@@ -189,10 +189,12 @@ export async function fetchBsdConfirmedLineups(
 
 export type BsdPredictedPlayer = {
   name?: string;
+  short_name?: string;
   jersey_number?: number | null;
   position?: string | null;
   predicted_slot?: string | null;
   availability?: string | null;
+  ai_score?: number;
 };
 
 export type BsdPredictedTeamLineup = {
