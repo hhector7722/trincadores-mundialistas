@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { ImageLightboxModal } from "@/components/ui/image-lightbox-modal";
@@ -12,6 +13,7 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
+  BRACKET_GRID_ROWS,
   buildBracketConnectorPaths,
   buildBracketGeometry,
   FINAL_CENTER_X,
@@ -46,6 +48,8 @@ const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 /** Fila 2 de la rejilla guía (octavos superiores / banda cabecera). */
 const PERRETE_CENTER_Y = gridRowToPercentY(2);
+/** Simétrico a la mascota superior (fila 2 ↔ fila 14 en rejilla de 15 filas). */
+const GROUPS_NAV_CENTER_Y = gridRowToPercentY(BRACKET_GRID_ROWS - 1);
 const KO_MASCOT_SRC = "/icons/psoe.png";
 
 type TeamSlotLayout = {
@@ -206,6 +210,7 @@ function BracketMatchNode({
 
 export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
+  const { navigate } = useAppNavigation();
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
@@ -256,6 +261,23 @@ export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutB
                 className="tm-ko-perrete-img"
                 priority
               />
+            </button>
+          </div>
+
+          <div
+            className="tm-ko-groups-nav"
+            style={{
+              left: "50%",
+              top: `${GROUPS_NAV_CENTER_Y}%`,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => navigate("/predictions")}
+              className="tm-ko-groups-nav-btn"
+              aria-label="Ir al calendario de fase de grupos"
+            >
+              Fase de grupos
             </button>
           </div>
 

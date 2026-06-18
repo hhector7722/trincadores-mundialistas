@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalendarDataAccessModal } from "@/components/predictions/CalendarDataAccessModal";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import type { CalendarModalOpener } from "@/lib/predictions/calendar-data-access";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,7 @@ export function CalendarSidebarAccessDock({
   className,
 }: CalendarSidebarAccessDockProps) {
   const [dataAccessOpen, setDataAccessOpen] = useState(false);
+  const { navigate } = useAppNavigation();
 
   return (
     <>
@@ -47,6 +49,13 @@ export function CalendarSidebarAccessDock({
             className="tm-cal-sidebar-access-btn"
           >
             Ver datos
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/predictions/knockout")}
+            className="tm-cal-sidebar-access-btn"
+          >
+            Fase final
           </button>
         </div>
       </div>

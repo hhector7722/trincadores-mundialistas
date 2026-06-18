@@ -1919,6 +1919,43 @@ html:has(.tm-app-shell) body {
   object-fit: contain;
 }
 
+.tm-ko-groups-nav {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.tm-ko-groups-nav-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border: none;
+  border-radius: 9999px;
+  background: #ccff00;
+  padding: clamp(6px, 1.5cqw, 10px) clamp(14px, 4cqw, 22px);
+  font-size: clamp(10px, 2.6cqw, 12px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tm-ko-groups-nav-btn:hover {
+  opacity: 0.9;
+}
+
+.tm-ko-groups-nav-btn:active {
+  opacity: 0.8;
+}
+
 .tm-ko-cup {
   position: absolute;
   z-index: 2;
@@ -2482,7 +2519,7 @@ html:has(.tm-app-shell) body {
 
 .tm-porra-calendar .tm-cal-sidebar-access-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: auto;
   gap: var(--tm-cal-sidebar-access-grid-gap, 6px);
   place-items: center stretch;
