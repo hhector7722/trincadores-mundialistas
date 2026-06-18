@@ -24,7 +24,7 @@ export function CalendarFinishedOutcomeIcons({
       aria-hidden={icons.length === 0}
     >
       {icons.length > 0 ? (
-        <span className="pointer-events-none absolute inset-x-0 top-[3px] z-[3] flex items-center justify-center gap-0.5">
+        <span className="pointer-events-none absolute inset-x-0 top-[5px] z-[3] flex items-center justify-center gap-0.5">
           {icons.map((variant, index) => (
             <PredictionOutcomeIcon
               key={`${variant}-${index}`}
