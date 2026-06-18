@@ -1,6 +1,9 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
-import { computeReliabilityPct } from "@/lib/ranking/reliability";
+import {
+  computeCommunityAvgFromStats,
+  computeReliabilityPct,
+} from "@/lib/ranking/reliability";
 import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
 import { createClient } from "@/lib/supabase/server";
@@ -388,6 +391,7 @@ export function buildPositionsFromSnapshots(
   }));
 }
 
+/** Agregación Supabase (una query/pool): puntos y conteo por perfil para fiabilidad. */
 async function loadResolvedPredictionStats(
   poolId: string
 ): Promise<Map<string, { resolvedCount: number; totalPoints: number }>> {
@@ -504,6 +508,7 @@ function buildLeaderboardRows(
   scores: Map<string, ScoreRow>,
   lastMatchScores: Map<string, MatchStatsRow>,
   reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
+  communityAvg: number,
   generalPoints: Map<string, number>,
   quizStats: Map<string, QuizProfileStats>,
   quizFinalBonus: Map<string, number>,
@@ -532,7 +537,8 @@ function buildLeaderboardRows(
       quizFinalBonus: quizBonus,
       reliabilityPct: computeReliabilityPct(
         rel?.resolvedCount ?? 0,
-        rel?.totalPoints ?? 0
+        rel?.totalPoints ?? 0,
+        communityAvg
       ),
     };
   });
@@ -600,11 +606,13 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
   const previousPositions = previousReferenceMatch
     ? buildPositionMap(members, previousScores, generalPoints, quizFinalBonus)
     : null;
+  const communityAvg = computeCommunityAvgFromStats(reliability);
   const sorted = buildLeaderboardRows(
     members,
     scores,
     lastMatchStats,
     reliability,
+    communityAvg,
     generalPoints,
     quizStats,
     quizFinalBonus,
