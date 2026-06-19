@@ -1,5 +1,6 @@
 import { CalendarFinishedOutcomeIcons } from "@/components/predictions/CalendarFinishedOutcomeIcons";
 import { CalendarMatchGroupBadge } from "@/components/predictions/CalendarMatchGroupBadge";
+import { CalendarMatchMvpLine } from "@/components/predictions/CalendarMatchMvpLine";
 import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
@@ -61,7 +62,6 @@ export function CalendarFinishedMatchCardVisual({
         homeTeam={homeTeam}
         awayTeam={awayTeam}
         centerLabel={officialLabel}
-        underScore={underScore}
         centerClassName="!text-white"
       />
     </div>
@@ -78,6 +78,7 @@ export function CalendarFinishedMatchCardVisual({
         className={cardClassName}
       >
         <CalendarMatchGroupBadge groupCode={groupCode} />
+        <CalendarMatchMvpLine underScore={underScore} />
         {body}
       </button>
     );
@@ -86,6 +87,7 @@ export function CalendarFinishedMatchCardVisual({
   return (
     <div className={cardClassName}>
       <CalendarMatchGroupBadge groupCode={groupCode} />
+      <CalendarMatchMvpLine underScore={underScore} />
       {body}
     </div>
   );

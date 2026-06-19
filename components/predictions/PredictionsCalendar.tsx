@@ -28,6 +28,7 @@ import {
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { CalendarMatchGroupBadge } from "@/components/predictions/CalendarMatchGroupBadge";
+import { CalendarMatchMvpLine } from "@/components/predictions/CalendarMatchMvpLine";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import { resolveCalendarMatchUnderScore } from "@/lib/predictions/calendar-match-under-score";
 import { mvpPlayerNameFromMatch } from "@/lib/predictions/mvp-match-state";
@@ -154,6 +155,7 @@ function CalendarMatchCard({
       )}
     >
       <CalendarMatchGroupBadge groupCode={match.group_code} />
+      <CalendarMatchMvpLine underScore={upcomingUnderScore} />
       <div className="tm-cal-match-card-body">
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}
@@ -162,7 +164,6 @@ function CalendarMatchCard({
           homeTeam={match.home_team}
           awayTeam={match.away_team}
           centerLabel={predictionLabel}
-          underScore={upcomingUnderScore}
         />
       </div>
     </button>
