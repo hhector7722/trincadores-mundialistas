@@ -10,7 +10,7 @@ type CalendarMatchCardFlagsRowProps = {
   centerClassName?: string;
 };
 
-/** Fila de banderas alineadas al guión del marcador; subtítulo bajo el marcador (grupo o MVP). */
+/** Fila de banderas con marcador; grupo bajo el marcador o MVP entre resultado y borde inferior. */
 export function CalendarMatchCardFlagsRow({
   homeTeam,
   awayTeam,
@@ -18,36 +18,46 @@ export function CalendarMatchCardFlagsRow({
   underScore,
   centerClassName,
 }: CalendarMatchCardFlagsRowProps) {
+  const groupSubtitle = underScore?.tone === "group" ? underScore : null;
+  const mvpSubtitle =
+    underScore && underScore.tone !== "group" ? underScore : null;
+
   return (
-    <div className="tm-cal-flags relative w-full shrink-0">
-      <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-        <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
+    <div className="tm-cal-flags-stack w-full min-w-0 shrink-0">
+      <div className="tm-cal-flags relative w-full shrink-0">
+        <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
+        </div>
+
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2">
+          <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
+            {centerLabel}
+            {groupSubtitle ? (
+              <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 -translate-y-0.5 uppercase font-semibold tracking-wide text-[var(--tm-accent)]">
+                {groupSubtitle.label}
+              </span>
+            ) : null}
+          </span>
+        </div>
+
+        <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+          <TeamFlagBadge name={awayTeam} size="cal" className="tm-cal-flag" />
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2">
-        <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
-          {centerLabel}
-          {underScore ? (
-            <span
-              className={cn(
-                "tm-cal-match-subtitle absolute left-1/2 top-full max-w-[3.5rem] -translate-x-1/2 -translate-y-0.5 truncate leading-none",
-                underScore.tone === "group" &&
-                  "tm-cal-match-group tm-cal-match-group--under-score uppercase font-semibold tracking-wide text-[var(--tm-accent)]",
-                underScore.tone === "official-mvp" &&
-                  "tm-cal-match-subtitle--official-mvp font-medium text-white",
-                underScore.tone === "predicted-mvp" &&
-                  "tm-cal-match-subtitle--predicted-mvp font-medium text-[var(--tm-accent)]",
-              )}
-            >
-              {underScore.label}
-            </span>
-          ) : null}
+      {mvpSubtitle ? (
+        <span
+          className={cn(
+            "tm-cal-match-mvp-line block w-full truncate text-center leading-none",
+            mvpSubtitle.tone === "official-mvp" &&
+              "tm-cal-match-subtitle tm-cal-match-subtitle--official-mvp font-medium text-white",
+            mvpSubtitle.tone === "predicted-mvp" &&
+              "tm-cal-match-subtitle tm-cal-match-subtitle--predicted-mvp font-medium text-[var(--tm-accent)]",
+          )}
+        >
+          {mvpSubtitle.label}
         </span>
-      </div>
-
-      <div className="absolute left-[90%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
-        <TeamFlagBadge name={awayTeam} size="cal" className="tm-cal-flag" />
-      </div>
+      ) : null}
     </div>
   );
 }

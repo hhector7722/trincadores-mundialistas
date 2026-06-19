@@ -2250,6 +2250,19 @@ html:has(.tm-app-shell) body {
   text-transform: none;
 }
 
+.tm-porra-calendar .tm-cal-flags-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  min-width: 0;
+}
+
+.tm-porra-calendar .tm-cal-match-mvp-line {
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
 .tm-porra-calendar .tm-cal-match-card-body {
   display: flex;
   width: 100%;

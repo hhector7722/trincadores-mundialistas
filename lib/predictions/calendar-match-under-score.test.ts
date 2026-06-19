@@ -13,25 +13,35 @@ test("partido pendiente sin MVP muestra grupo", () => {
   );
 });
 
-test("partido pendiente con MVP pronosticado muestra nombre en amarillo", () => {
+test("partido pendiente con MVP pronosticado muestra apellido conocido", () => {
   assert.deepEqual(
     resolveCalendarMatchUnderScore({
       finished: false,
       groupCode: "b",
-      predictedMvpPlayerName: "Pedri",
+      predictedMvpPlayerName: "Pedri Gonzalez",
     }),
-    { label: "Pedri", tone: "predicted-mvp" },
+    { label: "Gonzalez", tone: "predicted-mvp" },
   );
 });
 
-test("partido finalizado muestra MVP oficial en blanco", () => {
+test("partido finalizado muestra apellido del MVP oficial", () => {
   assert.deepEqual(
     resolveCalendarMatchUnderScore({
       finished: true,
       groupCode: "c",
       officialMvpPlayerName: "Lamine Yamal",
     }),
-    { label: "Lamine Yamal", tone: "official-mvp" },
+    { label: "Yamal", tone: "official-mvp" },
+  );
+});
+
+test("monónimo se mantiene", () => {
+  assert.deepEqual(
+    resolveCalendarMatchUnderScore({
+      finished: false,
+      predictedMvpPlayerName: "Pedri",
+    }),
+    { label: "Pedri", tone: "predicted-mvp" },
   );
 });
 
