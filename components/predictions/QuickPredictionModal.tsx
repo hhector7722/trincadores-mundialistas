@@ -1070,6 +1070,7 @@ export function QuickPredictionModal({
         awayTeam={viewMatch.away_team}
         currentProfileId={currentProfileId}
         carouselMatches={boardCarouselMatches}
+        showSignOutcomeTicks={isFinishedMatch}
       />
     ) : null}
 
