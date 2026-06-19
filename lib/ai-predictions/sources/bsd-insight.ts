@@ -10,6 +10,7 @@ import {
   BSD_WC_SEASON_ID,
 } from "@/lib/lineup/sources/bsd-constants";
 import type { GeneratedPredictionInsight } from "@/lib/ai-predictions/types";
+import { resolveBsdDisplayScore } from "@/lib/ai-predictions/sources/bsd-display-score";
 import { teamNameEs } from "@/lib/teams/display";
 
 type BsdPredictionMarket = {
@@ -189,7 +190,15 @@ export function mapBsdPredictionToInsight(
   const xgHome = typeof expectedGoals.home === "number" ? expectedGoals.home : 0;
   const xgAway = typeof expectedGoals.away === "number" ? expectedGoals.away : 0;
   const bttsProb = roundProb(btts.prob_yes);
-  const mostLikely = (score.most_likely ?? `${Math.round(xgHome)}-${Math.round(xgAway)}`).trim();
+  const mostLikely = resolveBsdDisplayScore({
+    predicted: matchResult.predicted ?? null,
+    probHome,
+    probDraw,
+    probAway,
+    mostLikely: score.most_likely ?? null,
+    xgHome,
+    xgAway,
+  });
   const favoriteProb = Math.max(probHome, probDraw, probAway);
   const confidence = mapConfidence(favoriteProb, payload.model?.confidence ?? null);
 

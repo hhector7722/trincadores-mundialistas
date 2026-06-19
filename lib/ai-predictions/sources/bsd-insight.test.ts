@@ -25,7 +25,7 @@ describe("mapBsdPredictionToInsight", () => {
       "Son Heung-min",
     );
 
-    assert.match(insight.mainPrediction, /México 0-1 Corea del Sur/);
+    assert.match(insight.mainPrediction, /México 2-1 Corea del Sur/);
     assert.equal(insight.confidence, "Alta");
     assert.equal(insight.mvpPlayerName, "Son Heung-min");
     assert.equal(insight.homeWinProb, 56);

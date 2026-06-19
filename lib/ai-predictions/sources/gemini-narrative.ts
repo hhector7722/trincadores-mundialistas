@@ -1,4 +1,5 @@
 import { sanitizePredictorOutput } from "@/lib/laboratorio/sanitize-predictor-output";
+import { formatCalendarMvpLabel } from "@/lib/predictions/calendar-match-under-score";
 import { teamNameEs } from "@/lib/teams/display";
 import { geminiGenerateJson } from "@/lib/ai-predictions/sources/gemini-client";
 
@@ -52,8 +53,9 @@ Responde SOLO JSON valido:
 Reglas:
 - analysis: maximo 5 frases cortas; sin URLs, sin «segun X», sin ingles.
 - No contradigas ni reemplaces las probabilidades ni el marcador principal.
+- El favorito es quien tiene mayor probabilidad 1X2 (o el campo predicted H/D/A). No afirmes victoria del visitante si el local lidera el 1X2.
 - Si mencionas xG, usa EXACTAMENTE los valores fijos que te pasamos.
-- mvp_player_name: jugador realista para ESTE partido; puede ser de cualquier equipo.
+- mvp_player_name: un solo nombre conocido (apellido o monónimo), sin nombre y apellido completos.
 - alternatives: exactamente 2 marcadores alternativos plausibles, distintos del principal.
 - Prohibido inventar lesiones sin contrastar en web.`;
 }
@@ -110,5 +112,5 @@ Redacta MVP probable, analisis contextual y 2 marcadores alternativos.`;
     throw new Error("Gemini devolvio narrativa incompleta (MVP o analisis).");
   }
 
-  return { mvpPlayerName, analysis, alternatives };
+  return { mvpPlayerName: formatCalendarMvpLabel(mvpPlayerName), analysis, alternatives };
 }

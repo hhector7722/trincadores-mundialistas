@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Modal } from "@/components/ui/modal";
+import { formatCalendarMvpLabel } from "@/lib/predictions/calendar-match-under-score";
 import { formatPredictionInsightUpdatedAgo } from "@/lib/ai-predictions/format-updated-ago";
 import { predictionInsightSourceLabel } from "@/lib/ai-predictions/source-config";
 import type { PredictionInsight } from "@/lib/ai-predictions/types";
@@ -82,7 +83,9 @@ export function AiPredictionModal({
 
             <InsightField label="Confianza">{insight.confidence}</InsightField>
 
-            <InsightField label="MVP probable">{insight.mvpPlayerName}</InsightField>
+            <InsightField label="MVP probable">
+              {formatCalendarMvpLabel(insight.mvpPlayerName)}
+            </InsightField>
 
             <InsightField label="Probabilidades">
               <ul className="space-y-1">

@@ -9,6 +9,8 @@ import {
 } from "@/lib/ai-predictions/sources/gemini-narrative";
 import { isGeminiConfigured } from "@/lib/ai-predictions/sources/gemini-client";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
+import { resolveBsdDisplayScore } from "@/lib/ai-predictions/sources/bsd-display-score";
+import { formatCalendarMvpLabel } from "@/lib/predictions/calendar-match-under-score";
 import type { GeneratedPredictionInsight } from "@/lib/ai-predictions/types";
 import { teamNameEs } from "@/lib/teams/display";
 
@@ -49,7 +51,15 @@ export function mapBsdPayloadToNumericContext(
   const xgHome = typeof expectedGoals.home === "number" ? expectedGoals.home : 0;
   const xgAway = typeof expectedGoals.away === "number" ? expectedGoals.away : 0;
   const bttsProb = roundProb(btts.prob_yes);
-  const mostLikely = (score.most_likely ?? `${Math.round(xgHome)}-${Math.round(xgAway)}`).trim();
+  const mostLikely = resolveBsdDisplayScore({
+    predicted: matchResult.predicted ?? null,
+    probHome,
+    probDraw,
+    probAway,
+    mostLikely: score.most_likely ?? null,
+    xgHome,
+    xgAway,
+  });
   const favoriteProb = Math.max(probHome, probDraw, probAway);
 
   return {
@@ -112,7 +122,7 @@ export async function generateHybridPredictionInsight(input: {
       homeWinProb: numeric.homeWinProb,
       drawProb: numeric.drawProb,
       awayWinProb: numeric.awayWinProb,
-      mvpPlayerName: narrative.mvpPlayerName,
+      mvpPlayerName: formatCalendarMvpLabel(narrative.mvpPlayerName),
       analysis: narrative.analysis,
       alternatives:
         narrative.alternatives.length >= 2
