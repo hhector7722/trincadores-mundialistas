@@ -1,20 +1,11 @@
-import { buildPredictorSystemPrompt } from "@/lib/laboratorio/system-prompt";
 import { canAccessQuizLab } from "@/lib/quiz/lab-access";
+import { resolvePredictorStream, type PredictorChatMessage } from "@/lib/laboratorio/predict-providers";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const OPENAI_MODEL = "gpt-4o";
-
-type ChatRole = "user" | "assistant";
-
-type ChatMessage = {
-  role: ChatRole;
-  content: string;
-};
-
-function parseMessages(body: unknown): ChatMessage[] {
+function parseMessages(body: unknown): PredictorChatMessage[] {
   if (!body || typeof body !== "object" || !("messages" in body)) {
     throw new Error("Formato de solicitud invalido.");
   }
@@ -42,85 +33,6 @@ function parseMessages(body: unknown): ChatMessage[] {
 
     return { role, content: content.trim() };
   });
-}
-
-function extractOpenAiTextDeltaFromSseBlock(block: string): string | null {
-  const dataLines = block
-    .split("\n")
-    .filter((line) => line.startsWith("data: "))
-    .map((line) => line.slice(6));
-
-  if (dataLines.length === 0) {
-    return null;
-  }
-
-  const payload = dataLines.join("\n");
-  if (!payload || payload === "[DONE]") {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(payload) as {
-      type?: string;
-      delta?: string;
-      error?: { message?: string };
-    };
-
-    if (parsed.type === "error") {
-      throw new Error(parsed.error?.message ?? "Error en streaming de OpenAI.");
-    }
-
-    if (parsed.type === "response.output_text.delta" && typeof parsed.delta === "string") {
-      return parsed.delta;
-    }
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      return null;
-    }
-    throw error;
-  }
-
-  return null;
-}
-
-function createOpenAiTextTransformStream(
-  upstream: ReadableStream<Uint8Array>,
-): ReadableStream<Uint8Array> {
-  const decoder = new TextDecoder();
-  const encoder = new TextEncoder();
-  let buffer = "";
-
-  return upstream.pipeThrough(
-    new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, controller) {
-        buffer += decoder.decode(chunk, { stream: true });
-
-        let boundary = buffer.indexOf("\n\n");
-        while (boundary !== -1) {
-          const block = buffer.slice(0, boundary);
-          buffer = buffer.slice(boundary + 2);
-
-          const text = extractOpenAiTextDeltaFromSseBlock(block);
-          if (text) {
-            controller.enqueue(encoder.encode(text));
-          }
-
-          boundary = buffer.indexOf("\n\n");
-        }
-      },
-      flush(controller) {
-        const trailing = buffer.trim();
-        if (!trailing) {
-          return;
-        }
-
-        const text = extractOpenAiTextDeltaFromSseBlock(trailing);
-        if (text) {
-          controller.enqueue(encoder.encode(text));
-        }
-      },
-    }),
-  );
 }
 
 async function assertPredictorAccess(): Promise<Response | null> {
@@ -152,12 +64,7 @@ export async function POST(request: Request) {
     return denied;
   }
 
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) {
-    return new Response("Servicio de predicciones no configurado.", { status: 500 });
-  }
-
-  let messages: ChatMessage[];
+  let messages: PredictorChatMessage[];
   try {
     messages = parseMessages(await request.json());
   } catch (error) {
@@ -165,36 +72,17 @@ export async function POST(request: Request) {
     return new Response(message, { status: 400 });
   }
 
-  const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      instructions: buildPredictorSystemPrompt(),
-      input: messages.map((message) => ({
-        role: message.role,
-        content: message.content,
-      })),
-      tools: [{ type: "web_search" }],
-      stream: true,
-    }),
-  });
+  try {
+    const textStream = await resolvePredictorStream(messages);
 
-  if (!openAiResponse.ok || !openAiResponse.body) {
-    const detail = await openAiResponse.text().catch(() => "");
-    console.error("[laboratorio/predict] OpenAI error:", openAiResponse.status, detail);
+    return new Response(textStream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (error) {
+    console.error("[laboratorio/predict]", error);
     return new Response("No se pudo generar la prediccion.", { status: 502 });
   }
-
-  const textStream = createOpenAiTextTransformStream(openAiResponse.body);
-
-  return new Response(textStream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
-  });
 }
