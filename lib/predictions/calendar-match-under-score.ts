@@ -1,6 +1,6 @@
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 
-export type CalendarMatchUnderScoreTone = "group" | "official-mvp" | "predicted-mvp";
+export type CalendarMatchUnderScoreTone = "official-mvp" | "predicted-mvp";
 
 export type CalendarMatchUnderScore = {
   label: string;
@@ -13,7 +13,6 @@ export function formatCalendarMvpLabel(fullName: string): string {
 
 export function resolveCalendarMatchUnderScore(input: {
   finished: boolean;
-  groupCode?: string | null;
   predictedMvpPlayerName?: string | null;
   officialMvpPlayerName?: string | null;
 }): CalendarMatchUnderScore | null {
@@ -26,11 +25,6 @@ export function resolveCalendarMatchUnderScore(input: {
   const predicted = input.predictedMvpPlayerName?.trim();
   if (predicted) {
     return { label: formatCalendarMvpLabel(predicted), tone: "predicted-mvp" };
-  }
-
-  const group = input.groupCode?.trim();
-  if (group) {
-    return { label: group.toUpperCase(), tone: "group" };
   }
 
   return null;

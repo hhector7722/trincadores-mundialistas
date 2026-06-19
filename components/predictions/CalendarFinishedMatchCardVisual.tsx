@@ -1,4 +1,5 @@
 import { CalendarFinishedOutcomeIcons } from "@/components/predictions/CalendarFinishedOutcomeIcons";
+import { CalendarMatchGroupBadge } from "@/components/predictions/CalendarMatchGroupBadge";
 import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
@@ -38,7 +39,6 @@ export function CalendarFinishedMatchCardVisual({
   const officialLabel = displayGoals(officialHome, officialAway);
   const underScore = resolveCalendarMatchUnderScore({
     finished: true,
-    groupCode,
     officialMvpPlayerName,
   });
   const outcomeIcons = resolvePredictionOutcomeIcons({
@@ -56,6 +56,7 @@ export function CalendarFinishedMatchCardVisual({
 
   const body = (
     <div className="tm-cal-match-card-body">
+      <CalendarMatchGroupBadge groupCode={groupCode} />
       <CalendarFinishedOutcomeIcons icons={outcomeIcons} />
       <CalendarMatchCardFlagsRow
         homeTeam={homeTeam}

@@ -27,6 +27,7 @@ import {
 } from "@/lib/pool/calendar-layout";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
+import { CalendarMatchGroupBadge } from "@/components/predictions/CalendarMatchGroupBadge";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import { resolveCalendarMatchUnderScore } from "@/lib/predictions/calendar-match-under-score";
 import { mvpPlayerNameFromMatch } from "@/lib/predictions/mvp-match-state";
@@ -114,7 +115,6 @@ function CalendarMatchCard({
   const isSidebarAnchor = isSidebarCardAnchorMatch(match);
   const upcomingUnderScore = resolveCalendarMatchUnderScore({
     finished: false,
-    groupCode: match.group_code,
     predictedMvpPlayerName: mvpPlayerNameFromMatch(match),
   });
 
@@ -154,6 +154,7 @@ function CalendarMatchCard({
       )}
     >
       <div className="tm-cal-match-card-body">
+        <CalendarMatchGroupBadge groupCode={match.group_code} />
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}
         </span>

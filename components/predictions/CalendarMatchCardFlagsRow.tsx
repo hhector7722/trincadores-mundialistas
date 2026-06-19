@@ -10,7 +10,7 @@ type CalendarMatchCardFlagsRowProps = {
   centerClassName?: string;
 };
 
-/** Fila de banderas alineadas al guión del marcador; grupo bajo el marcador; MVP anclado al borde inferior de la card. */
+/** Fila de banderas alineadas al guión del marcador; MVP anclado al borde inferior de la card. */
 export function CalendarMatchCardFlagsRow({
   homeTeam,
   awayTeam,
@@ -18,10 +18,6 @@ export function CalendarMatchCardFlagsRow({
   underScore,
   centerClassName,
 }: CalendarMatchCardFlagsRowProps) {
-  const groupSubtitle = underScore?.tone === "group" ? underScore : null;
-  const mvpSubtitle =
-    underScore && underScore.tone !== "group" ? underScore : null;
-
   return (
     <>
       <div className="tm-cal-flags relative w-full shrink-0">
@@ -30,13 +26,8 @@ export function CalendarMatchCardFlagsRow({
         </div>
 
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2">
-          <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
+          <span className={cn("tm-cal-prediction block tabular-nums leading-none", centerClassName)}>
             {centerLabel}
-            {groupSubtitle ? (
-              <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full max-w-[3.5rem] -translate-x-1/2 -translate-y-0.5 truncate uppercase font-semibold tracking-wide text-[var(--tm-accent)] leading-none">
-                {groupSubtitle.label}
-              </span>
-            ) : null}
           </span>
         </div>
 
@@ -45,17 +36,17 @@ export function CalendarMatchCardFlagsRow({
         </div>
       </div>
 
-      {mvpSubtitle ? (
+      {underScore ? (
         <span
           className={cn(
             "tm-cal-match-mvp-line pointer-events-none absolute inset-x-0 z-[5] truncate text-center leading-none",
-            mvpSubtitle.tone === "official-mvp" &&
+            underScore.tone === "official-mvp" &&
               "tm-cal-match-subtitle tm-cal-match-subtitle--official-mvp font-medium text-white",
-            mvpSubtitle.tone === "predicted-mvp" &&
+            underScore.tone === "predicted-mvp" &&
               "tm-cal-match-subtitle tm-cal-match-subtitle--predicted-mvp font-medium text-[var(--tm-accent)]",
           )}
         >
-          {mvpSubtitle.label}
+          {underScore.label}
         </span>
       ) : null}
     </>
