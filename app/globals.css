@@ -2336,7 +2336,7 @@ html:has(.tm-app-shell) body {
   overflow: hidden;
   white-space: nowrap;
   color: #ffffff;
-  font-size: 0.5rem;
+  font-size: 0.4375rem;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -2377,7 +2377,7 @@ html:has(.tm-app-shell) body {
   }
 
   .tm-porra-calendar .tm-cal-kickoff {
-    font-size: 0.5625rem;
+    font-size: 0.5rem;
   }
 
   .tm-cal-ko-link {
