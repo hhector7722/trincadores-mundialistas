@@ -56,7 +56,6 @@ export function CalendarFinishedMatchCardVisual({
 
   const body = (
     <div className="tm-cal-match-card-body">
-      <CalendarMatchGroupBadge groupCode={groupCode} />
       <CalendarFinishedOutcomeIcons icons={outcomeIcons} />
       <CalendarMatchCardFlagsRow
         homeTeam={homeTeam}
@@ -78,10 +77,16 @@ export function CalendarFinishedMatchCardVisual({
         {...(anchorAttr ?? {})}
         className={cardClassName}
       >
+        <CalendarMatchGroupBadge groupCode={groupCode} />
         {body}
       </button>
     );
   }
 
-  return <div className={cardClassName}>{body}</div>;
+  return (
+    <div className={cardClassName}>
+      <CalendarMatchGroupBadge groupCode={groupCode} />
+      {body}
+    </div>
+  );
 }

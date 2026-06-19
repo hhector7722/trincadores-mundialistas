@@ -8,7 +8,7 @@ export function CalendarMatchGroupBadge({ groupCode }: CalendarMatchGroupBadgePr
   if (!group) return null;
 
   return (
-    <span className="tm-cal-match-group tm-cal-match-group-badge pointer-events-none absolute left-0 top-0 z-[6] uppercase leading-none text-[var(--tm-accent)]">
+    <span className="tm-cal-match-group tm-cal-match-group-badge pointer-events-none absolute z-[6] uppercase leading-none text-[var(--tm-accent)]">
       {group.toUpperCase()}
     </span>
   );

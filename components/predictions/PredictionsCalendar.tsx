@@ -153,8 +153,8 @@ function CalendarMatchCard({
         match.status === "live" && "ring-1 ring-[var(--tm-live)]",
       )}
     >
+      <CalendarMatchGroupBadge groupCode={match.group_code} />
       <div className="tm-cal-match-card-body">
-        <CalendarMatchGroupBadge groupCode={match.group_code} />
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
           {time}
         </span>
