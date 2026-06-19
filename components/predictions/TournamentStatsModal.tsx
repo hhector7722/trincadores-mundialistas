@@ -9,6 +9,10 @@ import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { searchPlayers, type SearchablePlayer } from "@/lib/players/search-players";
 import { normalizeText } from "@/lib/text/normalize-alias";
 import {
+  CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS,
+  CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS,
+} from "@/lib/predictions/calendar-data-access";
+import {
   getTournamentStatRows,
   TOURNAMENT_STAT_TABS,
   type TournamentStatKind,
@@ -106,8 +110,9 @@ export function TournamentStatsModal({
       backButtonPlain={Boolean(onBack)}
       title="Estadísticas del torneo"
       hideHeaderDivider
-      className="max-h-[calc(100dvh-1rem)]"
-      wrapperClassName="max-w-[min(100vw-1rem,28rem)]"
+      className={CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS}
+      wrapperClassName={CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS}
+      scrollContent={false}
       opaque
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">

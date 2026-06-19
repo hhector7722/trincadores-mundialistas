@@ -1,6 +1,10 @@
 "use client";
 
 import { Modal } from "@/components/ui/modal";
+import {
+  CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS,
+  CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS,
+} from "@/lib/predictions/calendar-data-access";
 import { cn } from "@/lib/utils";
 
 type CalendarDataAccessModalProps = {
@@ -45,10 +49,11 @@ export function CalendarDataAccessModal({
       title="Datos del torneo"
       ariaLabel="Datos del torneo"
       opaque
-      className="max-w-xs"
-      panelHostClassName="max-w-xs"
+      scrollContent={false}
+      className={CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS}
+      wrapperClassName={CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS}
     >
-      <div className="flex flex-col gap-4 px-3 py-4">
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-4 px-3 py-4">
         {ACCESS_ACTIONS.map((action) => (
           <button
             key={action.id}

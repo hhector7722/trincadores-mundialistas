@@ -6,6 +6,10 @@ import {
   EntityModalController,
 } from "@/components/lineup/EntityModalController";
 import { TeamsPickerModal } from "@/components/predictions/TeamsPickerModal";
+import {
+  CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS,
+  CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS,
+} from "@/lib/predictions/calendar-data-access";
 import { getAllWorldCupTeamsAlphabetically } from "@/lib/predictions/teams-picker-data";
 
 type AllTeamsLineupModalProps = {
@@ -44,6 +48,9 @@ export function AllTeamsLineupModal({
         mode="view"
         title="Plantillas"
         onViewTeam={setSelectedTeam}
+        panelClassName={CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS}
+        wrapperClassName={CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS}
+        scrollContent={false}
       />
 
       {selectedTeam ? (

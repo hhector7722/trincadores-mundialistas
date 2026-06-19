@@ -5,6 +5,10 @@ import { X } from "lucide-react";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal } from "@/components/ui/modal";
 import { ModalPlainBackButton } from "@/components/ui/modal-plain-back-button";
+import {
+  CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS,
+  CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS,
+} from "@/lib/predictions/calendar-data-access";
 import type { GroupStandingDetail } from "@/lib/pool/group-standings";
 import { cn } from "@/lib/utils";
 
@@ -241,12 +245,12 @@ export function AllGroupsStandingsModal({
       title="Clasificación de grupos"
       hideHeader
       ariaLabel="Clasificación de grupos"
-      className="flex max-h-[calc(100dvh-1rem)] flex-col"
-      wrapperClassName="max-w-[min(100vw-1rem,56rem)]"
+      className={CALENDAR_DATA_ACCESS_MODAL_PANEL_CLASS}
+      wrapperClassName={CALENDAR_DATA_ACCESS_MODAL_WRAPPER_CLASS}
+      scrollContent={false}
       opaque
       onSwipeLeft={viewIndex === 0 && !viewSlide ? () => startViewSlide("predictions") : undefined}
       onSwipeRight={viewIndex === 1 && !viewSlide ? () => startViewSlide("official") : undefined}
-      belowPanel={<ViewSwipeDots activeIndex={activeDotIndex} />}
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 px-2.5 pb-2 pt-2.5 sm:px-3 sm:pt-3">
@@ -290,6 +294,8 @@ export function AllGroupsStandingsModal({
             </div>
           </div>
         </div>
+
+        <ViewSwipeDots activeIndex={activeDotIndex} />
       </div>
     </Modal>
   );
