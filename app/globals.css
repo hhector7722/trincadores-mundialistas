@@ -2264,7 +2264,7 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-porra-calendar .tm-cal-match-mvp-line {
-  bottom: calc(2px * var(--tm-cal-ui-scale, 1));
+  bottom: calc(5px * var(--tm-cal-ui-scale, 1));
   max-width: 100%;
   padding-inline: 1px;
 }
