@@ -10,7 +10,7 @@ type CalendarMatchCardFlagsRowProps = {
   centerClassName?: string;
 };
 
-/** Fila de banderas con marcador; grupo bajo el marcador o MVP entre resultado y borde inferior. */
+/** Fila de banderas alineadas al guión del marcador; grupo bajo el marcador; MVP anclado al borde inferior de la card. */
 export function CalendarMatchCardFlagsRow({
   homeTeam,
   awayTeam,
@@ -23,7 +23,7 @@ export function CalendarMatchCardFlagsRow({
     underScore && underScore.tone !== "group" ? underScore : null;
 
   return (
-    <div className="tm-cal-flags-stack w-full min-w-0 shrink-0">
+    <>
       <div className="tm-cal-flags relative w-full shrink-0">
         <div className="absolute left-[10%] top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
           <TeamFlagBadge name={homeTeam} size="cal" className="tm-cal-flag" />
@@ -33,7 +33,7 @@ export function CalendarMatchCardFlagsRow({
           <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
             {centerLabel}
             {groupSubtitle ? (
-              <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 -translate-y-0.5 uppercase font-semibold tracking-wide text-[var(--tm-accent)]">
+              <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full max-w-[3.5rem] -translate-x-1/2 -translate-y-0.5 truncate uppercase font-semibold tracking-wide text-[var(--tm-accent)] leading-none">
                 {groupSubtitle.label}
               </span>
             ) : null}
@@ -48,7 +48,7 @@ export function CalendarMatchCardFlagsRow({
       {mvpSubtitle ? (
         <span
           className={cn(
-            "tm-cal-match-mvp-line block w-full truncate text-center leading-none",
+            "tm-cal-match-mvp-line pointer-events-none absolute inset-x-0 bottom-[1px] z-[5] truncate text-center leading-none",
             mvpSubtitle.tone === "official-mvp" &&
               "tm-cal-match-subtitle tm-cal-match-subtitle--official-mvp font-medium text-white",
             mvpSubtitle.tone === "predicted-mvp" &&
@@ -58,6 +58,6 @@ export function CalendarMatchCardFlagsRow({
           {mvpSubtitle.label}
         </span>
       ) : null}
-    </div>
+    </>
   );
 }
