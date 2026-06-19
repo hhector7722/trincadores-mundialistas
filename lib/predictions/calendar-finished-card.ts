@@ -15,7 +15,7 @@ export type CalendarFinishedCardVariant =
 
 /** Partido pasado: desatura banderas, grupo y marcador oficial (iconos de acierto a color pleno). */
 export const CAL_FINISHED_OUTER_MUTED_CLASS =
-  "[&_.tm-cal-flags_.tm-cal-flag]:opacity-60 [&_.tm-cal-flags_.tm-cal-flag]:saturate-50 [&_.tm-cal-match-group--under-score]:opacity-60 [&_.tm-cal-match-group--under-score]:saturate-50 [&_.tm-cal-flags_.tm-cal-prediction]:opacity-60 [&_.tm-cal-flags_.tm-cal-prediction]:saturate-50";
+  "[&_.tm-cal-flags_.tm-cal-flag]:opacity-60 [&_.tm-cal-flags_.tm-cal-flag]:saturate-50 [&_.tm-cal-match-subtitle]:opacity-60 [&_.tm-cal-match-subtitle]:saturate-50 [&_.tm-cal-flags_.tm-cal-prediction]:opacity-60 [&_.tm-cal-flags_.tm-cal-prediction]:saturate-50";
 
 export type CalendarFinishedCardState = {
   variant: CalendarFinishedCardVariant;

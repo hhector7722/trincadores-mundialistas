@@ -28,6 +28,8 @@ import {
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { displayGoals } from "@/lib/predictions/edit-state";
+import { resolveCalendarMatchUnderScore } from "@/lib/predictions/calendar-match-under-score";
+import { mvpPlayerNameFromMatch } from "@/lib/predictions/mvp-match-state";
 import {
   CAL_FINISHED_OUTER_MUTED_CLASS,
   resolveCalendarFinishedCard,
@@ -110,6 +112,11 @@ function CalendarMatchCard({
   const officialLabel = formatCalendarOfficialScore(match);
   const finishedState = resolveCalendarFinishedCard(match);
   const isSidebarAnchor = isSidebarCardAnchorMatch(match);
+  const upcomingUnderScore = resolveCalendarMatchUnderScore({
+    finished: false,
+    groupCode: match.group_code,
+    predictedMvpPlayerName: mvpPlayerNameFromMatch(match),
+  });
 
   const title = finishedState
     ? `${teamNameEs(match.home_team)} vs ${teamNameEs(match.away_team)} · Real ${officialLabel} · Tu ${predictionLabel}`
@@ -126,6 +133,7 @@ function CalendarMatchCard({
         homeTeam={match.home_team}
         awayTeam={match.away_team}
         groupCode={match.group_code}
+        officialMvpPlayerName={match.officialMvpPlayerName}
         officialHome={match.officialHome!}
         officialAway={match.officialAway!}
         finishedState={finishedState}
@@ -153,7 +161,7 @@ function CalendarMatchCard({
           homeTeam={match.home_team}
           awayTeam={match.away_team}
           centerLabel={predictionLabel}
-          groupCode={match.group_code}
+          underScore={upcomingUnderScore}
         />
       </div>
     </button>

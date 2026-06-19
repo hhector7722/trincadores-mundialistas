@@ -2,6 +2,7 @@ import { CalendarFinishedOutcomeIcons } from "@/components/predictions/CalendarF
 import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import type { CalendarFinishedCardState } from "@/lib/predictions/calendar-finished-card";
+import { resolveCalendarMatchUnderScore } from "@/lib/predictions/calendar-match-under-score";
 import { resolvePredictionOutcomeIcons } from "@/lib/predictions/prediction-outcome-icons";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +10,7 @@ type CalendarFinishedMatchCardVisualProps = {
   homeTeam: string;
   awayTeam: string;
   groupCode?: string | null;
+  officialMvpPlayerName?: string | null;
   officialHome: number;
   officialAway: number;
   finishedState: CalendarFinishedCardState;
@@ -23,6 +25,7 @@ export function CalendarFinishedMatchCardVisual({
   homeTeam,
   awayTeam,
   groupCode,
+  officialMvpPlayerName,
   officialHome,
   officialAway,
   finishedState,
@@ -33,6 +36,11 @@ export function CalendarFinishedMatchCardVisual({
   anchorAttr,
 }: CalendarFinishedMatchCardVisualProps) {
   const officialLabel = displayGoals(officialHome, officialAway);
+  const underScore = resolveCalendarMatchUnderScore({
+    finished: true,
+    groupCode,
+    officialMvpPlayerName,
+  });
   const outcomeIcons = resolvePredictionOutcomeIcons({
     scoreOutcome: finishedState.scoreOutcome,
     mvpCorrect: finishedState.mvpCorrect,
@@ -53,7 +61,7 @@ export function CalendarFinishedMatchCardVisual({
         homeTeam={homeTeam}
         awayTeam={awayTeam}
         centerLabel={officialLabel}
-        groupCode={groupCode}
+        underScore={underScore}
         centerClassName="!text-white"
       />
     </div>

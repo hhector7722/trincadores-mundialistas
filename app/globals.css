@@ -2243,6 +2243,13 @@ html:has(.tm-app-shell) body {
   line-height: 1;
 }
 
+.tm-porra-calendar .tm-cal-match-subtitle--official-mvp,
+.tm-porra-calendar .tm-cal-match-subtitle--predicted-mvp {
+  font-size: calc(var(--tm-cal-sidebar-heading-fs) * 0.82);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .tm-porra-calendar .tm-cal-match-card-body {
   display: flex;
   width: 100%;

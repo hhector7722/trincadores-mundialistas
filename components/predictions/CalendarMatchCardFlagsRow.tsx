@@ -1,20 +1,21 @@
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import type { CalendarMatchUnderScore } from "@/lib/predictions/calendar-match-under-score";
 import { cn } from "@/lib/utils";
 
 type CalendarMatchCardFlagsRowProps = {
   homeTeam: string;
   awayTeam: string;
   centerLabel: string;
-  groupCode?: string | null;
+  underScore?: CalendarMatchUnderScore | null;
   centerClassName?: string;
 };
 
-/** Fila de banderas alineadas al guión del marcador; la letra de grupo cuelga bajo el marcador. */
+/** Fila de banderas alineadas al guión del marcador; subtítulo bajo el marcador (grupo o MVP). */
 export function CalendarMatchCardFlagsRow({
   homeTeam,
   awayTeam,
   centerLabel,
-  groupCode,
+  underScore,
   centerClassName,
 }: CalendarMatchCardFlagsRowProps) {
   return (
@@ -26,9 +27,19 @@ export function CalendarMatchCardFlagsRow({
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-[3] -translate-x-1/2 -translate-y-1/2">
         <span className={cn("tm-cal-prediction relative block tabular-nums leading-none", centerClassName)}>
           {centerLabel}
-          {groupCode ? (
-            <span className="tm-cal-match-group tm-cal-match-group--under-score absolute left-1/2 top-full -translate-x-1/2 -translate-y-0.5 uppercase text-[var(--tm-accent)]">
-              {groupCode.toUpperCase()}
+          {underScore ? (
+            <span
+              className={cn(
+                "tm-cal-match-subtitle absolute left-1/2 top-full max-w-[3.5rem] -translate-x-1/2 -translate-y-0.5 truncate leading-none",
+                underScore.tone === "group" &&
+                  "tm-cal-match-group tm-cal-match-group--under-score uppercase font-semibold tracking-wide text-[var(--tm-accent)]",
+                underScore.tone === "official-mvp" &&
+                  "tm-cal-match-subtitle--official-mvp font-medium text-white",
+                underScore.tone === "predicted-mvp" &&
+                  "tm-cal-match-subtitle--predicted-mvp font-medium text-[var(--tm-accent)]",
+              )}
+            >
+              {underScore.label}
             </span>
           ) : null}
         </span>
