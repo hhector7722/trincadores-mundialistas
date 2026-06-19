@@ -3,6 +3,7 @@ import { test } from "node:test";
 import {
   isMvpPredictionCorrect,
   mvpPlayerNamesMatch,
+  mvpTeamsMatch,
   resolveStoredOfficialMvpPlayerName,
 } from "@/lib/predictions/mvp-name-match";
 
@@ -25,4 +26,8 @@ test("resolveStoredOfficialMvpPlayerName prefiere etiqueta de porra", () => {
     "Vinicius Junior",
   ]);
   assert.equal(stored, "Vinicius Junior");
+});
+
+test("mvpTeamsMatch unifica Bosnia and Herzegovina", () => {
+  assert.equal(mvpTeamsMatch("Bosnia & Herzegovina", "Bosnia and Herzegovina"), true);
 });

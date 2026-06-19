@@ -1,4 +1,5 @@
 import { normalizePlayerName } from "@/lib/lineup/player-dedupe";
+import { openFootballTeamName } from "@/lib/worldcup2026/squad-team-names";
 
 /** Tokens equivalentes en nombres FIFA vs plantilla/porra (Jr/Junior, etc.). */
 function normalizeMvpPlayerToken(name: string): string {
@@ -16,7 +17,9 @@ export function mvpPlayerNamesMatch(
 }
 
 export function mvpTeamsMatch(predictedTeam: string, officialTeam: string): boolean {
-  return normalizePlayerName(predictedTeam) === normalizePlayerName(officialTeam);
+  const predicted = openFootballTeamName(predictedTeam);
+  const official = openFootballTeamName(officialTeam);
+  return normalizePlayerName(predicted) === normalizePlayerName(official);
 }
 
 /** Misma regla que `compute_mvp_points` en SQL (con alias Jr/Junior). */

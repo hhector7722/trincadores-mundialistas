@@ -9,8 +9,8 @@ import {
 import {
   mvpPlayerNamesMatch,
   mvpTeamsMatch,
-  resolveStoredOfficialMvpPlayerName,
 } from "@/lib/predictions/mvp-name-match";
+import { resolveOfficialMvpToSquad } from "@/lib/predictions/resolve-official-mvp-squad";
 import type { SyncLiveMatchesResult } from "@/lib/live/sync-live-matches";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
@@ -161,12 +161,19 @@ async function persistOfficialMvp(
   return "written";
 }
 
+type ResolvedOfficialMvp = {
+  playerName: string;
+  teamName: string;
+  fifaPlayerId?: string;
+  shirtNumber?: number;
+};
+
 /** Prioridad: crónica FIFA.com → api.fifa.com → BSD. FotMob excluido (nota, no POTM FIFA). */
 async function resolveOfficialMvp(
   match: MatchMvpCandidate,
   fifaLookup: Map<string, FifaResolvedMatch>,
   bsdEventId: string | undefined,
-): Promise<{ playerName: string; teamName: string } | null> {
+): Promise<ResolvedOfficialMvp | null> {
   const fifaMatch = resolveFifaMatchFromCalendar(
     fifaLookup,
     match.home_team,
@@ -186,7 +193,11 @@ async function resolveOfficialMvp(
   if (fifaMatch) {
     const fifaMvp = await fetchOfficialMvpFromFifa(fifaMatch, match.home_team, match.away_team);
     if (fifaMvp) {
-      return { playerName: fifaMvp.playerName, teamName: fifaMvp.teamName };
+      return {
+        playerName: fifaMvp.playerName,
+        teamName: fifaMvp.teamName,
+        fifaPlayerId: fifaMvp.fifaPlayerId,
+      };
     }
   }
 
@@ -206,19 +217,19 @@ async function resolveOfficialMvp(
 async function applyOfficialMvp(
   admin: AdminClient,
   match: MatchMvpCandidate,
-  official: { playerName: string; teamName: string },
+  official: ResolvedOfficialMvp,
   result: SyncLiveMatchesResult,
   poolsToRebuild: Set<string>,
   options?: { overwrite?: boolean },
 ): Promise<void> {
   const predictedNames = await loadPredictedMvpPlayerNames(admin, match.id);
-  const playerName = resolveStoredOfficialMvpPlayerName(official.playerName, predictedNames);
+  const resolved = await resolveOfficialMvpToSquad(admin, official, predictedNames);
 
   const outcome = await persistOfficialMvp(
     admin,
     match.id,
-    playerName,
-    official.teamName,
+    resolved.playerName,
+    resolved.teamName,
     options,
   );
   if (outcome !== "written") return;

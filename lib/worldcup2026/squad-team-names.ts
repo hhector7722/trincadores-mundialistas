@@ -70,6 +70,8 @@ const ALIAS_TO_CANONICAL: Record<string, string> = {
   "democratic republic of the congo": "DR Congo",
   "bosnia and herzegovina": "Bosnia & Herzegovina",
   "bosnia & herzegovina": "Bosnia & Herzegovina",
+  "bosnia herzegovina": "Bosnia & Herzegovina",
+  "bosnia-herzegovina": "Bosnia & Herzegovina",
   "ir iran": "Iran",
   iran: "Iran",
   "cabo verde": "Cape Verde",

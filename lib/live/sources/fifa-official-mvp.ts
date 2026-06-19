@@ -35,6 +35,7 @@ export type FifaResolvedMatch = {
 export type OfficialMvpFromFifa = {
   playerName: string;
   teamName: string;
+  fifaPlayerId?: string;
   sourceCode: typeof FIFA_WC_SOURCE_CODE;
   sourceExternalKey: string;
   signal: "timeline" | "live_field" | "calendar_field";
@@ -296,6 +297,7 @@ export function parseOfficialMvpFromFifaLive(
     sourceCode: FIFA_WC_SOURCE_CODE,
     sourceExternalKey: resolved.idMatch,
     signal: "live_field",
+    ...(field.playerId ? { fifaPlayerId: field.playerId } : {}),
   };
 }
 
@@ -326,6 +328,7 @@ export async function fetchOfficialMvpFromFifa(
       return {
         playerName: fromLineup.playerName,
         teamName,
+        fifaPlayerId: timelinePlayerId,
         sourceCode: FIFA_WC_SOURCE_CODE,
         sourceExternalKey: resolved.idMatch,
         signal: "timeline",

@@ -1,8 +1,11 @@
 import { isProfileOnboardingComplete } from "@/lib/auth/onboarding-device";
 import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
 import {
+  addResolvedMatchToReliabilityStats,
   computeCommunityAvgFromStats,
   computeReliabilityPct,
+  createEmptyReliabilityStats,
+  type ReliabilityStats,
 } from "@/lib/ranking/reliability";
 import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
@@ -391,27 +394,51 @@ export function buildPositionsFromSnapshots(
   }));
 }
 
-/** Agregación Supabase (una query/pool): puntos y conteo por perfil para fiabilidad. */
+/** Agregación Supabase (marcador + MVP por partido): unidades Fiab por perfil. */
 async function loadResolvedPredictionStats(
   poolId: string
-): Promise<Map<string, { resolvedCount: number; totalPoints: number }>> {
+): Promise<Map<string, ReliabilityStats>> {
   const supabase = await createClient();
-  const { data: predictions } = await supabase
-    .from("predictions")
-    .select("profile_id, points_awarded")
-    .eq("pool_id", poolId)
-    .not("points_awarded", "is", null);
+  const [{ data: predictions, error: predictionError }, { data: mvps, error: mvpError }] =
+    await Promise.all([
+      supabase
+        .from("predictions")
+        .select("profile_id, match_id, points_awarded")
+        .eq("pool_id", poolId)
+        .not("points_awarded", "is", null),
+      supabase
+        .from("match_mvp_predictions")
+        .select("profile_id, match_id, points_awarded")
+        .eq("pool_id", poolId)
+        .not("points_awarded", "is", null),
+    ]);
 
-  const stats = new Map<string, { resolvedCount: number; totalPoints: number }>();
+  if (predictionError) throw new Error(predictionError.message);
+  if (mvpError) throw new Error(mvpError.message);
+
+  const mvpByProfileMatch = new Map<string, number>();
+  for (const row of mvps ?? []) {
+    mvpByProfileMatch.set(
+      `${row.profile_id as string}:${row.match_id as string}`,
+      row.points_awarded ?? 0
+    );
+  }
+
+  const stats = new Map<string, ReliabilityStats>();
 
   for (const prediction of predictions ?? []) {
-    const current = stats.get(prediction.profile_id) ?? {
-      resolvedCount: 0,
-      totalPoints: 0,
-    };
-    current.resolvedCount += 1;
-    current.totalPoints += prediction.points_awarded ?? 0;
-    stats.set(prediction.profile_id, current);
+    const profileId = prediction.profile_id as string;
+    const matchId = prediction.match_id as string;
+    const current = stats.get(profileId) ?? createEmptyReliabilityStats();
+    const mvpPoints = mvpByProfileMatch.get(`${profileId}:${matchId}`);
+    stats.set(
+      profileId,
+      addResolvedMatchToReliabilityStats(
+        current,
+        prediction.points_awarded ?? 0,
+        mvpPoints
+      )
+    );
   }
 
   return stats;
@@ -507,7 +534,7 @@ function buildLeaderboardRows(
   members: MemberRow[],
   scores: Map<string, ScoreRow>,
   lastMatchScores: Map<string, MatchStatsRow>,
-  reliability: Map<string, { resolvedCount: number; totalPoints: number }>,
+  reliability: Map<string, ReliabilityStats>,
   communityAvg: number,
   generalPoints: Map<string, number>,
   quizStats: Map<string, QuizProfileStats>,
@@ -537,7 +564,7 @@ function buildLeaderboardRows(
       quizFinalBonus: quizBonus,
       reliabilityPct: computeReliabilityPct(
         rel?.resolvedCount ?? 0,
-        rel?.totalPoints ?? 0,
+        rel?.totalUnitSum ?? 0,
         communityAvg
       ),
     };

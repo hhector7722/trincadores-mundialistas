@@ -4,7 +4,7 @@
  * en el match report publicado tras el partido.
  */
 
-import { buildFifaMatchReportArticlePath } from "@/lib/live/sources/fifa-match-report-slugs";
+import { buildFifaMatchReportArticlePathCandidates } from "@/lib/live/sources/fifa-match-report-slugs";
 import { titleCasePlayerName } from "@/lib/worldcup2026/fifa-squads";
 import { openFootballTeamName } from "@/lib/worldcup2026/squad-team-names";
 
@@ -129,14 +129,12 @@ async function cxmFetch<T>(path: string): Promise<T | null> {
   return (await response.json()) as T;
 }
 
-export async function fetchOfficialMvpFromFifaMatchReport(
-  homeTeam: string,
-  awayTeam: string,
-  options?: { idMatch?: string },
+async function fetchOfficialMvpFromFifaMatchReportPage(
+  articlePath: string,
+  idMatch: string | undefined,
 ): Promise<OfficialMvpFromFifaMatchReport | null> {
-  const articlePath = buildFifaMatchReportArticlePath(homeTeam, awayTeam);
   const page = await cxmFetch<FifaArticlePage>(`/pages${articlePath}`);
-  if (!page || !pageMatchesFifaId(page, options?.idMatch)) return null;
+  if (!page || !pageMatchesFifaId(page, idMatch)) return null;
 
   const entryId = extractArticleEntryId(page);
   if (!entryId) return null;
@@ -152,4 +150,19 @@ export async function fetchOfficialMvpFromFifaMatchReport(
     sourceExternalKey: page.relativeUrl ?? articlePath,
     signal: "match_report_article",
   };
+}
+
+export async function fetchOfficialMvpFromFifaMatchReport(
+  homeTeam: string,
+  awayTeam: string,
+  options?: { idMatch?: string },
+): Promise<OfficialMvpFromFifaMatchReport | null> {
+  const candidates = buildFifaMatchReportArticlePathCandidates(homeTeam, awayTeam);
+
+  for (const articlePath of candidates) {
+    const result = await fetchOfficialMvpFromFifaMatchReportPage(articlePath, options?.idMatch);
+    if (result) return result;
+  }
+
+  return null;
 }

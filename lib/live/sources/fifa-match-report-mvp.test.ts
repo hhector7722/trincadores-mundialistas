@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  buildFifaMatchReportArticlePathCandidates,
   buildFifaMatchReportArticleSlug,
   fifaArticleSlugForTeam,
 } from "@/lib/live/sources/fifa-match-report-slugs";
@@ -88,6 +89,24 @@ test("buildFifaMatchReportArticleSlug compone home-away", () => {
   assert.equal(
     buildFifaMatchReportArticleSlug("Ivory Coast", "Ecuador"),
     "cote-d-ivoire-ecuador",
+  );
+});
+
+test("buildFifaMatchReportArticlePathCandidates incluye variantes Bosnia y sufijos FIFA", () => {
+  const candidates = buildFifaMatchReportArticlePathCandidates(
+    "Switzerland",
+    "Bosnia & Herzegovina",
+  );
+
+  assert.ok(
+    candidates.includes(
+      "/en/tournaments/mens/worldcup/canadamexicousa2026/articles/switzerland-bosnia-herzegovina-match-report-highlights",
+    ),
+  );
+  assert.ok(
+    candidates.includes(
+      "/en/tournaments/mens/worldcup/canadamexicousa2026/articles/switzerland-bosnia-and-herzegovina-highlights-match-report",
+    ),
   );
 });
 
