@@ -48,7 +48,7 @@ export function CalendarMatchCardFlagsRow({
       {mvpSubtitle ? (
         <span
           className={cn(
-            "tm-cal-match-mvp-line pointer-events-none absolute inset-x-0 bottom-[1px] z-[5] truncate text-center leading-none",
+            "tm-cal-match-mvp-line pointer-events-none absolute inset-x-0 z-[5] truncate text-center leading-none",
             mvpSubtitle.tone === "official-mvp" &&
               "tm-cal-match-subtitle tm-cal-match-subtitle--official-mvp font-medium text-white",
             mvpSubtitle.tone === "predicted-mvp" &&

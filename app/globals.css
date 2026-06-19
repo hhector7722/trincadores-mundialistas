@@ -2245,7 +2245,7 @@ html:has(.tm-app-shell) body {
 
 .tm-porra-calendar .tm-cal-match-subtitle--official-mvp,
 .tm-porra-calendar .tm-cal-match-subtitle--predicted-mvp {
-  font-size: calc(var(--tm-cal-sidebar-heading-fs) * 0.82);
+  font-size: calc(var(--tm-cal-sidebar-heading-fs) * 0.65);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -2262,6 +2262,7 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-porra-calendar .tm-cal-match-mvp-line {
+  bottom: calc(3px * var(--tm-cal-ui-scale, 1));
   max-width: 100%;
   padding-inline: 1px;
 }
