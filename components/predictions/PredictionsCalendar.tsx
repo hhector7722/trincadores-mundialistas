@@ -27,7 +27,6 @@ import {
 } from "@/lib/pool/calendar-layout";
 import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
-import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { displayGoals } from "@/lib/predictions/edit-state";
 import {
   CAL_FINISHED_OUTER_MUTED_CLASS,
@@ -118,33 +117,23 @@ function CalendarMatchCard({
 
   if (finishedState) {
     return (
-      <div className="relative">
-        <CalendarFinishedMatchCardVisual
-          interactive
-          title={title}
-          onClick={onOpen}
-          anchorAttr={isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : undefined}
-          className={CAL_FINISHED_OUTER_MUTED_CLASS}
-          homeTeam={match.home_team}
-          awayTeam={match.away_team}
-          groupCode={match.group_code}
-          officialHome={match.officialHome!}
-          officialAway={match.officialAway!}
-          finishedState={finishedState}
-        />
-        <AiPredictionTrigger
-          matchId={match.id}
-          homeTeam={match.home_team}
-          awayTeam={match.away_team}
-          className="pointer-events-auto absolute right-0 top-0 z-10 min-h-8 min-w-8"
-          iconClassName="h-3 w-3"
-        />
-      </div>
+      <CalendarFinishedMatchCardVisual
+        interactive
+        title={title}
+        onClick={onOpen}
+        anchorAttr={isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : undefined}
+        className={CAL_FINISHED_OUTER_MUTED_CLASS}
+        homeTeam={match.home_team}
+        awayTeam={match.away_team}
+        groupCode={match.group_code}
+        officialHome={match.officialHome!}
+        officialAway={match.officialAway!}
+        finishedState={finishedState}
+      />
     );
   }
 
   return (
-    <div className="relative">
     <button
       type="button"
       title={title}
@@ -168,14 +157,6 @@ function CalendarMatchCard({
         />
       </div>
     </button>
-    <AiPredictionTrigger
-      matchId={match.id}
-      homeTeam={match.home_team}
-      awayTeam={match.away_team}
-      className="pointer-events-auto absolute right-0 top-0 z-10 min-h-8 min-w-8"
-      iconClassName="h-3 w-3"
-    />
-    </div>
   );
 }
 
