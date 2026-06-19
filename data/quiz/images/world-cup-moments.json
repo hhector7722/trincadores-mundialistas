@@ -584,40 +584,34 @@
         "Roberto Baggio"
       ],
       "competition": "Final",
-      "difficulty": "easy",
+      "difficulty": "hard",
       "search_hint": null,
       "local_path": "/images/quiz/historic/1994/wc1994-baggio-penalty.jpg",
-      "source_url": "https://c8.alamy.com/comp/G5MDXE/16-07-94-1994-world-cup-final-roberto-baggio-on-the-ball-against-brazil-G5MDXE.jpg",
-      "source_label": "auto/alamy.com",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
       "status": "ready",
-      "image_alt": "Roberto Baggio en la final del Mundial 1994",
+      "image_alt": "Roberto Baggio tras fallar el penalti en la final de 1994",
       "quiz": {
-        "prompt": "¿Qué jugador aparece en la imagen?",
+        "prompt": "¿Qué jugador es la silueta?",
         "answer_type": "player",
         "correct_option": "Roberto Baggio",
         "options": [
           "Roberto Baggio",
-          "Romário",
-          "Bebeto",
-          "Paolo Maldini"
+          "Franco Baresi",
+          "Daniele Massaro",
+          "Aldair"
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
       },
       "lab_suitability": [
-        "hair",
-        "eyes",
         "silhouette"
-      ],
-      "face_focus": {
-        "x": 0.5,
-        "y": 0.28
-      }
+      ]
     },
     {
       "id": "wc1994-bebeto-celebration",
       "year": 1994,
-      "label": "Bebeto — choncleta USA 94",
+      "label": "Bebeto — celebración con Romário USA 94",
       "moment_type": "celebration",
       "teams": [
         "Brasil"
@@ -625,36 +619,30 @@
       "players": [
         "Bebeto"
       ],
-      "competition": "Cuartos",
-      "difficulty": "medium",
-      "search_hint": "Bebeto cradle celebration 1994 World Cup",
+      "competition": "Mundial",
+      "difficulty": "hard",
+      "search_hint": "Bebeto Romario celebration 1994 World Cup",
       "local_path": "/images/quiz/historic/1994/wc1994-bebeto-celebration.jpg",
-      "source_url": "https://c8.alamy.com/comp/HAEJCM/taffarel-bebeto-mauro-silva-brazil-win-the-world-cup-17-july-1994-HAEJCM.jpg",
-      "source_label": "auto/alamy.com",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
       "status": "ready",
-      "image_alt": "Bebeto celebra en el Mundial 1994",
+      "image_alt": "Bebeto celebra junto a Romário en el Mundial 1994",
       "quiz": {
-        "prompt": "¿Quién celebra?",
+        "prompt": "¿Qué jugador es la silueta?",
         "answer_type": "player",
         "correct_option": "Bebeto",
         "options": [
           "Bebeto",
           "Romário",
-          "Rai",
+          "Mauro Silva",
           "Dunga"
         ],
         "blur_start_px": 28,
         "reveal_seconds": 7
       },
       "lab_suitability": [
-        "hair",
-        "eyes",
         "silhouette"
-      ],
-      "face_focus": {
-        "x": 0.5,
-        "y": 0.28
-      }
+      ]
     },
     {
       "id": "wc1994-stoichkov-action",
@@ -1048,36 +1036,40 @@
     {
       "id": "wc2006-zidane-headbutt",
       "year": 2006,
-      "label": "Zidane — Alemania 2006",
+      "label": "Materazzi en el suelo — final 2006",
       "moment_type": "iconic",
       "teams": [
         "Francia",
         "Italia"
       ],
       "players": [
+        "Marco Materazzi",
         "Zinedine Zidane"
       ],
       "competition": "Final",
-      "difficulty": "easy",
+      "difficulty": "hard",
       "search_hint": null,
       "local_path": "/images/quiz/historic/2006/wc2006-zidane-headbutt.jpg",
-      "source_url": "https://www.sopitas.com/wp-content/uploads/2015/09/zidane_2006.jpg",
-      "source_label": "auto/sopitas.com",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
       "status": "ready",
-      "image_alt": "Zinedine Zidane en la final del Mundial 2006",
+      "image_alt": "Marco Materazzi en el suelo tras el cabezazo de Zidane",
       "quiz": {
-        "prompt": "¿En qué Mundial fue este momento?",
-        "answer_type": "year",
-        "correct_option": "2006",
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Marco Materazzi",
         "options": [
-          "2002",
-          "2006",
-          "2010",
-          "2014"
+          "Marco Materazzi",
+          "Gianluca Zambrotta",
+          "Fabio Grosso",
+          "Alessandro Del Piero"
         ],
         "blur_start_px": 28,
         "reveal_seconds": 8
-      }
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2010-forlan-celebration",
@@ -1218,44 +1210,40 @@
     {
       "id": "wc2014-gotze-goal",
       "year": 2014,
-      "label": "Mario Götze — gol decisivo final 2014",
+      "label": "Götze marca — silueta Demichelis final 2014",
       "moment_type": "goal",
       "teams": [
         "Alemania",
         "Argentina"
       ],
       "players": [
+        "Martin Demichelis",
         "Mario Götze"
       ],
       "competition": "Final",
-      "difficulty": "medium",
+      "difficulty": "hard",
       "search_hint": "Mario Gotze goal 2014 World Cup final extra time",
       "local_path": "/images/quiz/historic/2014/wc2014-gotze-goal.jpg",
-      "source_url": "https://www.nydailynews.com/wp-content/uploads/migration/2014/07/14/KAJCIZTNRYIL7MQJWSLSS2FRQY.jpg",
-      "source_label": "auto/nydailynews.com",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
       "status": "ready",
-      "image_alt": "Mario Götze marca en la final de 2014",
+      "image_alt": "Mario Götze marca en la final de 2014 con Demichelis en escena",
       "quiz": {
-        "prompt": "¿Quién marcó el gol de la final?",
+        "prompt": "¿Qué jugador es la silueta?",
         "answer_type": "player",
-        "correct_option": "Mario Götze",
+        "correct_option": "Martin Demichelis",
         "options": [
-          "Mario Götze",
-          "Thomas Müller",
-          "André Schürrle",
-          "Miroslav Klose"
+          "Martin Demichelis",
+          "Nicolás Otamendi",
+          "Ezequiel Garay",
+          "Javier Mascherano"
         ],
         "blur_start_px": 30,
         "reveal_seconds": 7
       },
       "lab_suitability": [
-        "hair",
-        "eyes"
-      ],
-      "face_focus": {
-        "x": 0.52,
-        "y": 0.22
-      }
+        "silhouette"
+      ]
     },
     {
       "id": "wc2014-james-volley",
@@ -1789,6 +1777,227 @@
         "x": 0.5,
         "y": 0.24
       }
+    },
+    {
+      "id": "wc2014-suarez-bite",
+      "year": 2014,
+      "label": "Suárez muerde a Chiellini — Brasil 2014",
+      "moment_type": "iconic",
+      "teams": [
+        "Uruguay",
+        "Italia"
+      ],
+      "players": [
+        "Giorgio Chiellini"
+      ],
+      "competition": "Fase de grupos",
+      "difficulty": "hard",
+      "search_hint": "Luis Suarez bite Chiellini 2014 World Cup",
+      "local_path": "/images/quiz/historic/2014/wc2014-suarez-bite.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Giorgio Chiellini tras la mordida de Luis Suárez",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Giorgio Chiellini",
+        "options": [
+          "Giorgio Chiellini",
+          "Leonardo Bonucci",
+          "Andrea Barzagli",
+          "Claudio Marchisio"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc1990-rijkaard-voller",
+      "year": 1990,
+      "label": "Rijkaard y Völler — Italia 90",
+      "moment_type": "iconic",
+      "teams": [
+        "Países Bajos",
+        "Alemania"
+      ],
+      "players": [
+        "Frank Rijkaard"
+      ],
+      "competition": "Octavos",
+      "difficulty": "hard",
+      "search_hint": "Rijkaard Völler spit 1990 World Cup",
+      "local_path": "/images/quiz/historic/1990/wc1990-rijkaard-voller.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Frank Rijkaard junto a Rudi Völler en Italia 90",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Frank Rijkaard",
+        "options": [
+          "Frank Rijkaard",
+          "Ruud Gullit",
+          "Marco van Basten",
+          "Ronald Koeman"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc1970-rivelino-kick",
+      "year": 1970,
+      "label": "Rivelino chuta — México 70",
+      "moment_type": "action",
+      "teams": [
+        "Brasil"
+      ],
+      "players": [
+        "Rivelino"
+      ],
+      "competition": "Mundial",
+      "difficulty": "hard",
+      "search_hint": "Rivelino Tostao 1970 World Cup",
+      "local_path": "/images/quiz/historic/1970/wc1970-rivelino-kick.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Rivelino en acción con Tostão en México 70",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Rivelino",
+        "options": [
+          "Rivelino",
+          "Tostão",
+          "Jairzinho",
+          "Gérson"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc1994-luis-enrique-blood",
+      "year": 1994,
+      "label": "Luis Enrique sangrando — USA 94",
+      "moment_type": "iconic",
+      "teams": [
+        "España",
+        "Italia"
+      ],
+      "players": [
+        "Fernando Hierro"
+      ],
+      "competition": "Cuartos",
+      "difficulty": "hard",
+      "search_hint": "Luis Enrique Tassotti blood 1994 World Cup",
+      "local_path": "/images/quiz/historic/1994/wc1994-luis-enrique-blood.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Luis Enrique sangrando ante Italia en 1994",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Fernando Hierro",
+        "options": [
+          "Fernando Hierro",
+          "Abelardo",
+          "Sergi",
+          "Caminero"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc1997-ronaldo-maldini-tackle",
+      "year": 1997,
+      "label": "Ronaldo entre Maldini y Cannavaro",
+      "moment_type": "action",
+      "teams": [
+        "Brasil",
+        "Italia"
+      ],
+      "players": [
+        "Ronaldo Nazário"
+      ],
+      "competition": "Amistoso",
+      "difficulty": "hard",
+      "search_hint": "Ronaldo Maldini Cannavaro 1997 Tournoi de France",
+      "local_path": "/images/quiz/historic/1997/wc1997-ronaldo-maldini-tackle.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Ronaldo Nazário entre Maldini y Cannavaro",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Ronaldo Nazário",
+        "options": [
+          "Ronaldo Nazário",
+          "Romário",
+          "Leonardo",
+          "Bebeto"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
+    },
+    {
+      "id": "wc1970-pele-jairzinho-celebration",
+      "year": 1970,
+      "label": "Pelé y Jairzinho celebran — final 1970",
+      "moment_type": "celebration",
+      "teams": [
+        "Brasil",
+        "Italia"
+      ],
+      "players": [
+        "Jairzinho"
+      ],
+      "competition": "Final",
+      "difficulty": "hard",
+      "search_hint": "Pele Jairzinho celebration 1970 World Cup final",
+      "local_path": "/images/quiz/historic/1970/wc1970-pele-jairzinho-celebration.jpg",
+      "source_url": null,
+      "source_label": "manual/chatgpt",
+      "status": "ready",
+      "image_alt": "Pelé celebra con Jairzinho en la final de 1970",
+      "quiz": {
+        "prompt": "¿Qué jugador es la silueta?",
+        "answer_type": "player",
+        "correct_option": "Jairzinho",
+        "options": [
+          "Jairzinho",
+          "Rivelino",
+          "Carlos Alberto",
+          "Tostão"
+        ],
+        "blur_start_px": 28,
+        "reveal_seconds": 7
+      },
+      "lab_suitability": [
+        "silhouette"
+      ]
     },
     {
       "id": "wc2022-messi-cup",
