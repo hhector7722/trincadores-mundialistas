@@ -415,7 +415,9 @@ export async function getQuizResult(
 
   const { data: responses, error: responsesError } = await supabase
     .from("quiz_responses")
-    .select("question_id, selected_option_id, is_correct, points_awarded")
+    .select(
+      "question_id, selected_option_id, selected_option_label, question_prompt, is_correct, points_awarded"
+    )
     .eq("attempt_id", attemptId);
 
   if (responsesError) throw new Error(responsesError.message);
@@ -459,8 +461,9 @@ export async function getQuizResult(
       if (!question) return null;
       return {
         questionId: r.question_id as string,
-        prompt: question.prompt,
+        prompt: (r.question_prompt as string | null) ?? question.prompt,
         selectedOptionId: r.selected_option_id as string,
+        selectedOptionLabel: (r.selected_option_label as string | null) ?? undefined,
         correctOptionId: "",
         isCorrect: Boolean(r.is_correct),
         pointsAwarded: r.points_awarded as number,

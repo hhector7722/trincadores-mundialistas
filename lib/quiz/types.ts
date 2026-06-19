@@ -114,6 +114,7 @@ export type QuizResultResponse = {
     questionId: string;
     prompt: string;
     selectedOptionId: string;
+    selectedOptionLabel?: string;
     correctOptionId: string;
     isCorrect: boolean;
     pointsAwarded: number;
