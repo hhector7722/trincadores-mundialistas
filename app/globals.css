@@ -175,7 +175,32 @@ html[data-modal-open] .tm-app-main {
 }
 
 .tm-app-header {
-  background: transparent;
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tm-bg) 90%, transparent) 0%,
+    color-mix(in srgb, var(--tm-bg) 68%, transparent) 42%,
+    color-mix(in srgb, var(--tm-bg) 34%, transparent) 72%,
+    transparent 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.tm-app-header::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1.75rem;
+  left: 0;
+  height: 1.75rem;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tm-bg) 18%, transparent) 0%,
+    transparent 100%
+  );
 }
 
 .tm-app-header-fixed {
@@ -1024,11 +1049,11 @@ html:has(.tm-app-shell) body {
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(150, 100, 245, 0.28) 0%,
-    rgba(120, 70, 220, 0.16) 30%,
-    rgba(100, 55, 200, 0.1) 52%,
-    rgba(70, 30, 150, 0.04) 68%,
-    transparent 82%
+    rgba(150, 100, 245, 0.2) 0%,
+    rgba(120, 70, 220, 0.12) 26%,
+    rgba(100, 55, 200, 0.07) 50%,
+    rgba(70, 30, 150, 0.03) 66%,
+    transparent 80%
   );
 }
 
@@ -2036,6 +2061,8 @@ html:has(.tm-app-shell) body {
   --tm-ko-orb-pair-gap: min(3.2cqh, 0.85rem);
   --tm-ko-header-band: 10%;
   --tm-ko-footer-band: 10%;
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -2043,6 +2070,23 @@ html:has(.tm-app-shell) body {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+}
+
+.tm-ko-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: calc(env(safe-area-inset-top, 0px) + 4.5rem);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tm-bg) 72%, transparent) 0%,
+    color-mix(in srgb, var(--tm-bg) 28%, transparent) 58%,
+    transparent 100%
+  );
 }
 
 .tm-ko-stage {
@@ -2302,9 +2346,31 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-porra-calendar .tm-cal-header {
-  background: transparent;
+  position: relative;
+  isolation: isolate;
   flex-shrink: 0;
   padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tm-bg) 72%, transparent) 0%,
+    color-mix(in srgb, var(--tm-bg) 28%, transparent) 58%,
+    transparent 100%
+  );
+}
+
+.tm-porra-calendar .tm-cal-header::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1.25rem;
+  left: 0;
+  height: 1.25rem;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tm-bg) 14%, transparent) 0%,
+    transparent 100%
+  );
 }
 
 .tm-app-main--no-header .tm-porra-calendar .tm-cal-header {
