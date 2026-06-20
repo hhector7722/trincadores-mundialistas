@@ -7,6 +7,9 @@ export function measureChromeBottomLift(): number {
   if (typeof window === "undefined") return 0;
   const vv = window.visualViewport;
   if (!vv) return 0;
+  // Solo compensar con teclado abierto; sin teclado evita TabBar flotante en PWA iOS.
+  const keyboardOpen = vv.height < window.innerHeight * 0.82;
+  if (!keyboardOpen) return 0;
   return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
 }
 
