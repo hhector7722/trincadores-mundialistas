@@ -110,6 +110,22 @@ test("buildFifaMatchReportArticlePathCandidates incluye variantes Bosnia y sufij
   );
 });
 
+test("buildFifaMatchReportArticlePathCandidates incluye variantes Cabo Verde y Congo DR", () => {
+  const spainCapeVerde = buildFifaMatchReportArticlePathCandidates("Spain", "Cape Verde");
+  assert.ok(
+    spainCapeVerde.includes(
+      "/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-cabo-verde-highlights-match-report",
+    ),
+  );
+
+  const portugalCongo = buildFifaMatchReportArticlePathCandidates("Portugal", "DR Congo");
+  assert.ok(
+    portugalCongo.includes(
+      "/en/tournaments/mens/worldcup/canadamexicousa2026/articles/portugal-congo-dr-highlights-match-report",
+    ),
+  );
+});
+
 test("parseOfficialMvpFromFifaMatchReportRichtext lee Brasil-Marruecos", () => {
   const parsed = parseOfficialMvpFromFifaMatchReportRichtext(BRA_MAR_RICHTEXT);
   assert.deepEqual(parsed, {

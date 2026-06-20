@@ -99,6 +99,7 @@ export async function syncBsdHeadlineForMatch(
     awayTeam: row.away_team,
     homeGoals,
     awayGoals,
+    seed: matchId,
   };
 
   const headline = await fetchBsdHeadline(eventId, context);

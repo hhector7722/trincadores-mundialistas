@@ -18,6 +18,7 @@ import {
   shouldAutoSubmit,
 } from "@/lib/quiz/play-flow";
 import { QUIZ_PLAY_ENTER_MS } from "@/lib/quiz/intro";
+import { prefetchQuizQuestionImages } from "@/lib/quiz/prefetch-question-images";
 import type { QuizStartSession } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +44,6 @@ export function QuizPlaySession({
   const { navigate } = useAppNavigation();
   const [introDone, setIntroDone] = useState(skipIntro);
   const [quizRevealed, setQuizRevealed] = useState(skipIntro);
-  const [sessionStarted, setSessionStarted] = useState(skipIntro);
   const [session, setSession] = useState<QuizStartSession | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -107,8 +107,6 @@ export function QuizPlaySession({
   }, [clearQuestionTimer, clearFeedbackTimer]);
 
   useEffect(() => {
-    if (!sessionStarted) return;
-
     startLoading(async () => {
       const result = await startQuiz(poolId, quizId, { drill });
       if (!result.ok) {
@@ -118,7 +116,12 @@ export function QuizPlaySession({
       setSession(result.data);
       setLoadError(null);
     });
-  }, [drill, poolId, quizId, sessionStarted]);
+  }, [drill, poolId, quizId]);
+
+  useEffect(() => {
+    if (!session?.questions.length) return;
+    prefetchQuizQuestionImages(session.questions);
+  }, [session]);
 
   const questions = session?.questions ?? [];
   const currentQuestion = questions[step] ?? null;
@@ -251,7 +254,6 @@ export function QuizPlaySession({
 
   const handleIntroComplete = useCallback(() => {
     setIntroDone(true);
-    setSessionStarted(true);
   }, []);
 
   let body: ReactNode;
@@ -328,7 +330,7 @@ export function QuizPlaySession({
   }
 
   const showIntro = !skipIntro && !introDone;
-  const showPreparing = sessionStarted && !playReady && !loadError;
+  const showPreparing = !playReady && !loadError && (skipIntro || introDone);
 
   return (
     <div className="tm-quiz-play-root flex min-h-0 flex-1 flex-col">

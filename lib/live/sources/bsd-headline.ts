@@ -36,6 +36,10 @@ type BsdIncident = {
   player?: string;
   player_name?: string;
   is_home?: boolean;
+  assist?: string;
+  assist_player?: string;
+  assist_name?: string;
+  related_player?: string;
 };
 
 type BsdIncidentsResponse = {
@@ -47,6 +51,14 @@ export type BsdHeadlineContext = {
   awayTeam: string;
   homeGoals: number;
   awayGoals: number;
+  /** Semilla estable para elegir plantilla (p. ej. UUID del partido). */
+  seed?: string;
+};
+
+type ParsedGoal = {
+  scorer: string;
+  assist: string | null;
+  isHome: boolean;
 };
 
 async function bsdFetch<T>(path: string): Promise<T | null> {
@@ -128,6 +140,161 @@ function goalScorerName(incident: BsdIncident): string | null {
   return name || null;
 }
 
+function goalAssistName(incident: BsdIncident): string | null {
+  const name =
+    incident.assist_name?.trim() ||
+    incident.assist_player?.trim() ||
+    incident.assist?.trim() ||
+    incident.related_player?.trim();
+  return name || null;
+}
+
+function parseGoalIncidents(incidents: BsdIncident[]): ParsedGoal[] {
+  return incidents
+    .filter((incident) => incident.type === "goal")
+    .map((incident) => {
+      const scorer = goalScorerName(incident);
+      if (!scorer) return null;
+      return {
+        scorer,
+        assist: goalAssistName(incident),
+        isHome: incident.is_home !== false,
+      };
+    })
+    .filter((goal): goal is ParsedGoal => goal != null);
+}
+
+function headlineSeed(context: BsdHeadlineContext): string {
+  return (
+    context.seed ??
+    `${context.homeTeam}:${context.awayTeam}:${context.homeGoals}:${context.awayGoals}`
+  );
+}
+
+/** Elige una plantilla de forma estable para el mismo partido. */
+export function pickHeadlineVariant(seed: string, variants: readonly string[]): string {
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  }
+  return variants[hash % variants.length]!;
+}
+
+function countGoalsByScorer(goals: ParsedGoal[], winnerIsHome: boolean): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const goal of goals) {
+    if (goal.isHome !== winnerIsHome) continue;
+    counts.set(goal.scorer, (counts.get(goal.scorer) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function composeDrawHeadline(homeEs: string, awayEs: string, seed: string, scoreless: boolean): string {
+  if (scoreless) {
+    return pickHeadlineVariant(`${seed}:draw-0`, [
+      `Porterías a cero entre ${homeEs} y ${awayEs}`,
+      `Sin goles en el duelo entre ${homeEs} y ${awayEs}`,
+      `Tablas en blanco para ${homeEs} y ${awayEs}`,
+    ]);
+  }
+
+  return pickHeadlineVariant(`${seed}:draw`, [
+    `Empate entre ${homeEs} y ${awayEs}`,
+    `Reparto de puntos entre ${homeEs} y ${awayEs}`,
+    `${homeEs} y ${awayEs} firmaron las tablas`,
+    `Puntos para ambos entre ${homeEs} y ${awayEs}`,
+  ]);
+}
+
+function composeWinHeadline(
+  goals: ParsedGoal[],
+  winnerEs: string,
+  loserEs: string,
+  winnerIsHome: boolean,
+  goalDiff: number,
+  loserGoals: number,
+  seed: string,
+): string {
+  const winnerGoals = goals.filter((goal) => goal.isHome === winnerIsHome);
+  const scorerCounts = countGoalsByScorer(goals, winnerIsHome);
+  const topScorer = [...scorerCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+  const lastGoal = goals.at(-1);
+  const lastScorer = lastGoal?.scorer ?? null;
+  const lastAssist =
+    lastGoal && lastGoal.isHome === winnerIsHome ? lastGoal.assist : null;
+  const distinctWinnerScorers = scorerCounts.size;
+
+  if (topScorer && topScorer[1] >= 3) {
+    return pickHeadlineVariant(`${seed}:hattrick`, [
+      `${topScorer[0]} firma un hat-trick y ${winnerEs} gana`,
+      `Hat-trick de ${topScorer[0]} para el triunfo de ${winnerEs}`,
+      `${topScorer[0]} con tres goles y victoria de ${winnerEs}`,
+    ]);
+  }
+
+  if (topScorer && topScorer[1] >= 2) {
+    return pickHeadlineVariant(`${seed}:brace`, [
+      `Doblete de ${topScorer[0]} y victoria de ${winnerEs}`,
+      `${topScorer[0]} anota dos veces y ${winnerEs} suma`,
+      `${topScorer[0]} con doblete para el triunfo de ${winnerEs}`,
+    ]);
+  }
+
+  if (lastScorer && lastAssist && lastGoal?.isHome === winnerIsHome) {
+    return pickHeadlineVariant(`${seed}:assist`, [
+      `Asistencia de ${lastAssist} y gol de ${lastScorer} para ${winnerEs}`,
+      `${lastScorer}, con pase de ${lastAssist}, decide para ${winnerEs}`,
+      `Gol de ${lastScorer} tras asistencia de ${lastAssist} y triunfo de ${winnerEs}`,
+    ]);
+  }
+
+  if (goalDiff >= 3) {
+    return pickHeadlineVariant(`${seed}:blowout`, [
+      `${winnerEs} golea a ${loserEs}`,
+      `${winnerEs} arrasa ante ${loserEs}`,
+      `Contundente victoria de ${winnerEs} ante ${loserEs}`,
+    ]);
+  }
+
+  if (loserGoals === 0) {
+    return pickHeadlineVariant(`${seed}:clean-sheet`, [
+      `${winnerEs} deja la portería a cero ante ${loserEs}`,
+      `Victoria sin encajar de ${winnerEs} ante ${loserEs}`,
+      `${winnerEs} cierra el partido sin recibir goles`,
+    ]);
+  }
+
+  if (goalDiff === 1 && lastScorer && lastGoal?.isHome === winnerIsHome) {
+    return pickHeadlineVariant(`${seed}:narrow`, [
+      `Victoria ajustada de ${winnerEs}: gol de ${lastScorer}`,
+      `${lastScorer} desnivela y ${winnerEs} gana por la mínima`,
+      `Triunfo mínimo de ${winnerEs} con gol de ${lastScorer}`,
+    ]);
+  }
+
+  if (distinctWinnerScorers >= 2 && winnerGoals.length >= 2) {
+    return pickHeadlineVariant(`${seed}:multi-scorer`, [
+      `Goles repartidos y triunfo de ${winnerEs}`,
+      `${winnerEs} gana con varios goleadores`,
+      `Varios autores del gol y victoria de ${winnerEs}`,
+    ]);
+  }
+
+  if (lastScorer && lastGoal?.isHome === winnerIsHome) {
+    return pickHeadlineVariant(`${seed}:scorer`, [
+      `${lastScorer} decide la victoria de ${winnerEs}`,
+      `Gol de ${lastScorer} y triunfo de ${winnerEs}`,
+      `${lastScorer} sentencia el triunfo de ${winnerEs}`,
+    ]);
+  }
+
+  return pickHeadlineVariant(`${seed}:generic`, [
+    `${winnerEs} se impone ante ${loserEs}`,
+    `${winnerEs} vence a ${loserEs}`,
+    `Triunfo de ${winnerEs} ante ${loserEs}`,
+  ]);
+}
+
 export function composeHeadlineFromBsdIncidents(
   incidents: BsdIncident[],
   context: BsdHeadlineContext,
@@ -135,24 +302,22 @@ export function composeHeadlineFromBsdIncidents(
   const { homeTeam, awayTeam, homeGoals, awayGoals } = context;
   const homeEs = teamNameEs(homeTeam);
   const awayEs = teamNameEs(awayTeam);
+  const seed = headlineSeed(context);
+  const goals = parseGoalIncidents(incidents);
 
   if (homeGoals === awayGoals) {
-    return truncateHeadline(`Empate entre ${homeEs} y ${awayEs}`);
+    return truncateHeadline(composeDrawHeadline(homeEs, awayEs, seed, homeGoals === 0));
   }
 
   const homeWins = homeGoals > awayGoals;
   const winnerEs = homeWins ? homeEs : awayEs;
   const loserEs = homeWins ? awayEs : homeEs;
+  const goalDiff = Math.abs(homeGoals - awayGoals);
+  const loserGoals = homeWins ? awayGoals : homeGoals;
 
-  const goals = incidents.filter((incident) => incident.type === "goal");
-  const lastGoal = goals.at(-1);
-  const scorer = lastGoal ? goalScorerName(lastGoal) : null;
-
-  if (scorer) {
-    return truncateHeadline(`${scorer} decide la victoria de ${winnerEs}`);
-  }
-
-  return truncateHeadline(`${winnerEs} se impone ante ${loserEs}`);
+  return truncateHeadline(
+    composeWinHeadline(goals, winnerEs, loserEs, homeWins, goalDiff, loserGoals, seed),
+  );
 }
 
 export async function fetchBsdHeadline(

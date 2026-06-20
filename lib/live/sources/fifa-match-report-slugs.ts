@@ -16,6 +16,10 @@ const FIFA_ARTICLE_SLUG_OVERRIDES: Record<string, string> = {
 /** Variantes observadas en fifa.com (p. ej. Bosnia usa slug distinto según rival). */
 const FIFA_ARTICLE_SLUG_EXTRA_VARIANTS: Record<string, string[]> = {
   "Bosnia & Herzegovina": ["bosnia-herzegovina"],
+  /** FIFA publica crónicas con el nombre en portugués (cabo-verde). */
+  "Cape Verde": ["cabo-verde"],
+  /** FIFA ordena el slug como congo-dr, no dr-congo. */
+  "DR Congo": ["congo-dr"],
 };
 
 const FIFA_MATCH_REPORT_SUFFIXES = [
