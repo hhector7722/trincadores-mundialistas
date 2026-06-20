@@ -39,7 +39,7 @@ export function TabAdjacentPanel({ href, dragX, animating, side }: TabAdjacentPa
     >
       <div
         ref={hostRef}
-        className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-[var(--tm-purple-deep)]"
+        className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent"
       />
     </div>
   );
@@ -89,13 +89,13 @@ export function TabTransitionIncoming({
       aria-hidden={!liveReady}
     >
       {liveReady ? (
-        <div className="tm-tab-swipe-incoming-live flex h-full min-h-0 w-full flex-col bg-[var(--tm-purple-deep)]">
+        <div className="tm-tab-swipe-incoming-live flex h-full min-h-0 w-full flex-col bg-transparent">
           {liveContent}
         </div>
       ) : (
         <div
           ref={hostRef}
-          className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-[var(--tm-purple-deep)]"
+          className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent"
         />
       )}
     </div>

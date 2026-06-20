@@ -535,7 +535,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       <div
         ref={trackRef}
         className={cn(
-          "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-[var(--tm-purple-deep)] will-change-transform",
+          "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
           !animating && dragX === 0 && "transform-gpu"
         )}
         style={{

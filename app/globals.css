@@ -72,19 +72,24 @@
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
+  --tm-header-chrome-bg: var(--tm-bg);
   --tm-shell-bg-image:
-    radial-gradient(ellipse 110% 65% at 50% -8%, rgba(170, 120, 255, 0.42) 0%, transparent 58%),
-    radial-gradient(ellipse 85% 55% at 50% 42%, rgba(140, 90, 240, 0.22) 0%, transparent 68%),
-    radial-gradient(ellipse 75% 50% at 8% 8%, rgba(140, 90, 240, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 80% 55% at 92% 12%, rgba(120, 70, 220, 0.22) 0%, transparent 52%),
-    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(80, 35, 160, 0.16) 0%, transparent 55%),
+    radial-gradient(
+      ellipse 130% 72% at 50% -10%,
+      color-mix(in srgb, var(--tm-bg-top) 48%, var(--tm-header-chrome-bg) 52%) 0%,
+      transparent 66%
+    ),
+    radial-gradient(
+      ellipse 115% 68% at 50% 108%,
+      color-mix(in srgb, var(--tm-tabbar-bg-hex) 88%, var(--tm-bg-mid) 12%) 0%,
+      transparent 64%
+    ),
     linear-gradient(
-      180deg,
-      var(--tm-bg-top) 0%,
-      var(--tm-bg-light) 26%,
-      var(--tm-bg-mid) 52%,
-      var(--tm-bg) 78%,
-      var(--tm-purple-deep) 100%
+      to top,
+      var(--tm-tabbar-bg-hex) 0%,
+      color-mix(in srgb, var(--tm-tabbar-bg-hex) 86%, var(--tm-bg-mid) 14%) 30%,
+      color-mix(in srgb, var(--tm-bg) 78%, var(--tm-bg-light) 22%) 62%,
+      var(--tm-header-chrome-bg) 100%
     );
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-brand: "GIBSFUT", var(--font-brand-src), system-ui, sans-serif;
@@ -94,15 +99,16 @@
 body {
   margin: 0;
   min-height: 100dvh;
-  background-color: var(--tm-purple-deep);
+  background-color: var(--tm-tabbar-bg-hex);
   background-image: var(--tm-shell-bg-image);
+  background-attachment: fixed;
   color: var(--tm-fg);
   font-family: var(--font-ui);
   color-scheme: dark;
 }
 
 html {
-  background-color: var(--tm-purple-deep);
+  background-color: var(--tm-tabbar-bg-hex);
   touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -158,14 +164,11 @@ html[data-modal-open] .tm-app-main {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-color: var(--tm-purple-deep);
-  background-image:
-    radial-gradient(
-      ellipse 100% 55% at 50% -5%,
-      rgba(170, 120, 255, 0.18) 0%,
-      transparent 68%
-    ),
-    var(--tm-shell-bg-image);
+  background-color: var(--tm-tabbar-bg-hex);
+  background-image: var(--tm-shell-bg-image);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .tm-app-header {
@@ -486,13 +489,15 @@ html[data-tab-swipe-navigating] .tm-tab-loading-overlay {
 
 /* Overscroll: mismo degradado del shell (no tono plano distinto al cargar). */
 html:has(.tm-app-shell) {
-  background-color: var(--tm-purple-deep);
+  background-color: var(--tm-tabbar-bg-hex);
   background-image: var(--tm-shell-bg-image);
+  background-attachment: fixed;
 }
 
 html:has(.tm-app-shell) body {
-  background-color: var(--tm-purple-deep);
+  background-color: var(--tm-tabbar-bg-hex);
   background-image: var(--tm-shell-bg-image);
+  background-attachment: fixed;
 }
 
 .font-display {
