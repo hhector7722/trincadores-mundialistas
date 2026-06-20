@@ -514,6 +514,7 @@ export function QuickPredictionModal({
   useEffect(() => {
     if (!open) {
       wasOpenRef.current = false;
+      reset({ kind: "prediction" });
       clearMatchSlideTimer();
       matchSlideLockRef.current = false;
       setMatchSlide(null);
@@ -528,6 +529,7 @@ export function QuickPredictionModal({
 
     if (!wasOpenRef.current) {
       wasOpenRef.current = true;
+      reset({ kind: "prediction" });
       setMatchSlide(null);
       matchSlideLockRef.current = false;
       setMvpOverrides(mvpOverridesFromMatchListAndActive(orderedMatches, match));
@@ -543,7 +545,7 @@ export function QuickPredictionModal({
         ])
       );
     }
-  }, [open, match, orderedMatches, clearMatchSlideTimer]);
+  }, [open, match, orderedMatches, clearMatchSlideTimer, reset]);
 
   useEffect(() => {
     if (open) return;
