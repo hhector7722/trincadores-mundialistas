@@ -28,7 +28,7 @@ export function RankingTableShell({
   const [evolutionOpen, setEvolutionOpen] = useState(false);
 
   return (
-    <>
+    <div className="tm-ranking-shell flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <RankingTable rows={rows} currentProfileId={currentProfileId} />
 
       <div className="tm-ranking-evolution-trigger flex shrink-0 justify-center pt-2">
@@ -47,6 +47,6 @@ export function RankingTableShell({
         onClose={() => setEvolutionOpen(false)}
         poolId={poolId}
       />
-    </>
+    </div>
   );
 }
