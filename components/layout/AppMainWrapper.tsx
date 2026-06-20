@@ -2,7 +2,6 @@
 
 import {
   isAppHeaderHidden,
-  isAppHeaderVisible,
   isAppShellScrollPage,
   isFullscreenPath,
 } from "@/lib/layout/app-shell-paths";
@@ -19,13 +18,11 @@ export function AppMainWrapper({ children }: AppMainWrapperProps) {
   const fullscreen = isFullscreenPath(pathname);
   const internalScroll = isAppShellScrollPage(pathname);
   const headerHidden = isAppHeaderHidden(pathname);
-  const headerFade = isAppHeaderVisible(pathname);
 
   return (
     <main
       className={cn(
         "tm-app-main relative z-10 w-full",
-        headerFade && !fullscreen && "tm-app-main--header-fade",
         !fullscreen && !headerHidden && "pt-[var(--tm-app-header-block)]",
         !fullscreen && !internalScroll && "pb-[var(--tm-tabbar-shell)]",
         !fullscreen &&

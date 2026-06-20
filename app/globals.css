@@ -72,7 +72,6 @@
   --tm-panel-slide-ms: 350ms;
   --tm-modal-enter-ms: 260ms;
   --tm-modal-exit-ms: 220ms;
-  --tm-header-content-fade-extra: 1.75rem;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -181,47 +180,6 @@ html[data-modal-open] .tm-app-main {
 
 .tm-app-header-fixed {
   top: var(--tm-vv-offset-top, 0px);
-  isolation: isolate;
-}
-
-/* Contenido bajo cabecera transparente: atenuación progresiva en la franja superior */
-.tm-header-content-fade {
-  position: fixed;
-  top: var(--tm-vv-offset-top, 0px);
-  right: 0;
-  left: 0;
-  z-index: 99;
-  height: calc(var(--tm-app-header-block) + var(--tm-header-content-fade-extra, 1.75rem));
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgb(42 16 88 / 0.55) 0%,
-    rgb(46 18 96 / 0.32) 38%,
-    rgb(46 18 96 / 0.12) 68%,
-    transparent 100%
-  );
-  backdrop-filter: blur(4px) brightness(0.58) saturate(1.08);
-  -webkit-backdrop-filter: blur(4px) brightness(0.58) saturate(1.08);
-}
-
-.tm-app-main--header-fade.tm-app-main--internal-scroll .tm-tab-scroll-layout__viewport,
-.tm-app-main--header-fade.tm-app-main--internal-scroll .tm-quiz-leaderboard-body,
-.tm-app-main--header-fade.tm-app-main--internal-scroll .tm-quiz-page--viewport,
-.tm-app-main--header-fade.tm-app-main--internal-scroll .tm-quiz-play-scroll {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgb(0 0 0 / 0) 0,
-    rgb(0 0 0 / 0.42) 0.5rem,
-    rgb(0 0 0 / 0.88) 1.25rem,
-    #000 2.125rem
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    rgb(0 0 0 / 0) 0,
-    rgb(0 0 0 / 0.42) 0.5rem,
-    rgb(0 0 0 / 0.88) 1.25rem,
-    #000 2.125rem
-  );
 }
 
 html[data-modal-open="true"] .tm-app-header-fixed,
