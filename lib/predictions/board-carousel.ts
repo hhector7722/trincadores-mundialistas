@@ -4,6 +4,7 @@ export type MatchPredictionsBoardCarouselMatch = {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  status: "live" | "finished";
 };
 
 export function buildBoardCarouselMatches(
@@ -18,6 +19,7 @@ export function buildBoardCarouselMatches(
       id: match.id,
       homeTeam: match.home_team,
       awayTeam: match.away_team,
+      status: match.status as "live" | "finished",
     }));
 }
 

@@ -114,6 +114,9 @@ export function MatchPredictionsBoardModal({
   const displayMatch = canSwipeBoard ? (activeItem ?? fallbackMatch) : fallbackMatch;
   const activeBoard =
     loadedBoard?.matchId === displayMatch.id ? loadedBoard.board : null;
+  const isFinishedMatch =
+    ("status" in displayMatch && displayMatch.status === "finished") ||
+    activeBoard?.showOutcomes === true;
   const isLoading = !error && (fetching || activeBoard === null);
 
   const prefetchBoard = useCallback(
@@ -244,12 +247,14 @@ export function MatchPredictionsBoardModal({
       scrollContent={false}
       loading={isLoading}
       headerTrailing={
-        <AiPredictionTrigger
-          matchId={displayMatch.id}
-          homeTeam={displayMatch.homeTeam}
-          awayTeam={displayMatch.awayTeam}
-          className="min-h-10 min-w-10"
-        />
+        !isFinishedMatch ? (
+          <AiPredictionTrigger
+            matchId={displayMatch.id}
+            homeTeam={displayMatch.homeTeam}
+            awayTeam={displayMatch.awayTeam}
+            className="min-h-10 min-w-10"
+          />
+        ) : undefined
       }
       onSwipeLeft={canSwipe && !carouselPanelSlide ? () => handleStartSlide(1) : undefined}
       onSwipeRight={canSwipe && !carouselPanelSlide ? () => handleStartSlide(-1) : undefined}

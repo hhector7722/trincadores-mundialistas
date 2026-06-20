@@ -999,7 +999,7 @@ export function QuickPredictionModal({
           : undefined
       }
       headerTrailing={
-        atPredictionRoot ? (
+        atPredictionRoot && !isFinishedMatch ? (
           <AiPredictionTrigger
             matchId={viewMatch.id}
             homeTeam={viewMatch.home_team}
