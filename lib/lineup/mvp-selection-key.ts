@@ -1,5 +1,20 @@
 import { normalizePlayerName } from "@/lib/lineup/player-dedupe";
 
+const NAME_SUFFIX_TOKENS = new Set(["jr", "junior", "ii", "iii"]);
+
+/** Alias Jr/Junior alineado con `mvp-name-match` para resolver fuentes FIFA. */
+function normalizeMvpLookupName(name: string): string {
+  return normalizePlayerName(name).replace(/\bjr\b/g, "junior");
+}
+
+function significantNameParts(normalized: string): string[] {
+  const parts = normalized.split(" ").filter(Boolean);
+  while (parts.length > 1 && NAME_SUFFIX_TOKENS.has(parts.at(-1)!)) {
+    parts.pop();
+  }
+  return parts;
+}
+
 export type MvpSelectablePlayer = {
   name: string;
   shirtNumber: number | null;
@@ -175,11 +190,11 @@ export function findMvpOptionBySaved<T extends MvpSelectablePlayer & { teamName:
   }
 
   const trimmedSaved = savedPlayerName.trim();
-  const normalizedSaved = normalizePlayerName(savedPlayerName);
+  const normalizedSaved = normalizeMvpLookupName(savedPlayerName);
   if (!normalizedSaved) return undefined;
 
   const exactNormalized = teamOptions.filter(
-    (option) => normalizePlayerName(option.name) === normalizedSaved
+    (option) => normalizeMvpLookupName(option.name) === normalizedSaved
   );
   if (exactNormalized.length === 1) return exactNormalized[0];
 
@@ -187,24 +202,24 @@ export function findMvpOptionBySaved<T extends MvpSelectablePlayer & { teamName:
   if (exactTrimmed.length === 1) return exactTrimmed[0];
 
   const suffixMatches = teamOptions.filter((option) => {
-    const normalizedOption = normalizePlayerName(option.name);
+    const normalizedOption = normalizeMvpLookupName(option.name);
     if (normalizedOption === normalizedSaved) return false;
     return nameHintMatchesOption(normalizedSaved, option.name);
   });
   if (suffixMatches.length === 1) return suffixMatches[0];
 
-  const savedParts = normalizedSaved.split(" ").filter(Boolean);
+  const savedParts = significantNameParts(normalizedSaved);
   if (savedParts.length >= 2) {
     const savedSurname = savedParts.at(-1)!;
     const bySurname = teamOptions.filter((option) => {
-      const parts = normalizePlayerName(option.name).split(" ").filter(Boolean);
+      const parts = significantNameParts(normalizeMvpLookupName(option.name));
       return parts.at(-1) === savedSurname;
     });
     if (bySurname.length === 1) return bySurname[0];
     if (bySurname.length > 1) {
       const savedFirst = savedParts[0]!;
       const byFirstAndSurname = bySurname.filter((option) => {
-        const parts = normalizePlayerName(option.name).split(" ").filter(Boolean);
+        const parts = significantNameParts(normalizeMvpLookupName(option.name));
         return parts[0] === savedFirst;
       });
       if (byFirstAndSurname.length === 1) return byFirstAndSurname[0];
@@ -212,7 +227,7 @@ export function findMvpOptionBySaved<T extends MvpSelectablePlayer & { teamName:
   }
 
   const includesMatches = teamOptions.filter((option) => {
-    const normalizedOption = normalizePlayerName(option.name);
+    const normalizedOption = normalizeMvpLookupName(option.name);
     return normalizedSaved.includes(normalizedOption) || normalizedOption.includes(normalizedSaved);
   });
   if (includesMatches.length === 1) return includesMatches[0];

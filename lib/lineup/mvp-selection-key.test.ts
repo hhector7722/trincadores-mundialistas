@@ -136,6 +136,26 @@ test("findMvpOptionBySaved prioriza dorsal sobre nombre ambiguo", () => {
     "Raul Rangel"
   );
 });
+test("findMvpOptionBySaved no confunde Vinicius Jr con Neymar Jr", () => {
+  const options = [
+    {
+      key: "Brazil::10::neymar jr",
+      name: "Neymar Jr",
+      teamName: "Brazil",
+      shirtNumber: 10,
+    },
+    {
+      key: "Brazil::7::vinicius junior",
+      name: "Vinicius Junior",
+      teamName: "Brazil",
+      shirtNumber: 7,
+    },
+  ];
+
+  assert.equal(findMvpOptionBySaved(options, "Vinicius Jr", "Brazil")?.name, "Vinicius Junior");
+  assert.equal(findMvpOptionBySaved(options, "Neymar Jr", "Brazil")?.name, "Neymar Jr");
+});
+
 test("findMvpOptionBySaved no confunde jugadores con el mismo nombre de pila sin dorsal", () => {
   const options = [
     {
