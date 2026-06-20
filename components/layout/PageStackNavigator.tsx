@@ -62,7 +62,6 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
   displayedRef.current = children;
 
   const [transition, setTransition] = useState<PageTransition | null>(null);
-  const transitionStartedAtRef = useRef<number | null>(null);
 
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -105,37 +104,23 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
     stackRef.current = nextStack;
 
     if (direction === "push" || direction === "pop") {
-      transitionStartedAtRef.current = performance.now();
       setTransition({
         direction,
         outgoing: displayedRef.current,
         incoming: children,
       });
       prevPathRef.current = pathname;
-      return;
+
+      const timer = window.setTimeout(() => {
+        setTransition(null);
+      }, PAGE_PUSH_MS + 48);
+
+      return () => window.clearTimeout(timer);
     }
 
     prevPathRef.current = pathname;
     setTransition(null);
   }, [pathname, children]);
-
-  useEffect(() => {
-    if (!transition) return;
-
-    const startedAt = transitionStartedAtRef.current ?? performance.now();
-    const minDurationMs = PAGE_PUSH_MS + 48;
-    const elapsed = performance.now() - startedAt;
-    const minDelay = Math.max(0, minDurationMs - elapsed);
-
-    if (transition.direction === "push" && navPending) return;
-
-    const timer = window.setTimeout(() => {
-      setTransition(null);
-      transitionStartedAtRef.current = null;
-    }, minDelay);
-
-    return () => window.clearTimeout(timer);
-  }, [transition, navPending]);
 
   useEffect(() => {
     if (transition) return;
@@ -364,14 +349,6 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
         }}
       >
         {children}
-        {navPending && isStackSubpage(pathname) ? (
-          <div
-            className="tm-page-stack__pending-spinner pointer-events-none absolute inset-0 flex items-center justify-center"
-            aria-hidden
-          >
-            <div className="tm-spinner tm-spinner--sm" />
-          </div>
-        ) : null}
       </div>
     </div>
   );

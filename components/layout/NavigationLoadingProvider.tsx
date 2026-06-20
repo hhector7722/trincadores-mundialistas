@@ -12,7 +12,6 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useNavigationContentPending } from "@/lib/layout/navigation-content-pending";
 
 type NavigationLoadingContextValue = {
   navigate: (href: string) => void;
@@ -75,10 +74,6 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
   const [isPending, startTransition] = useTransition();
   const [tabPending, startTabTransition] = useTransition();
   const [navigating, setNavigating] = useState(false);
-  const routerTransitionPending = isPending || tabPending;
-  const contentPending = useNavigationContentPending(pathname, routerTransitionPending, children);
-  const navPending = isPending || contentPending;
-  const tabPendingEffective = tabPending || contentPending;
 
   const navigate = useCallback(
     (href: string) => {
@@ -103,13 +98,8 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
 
   useEffect(() => {
     pathnameRef.current = pathname;
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!navigating) return;
-    if (navPending) return;
     setNavigating(false);
-  }, [navPending, navigating]);
+  }, [pathname]);
 
   const handleCaptureClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
     const target = event.target;
@@ -122,11 +112,11 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     setNavigating(true);
   }, []);
 
-  const showLinkOverlay = navigating;
+  const showLinkOverlay = navigating && isPending;
 
   return (
     <NavigationLoadingContext.Provider
-      value={{ navigate, navigateTab, setNavigating, tabPending: tabPendingEffective, navPending }}
+      value={{ navigate, navigateTab, setNavigating, tabPending, navPending: isPending }}
     >
       <div className="contents" onClickCapture={handleCaptureClick}>
         {children}
