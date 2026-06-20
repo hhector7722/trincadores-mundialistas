@@ -67,8 +67,8 @@
   --tm-ios-ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --tm-page-push-ms: 360ms;
   --tm-panel-slide-ms: 350ms;
-  --tm-modal-enter-ms: 380ms;
-  --tm-modal-exit-ms: 280ms;
+  --tm-modal-enter-ms: 260ms;
+  --tm-modal-exit-ms: 220ms;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -335,7 +335,8 @@ html:has(.tm-tab-swipe-root) {
 }
 
 .tm-tab-swipe-adjacent-host,
-.tm-tab-swipe-adjacent-content {
+.tm-tab-swipe-adjacent-content,
+.tm-tab-swipe-incoming-live {
   min-height: 0;
   height: 100%;
 }
@@ -368,15 +369,54 @@ html:has(.tm-tab-swipe-root) {
   -webkit-backface-visibility: hidden;
 }
 
-.tm-page-stack__layer--enter-push {
-  animation: tm-page-enter-push var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+.tm-page-stack--dual {
+  overflow: hidden;
 }
 
-.tm-page-stack__layer--enter-pop {
-  animation: tm-page-enter-pop var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+.tm-page-stack__layer--base {
+  position: relative;
+  z-index: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes tm-page-enter-push {
+.tm-page-stack__layer--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tm-page-stack__layer--push-out {
+  animation: tm-page-push-out var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+.tm-page-stack__layer--push-in {
+  animation: tm-page-push-in var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+.tm-page-stack__layer--pop-out {
+  animation: tm-page-pop-out var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+.tm-page-stack__layer--pop-in {
+  animation: tm-page-pop-in var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+@keyframes tm-page-push-out {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes tm-page-push-in {
   from {
     transform: translate3d(100%, 0, 0);
   }
@@ -385,9 +425,18 @@ html:has(.tm-tab-swipe-root) {
   }
 }
 
-@keyframes tm-page-enter-pop {
+@keyframes tm-page-pop-out {
   from {
-    transform: translate3d(-28%, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes tm-page-pop-in {
+  from {
+    transform: translate3d(-100%, 0, 0);
   }
   to {
     transform: translate3d(0, 0, 0);
@@ -425,7 +474,7 @@ html[data-page-back-dragging] body {
 
 .tm-modal-panel-host--hidden {
   opacity: 0;
-  transform: translate3d(0, 10px, 0) scale(0.97);
+  transform: translate3d(0, 6px, 0) scale(0.985);
   transition:
     opacity var(--tm-modal-exit-ms) var(--tm-ios-ease-out),
     transform var(--tm-modal-exit-ms) var(--tm-ios-ease-out);

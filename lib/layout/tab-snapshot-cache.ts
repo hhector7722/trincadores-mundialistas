@@ -1,10 +1,20 @@
 const tabSnapshots = new Map<string, HTMLElement>();
 
-/** Inicio tiene carrusel/vídeo dinámico: el snapshot clonado queda en slide 0 y parpadea al montar. */
-const SNAPSHOT_EXCLUDED_HREFS = new Set<string>(["/"]);
-
 export function canUseTabSnapshot(href: string): boolean {
-  return !SNAPSHOT_EXCLUDED_HREFS.has(href);
+  return href.length > 0;
+}
+
+function restoreSnapshotState(root: HTMLElement) {
+  const scrollLeft = root.dataset.carouselScrollLeft;
+  if (!scrollLeft) return;
+
+  const carousel = root.querySelector<HTMLElement>("[data-home-hero-carousel]");
+  if (!carousel) return;
+
+  const left = Number(scrollLeft);
+  if (!Number.isFinite(left)) return;
+
+  carousel.scrollLeft = left;
 }
 
 export function saveTabSnapshot(href: string, track: HTMLElement) {
@@ -19,7 +29,26 @@ export function saveTabSnapshot(href: string, track: HTMLElement) {
   for (const child of track.childNodes) {
     wrapper.appendChild(child.cloneNode(true));
   }
+
+  const carousel = track.querySelector<HTMLElement>("[data-home-hero-carousel]");
+  if (carousel) {
+    wrapper.dataset.carouselScrollLeft = String(carousel.scrollLeft);
+  }
+
   tabSnapshots.set(href, wrapper);
+}
+
+export function mountTabSnapshot(href: string, host: HTMLElement) {
+  const snap = getTabSnapshot(href);
+  if (!snap) {
+    host.replaceChildren();
+    return false;
+  }
+
+  const clone = snap.cloneNode(true) as HTMLElement;
+  host.replaceChildren(clone);
+  restoreSnapshotState(clone);
+  return true;
 }
 
 export function getTabSnapshot(href: string): HTMLElement | null {

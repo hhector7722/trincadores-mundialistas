@@ -87,6 +87,7 @@ export function HomeHeroCarousel({ matchHighlights }: HomeHeroCarouselProps) {
         </div>
         <div
           ref={scrollRef}
+          data-home-hero-carousel
           className={cn(
             "flex h-full min-h-0 w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
             !scrollReady && "invisible"

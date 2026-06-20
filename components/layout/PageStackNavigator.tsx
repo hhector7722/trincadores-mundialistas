@@ -18,6 +18,12 @@ type PageStackNavigatorProps = {
   children: ReactNode;
 };
 
+type PageTransition = {
+  direction: "push" | "pop";
+  outgoing: ReactNode;
+  incoming: ReactNode;
+};
+
 const EDGE_ZONE_PX = 28;
 const LOCK_THRESHOLD_PX = 6;
 const COMMIT_RATIO = 0.34;
@@ -50,9 +56,10 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
   const router = useRouter();
   const stackRef = useRef<string[]>([pathname]);
   const prevPathRef = useRef(pathname);
+  const displayedRef = useRef(children);
+  displayedRef.current = children;
 
-  const [navDirection, setNavDirection] = useState<PageNavDirection>("none");
-  const [navKey, setNavKey] = useState(0);
+  const [transition, setTransition] = useState<PageTransition | null>(null);
 
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -67,7 +74,7 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const dragXRef = useRef(0);
 
-  const edgeBackEnabled = isStackSubpage(pathname);
+  const edgeBackEnabled = isStackSubpage(pathname) && transition == null;
 
   useEffect(() => {
     const root = layerRef.current;
@@ -93,26 +100,30 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
 
     const { direction, nextStack } = resolvePageNavDirection(stackRef.current, pathname);
     stackRef.current = nextStack;
-    prevPathRef.current = pathname;
 
-    if (direction === "none" || direction === "tab") {
-      setNavDirection("none");
-      return;
+    if (direction === "push" || direction === "pop") {
+      setTransition({
+        direction,
+        outgoing: displayedRef.current,
+        incoming: children,
+      });
+      prevPathRef.current = pathname;
+
+      const timer = window.setTimeout(() => {
+        setTransition(null);
+      }, PAGE_PUSH_MS + 48);
+
+      return () => window.clearTimeout(timer);
     }
 
-    setNavDirection(direction);
-    setNavKey((value) => value + 1);
-  }, [pathname]);
+    prevPathRef.current = pathname;
+    setTransition(null);
+  }, [pathname, children]);
 
   useEffect(() => {
-    if (navDirection === "none") return;
-
-    const timer = window.setTimeout(() => {
-      setNavDirection("none");
-    }, PAGE_PUSH_MS + 40);
-
-    return () => window.clearTimeout(timer);
-  }, [navDirection, navKey]);
+    if (transition) return;
+    displayedRef.current = children;
+  }, [children, transition]);
 
   useEffect(() => {
     setPageBackDragging(isDragging);
@@ -271,6 +282,33 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
   const showEdgeShadow = isDragging || animatingBack;
   const slideTransition = isDragging ? "none" : iosTransition("transform", PAGE_PUSH_MS);
 
+  if (transition) {
+    return (
+      <div className="tm-page-stack tm-page-stack--dual relative min-h-0 min-w-0 flex-1">
+        <div
+          className={cn(
+            "tm-page-stack__layer tm-page-stack__layer--base",
+            transition.direction === "push"
+              ? "tm-page-stack__layer--push-out"
+              : "tm-page-stack__layer--pop-out"
+          )}
+        >
+          {transition.outgoing}
+        </div>
+        <div
+          className={cn(
+            "tm-page-stack__layer tm-page-stack__layer--overlay",
+            transition.direction === "push"
+              ? "tm-page-stack__layer--push-in"
+              : "tm-page-stack__layer--pop-in"
+          )}
+        >
+          {transition.incoming}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -293,13 +331,8 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
       ) : null}
 
       <div
-        key={`${pathname}-${navKey}`}
         ref={layerRef}
-        className={cn(
-          "tm-page-stack__layer relative z-[1] flex min-h-0 w-full flex-1 flex-col will-change-transform",
-          navDirection === "push" && "tm-page-stack__layer--enter-push",
-          navDirection === "pop" && "tm-page-stack__layer--enter-pop"
-        )}
+        className="tm-page-stack__layer relative z-[1] flex min-h-0 w-full flex-1 flex-col will-change-transform"
         style={{
           transform: dragX > 0 ? `translate3d(${dragX}px, 0, 0)` : undefined,
           transition: dragX > 0 ? slideTransition : undefined,

@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { TabAdjacentPanel } from "@/components/layout/TabAdjacentPanel";
+import { TabAdjacentPanel, TabTransitionIncoming } from "@/components/layout/TabAdjacentPanel";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import {
@@ -33,16 +33,11 @@ import {
 } from "@/lib/layout/tab-swipe";
 import { cn } from "@/lib/utils";
 
-/** Distancia mínima para confirmar cambio de pestaña (ratio del ancho). */
 const COMMIT_RATIO = 0.14;
-/** Flick horizontal suficiente para cambiar sin recorrer mucho. */
 const VELOCITY_THRESHOLD = 0.28;
-/** Resistencia en el primer/último tab (0–1, más alto = más suave). */
 const EDGE_RESISTANCE = 0.58;
 const LOCK_THRESHOLD_PX = 5;
-/** Zona lateral donde el swipe horizontal tiene prioridad (px). */
 const EDGE_ZONE_PX = 44;
-/** Desde el centro hace falta un gesto más horizontal para robar el scroll vertical. */
 const AXIS_Y_RATIO_CENTER = 1.65;
 const AXIS_Y_RATIO_EDGE = 1.05;
 
@@ -97,6 +92,9 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const { setSwipeProgress, registerTabNavigator, setShellPathnameOverride } = useTabNavigation();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const childrenRef = useRef(children);
+  childrenRef.current = children;
+
   const activeIndex = getMainTabIndex(pathname);
   const enabled = !previewMode && isExactMainTabRoot(pathname) && activeIndex != null;
 
@@ -105,7 +103,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [snapshotVersion, setSnapshotVersion] = useState(0);
   const [commitActive, setCommitActive] = useState(false);
-  const [navigateDispatched, setNavigateDispatched] = useState(false);
+  const [frozenOutgoing, setFrozenOutgoing] = useState<ReactNode | null>(null);
+  const [transitionHref, setTransitionHref] = useState<string | null>(null);
 
   const dragXRef = useRef(0);
   const widthRef = useRef(0);
@@ -117,7 +116,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const lockedAxisRef = useRef<"none" | "x" | "y">("none");
   const navigatingRef = useRef(false);
   const animatingRef = useRef(false);
-  const commitTargetHrefRef = useRef<string | null>(null);
+  const commitIncomingSideRef = useRef<"left" | "right">("right");
   const commitFromIndexRef = useRef<number | null>(null);
 
   const syncDrag = useCallback(
@@ -226,7 +225,9 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [activeIndex, enabled, router]);
 
   useEffect(() => {
-    if (!enabled || isDragging || navigatingRef.current || animatingRef.current) return;
+    if (!enabled || isDragging || navigatingRef.current || animatingRef.current || commitActive) {
+      return;
+    }
     const track = trackRef.current;
     if (!track || activeIndex == null) return;
     const href = MAIN_TABS[activeIndex]?.href;
@@ -238,7 +239,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [activeIndex, enabled, isDragging, pathname]);
+  }, [activeIndex, commitActive, enabled, isDragging, pathname]);
 
   const animateTo = useCallback(
     (target: number, onDone?: () => void) => {
@@ -285,6 +286,15 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     [syncDrag]
   );
 
+  const finishCommit = useCallback(() => {
+    commitFromIndexRef.current = null;
+    setFrozenOutgoing(null);
+    setTransitionHref(null);
+    setShellPathnameOverride(null);
+    setCommitActive(false);
+    resetSwipe();
+  }, [resetSwipe, setShellPathnameOverride]);
+
   const commitToIndex = useCallback(
     (nextIndex: number) => {
       if (navigatingRef.current || animatingRef.current) return;
@@ -305,31 +315,29 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
 
       router.prefetch(href);
 
-      if (width <= 0) {
-        setNavigateDispatched(true);
-        setShellPathnameOverride(href);
-        setCommitActive(true);
-        commitTargetHrefRef.current = href;
-        navigateTab(href);
-        return;
-      }
-
       const direction = nextIndex > activeIndex ? -1 : 1;
-      commitTargetHrefRef.current = href;
+      commitIncomingSideRef.current = direction === -1 ? "right" : "left";
       commitFromIndexRef.current = activeIndex;
-      setNavigateDispatched(false);
+
+      setFrozenOutgoing(childrenRef.current);
+      setTransitionHref(href);
       setShellPathnameOverride(href);
       setCommitActive(true);
       navigatingRef.current = true;
       setSwipeNavigating(true);
 
+      navigateTab(href);
+
+      if (width <= 0) {
+        navigatingRef.current = false;
+        return;
+      }
+
       animateTo(direction * width, () => {
-        setNavigateDispatched(true);
-        navigateTab(href);
         navigatingRef.current = false;
       });
     },
-    [activeIndex, animateTo, navigateTab, resetSwipe, router, setShellPathnameOverride]
+    [activeIndex, animateTo, navigateTab, pathname, resetSwipe, router, setShellPathnameOverride]
   );
 
   useEffect(() => {
@@ -343,22 +351,16 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [commitToIndex, enabled, registerTabNavigator]);
 
   useLayoutEffect(() => {
-    if (!commitActive) return;
+    if (!commitActive || !transitionHref) return;
+    if (!isMainTabActive(pathname, transitionHref)) return;
+    if (tabPending || animating || navigatingRef.current) return;
 
-    const targetHref = commitTargetHrefRef.current;
-    if (!targetHref || !isMainTabActive(pathname, targetHref)) return;
+    const frame = window.requestAnimationFrame(() => {
+      finishCommit();
+    });
 
-    syncDrag(0);
-
-    if (tabPending) return;
-
-    commitTargetHrefRef.current = null;
-    commitFromIndexRef.current = null;
-    setNavigateDispatched(false);
-    setShellPathnameOverride(null);
-    setCommitActive(false);
-    resetSwipe();
-  }, [commitActive, pathname, resetSwipe, setShellPathnameOverride, syncDrag, tabPending]);
+    return () => window.cancelAnimationFrame(frame);
+  }, [animating, commitActive, finishCommit, pathname, tabPending, transitionHref]);
 
   useEffect(() => {
     if (commitActive || navigatingRef.current || isDragging || animatingRef.current) return;
@@ -398,7 +400,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   }, [activeIndex, animateTo, commitToIndex, resetSwipe]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!enabled || animating || navigatingRef.current || isModalOpen()) return;
+    if (!enabled || animating || navigatingRef.current || commitActive || isModalOpen()) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!canStartSwipe(event.target)) return;
 
@@ -420,7 +422,8 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       pointerIdRef.current !== event.pointerId ||
       !enabled ||
       animating ||
-      navigatingRef.current
+      navigatingRef.current ||
+      commitActive
     ) {
       return;
     }
@@ -469,20 +472,19 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     return <div className="tm-tab-swipe-root min-h-0 min-w-0 flex-1">{children}</div>;
   }
 
-  const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(
+  const inCommitTransition = commitActive && frozenOutgoing != null && transitionHref != null;
+  const incomingReady =
+    transitionHref != null && isMainTabActive(pathname, transitionHref) && !tabPending;
+
+  const neighborIndex =
     commitActive && commitFromIndexRef.current != null
       ? commitFromIndexRef.current
-      : activeIndex
-  );
+      : activeIndex;
+  const { left: leftIndex, right: rightIndex } = getMainTabBarNeighbors(neighborIndex);
   const prevTab = leftIndex != null ? MAIN_TABS[leftIndex] : null;
   const nextTab = rightIndex != null ? MAIN_TABS[rightIndex] : null;
-  const commitTargetHref = commitTargetHrefRef.current;
-  const reachedCommitTarget =
-    commitActive &&
-    commitTargetHref != null &&
-    isMainTabActive(pathname, commitTargetHref);
-  const visualDragX = reachedCommitTarget ? 0 : dragX;
-  const showAdjacentPanels = (isDragging || animating) && !navigateDispatched && !reachedCommitTarget;
+
+  const showAdjacentPanels = (isDragging || animating) && !inCommitTransition;
   const slideTransition = animating
     ? `transform ${TAB_SWIPE_ANIMATION_MS}ms ${TAB_SWIPE_EASING}`
     : "none";
@@ -499,11 +501,22 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       onPointerUp={onPointerEnd}
       onPointerCancel={onPointerEnd}
     >
+      {inCommitTransition ? (
+        <TabTransitionIncoming
+          href={transitionHref}
+          dragX={dragX}
+          side={commitIncomingSideRef.current}
+          animating={animating}
+          liveContent={children}
+          liveReady={incomingReady}
+        />
+      ) : null}
+
       {showAdjacentPanels && prevTab ? (
         <TabAdjacentPanel
           key={`${prevTab.href}-${snapshotVersion}`}
           href={prevTab.href}
-          dragX={visualDragX}
+          dragX={dragX}
           animating={animating}
           side="left"
         />
@@ -513,7 +526,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
         <TabAdjacentPanel
           key={`${nextTab.href}-${snapshotVersion}`}
           href={nextTab.href}
-          dragX={visualDragX}
+          dragX={dragX}
           animating={animating}
           side="right"
         />
@@ -522,15 +535,15 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
       <div
         ref={trackRef}
         className={cn(
-          "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-transparent will-change-transform",
-          !animating && visualDragX === 0 && "transform-gpu"
+          "tm-tab-swipe-track relative z-[1] flex h-full min-h-0 w-full flex-col bg-[var(--tm-purple-deep)] will-change-transform",
+          !animating && dragX === 0 && "transform-gpu"
         )}
         style={{
-          transform: `translate3d(${visualDragX}px, 0, 0)`,
-          transition: reachedCommitTarget ? "none" : slideTransition,
+          transform: `translate3d(${dragX}px, 0, 0)`,
+          transition: slideTransition,
         }}
       >
-        {children}
+        {inCommitTransition ? frozenOutgoing : children}
       </div>
     </div>
   );

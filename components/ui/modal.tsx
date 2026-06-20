@@ -380,9 +380,7 @@ export function Modal({
   useEffect(() => {
     if (open) {
       setMounted(true);
-      const frame = window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => setVisible(true));
-      });
+      const frame = window.requestAnimationFrame(() => setVisible(true));
       return () => window.cancelAnimationFrame(frame);
     }
 
