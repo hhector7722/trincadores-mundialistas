@@ -1,23 +1,31 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { getMainTabSectionIndex } from "@/lib/layout/main-tabs";
+import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 
-function shouldShowHomeAtmosphere(pathname: string): boolean {
-  return getMainTabSectionIndex(pathname) != null;
+const HOME_TAB_INDEX = 2;
+
+function getHomeAtmosphereOpacity(pathname: string, swipeProgress: number | null): number {
+  if (swipeProgress != null) {
+    return Math.max(0, Math.min(1, 1 - Math.abs(swipeProgress - HOME_TAB_INDEX)));
+  }
+  return pathname === "/" ? 1 : 0;
 }
 
 export function HomeAtmosphere() {
   const pathname = usePathname();
-  const visible = shouldShowHomeAtmosphere(pathname);
+  const { swipeProgress } = useTabNavigation();
+  const opacity = getHomeAtmosphereOpacity(pathname, swipeProgress);
+  const isDragging =
+    swipeProgress != null && Math.abs(swipeProgress - Math.round(swipeProgress)) > 0.02;
 
   return (
     <div
       className="tm-home-atmosphere"
-      data-active={visible ? "true" : "false"}
+      data-active={opacity > 0.02 ? "true" : "false"}
       style={{
-        opacity: visible ? 1 : 0,
-        transition: "opacity 320ms ease-out",
+        opacity,
+        transition: isDragging ? "none" : "opacity 320ms ease-out",
       }}
       aria-hidden="true"
     >
