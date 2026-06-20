@@ -38,6 +38,9 @@ const PLOT_START_X = 68;
 const LABEL_OFFSET = 14;
 const ALIAS_FONT_SIZE = 8;
 const ALIAS_MAX_CHARS = 10;
+/** Trazo fino: muchas series cruzadas en el mismo plot. */
+const LINE_STROKE_WIDTH = 1.25;
+const NODE_RADIUS = 2.5;
 
 /** Slots de la tabla (pool fijo de participantes). */
 export const RANKING_EVOLUTION_MEMBER_SLOTS = 11;
@@ -237,7 +240,7 @@ export function RankingEvolutionChart({
             d={pathParts.join(" ")}
             fill="none"
             stroke={item.color}
-            strokeWidth={2.5}
+            strokeWidth={LINE_STROKE_WIDTH}
             strokeLinejoin="round"
             strokeLinecap="round"
           />
@@ -348,10 +351,10 @@ export function RankingEvolutionChart({
             <circle
               cx={point.x}
               cy={point.y}
-              r={3.5}
+              r={NODE_RADIUS}
               fill={item.color}
               stroke={CHART_BG}
-              strokeWidth={1}
+              strokeWidth={0.75}
             />
           </g>
         ))
