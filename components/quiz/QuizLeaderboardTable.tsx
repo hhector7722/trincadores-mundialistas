@@ -3,6 +3,8 @@ import { QUIZ_RANKING_GRID } from "@/components/quiz/quiz-ranking-grid";
 import type { QuizLeaderboardRow as QuizLeaderboardRowType } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 
+const EMPTY_ROW_COUNT = 11;
+
 function QuizLeaderboardHeader() {
   return (
     <div
@@ -19,6 +21,26 @@ function QuizLeaderboardHeader() {
   );
 }
 
+function QuizLeaderboardEmptyRow() {
+  return (
+    <div
+      className={cn(
+        QUIZ_RANKING_GRID,
+        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 last:border-0"
+      )}
+      aria-hidden="true"
+    >
+      <span />
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="size-9 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
+        <span className="min-w-0 flex-1 truncate">&nbsp;</span>
+      </div>
+      <span />
+      <span />
+    </div>
+  );
+}
+
 type QuizLeaderboardTableProps = {
   rows: QuizLeaderboardRowType[];
   currentProfileId: string;
@@ -29,16 +51,20 @@ export function QuizLeaderboardTable({
   currentProfileId,
 }: QuizLeaderboardTableProps) {
   return (
-    <div className="tm-quiz-leaderboard-table">
+    <div className="tm-ranking-table">
       <QuizLeaderboardHeader />
-      <div className="tm-quiz-leaderboard-body">
-        {rows.map((row) => (
-          <QuizLeaderboardRow
-            key={row.profileId}
-            row={row}
-            isCurrentUser={row.profileId === currentProfileId}
-          />
-        ))}
+      <div className="tm-ranking-body">
+        {rows.length === 0
+          ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
+              <QuizLeaderboardEmptyRow key={`empty-${index}`} />
+            ))
+          : rows.map((row) => (
+              <QuizLeaderboardRow
+                key={row.profileId}
+                row={row}
+                isCurrentUser={row.profileId === currentProfileId}
+              />
+            ))}
       </div>
     </div>
   );

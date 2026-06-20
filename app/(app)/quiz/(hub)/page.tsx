@@ -1,5 +1,4 @@
-﻿import { QuizHub } from "@/components/quiz/QuizHub";
-import { QuizPageShell } from "@/components/quiz/QuizPageShell";
+import { QuizHub } from "@/components/quiz/QuizHub";
 import { getQuizDayHub, getQuizLeaderboard } from "@/lib/quiz/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
@@ -19,12 +18,12 @@ export default async function QuizPage() {
   ]);
 
   return (
-    <QuizPageShell variant="hub">
+    <div className="tm-ranking-page">
       <QuizHub
         hub={hub}
         leaderboardRows={leaderboardRows}
         currentProfileId={user!.id}
       />
-    </QuizPageShell>
+    </div>
   );
 }

@@ -16,7 +16,7 @@ export function QuizLeaderboardRow({
     <div
       className={cn(
         QUIZ_RANKING_GRID,
-        "tm-quiz-leaderboard-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
       )}
     >
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">

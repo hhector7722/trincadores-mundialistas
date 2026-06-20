@@ -43,11 +43,6 @@ export function AppHeaderGate({ ctx }: { ctx: AppShellContext }) {
               ? "Perfil"
               : undefined
       }
-      titleClassName={
-        isQuizHub
-          ? "whitespace-nowrap px-8 text-[clamp(0.5625rem,2.65vw,1rem)] leading-none"
-          : undefined
-      }
     />
   );
 }
