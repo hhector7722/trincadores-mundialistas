@@ -32,7 +32,7 @@ export function QuizHub({ hub, leaderboardRows, currentProfileId }: QuizHubProps
         currentProfileId={currentProfileId}
       />
 
-      <div className="tm-ranking-evolution-trigger flex shrink-0 flex-col items-center gap-2 pt-2">
+      <div className="tm-ranking-evolution-trigger flex shrink-0 flex-col items-center gap-2 pt-1 -translate-y-1">
         <button
           type="button"
           onClick={requestQuizEntry}
