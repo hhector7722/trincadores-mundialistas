@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AvatarPreviewModal } from "@/components/profile/AvatarPreviewModal";
+import { useMemo, type KeyboardEvent, type MouseEvent } from "react";
 import type { RankingEvolutionData } from "@/lib/ranking/evolution";
 
 const LINE_COLORS = [
@@ -40,7 +39,11 @@ const ALIAS_FONT_SIZE = 8;
 const ALIAS_MAX_CHARS = 10;
 /** Trazo fino: muchas series cruzadas en el mismo plot. */
 const LINE_STROKE_WIDTH = 1.25;
+const HIGHLIGHTED_STROKE_WIDTH = 2;
 const NODE_RADIUS = 2.5;
+/** Opacidad de series no seleccionadas cuando hay un usuario resaltado. */
+const FADED_SERIES_OPACITY = 0.12;
+const FADED_AVATAR_OPACITY = 0.35;
 
 /** Slots de la tabla (pool fijo de participantes). */
 export const RANKING_EVOLUTION_MEMBER_SLOTS = 11;
@@ -87,19 +90,90 @@ function buildColorMap(members: RankingEvolutionData["members"]): Map<string, st
   return map;
 }
 
+function seriesVisualState(
+  profileId: string,
+  highlightedProfileId: string | null
+): { opacity: number; strokeWidth: number } {
+  if (!highlightedProfileId) {
+    return { opacity: 1, strokeWidth: LINE_STROKE_WIDTH };
+  }
+  if (profileId === highlightedProfileId) {
+    return { opacity: 1, strokeWidth: HIGHLIGHTED_STROKE_WIDTH };
+  }
+  return { opacity: FADED_SERIES_OPACITY, strokeWidth: LINE_STROKE_WIDTH };
+}
+
+function avatarVisualOpacity(
+  profileId: string,
+  highlightedProfileId: string | null
+): number {
+  if (!highlightedProfileId || profileId === highlightedProfileId) {
+    return 1;
+  }
+  return FADED_AVATAR_OPACITY;
+}
+
 type RankingEvolutionChartProps = {
   data: RankingEvolutionData;
   endMatchdayIndex: number;
+  highlightedProfileId: string | null;
+  onHighlightProfileId: (profileId: string) => void;
 };
+
+function renderSeriesLine(item: ChartSeries, highlightedProfileId: string | null) {
+  const pathParts = [`M ${AVATAR_X} ${item.initialY}`];
+  for (const point of item.points) {
+    pathParts.push(`L ${point.x} ${point.y}`);
+  }
+  const { opacity, strokeWidth } = seriesVisualState(item.profileId, highlightedProfileId);
+
+  return (
+    <path
+      key={`line-${item.profileId}`}
+      d={pathParts.join(" ")}
+      fill="none"
+      stroke={item.color}
+      strokeWidth={strokeWidth}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      opacity={opacity}
+    />
+  );
+}
+
+function renderSeriesNodes(item: ChartSeries, highlightedProfileId: string | null) {
+  const { opacity } = seriesVisualState(item.profileId, highlightedProfileId);
+
+  return item.points.map((point, pointIndex) => (
+    <g key={`node-${item.profileId}-${pointIndex}`} opacity={opacity}>
+      <text
+        x={point.x}
+        y={point.y - LABEL_OFFSET}
+        textAnchor="middle"
+        fill={item.color}
+        fontSize={10}
+        fontWeight={700}
+      >
+        {point.position}
+      </text>
+      <circle
+        cx={point.x}
+        cy={point.y}
+        r={NODE_RADIUS}
+        fill={item.color}
+        stroke={CHART_BG}
+        strokeWidth={0.75}
+      />
+    </g>
+  ));
+}
 
 export function RankingEvolutionChart({
   data,
   endMatchdayIndex,
+  highlightedProfileId,
+  onHighlightProfileId,
 }: RankingEvolutionChartProps) {
-  const [previewAvatar, setPreviewAvatar] = useState<{
-    avatarUrl: string;
-    label: string;
-  } | null>(null);
   const memberCount = data.members.length;
   const chartHeight = chartHeightForMemberCount(memberCount);
 
@@ -122,32 +196,32 @@ export function RankingEvolutionChart({
         : MARGIN_TOP + ((position - 1) / (count - 1)) * plotH;
 
     const builtSeries: ChartSeries[] = data.members.map((member) => {
-        const color = colorMap.get(member.profileId) ?? LINE_COLORS[0]!;
-        const initialStanding = data.initialStandings.find(
-          (row) => row.profileId === member.profileId
-        );
-        const initialPosition = initialStanding?.position ?? count;
-        const initialY = yAt(initialPosition);
+      const color = colorMap.get(member.profileId) ?? LINE_COLORS[0]!;
+      const initialStanding = data.initialStandings.find(
+        (row) => row.profileId === member.profileId
+      );
+      const initialPosition = initialStanding?.position ?? count;
+      const initialY = yAt(initialPosition);
 
-        const points = visiblePoints.map((point, index) => {
-          const standing = point.standings.find((row) => row.profileId === member.profileId);
-          const position = standing?.position ?? count;
-          return {
-            x: xAt(index),
-            y: yAt(position),
-            position,
-          };
-        });
-
+      const points = visiblePoints.map((point, index) => {
+        const standing = point.standings.find((row) => row.profileId === member.profileId);
+        const position = standing?.position ?? count;
         return {
-          profileId: member.profileId,
-          label: member.label,
-          avatarUrl: member.avatarUrl,
-          color,
-          initialY,
-          points,
+          x: xAt(index),
+          y: yAt(position),
+          position,
         };
       });
+
+      return {
+        profileId: member.profileId,
+        label: member.label,
+        avatarUrl: member.avatarUrl,
+        color,
+        initialY,
+        points,
+      };
+    });
 
     return {
       plotWidth: plotW,
@@ -165,8 +239,22 @@ export function RankingEvolutionChart({
     );
   }
 
+  const backgroundSeries = highlightedProfileId
+    ? series.filter((item) => item.profileId !== highlightedProfileId)
+    : series;
+  const foregroundSeries = highlightedProfileId
+    ? series.filter((item) => item.profileId === highlightedProfileId)
+    : [];
+
+  const handleAvatarActivate = (
+    event: MouseEvent | KeyboardEvent,
+    profileId: string
+  ) => {
+    event.stopPropagation();
+    onHighlightProfileId(profileId);
+  };
+
   return (
-    <>
     <svg
       viewBox={`0 0 ${CHART_WIDTH} ${chartHeight}`}
       width="100%"
@@ -212,8 +300,7 @@ export function RankingEvolutionChart({
           visibleMatchdays.length <= 1
             ? PLOT_START_X + plotWidth / 2
             : PLOT_START_X + (index / (visibleMatchdays.length - 1)) * plotWidth;
-        const matchdayLabelY =
-          MARGIN_TOP + plotHeight + PLOT_LABEL_GAP + 10;
+        const matchdayLabelY = MARGIN_TOP + plotHeight + PLOT_LABEL_GAP + 10;
         return (
           <text
             key={`x-label-${matchday.id}`}
@@ -229,65 +316,46 @@ export function RankingEvolutionChart({
         );
       })}
 
-      {series.map((item) => {
-        const pathParts = [`M ${AVATAR_X} ${item.initialY}`];
-        for (const point of item.points) {
-          pathParts.push(`L ${point.x} ${point.y}`);
-        }
-        return (
-          <path
-            key={`line-${item.profileId}`}
-            d={pathParts.join(" ")}
-            fill="none"
-            stroke={item.color}
-            strokeWidth={LINE_STROKE_WIDTH}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-        );
-      })}
+      {backgroundSeries.map((item) => renderSeriesLine(item, highlightedProfileId))}
+      {foregroundSeries.map((item) => renderSeriesLine(item, highlightedProfileId))}
 
       {series.map((item) => {
         const aliasY = item.initialY + AVATAR_RADIUS + 10;
-        const canPreview = Boolean(item.avatarUrl);
+        const isHighlighted = highlightedProfileId === item.profileId;
+        const avatarOpacity = avatarVisualOpacity(item.profileId, highlightedProfileId);
 
         return (
-          <g key={`avatar-${item.profileId}`}>
+          <g key={`avatar-${item.profileId}`} opacity={avatarOpacity}>
             <g
-              role={canPreview ? "button" : undefined}
-              tabIndex={canPreview ? 0 : undefined}
-              aria-label={canPreview ? `Ver avatar de ${item.label}` : undefined}
-              style={{ cursor: canPreview ? "pointer" : undefined }}
-              onClick={
-                canPreview
-                  ? () =>
-                      setPreviewAvatar({
-                        avatarUrl: item.avatarUrl!,
-                        label: item.label,
-                      })
-                  : undefined
-              }
-              onKeyDown={
-                canPreview
-                  ? (event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        setPreviewAvatar({
-                          avatarUrl: item.avatarUrl!,
-                          label: item.label,
-                        });
-                      }
-                    }
-                  : undefined
-              }
+              role="button"
+              tabIndex={0}
+              aria-label={`Resaltar evolucion de ${item.label}`}
+              aria-pressed={isHighlighted}
+              style={{ cursor: "pointer" }}
+              onClick={(event) => handleAvatarActivate(event, item.profileId)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  handleAvatarActivate(event, item.profileId);
+                }
+              }}
             >
-              {canPreview ? (
+              <circle
+                cx={AVATAR_X}
+                cy={item.initialY}
+                r={24}
+                fill="transparent"
+                pointerEvents="all"
+              />
+              {isHighlighted ? (
                 <circle
                   cx={AVATAR_X}
                   cy={item.initialY}
-                  r={24}
-                  fill="transparent"
-                  pointerEvents="all"
+                  r={AVATAR_RADIUS + 2}
+                  fill="none"
+                  stroke={item.color}
+                  strokeWidth={2}
+                  pointerEvents="none"
                 />
               ) : null}
               {item.avatarUrl ? (
@@ -299,6 +367,7 @@ export function RankingEvolutionChart({
                   height={AVATAR_RADIUS * 2}
                   clipPath={`url(#evo-clip-${item.profileId})`}
                   preserveAspectRatio="xMidYMid slice"
+                  pointerEvents="none"
                 />
               ) : (
                 <>
@@ -307,6 +376,7 @@ export function RankingEvolutionChart({
                     cy={item.initialY}
                     r={AVATAR_RADIUS}
                     fill="var(--tm-surface-elevated)"
+                    pointerEvents="none"
                   />
                   <text
                     x={AVATAR_X}
@@ -315,6 +385,7 @@ export function RankingEvolutionChart({
                     fill="rgba(255,255,255,0.85)"
                     fontSize={9}
                     fontWeight={700}
+                    pointerEvents="none"
                   >
                     {avatarInitials(item.label)}
                   </text>
@@ -328,6 +399,7 @@ export function RankingEvolutionChart({
               fill="rgba(255,255,255,0.7)"
               fontSize={ALIAS_FONT_SIZE}
               fontWeight={500}
+              pointerEvents="none"
             >
               {aliasShortLabel(item.label)}
             </text>
@@ -335,39 +407,8 @@ export function RankingEvolutionChart({
         );
       })}
 
-      {series.flatMap((item) =>
-        item.points.map((point, pointIndex) => (
-          <g key={`node-${item.profileId}-${pointIndex}`}>
-            <text
-              x={point.x}
-              y={point.y - LABEL_OFFSET}
-              textAnchor="middle"
-              fill={item.color}
-              fontSize={10}
-              fontWeight={700}
-            >
-              {point.position}
-            </text>
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r={NODE_RADIUS}
-              fill={item.color}
-              stroke={CHART_BG}
-              strokeWidth={0.75}
-            />
-          </g>
-        ))
-      )}
+      {backgroundSeries.flatMap((item) => renderSeriesNodes(item, highlightedProfileId))}
+      {foregroundSeries.flatMap((item) => renderSeriesNodes(item, highlightedProfileId))}
     </svg>
-    {previewAvatar ? (
-      <AvatarPreviewModal
-        open
-        onClose={() => setPreviewAvatar(null)}
-        avatarUrl={previewAvatar.avatarUrl}
-        label={previewAvatar.label}
-      />
-    ) : null}
-    </>
   );
 }

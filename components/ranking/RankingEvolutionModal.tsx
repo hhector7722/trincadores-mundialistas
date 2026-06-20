@@ -35,6 +35,7 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [endMatchdayIndex, setEndMatchdayIndex] = useState(0);
+  const [highlightedProfileId, setHighlightedProfileId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -57,6 +58,10 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
     void loadData();
   }, [open, loadData]);
 
+  useEffect(() => {
+    if (!open) setHighlightedProfileId(null);
+  }, [open]);
+
   const hasMatchdayData = Boolean(data && data.matchdays.length > 0);
   const showFullLayout = loading || hasMatchdayData;
   const chartHeightPx = data
@@ -73,7 +78,10 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
       loading={loading}
       scrollContent={false}
     >
-      <div className="flex flex-col gap-3 px-3 pt-1 pb-0">
+      <div
+        className="flex flex-col gap-3 px-3 pt-1 pb-0"
+        onClick={() => setHighlightedProfileId(null)}
+      >
         {error ? (
           <p className="shrink-0 text-center text-sm text-red-400">{error}</p>
         ) : null}
@@ -83,7 +91,12 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
           style={showFullLayout ? { minHeight: chartHeightPx + 4 } : undefined}
         >
           {hasMatchdayData ? (
-            <RankingEvolutionChart data={data!} endMatchdayIndex={endMatchdayIndex} />
+            <RankingEvolutionChart
+              data={data!}
+              endMatchdayIndex={endMatchdayIndex}
+              highlightedProfileId={highlightedProfileId}
+              onHighlightProfileId={setHighlightedProfileId}
+            />
           ) : showFullLayout ? (
             <div
               className="w-full"
