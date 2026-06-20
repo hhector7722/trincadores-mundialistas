@@ -60,15 +60,26 @@ export function MatchContextActionsRow({
 }: MatchContextActionsRowProps) {
   if (layout === "homeCardScheduledStacked") {
     return (
-      <div className={cn("flex h-full w-full flex-col items-stretch justify-evenly gap-0 leading-none", className)}>
-        <div className="flex h-max w-full shrink-0 items-center justify-center">{centerSlot}</div>
+      <div
+        className={cn(
+          "pointer-events-none flex h-full w-full flex-col items-stretch justify-evenly gap-0 leading-none",
+          className,
+        )}
+      >
+        <div className="pointer-events-auto flex h-max w-full shrink-0 items-center justify-center">
+          {centerSlot}
+        </div>
         {predictionSlot ? (
-          <div className="flex w-full shrink-0 items-center justify-center">{predictionSlot}</div>
+          <div className="pointer-events-auto flex w-full shrink-0 items-center justify-center">
+            {predictionSlot}
+          </div>
         ) : null}
         {bottomSlot ? (
-          <div className="flex w-full shrink-0 items-center justify-center">{bottomSlot}</div>
+          <div className="pointer-events-auto flex w-full shrink-0 items-center justify-center">
+            {bottomSlot}
+          </div>
         ) : hidePossibleLineups ? null : (
-          <div className="flex shrink-0 items-center justify-center px-1">
+          <div className="pointer-events-auto flex shrink-0 items-center justify-center px-1">
             <MatchContextActionButton
               caption={possibleLineupsCaption}
               hideCaption={compact}

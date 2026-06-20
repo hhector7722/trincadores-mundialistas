@@ -372,7 +372,7 @@ export function HomeMatchCard({
 
         <div
           className={cn(
-            "absolute inset-x-0 pointer-events-none",
+            "pointer-events-none absolute inset-x-0 z-[4]",
             HOME_CARD_SCHEDULED_ACTIONS_TOP_CLASS,
             HOME_CARD_SCHEDULED_ACTIONS_STACKED_CLASS,
           )}
@@ -382,7 +382,7 @@ export function HomeMatchCard({
             layout="homeCardScheduledStacked"
             homeAnchor="15%"
             awayAnchor="85%"
-            className="pointer-events-auto h-full w-full"
+            className="h-full w-full"
               centerSlot={
                 saved ? (
                   <HomeScheduledPredictionScore
