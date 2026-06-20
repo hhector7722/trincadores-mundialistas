@@ -4,8 +4,8 @@ import { normalizeAlias } from "@/lib/text/normalize-alias";
 export const ACTIVE_QUIZ_RESEED_ANNOUNCEMENT = {
   quizDate: "2026-06-20",
   announcementId: "quiz-reseed-2026-06-20",
-  /** true = solo hector ve el modal (preview); false = todos los usuarios. */
-  hectorPreviewOnly: true,
+  /** Si tiene elementos, solo esos aliases ven el modal; vacío = todos los usuarios. */
+  previewUsernames: ["hector", "gabri", "dani"] as const,
 } as const;
 
 export function isActiveQuizReseedAnnouncement(quizDate: string): boolean {
@@ -18,8 +18,10 @@ export function shouldShowQuizReseedAnnouncement(
 ): boolean {
   if (!isActiveQuizReseedAnnouncement(quizDate)) return false;
 
-  if (ACTIVE_QUIZ_RESEED_ANNOUNCEMENT.hectorPreviewOnly) {
-    return normalizeAlias(username ?? "") === "hector";
+  const previewUsernames = ACTIVE_QUIZ_RESEED_ANNOUNCEMENT.previewUsernames;
+  if (previewUsernames.length > 0) {
+    const alias = normalizeAlias(username ?? "");
+    return previewUsernames.some((name) => normalizeAlias(name) === alias);
   }
 
   return true;
