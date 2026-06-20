@@ -121,8 +121,12 @@ type RankingEvolutionChartProps = {
 };
 
 function renderSeriesLine(item: ChartSeries, highlightedProfileId: string | null) {
-  const pathParts = [`M ${AVATAR_X} ${item.initialY}`];
-  for (const point of item.points) {
+  if (item.points.length === 0) return null;
+
+  const pathParts: string[] = [];
+  const [firstPoint, ...restPoints] = item.points;
+  pathParts.push(`M ${firstPoint!.x} ${firstPoint!.y}`);
+  for (const point of restPoints) {
     pathParts.push(`L ${point.x} ${point.y}`);
   }
   const { opacity, strokeWidth } = seriesVisualState(item.profileId, highlightedProfileId);
@@ -347,17 +351,6 @@ export function RankingEvolutionChart({
                 fill="transparent"
                 pointerEvents="all"
               />
-              {isHighlighted ? (
-                <circle
-                  cx={AVATAR_X}
-                  cy={item.initialY}
-                  r={AVATAR_RADIUS + 2}
-                  fill="none"
-                  stroke={item.color}
-                  strokeWidth={2}
-                  pointerEvents="none"
-                />
-              ) : null}
               {item.avatarUrl ? (
                 <image
                   href={item.avatarUrl}
