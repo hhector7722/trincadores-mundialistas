@@ -27,8 +27,9 @@ export function AppBrandTitle({
     return (
       <span
         className={cn(
-          "font-display uppercase tracking-wider text-[var(--tm-accent)]",
-          className
+          "font-brand uppercase tracking-[-0.03em] text-[var(--tm-accent)]",
+          brandTextClass,
+          className,
         )}
       >
         {title}

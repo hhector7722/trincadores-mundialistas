@@ -38,7 +38,9 @@ export function AppHeader({
       >
         <h1
           className={cn(
-            "font-display tracking-wider",
+            stackedTitle || title
+              ? "font-brand tracking-[-0.03em]"
+              : "font-display tracking-wider",
             stackedTitle
               ? "relative left-1/2 w-screen -translate-x-1/2 text-lg sm:text-xl"
               : "text-center text-base",
