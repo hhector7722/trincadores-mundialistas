@@ -224,22 +224,13 @@ html:has(.tm-app-header--compact) {
 
 .tm-app-main--internal-scroll {
   box-sizing: border-box;
-  height: calc(
-    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
-  );
-  min-height: calc(
-    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
-  );
-  max-height: calc(
-    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
-  );
+  height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
+  min-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
+  max-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
 }
 
 .tm-app-main--internal-scroll.tm-app-main--no-header {
   padding-top: env(safe-area-inset-top, 0px);
-  height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
-  min-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
-  max-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
 }
 
 .tm-app-main--internal-scroll .tm-tab-swipe-root {
@@ -1384,7 +1375,9 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-quiz-hub-actions {
-  padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(
+    var(--tm-tabbar-indicators-gap) + var(--tm-tabbar-indicators-row) + 0.25rem
+  );
 }
 
 .tm-quiz-leaderboard-table {
@@ -1402,11 +1395,14 @@ html:has(.tm-app-shell) body {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tm-quiz-leaderboard-row {
-  flex: 1 1 0%;
+  flex: 0 0 auto;
   min-height: 2.375rem;
   line-height: 1.2;
 }
