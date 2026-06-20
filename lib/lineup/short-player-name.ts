@@ -23,6 +23,8 @@ const NAME_PARTICLES = new Set([
   "mac",
 ]);
 
+const NAME_SUFFIX_TOKENS = new Set(["jr", "junior", "ii", "iii"]);
+
 /** Nombre tipo camiseta: apellido, compuesto con partícula o monónimo (sin nombre de pila). */
 export function shirtPlayerName(fullName: string): string {
   const trimmed = fullName.trim();
@@ -33,6 +35,10 @@ export function shirtPlayerName(fullName: string): string {
 
   const last = parts[parts.length - 1]!;
   const secondLast = parts[parts.length - 2]!;
+
+  if (NAME_SUFFIX_TOKENS.has(last.toLowerCase())) {
+    return `${parts[0]} ${last}`;
+  }
 
   if (NAME_PARTICLES.has(secondLast.toLowerCase())) {
     return `${secondLast} ${last}`;
