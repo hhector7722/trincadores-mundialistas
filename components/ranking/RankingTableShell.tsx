@@ -29,7 +29,9 @@ export function RankingTableShell({
 
   return (
     <>
-      <div className="tm-ranking-evolution-trigger flex shrink-0 justify-center pb-2">
+      <RankingTable rows={rows} currentProfileId={currentProfileId} />
+
+      <div className="tm-ranking-evolution-trigger flex shrink-0 justify-center pt-2">
         <button
           type="button"
           className={EVOLUTION_BUTTON_CLASS}
@@ -39,8 +41,6 @@ export function RankingTableShell({
           VER EVOLUCIÓN POR JORNADA
         </button>
       </div>
-
-      <RankingTable rows={rows} currentProfileId={currentProfileId} />
 
       <RankingEvolutionModal
         open={evolutionOpen}
