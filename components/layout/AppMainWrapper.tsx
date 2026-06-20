@@ -24,9 +24,7 @@ export function AppMainWrapper({ children }: AppMainWrapperProps) {
       className={cn(
         "tm-app-main relative z-10 w-full",
         !fullscreen && !headerHidden && "pt-[var(--tm-app-header-block)]",
-        !fullscreen &&
-          !internalScroll &&
-          "min-h-screen pb-[calc(5rem+env(safe-area-inset-bottom,0px))]",
+        !fullscreen && !internalScroll && "pb-[var(--tm-tabbar-shell)]",
         !fullscreen &&
           internalScroll &&
           "tm-app-main--internal-scroll flex flex-col overflow-hidden pb-0",

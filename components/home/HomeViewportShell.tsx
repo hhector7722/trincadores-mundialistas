@@ -16,6 +16,7 @@ export function HomeViewportShell({ hero, body }: HomeViewportShellProps) {
         <div className="tm-home-layout__hero shrink-0">{hero}</div>
         {body}
       </div>
+      <div className="scroll-end-touch" aria-hidden />
     </div>
   );
 }

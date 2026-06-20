@@ -64,6 +64,9 @@
   --tm-app-header-block-pinned: calc(
     var(--tm-app-header-pt-pinned) + var(--tm-app-header-inner-pinned) + var(--tm-app-header-pb-pinned)
   );
+  --tm-app-height: 100dvh;
+  --tm-vv-offset-top: 0px;
+  --tm-vv-height: 100dvh;
   --tm-ios-ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --tm-page-push-ms: 360ms;
   --tm-panel-slide-ms: 350ms;
@@ -98,7 +101,7 @@
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  min-height: var(--tm-app-height);
   background-color: var(--tm-tabbar-bg-hex);
   background-image: var(--tm-shell-bg-image);
   background-attachment: fixed;
@@ -142,21 +145,21 @@ html[data-modal-open] .tm-app-main {
 }
 
 .scroll-end-touch {
-  min-height: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  min-height: var(--tm-tabbar-shell);
   width: 100%;
   flex-shrink: 0;
   pointer-events: none;
 }
 
 .scroll-pb-end {
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  scroll-padding-bottom: var(--tm-tabbar-shell);
 }
 
 /* Shell Marbella: documento normal + chrome fixed (sin frame vv) */
 .tm-app-shell {
   position: relative;
   isolation: isolate;
-  min-height: 100dvh;
+  min-height: var(--tm-app-height);
 }
 
 .tm-app-shell-bg {
@@ -173,6 +176,10 @@ html[data-modal-open] .tm-app-main {
 
 .tm-app-header {
   background: transparent;
+}
+
+.tm-app-header-fixed {
+  top: var(--tm-vv-offset-top, 0px);
 }
 
 html[data-modal-open="true"] .tm-app-header-fixed,
@@ -211,15 +218,28 @@ html:has(.tm-app-header--compact) {
   overflow-x: hidden;
 }
 
+.tm-app-main:not(.tm-app-main--internal-scroll) {
+  min-height: var(--tm-app-height);
+}
+
 .tm-app-main--internal-scroll {
   box-sizing: border-box;
-  height: calc(100dvh - var(--tm-tabbar-shell));
-  min-height: calc(100dvh - var(--tm-tabbar-shell));
-  max-height: calc(100dvh - var(--tm-tabbar-shell));
+  height: calc(
+    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
+  );
+  min-height: calc(
+    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
+  );
+  max-height: calc(
+    var(--tm-app-height) - var(--tm-tabbar-shell) - var(--tm-app-header-block)
+  );
 }
 
 .tm-app-main--internal-scroll.tm-app-main--no-header {
   padding-top: env(safe-area-inset-top, 0px);
+  height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
+  min-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
+  max-height: calc(var(--tm-app-height) - var(--tm-tabbar-shell));
 }
 
 .tm-app-main--internal-scroll .tm-tab-swipe-root {
@@ -266,9 +286,20 @@ html:has(.tm-app-header--compact) {
   padding-bottom: 0;
 }
 
+@media (min-width: 768px) {
+  :root {
+    --tm-tabbar-shell: var(--tm-tabbar-height-md);
+    --tm-tabbar-core: var(--tm-tabbar-height-md);
+  }
+}
+
 .tm-app-tabbar {
   box-sizing: border-box;
-  bottom: var(--tm-chrome-bottom, 0px);
+  bottom: 0;
+  transform: translate3d(0, calc(-1 * var(--tm-chrome-bottom, 0px)), 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .tm-app-tabbar--with-indicators .tm-tabbar-indicators-row {
@@ -1305,7 +1336,7 @@ html:has(.tm-app-shell) body {
 
 /* ── Quiz: scroll interno con reserva táctil al final ── */
 .tm-quiz-page {
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  scroll-padding-bottom: var(--tm-tabbar-shell);
 }
 
 .tm-quiz-page--play,

@@ -50,7 +50,7 @@ export function AppShell({
               <LineupsNotificationOpener />
               <HighlightNotificationOpener />
               <TabNavigationProvider>
-                <div className="tm-app-shell relative min-h-screen">
+                <div className="tm-app-shell relative">
                   <div className="tm-app-shell-bg" aria-hidden="true" />
                   <div
                     id="tm-safe-probe"

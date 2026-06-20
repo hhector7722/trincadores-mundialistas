@@ -10,7 +10,7 @@ export function measureChromeBottomLift(): number {
   return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
 }
 
-/** Variables vv para debug/calendario; ya no ancla frame fixed. */
+/** Variables vv: altura útil del viewport + lift de la TabBar (iOS PWA / barra Safari). */
 export function applyVisualViewportChrome(): void {
   if (typeof document === "undefined") return;
 
@@ -23,6 +23,7 @@ export function applyVisualViewportChrome(): void {
   root.style.setProperty("--tm-vv-height", `${height}px`);
   root.style.setProperty("--tm-vv-offset-top", `${offsetTop}px`);
   root.style.setProperty("--tm-chrome-bottom", `${chromeBottom}px`);
+  root.style.setProperty("--tm-app-height", `${height + offsetTop}px`);
 }
 
 export function resetVisualViewportChrome(): void {
@@ -32,6 +33,7 @@ export function resetVisualViewportChrome(): void {
   root.style.removeProperty("--tm-vv-height");
   root.style.removeProperty("--tm-vv-offset-top");
   root.style.removeProperty("--tm-chrome-bottom");
+  root.style.removeProperty("--tm-app-height");
 }
 
 function readTabBarCorePx(): number {

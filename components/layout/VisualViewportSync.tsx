@@ -1,12 +1,15 @@
 "use client";
 
 import { useLayoutEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   applyVisualViewportChrome,
   VIEWPORT_CHROME_SYNC_EVENT,
 } from "@/lib/layout/viewport-chrome";
 
-function isFormChromeTarget(target: EventTarget | null): target is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
+function isFormChromeTarget(
+  target: EventTarget | null
+): target is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
   return (
     target instanceof HTMLInputElement ||
     target instanceof HTMLSelectElement ||
@@ -16,6 +19,8 @@ function isFormChromeTarget(target: EventTarget | null): target is HTMLInputElem
 
 /** Sincroniza la altura del shell con el visual viewport (iOS PWA). */
 export function VisualViewportSync() {
+  const pathname = usePathname();
+
   useLayoutEffect(() => {
     const sync = () => {
       applyVisualViewportChrome();
@@ -42,11 +47,19 @@ export function VisualViewportSync() {
       requestAnimationFrame(sync);
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        sync();
+        requestAnimationFrame(sync);
+      }
+    };
+
     window.visualViewport?.addEventListener("resize", sync);
     window.visualViewport?.addEventListener("scroll", sync);
     window.addEventListener("resize", sync);
     window.addEventListener("orientationchange", sync);
     window.addEventListener("pageshow", handlePageShow);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("focusout", handleFocusOut);
 
     return () => {
@@ -56,9 +69,10 @@ export function VisualViewportSync() {
       window.removeEventListener("resize", sync);
       window.removeEventListener("orientationchange", sync);
       window.removeEventListener("pageshow", handlePageShow);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("focusout", handleFocusOut);
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
