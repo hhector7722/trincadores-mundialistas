@@ -17,7 +17,8 @@ import {
 } from "@/lib/layout/pull-to-refresh";
 
 const IOS_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
-const SNAP_BACK_MS = 380;
+const SNAP_BACK_EASING = "cubic-bezier(0.34, 1.18, 0.64, 1)";
+const SNAP_BACK_MS = 420;
 
 type PullPhase = "idle" | "pulling" | "refreshing" | "snapping";
 
@@ -84,7 +85,7 @@ export function PullToRefresh() {
   const snapBack = useCallback(() => {
     const root = transformRootRef.current;
     if (root) {
-      root.style.transition = `transform ${SNAP_BACK_MS}ms ${IOS_EASING}`;
+      root.style.transition = `transform ${SNAP_BACK_MS}ms ${SNAP_BACK_EASING}`;
       root.style.transform = "translate3d(0, 0, 0)";
     }
     setPhaseSafe("snapping");

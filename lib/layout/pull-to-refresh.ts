@@ -65,17 +65,14 @@ export function findPullScrollRoot(): HTMLElement | null {
   return document.querySelector<HTMLElement>(".tm-tab-swipe-root");
 }
 
-/** Raíz del translate del pull. Nunca `html`: un transform ahí rompe `position:fixed` de la TabBar en `body`. */
+/** Raíz del translate del pull. Nunca `html` ni `.tm-app-shell`: rompe `position:fixed` y arrastra la cabecera. */
 export function findPullTransformRoot(scrollRoot: HTMLElement | null): HTMLElement | null {
   if (!scrollRoot) return null;
   if (scrollRoot !== document.documentElement) {
     return scrollRoot;
   }
 
-  return (
-    document.querySelector<HTMLElement>(".tm-app-shell") ??
-    document.querySelector<HTMLElement>(".tm-app-main")
-  );
+  return document.querySelector<HTMLElement>(".tm-app-main");
 }
 
 export function clearDocumentElementPullTransform(): void {
@@ -157,13 +154,13 @@ export function isScrollAtTop(el: HTMLElement): boolean {
 
 
 export function applyPullResistance(distance: number): number {
-
   if (distance <= 0) return 0;
 
-  const capped = Math.min(distance, PULL_MAX_PX * 1.35);
-
-  return capped * PULL_RESISTANCE;
-
+  const maxVisual = PULL_MAX_PX;
+  const raw = Math.min(distance, maxVisual * 1.35);
+  // Resistencia progresiva: más difícil al acercarse al tope (efecto muro).
+  const wall = 1 - Math.exp(-raw / (maxVisual * 0.72));
+  return wall * maxVisual * PULL_RESISTANCE;
 }
 
 

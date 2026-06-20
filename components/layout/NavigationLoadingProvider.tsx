@@ -122,11 +122,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
         {children}
       </div>
       {showLinkOverlay ? (
-        <div
-          className="tm-nav-loading-overlay tm-nav-loading-overlay--subtle"
-          aria-busy="true"
-          aria-live="polite"
-        />
+        <div className="tm-nav-loading-overlay" aria-busy="true" aria-live="polite" />
       ) : null}
     </NavigationLoadingContext.Provider>
   );

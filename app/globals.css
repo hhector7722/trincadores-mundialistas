@@ -216,6 +216,15 @@ html:has(.tm-app-header--compact) {
   box-sizing: border-box;
   width: 100%;
   overflow-x: hidden;
+  background: transparent;
+}
+
+.tm-tab-swipe-root,
+.tm-tab-swipe-track,
+.tm-page-stack,
+.tm-tab-swipe-adjacent,
+.tm-tab-swipe-incoming {
+  background: transparent;
 }
 
 .tm-app-main:not(.tm-app-main--internal-scroll) {
@@ -245,6 +254,7 @@ html:has(.tm-app-header--compact) {
 .tm-porra-layout,
 .tm-ranking-layout,
 .tm-tab-scroll-layout,
+.tm-home-scroll-layout,
 .tm-quiz-page--viewport,
 .tm-quiz-page--play,
 .tm-quiz-page--hub {
@@ -268,7 +278,7 @@ html:has(.tm-app-header--compact) {
   min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -681,22 +691,6 @@ html:has(.tm-app-shell) body {
   background: transparent;
 }
 
-.tm-nav-loading-overlay--subtle {
-  background: rgba(26, 8, 56, 0.08);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  animation: tm-nav-loading-fade 220ms var(--tm-ios-ease-out);
-}
-
-@keyframes tm-nav-loading-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .tm-tab-loading-overlay {
   position: fixed;
   top: 0;
@@ -712,15 +706,15 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-tab-panel-spinner {
-  background: rgba(26, 8, 56, 0.12);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .tm-page-stack__pending-spinner {
-  background: rgba(26, 8, 56, 0.1);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .tm-card-surface {
@@ -975,8 +969,11 @@ html:has(.tm-app-shell) body {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  opacity: 0;
   will-change: opacity;
+}
+
+.tm-app-shell .tm-home-atmosphere {
+  opacity: 1;
 }
 
 .tm-home-atmosphere:not([data-active="true"]) .tm-home-layer-glow,
