@@ -254,7 +254,6 @@ html:has(.tm-app-header--compact) {
 .tm-porra-layout,
 .tm-ranking-layout,
 .tm-tab-scroll-layout,
-.tm-home-scroll-layout,
 .tm-quiz-page--viewport,
 .tm-quiz-page--play,
 .tm-quiz-page--hub {
@@ -278,7 +277,7 @@ html:has(.tm-app-header--compact) {
   min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
