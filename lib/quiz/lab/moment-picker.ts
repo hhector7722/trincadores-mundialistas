@@ -1,6 +1,7 @@
 import {
   filterCatalogReadyMoments,
   filterMomentsByDifficulty,
+  isImageTriviaAnswerTypeAllowed,
   pickGuessImageMoment,
   type LabSuitability,
   type WorldCupMoment,
@@ -109,7 +110,9 @@ export function pickImageTriviaMoment(opts?: PickMomentOptions): WorldCupMoment 
 
   ready = filterExcludedPlayers(ready, opts?.excludePlayerKeys);
 
-  const contextual = ready.filter((moment) => moment.quiz.answer_type !== "player");
+  const contextual = ready.filter((moment) =>
+    isImageTriviaAnswerTypeAllowed(moment.quiz.answer_type)
+  );
   const pool = contextual.length ? contextual : ready;
   if (!pool.length) return null;
 

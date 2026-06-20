@@ -66,7 +66,7 @@ export async function writeQuizLabDailyPack(pack: QuizLabDailyPack): Promise<voi
 
 export async function pregenerateQuizLabDailyPack(
   quizDate: string,
-  options?: { force?: boolean }
+  options?: { force?: boolean; excludeMomentIds?: string[] }
 ): Promise<PregenerateQuizLabDailyPackResult> {
   if (!options?.force) {
     const existing = await readQuizLabDailyPack(quizDate);
@@ -75,9 +75,10 @@ export async function pregenerateQuizLabDailyPack(
     }
   }
 
-  const excludeMomentIds: string[] = [];
+  const excludeMomentIds: string[] = [...(options?.excludeMomentIds ?? [])];
   const excludePlayerKeys: string[] = [];
   const questions: LabQuestion[] = [];
+  const usedMomentIds: string[] = [];
 
   for (let slot = 0; slot < DAILY_LAB_QUESTION_FORMATS.length; slot++) {
     const format = DAILY_LAB_QUESTION_FORMATS[slot];
@@ -97,7 +98,10 @@ export async function pregenerateQuizLabDailyPack(
     questions.push(materialized);
 
     const momentId = "momentId" in materialized ? materialized.momentId : null;
-    if (momentId) excludeMomentIds.push(momentId);
+    if (momentId) {
+      excludeMomentIds.push(momentId);
+      usedMomentIds.push(momentId);
+    }
     for (const playerKey of playerKeysFromMomentId(momentId)) {
       if (!excludePlayerKeys.includes(playerKey)) {
         excludePlayerKeys.push(playerKey);
@@ -108,7 +112,7 @@ export async function pregenerateQuizLabDailyPack(
   const pack: QuizLabDailyPack = {
     quizDate,
     generatedAt: new Date().toISOString(),
-    momentIds: excludeMomentIds,
+    momentIds: usedMomentIds,
     questions,
   };
 

@@ -118,6 +118,19 @@ function readLocalPath(value: unknown, index: number): string {
 
 const LAB_SUITABILITY = new Set<LabSuitability>(["hair", "eyes", "silhouette"]);
 
+/**
+ * Tipos de respuesta prohibidos en trivia de imagen: la foto no debe delatar la solución
+ * (p. ej. rivales con camisetas visibles en preguntas de "contra quién").
+ */
+export const IMAGE_TRIVIA_EXCLUDED_ANSWER_TYPES: ReadonlySet<WorldCupMomentAnswerType> =
+  new Set(["player", "opponent"]);
+
+export function isImageTriviaAnswerTypeAllowed(
+  answerType: WorldCupMomentAnswerType
+): boolean {
+  return !IMAGE_TRIVIA_EXCLUDED_ANSWER_TYPES.has(answerType);
+}
+
 function readOptionalFaceFocus(
   raw: unknown,
   index: number

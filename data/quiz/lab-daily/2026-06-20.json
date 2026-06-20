@@ -1,0 +1,71 @@
+{
+  "quizDate": "2026-06-20",
+  "generatedAt": "2026-06-20T05:10:54.133Z",
+  "momentIds": [
+    "wc2010-forlan-celebration",
+    "wc1997-ronaldo-maldini-tackle"
+  ],
+  "questions": [
+    {
+      "id": "daily-2026-06-20-image_trivia",
+      "format": "image_trivia",
+      "prompt": "¿Qué selección representa?",
+      "imageUrl": "/images/quiz/historic/2010/wc2010-forlan-celebration.jpg",
+      "timerSeconds": 10,
+      "momentId": "wc2010-forlan-celebration",
+      "momentLabel": "Diego Forlán — Uruguay Sudáfrica",
+      "momentDifficulty": "medium",
+      "answerType": "team",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Uruguay"
+        },
+        {
+          "id": "opt_2",
+          "label": "Chile"
+        },
+        {
+          "id": "opt_3",
+          "label": "Paraguay"
+        },
+        {
+          "id": "opt_4",
+          "label": "Colombia"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    },
+    {
+      "id": "daily-2026-06-20-guess_player_silhouette",
+      "format": "guess_player_silhouette",
+      "prompt": "¿QUÉ JUGADOR ES LA SILUETA?",
+      "imageUrl": "/images/quiz/lab/generated/wc1997-ronaldo-maldini-tackle-silhouette.jpg",
+      "revealImageUrl": "/images/quiz/historic/1997/wc1997-ronaldo-maldini-tackle.jpg",
+      "sceneLabel": "1997 — Brasil vs Italia",
+      "timerSeconds": 10,
+      "silhouetteDemoId": null,
+      "momentId": "wc1997-ronaldo-maldini-tackle",
+      "momentLabel": "Ronaldo entre Maldini y Cannavaro",
+      "options": [
+        {
+          "id": "opt_1",
+          "label": "Ronaldo Nazário"
+        },
+        {
+          "id": "opt_2",
+          "label": "Romário"
+        },
+        {
+          "id": "opt_3",
+          "label": "Leonardo"
+        },
+        {
+          "id": "opt_4",
+          "label": "Bebeto"
+        }
+      ],
+      "correctOptionId": "opt_1"
+    }
+  ]
+}

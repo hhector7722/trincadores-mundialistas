@@ -6,6 +6,8 @@ import { labDailyPackSettingsSummary } from "@/lib/quiz/lab/daily-pack-types";
 import {
   factIdsFromSettings,
   loadRecentFactIdsFromDb,
+  loadRecentMomentIdsFromDb,
+  momentIdsFromSettings,
 } from "@/lib/quiz/recent-fact-ids";
 import {
   ensureQuizPool,
@@ -72,21 +74,6 @@ export async function publishQuizDay(
     };
   }
 
-  const shouldPregenerateLab = options.pregenerateLabAssets !== false;
-  const labResult = shouldPregenerateLab
-    ? process.env.VERCEL === "1"
-      ? await (
-          await import("@/lib/quiz/lab/daily-pack-light.server")
-        ).pregenerateQuizLabDailyPackLight(quizDate, {
-          force: Boolean(options.allowReseed),
-        })
-      : await (
-          await import("@/lib/quiz/lab/daily-pack.server")
-        ).pregenerateQuizLabDailyPack(quizDate, {
-          force: Boolean(options.allowReseed),
-        })
-    : null;
-
   const existingId = await findQuizForDate(
     options.admin,
     poolId,
@@ -100,17 +87,16 @@ export async function publishQuizDay(
       scoringMode: "training",
       skipped: true,
       factIds: [],
-      labDailyPack: labResult?.pack
-        ? {
-            skipped: labResult.skipped,
-            questionCount: labResult.pack.questions.length,
-            momentIds: labResult.pack.momentIds,
-          }
-        : undefined,
     };
   }
 
   const excludeFromDb = await loadRecentFactIdsFromDb(
+    options.admin,
+    poolId,
+    quizDate
+  );
+
+  const excludeMomentsFromDb = await loadRecentMomentIdsFromDb(
     options.admin,
     poolId,
     quizDate
@@ -138,7 +124,28 @@ export async function publishQuizDay(
     for (const id of factIdsFromSettings(existingQuiz?.settings_json)) {
       excludeFactIds.add(id);
     }
+    for (const id of momentIdsFromSettings(existingQuiz?.settings_json)) {
+      excludeMomentsFromDb.add(id);
+    }
   }
+
+  const labExcludeMomentIds = [...excludeMomentsFromDb];
+  const shouldPregenerateLab = options.pregenerateLabAssets !== false;
+  const labResult = shouldPregenerateLab
+    ? process.env.VERCEL === "1"
+      ? await (
+          await import("@/lib/quiz/lab/daily-pack-light.server")
+        ).pregenerateQuizLabDailyPackLight(quizDate, {
+          force: Boolean(options.allowReseed),
+          excludeMomentIds: labExcludeMomentIds,
+        })
+      : await (
+          await import("@/lib/quiz/lab/daily-pack.server")
+        ).pregenerateQuizLabDailyPack(quizDate, {
+          force: Boolean(options.allowReseed),
+          excludeMomentIds: labExcludeMomentIds,
+        })
+    : null;
 
   const generated = await generateQuizDayFromSources({
     quizDate,

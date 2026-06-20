@@ -3,6 +3,7 @@ import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { AppMainWrapper } from "@/components/layout/AppMainWrapper";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
 import { HighlightNotificationOpener } from "@/components/notifications/HighlightNotificationOpener";
+import { QuizReseedAnnouncementModal } from "@/components/quiz/QuizReseedAnnouncementModal";
 import { QuizEntryProvider } from "@/components/quiz/QuizEntryProvider";
 import { QuizActiveNotificationProvider } from "@/components/notifications/QuizActiveNotificationProvider";
 import type { QuizDayHub } from "@/lib/quiz/types";
@@ -45,6 +46,7 @@ export function AppShell({
               username={ctx.username}
               initialVisible={ctx.heroHighlightScorelineVisible}
             >
+              <QuizReseedAnnouncementModal quizDate={quizHub.quizDate} />
               <LineupsNotificationOpener />
               <HighlightNotificationOpener />
               <TabNavigationProvider>

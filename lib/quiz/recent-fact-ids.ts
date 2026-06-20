@@ -17,6 +17,15 @@ function addDays(quizDate: string, delta: number): string {
   return `${yy}-${mm}-${dd}`;
 }
 
+export function momentIdsFromSettings(settings: unknown): string[] {
+  if (!settings || typeof settings !== "object") return [];
+  const pack = (settings as Record<string, unknown>).lab_daily_pack;
+  if (!pack || typeof pack !== "object") return [];
+  const ids = (pack as { moment_ids?: unknown }).moment_ids;
+  if (!Array.isArray(ids)) return [];
+  return ids.filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+}
+
 export function factIdsFromSettings(settings: unknown): string[] {
   if (!settings || typeof settings !== "object") return [];
   const meta = (settings as Record<string, unknown>).questions_meta;
@@ -57,6 +66,40 @@ export async function loadRecentFactIdsFromDb(
 
   for (const row of data ?? []) {
     for (const id of factIdsFromSettings(row.settings_json)) {
+      used.add(id);
+    }
+  }
+
+  return used;
+}
+
+/** Momentos de imagen/silueta usados en quizzes recientes (evita repetir la misma foto). */
+export async function loadRecentMomentIdsFromDb(
+  admin: QuizAdminClient,
+  poolId: string,
+  quizDate: string,
+  historyDays = 14
+): Promise<Set<string>> {
+  if (!DATE_RE.test(quizDate)) {
+    throw new Error("quiz_date invalido. Usa YYYY-MM-DD.");
+  }
+
+  const fromDate = addDays(quizDate, -historyDays);
+  const used = new Set<string>();
+
+  const { data, error } = await admin
+    .from("quizzes")
+    .select("quiz_date, settings_json")
+    .eq("pool_id", poolId)
+    .eq("kind", "official")
+    .gte("quiz_date", fromDate)
+    .lt("quiz_date", quizDate)
+    .order("quiz_date", { ascending: false });
+
+  if (error) throw error;
+
+  for (const row of data ?? []) {
+    for (const id of momentIdsFromSettings(row.settings_json)) {
       used.add(id);
     }
   }

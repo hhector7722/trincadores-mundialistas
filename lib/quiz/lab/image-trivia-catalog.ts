@@ -4,6 +4,7 @@ import { getWorldCupMomentsCatalog } from "@/lib/quiz/world-cup-moments-catalog"
 import {
   filterCatalogReadyMoments,
   filterMomentsByDifficulty,
+  isImageTriviaAnswerTypeAllowed,
   type WorldCupMoment,
   type WorldCupMomentDifficulty,
 } from "@/lib/quiz/world-cup-moments";
@@ -21,7 +22,9 @@ function pickImageTriviaMoment(
 ): WorldCupMoment | null {
   if (!moments.length) return null;
 
-  const contextual = moments.filter((moment) => moment.quiz.answer_type !== "player");
+  const contextual = moments.filter((moment) =>
+    isImageTriviaAnswerTypeAllowed(moment.quiz.answer_type)
+  );
   const pool = contextual.length ? contextual : moments;
   pool.sort((a, b) => a.id.localeCompare(b.id));
   return pool[Math.abs(seed) % pool.length] ?? null;

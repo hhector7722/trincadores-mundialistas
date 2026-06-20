@@ -148,6 +148,14 @@ export async function upsertQuizBundle(args: {
     return existingId;
   }
 
+  if (existingId && args.allowReseed) {
+    const { error: attemptsError } = await args.admin
+      .from("quiz_attempts")
+      .delete()
+      .eq("quiz_id", existingId);
+    if (attemptsError) throw attemptsError;
+  }
+
   let quizId = existingId;
 
   if (quizId) {

@@ -78,7 +78,7 @@ function generateLightLabQuestion(args: {
 /** Pack diario sin sharp (Vercel cron / serverless). */
 export async function pregenerateQuizLabDailyPackLight(
   quizDate: string,
-  options?: { force?: boolean }
+  options?: { force?: boolean; excludeMomentIds?: string[] }
 ): Promise<PregenerateQuizLabDailyPackResult> {
   if (!options?.force) {
     const existing = await readManifest(quizDate);
@@ -87,9 +87,10 @@ export async function pregenerateQuizLabDailyPackLight(
     }
   }
 
-  const excludeMomentIds: string[] = [];
+  const excludeMomentIds: string[] = [...(options?.excludeMomentIds ?? [])];
   const excludePlayerKeys: string[] = [];
   const questions: LabQuestion[] = [];
+  const usedMomentIds: string[] = [];
 
   for (let slot = 0; slot < DAILY_LAB_QUESTION_FORMATS.length; slot++) {
     const format = DAILY_LAB_QUESTION_FORMATS[slot];
@@ -104,7 +105,10 @@ export async function pregenerateQuizLabDailyPackLight(
 
     questions.push(generated);
     const momentId = "momentId" in generated ? generated.momentId : null;
-    if (momentId) excludeMomentIds.push(momentId);
+    if (momentId) {
+      excludeMomentIds.push(momentId);
+      usedMomentIds.push(momentId);
+    }
     for (const playerKey of playerKeysFromMomentId(momentId)) {
       if (!excludePlayerKeys.includes(playerKey)) {
         excludePlayerKeys.push(playerKey);
@@ -115,7 +119,7 @@ export async function pregenerateQuizLabDailyPackLight(
   const pack: QuizLabDailyPack = {
     quizDate,
     generatedAt: new Date().toISOString(),
-    momentIds: excludeMomentIds,
+    momentIds: usedMomentIds,
     questions,
   };
 
