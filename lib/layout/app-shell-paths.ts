@@ -11,6 +11,12 @@ export function isAppHeaderHidden(pathname: string): boolean {
   return pathname.startsWith("/predictions") || pathname.startsWith("/quiz/play");
 }
 
+/** Cabecera AppHeader visible (título / logo / acciones). */
+export function isAppHeaderVisible(pathname: string): boolean {
+  if (isFullscreenPath(pathname)) return false;
+  return !isAppHeaderHidden(pathname);
+}
+
 /** Rutas con scroll en contenedor interno: el main no añade padding inferior extra. */
 export function isInternalScrollPath(pathname: string): boolean {
   if (isFullscreenPath(pathname)) return true;

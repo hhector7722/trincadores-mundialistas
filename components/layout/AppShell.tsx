@@ -20,6 +20,7 @@ import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { CurrentUsernameProvider } from "@/lib/auth/current-username-context";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
+import { HeaderContentFade } from "@/components/layout/HeaderContentFade";
 import { UsagePageTracker } from "@/components/usage/UsagePageTracker";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -59,6 +60,7 @@ export function AppShell({
                   />
                   <HomeAtmosphere />
                   <AppHeaderGate ctx={ctx} />
+                  <HeaderContentFade />
                   <AppMainWrapper>
                     <TabSwipeNavigator>
                       <PageStackNavigator>{children}</PageStackNavigator>
