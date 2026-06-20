@@ -11,6 +11,7 @@ import { PushNotificationProvider } from "@/components/push/PushNotificationProv
 import { NavigationLoadingProvider } from "@/components/layout/NavigationLoadingProvider";
 import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
+import { PageStackNavigator } from "@/components/layout/PageStackNavigator";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
@@ -57,7 +58,9 @@ export function AppShell({
                   <HomeAtmosphere />
                   <AppHeaderGate ctx={ctx} />
                   <AppMainWrapper>
-                    <TabSwipeNavigator>{children}</TabSwipeNavigator>
+                    <TabSwipeNavigator>
+                      <PageStackNavigator>{children}</PageStackNavigator>
+                    </TabSwipeNavigator>
                   </AppMainWrapper>
                 </div>
                 <PullToRefresh />

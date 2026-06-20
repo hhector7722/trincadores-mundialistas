@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, X } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/spinner";
 import { trackUsageModalDwell, trackUsageModalOpen } from "@/lib/usage/client";
+import { MODAL_ENTER_MS, MODAL_EXIT_MS, PANEL_SLIDE_MS, iosTransition } from "@/lib/ui/motion";
 import { cn } from "@/lib/utils";
 
 export type ModalPanelSlide = {
@@ -319,6 +320,9 @@ export function Modal({
   const hasSwipe = Boolean(onSwipeLeft || onSwipeRight);
   const openedAtRef = useRef<number | null>(null);
   const trackedLabelRef = useRef<string | null>(null);
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(false);
+  const panelSlideTransition = iosTransition("transform", PANEL_SLIDE_MS);
 
   const resolvedUsageLabel =
     usageLabel ??
@@ -374,7 +378,21 @@ export function Modal({
   }, [disableUsageTracking, open, pathname, resolvedUsageId, resolvedUsageLabel]);
 
   useEffect(() => {
-    if (!open) return;
+    if (open) {
+      setMounted(true);
+      const frame = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setVisible(true));
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    setVisible(false);
+    const timer = window.setTimeout(() => setMounted(false), MODAL_EXIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!mounted) return;
 
     const unlockScroll = lockPageScroll();
 
@@ -391,9 +409,9 @@ export function Modal({
       unlockScroll();
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, onClose]);
+  }, [mounted, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   function onTouchStart(event: React.TouchEvent<HTMLDivElement>) {
     if (panelSlide || !hasSwipe) return;
@@ -455,9 +473,10 @@ export function Modal({
         type="button"
         aria-label="Cerrar"
         className={cn(
-          "absolute inset-0 overscroll-none",
+          "tm-modal-backdrop absolute inset-0 overscroll-none",
           opaque ? "bg-[#2a1058]/40 backdrop-blur-md" : "bg-[#2a1058]/40 backdrop-blur-sm",
           hasSwipe ? "touch-manipulation" : "touch-none",
+          visible ? "tm-modal-backdrop--visible" : "tm-modal-backdrop--hidden",
           !opaque && backdropClassName
         )}
         onClick={onBackdropClick}
@@ -466,6 +485,7 @@ export function Modal({
       <div
         className={cn(
           "relative z-10 flex w-full max-w-sm flex-col items-center gap-3 pointer-events-none",
+          visible ? "tm-modal-panel-host--visible" : "tm-modal-panel-host--hidden",
           wrapperClassName
         )}
       >
@@ -483,17 +503,17 @@ export function Modal({
         >
           {slideActive && panelSlide ? (
             <div
-              className={cn(
-                "flex w-[200%]",
-                slideAnimate && "transition-transform duration-300 ease-in-out",
-                slideNext
+              className="flex w-[200%]"
+              style={{
+                transform: slideNext
                   ? slideAnimate
-                    ? "-translate-x-1/2"
-                    : "translate-x-0"
+                    ? "translateX(-50%)"
+                    : "translateX(0)"
                   : slideAnimate
-                    ? "translate-x-0"
-                    : "-translate-x-1/2"
-              )}
+                    ? "translateX(0)"
+                    : "translateX(-50%)",
+                transition: slideAnimate ? panelSlideTransition : "none",
+              }}
               onTransitionEnd={(event) => {
                 if (event.target !== event.currentTarget) return;
                 if (event.propertyName !== "transform") return;

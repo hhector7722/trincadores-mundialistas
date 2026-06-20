@@ -61,6 +61,13 @@ export function isMainTabRoot(pathname: string): boolean {
   return getMainTabIndex(pathname) !== null;
 }
 
+/** Solo rutas raíz exactas de pestaña (sin subpáginas). */
+export function isExactMainTabRoot(pathname: string): boolean {
+  return MAIN_TABS.some((tab) =>
+    tab.href === "/" ? pathname === "/" : pathname === tab.href
+  );
+}
+
 /** Rutas de la pestaña Partidos (calendario / KO / detalle). */
 export function isPredictionsTabPath(pathname: string): boolean {
   return pathname === "/predictions" || pathname.startsWith("/predictions/");

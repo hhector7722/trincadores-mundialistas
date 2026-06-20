@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ModalPanelSlide } from "@/components/ui/modal";
+import { PANEL_SLIDE_MS } from "@/lib/ui/motion";
 
 type SlidePhase = "prep" | "animate";
 
@@ -11,7 +12,7 @@ type SlideState<T> = {
   phase: SlidePhase;
 };
 
-const SLIDE_MS = 300;
+const SLIDE_MS = PANEL_SLIDE_MS;
 
 export function usePanelSlideStack<T>(initialView: T) {
   const [stack, setStack] = useState<T[]>([initialView]);

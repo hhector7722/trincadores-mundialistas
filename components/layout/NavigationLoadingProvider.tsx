@@ -12,7 +12,6 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { LoadingCenter } from "@/components/ui/spinner";
 
 type NavigationLoadingContextValue = {
   navigate: (href: string) => void;
@@ -121,9 +120,11 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
         {children}
       </div>
       {showLinkOverlay ? (
-        <div className="tm-nav-loading-overlay" aria-busy="true" aria-live="polite">
-          <LoadingCenter />
-        </div>
+        <div
+          className="tm-nav-loading-overlay tm-nav-loading-overlay--subtle"
+          aria-busy="true"
+          aria-live="polite"
+        />
       ) : null}
     </NavigationLoadingContext.Provider>
   );

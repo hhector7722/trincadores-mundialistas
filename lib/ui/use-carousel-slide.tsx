@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ModalPanelSlide } from "@/components/ui/modal";
+import { PANEL_SLIDE_MS } from "@/lib/ui/motion";
 import { cn } from "@/lib/utils";
 
 export type CarouselDotPosition = "start" | "middle" | "end";
@@ -12,7 +13,7 @@ export type CarouselSlideState<T> = {
   phase: "prep" | "animate";
 };
 
-const SLIDE_MS = 300;
+const SLIDE_MS = PANEL_SLIDE_MS;
 
 export function resolveCarouselDotPosition(index: number, total: number): CarouselDotPosition {
   if (total <= 1 || index <= 0) return "start";

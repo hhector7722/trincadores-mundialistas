@@ -13,7 +13,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { TabAdjacentPanel } from "@/components/layout/TabAdjacentPanel";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
-import { getMainTabIndex, isMainTabActive, isMainTabRoot, MAIN_TABS } from "@/lib/layout/main-tabs";
+import {
+  getMainTabIndex,
+  isExactMainTabRoot,
+  isMainTabActive,
+  MAIN_TABS,
+} from "@/lib/layout/main-tabs";
 import { trackUsageTabSwitch } from "@/lib/usage/client";
 import { saveTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
 import { useTabPreviewMode } from "@/lib/layout/tab-preview";
@@ -29,9 +34,9 @@ import {
 import { cn } from "@/lib/utils";
 
 /** Distancia mínima para confirmar cambio de pestaña (ratio del ancho). */
-const COMMIT_RATIO = 0.16;
+const COMMIT_RATIO = 0.14;
 /** Flick horizontal suficiente para cambiar sin recorrer mucho. */
-const VELOCITY_THRESHOLD = 0.22;
+const VELOCITY_THRESHOLD = 0.28;
 /** Resistencia en el primer/último tab (0–1, más alto = más suave). */
 const EDGE_RESISTANCE = 0.58;
 const LOCK_THRESHOLD_PX = 5;
@@ -93,7 +98,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const activeIndex = getMainTabIndex(pathname);
-  const enabled = !previewMode && isMainTabRoot(pathname) && activeIndex != null;
+  const enabled = !previewMode && isExactMainTabRoot(pathname) && activeIndex != null;
 
   const [dragX, setDragX] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -190,7 +195,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
     markTabShell();
 
     const onPopState = () => {
-      if (!isMainTabRoot(window.location.pathname)) return;
+      if (!isExactMainTabRoot(window.location.pathname)) return;
       markTabShell();
       window.history.pushState(
         { ...(window.history.state ?? {}), tmTabShell: true },

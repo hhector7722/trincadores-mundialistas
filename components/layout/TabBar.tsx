@@ -86,7 +86,7 @@ export function TabBar() {
             aria-current={active ? "page" : undefined}
             className={cn(
               "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
-              "transition-all duration-200 active:scale-95",
+              "transition-[color,transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95",
               active ? "text-[var(--tm-accent)] drop-shadow-md" : "text-[var(--tm-muted)]",
               navigating && "opacity-80",
             )}

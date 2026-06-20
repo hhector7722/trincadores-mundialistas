@@ -64,6 +64,11 @@
   --tm-app-header-block-pinned: calc(
     var(--tm-app-header-pt-pinned) + var(--tm-app-header-inner-pinned) + var(--tm-app-header-pb-pinned)
   );
+  --tm-ios-ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --tm-page-push-ms: 360ms;
+  --tm-panel-slide-ms: 350ms;
+  --tm-modal-enter-ms: 380ms;
+  --tm-modal-exit-ms: 280ms;
   /* Hex explícito: iOS PWA usa esto para la franja bajo el viewport (no lee bien solo variables) */
   --tm-shell-bg-hex: #2a1058;
   --tm-tabbar-bg-hex: #2e1260;
@@ -335,6 +340,97 @@ html:has(.tm-tab-swipe-root) {
   height: 100%;
 }
 
+/* Stack de páginas (push/pop estilo iOS) */
+.tm-page-stack {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior-x: none;
+}
+
+.tm-page-stack--dragging {
+  touch-action: none;
+}
+
+.tm-page-stack__edge-shadow {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.34) 0%,
+    rgba(0, 0, 0, 0.12) 55%,
+    transparent 100%
+  );
+}
+
+.tm-page-stack__layer {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tm-page-stack__layer--enter-push {
+  animation: tm-page-enter-push var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+.tm-page-stack__layer--enter-pop {
+  animation: tm-page-enter-pop var(--tm-page-push-ms) var(--tm-ios-ease-out) both;
+}
+
+@keyframes tm-page-enter-push {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tm-page-enter-pop {
+  from {
+    transform: translate3d(-28%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+html[data-page-back-dragging],
+html[data-page-back-dragging] body {
+  overscroll-behavior-x: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Modales: entrada/salida suave */
+.tm-modal-backdrop {
+  opacity: 0;
+  transition: opacity var(--tm-modal-enter-ms) var(--tm-ios-ease-out);
+}
+
+.tm-modal-backdrop--visible {
+  opacity: 1;
+}
+
+.tm-modal-backdrop--hidden {
+  opacity: 0;
+  transition-duration: var(--tm-modal-exit-ms);
+}
+
+.tm-modal-panel-host--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity var(--tm-modal-enter-ms) var(--tm-ios-ease-out),
+    transform var(--tm-modal-enter-ms) var(--tm-ios-ease-out);
+}
+
+.tm-modal-panel-host--hidden {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) scale(0.97);
+  transition:
+    opacity var(--tm-modal-exit-ms) var(--tm-ios-ease-out),
+    transform var(--tm-modal-exit-ms) var(--tm-ios-ease-out);
+}
+
 html[data-tab-swipe-navigating] .tm-tab-loading-overlay {
   display: none;
 }
@@ -507,6 +603,22 @@ html:has(.tm-app-shell) body {
   justify-content: center;
   pointer-events: none;
   background: transparent;
+}
+
+.tm-nav-loading-overlay--subtle {
+  background: rgba(26, 8, 56, 0.08);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  animation: tm-nav-loading-fade 220ms var(--tm-ios-ease-out);
+}
+
+@keyframes tm-nav-loading-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .tm-tab-loading-overlay {

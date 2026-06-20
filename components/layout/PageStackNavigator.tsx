@@ -1,0 +1,312 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { isStackSubpage, resolvePageNavDirection, type PageNavDirection } from "@/lib/layout/page-navigation";
+import { PAGE_PUSH_MS, iosTransition } from "@/lib/ui/motion";
+import { cn } from "@/lib/utils";
+
+type PageStackNavigatorProps = {
+  children: ReactNode;
+};
+
+const EDGE_ZONE_PX = 28;
+const LOCK_THRESHOLD_PX = 6;
+const COMMIT_RATIO = 0.34;
+const VELOCITY_THRESHOLD = 0.38;
+
+function isModalOpen() {
+  return typeof document !== "undefined" && document.documentElement.hasAttribute("data-modal-open");
+}
+
+function canStartEdgeBack(target: EventTarget | null) {
+  if (!(target instanceof Element)) return true;
+  if (target.closest("[data-block-page-back]")) return false;
+  if (target.closest("input, textarea, select, button, a, [role='slider'], [data-vaul-drawer]")) {
+    return false;
+  }
+  return true;
+}
+
+function setPageBackDragging(active: boolean) {
+  if (typeof document === "undefined") return;
+  if (active) {
+    document.documentElement.setAttribute("data-page-back-dragging", "");
+  } else {
+    document.documentElement.removeAttribute("data-page-back-dragging");
+  }
+}
+
+export function PageStackNavigator({ children }: PageStackNavigatorProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const stackRef = useRef<string[]>([pathname]);
+  const prevPathRef = useRef(pathname);
+
+  const [navDirection, setNavDirection] = useState<PageNavDirection>("none");
+  const [navKey, setNavKey] = useState(0);
+
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [animatingBack, setAnimatingBack] = useState(false);
+
+  const layerRef = useRef<HTMLDivElement>(null);
+  const widthRef = useRef(0);
+  const pointerIdRef = useRef<number | null>(null);
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const lockedAxisRef = useRef<"none" | "x" | "y">("none");
+  const dragXRef = useRef(0);
+
+  const edgeBackEnabled = isStackSubpage(pathname);
+
+  useEffect(() => {
+    const root = layerRef.current;
+    if (!root) return;
+
+    const updateWidth = () => {
+      widthRef.current = root.clientWidth || window.innerWidth;
+    };
+
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(root);
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (pathname === prevPathRef.current) return;
+
+    const { direction, nextStack } = resolvePageNavDirection(stackRef.current, pathname);
+    stackRef.current = nextStack;
+    prevPathRef.current = pathname;
+
+    if (direction === "none" || direction === "tab") {
+      setNavDirection("none");
+      return;
+    }
+
+    setNavDirection(direction);
+    setNavKey((value) => value + 1);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (navDirection === "none") return;
+
+    const timer = window.setTimeout(() => {
+      setNavDirection("none");
+    }, PAGE_PUSH_MS + 40);
+
+    return () => window.clearTimeout(timer);
+  }, [navDirection, navKey]);
+
+  useEffect(() => {
+    setPageBackDragging(isDragging);
+    return () => setPageBackDragging(false);
+  }, [isDragging]);
+
+  const resetDrag = useCallback(() => {
+    dragXRef.current = 0;
+    setDragX(0);
+    setIsDragging(false);
+    setAnimatingBack(false);
+    lockedAxisRef.current = "none";
+    pointerIdRef.current = null;
+  }, []);
+
+  const animateBackCommit = useCallback(() => {
+    const width = widthRef.current;
+    if (width <= 0) {
+      router.back();
+      resetDrag();
+      return;
+    }
+
+    setAnimatingBack(true);
+    dragXRef.current = width;
+    setDragX(width);
+
+    const layer = layerRef.current;
+    if (!layer) {
+      router.back();
+      resetDrag();
+      return;
+    }
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      layer.removeEventListener("transitionend", onEnd);
+      window.clearTimeout(fallback);
+      router.back();
+      resetDrag();
+    };
+
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target !== layer || event.propertyName !== "transform") return;
+      finish();
+    };
+
+    const fallback = window.setTimeout(finish, PAGE_PUSH_MS + 80);
+    layer.addEventListener("transitionend", onEnd);
+  }, [resetDrag, router]);
+
+  const settleDrag = useCallback(() => {
+    const width = widthRef.current;
+    const offset = dragXRef.current;
+    const elapsed = Math.max(performance.now() - startTimeRef.current, 1);
+    const velocity = offset / elapsed;
+    const ratio = offset / Math.max(width, 1);
+    const committed = ratio >= COMMIT_RATIO || velocity > VELOCITY_THRESHOLD;
+
+    if (committed) {
+      animateBackCommit();
+      return;
+    }
+
+    setAnimatingBack(true);
+    dragXRef.current = 0;
+    setDragX(0);
+
+    const layer = layerRef.current;
+    if (!layer) {
+      resetDrag();
+      return;
+    }
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      layer.removeEventListener("transitionend", onEnd);
+      window.clearTimeout(fallback);
+      resetDrag();
+    };
+
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target !== layer || event.propertyName !== "transform") return;
+      finish();
+    };
+
+    const fallback = window.setTimeout(finish, PAGE_PUSH_MS + 80);
+    layer.addEventListener("transitionend", onEnd);
+  }, [animateBackCommit, resetDrag]);
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!edgeBackEnabled || animatingBack || isModalOpen()) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.clientX > EDGE_ZONE_PX) return;
+    if (!canStartEdgeBack(event.target)) return;
+
+    pointerIdRef.current = event.pointerId;
+    startXRef.current = event.clientX;
+    startYRef.current = event.clientY;
+    startTimeRef.current = performance.now();
+    lockedAxisRef.current = "none";
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId || animatingBack) return;
+
+    const deltaX = event.clientX - startXRef.current;
+    const deltaY = event.clientY - startYRef.current;
+
+    if (lockedAxisRef.current === "none") {
+      if (Math.hypot(deltaX, deltaY) < LOCK_THRESHOLD_PX) return;
+      if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) {
+        lockedAxisRef.current = "y";
+        event.currentTarget.releasePointerCapture(event.pointerId);
+        pointerIdRef.current = null;
+        return;
+      }
+      if (deltaX <= 0) {
+        lockedAxisRef.current = "y";
+        event.currentTarget.releasePointerCapture(event.pointerId);
+        pointerIdRef.current = null;
+        return;
+      }
+      lockedAxisRef.current = "x";
+      setIsDragging(true);
+    }
+
+    if (lockedAxisRef.current !== "x") return;
+    if (event.cancelable) event.preventDefault();
+
+    const next = Math.max(0, deltaX);
+    dragXRef.current = next;
+    setDragX(next);
+  };
+
+  const onPointerEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (lockedAxisRef.current === "x") {
+      settleDrag();
+    } else {
+      resetDrag();
+    }
+  };
+
+  const showEdgeShadow = isDragging || animatingBack;
+  const slideTransition = isDragging ? "none" : iosTransition("transform", PAGE_PUSH_MS);
+
+  return (
+    <div
+      className={cn(
+        "tm-page-stack relative min-h-0 min-w-0 flex-1",
+        isDragging && "tm-page-stack--dragging"
+      )}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerEnd}
+      onPointerCancel={onPointerEnd}
+    >
+      {showEdgeShadow ? (
+        <div
+          className="tm-page-stack__edge-shadow pointer-events-none absolute inset-y-0 left-0 z-0 w-8"
+          aria-hidden
+          style={{
+            opacity: Math.min(0.42, dragX / Math.max(widthRef.current * 0.55, 1)),
+          }}
+        />
+      ) : null}
+
+      <div
+        key={`${pathname}-${navKey}`}
+        ref={layerRef}
+        className={cn(
+          "tm-page-stack__layer relative z-[1] flex min-h-0 w-full flex-1 flex-col will-change-transform",
+          navDirection === "push" && "tm-page-stack__layer--enter-push",
+          navDirection === "pop" && "tm-page-stack__layer--enter-pop"
+        )}
+        style={{
+          transform: dragX > 0 ? `translate3d(${dragX}px, 0, 0)` : undefined,
+          transition: dragX > 0 ? slideTransition : undefined,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
