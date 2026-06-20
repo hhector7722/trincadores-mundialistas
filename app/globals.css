@@ -1733,7 +1733,7 @@ html:has(.tm-app-shell) body {
 .tm-ranking-evolution-trigger {
   flex-shrink: 0;
   padding-bottom: calc(
-    var(--tm-tabbar-indicators-gap) + var(--tm-tabbar-indicators-row) + 0.25rem
+    var(--tm-tabbar-indicators-gap) + var(--tm-tabbar-indicators-row) + 1rem
   );
 }
 
