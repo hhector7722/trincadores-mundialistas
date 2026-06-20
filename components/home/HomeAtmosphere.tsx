@@ -2,14 +2,19 @@
 
 import { usePathname } from "next/navigation";
 import { useTabNavigation } from "@/components/layout/TabNavigationProvider";
+import { getMainTabSectionIndex, MAIN_TABS } from "@/lib/layout/main-tabs";
 
-const HOME_TAB_INDEX = 2;
+function shouldShowMainTabAtmosphere(pathname: string, swipeProgress: number | null): boolean {
+  if (getMainTabSectionIndex(pathname) !== null) return true;
+  if (swipeProgress != null) {
+    const idx = Math.round(swipeProgress);
+    return idx >= 0 && idx < MAIN_TABS.length;
+  }
+  return false;
+}
 
 function getHomeAtmosphereOpacity(pathname: string, swipeProgress: number | null): number {
-  if (swipeProgress != null) {
-    return Math.max(0, Math.min(1, 1 - Math.abs(swipeProgress - HOME_TAB_INDEX)));
-  }
-  return pathname === "/" ? 1 : 0;
+  return shouldShowMainTabAtmosphere(pathname, swipeProgress) ? 1 : 0;
 }
 
 export function HomeAtmosphere() {
