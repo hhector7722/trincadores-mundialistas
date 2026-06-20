@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 const PLAY_BUTTON_CLASS = cn(
   "inline-flex h-auto w-max shrink-0 items-center justify-center",
-  "rounded-full bg-[#CCFF00] px-[clamp(12px,3.2cqw,14px)] py-[clamp(3px,1.25cqw,4px)]",
-  "text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-black",
+  "rounded-full bg-[#CCFF00] px-[clamp(14px,3.8cqw,17px)] py-[clamp(4px,1.5cqw,5px)]",
+  "text-[clamp(12px,3.2cqw,14px)] font-bold uppercase leading-none tracking-[0.12em] text-black",
   "transition-opacity hover:opacity-90 active:opacity-80",
   "disabled:cursor-not-allowed disabled:opacity-50"
 );
