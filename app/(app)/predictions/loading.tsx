@@ -1,4 +1,5 @@
-/** Sin spinner propio: la navegación por pestaña ya muestra indicador de carga. */
+import { TabPageLoading } from "@/components/layout/TabPageLoading";
+
 export default function PredictionsLoading() {
-  return null;
+  return <TabPageLoading label="Cargando calendario" />;
 }
