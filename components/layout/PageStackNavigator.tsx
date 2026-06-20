@@ -11,6 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { isStackSubpage, resolvePageNavDirection, type PageNavDirection } from "@/lib/layout/page-navigation";
+import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { PAGE_PUSH_MS, iosTransition } from "@/lib/ui/motion";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,7 @@ function setPageBackDragging(active: boolean) {
 export function PageStackNavigator({ children }: PageStackNavigatorProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { navPending } = useAppNavigation();
   const stackRef = useRef<string[]>([pathname]);
   const prevPathRef = useRef(pathname);
   const displayedRef = useRef(children);
@@ -297,13 +299,21 @@ export function PageStackNavigator({ children }: PageStackNavigatorProps) {
         </div>
         <div
           className={cn(
-            "tm-page-stack__layer tm-page-stack__layer--overlay",
+            "tm-page-stack__layer tm-page-stack__layer--overlay relative",
             transition.direction === "push"
               ? "tm-page-stack__layer--push-in"
               : "tm-page-stack__layer--pop-in"
           )}
         >
           {transition.incoming}
+          {transition.direction === "push" && navPending ? (
+            <div
+              className="tm-page-stack__pending-spinner pointer-events-none absolute inset-0 flex items-center justify-center"
+              aria-hidden
+            >
+              <div className="tm-spinner tm-spinner--sm" />
+            </div>
+          ) : null}
         </div>
       </div>
     );

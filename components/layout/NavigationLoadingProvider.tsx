@@ -18,6 +18,7 @@ type NavigationLoadingContextValue = {
   navigateTab: (href: string) => void;
   setNavigating: (active: boolean) => void;
   tabPending: boolean;
+  navPending: boolean;
 };
 
 const NavigationLoadingContext = createContext<NavigationLoadingContextValue | null>(null);
@@ -62,6 +63,7 @@ export function useAppNavigation() {
     navigateTab: context?.navigateTab ?? ((href: string) => router.replace(href)),
     setNavigating: context?.setNavigating ?? (() => undefined),
     tabPending: context?.tabPending ?? false,
+    navPending: context?.navPending ?? false,
   };
 }
 
@@ -114,7 +116,7 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
 
   return (
     <NavigationLoadingContext.Provider
-      value={{ navigate, navigateTab, setNavigating, tabPending }}
+      value={{ navigate, navigateTab, setNavigating, tabPending, navPending: isPending }}
     >
       <div className="contents" onClickCapture={handleCaptureClick}>
         {children}

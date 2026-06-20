@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
-import { mountTabSnapshot } from "@/lib/layout/tab-snapshot-cache";
+import type { ReactNode } from "react";
+import { TabPanelFallback } from "@/components/layout/TabPanelFallback";
 import { TAB_SWIPE_ANIMATION_MS, TAB_SWIPE_EASING } from "@/lib/layout/tab-swipe";
 
 type TabAdjacentPanelProps = {
@@ -13,14 +13,6 @@ type TabAdjacentPanelProps = {
 
 /** Panel lateral durante el gesto: snapshot estático del tab vecino. */
 export function TabAdjacentPanel({ href, dragX, animating, side }: TabAdjacentPanelProps) {
-  const hostRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-    mountTabSnapshot(href, host);
-  }, [href]);
-
   const transform =
     side === "left"
       ? `translate3d(calc(-100% + ${dragX}px), 0, 0)`
@@ -37,10 +29,7 @@ export function TabAdjacentPanel({ href, dragX, animating, side }: TabAdjacentPa
       }}
       aria-hidden
     >
-      <div
-        ref={hostRef}
-        className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent"
-      />
+      <TabPanelFallback href={href} />
     </div>
   );
 }
@@ -52,6 +41,7 @@ type TabTransitionIncomingProps = {
   animating: boolean;
   liveContent: ReactNode;
   liveReady: boolean;
+  pending: boolean;
 };
 
 /** Panel entrante durante commit de pestaña: snapshot hasta que el RSC esté listo. */
@@ -62,16 +52,8 @@ export function TabTransitionIncoming({
   animating,
   liveContent,
   liveReady,
+  pending,
 }: TabTransitionIncomingProps) {
-  const hostRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (liveReady) return;
-    const host = hostRef.current;
-    if (!host) return;
-    mountTabSnapshot(href, host);
-  }, [href, liveReady]);
-
   const transform =
     side === "left"
       ? `translate3d(calc(-100% + ${dragX}px), 0, 0)`
@@ -93,10 +75,7 @@ export function TabTransitionIncoming({
           {liveContent}
         </div>
       ) : (
-        <div
-          ref={hostRef}
-          className="tm-tab-swipe-adjacent-host flex h-full min-h-0 w-full flex-col bg-transparent"
-        />
+        <TabPanelFallback href={href} pending={pending} />
       )}
     </div>
   );

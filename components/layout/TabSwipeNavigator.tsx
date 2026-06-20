@@ -509,6 +509,7 @@ export function TabSwipeNavigator({ children }: TabSwipeNavigatorProps) {
           animating={animating}
           liveContent={children}
           liveReady={incomingReady}
+          pending={tabPending}
         />
       ) : null}
 

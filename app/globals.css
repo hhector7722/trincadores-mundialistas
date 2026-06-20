@@ -689,6 +689,18 @@ html:has(.tm-app-shell) body {
   background: transparent;
 }
 
+.tm-tab-panel-spinner {
+  background: rgba(26, 8, 56, 0.12);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.tm-page-stack__pending-spinner {
+  background: rgba(26, 8, 56, 0.1);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
 .tm-card-surface {
   background: var(--tm-glass);
   backdrop-filter: blur(16px);
