@@ -38,6 +38,7 @@ import {
   lineupsModalTitle,
 } from "@/lib/lineup/lineups-modal-copy";
 import { useMatchLiveSnapshot } from "@/lib/live/use-match-live-snapshot";
+import { useHighlightScorelineVisibility } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { formatListScore } from "@/lib/predictions/edit-state";
 import {
@@ -191,6 +192,7 @@ export function HomeMatchCard({
   const [bothConfirmed, setBothConfirmed] = useState(false);
   const [selectedGroupCode, setSelectedGroupCode] = useState<string | null>(null);
   const { snapshot: liveSnapshot } = useMatchLiveSnapshot(match.id, isLive);
+  const { visible: aiVisible } = useHighlightScorelineVisibility();
 
   const displayMatch = useMemo(
     () => mergeMvpIntoMatch(match, mvpSnapshot),
@@ -283,14 +285,17 @@ export function HomeMatchCard({
             {scheduledHeaderLabel(slidePosition, hasLiveInCarousel)}
           </p>
         )}
-        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-0.5">
-          <AiPredictionTrigger
-            matchId={displayMatch.id}
-            homeTeam={displayMatch.home_team}
-            awayTeam={displayMatch.away_team}
-            className="min-h-8 min-w-8"
-            iconClassName="h-3 w-3"
-          />
+        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-1.5">
+          {aiVisible && (
+            <AiPredictionTrigger
+              matchId={displayMatch.id}
+              homeTeam={displayMatch.home_team}
+              awayTeam={displayMatch.away_team}
+              className="min-h-8 px-1 text-[8px] font-bold uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            >
+              AI
+            </AiPredictionTrigger>
+          )}
           {displayMatch.group_code ? (
             <button
               type="button"

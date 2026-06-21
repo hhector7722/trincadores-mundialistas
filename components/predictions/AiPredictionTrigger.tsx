@@ -15,6 +15,7 @@ type AiPredictionTriggerProps = {
   awayTeam: string;
   className?: string;
   iconClassName?: string;
+  children?: React.ReactNode;
 };
 
 export function AiPredictionTrigger({
@@ -23,6 +24,7 @@ export function AiPredictionTrigger({
   awayTeam,
   className,
   iconClassName,
+  children,
 }: AiPredictionTriggerProps) {
   const username = useCurrentUsername();
   const [open, setOpen] = useState(false);
@@ -67,16 +69,19 @@ export function AiPredictionTrigger({
         aria-label="Predicción IA"
         onClick={handleOpen}
         className={cn(
-          "inline-flex min-h-12 min-w-12 shrink-0 items-center justify-center",
-          "text-[var(--tm-muted)] transition-colors hover:text-[var(--tm-accent)]",
-          className,
+          "inline-flex shrink-0 items-center justify-center transition-colors",
+          className ? className : "min-h-12 min-w-12 text-[var(--tm-muted)] hover:text-[var(--tm-accent)]",
         )}
       >
-        <Lightbulb
-          className={cn("h-3.5 w-3.5", iconClassName)}
-          strokeWidth={1.75}
-          aria-hidden="true"
-        />
+        {children !== undefined ? (
+          children
+        ) : (
+          <Lightbulb
+            className={cn("h-3.5 w-3.5", iconClassName)}
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+        )}
       </button>
 
       <AiPredictionModal
