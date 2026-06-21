@@ -28,6 +28,11 @@ import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigge
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
+import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
+import {
+  buildGroupStandingsDetail,
+  toGroupMatchRows,
+} from "@/lib/pool/group-standings";
 import {
   lineupsActionCaption,
   lineupsModalTitle,
@@ -184,12 +189,18 @@ export function HomeMatchCard({
     view: buildLineupView(match.home_team),
   });
   const [bothConfirmed, setBothConfirmed] = useState(false);
+  const [selectedGroupCode, setSelectedGroupCode] = useState<string | null>(null);
   const { snapshot: liveSnapshot } = useMatchLiveSnapshot(match.id, isLive);
 
   const displayMatch = useMemo(
     () => mergeMvpIntoMatch(match, mvpSnapshot),
     [match, mvpSnapshot],
   );
+
+  const groupStandingsDetail = useMemo(() => {
+    if (!modalCarouselMatches?.length) return [];
+    return buildGroupStandingsDetail(toGroupMatchRows(modalCarouselMatches), "official");
+  }, [modalCarouselMatches]);
 
   const lineupsCaption = lineupsActionCaption({ bothConfirmed, isLive });
   const lineupsTitle = lineupsModalTitle({ bothConfirmed, isLive });
@@ -275,12 +286,22 @@ export function HomeMatchCard({
             className="min-h-8 min-w-8"
             iconClassName="h-3 w-3"
           />
-          <Link
-            href="/predictions"
-            className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
-          >
-            Ver todos
-          </Link>
+          {displayMatch.group_code ? (
+            <button
+              type="button"
+              onClick={() => setSelectedGroupCode(displayMatch.group_code)}
+              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            >
+              Ver grupo
+            </button>
+          ) : (
+            <Link
+              href="/predictions"
+              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+            >
+              Ver todos
+            </Link>
+          )}
         </div>
         {isLive || isFinished ? (
           <button
@@ -479,6 +500,16 @@ export function HomeMatchCard({
           showSignOutcomeTicks
         />
       ) : null}
+
+      {selectedGroupCode && (
+        <GroupStandingsModal
+          open
+          onClose={() => setSelectedGroupCode(null)}
+          groupCode={selectedGroupCode}
+          groups={groupStandingsDetail}
+          onGroupChange={setSelectedGroupCode}
+        />
+      )}
     </>
   );
 }
