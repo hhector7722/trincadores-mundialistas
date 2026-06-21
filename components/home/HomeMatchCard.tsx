@@ -288,7 +288,7 @@ export function HomeMatchCard({
             <button
               type="button"
               onClick={() => setSelectedGroupCode(displayMatch.group_code)}
-              className="text-[8px] font-medium uppercase tracking-[0.12em] text-[var(--tm-accent)] transition-opacity hover:opacity-80"
+              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)] text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
             >
               Ver grupo
             </button>
