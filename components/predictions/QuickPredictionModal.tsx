@@ -15,6 +15,7 @@ import { MatchContextActionsRow } from "@/components/lineup/MatchContextActionsR
 import { MvpPickPanel } from "@/components/lineup/MvpPickPanel";
 import { PossibleLineupsPanel } from "@/components/lineup/PossibleLineupsPanel";
 import { FinishedMatchScoreRow } from "@/components/predictions/FinishedMatchScoreRow";
+import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButton";
@@ -70,6 +71,10 @@ import {
 } from "@/lib/lineup/field-asset";
 import { buildBoardCarouselMatches } from "@/lib/predictions/board-carousel";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
+import {
+  buildGroupStandingsDetail,
+  toGroupMatchRows,
+} from "@/lib/pool/group-standings";
 import { usePanelSlideStack } from "@/lib/ui/use-panel-slide-stack";
 import { CarouselSwipeDots, useCarouselSlide } from "@/lib/ui/use-carousel-slide";
 import { cn } from "@/lib/utils";
@@ -232,6 +237,7 @@ export function QuickPredictionModal({
   const [mvpOverrides, setMvpOverrides] = useState<Record<string, MvpSnapshot>>({});
   const [predictionsBoardOpen, setPredictionsBoardOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [groupStandingsCode, setGroupStandingsCode] = useState<string | null>(null);
   const [matchSlide, setMatchSlide] = useState<MatchSlideState | null>(null);
   const matchSlideLockRef = useRef(false);
   const matchSlideTimerRef = useRef<number | null>(null);
@@ -259,6 +265,21 @@ export function QuickPredictionModal({
   const boardCarouselMatches = useMemo(
     () => buildBoardCarouselMatches(orderedMatches),
     [orderedMatches],
+  );
+
+  const groupMatchRows = useMemo(
+    () => toGroupMatchRows(orderedMatches),
+    [orderedMatches],
+  );
+
+  const groupStandingsDetail = useMemo(
+    () => buildGroupStandingsDetail(groupMatchRows, "official"),
+    [groupMatchRows],
+  );
+
+  const groupStandingsPredicted = useMemo(
+    () => buildGroupStandingsDetail(groupMatchRows, "predictions"),
+    [groupMatchRows],
   );
 
   const {
@@ -866,6 +887,18 @@ export function QuickPredictionModal({
 
           </div>
 
+          {targetMatch.group_code ? (
+            <div className="flex justify-center px-4 pt-3">
+              <button
+                type="button"
+                onClick={() => setGroupStandingsCode(targetMatch.group_code)}
+                className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] pt-[clamp(2px,1cqw,3px)] pb-[clamp(1px,0.5cqw,1.5px)] text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
+              >
+                <span className="-translate-y-[0.5px]">Ver grupo</span>
+              </button>
+            </div>
+          ) : null}
+
           <div className="mt-auto shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[1.38rem]">
             <PredictionDeadlineCountdown kickoffAt={targetMatch.kickoff_at} />
             <div className="mt-3 flex gap-2">
@@ -1085,6 +1118,17 @@ export function QuickPredictionModal({
         homeGoals={viewMatch.officialHome ?? liveSnapshot?.homeScore ?? null}
         awayGoals={viewMatch.officialAway ?? liveSnapshot?.awayScore ?? null}
         stats={liveSnapshot?.stats ?? null}
+      />
+    ) : null}
+
+    {groupStandingsCode ? (
+      <GroupStandingsModal
+        open
+        groupCode={groupStandingsCode}
+        groups={groupStandingsDetail}
+        predictedGroups={groupStandingsPredicted}
+        onClose={() => setGroupStandingsCode(null)}
+        onGroupChange={setGroupStandingsCode}
       />
     ) : null}
     </>
