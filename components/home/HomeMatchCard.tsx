@@ -202,6 +202,11 @@ export function HomeMatchCard({
     return buildGroupStandingsDetail(toGroupMatchRows(modalCarouselMatches), "official");
   }, [modalCarouselMatches]);
 
+  const groupStandingsPredicted = useMemo(() => {
+    if (!modalCarouselMatches?.length) return [];
+    return buildGroupStandingsDetail(toGroupMatchRows(modalCarouselMatches), "predictions");
+  }, [modalCarouselMatches]);
+
   const lineupsCaption = lineupsActionCaption({ bothConfirmed, isLive });
   const lineupsTitle = lineupsModalTitle({ bothConfirmed, isLive });
 
@@ -507,6 +512,7 @@ export function HomeMatchCard({
           onClose={() => setSelectedGroupCode(null)}
           groupCode={selectedGroupCode}
           groups={groupStandingsDetail}
+          predictedGroups={groupStandingsPredicted}
           onGroupChange={setSelectedGroupCode}
         />
       )}

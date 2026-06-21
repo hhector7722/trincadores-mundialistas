@@ -572,6 +572,7 @@ export function PredictionsCalendar({
           onClose={() => setActiveGroupCode(null)}
           groupCode={activeGroupCode}
           groups={groupStandingsDetail}
+          predictedGroups={groupStandingsPredicted}
           onGroupChange={setActiveGroupCode}
         />
       )}

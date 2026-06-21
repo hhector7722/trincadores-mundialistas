@@ -8,6 +8,7 @@ import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
 import { GroupStandingsTable } from "@/components/predictions/group-standings-table";
 import { Modal, type ModalPanelSlide } from "@/components/ui/modal";
+import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import {
   LINEUP_MODAL_PANEL_CLASS,
   LINEUP_MODAL_PANEL_HOST_CLASS,
@@ -26,6 +27,7 @@ type GroupStandingsModalProps = {
   onClose: () => void;
   groupCode: string | null;
   groups: GroupStandingDetail[];
+  predictedGroups?: GroupStandingDetail[];
   onGroupChange?: (groupCode: string) => void;
 };
 
@@ -73,7 +75,7 @@ function GroupSwipeDots({ position }: { position: DotPosition }) {
 }
 
 function groupPanelTitle(view: GroupPanelView, lineupFormation?: string): ReactNode {
-  if (view.kind === "standings") return `Grupo ${view.group.code}`;
+  if (view.kind === "standings") return `GRUPO ${view.group.code}`;
   return entityModalTitleContent(view, {
     lineupFormation: view.kind === "lineup" ? lineupFormation : undefined,
   });
@@ -84,10 +86,12 @@ export function GroupStandingsModal({
   onClose,
   groupCode,
   groups,
+  predictedGroups,
   onGroupChange,
 }: GroupStandingsModalProps) {
   const orderedGroups = useMemo(() => groups, [groups]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [allGroupsOpen, setAllGroupsOpen] = useState(false);
   const [groupSlide, setGroupSlide] = useState<GroupSlideState | null>(null);
   const groupSlideLockRef = useRef(false);
   const groupSlideTimerRef = useRef<number | null>(null);
@@ -294,55 +298,84 @@ export function GroupStandingsModal({
   const isCompactModal = isLineupView || isPlayerView;
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={groupPanelTitle(panelView, lineupFormation)}
-      hideHeaderDivider
-      headerCompact={isCompactModal}
-      scrollContent={!isCompactModal}
-      className={cn(
-        isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
-        isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+    <>
+      <Modal
+        open={open}
+        onClose={onClose}
+        title={groupPanelTitle(panelView, lineupFormation)}
+        hideHeaderDivider
+        headerCompact={isCompactModal}
+        scrollContent={!isCompactModal}
+        headerTitleAlign={atStandingsRoot ? "left" : "default"}
+        hideCloseButton
+        headerTrailing={
+          atStandingsRoot ? (
+            <button
+              type="button"
+              onClick={() => setAllGroupsOpen(true)}
+              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-2 py-0.5 text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
+            >
+              Ver grupos
+            </button>
+          ) : undefined
+        }
+        className={cn(
+          isLineupView && cn(LINEUP_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]"),
+          isPlayerView && cn(PLAYER_MODAL_PANEL_CLASS, "max-h-[calc(100dvh-1rem)]")
+        )}
+        panelHostClassName={
+          isLineupView
+            ? LINEUP_MODAL_PANEL_HOST_CLASS
+            : isPlayerView
+              ? PLAYER_MODAL_PANEL_HOST_CLASS
+              : undefined
+        }
+        wrapperClassName={cn(
+          isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
+          isPlayerView && PLAYER_MODAL_WRAPPER_CLASS
+        )}
+        containerClassName={isCompactModal ? "p-1.5" : undefined}
+        opaque
+        onSwipeLeft={
+          canSwipeGroups && atStandingsRoot && !activePanelSlide
+            ? () => startGroupSlide(1)
+            : canSwipeTeams && atLineupCarousel && !activePanelSlide
+              ? () => startTeamSlide(1)
+              : undefined
+        }
+        onSwipeRight={
+          canSwipeGroups && atStandingsRoot && !activePanelSlide
+            ? () => startGroupSlide(-1)
+            : canSwipeTeams && atLineupCarousel && !activePanelSlide
+              ? () => startTeamSlide(-1)
+              : undefined
+        }
+        belowPanel={
+          canSwipeGroups && atStandingsRoot ? (
+            <GroupSwipeDots position={dotPosition} />
+          ) : canSwipeTeams && atLineupCarousel ? (
+            <CarouselSwipeDots activeIndex={teamCarouselIndex} total={groupTeamNames.length} />
+          ) : undefined
+        }
+        onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}
+        panelSlide={activePanelSlide}
+      >
+        {renderPanelView(panelView)}
+      </Modal>
+
+      {allGroupsOpen && (
+        <AllGroupsStandingsModal
+          open
+          stackElevated
+          onClose={() => setAllGroupsOpen(false)}
+          officialGroups={groups}
+          predictedGroups={predictedGroups ?? groups}
+          onSelectGroup={(code) => {
+            setAllGroupsOpen(false);
+            onGroupChange?.(code);
+          }}
+        />
       )}
-      panelHostClassName={
-        isLineupView
-          ? LINEUP_MODAL_PANEL_HOST_CLASS
-          : isPlayerView
-            ? PLAYER_MODAL_PANEL_HOST_CLASS
-            : undefined
-      }
-      wrapperClassName={cn(
-        isLineupView && LINEUP_MODAL_WRAPPER_CLASS,
-        isPlayerView && PLAYER_MODAL_WRAPPER_CLASS
-      )}
-      containerClassName={isCompactModal ? "p-1.5" : undefined}
-      opaque
-      onSwipeLeft={
-        canSwipeGroups && atStandingsRoot && !activePanelSlide
-          ? () => startGroupSlide(1)
-          : canSwipeTeams && atLineupCarousel && !activePanelSlide
-            ? () => startTeamSlide(1)
-            : undefined
-      }
-      onSwipeRight={
-        canSwipeGroups && atStandingsRoot && !activePanelSlide
-          ? () => startGroupSlide(-1)
-          : canSwipeTeams && atLineupCarousel && !activePanelSlide
-            ? () => startTeamSlide(-1)
-            : undefined
-      }
-      belowPanel={
-        canSwipeGroups && atStandingsRoot ? (
-          <GroupSwipeDots position={dotPosition} />
-        ) : canSwipeTeams && atLineupCarousel ? (
-          <CarouselSwipeDots activeIndex={teamCarouselIndex} total={groupTeamNames.length} />
-        ) : undefined
-      }
-      onBack={canGoBack && !isPanelSliding && !isCarouselSliding ? pop : undefined}
-      panelSlide={activePanelSlide}
-    >
-      {renderPanelView(panelView)}
-    </Modal>
+    </>
   );
 }
