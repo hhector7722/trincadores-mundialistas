@@ -26,13 +26,13 @@ export function LiveMatchHeaderLabel({
       <span
         className={cn(
           "inline-flex items-center gap-1 rounded-full bg-[#CCFF00]",
-          "px-[clamp(6px,2cqw,8px)] py-[clamp(2px,0.8cqw,3px)]",
+          "px-[clamp(6px,2cqw,8px)] pt-[clamp(2px,0.8cqw,3px)] pb-[clamp(1px,0.4cqw,1.5px)]",
           "font-bold uppercase leading-none tracking-[0.12em] text-black",
           size === "card" ? "text-[8px]" : "text-[10px]",
         )}
       >
         <span className="-translate-y-[0.5px]">EN JUEGO</span>
-        <LivePulseIcon className="-translate-y-[0.5px]" />
+        <LivePulseIcon className="-translate-y-[0.25px]" />
       </span>
       {showMinute ? (
         <span

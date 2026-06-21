@@ -66,10 +66,6 @@ export function usePanelSlideStack<T>(initialView: T) {
 
       setSlide({ target, direction, phase: "prep" });
 
-      slideFinishTimerRef.current = window.setTimeout(() => {
-        finishSlideRef.current();
-      }, SLIDE_MS + 80);
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setSlide((currentSlide) =>
@@ -127,6 +123,10 @@ export function usePanelSlideStack<T>(initialView: T) {
         phase: slide.phase,
         incoming: renderView(slide.target),
         onTransitionEnd: () => finishSlideRef.current(),
+        onTransitionCancel: () => {
+          slideLockRef.current = false;
+          setSlide(null);
+        },
       };
     },
     [slide]

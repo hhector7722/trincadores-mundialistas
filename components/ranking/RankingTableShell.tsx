@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const EVOLUTION_BUTTON_CLASS = cn(
   "inline-flex h-auto w-max shrink-0 items-center justify-center gap-1.5",
-  "rounded-full bg-[#CCFF00] px-[clamp(8px,2.6cqw,10px)] py-[clamp(3px,1.25cqw,4px)]",
+  "rounded-full bg-[#CCFF00] px-[clamp(8px,2.6cqw,10px)] pt-[clamp(3px,1.25cqw,4px)] pb-[clamp(2px,0.6cqw,2.5px)]",
   "text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-black",
   "transition-opacity hover:opacity-90 active:opacity-80"
 );

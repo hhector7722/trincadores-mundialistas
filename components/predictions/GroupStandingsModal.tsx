@@ -217,10 +217,6 @@ export function GroupStandingsModal({
       groupSlideLockRef.current = true;
       setGroupSlide({ target, direction: offset === 1 ? "next" : "prev", phase: "prep" });
 
-      groupSlideTimerRef.current = window.setTimeout(() => {
-        finishGroupSlideRef.current();
-      }, SLIDE_MS + 80);
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setGroupSlide((current) => (current ? { ...current, phase: "animate" } : current));
@@ -289,6 +285,10 @@ export function GroupStandingsModal({
             />
           ),
           onTransitionEnd: () => finishGroupSlideRef.current(),
+          onTransitionCancel: () => {
+            groupSlideLockRef.current = false;
+            setGroupSlide(null);
+          },
         }
       : null;
 
@@ -312,7 +312,7 @@ export function GroupStandingsModal({
             <button
               type="button"
               onClick={() => setAllGroupsOpen(true)}
-              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-2 py-0.5 text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
+              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-2 pt-0.5 pb-[1px] text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
             >
               <span className="-translate-y-[0.5px]">Ver grupos</span>
             </button>

@@ -267,6 +267,7 @@ export function RankingEvolutionChart({
       role="img"
       aria-label="Grafico de evolucion de clasificacion por jornada"
       className="block w-full"
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <defs>
         {series.map((item) => (

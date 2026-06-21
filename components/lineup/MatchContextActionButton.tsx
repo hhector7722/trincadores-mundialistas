@@ -31,7 +31,7 @@ type MatchContextTextActionButtonProps = {
 /** Botón pill amarillo compartido (p. ej. «+ Añadir», «Añadir MVP»). */
 export const MATCH_ADD_PILL_BUTTON_CLASS = cn(
   "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-  "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+  "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] pt-[clamp(2px,1cqw,3px)] pb-[clamp(1px,0.5cqw,1.5px)]",
   "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
   "transition-opacity hover:opacity-90 active:opacity-80"
 );

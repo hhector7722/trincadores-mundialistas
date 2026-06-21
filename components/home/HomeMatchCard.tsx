@@ -80,7 +80,7 @@ const SCHEDULED_SCORE_EDIT_GAP_PX = 10;
 const HOME_PREDICTIONS_BOARD_BUTTON_CLASS = cn(
   "absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
   "inline-flex h-auto w-max shrink-0 items-center justify-center",
-  "rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)]",
+  "rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] pt-[clamp(2px,1cqw,3px)] pb-[clamp(1px,0.5cqw,1.5px)]",
   "text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black",
   "transition-opacity hover:opacity-90 active:opacity-80"
 );
@@ -288,7 +288,7 @@ export function HomeMatchCard({
             <button
               type="button"
               onClick={() => setSelectedGroupCode(displayMatch.group_code)}
-              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(2px,1cqw,3px)] text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
+              className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] pt-[clamp(2px,1cqw,3px)] pb-[clamp(1px,0.5cqw,1.5px)] text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
             >
               <span className="-translate-y-[0.5px]">Ver grupo</span>
             </button>

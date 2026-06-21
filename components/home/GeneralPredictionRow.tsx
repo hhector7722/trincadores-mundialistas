@@ -53,7 +53,7 @@ export function GeneralPredictionRow({
             }}
             className={cn(
               "inline-flex shrink-0 items-center whitespace-nowrap rounded-full",
-              "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] py-[clamp(3px,1cqw,4px)]",
+              "bg-[#CCFF00] px-[clamp(6px,2.1cqw,8px)] pt-[clamp(3px,1cqw,4px)] pb-[clamp(2px,0.5cqw,2.5px)]",
               "text-[clamp(8px,2.2cqw,9px)] font-bold uppercase tracking-wide text-black",
               "transition-opacity hover:opacity-90 active:opacity-80"
             )}

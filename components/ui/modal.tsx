@@ -14,6 +14,7 @@ export type ModalPanelSlide = {
   phase: "prep" | "animate";
   incoming: ReactNode;
   onTransitionEnd: () => void;
+  onTransitionCancel?: () => void;
 };
 
 type ModalProps = {
@@ -324,6 +325,22 @@ export function Modal({
   const [visible, setVisible] = useState(false);
   const panelSlideTransition = iosTransition("transform", PANEL_SLIDE_MS);
 
+  const releaseTimerRef = useRef<number | null>(null);
+  const swipeTriggeredRef = useRef<"left" | "right" | null>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isReleaseAnimating, setIsReleaseAnimating] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (releaseTimerRef.current !== null) {
+        window.clearTimeout(releaseTimerRef.current);
+      }
+    };
+  }, []);
+
   const resolvedUsageLabel =
     usageLabel ??
     (typeof title === "string" ? title : ariaLabel) ??
@@ -412,35 +429,120 @@ export function Modal({
   if (!mounted) return null;
 
   function onTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-    if (panelSlide || !hasSwipe) return;
+    if (panelSlide || !hasSwipe || isReleaseAnimating) return;
     swipeHandledRef.current = false;
+    swipeTriggeredRef.current = null;
     touchStartX.current = event.touches[0]?.clientX ?? null;
     touchStartY.current = event.touches[0]?.clientY ?? null;
+    touchStartTimeRef.current = Date.now();
+    setDragX(0);
+    setIsDragging(false);
+    setIsReleaseAnimating(false);
+    setIsCompleted(false);
   }
 
-  function onTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
-    if (panelSlide || !hasSwipe) return;
-    if (touchStartX.current === null || touchStartY.current === null) return;
+  function onTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    if (!hasSwipe || touchStartX.current === null || touchStartY.current === null || isReleaseAnimating) return;
 
-    const touch = event.changedTouches[0];
+    const touch = event.touches[0];
     if (!touch) return;
 
     const deltaX = touch.clientX - touchStartX.current;
     const deltaY = touch.clientY - touchStartY.current;
 
+    // Check gesture direction lock
+    if (!isDragging && !swipeHandledRef.current) {
+      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
+        // Vertical scroll, cancel swipe detection
+        touchStartX.current = null;
+        touchStartY.current = null;
+        return;
+      }
+      if (Math.abs(deltaX) > 10) {
+        swipeHandledRef.current = true;
+        setIsDragging(true);
+      }
+    }
+
+    if (swipeHandledRef.current) {
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
+      // Trigger swipe callbacks on the first motion past threshold
+      if (deltaX < -15 && onSwipeLeft && swipeTriggeredRef.current !== "left") {
+        swipeTriggeredRef.current = "left";
+        onSwipeLeft();
+      } else if (deltaX > 15 && onSwipeRight && swipeTriggeredRef.current !== "right") {
+        swipeTriggeredRef.current = "right";
+        onSwipeRight();
+      }
+
+      // Clamp drag distance to prevent scrolling past limits
+      let clampedDeltaX = deltaX;
+      const panelWidth = panelRef.current?.offsetWidth ?? 320;
+      if (panelSlide) {
+        const isNext = panelSlide.direction === "next";
+        if (isNext) {
+          clampedDeltaX = Math.max(-panelWidth, Math.min(0, deltaX));
+        } else {
+          clampedDeltaX = Math.max(0, Math.min(panelWidth, deltaX));
+        }
+      }
+
+      setDragX(clampedDeltaX);
+    }
+  }
+
+  function onTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    const startX = touchStartX.current;
     touchStartX.current = null;
     touchStartY.current = null;
 
-    if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    if (!hasSwipe || startX === null || isReleaseAnimating) return;
 
-    event.preventDefault();
-    swipeHandledRef.current = true;
-
-    if (deltaX < 0) {
-      onSwipeLeft?.();
-    } else {
-      onSwipeRight?.();
+    const touch = event.changedTouches[0];
+    if (!touch || !swipeHandledRef.current || !panelSlide) {
+      setIsDragging(false);
+      setDragX(0);
+      return;
     }
+
+    const deltaX = touch.clientX - startX;
+    const duration = Date.now() - touchStartTimeRef.current;
+    const velocity = deltaX / (duration || 1);
+
+    const panelWidth = panelRef.current?.offsetWidth ?? 320;
+    const threshold = panelWidth * 0.22; // 22% of panel width threshold to complete
+
+    const isNext = panelSlide.direction === "next";
+    let completed = false;
+
+    if (isNext) {
+      if (deltaX < -threshold || velocity < -0.2) {
+        completed = true;
+      }
+    } else {
+      if (deltaX > threshold || velocity > 0.2) {
+        completed = true;
+      }
+    }
+
+    setIsDragging(false);
+    setIsCompleted(completed);
+    setIsReleaseAnimating(true);
+    setDragX(0);
+
+    const timer = window.setTimeout(() => {
+      setIsReleaseAnimating(false);
+      if (completed) {
+        panelSlide.onTransitionEnd();
+      } else {
+        panelSlide.onTransitionCancel?.();
+      }
+    }, 250);
+
+    releaseTimerRef.current = timer;
   }
 
   function onBackdropClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -453,18 +555,47 @@ export function Modal({
   }
 
   const slideActive = panelSlide !== null;
-  const slideNext = panelSlide?.direction === "next";
-  const slideAnimate = panelSlide?.phase === "animate";
+  const isNext = panelSlide?.direction === "next";
+
+  let inlineTransform = "";
+  let inlineTransition = "";
+
+  if (isDragging) {
+    if (isNext) {
+      inlineTransform = `translate3d(${dragX}px, 0, 0)`;
+    } else {
+      inlineTransform = `translate3d(calc(-50% + ${dragX}px), 0, 0)`;
+    }
+    inlineTransition = "none";
+  } else if (isReleaseAnimating) {
+    if (isNext) {
+      inlineTransform = isCompleted ? "translate3d(-50%, 0, 0)" : "translate3d(0px, 0, 0)";
+    } else {
+      inlineTransform = isCompleted ? "translate3d(0px, 0, 0)" : "translate3d(-50%, 0, 0)";
+    }
+    inlineTransition = "transform 250ms cubic-bezier(0.16, 1, 0.3, 1)";
+  } else {
+    const slideAnimate = panelSlide?.phase === "animate";
+    inlineTransform = isNext
+      ? slideAnimate
+        ? "translate3d(-50%, 0, 0)"
+        : "translate3d(0px, 0, 0)"
+      : slideAnimate
+        ? "translate3d(0px, 0, 0)"
+        : "translate3d(-50%, 0, 0)";
+    inlineTransition = slideAnimate ? panelSlideTransition : "none";
+  }
 
   return createPortal(
     <div
       className={cn(
         "fixed inset-0 flex items-center justify-center p-4",
         stackElevated ? "z-[110]" : "z-[100]",
-        slideActive && "touch-none",
+        (slideActive && !isDragging) && "touch-none",
         containerClassName
       )}
       onTouchStart={hasSwipe ? onTouchStart : undefined}
+      onTouchMove={hasSwipe ? onTouchMove : undefined}
       onTouchEnd={hasSwipe ? onTouchEnd : undefined}
     >
       <button
@@ -503,23 +634,18 @@ export function Modal({
             <div
               className="flex w-[200%]"
               style={{
-                transform: slideNext
-                  ? slideAnimate
-                    ? "translateX(-50%)"
-                    : "translateX(0)"
-                  : slideAnimate
-                    ? "translateX(0)"
-                    : "translateX(-50%)",
-                transition: slideAnimate ? panelSlideTransition : "none",
+                transform: inlineTransform,
+                transition: inlineTransition,
               }}
               onTransitionEnd={(event) => {
                 if (event.target !== event.currentTarget) return;
                 if (event.propertyName !== "transform") return;
-                if (!slideAnimate) return;
-                panelSlide.onTransitionEnd();
+                if (!isReleaseAnimating && panelSlide?.phase === "animate") {
+                  panelSlide.onTransitionEnd();
+                }
               }}
             >
-              {slideNext ? (
+              {isNext ? (
                 <>
                   <div className="w-1/2 shrink-0 pr-0">
                     <ModalPanelShell
