@@ -6,26 +6,36 @@ import { cn } from "@/lib/utils";
 export function HighlightScorelineToggle() {
   const { visible, toggleVisible, canControl, pending } = useHighlightScorelineVisibility();
 
-  if (!canControl && !visible) return null;
+  if (!canControl) return null;
 
   return (
     <button
       type="button"
-      role={canControl ? "switch" : undefined}
-      aria-checked={canControl ? visible : undefined}
-      aria-label="Predicción IA"
-      onClick={canControl ? () => void toggleVisible() : undefined}
-      disabled={pending || (!canControl)}
-      className={cn(
-        "inline-flex h-6 items-center justify-center rounded-full px-2.5 text-[8px] font-bold uppercase tracking-[0.12em] transition-opacity",
+      role="switch"
+      aria-checked={visible}
+      aria-label={
         visible
-          ? "bg-[#CCFF00] text-black hover:opacity-90"
-          : "bg-white/10 text-white/40 hover:bg-white/20",
-        pending && "opacity-50",
-        !canControl && "cursor-default"
-      )}
+          ? "Ocultar asistente AI"
+          : "Mostrar asistente AI"
+      }
+      onClick={() => void toggleVisible()}
+      disabled={pending}
+      className="flex h-12 w-10 shrink-0 items-center justify-center disabled:opacity-60"
     >
-      AI
+      <span
+        className={cn(
+          "relative h-5 w-9 rounded-full border border-white/55 bg-transparent p-0.5 transition-[border-color]",
+          visible && "border-white/85",
+        )}
+      >
+        <span
+          className={cn(
+            "block h-3.5 w-3.5 rounded-full border border-white/70 bg-transparent transition-transform duration-200 ease-out",
+            visible ? "translate-x-3.5" : "translate-x-0",
+          )}
+          aria-hidden="true"
+        />
+      </span>
     </button>
   );
 }

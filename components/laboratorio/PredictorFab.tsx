@@ -3,6 +3,7 @@
 import { useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { PredictorPanel } from "@/components/laboratorio/PredictorPanel";
+import { useHighlightScorelineVisibility } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { useTabPreviewMode } from "@/lib/layout/tab-preview";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ type PredictorFabProps = {
 };
 
 export function PredictorFab({ enabled }: PredictorFabProps) {
+  const { visible: aiVisible } = useHighlightScorelineVisibility();
   const previewMode = useTabPreviewMode();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -19,7 +21,7 @@ export function PredictorFab({ enabled }: PredictorFabProps) {
     setMounted(true);
   }, []);
 
-  if (!enabled || previewMode || !mounted) {
+  if (!enabled || previewMode || !mounted || !aiVisible) {
     return null;
   }
 

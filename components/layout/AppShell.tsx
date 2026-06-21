@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import { AppHeaderGate } from "@/components/layout/AppHeaderGate";
 import { AppMainWrapper } from "@/components/layout/AppMainWrapper";
 import { LineupsNotificationOpener } from "@/components/notifications/LineupsNotificationOpener";
@@ -19,6 +19,8 @@ import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { CurrentUsernameProvider } from "@/lib/auth/current-username-context";
+import { PredictorFab } from "@/components/laboratorio/PredictorFab";
+import { canAccessQuizLab } from "@/lib/quiz/lab-access";
 import { HomeAtmosphere } from "@/components/home/HomeAtmosphere";
 import { UsagePageTracker } from "@/components/usage/UsagePageTracker";
 import type { AppShellContext } from "@/lib/pool/active-pool";
@@ -33,6 +35,7 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null;
+  const predictorEnabled = canAccessQuizLab(ctx.username);
 
   return (
     <NavigationLoadingProvider>
@@ -69,6 +72,7 @@ export function AppShell({
                 <TabBarWrapper />
                 <UsagePageTracker />
                 <VisualViewportSync />
+                {predictorEnabled ? <PredictorFab enabled={predictorEnabled} /> : null}
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />
                 </Suspense>
