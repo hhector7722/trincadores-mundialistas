@@ -75,7 +75,13 @@ function GroupSwipeDots({ position }: { position: DotPosition }) {
 }
 
 function groupPanelTitle(view: GroupPanelView, lineupFormation?: string): ReactNode {
-  if (view.kind === "standings") return `GRUPO ${view.group.code}`;
+  if (view.kind === "standings") {
+    return (
+      <span className="-ml-0.5 sm:ml-0.5">
+        GRUPO {view.group.code}
+      </span>
+    );
+  }
   return entityModalTitleContent(view, {
     lineupFormation: view.kind === "lineup" ? lineupFormation : undefined,
   });
@@ -315,7 +321,7 @@ export function GroupStandingsModal({
               onClick={() => setAllGroupsOpen(true)}
               className="inline-flex h-auto w-max shrink-0 items-center justify-center rounded-full bg-[#CCFF00] px-2 py-0.5 text-[8px] font-bold uppercase leading-none tracking-[0.12em] text-black transition-opacity hover:opacity-90 active:opacity-80"
             >
-              Ver grupos
+              <span className="-translate-y-[0.5px]">Ver grupos</span>
             </button>
           ) : undefined
         }
