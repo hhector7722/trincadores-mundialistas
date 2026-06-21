@@ -217,6 +217,10 @@ export function GroupStandingsModal({
       groupSlideLockRef.current = true;
       setGroupSlide({ target, direction: offset === 1 ? "next" : "prev", phase: "prep" });
 
+      groupSlideTimerRef.current = window.setTimeout(() => {
+        finishGroupSlideRef.current();
+      }, SLIDE_MS + 80);
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setGroupSlide((current) => (current ? { ...current, phase: "animate" } : current));
@@ -285,10 +289,6 @@ export function GroupStandingsModal({
             />
           ),
           onTransitionEnd: () => finishGroupSlideRef.current(),
-          onTransitionCancel: () => {
-            groupSlideLockRef.current = false;
-            setGroupSlide(null);
-          },
         }
       : null;
 

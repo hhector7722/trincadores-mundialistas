@@ -148,6 +148,10 @@ export function useCarouselSlide<T>({
       slideLockRef.current = true;
       setSlide({ target, direction: offset === 1 ? "next" : "prev", phase: "prep" });
 
+      slideTimerRef.current = window.setTimeout(() => {
+        finishSlideRef.current();
+      }, SLIDE_MS + 80);
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setSlide((current) => (current ? { ...current, phase: "animate" } : current));
@@ -166,10 +170,6 @@ export function useCarouselSlide<T>({
         phase: slide.phase,
         incoming: renderItem(slide.target),
         onTransitionEnd: () => finishSlideRef.current(),
-        onTransitionCancel: () => {
-          slideLockRef.current = false;
-          setSlide(null);
-        },
       };
     },
     [slide]
