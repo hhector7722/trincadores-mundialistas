@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, Play } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
@@ -29,6 +29,7 @@ export default async function ProfilePage() {
   const showLab = canAccessQuizLab(profile?.username);
   const showUsage = canAccessUsageAnalytics(profile?.username);
   const showActions = showUsage || showLab;
+  const isHector = profile?.username?.toLowerCase() === "hector";
 
   return (
     <div className="space-y-3 p-4 pb-4">
@@ -59,6 +60,21 @@ export default async function ProfilePage() {
             </Link>
           )}
         </div>
+      )}
+
+      {isHector && (
+        <Link
+          href="/quiz/play-hector-yesterday"
+          className={cn(
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+            "border border-[var(--tm-primary)] bg-[var(--tm-primary)]/10",
+            "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-primary)]",
+            "transition-colors hover:bg-[var(--tm-primary)]/20"
+          )}
+        >
+          <Play className="size-4 shrink-0" aria-hidden />
+          Quiz ayer (21/06)
+        </Link>
       )}
 
       <form action={signOut}>
