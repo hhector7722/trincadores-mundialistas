@@ -300,6 +300,8 @@ html:has(.tm-app-header--compact) {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: transform;
+  transition: filter var(--tm-modal-exit-ms) var(--tm-ios-ease-out),
+              opacity var(--tm-modal-exit-ms) var(--tm-ios-ease-out);
 }
 
 .tm-app-tabbar--with-indicators .tm-tabbar-indicators-row {
