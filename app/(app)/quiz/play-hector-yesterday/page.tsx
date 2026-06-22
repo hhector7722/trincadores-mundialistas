@@ -1,4 +1,5 @@
-import { redirect } from "next/navigation";
+import { QuizPageShell } from "@/components/quiz/QuizPageShell";
+import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 
@@ -20,7 +21,13 @@ export default async function HectorYesterdayQuizPage() {
 
   // Only allow hector
   if (!profile || profile.username?.toLowerCase() !== "hector") {
-    redirect("/quiz");
+    return (
+      <QuizPageShell variant="play">
+        <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+          <p className="text-center text-[var(--tm-muted)]">Acceso no autorizado</p>
+        </div>
+      </QuizPageShell>
+    );
   }
 
   // Get the quiz for 2026-06-21
@@ -32,9 +39,23 @@ export default async function HectorYesterdayQuizPage() {
     .maybeSingle();
 
   if (!quiz) {
-    redirect("/quiz");
+    return (
+      <QuizPageShell variant="play">
+        <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+          <p className="text-center text-[var(--tm-muted)]">Quiz no encontrado</p>
+        </div>
+      </QuizPageShell>
+    );
   }
 
-  // Redirect to the play page with the quiz ID
-  redirect(`/quiz/play?quizId=${quiz.id}`);
+  return (
+    <QuizPageShell variant="play">
+      <QuizPlaySession
+        poolId={ctx.activePoolId}
+        quizId={quiz.id}
+        skipIntro={false}
+        drill={false}
+      />
+    </QuizPageShell>
+  );
 }
