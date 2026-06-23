@@ -99,6 +99,7 @@ export type QuizLeaderboardRow = {
   label: string;
   avatarUrl: string | null;
   totalScore: number;
+  totalTimeMs: number;
   reliabilityPct: number | null;
   hasParticipated: boolean;
 };

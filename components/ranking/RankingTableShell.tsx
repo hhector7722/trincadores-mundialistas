@@ -57,8 +57,8 @@ export function RankingTableShell({
     // 1. Identify top 4 in quiz
     const sortedByQuiz = [...rows].sort((a, b) => {
       if (a.quizPoints !== b.quizPoints) return b.quizPoints - a.quizPoints;
-      if (a.exactHits !== b.exactHits) return b.exactHits - a.exactHits;
-      return a.label.localeCompare(b.label, "es");
+      if (a.quizTimeMs !== b.quizTimeMs) return a.quizTimeMs - b.quizTimeMs;
+      return a.label.localeCompare(b.label, "es", { sensitivity: "base" });
     });
 
     const bonuses = [5, 3, 2, 1];

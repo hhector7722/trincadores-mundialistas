@@ -553,21 +553,22 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
     (quizzes ?? []).map((q) => [q.id as string, (q.max_points as number) ?? 0])
   );
 
-  const totals = new Map<string, { totalScore: number; totalMaxPoints: number }>();
+  const totals = new Map<string, { totalScore: number; totalMaxPoints: number; totalTimeMs: number }>();
 
   if (quizIds.length) {
     const { data: scores, error: scoreError } = await supabase
       .from("quiz_leaderboard")
-      .select("quiz_id, profile_id, best_score")
+      .select("quiz_id, profile_id, best_score, best_time_ms")
       .in("quiz_id", quizIds);
 
     if (scoreError) throw new Error(scoreError.message);
 
     for (const row of scores ?? []) {
       const profileId = row.profile_id as string;
-      const current = totals.get(profileId) ?? { totalScore: 0, totalMaxPoints: 0 };
+      const current = totals.get(profileId) ?? { totalScore: 0, totalMaxPoints: 0, totalTimeMs: 0 };
       current.totalScore += (row.best_score as number) ?? 0;
       current.totalMaxPoints += maxPointsByQuiz.get(row.quiz_id as string) ?? 0;
+      current.totalTimeMs += (row.best_time_ms as number) ?? 0;
       totals.set(profileId, current);
     }
   }
@@ -576,12 +577,14 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
     const stats = totals.get(member.profileId);
     const totalScore = stats?.totalScore ?? 0;
     const totalMaxPoints = stats?.totalMaxPoints ?? 0;
+    const totalTimeMs = stats?.totalTimeMs ?? 0;
     const hasParticipated = totalMaxPoints > 0;
     return {
       profileId: member.profileId,
       label: member.label,
       avatarUrl: member.avatarUrl,
       totalScore,
+      totalTimeMs,
       reliabilityPct: computeQuizReliabilityPct(totalScore, totalMaxPoints),
       hasParticipated,
     };
@@ -590,6 +593,7 @@ export async function getQuizLeaderboard(poolId: string): Promise<QuizLeaderboar
   merged.sort(
     (a, b) =>
       b.totalScore - a.totalScore ||
+      a.totalTimeMs - b.totalTimeMs ||
       a.label.localeCompare(b.label, "es", { sensitivity: "base" })
   );
 

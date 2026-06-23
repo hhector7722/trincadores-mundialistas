@@ -41,6 +41,7 @@ export type LeaderboardRow = {
   matchPoints: number;
   generalPoints: number;
   quizPoints: number;
+  quizTimeMs: number;
   hasQuizParticipated: boolean;
   quizFinalBonus: number;
   reliabilityPct: number | null;
@@ -446,6 +447,7 @@ async function loadResolvedPredictionStats(
 
 type QuizProfileStats = {
   points: number;
+  timeMs: number;
   hasParticipated: boolean;
 };
 
@@ -466,7 +468,7 @@ async function loadQuizStatsByProfile(
   const quizIds = quizzes.map((q) => q.id as string);
   const { data: scores, error: scoreError } = await supabase
     .from("quiz_leaderboard")
-    .select("profile_id, best_score")
+    .select("profile_id, best_score, best_time_ms")
     .in("quiz_id", quizIds);
 
   if (scoreError) throw new Error(scoreError.message);
@@ -474,8 +476,9 @@ async function loadQuizStatsByProfile(
   const stats = new Map<string, QuizProfileStats>();
   for (const row of scores ?? []) {
     const profileId = row.profile_id as string;
-    const current = stats.get(profileId) ?? { points: 0, hasParticipated: false };
+    const current = stats.get(profileId) ?? { points: 0, timeMs: 0, hasParticipated: false };
     current.points += (row.best_score as number) ?? 0;
+    current.timeMs += (row.best_time_ms as number) ?? 0;
     current.hasParticipated = true;
     stats.set(profileId, current);
   }
@@ -560,6 +563,7 @@ function buildLeaderboardRows(
       matchPoints: lastMatch?.match_points ?? 0,
       generalPoints: general,
       quizPoints: quiz?.points ?? 0,
+      quizTimeMs: quiz?.timeMs ?? 0,
       hasQuizParticipated: quiz?.hasParticipated ?? false,
       quizFinalBonus: quizBonus,
       reliabilityPct: computeReliabilityPct(
