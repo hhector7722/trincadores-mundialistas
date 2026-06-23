@@ -11,7 +11,8 @@ export type AppUsageActionKind =
   | "quiz_started"
   | "quiz_drill_started"
   | "quiz_submitted"
-  | "quiz_drill_submitted";
+  | "quiz_drill_submitted"
+  | "quiz_bonus_toggle";
 
 export type AppUsageMetadata = {
   action?: AppUsageActionKind;
