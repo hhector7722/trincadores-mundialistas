@@ -1,4 +1,4 @@
-﻿import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Barlow_Semi_Condensed, Space_Grotesk } from "next/font/google";
 import { AppUpdateNotifier } from "@/components/pwa/AppUpdateNotifier";
 import { getSiteUrl } from "@/lib/site-url";
@@ -32,6 +32,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
+  interactiveWidget: "resizes-content",
   themeColor: "#2E1260",
 };
 

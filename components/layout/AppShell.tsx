@@ -16,7 +16,7 @@ import { PageStackNavigator } from "@/components/layout/PageStackNavigator";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
-import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
+
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
 import { CurrentUsernameProvider } from "@/lib/auth/current-username-context";
 import { PredictorFab } from "@/components/laboratorio/PredictorFab";
@@ -71,7 +71,7 @@ export function AppShell({
                 <PullToRefresh />
                 <TabBarWrapper />
                 <UsagePageTracker />
-                <VisualViewportSync />
+
                 {predictorEnabled ? <PredictorFab enabled={predictorEnabled} /> : null}
                 <Suspense fallback={null}>
                   <ViewportLayoutDebug />
