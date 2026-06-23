@@ -19,7 +19,6 @@ export function AppHeader({
   title?: string;
   titleClassName?: string;
   showNotificationsBell?: boolean;
-  showNotificationsBell?: boolean;
   /** Home: cabecera más compacta, siempre en flujo (sin fixed). */
   compact?: boolean;
 }) {
