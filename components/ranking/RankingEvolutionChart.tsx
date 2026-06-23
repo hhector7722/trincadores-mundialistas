@@ -147,29 +147,37 @@ function renderSeriesLine(item: ChartSeries, highlightedProfileId: string | null
 
 function renderSeriesNodes(item: ChartSeries, highlightedProfileId: string | null) {
   const { opacity } = seriesVisualState(item.profileId, highlightedProfileId);
+  const isHighlighted = highlightedProfileId === item.profileId;
 
-  return item.points.map((point, pointIndex) => (
-    <g key={`node-${item.profileId}-${pointIndex}`} opacity={opacity}>
-      <text
-        x={point.x}
-        y={point.y - LABEL_OFFSET}
-        textAnchor="middle"
-        fill={item.color}
-        fontSize={10}
-        fontWeight={700}
-      >
-        {point.position}
-      </text>
-      <circle
-        cx={point.x}
-        cy={point.y}
-        r={NODE_RADIUS}
-        fill={item.color}
-        stroke={CHART_BG}
-        strokeWidth={0.75}
-      />
-    </g>
-  ));
+  return item.points.map((point, pointIndex) => {
+    const isLastPoint = pointIndex === item.points.length - 1;
+    const showLabel = isLastPoint || isHighlighted;
+
+    return (
+      <g key={`node-${item.profileId}-${pointIndex}`} opacity={opacity}>
+        {showLabel && (
+          <text
+            x={point.x}
+            y={point.y - LABEL_OFFSET}
+            textAnchor="middle"
+            fill={item.color}
+            fontSize={10}
+            fontWeight={700}
+          >
+            {point.position}
+          </text>
+        )}
+        <circle
+          cx={point.x}
+          cy={point.y}
+          r={NODE_RADIUS}
+          fill={item.color}
+          stroke={CHART_BG}
+          strokeWidth={0.75}
+        />
+      </g>
+    );
+  });
 }
 
 export function RankingEvolutionChart({

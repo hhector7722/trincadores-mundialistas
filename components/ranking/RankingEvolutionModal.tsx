@@ -110,6 +110,12 @@ export function RankingEvolutionModal({ open, onClose, poolId }: RankingEvolutio
           ) : null}
         </div>
 
+        {hasMatchdayData ? (
+          <p className="text-center text-xs text-[var(--tm-muted)] mt-1">
+            Pulsa sobre un usuario para ver su evolución.
+          </p>
+        ) : null}
+
         {showFullLayout ? (
           <div
             className="shrink-0 px-1"
