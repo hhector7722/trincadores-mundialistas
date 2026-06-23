@@ -63,18 +63,32 @@ export default async function ProfilePage() {
       )}
 
       {isHector && (
-        <Link
-          href="/quiz/play-hector-yesterday"
-          className={cn(
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
-            "border border-[var(--tm-primary)] bg-[var(--tm-primary)]/10",
-            "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-primary)]",
-            "transition-colors hover:bg-[var(--tm-primary)]/20"
-          )}
-        >
-          <Play className="size-4 shrink-0" aria-hidden />
-          Quiz ayer (21/06)
-        </Link>
+        <div className="flex flex-col gap-2 w-full">
+          <Link
+            href="/quiz/play-hector-yesterday"
+            className={cn(
+              "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+              "border border-[var(--tm-primary)] bg-[var(--tm-primary)]/10",
+              "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-primary)]",
+              "transition-colors hover:bg-[var(--tm-primary)]/20"
+            )}
+          >
+            <Play className="size-4 shrink-0" aria-hidden />
+            Quiz ayer (21/06)
+          </Link>
+          <Link
+            href="/hector/force-result"
+            className={cn(
+              "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+              "border border-red-500 bg-red-500/10",
+              "font-display text-sm uppercase tracking-[0.12em] text-red-500",
+              "transition-colors hover:bg-red-500/20"
+            )}
+          >
+            <Play className="size-4 shrink-0" aria-hidden />
+            Forzar Resultado (SuperAdmin)
+          </Link>
+        </div>
       )}
 
       <form action={signOut}>
