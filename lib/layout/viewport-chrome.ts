@@ -4,13 +4,7 @@ export const VIEWPORT_CHROME_SYNC_EVENT = "tm:viewport-chrome-sync";
 
 /** Espacio layout bajo el visual viewport (iOS PWA / barra dinámica). */
 export function measureChromeBottomLift(): number {
-  if (typeof window === "undefined") return 0;
-  const vv = window.visualViewport;
-  if (!vv) return 0;
-  // Solo compensar con teclado abierto; sin teclado evita TabBar flotante en PWA iOS.
-  const keyboardOpen = vv.height < window.innerHeight * 0.82;
-  if (!keyboardOpen) return 0;
-  return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
+  return 0;
 }
 
 /** Variables vv: altura útil del viewport + lift de la TabBar (iOS PWA / barra Safari). */
