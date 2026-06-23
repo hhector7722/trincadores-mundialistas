@@ -41,7 +41,7 @@ export default async function QuizResultPage({ searchParams }: QuizResultPagePro
 
   return (
     <QuizPageShell>
-      <div>
+      <div className="sticky top-0 z-20 shrink-0 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Resultado del quiz
         </h1>

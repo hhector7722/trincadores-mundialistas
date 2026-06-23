@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export default function ActivityPage() {
   return (
     <div className="space-y-4 p-4 pb-4">
-      <div>
+      <div className="sticky top-0 z-20 -mx-4 -mt-4 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Actividad
         </h1>

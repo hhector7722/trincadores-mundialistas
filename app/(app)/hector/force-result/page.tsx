@@ -29,14 +29,16 @@ export default async function HectorForceResultPage() {
     .order("kickoff_at", { ascending: false });
 
   return (
-    <div className="p-4 space-y-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-display font-bold text-[var(--tm-fg)] uppercase">
-        SuperAdmin: Forzar Resultado
-      </h1>
-      <p className="text-sm text-[var(--tm-fg-alt)]">
-        Selecciona un partido para forzar su resultado oficial y MVP. Esto sobreescribirá
-        los datos actuales y actualizará las puntuaciones de todas las porras.
-      </p>
+    <div className="mx-auto max-w-2xl space-y-6 p-4">
+      <div className="sticky top-0 z-20 -mx-4 -mt-4 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
+        <h1 className="font-display text-2xl font-bold uppercase text-[var(--tm-fg)]">
+          SuperAdmin: Forzar Resultado
+        </h1>
+        <p className="mt-1 text-sm text-[var(--tm-fg-alt)]">
+          Selecciona un partido para forzar su resultado oficial y MVP. Esto sobreescribirá
+          los datos actuales y actualizará las puntuaciones de todas las porras.
+        </p>
+      </div>
 
       <SuperAdminMatchEditor matches={matches || []} />
     </div>

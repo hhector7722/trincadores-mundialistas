@@ -2,7 +2,7 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { HomeViewportShell } from "@/components/home/HomeViewportShell";
 import { getMatchHighlightsForPool } from "@/lib/highlights/queries";
-import { getDailyFactForToday } from "@/lib/home/daily-fact";
+import { getDailyFactsHistory } from "@/lib/home/daily-fact";
 import {
   getPoolMatchesWithPredictions,
 } from "@/lib/predictions/queries";
@@ -37,7 +37,7 @@ export default async function HomePage() {
     getMatchHighlightsForPool(ctx.activePoolId),
   ]);
 
-  const dailyFact = getDailyFactForToday();
+  const dailyFacts = getDailyFactsHistory();
 
   return (
     <HomeViewportShell
@@ -52,7 +52,7 @@ export default async function HomePage() {
           generalPredictions={generalPredictionsBundle.predictions}
           generalPredictionsEditable={generalPredictionsBundle.editable}
           generalPredictionsBoard={generalPredictionsBoard}
-          dailyFact={dailyFact}
+          dailyFacts={dailyFacts}
           matchCarouselMatches={matchCarouselMatches}
         />
       }

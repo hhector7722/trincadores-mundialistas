@@ -18,7 +18,7 @@ export default async function QuizLeaderboardPage() {
 
   return (
     <QuizPageShell variant="viewport" className="gap-2 p-3">
-      <div className="shrink-0">
+      <div className="sticky top-0 z-20 shrink-0 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
         <h1 className="font-display text-sm uppercase tracking-wide text-[var(--tm-fg)]">
           Ranking del quiz
         </h1>

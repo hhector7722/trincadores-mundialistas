@@ -19,7 +19,7 @@ type HomeStandingCardProps = {
   generalPredictions: TournamentGeneralPredictions;
   generalPredictionsEditable: boolean;
   generalPredictionsBoard: TournamentGeneralPredictionsBoardRow[];
-  dailyFact: DailyFact | null;
+  dailyFacts: DailyFact[];
   matchCarouselMatches: MatchWithPrediction[];
 };
 
@@ -30,7 +30,7 @@ export function HomeStandingCard({
   generalPredictions,
   generalPredictionsEditable,
   generalPredictionsBoard,
-  dailyFact,
+  dailyFacts,
   matchCarouselMatches,
 }: HomeStandingCardProps) {
   return (
@@ -59,7 +59,7 @@ export function HomeStandingCard({
           <HomeScoringRulesCard className="min-h-0 flex-1" />
           <HomeDailyQuizCard className="shrink-0" />
         </div>
-        <HomeDailyFactCard fact={dailyFact} />
+        <HomeDailyFactCard facts={dailyFacts} />
       </div>
     </div>
   );

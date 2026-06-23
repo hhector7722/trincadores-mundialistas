@@ -85,3 +85,48 @@ export function getDailyFactForDate(
 export function getDailyFactForToday(now = new Date()): DailyFact | null {
   return getDailyFactForDate(todayDateKey(now));
 }
+
+export function getDailyFactsHistory(
+  now = new Date(),
+  startDateKey = "2026-06-11",
+  path = DEFAULT_DAILY_FACTS_PATH
+): DailyFact[] {
+  const facts = loadDailyFacts(path);
+  if (facts.length === 0) return [];
+
+  const todayKey = todayDateKey(now);
+  const result: DailyFact[] = [];
+  
+  // Create a date object for the start date at noon Madrid time to avoid timezone edge cases
+  const current = new Date(`${startDateKey}T12:00:00+02:00`);
+  const today = new Date(`${todayKey}T12:00:00+02:00`);
+
+  // Generate sequence from start date up to today
+  while (current <= today) {
+    const key = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Madrid",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(current);
+
+    const fact = pickDailyFactForDate(key, facts);
+    if (fact) {
+      // Deduplicate consecutive facts or previously seen facts if desired
+      // but pickDailyFactForDate already guarantees determinism.
+      // We will just add it.
+      if (!result.find(f => f.id === fact.id)) {
+        result.push(fact);
+      }
+    }
+    current.setDate(current.getDate() + 1);
+  }
+
+  // Ensure we don't return empty if today is before start date, return at least today's
+  if (result.length === 0) {
+    const fallback = getDailyFactForToday(now);
+    if (fallback) result.push(fallback);
+  }
+
+  return result.reverse(); // Most recent first
+}

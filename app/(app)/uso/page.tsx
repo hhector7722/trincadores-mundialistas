@@ -41,7 +41,7 @@ export default async function UsoPage({ searchParams }: UsoPageProps) {
 
   return (
     <div className="space-y-4 p-4 pb-4">
-      <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-20 flex items-center gap-3 -mx-4 -mt-4 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[var(--tm-border)] bg-[var(--tm-surface)]">
           <BarChart3 className="size-5 text-[var(--tm-primary)]" aria-hidden />
         </div>

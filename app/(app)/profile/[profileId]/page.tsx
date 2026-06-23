@@ -37,7 +37,7 @@ export default async function PublicProfilePage({
       <Link href="/ranking" className="text-sm font-medium text-[var(--tm-primary)]">
         Volver al ranking
       </Link>
-      <div>
+      <div className="sticky top-0 z-20 -mx-4 -mt-4 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
         <h1 className="font-display text-lg uppercase tracking-wide text-[var(--tm-fg)]">
           Perfil
         </h1>
