@@ -379,12 +379,14 @@ export function Modal({
 
   useEffect(() => {
     if (open) {
+      document.documentElement.setAttribute("data-modal-open", "");
       setMounted(true);
       const frame = window.requestAnimationFrame(() => setVisible(true));
       return () => window.cancelAnimationFrame(frame);
     }
 
     setVisible(false);
+    document.documentElement.removeAttribute("data-modal-open");
     const timer = window.setTimeout(() => setMounted(false), MODAL_EXIT_MS);
     return () => window.clearTimeout(timer);
   }, [open]);

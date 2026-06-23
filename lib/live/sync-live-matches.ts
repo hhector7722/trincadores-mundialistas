@@ -181,9 +181,14 @@ async function persistOfficialResultFromLive(
 ): Promise<boolean> {
   const { data: existing } = await admin
     .from("match_results")
-    .select("home_goals, away_goals")
+    .select("home_goals, away_goals, recorded_by")
     .eq("match_id", matchId)
     .maybeSingle();
+
+  // No sobreescribir si el resultado fue introducido manualmente (recorded_by no es null)
+  if (existing && existing.recorded_by !== null) {
+    return false;
+  }
 
   if (
     existing &&
@@ -267,7 +272,7 @@ export async function syncLiveMatches(
       const status =
         liveRow?.status ??
         (bundle.isLive ? "inprogress" : bundle.finished ? "finished" : "notstarted");
-      const isFinished = bundle.finished || isBsdEventFinished(status);
+      const isFinished = bundle.finished || isBsdEventFinished(status) || match.status === "finished";
 
       const shouldPersist =
         isBsdEventLive(status) ||
