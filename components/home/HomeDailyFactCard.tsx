@@ -22,8 +22,9 @@ export function HomeDailyFactCard({ facts }: HomeDailyFactCardProps) {
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el || facts.length === 0) return;
-    el.scrollLeft = 0;
-    setActiveIndex(0);
+    const lastIndex = facts.length - 1;
+    el.scrollLeft = lastIndex * el.clientWidth;
+    setActiveIndex(lastIndex);
   }, [facts.length]);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export function HomeDailyFactCard({ facts }: HomeDailyFactCardProps) {
       </div>
 
       {facts.length > 1 ? (
-        <HomeStatCardScrollHint activeSlot={activeIndex === 0 ? 0 : 1} />
+        <HomeStatCardScrollHint activeSlot={activeIndex === facts.length - 1 ? 1 : 0} />
       ) : null}
     </div>
   );

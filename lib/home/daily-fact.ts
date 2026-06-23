@@ -128,5 +128,5 @@ export function getDailyFactsHistory(
     if (fallback) result.push(fallback);
   }
 
-  return result.reverse(); // Most recent first
+  return result; // Oldest first, newest last
 }
