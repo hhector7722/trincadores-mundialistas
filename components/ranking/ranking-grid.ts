@@ -1,6 +1,6 @@
-/** Grid: tendencia | pos | trincador (avatar+nombre) | pts | fiab | quiz */
+/** Grid: tendencia | pos | trincador (avatar+nombre) | pts | fiab | quiz | bonus */
 export const RANKING_GRID =
-  "grid grid-cols-[0.625rem_1.5rem_minmax(0,1fr)_2.25rem_2.25rem_2.25rem] items-center gap-x-2";
+  "grid grid-cols-[0.625rem_1.5rem_minmax(0,1fr)_2.25rem_2.25rem_2.25rem_2.5rem] items-center gap-x-2";
 
 /** Card inicio: tendencia | pos | avatar | nombre | (relleno) | pts | fiab | quiz */
 export const MINI_RANKING_GRID =

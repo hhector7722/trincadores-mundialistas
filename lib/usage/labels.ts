@@ -41,6 +41,7 @@ const ACTION_LABELS: Record<string, string> = {
   quiz_drill_started: "Quiz entreno iniciado",
   quiz_submitted: "Quiz enviado",
   quiz_drill_submitted: "Quiz entreno enviado",
+  quiz_bonus_toggle: "Bonus del quiz alternado",
 };
 
 export function deriveUsageLabel(
@@ -65,6 +66,9 @@ export function deriveUsageLabel(
     }
     if (metadata.action === "modal_open" && metadata.modalLabel) {
       return String(metadata.modalLabel);
+    }
+    if (metadata.action === "quiz_bonus_toggle") {
+      return metadata.active ? "Bonus del quiz activado" : "Bonus del quiz desactivado";
     }
     if (
       (metadata.action === "highlight_open" || metadata.action === "highlight_watch") &&

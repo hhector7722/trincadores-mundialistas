@@ -1,5 +1,6 @@
 import { RankingRow } from "@/components/ranking/RankingRow";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
+import { QuizBonusToggle } from "@/components/ranking/QuizBonusToggle";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,9 @@ function RankingTableHeader() {
       <span className="text-center">Pts</span>
       <span className="text-center">Fiab</span>
       <span className="text-center">Quiz</span>
+      <div className="flex items-center justify-end pr-1">
+        <QuizBonusToggle />
+      </div>
     </div>
   );
 }
@@ -41,15 +45,18 @@ function RankingEmptyRow() {
       <span />
       <span />
       <span />
+      <span />
     </div>
   );
 }
+
+export type EnhancedLeaderboardRow = LeaderboardRow & { quizBonusText?: string };
 
 export function RankingTable({
   rows,
   currentProfileId,
 }: {
-  rows: LeaderboardRow[];
+  rows: EnhancedLeaderboardRow[];
   currentProfileId: string;
 }) {
   return (
@@ -65,6 +72,7 @@ export function RankingTable({
                 key={row.profileId}
                 row={row}
                 isCurrentUser={row.profileId === currentProfileId}
+                quizBonusText={row.quizBonusText}
               />
             ))}
       </div>

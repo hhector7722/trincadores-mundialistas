@@ -10,9 +10,11 @@ import { cn } from "@/lib/utils";
 export function RankingRow({
   row,
   isCurrentUser,
+  quizBonusText,
 }: {
   row: LeaderboardRow;
   isCurrentUser: boolean;
+  quizBonusText?: string;
 }) {
   return (
     <div
@@ -42,6 +44,9 @@ export function RankingRow({
       </span>
       <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatQuizScore(row.quizPoints, row.hasQuizParticipated)}
+      </span>
+      <span className="font-display w-full shrink-0 text-right text-[10px] whitespace-nowrap tabular-nums text-[#34C759]">
+        {quizBonusText ?? ""}
       </span>
     </div>
   );

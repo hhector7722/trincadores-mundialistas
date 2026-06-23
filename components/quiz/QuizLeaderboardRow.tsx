@@ -1,3 +1,4 @@
+import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { QUIZ_RANKING_GRID } from "@/components/quiz/quiz-ranking-grid";
 import { formatQuizReliabilityPct, formatQuizScore } from "@/lib/quiz/format";
@@ -12,13 +13,27 @@ export function QuizLeaderboardRow({
   row: QuizLeaderboardRow;
   isCurrentUser: boolean;
 }) {
+  const bonusText =
+    row.position === 1
+      ? "+ 5pts"
+      : row.position === 2
+      ? "+ 3pts"
+      : row.position === 3
+      ? "+ 2pts"
+      : row.position === 4
+      ? "+ 1pts"
+      : "";
+
   return (
     <div
       className={cn(
         QUIZ_RANKING_GRID,
-        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
+        "tm-ranking-row w-full px-3 text-left last:border-0",
+        row.position === 4 ? "border-b-[3px] border-white" : "border-b border-[var(--tm-border)]",
+        row.position > 4 ? "opacity-80" : ""
       )}
     >
+      <PositionTrendIndicator trend={null} />
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(row.position)}
       </span>
@@ -31,6 +46,9 @@ export function QuizLeaderboardRow({
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
+      <span className="font-display w-full shrink-0 text-right text-[10px] whitespace-nowrap tabular-nums text-[#34C759]">
+        {bonusText}
+      </span>
       <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatQuizScore(row.totalScore, row.hasParticipated)}
       </span>

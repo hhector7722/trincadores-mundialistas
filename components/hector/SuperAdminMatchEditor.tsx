@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { toast } from "sonner";
 import { forceGlobalMatchResult } from "@/actions/super-admin";
 import { fetchMatchSquadsAction } from "@/actions/lineup";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,9 @@ export function SuperAdminMatchEditor({ matches }: Props) {
   const [squadsLoading, setSquadsLoading] = useState(false);
   const [squads, setSquads] = useState<{ home: TeamSquadWithPlayers | null; away: TeamSquadWithPlayers | null } | null>(null);
 
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   const selectedMatch = matches.find((m) => m.id === selectedMatchId);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export function SuperAdminMatchEditor({ matches }: Props) {
           if (res.ok) {
             setSquads(res.data);
           } else {
-            toast.error(res.error);
+            setErrorMsg(res.error);
             setSquads(null);
           }
         }
@@ -73,8 +75,10 @@ export function SuperAdminMatchEditor({ matches }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedMatch) return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
     if (homeGoals === "" || awayGoals === "") {
-      toast.error("Debes introducir ambos goles.");
+      setErrorMsg("Debes introducir ambos goles.");
       return;
     }
 
@@ -87,7 +91,7 @@ export function SuperAdminMatchEditor({ matches }: Props) {
         mvpTeamName || null
       );
       if (res.ok) {
-        toast.success("Resultado forzado con éxito en toda la base de datos.");
+        setSuccessMsg("Resultado forzado con éxito en toda la base de datos.");
         // Reset form
         setSelectedMatchId("");
         setHomeGoals("");
@@ -95,7 +99,7 @@ export function SuperAdminMatchEditor({ matches }: Props) {
         setMvpTeamName("");
         setMvpPlayerName("");
       } else {
-        toast.error(res.error);
+        setErrorMsg(res.error);
       }
     });
   }
@@ -180,6 +184,17 @@ export function SuperAdminMatchEditor({ matches }: Props) {
               <p className="text-xs text-red-500 mt-1">No hay plantilla disponible en la BD para este equipo.</p>
             )}
           </div>
+
+          {errorMsg && (
+            <p className="text-sm text-red-500 bg-red-500/10 p-2 rounded" role="alert">
+              {errorMsg}
+            </p>
+          )}
+          {successMsg && (
+            <p className="text-sm text-green-500 bg-green-500/10 p-2 rounded" role="status">
+              {successMsg}
+            </p>
+          )}
 
           <Button type="submit" disabled={isPending} className="w-full min-h-11 font-display tracking-wider uppercase text-sm">
             {isPending ? "Guardando..." : "Guardar Oficialmente"}

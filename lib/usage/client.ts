@@ -155,3 +155,15 @@ export function trackUsageHighlightWatch(
     },
   });
 }
+
+export function trackUsageQuizBonusToggle(active: boolean, pagePath: string): void {
+  void sendUsageEvent({
+    eventType: "action",
+    path: pagePath,
+    label: active ? "Bonus del quiz activado" : "Bonus del quiz desactivado",
+    metadata: {
+      action: "quiz_bonus_toggle",
+      active,
+    },
+  });
+}

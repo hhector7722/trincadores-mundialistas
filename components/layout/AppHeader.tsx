@@ -1,7 +1,8 @@
-﻿import { HighlightScorelineToggle } from "@/components/highlights/HighlightScorelineToggle";
+import { HighlightScorelineToggle } from "@/components/highlights/HighlightScorelineToggle";
 import { AppBrandTitle } from "@/components/layout/AppBrandTitle";
 import { NotificationsBell } from "@/components/notifications/NotificationsBell";
 import { PoolSwitcher } from "@/components/layout/PoolSwitcher";
+import { QuizBonusToggle } from "@/components/ranking/QuizBonusToggle";
 import { cn } from "@/lib/utils";
 import type { AppShellContext } from "@/lib/pool/active-pool";
 
@@ -17,6 +18,7 @@ export function AppHeader({
   stackedTitle?: boolean;
   title?: string;
   titleClassName?: string;
+  showNotificationsBell?: boolean;
   showNotificationsBell?: boolean;
   /** Home: cabecera más compacta, siempre en flujo (sin fixed). */
   compact?: boolean;

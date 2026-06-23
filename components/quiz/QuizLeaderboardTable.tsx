@@ -13,8 +13,10 @@ function QuizLeaderboardHeader() {
         "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
+      <span aria-hidden="true" />
       <span className="text-left">Pos</span>
       <span className="text-left">Trincador</span>
+      <span />
       <span className="text-center">Quiz</span>
       <span className="text-center">Fiab</span>
     </div>
@@ -31,10 +33,12 @@ function QuizLeaderboardEmptyRow() {
       aria-hidden="true"
     >
       <span />
+      <span />
       <div className="flex min-w-0 items-center gap-2.5">
         <span className="size-9 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
         <span className="min-w-0 flex-1 truncate">&nbsp;</span>
       </div>
+      <span />
       <span />
       <span />
     </div>
