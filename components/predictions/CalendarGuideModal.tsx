@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, type RefObject } from "react";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { Modal } from "@/components/ui/modal";
-
+import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { syncAllCalendarGuidePreviews } from "@/lib/pool/calendar-layout";
 import {
   CAL_FINISHED_OUTER_MUTED_CLASS,
@@ -76,11 +76,13 @@ function useSyncGuidePreviewMetrics(listRef: RefObject<HTMLUListElement | null>,
     observer.observe(list);
 
     window.addEventListener("resize", applyMetrics);
+    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, applyMetrics);
 
     return () => {
       cancelAnimationFrame(raf);
       observer.disconnect();
       window.removeEventListener("resize", applyMetrics);
+      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, applyMetrics);
     };
   }, [active, listRef]);
 }

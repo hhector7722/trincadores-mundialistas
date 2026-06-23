@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { useLayoutAboveTabBar } from "@/components/layout/useLayoutAboveTabBar";
 import { cn } from "@/lib/utils";
 
 type TabScrollLayoutProps = {
@@ -10,8 +11,11 @@ type TabScrollLayoutProps = {
 
 /** Scroll interno hasta la TabBar (perfil, uso, subrutas de pestaña). */
 export function TabScrollLayout({ children, className }: TabScrollLayoutProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  useLayoutAboveTabBar(rootRef);
+
   return (
-    <div className={cn("tm-tab-scroll-layout", className)}>
+    <div ref={rootRef} className={cn("tm-tab-scroll-layout", className)}>
       <div className="tm-tab-scroll-layout__viewport scroll-pb-end">
         {children}
         <div className="scroll-end-touch" aria-hidden />

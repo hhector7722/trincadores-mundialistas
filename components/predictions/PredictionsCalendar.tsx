@@ -19,7 +19,13 @@ import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { teamNameEs } from "@/lib/teams/display";
-
+import {
+  CALENDAR_SIDEBAR_CARD_ANCHOR,
+  fitCalendarLayout,
+  resetCalendarLayout,
+  SIDEBAR_CARD_ANCHOR_ATTR,
+} from "@/lib/pool/calendar-layout";
+import { VIEWPORT_CHROME_SYNC_EVENT } from "@/lib/layout/viewport-chrome";
 import { CalendarFinishedMatchCardVisual } from "@/components/predictions/CalendarFinishedMatchCardVisual";
 import { CalendarMatchGroupBadge } from "@/components/predictions/CalendarMatchGroupBadge";
 import { CalendarMatchMvpLine } from "@/components/predictions/CalendarMatchMvpLine";
@@ -63,7 +69,13 @@ type PredictionsCalendarProps = {
 };
 
 function isSidebarCardAnchorMatch(match: MatchWithPrediction): boolean {
-  return false;
+  const dateKey = kickoffDateKey(match.kickoff_at);
+  const day = Number(dateKey.split("-")[2]);
+  return (
+    day === CALENDAR_SIDEBAR_CARD_ANCHOR.day &&
+    match.group_code?.toUpperCase() === CALENDAR_SIDEBAR_CARD_ANCHOR.groupCode &&
+    formatCalendarKickoffHour(match.kickoff_at) === CALENDAR_SIDEBAR_CARD_ANCHOR.kickoffHour
+  );
 }
 
 function formatCalendarPrediction(match: MatchWithPrediction): string {
@@ -117,6 +129,7 @@ function CalendarMatchCard({
         interactive
         title={title}
         onClick={onOpen}
+        anchorAttr={isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : undefined}
         className={CAL_FINISHED_OUTER_MUTED_CLASS}
         homeTeam={match.home_team}
         awayTeam={match.away_team}
@@ -135,6 +148,7 @@ function CalendarMatchCard({
       title={title}
       aria-label={title}
       onClick={onOpen}
+      {...(isSidebarAnchor ? { [SIDEBAR_CARD_ANCHOR_ATTR]: "" } : {})}
       className={cn(
         "tm-cal-match-card relative flex min-w-0 w-full shrink-0 flex-col overflow-hidden",
         match.status === "live" && "ring-1 ring-[var(--tm-live)]",
@@ -281,7 +295,74 @@ function DayCell({
   );
 }
 
+function useCalendarViewportLayout(
+  rootRef: RefObject<HTMLElement | null>,
+  calendarRef: RefObject<HTMLElement | null>,
+  gridRef: RefObject<HTMLDivElement | null>,
+  rowCount: number
+) {
+  useLayoutEffect(() => {
+    const calendar = calendarRef.current;
+    const grid = gridRef.current;
+    if (!calendar || !grid || rowCount === 0) return;
 
+    const layout =
+      rootRef.current?.closest(".tm-porra-layout") ??
+      rootRef.current ??
+      calendar.parentElement;
+
+    const mainEl = layout instanceof HTMLElement ? layout.closest(".tm-app-main") : null;
+
+    const syncLayout = () => {
+      calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+      const layoutEl = layout instanceof HTMLElement ? layout : null;
+      resetCalendarLayout(calendar, grid, layoutEl);
+      void calendar.offsetHeight;
+      fitCalendarLayout(calendar, grid, rowCount, layoutEl);
+    };
+
+    const syncFrameRef = { current: null as number | null };
+
+    const scheduleSync = () => {
+      if (syncFrameRef.current != null) {
+        cancelAnimationFrame(syncFrameRef.current);
+      }
+
+      syncFrameRef.current = requestAnimationFrame(() => {
+        syncFrameRef.current = requestAnimationFrame(() => {
+          syncLayout();
+          syncFrameRef.current = null;
+        });
+      });
+    };
+
+    scheduleSync();
+
+    const observer = new ResizeObserver(scheduleSync);
+    if (layout instanceof HTMLElement) observer.observe(layout);
+    if (mainEl instanceof HTMLElement) observer.observe(mainEl);
+    observer.observe(calendar);
+    observer.observe(grid);
+    window.addEventListener("resize", scheduleSync);
+    window.addEventListener(VIEWPORT_CHROME_SYNC_EVENT, scheduleSync);
+    window.visualViewport?.addEventListener("resize", scheduleSync);
+    window.visualViewport?.addEventListener("scroll", scheduleSync);
+    window.addEventListener("load", scheduleSync, { once: true });
+
+    return () => {
+      if (syncFrameRef.current != null) {
+        cancelAnimationFrame(syncFrameRef.current);
+      }
+      observer.disconnect();
+      window.removeEventListener("resize", scheduleSync);
+      window.removeEventListener(VIEWPORT_CHROME_SYNC_EVENT, scheduleSync);
+      window.visualViewport?.removeEventListener("resize", scheduleSync);
+      window.visualViewport?.removeEventListener("scroll", scheduleSync);
+      const layoutEl = layout instanceof HTMLElement ? layout : null;
+      resetCalendarLayout(calendar, grid, layoutEl);
+    };
+  }, [rootRef, calendarRef, gridRef, rowCount]);
+}
 
 export function PredictionsCalendar({
   poolId,
@@ -362,7 +443,7 @@ export function PredictionsCalendar({
     [groupMatchRows]
   );
 
-
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
