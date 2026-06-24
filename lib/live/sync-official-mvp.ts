@@ -11,7 +11,11 @@ import {
   mvpTeamsMatch,
 } from "@/lib/predictions/mvp-name-match";
 import { resolveOfficialMvpToSquad } from "@/lib/predictions/resolve-official-mvp-squad";
-import type { SyncLiveMatchesResult } from "@/lib/live/sync-live-matches";
+export type SyncMvpResult = {
+  mvpsPersisted: number;
+  scoresRecalculated: number;
+  errors: string[];
+};
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type MatchMvpCandidate = {
@@ -218,7 +222,7 @@ async function applyOfficialMvp(
   admin: AdminClient,
   match: MatchMvpCandidate,
   official: ResolvedOfficialMvp,
-  result: SyncLiveMatchesResult,
+  result: SyncMvpResult,
   poolsToRebuild: Set<string>,
   options?: { overwrite?: boolean },
 ): Promise<void> {
@@ -251,7 +255,7 @@ async function applyOfficialMvp(
 
 export async function syncOfficialMvps(
   admin: AdminClient,
-  result: SyncLiveMatchesResult,
+  result: SyncMvpResult,
   poolsToRebuild: Set<string>,
   nowMs: number = Date.now(),
   prefetchedMatches?: MatchMvpCandidate[],
@@ -301,16 +305,9 @@ export async function correctOfficialMvpForMatch(
     return { ok: false, error: matchError?.message ?? "Partido no encontrado." };
   }
 
-  const result: SyncLiveMatchesResult = {
-    scanned: 0,
-    updated: 0,
-    markedLive: 0,
-    markedFinished: 0,
-    resultsPersisted: 0,
-    scoresRecalculated: 0,
+  const result: SyncMvpResult = {
     mvpsPersisted: 0,
-    headlinesPersisted: 0,
-    poolsRebuilt: 0,
+    scoresRecalculated: 0,
     errors: [],
   };
   const poolsToRebuild = new Set<string>();
