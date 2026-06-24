@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getSiteUrl } from "@/lib/site-url";
-import { syncLiveMatches } from "@/lib/live/sync-live-matches";
+import { syncAllMatchHighlights } from "@/lib/youtube/sync-highlights";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
+
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300; // Editorial fetches from RSS and YouTube, can take a while
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -15,11 +16,11 @@ export async function GET(request: Request) {
 
   try {
     const admin = createAdminClient();
-    const result = await syncLiveMatches(admin, Date.now());
+    const result = await syncAllMatchHighlights(admin, getSiteUrl().origin);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "live-matches cron failed";
-    console.error("[cron/live-matches]", message);
+    const message = error instanceof Error ? error.message : "editorial-sync cron failed";
+    console.error("[cron/editorial-sync]", message);
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }

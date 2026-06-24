@@ -1,5 +1,3 @@
-import { syncBsdHeadlineForMatch } from "@/lib/highlights/sync-bsd-headline";
-import { syncAllMatchHighlights } from "@/lib/youtube/sync-highlights";
 import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
 import {
@@ -8,8 +6,6 @@ import {
   isBsdEventFinished,
   isBsdEventLive,
 } from "@/lib/live/sources/bsd-live";
-import type { MatchLivePayload, MatchPlayerIncident } from "@/lib/live/types";
-import { syncOfficialMvps } from "@/lib/live/sync-official-mvp";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type MatchRow = {
@@ -26,19 +22,16 @@ export type SyncLiveMatchesResult = {
   markedLive: number;
   markedFinished: number;
   resultsPersisted: number;
-  scoresRecalculated: number;
-  mvpsPersisted: number;
-  headlinesPersisted: number;
-  poolsRebuilt: number;
   errors: string[];
 };
 
 async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<MatchRow[]> {
   const fromIso = new Date(nowMs - 4 * 60 * 60 * 1000).toISOString();
   const toIso = new Date(nowMs + 30 * 60 * 1000).toISOString();
-  const finishedFromIso = new Date(nowMs - 24 * 60 * 60 * 1000).toISOString();
 
-  const [windowed, liveOngoing, recentlyFinished] = await Promise.all([
+  // Only load scheduled matches within the window, and any currently live matches.
+  // Finished matches are handled by backfill and scores-recalc jobs.
+  const [windowed, liveOngoing] = await Promise.all([
     admin
       .from("matches")
       .select("id, home_team, away_team, kickoff_at, status")
@@ -49,68 +42,16 @@ async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<
       .from("matches")
       .select("id, home_team, away_team, kickoff_at, status")
       .eq("status", "live"),
-    admin
-      .from("matches")
-      .select("id, home_team, away_team, kickoff_at, status")
-      .eq("status", "finished")
-      .gte("kickoff_at", finishedFromIso),
   ]);
 
   if (windowed.error) throw new Error(`matches: ${windowed.error.message}`);
   if (liveOngoing.error) throw new Error(`matches live: ${liveOngoing.error.message}`);
-  if (recentlyFinished.error) {
-    throw new Error(`matches finished: ${recentlyFinished.error.message}`);
-  }
 
   const byId = new Map<string, MatchRow>();
-  for (const row of [
-    ...(windowed.data ?? []),
-    ...(liveOngoing.data ?? []),
-    ...(recentlyFinished.data ?? []),
-  ]) {
+  for (const row of [...(windowed.data ?? []), ...(liveOngoing.data ?? [])]) {
     byId.set(row.id, row as MatchRow);
   }
   return [...byId.values()];
-}
-
-function goalsMissingMinutes(incidents: MatchPlayerIncident[] | undefined): boolean {
-  const goals = (incidents ?? []).filter((row) => row.kind === "goal");
-  return goals.length > 0 && goals.every((row) => row.minute == null);
-}
-
-async function loadFinishedMatchesNeedingIncidentBackfill(
-  admin: AdminClient,
-  limit: number,
-): Promise<MatchRow[]> {
-  const { data, error } = await admin
-    .from("matches")
-    .select("id, home_team, away_team, kickoff_at, status, match_live_state(live_payload)")
-    .eq("status", "finished")
-    .order("kickoff_at", { ascending: false })
-    .limit(limit * 4);
-
-  if (error) throw new Error(`matches backfill: ${error.message}`);
-
-  const rows: MatchRow[] = [];
-  for (const row of data ?? []) {
-    const liveState = (row as {
-      match_live_state: { live_payload: MatchLivePayload | null } | { live_payload: MatchLivePayload | null }[] | null;
-    }).match_live_state;
-    const payload = Array.isArray(liveState) ? liveState[0]?.live_payload : liveState?.live_payload;
-    const incidents = (payload ?? {}).playerIncidents;
-    if (incidents?.length && !goalsMissingMinutes(incidents)) continue;
-
-    rows.push({
-      id: row.id as string,
-      home_team: row.home_team as string,
-      away_team: row.away_team as string,
-      kickoff_at: row.kickoff_at as string,
-      status: row.status as string,
-    });
-    if (rows.length >= limit) break;
-  }
-
-  return rows;
 }
 
 async function loadBsdEventMap(
@@ -130,47 +71,6 @@ async function loadBsdEventMap(
   if (error) throw new Error(`external_id_map: ${error.message}`);
 
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
-}
-
-async function ensureFinishedMatchScoring(
-  admin: AdminClient,
-  matchId: string,
-  result: SyncLiveMatchesResult,
-  poolsToRebuild: Set<string>,
-): Promise<void> {
-  const { data: officialResult } = await admin
-    .from("match_results")
-    .select("match_id")
-    .eq("match_id", matchId)
-    .maybeSingle();
-
-  if (!officialResult) return;
-
-  const { error: recalcError } = await admin.rpc("recalculate_match_scores", {
-    p_match_id: matchId,
-  });
-  if (recalcError) {
-    result.errors.push(`${matchId}/recalc: ${recalcError.message}`);
-    return;
-  }
-  result.scoresRecalculated += 1;
-
-  const poolId = await loadPoolIdForMatch(admin, matchId);
-  if (poolId) poolsToRebuild.add(poolId);
-}
-
-async function loadPoolIdForMatch(admin: AdminClient, matchId: string): Promise<string | null> {
-  const { data, error } = await admin
-    .from("matches")
-    .select("matchdays!inner(pool_id)")
-    .eq("id", matchId)
-    .maybeSingle();
-
-  if (error || !data) return null;
-
-  const matchdays = (data as { matchdays: { pool_id: string } | { pool_id: string }[] }).matchdays;
-  if (Array.isArray(matchdays)) return matchdays[0]?.pool_id ?? null;
-  return matchdays.pool_id ?? null;
 }
 
 async function persistOfficialResultFromLive(
@@ -215,7 +115,6 @@ async function persistOfficialResultFromLive(
 export async function syncLiveMatches(
   admin: AdminClient,
   nowMs: number = Date.now(),
-  siteOrigin?: string,
 ): Promise<SyncLiveMatchesResult> {
   const result: SyncLiveMatchesResult = {
     scanned: 0,
@@ -223,26 +122,12 @@ export async function syncLiveMatches(
     markedLive: 0,
     markedFinished: 0,
     resultsPersisted: 0,
-    scoresRecalculated: 0,
-    mvpsPersisted: 0,
-    headlinesPersisted: 0,
-    poolsRebuilt: 0,
     errors: [],
   };
 
   if (!isBsdConfigured()) return result;
 
-  const [windowMatches, backfillMatches] = await Promise.all([
-    loadCandidateMatches(admin, nowMs),
-    loadFinishedMatchesNeedingIncidentBackfill(admin, 12),
-  ]);
-
-  const matchesById = new Map<string, MatchRow>();
-  for (const match of [...windowMatches, ...backfillMatches]) {
-    matchesById.set(match.id, match);
-  }
-  const matches = [...matchesById.values()];
-
+  const matches = await loadCandidateMatches(admin, nowMs);
   result.scanned = matches.length;
   if (!matches.length) return result;
 
@@ -252,27 +137,22 @@ export async function syncLiveMatches(
   );
   const liveRows = await fetchBsdLiveLeagueEvents();
   const liveByEventId = new Map(liveRows.map((row) => [row.id, row]));
-  const poolsToRebuild = new Set<string>();
 
-  for (const match of matches) {
-    try {
+  // Paralelizamos las llamadas externas y escrituras a BD
+  const updates = await Promise.allSettled(
+    matches.map(async (match) => {
       const externalKey = eventMap.get(match.id);
-      if (!externalKey) {
-        if (match.status === "finished") {
-          await ensureFinishedMatchScoring(admin, match.id, result, poolsToRebuild);
-        }
-        continue;
-      }
+      if (!externalKey) return;
 
       const eventId = Number(externalKey);
-      if (!Number.isFinite(eventId)) continue;
+      if (!Number.isFinite(eventId)) return;
 
       const bundle = await fetchBsdLiveBundle(eventId, match.home_team, match.away_team);
       const liveRow = liveByEventId.get(eventId);
       const status =
         liveRow?.status ??
         (bundle.isLive ? "inprogress" : bundle.finished ? "finished" : "notstarted");
-      const isFinished = bundle.finished || isBsdEventFinished(status) || match.status === "finished";
+      const isFinished = bundle.finished || isBsdEventFinished(status);
 
       const shouldPersist =
         isBsdEventLive(status) ||
@@ -280,7 +160,7 @@ export async function syncLiveMatches(
         bundle.homeScore > 0 ||
         bundle.awayScore > 0;
 
-      if (!shouldPersist) continue;
+      if (!shouldPersist) return;
 
       const { error: upsertError } = await admin.from("match_live_state").upsert(
         {
@@ -298,18 +178,19 @@ export async function syncLiveMatches(
       );
 
       if (upsertError) {
-        result.errors.push(`${match.id}: ${upsertError.message}`);
-        continue;
+        throw new Error(`${match.id}: ${upsertError.message}`);
       }
 
-      result.updated += 1;
+      let markedLive = false;
+      let markedFinished = false;
+      let resultsPersisted = false;
 
       if (isBsdEventLive(status) && match.status !== "live") {
         const { error: liveError } = await admin
           .from("matches")
           .update({ status: "live" })
           .eq("id", match.id);
-        if (!liveError) result.markedLive += 1;
+        if (!liveError) markedLive = true;
       }
 
       if (isFinished) {
@@ -319,45 +200,30 @@ export async function syncLiveMatches(
           bundle.homeScore,
           bundle.awayScore,
         );
-        if (resultWritten) result.resultsPersisted += 1;
+        if (resultWritten) resultsPersisted = true;
 
         if (match.status !== "finished") {
           const { error: finishError } = await admin
             .from("matches")
             .update({ status: "finished" })
             .eq("id", match.id);
-          if (!finishError) result.markedFinished += 1;
+          if (!finishError) markedFinished = true;
         }
-
-        await ensureFinishedMatchScoring(admin, match.id, result, poolsToRebuild);
-
-        const headlineWritten = await syncBsdHeadlineForMatch(admin, match.id);
-        if (headlineWritten) result.headlinesPersisted += 1;
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "sync live match";
-      result.errors.push(`${match.id}: ${message}`);
+
+      return { markedLive, markedFinished, resultsPersisted, updated: true };
+    })
+  );
+
+  for (const update of updates) {
+    if (update.status === "rejected") {
+      result.errors.push(update.reason instanceof Error ? update.reason.message : String(update.reason));
+    } else if (update.value) {
+      if (update.value.updated) result.updated += 1;
+      if (update.value.markedLive) result.markedLive += 1;
+      if (update.value.markedFinished) result.markedFinished += 1;
+      if (update.value.resultsPersisted) result.resultsPersisted += 1;
     }
-  }
-
-  await syncOfficialMvps(admin, result, poolsToRebuild, nowMs);
-
-  for (const poolId of poolsToRebuild) {
-    const { error: rebuildError } = await admin.rpc("rebuild_pool_member_scores", {
-      p_pool_id: poolId,
-    });
-    if (rebuildError) {
-      result.errors.push(`${poolId}/rebuild: ${rebuildError.message}`);
-      continue;
-    }
-    result.poolsRebuilt += 1;
-  }
-
-  try {
-    await syncAllMatchHighlights(admin, siteOrigin);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "youtube highlights sync failed";
-    result.errors.push(`highlights: ${message}`);
   }
 
   return result;
