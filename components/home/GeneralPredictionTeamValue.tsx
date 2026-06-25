@@ -26,10 +26,10 @@ export function HomeChampionTeamValue({
 
 export function HomeFinalistsTeamValue({ teamA, teamB }: { teamA: string; teamB: string }) {
   return (
-    <span className="inline-flex max-w-full flex-wrap items-center justify-end gap-x-0.5 gap-y-0 text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight text-[#CCFF00] w-full">
-      <span className="break-words">{teamAbbr(teamA)}</span>
-      <span className="text-white/40">-</span>
-      <span className="break-words">{teamAbbr(teamB)}</span>
+    <span className="inline-flex max-w-full flex-nowrap items-center justify-end gap-x-0.5 gap-y-0 text-[clamp(8px,2.4cqw,10px)] font-medium leading-tight text-[#CCFF00] w-full whitespace-nowrap overflow-hidden">
+      <span className="truncate">{teamAbbr(teamA)}</span>
+      <span className="text-white/40 shrink-0">-</span>
+      <span className="truncate">{teamAbbr(teamB)}</span>
     </span>
   );
 }

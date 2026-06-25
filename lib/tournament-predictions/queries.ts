@@ -111,13 +111,16 @@ export async function getTournamentGeneralPredictions(
       predictions.championTeam,
       probabilities
     );
-    predictions.finalistsProbability = resolvePredictionProbability(
-      "finalists",
+    const finalistA = predictions.finalistTeamA
+      ? resolvePredictionProbability("finalists", predictions.finalistTeamA, probabilities) ?? 0
+      : 0;
+    const finalistB = predictions.finalistTeamB
+      ? resolvePredictionProbability("finalists", predictions.finalistTeamB, probabilities) ?? 0
+      : 0;
+    predictions.finalistsProbability =
       predictions.finalistTeamA && predictions.finalistTeamB
-        ? `${predictions.finalistTeamA}-${predictions.finalistTeamB}`
-        : null,
-      probabilities
-    );
+        ? Math.min(100, finalistA * finalistB * 2) // Rough heuristic for combined probability
+        : null;
     predictions.topScorerProbability = resolvePredictionProbability(
       "top_scorer",
       predictions.topScorerPlayerName,
@@ -218,13 +221,16 @@ export async function getPoolTournamentGeneralPredictionsBoard(
         row.championTeam,
         probabilities
       );
-      row.finalistsProbability = resolvePredictionProbability(
-        "finalists",
+      const finalistA = row.finalistTeamA
+        ? resolvePredictionProbability("finalists", row.finalistTeamA, probabilities) ?? 0
+        : 0;
+      const finalistB = row.finalistTeamB
+        ? resolvePredictionProbability("finalists", row.finalistTeamB, probabilities) ?? 0
+        : 0;
+      row.finalistsProbability =
         row.finalistTeamA && row.finalistTeamB
-          ? `${row.finalistTeamA}-${row.finalistTeamB}`
-          : null,
-        probabilities
-      );
+          ? Math.min(100, finalistA * finalistB * 2)
+          : null;
       row.topScorerProbability = resolvePredictionProbability(
         "top_scorer",
         row.topScorerPlayerName,

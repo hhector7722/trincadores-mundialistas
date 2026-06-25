@@ -170,7 +170,7 @@ export async function syncDynamicProbabilities(admin: AdminClient) {
     for (const team of uniquePicks.finalists) {
       const prob = (normalizedProbs[team] || 0.001) * 1.5; // Heurística simple: llegar a la final es más probable que ganar
       projectionRows.push({
-        category: 'final',
+        category: 'finalists',
         selection_key: team,
         entity_type: 'team',
         probability: Math.min(prob, 1),
@@ -182,14 +182,36 @@ export async function syncDynamicProbabilities(admin: AdminClient) {
     // MVP Heurística (Fotmob Rating proxy)
     // Para no bloquear la API, simularemos el rating. En un entorno real se haría query a match_team_lineups.
     for (const player of uniquePicks.mvps) {
-       // Necesitaríamos saber en qué equipo juega el jugador.
-       // Simulamos un fallback estándar para que el frontend nunca falle
        projectionRows.push({
-         category: 'mvp',
+         category: 'tournament_mvp',
          selection_key: player,
          entity_type: 'player',
          probability: 0.02, // 2% por defecto si no tenemos el equipo aún cruzado
          confidence_score: 30, // Confianza baja por ser heurística sin resolver equipo
+         algorithm_version: 1
+       });
+    }
+
+    // Top Scorer Fallback
+    for (const player of uniquePicks.topScorers) {
+       projectionRows.push({
+         category: 'top_scorer',
+         selection_key: player,
+         entity_type: 'player',
+         probability: 0.05, // 5% por defecto
+         confidence_score: 10,
+         algorithm_version: 1
+       });
+    }
+
+    // Golden Glove Fallback
+    for (const player of uniquePicks.goldenGloves) {
+       projectionRows.push({
+         category: 'golden_glove',
+         selection_key: player,
+         entity_type: 'player',
+         probability: 0.08, // 8% por defecto
+         confidence_score: 10,
          algorithm_version: 1
        });
     }
