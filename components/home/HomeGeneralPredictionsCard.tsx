@@ -80,6 +80,11 @@ function boardRowToPredictions(
     goldenGlovePlayerName: row.goldenGlovePlayerName,
     goldenGloveTeamName: row.goldenGloveTeamName,
     updatedAt: null,
+    championProbability: row.championProbability,
+    finalistsProbability: row.finalistsProbability,
+    topScorerProbability: row.topScorerProbability,
+    tournamentMvpProbability: row.tournamentMvpProbability,
+    goldenGloveProbability: row.goldenGloveProbability,
   };
 }
 
