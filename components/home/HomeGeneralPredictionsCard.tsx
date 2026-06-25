@@ -111,6 +111,7 @@ function GeneralPredictionsSlideBody({
             <HomeChampionTeamValue team={slidePredictions.championTeam} />
           ) : null
         }
+        probability={slidePredictions.championProbability}
         editable={editable}
         onAdd={onChampion}
         onEdit={onChampion}
@@ -125,6 +126,7 @@ function GeneralPredictionsSlideBody({
             />
           ) : null
         }
+        probability={slidePredictions.finalistsProbability}
         editable={editable}
         onAdd={onFinalists}
         onEdit={onFinalists}
@@ -135,6 +137,7 @@ function GeneralPredictionsSlideBody({
           slidePredictions.topScorerPlayerName,
           slidePredictions.topScorerTeamName
         )}
+        probability={slidePredictions.topScorerProbability}
         editable={editable}
         onAdd={onTopScorer}
         onEdit={onTopScorer}
@@ -145,6 +148,7 @@ function GeneralPredictionsSlideBody({
           slidePredictions.tournamentMvpPlayerName,
           slidePredictions.tournamentMvpTeamName
         )}
+        probability={slidePredictions.tournamentMvpProbability}
         editable={editable}
         onAdd={onTournamentMvp}
         onEdit={onTournamentMvp}
@@ -155,6 +159,7 @@ function GeneralPredictionsSlideBody({
           slidePredictions.goldenGlovePlayerName,
           slidePredictions.goldenGloveTeamName
         )}
+        probability={slidePredictions.goldenGloveProbability}
         editable={editable}
         onAdd={onGoldenGlove}
         onEdit={onGoldenGlove}

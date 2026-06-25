@@ -37,6 +37,18 @@ function mapRow(row: Row): TournamentGeneralPredictions {
   };
 }
 
+function resolvePredictionProbability(
+  category: string,
+  selectionKey: string | null,
+  probabilities: { category: string; selection_key: string; probability: number }[]
+): number | null {
+  if (!selectionKey) return null;
+  const match = probabilities.find(
+    (p) => p.category === category && p.selection_key === selectionKey
+  );
+  return match ? match.probability : null;
+}
+
 const EMPTY_PREDICTIONS = (poolId: string, profileId: string): TournamentGeneralPredictions => ({
   poolId,
   profileId,
@@ -85,11 +97,47 @@ export async function getTournamentGeneralPredictions(
     throw new Error(rowResult.error.message);
   }
 
+  let predictions = rowResult.data
+    ? mapRow(rowResult.data as Row)
+    : EMPTY_PREDICTIONS(poolId, profileId);
+
+  const { data: probabilities } = await supabase
+    .from("dynamic_probabilities")
+    .select("category, selection_key, probability");
+
+  if (probabilities) {
+    predictions.championProbability = resolvePredictionProbability(
+      "champion",
+      predictions.championTeam,
+      probabilities
+    );
+    predictions.finalistsProbability = resolvePredictionProbability(
+      "finalists",
+      predictions.finalistTeamA && predictions.finalistTeamB
+        ? `${predictions.finalistTeamA}-${predictions.finalistTeamB}`
+        : null,
+      probabilities
+    );
+    predictions.topScorerProbability = resolvePredictionProbability(
+      "top_scorer",
+      predictions.topScorerPlayerName,
+      probabilities
+    );
+    predictions.tournamentMvpProbability = resolvePredictionProbability(
+      "tournament_mvp",
+      predictions.tournamentMvpPlayerName,
+      probabilities
+    );
+    predictions.goldenGloveProbability = resolvePredictionProbability(
+      "golden_glove",
+      predictions.goldenGlovePlayerName,
+      probabilities
+    );
+  }
+
   return {
     editable,
-    predictions: rowResult.data
-      ? mapRow(rowResult.data as Row)
-      : EMPTY_PREDICTIONS(poolId, profileId),
+    predictions,
   };
 }
 
@@ -157,6 +205,42 @@ export async function getPoolTournamentGeneralPredictionsBoard(
       goldenGlovePlayerName: prediction?.golden_glove_player_name ?? null,
       goldenGloveTeamName: prediction?.golden_glove_team_name ?? null,
     });
+  }
+
+  const { data: probabilities } = await supabase
+    .from("dynamic_probabilities")
+    .select("category, selection_key, probability");
+
+  if (probabilities) {
+    for (const row of rows) {
+      row.championProbability = resolvePredictionProbability(
+        "champion",
+        row.championTeam,
+        probabilities
+      );
+      row.finalistsProbability = resolvePredictionProbability(
+        "finalists",
+        row.finalistTeamA && row.finalistTeamB
+          ? `${row.finalistTeamA}-${row.finalistTeamB}`
+          : null,
+        probabilities
+      );
+      row.topScorerProbability = resolvePredictionProbability(
+        "top_scorer",
+        row.topScorerPlayerName,
+        probabilities
+      );
+      row.tournamentMvpProbability = resolvePredictionProbability(
+        "tournament_mvp",
+        row.tournamentMvpPlayerName,
+        probabilities
+      );
+      row.goldenGloveProbability = resolvePredictionProbability(
+        "golden_glove",
+        row.goldenGlovePlayerName,
+        probabilities
+      );
+    }
   }
 
   rows.sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));

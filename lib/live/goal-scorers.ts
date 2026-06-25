@@ -16,7 +16,10 @@ const CARD_COMPACT_THRESHOLD = 3;
 const CARD_MAX_SCORERS_PER_ROW = 3;
 
 export function goalScorerDisplayName(fullName: string): string {
-  return shirtPlayerName(fullName);
+  const name = shirtPlayerName(fullName);
+  // Cuando el nombre es "Vinicius Junior" (o similar con sufijo),
+  // mostrar solo el nombre de pila (sin "Jr" / "Junior").
+  return name.replace(/\s+(Jr|Junior)$/i, "");
 }
 
 export function formatGoalScorerLabel(goal: MatchGoalScorer): string {

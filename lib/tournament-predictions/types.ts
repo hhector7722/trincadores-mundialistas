@@ -10,6 +10,11 @@ export type TournamentGeneralPredictions = {
   tournamentMvpTeamName: string | null;
   goldenGlovePlayerName: string | null;
   goldenGloveTeamName: string | null;
+  championProbability?: number | null;
+  finalistsProbability?: number | null;
+  topScorerProbability?: number | null;
+  tournamentMvpProbability?: number | null;
+  goldenGloveProbability?: number | null;
   updatedAt: string | null;
 };
 
@@ -44,4 +49,9 @@ export type TournamentGeneralPredictionsBoardRow = {
   tournamentMvpTeamName: string | null;
   goldenGlovePlayerName: string | null;
   goldenGloveTeamName: string | null;
+  championProbability?: number | null;
+  finalistsProbability?: number | null;
+  topScorerProbability?: number | null;
+  tournamentMvpProbability?: number | null;
+  goldenGloveProbability?: number | null;
 };
