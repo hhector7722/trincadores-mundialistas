@@ -35,6 +35,7 @@ export function GeneralPredictionRow({
     if (prob < 10) return "bg-[#c0392b]";
     if (prob < 25) return "bg-[#e67e22]";
     if (prob < 50) return "bg-[#d35400]";
+    if (prob < 75) return "bg-[#6ab04c]";
     return "bg-[#16a085]";
   }
 
