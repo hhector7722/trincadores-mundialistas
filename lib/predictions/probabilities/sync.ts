@@ -1,5 +1,6 @@
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 import { fetchWorldCupOutrights } from "@/lib/odds/the-odds-api-client";
+import { getStarPlayerConfig } from "./stars-config";
 
 type UniquePicks = {
   champions: Set<string>;
@@ -182,37 +183,40 @@ export async function syncDynamicProbabilities(admin: AdminClient) {
     // MVP Heurística (Fotmob Rating proxy)
     // Para no bloquear la API, simularemos el rating. En un entorno real se haría query a match_team_lineups.
     for (const player of uniquePicks.mvps) {
+       const config = getStarPlayerConfig(player);
        projectionRows.push({
          category: 'tournament_mvp',
          selection_key: player,
          entity_type: 'player',
-         probability: 0.02, // 2% por defecto si no tenemos el equipo aún cruzado
+         probability: config.mvpProb ?? 0.005, // 0.5% por defecto si no tenemos el equipo aún cruzado
          confidence_score: 30, // Confianza baja por ser heurística sin resolver equipo
-         algorithm_version: 1
+         algorithm_version: 2
        });
     }
 
     // Top Scorer Fallback
     for (const player of uniquePicks.topScorers) {
+       const config = getStarPlayerConfig(player);
        projectionRows.push({
          category: 'top_scorer',
          selection_key: player,
          entity_type: 'player',
-         probability: 0.05, // 5% por defecto
+         probability: config.topScorerProb ?? 0.005, // 0.5% por defecto
          confidence_score: 10,
-         algorithm_version: 1
+         algorithm_version: 2
        });
     }
 
     // Golden Glove Fallback
     for (const player of uniquePicks.goldenGloves) {
+       const config = getStarPlayerConfig(player);
        projectionRows.push({
          category: 'golden_glove',
          selection_key: player,
          entity_type: 'player',
-         probability: 0.08, // 8% por defecto
+         probability: config.goldenGloveProb ?? 0.005, // 0.5% por defecto
          confidence_score: 10,
-         algorithm_version: 1
+         algorithm_version: 2
        });
     }
   }

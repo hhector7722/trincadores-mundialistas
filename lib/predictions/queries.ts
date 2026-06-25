@@ -614,11 +614,17 @@ export async function getMatchPredictionsBoard(
           label: a.label,
           cumulativePoints: snapshotA?.cumulativePoints ?? 0,
           exactHits: snapshotA?.exactHits ?? 0,
+          signHits: snapshotA?.signHits ?? 0,
+          mvpHits: snapshotA?.mvpHits ?? 0,
+          globalHits: snapshotA?.globalHits ?? 0,
         },
         {
           label: b.label,
           cumulativePoints: snapshotB?.cumulativePoints ?? 0,
           exactHits: snapshotB?.exactHits ?? 0,
+          signHits: snapshotB?.signHits ?? 0,
+          mvpHits: snapshotB?.mvpHits ?? 0,
+          globalHits: snapshotB?.globalHits ?? 0,
         }
       );
     });
