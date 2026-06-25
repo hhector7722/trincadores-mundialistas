@@ -39,7 +39,7 @@ export function GeneralPredictionRow({
   }
 
   return (
-    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,auto)_minmax(2.5rem,1fr)_auto] items-center gap-1">
+    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_minmax(3.5rem,35%)_auto] items-center gap-1">
       <span className="flex min-w-0 items-center text-[clamp(7px,2cqw,9px)] font-semibold uppercase leading-tight tracking-wide text-white/50">
         {label}
       </span>

@@ -9,6 +9,7 @@ import {
 } from "@/lib/ranking/reliability";
 import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
+import { TOURNAMENT_GENERAL_SCORE_POINTS } from "@/lib/tournament-predictions/scoring";
 import { createClient } from "@/lib/supabase/server";
 
 export type ReferenceMatch = {
@@ -38,6 +39,8 @@ export type LeaderboardRow = {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  mvpHits: number;
+  globalHits: number;
   matchPoints: number;
   generalPoints: number;
   quizPoints: number;
@@ -56,6 +59,8 @@ export type MemberStanding = {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  mvpHits: number;
+  globalHits: number;
   matchPoints: number;
   generalPoints: number;
   totalMembers: number;
@@ -70,11 +75,11 @@ type MemberRow = {
   avatarUrl: string | null;
 };
 
-type MatchStatsRow = {
   profile_id: string;
   match_points: number;
   exact_hits: number;
   sign_hits: number;
+  mvp_hits: number;
 };
 
 type ScoreRow = MatchStatsRow & {
@@ -85,30 +90,44 @@ function sortKey(row: {
   label: string;
   cumulativePoints: number;
   exactHits: number;
-}): [number, number, string] {
-  return [-row.cumulativePoints, -row.exactHits, row.label.toLowerCase()];
+  signHits: number;
+  mvpHits: number;
+  globalHits: number;
+}): [number, number, number, number, number, string] {
+  return [
+    -row.cumulativePoints,
+    -row.exactHits,
+    -row.signHits,
+    -row.mvpHits,
+    -row.globalHits,
+    row.label.toLowerCase(),
+  ];
 }
 
 function compareRows(
-  a: { label: string; cumulativePoints: number; exactHits: number },
-  b: { label: string; cumulativePoints: number; exactHits: number }
+  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number },
+  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number }
 ): number {
   const ka = sortKey(a);
   const kb = sortKey(b);
-  if (ka[0] !== kb[0]) return ka[0] - kb[0];
-  if (ka[1] !== kb[1]) return ka[1] - kb[1];
-  return ka[2].localeCompare(kb[2], "es");
+  for (let i = 0; i < 5; i++) {
+    if (ka[i] !== kb[i]) return (ka[i] as number) - (kb[i] as number);
+  }
+  return (ka[5] as string).localeCompare(kb[5] as string, "es");
 }
 
 export type RankingSortSnapshot = {
   cumulativePoints: number;
   exactHits: number;
+  signHits: number;
+  mvpHits: number;
+  globalHits: number;
 };
 
-/** Misma regla de orden que `getPoolLeaderboard` (pts → exactos → nombre). */
+/** Misma regla de orden que `getPoolLeaderboard` (pts → exactos → signos → mvps → globales → nombre). */
 export function compareLeaderboardRows(
-  a: { label: string; cumulativePoints: number; exactHits: number },
-  b: { label: string; cumulativePoints: number; exactHits: number }
+  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number },
+  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number }
 ): number {
   return compareRows(a, b);
 }
@@ -130,16 +149,32 @@ export async function loadRankingSnapshotThroughKickoff(
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
   );
+  const generalHits = new Map(
+    [...generalScoreRows.entries()].map(([profileId, row]) => {
+      let hits = 0;
+      if (row.championPoints > 0) hits++;
+      if (row.finalistsPoints === TOURNAMENT_GENERAL_SCORE_POINTS.finalistSingle) hits += 1;
+      else if (row.finalistsPoints === TOURNAMENT_GENERAL_SCORE_POINTS.finalists) hits += 2;
+      if (row.topScorerPoints > 0) hits++;
+      if (row.tournamentMvpPoints > 0) hits++;
+      if (row.goldenGlovePoints > 0) hits++;
+      return [profileId, hits];
+    })
+  );
 
   const snapshot = new Map<string, RankingSortSnapshot>();
   for (const member of members) {
     const scoreRow = scores.get(member.profileId);
     const general = generalPoints.get(member.profileId) ?? 0;
+    const gHits = generalHits.get(member.profileId) ?? 0;
     const quizBonus = quizFinalBonus.get(member.profileId) ?? 0;
     const matchCumulative = scoreRow?.cumulative_points ?? 0;
     snapshot.set(member.profileId, {
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: scoreRow?.exact_hits ?? 0,
+      signHits: scoreRow?.sign_hits ?? 0,
+      mvpHits: scoreRow?.mvp_hits ?? 0,
+      globalHits: gHits,
     });
   }
 
@@ -215,17 +250,23 @@ async function getFinishedMatchIdsThroughKickoff(
 function ingestMatchPoints(
   stats: Map<string, MatchStatsRow>,
   profileId: string,
-  points: number
+  points: number,
+  type: "match" | "mvp"
 ) {
   const current = stats.get(profileId) ?? {
     profile_id: profileId,
     match_points: 0,
     exact_hits: 0,
     sign_hits: 0,
+    mvp_hits: 0,
   };
   current.match_points += points;
-  if (points === MATCH_SCORE_POINTS.exact) current.exact_hits += 1;
-  if (points === MATCH_SCORE_POINTS.sign) current.sign_hits += 1;
+  if (type === "match") {
+    if (points === MATCH_SCORE_POINTS.exact) current.exact_hits += 1;
+    if (points === MATCH_SCORE_POINTS.sign) current.sign_hits += 1;
+  } else if (type === "mvp") {
+    if (points > 0) current.mvp_hits += 1;
+  }
   stats.set(profileId, current);
 }
 
@@ -257,10 +298,10 @@ async function loadMatchStatsForMatchIds(
 
   const stats = new Map<string, MatchStatsRow>();
   for (const row of predictions ?? []) {
-    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0);
+    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "match");
   }
   for (const row of mvps ?? []) {
-    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0);
+    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "mvp");
   }
 
   return stats;
@@ -384,6 +425,9 @@ export function buildPositionsFromSnapshots(
       label: m.label,
       cumulativePoints: snap?.cumulativePoints ?? 0,
       exactHits: snap?.exactHits ?? 0,
+      signHits: snap?.signHits ?? 0,
+      mvpHits: snap?.mvpHits ?? 0,
+      globalHits: snap?.globalHits ?? 0,
     };
   });
 
@@ -490,11 +534,13 @@ function buildPositionMap(
   members: MemberRow[],
   scores: Map<string, ScoreRow>,
   generalPoints: Map<string, number>,
+  generalHits: Map<string, number>,
   quizFinalBonus: Map<string, number>
 ): Map<string, number> {
   const merged = members.map((m) => {
     const s = scores.get(m.profileId);
     const general = generalPoints.get(m.profileId) ?? 0;
+    const gHits = generalHits.get(m.profileId) ?? 0;
     const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
     return {
@@ -502,23 +548,13 @@ function buildPositionMap(
       label: m.label,
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
+      signHits: s?.sign_hits ?? 0,
+      mvpHits: s?.mvp_hits ?? 0,
+      globalHits: gHits,
     };
   });
 
-  merged.sort((a, b) =>
-    compareRows(
-      {
-        label: a.label,
-        cumulativePoints: a.cumulativePoints,
-        exactHits: a.exactHits,
-      },
-      {
-        label: b.label,
-        cumulativePoints: b.cumulativePoints,
-        exactHits: b.exactHits,
-      }
-    )
-  );
+  merged.sort((a, b) => compareRows(a, b));
 
   return new Map(merged.map((row, index) => [row.profileId, index + 1]));
 }
@@ -540,6 +576,7 @@ function buildLeaderboardRows(
   reliability: Map<string, ReliabilityStats>,
   communityAvg: number,
   generalPoints: Map<string, number>,
+  generalHits: Map<string, number>,
   quizStats: Map<string, QuizProfileStats>,
   quizFinalBonus: Map<string, number>,
   previousPositions: Map<string, number> | null
@@ -549,6 +586,7 @@ function buildLeaderboardRows(
     const lastMatch = lastMatchScores.get(m.profileId);
     const rel = reliability.get(m.profileId);
     const general = generalPoints.get(m.profileId) ?? 0;
+    const gHits = generalHits.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
     const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
     const quiz = quizStats.get(m.profileId);
@@ -560,6 +598,8 @@ function buildLeaderboardRows(
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
+      mvpHits: s?.mvp_hits ?? 0,
+      globalHits: gHits,
       matchPoints: lastMatch?.match_points ?? 0,
       generalPoints: general,
       quizPoints: quiz?.points ?? 0,
@@ -633,9 +673,21 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
   );
+  const generalHits = new Map(
+    [...generalScoreRows.entries()].map(([profileId, row]) => {
+      let hits = 0;
+      if (row.championPoints > 0) hits++;
+      if (row.finalistsPoints === TOURNAMENT_GENERAL_SCORE_POINTS.finalistSingle) hits += 1;
+      else if (row.finalistsPoints === TOURNAMENT_GENERAL_SCORE_POINTS.finalists) hits += 2;
+      if (row.topScorerPoints > 0) hits++;
+      if (row.tournamentMvpPoints > 0) hits++;
+      if (row.goldenGlovePoints > 0) hits++;
+      return [profileId, hits];
+    })
+  );
 
   const previousPositions = previousReferenceMatch
-    ? buildPositionMap(members, previousScores, generalPoints, quizFinalBonus)
+    ? buildPositionMap(members, previousScores, generalPoints, generalHits, quizFinalBonus)
     : null;
   const communityAvg = computeCommunityAvgFromStats(reliability);
   const sorted = buildLeaderboardRows(
@@ -645,6 +697,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     reliability,
     communityAvg,
     generalPoints,
+    generalHits,
     quizStats,
     quizFinalBonus,
     previousPositions
@@ -680,6 +733,8 @@ export async function getMemberStanding(
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,
+    mvpHits: row.mvpHits,
+    globalHits: row.globalHits,
     matchPoints: row.matchPoints,
     generalPoints: row.generalPoints,
     totalMembers: rows.length,
@@ -704,6 +759,8 @@ export function memberStandingFromLeaderboard(
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,
+    mvpHits: row.mvpHits,
+    globalHits: row.globalHits,
     matchPoints: row.matchPoints,
     generalPoints: row.generalPoints,
     totalMembers: rows.length,
