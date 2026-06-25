@@ -31,7 +31,15 @@ export default async function PublicProfilePage({
   }
 
   const isSelf = user!.id === profileId;
-  const isHector = isSelf && standing.username?.toLowerCase() === "hector";
+
+  // Consulta el username del usuario logueado (no del perfil visitado)
+  const { data: currentProfile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user!.id)
+    .single();
+
+  const isHector = currentProfile?.username?.toLowerCase() === "hector";
 
   return (
     <div className="space-y-4 p-4 pb-4">
