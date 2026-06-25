@@ -9,7 +9,7 @@ import {
   type StarPlayerConfigRow,
 } from "@/actions/star-player-config";
 import { fetchAllTournamentPlayersAction } from "@/actions/lineup";
-import { syncProbabilitiesAction } from "@/actions/sync-probabilities";
+import { syncProbabilitiesAction, getDynamicProbabilitiesAction } from "@/actions/sync-probabilities";
 import { EntityModalController, buildLineupView } from "@/components/lineup/EntityModalController";
 import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
@@ -72,13 +72,18 @@ function ProbInput({
 
 function PlayerRow({
   row,
+  probs,
   onDelete,
   onEdit,
 }: {
   row: StarPlayerConfigRow;
+  probs: DynProbMap;
   onDelete: (name: string) => void;
   onEdit: (row: StarPlayerConfigRow) => void;
 }) {
+  const computedProb = (category: string) =>
+    probs[category]?.[row.player_name] ?? null;
+
   return (
     <li className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0">
       <div className="shrink-0">
@@ -98,18 +103,39 @@ function PlayerRow({
       </div>
       <div className="flex shrink-0 items-center gap-3 text-[11px] tabular-nums">
         {row.top_scorer_prob !== null && (
-          <span className="rounded-full bg-orange-500/20 px-2 py-0.5 text-orange-300 font-semibold">
+          <span className="rounded-full bg-orange-500/20 px-2 py-0.5 text-orange-300 font-semibold"
+            title={`Config: ${probToDisplay(row.top_scorer_prob)}%`}>
             ⚽ {probToDisplay(row.top_scorer_prob)}%
           </span>
         )}
         {row.mvp_prob !== null && (
-          <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-purple-300 font-semibold">
+          <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-purple-300 font-semibold"
+            title={`Config: ${probToDisplay(row.mvp_prob)}%`}>
             🏅 {probToDisplay(row.mvp_prob)}%
           </span>
         )}
         {row.golden_glove_prob !== null && (
-          <span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-yellow-300 font-semibold">
+          <span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-yellow-300 font-semibold"
+            title={`Config: ${probToDisplay(row.golden_glove_prob)}%`}>
             🧤 {probToDisplay(row.golden_glove_prob)}%
+          </span>
+        )}
+        {row.top_scorer_prob !== null && computedProb("top_scorer") !== null && (
+          <span className="rounded-full bg-orange-500/10 px-2 py-0.5 text-orange-400/70 font-mono text-[10px]"
+            title="Probabilidad final calculada">
+            →{probToDisplay(computedProb("top_scorer"))}%
+          </span>
+        )}
+        {row.mvp_prob !== null && computedProb("tournament_mvp") !== null && (
+          <span className="rounded-full bg-purple-500/10 px-2 py-0.5 text-purple-400/70 font-mono text-[10px]"
+            title="Probabilidad final calculada">
+            →{probToDisplay(computedProb("tournament_mvp"))}%
+          </span>
+        )}
+        {row.golden_glove_prob !== null && computedProb("golden_glove") !== null && (
+          <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-yellow-400/70 font-mono text-[10px]"
+            title="Probabilidad final calculada">
+            →{probToDisplay(computedProb("golden_glove"))}%
           </span>
         )}
       </div>
@@ -135,8 +161,11 @@ function PlayerRow({
   );
 }
 
+type DynProbMap = Record<string, Record<string, number>>; // category → selection_key → probability
+
 export function StarPlayerConfigEditor() {
   const [rows, setRows] = useState<StarPlayerConfigRow[]>([]);
+  const [probs, setProbs] = useState<DynProbMap>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -148,12 +177,23 @@ export function StarPlayerConfigEditor() {
 
   const loadRows = useCallback(async () => {
     setLoading(true);
-    const result = await getStarPlayerConfigsAction();
-    if (result.ok) {
-      setRows(result.data);
+    const [configResult, probsResult] = await Promise.all([
+      getStarPlayerConfigsAction(),
+      getDynamicProbabilitiesAction(),
+    ]);
+    if (configResult.ok) {
+      setRows(configResult.data);
       setError(null);
     } else {
-      setError(result.error);
+      setError(configResult.error);
+    }
+    if (probsResult.ok) {
+      const map: DynProbMap = {};
+      for (const p of probsResult.data) {
+        if (!map[p.category]) map[p.category] = {};
+        map[p.category][p.selection_key] = p.probability;
+      }
+      setProbs(map);
     }
     setLoading(false);
   }, []);
@@ -332,6 +372,7 @@ export function StarPlayerConfigEditor() {
             <PlayerRow
               key={row.player_name}
               row={row}
+              probs={probs}
               onDelete={handleDelete}
               onEdit={handleEditRow}
             />
