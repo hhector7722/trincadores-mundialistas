@@ -9,6 +9,7 @@ import {
   type StarPlayerConfigRow,
 } from "@/actions/star-player-config";
 import { fetchAllTournamentPlayersAction } from "@/actions/lineup";
+import { syncProbabilitiesAction } from "@/actions/sync-probabilities";
 import { EntityModalController, buildLineupView } from "@/components/lineup/EntityModalController";
 import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
@@ -143,6 +144,7 @@ export function StarPlayerConfigEditor() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [lineupTeam, setLineupTeam] = useState<string | null>(null);
   const [editing, setEditing] = useState<EditingState | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "done" | "error">("idle");
 
   const loadRows = useCallback(async () => {
     setLoading(true);
@@ -229,6 +231,32 @@ export function StarPlayerConfigEditor() {
       >
         <Plus className="h-4 w-4" />
         Añadir jugador estrella
+      </button>
+
+      {/* Sync button */}
+      <button
+        type="button"
+        disabled={syncStatus === "syncing"}
+        onClick={async () => {
+          setSyncStatus("syncing");
+          setError(null);
+          const result = await syncProbabilitiesAction();
+          setSyncStatus(result.ok ? "done" : "error");
+          if (!result.ok) setError(result.error ?? "Error al sincronizar.");
+        }}
+        className={cn(
+          "inline-flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-colors",
+          syncStatus === "done"
+            ? "border border-green-500/40 bg-green-500/10 text-green-400"
+            : "border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white/90",
+          syncStatus === "syncing" && "opacity-60"
+        )}
+      >
+        {syncStatus === "syncing"
+          ? "Sincronizando…"
+          : syncStatus === "done"
+            ? "¡Sincronizado!"
+            : "Sync: recalcular probabilidades"}
       </button>
 
       {/* Inline editor panel */}
