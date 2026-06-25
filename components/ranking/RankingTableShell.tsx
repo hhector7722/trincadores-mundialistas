@@ -72,7 +72,7 @@ export function RankingTableShell({
       const bonus = bonusMap.get(row.profileId) ?? 0;
       return {
         ...row,
-        quizBonusText: bonus > 0 ? `+ ${bonus}pts` : undefined,
+        quizBonusText: bonus > 0 ? `+${bonus} pts` : undefined,
         cumulativePoints: isQuizBonusActive ? row.cumulativePoints + bonus : row.cumulativePoints,
       };
     });

@@ -299,8 +299,12 @@ function useCalendarViewportLayout(
   rootRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
-  rowCount: number
+  rowCount: number,
+  onReady?: () => void
 ) {
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
   useLayoutEffect(() => {
     const calendar = calendarRef.current;
     const grid = gridRef.current;
@@ -321,6 +325,9 @@ function useCalendarViewportLayout(
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
     };
 
+    syncLayout();
+    onReadyRef.current?.();
+
     const syncFrameRef = { current: null as number | null };
 
     const scheduleSync = () => {
@@ -335,8 +342,6 @@ function useCalendarViewportLayout(
         });
       });
     };
-
-    scheduleSync();
 
     const observer = new ResizeObserver(scheduleSync);
     if (layout instanceof HTMLElement) observer.observe(layout);
@@ -417,6 +422,7 @@ export function PredictionsCalendar({
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const [layoutReady, setLayoutReady] = useState(false);
 
   const weeks = useMemo(() => {
     const grid = buildMonthGrid(
@@ -443,7 +449,9 @@ export function PredictionsCalendar({
     [groupMatchRows]
   );
 
-  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length, () => {
+    setLayoutReady(true);
+  });
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
@@ -460,7 +468,7 @@ export function PredictionsCalendar({
     <div ref={rootRef} className="flex min-h-0 flex-1 flex-col">
       <section
         ref={calendarRef}
-        style={{ "--tm-cal-weeks": weeks.length } as CSSProperties}
+        style={{ "--tm-cal-weeks": weeks.length, opacity: layoutReady ? 1 : 0 } as CSSProperties}
         className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0"
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center px-2 py-1 sm:px-3">
