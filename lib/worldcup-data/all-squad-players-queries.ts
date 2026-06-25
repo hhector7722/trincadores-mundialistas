@@ -3,7 +3,7 @@ import type { SearchablePlayer } from "@/lib/players/search-players";
 import { WC2026_SQUAD_YEAR } from "@/lib/worldcup2026/normalize-squads";
 import { WC2026_FEED_SOURCE } from "@/lib/worldcup-data/types";
 
-const PAGE_SIZE = 2000;
+const PAGE_SIZE = 1000;
 
 /** Todas las convocatorias WC 2026 (fuente worldcup2026) para busqueda global. */
 export async function getAllTournamentPlayers(

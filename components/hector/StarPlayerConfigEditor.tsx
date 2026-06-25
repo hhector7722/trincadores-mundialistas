@@ -9,6 +9,7 @@ import {
   type StarPlayerConfigRow,
 } from "@/actions/star-player-config";
 import { fetchAllTournamentPlayersAction } from "@/actions/lineup";
+import { EntityModalController, buildLineupView } from "@/components/lineup/EntityModalController";
 import { PlayerAwardPickerModal } from "@/components/predictions/PlayerAwardPickerModal";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { teamNameEs } from "@/lib/teams/display";
@@ -140,6 +141,7 @@ export function StarPlayerConfigEditor() {
   const [pending, startTransition] = useTransition();
 
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [lineupTeam, setLineupTeam] = useState<string | null>(null);
   const [editing, setEditing] = useState<EditingState | null>(null);
 
   const loadRows = useCallback(async () => {
@@ -316,10 +318,21 @@ export function StarPlayerConfigEditor() {
         title="Seleccionar jugador"
         playerPickMode="any"
         onPickPlayer={handlePickPlayer}
-        onPickTeam={(teamName) => {
-          // Do nothing on team pick — user must click a specific player
-        }}
+        onPickTeam={setLineupTeam}
       />
+
+      {lineupTeam && (
+        <EntityModalController
+          open
+          onClose={() => setLineupTeam(null)}
+          initialView={buildLineupView(lineupTeam)}
+          playerPickMode="any"
+          onPlayerPicked={(teamName, playerName) => {
+            setLineupTeam(null);
+            handlePickPlayer(teamName, playerName);
+          }}
+        />
+      )}
     </div>
   );
 }
