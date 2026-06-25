@@ -8,7 +8,6 @@ import {
   getQuizResult,
   startQuizDrillSession,
   startQuizSession,
-  startQuizSessionYesterday,
 } from "@/lib/quiz/queries";
 import { todayQuizDate } from "@/lib/quiz/date";
 import type { QuizDayHub, QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
@@ -134,9 +133,14 @@ export async function startQuiz(
     const isHector = profile?.username?.toLowerCase() === "hector";
     const isPastQuiz = Boolean(quizRow?.quiz_date && quizRow.quiz_date < todayQuizDate());
 
-    const session = isHector && isPastQuiz && quizRow?.quiz_date
-      ? await startQuizSessionYesterday(quizId)
-      : await startQuizSession(quizId);
+    if (isHector && isPastQuiz) {
+      await supabase
+        .from("quizzes")
+        .update({ closes_at: new Date(Date.now() + 3600_000).toISOString() })
+        .eq("id", quizId);
+    }
+
+    const session = await startQuizSession(quizId);
 
     const playFormats = parsePlayFormats(quizRow?.settings_json);
     const enrichedSession: QuizStartSession = {

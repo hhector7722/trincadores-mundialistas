@@ -295,24 +295,6 @@ export async function startQuizSession(quizId: string): Promise<QuizStartSession
   return session;
 }
 
-export async function startQuizSessionYesterday(quizId: string): Promise<QuizStartSession> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("start_quiz_attempt_yesterday", {
-    p_quiz_id: quizId,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const session = parseQuizStartSession(data);
-  if (!session) {
-    throw new Error("Respuesta de quiz invalida.");
-  }
-
-  return session;
-}
-
 export async function startQuizDrillSession(
   quizId: string,
   todayQuizDate: string,
