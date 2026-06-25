@@ -46,7 +46,7 @@ function resolvePredictionProbability(
   const match = probabilities.find(
     (p) => p.category === category && p.selection_key === selectionKey
   );
-  return match ? match.probability : null;
+  return match ? match.probability * 100 : null;
 }
 
 const EMPTY_PREDICTIONS = (poolId: string, profileId: string): TournamentGeneralPredictions => ({
@@ -119,7 +119,7 @@ export async function getTournamentGeneralPredictions(
       : 0;
     predictions.finalistsProbability =
       predictions.finalistTeamA && predictions.finalistTeamB
-        ? Math.min(100, finalistA * finalistB * 2) // Rough heuristic for combined probability
+        ? Math.min(100, (finalistA * finalistB) / 50) // Rough heuristic for combined probability
         : null;
     predictions.topScorerProbability = resolvePredictionProbability(
       "top_scorer",
@@ -229,7 +229,7 @@ export async function getPoolTournamentGeneralPredictionsBoard(
         : 0;
       row.finalistsProbability =
         row.finalistTeamA && row.finalistTeamB
-          ? Math.min(100, finalistA * finalistB * 2)
+          ? Math.min(100, (finalistA * finalistB) / 50)
           : null;
       row.topScorerProbability = resolvePredictionProbability(
         "top_scorer",
