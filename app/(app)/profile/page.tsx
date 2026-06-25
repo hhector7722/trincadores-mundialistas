@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FlaskConical, Play } from "lucide-react";
+import { FlaskConical, Play, Star } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
@@ -75,6 +75,18 @@ export default async function ProfilePage() {
           >
             <Play className="size-4 shrink-0" aria-hidden />
             Quiz ayer (21/06)
+          </Link>
+          <Link
+            href="/hector/stars-config"
+            className={cn(
+              "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+              "border border-[#CCFF00]/30 bg-[#CCFF00]/5",
+              "font-display text-sm uppercase tracking-[0.12em] text-[#CCFF00]",
+              "transition-colors hover:bg-[#CCFF00]/10"
+            )}
+          >
+            <Star className="size-4 shrink-0" aria-hidden />
+            Top jugadores estrella
           </Link>
           <Link
             href="/hector/force-result"
