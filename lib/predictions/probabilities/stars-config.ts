@@ -35,25 +35,35 @@ export const STAR_PLAYERS_CONFIG: Record<string, StarPlayerConfig> = {
   "ederson": { goldenGloveProb: 0.08 },
 };
 
+/** Elimina acentos y convierte a minúsculas para comparaciones robustas. */
+function normalizeStr(str: string): string {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 export function getStarPlayerConfig(playerName: string): StarPlayerConfig {
-  const normalizedName = playerName.trim().toLowerCase();
-  // Busca el nombre exacto, o si la clave del diccionario está incluida en el nombre (ej. "Yamal" en "Lamine Yamal")
-  // Para mayor precisión empezamos por coincidencia exacta
-  if (STAR_PLAYERS_CONFIG[normalizedName]) {
-    return STAR_PLAYERS_CONFIG[normalizedName];
+  const normalizedName = normalizeStr(playerName);
+
+  // Coincidencia exacta (sin acentos)
+  for (const [key, config] of Object.entries(STAR_PLAYERS_CONFIG)) {
+    if (normalizeStr(key) === normalizedName) return config;
   }
 
-  // Búsqueda parcial (ej si en BD guardaron solo "Mbappé" en lugar de "Kylian Mbappé")
+  // Coincidencia parcial (sin acentos)
   for (const [key, config] of Object.entries(STAR_PLAYERS_CONFIG)) {
-    if (normalizedName.includes(key) || key.includes(normalizedName)) {
+    const normalizedKey = normalizeStr(key);
+    if (normalizedName.includes(normalizedKey) || normalizedKey.includes(normalizedName)) {
       return config;
     }
   }
 
   // Valores por defecto muy bajitos para cualquier jugador no listado
   return {
-    topScorerProb: 0.005, // 0.5%
-    mvpProb: 0.005,       // 0.5%
-    goldenGloveProb: 0.005 // 0.5%
+    topScorerProb: 0.005,
+    mvpProb: 0.005,
+    goldenGloveProb: 0.005,
   };
 }

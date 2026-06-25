@@ -2,6 +2,15 @@ import type { AdminClient } from "@/lib/scripts/supabase-admin";
 import { fetchWorldCupOutrights } from "@/lib/odds/the-odds-api-client";
 import { getStarPlayerConfig as getHardcodedStarConfig } from "./stars-config";
 
+/** Elimina acentos y convierte a minúsculas para comparaciones robustas. */
+function normalizeStr(str: string): string {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 type StarConfig = {
   topScorerProb?: number;
   mvpProb?: number;
@@ -14,7 +23,8 @@ async function buildStarConfigMap(admin: AdminClient): Promise<Record<string, St
 
   const map: Record<string, StarConfig> = {};
   for (const row of data) {
-    map[row.player_name.toLowerCase()] = {
+    // Guardamos con clave normalizada (sin acentos, minúsculas)
+    map[normalizeStr(row.player_name)] = {
       topScorerProb: row.top_scorer_prob ?? undefined,
       mvpProb: row.mvp_prob ?? undefined,
       goldenGloveProb: row.golden_glove_prob ?? undefined,
@@ -27,17 +37,17 @@ function getStarConfig(
   playerName: string,
   dbMap: Record<string, StarConfig>
 ): StarConfig {
-  const normalized = playerName.trim().toLowerCase();
+  const normalized = normalizeStr(playerName);
 
-  // 1. Buscar coincidencia exacta en BD
+  // 1. Buscar coincidencia exacta en BD (sin acentos)
   if (dbMap[normalized]) return dbMap[normalized];
 
-  // 2. Buscar coincidencia parcial en BD
+  // 2. Buscar coincidencia parcial en BD (sin acentos)
   for (const [key, config] of Object.entries(dbMap)) {
     if (normalized.includes(key) || key.includes(normalized)) return config;
   }
 
-  // 3. Fallback al archivo hardcodeado
+  // 3. Fallback al archivo hardcodeado (también normaliza internamente)
   return getHardcodedStarConfig(playerName);
 }
 
