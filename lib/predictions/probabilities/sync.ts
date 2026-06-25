@@ -238,8 +238,7 @@ export async function syncDynamicProbabilities(admin: AdminClient) {
       });
     }
 
-    // Helper: calcula prob(player) = prob(equipo_campeón) × peso_calidad_jugador
-    // Luego se normaliza dentro de su categoría para que la lista sea relativa, no absoluta.
+    // Helper: calcula prob(player) = prob(equipo_campeón) × peso_calidad_jugador (escala absoluta)
     function buildPlayerProbs(
       playerTeamMap: Map<string, string | null>,
       qualityExtractor: (config: StarConfig) => number | undefined
@@ -252,56 +251,42 @@ export async function syncDynamicProbabilities(admin: AdminClient) {
       });
     }
 
-    function normalizePlayers(
-      players: Array<{ player: string; team: string | null; rawScore: number }>
-    ): Array<{ player: string; team: string | null; prob: number }> {
-      const total = players.reduce((s, p) => s + p.rawScore, 0);
-      if (total === 0) return players.map((p) => ({ ...p, prob: 0.005 }));
-      return players.map((p) => ({ ...p, prob: p.rawScore / total }));
-    }
-
-    // MVP — prob = prob_equipo × calidad_mvp, normalizado
-    const mvpCandidates = normalizePlayers(
-      buildPlayerProbs(uniquePicks.mvps, (c) => c.mvpProb)
-    );
-    for (const { player, prob } of mvpCandidates) {
+    // MVP — prob = prob_equipo × calidad_mvp (escala absoluta)
+    const mvpCandidates = buildPlayerProbs(uniquePicks.mvps, (c) => c.mvpProb);
+    for (const { player, rawScore } of mvpCandidates) {
       projectionRows.push({
         category: 'tournament_mvp',
         selection_key: player,
         entity_type: 'player',
-        probability: prob,
+        probability: Math.min(rawScore, 1),
         confidence_score: 40,
-        algorithm_version: 3,
+        algorithm_version: 4,
       });
     }
 
-    // Pichichi — prob = prob_equipo × calidad_pichichi, normalizado
-    const topScorerCandidates = normalizePlayers(
-      buildPlayerProbs(uniquePicks.topScorers, (c) => c.topScorerProb)
-    );
-    for (const { player, prob } of topScorerCandidates) {
+    // Pichichi — prob = prob_equipo × calidad_pichichi (escala absoluta)
+    const topScorerCandidates = buildPlayerProbs(uniquePicks.topScorers, (c) => c.topScorerProb);
+    for (const { player, rawScore } of topScorerCandidates) {
       projectionRows.push({
         category: 'top_scorer',
         selection_key: player,
         entity_type: 'player',
-        probability: prob,
+        probability: Math.min(rawScore, 1),
         confidence_score: 40,
-        algorithm_version: 3,
+        algorithm_version: 4,
       });
     }
 
-    // Guante de Oro — prob = prob_equipo × calidad_portero, normalizado
-    const goldenGloveCandidates = normalizePlayers(
-      buildPlayerProbs(uniquePicks.goldenGloves, (c) => c.goldenGloveProb)
-    );
-    for (const { player, prob } of goldenGloveCandidates) {
+    // Guante de Oro — prob = prob_equipo × calidad_portero (escala absoluta)
+    const goldenGloveCandidates = buildPlayerProbs(uniquePicks.goldenGloves, (c) => c.goldenGloveProb);
+    for (const { player, rawScore } of goldenGloveCandidates) {
       projectionRows.push({
         category: 'golden_glove',
         selection_key: player,
         entity_type: 'player',
-        probability: prob,
+        probability: Math.min(rawScore, 1),
         confidence_score: 40,
-        algorithm_version: 3,
+        algorithm_version: 4,
       });
     }
   }

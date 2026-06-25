@@ -9,30 +9,31 @@ export type StarPlayerConfig = {
 };
 
 // Claves en minúsculas para facilitar el cruce (case-insensitive)
+// Los valores representan probabilidad condicional: P(jugador gana premio | equipo gana el mundial)
 export const STAR_PLAYERS_CONFIG: Record<string, StarPlayerConfig> = {
-  "kylian mbappé": { topScorerProb: 0.18, mvpProb: 0.15 },
-  "harry kane": { topScorerProb: 0.15, mvpProb: 0.08 },
-  "vinícius júnior": { topScorerProb: 0.12, mvpProb: 0.14 },
-  "lamine yamal": { topScorerProb: 0.08, mvpProb: 0.10 },
-  "jude bellingham": { topScorerProb: 0.06, mvpProb: 0.12 },
-  "lionel messi": { topScorerProb: 0.08, mvpProb: 0.10 },
-  "cristiano ronaldo": { topScorerProb: 0.08, mvpProb: 0.05 },
-  "kevin de bruyne": { topScorerProb: 0.04, mvpProb: 0.09 },
-  "antoine griezmann": { topScorerProb: 0.05, mvpProb: 0.08 },
-  "erling haaland": { topScorerProb: 0.14, mvpProb: 0.10 },
-  "bukayo saka": { topScorerProb: 0.07, mvpProb: 0.08 },
-  "rodri": { topScorerProb: 0.01, mvpProb: 0.11 },
-  "pedri": { topScorerProb: 0.02, mvpProb: 0.06 },
-  "yeremy pino": { topScorerProb: 0.01, mvpProb: 0.01 }, // Menor probabilidad que Yamal
+  "kylian mbappé": { topScorerProb: 0.35, mvpProb: 0.30 },
+  "harry kane": { topScorerProb: 0.30, mvpProb: 0.18 },
+  "vinícius júnior": { topScorerProb: 0.25, mvpProb: 0.25 },
+  "lamine yamal": { topScorerProb: 0.20, mvpProb: 0.20 },
+  "jude bellingham": { topScorerProb: 0.15, mvpProb: 0.25 },
+  "lionel messi": { topScorerProb: 0.20, mvpProb: 0.30 },
+  "cristiano ronaldo": { topScorerProb: 0.20, mvpProb: 0.15 },
+  "kevin de bruyne": { topScorerProb: 0.08, mvpProb: 0.22 },
+  "antoine griezmann": { topScorerProb: 0.10, mvpProb: 0.18 },
+  "erling haaland": { topScorerProb: 0.35, mvpProb: 0.25 },
+  "bukayo saka": { topScorerProb: 0.15, mvpProb: 0.15 },
+  "rodri": { topScorerProb: 0.03, mvpProb: 0.25 },
+  "pedri": { topScorerProb: 0.05, mvpProb: 0.12 },
+  "yeremy pino": { topScorerProb: 0.03, mvpProb: 0.03 },
   
-  // Porteros
-  "emiliano martínez": { goldenGloveProb: 0.15 },
-  "thibaut courtois": { goldenGloveProb: 0.12 },
-  "alisson becker": { goldenGloveProb: 0.14 },
-  "unai simón": { goldenGloveProb: 0.10 },
-  "gianluigi donnarumma": { goldenGloveProb: 0.09 },
-  "mike maignan": { goldenGloveProb: 0.13 },
-  "ederson": { goldenGloveProb: 0.08 },
+  // Porteros — probabilidad de ganar Guante de Oro si su equipo gana el mundial
+  "emiliano martínez": { goldenGloveProb: 0.75 },
+  "thibaut courtois": { goldenGloveProb: 0.60 },
+  "alisson becker": { goldenGloveProb: 0.70 },
+  "unai simón": { goldenGloveProb: 0.70 },
+  "gianluigi donnarumma": { goldenGloveProb: 0.65 },
+  "mike maignan": { goldenGloveProb: 0.70 },
+  "ederson": { goldenGloveProb: 0.40 },
 };
 
 /** Elimina acentos y convierte a minúsculas para comparaciones robustas. */
