@@ -75,6 +75,7 @@ type MemberRow = {
   avatarUrl: string | null;
 };
 
+type MatchStatsRow = {
   profile_id: string;
   match_points: number;
   exact_hits: number;
