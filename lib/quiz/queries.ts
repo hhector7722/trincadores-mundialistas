@@ -295,108 +295,22 @@ export async function startQuizSession(quizId: string): Promise<QuizStartSession
   return session;
 }
 
-export async function startQuizSessionBypassWindow(
-  quizId: string
-): Promise<QuizStartSession> {
+export async function startQuizSessionYesterday(quizId: string): Promise<QuizStartSession> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("not authenticated");
+  const { data, error } = await supabase.rpc("start_quiz_attempt_yesterday", {
+    p_quiz_id: quizId,
+  });
 
-  const { data: quiz, error: quizError } = await supabase
-    .from("quizzes")
-    .select("id, pool_id, title, quiz_date, kind, scoring_mode, max_points")
-    .eq("id", quizId)
-    .single();
+  if (error) {
+    throw new Error(error.message);
+  }
 
-  if (quizError || !quiz) throw new Error("quiz not found");
+  const session = parseQuizStartSession(data);
+  if (!session) {
+    throw new Error("Respuesta de quiz invalida.");
+  }
 
-  const { data: membership } = await supabase
-    .from("pool_members")
-    .select("pool_id")
-    .eq("profile_id", user.id)
-    .eq("pool_id", quiz.pool_id)
-    .maybeSingle();
-
-  if (!membership) throw new Error("not pool member");
-
-  const { data: existing } = await supabase
-    .from("quiz_attempts")
-    .select("id")
-    .eq("quiz_id", quizId)
-    .eq("profile_id", user.id)
-    .eq("status", "submitted")
-    .eq("counts_for_score", true)
-    .maybeSingle();
-
-  if (existing) throw new Error("quiz already completed");
-
-  await supabase
-    .from("quiz_attempts")
-    .update({ status: "expired" })
-    .eq("quiz_id", quizId)
-    .eq("profile_id", user.id)
-    .eq("status", "in_progress")
-    .eq("counts_for_score", true);
-
-  const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-  const { data: attempt, error: attemptError } = await supabase
-    .from("quiz_attempts")
-    .insert({
-      quiz_id: quizId,
-      profile_id: user.id,
-      status: "in_progress",
-      expires_at: expiresAt,
-      counts_for_score: true,
-    })
-    .select("id, expires_at")
-    .single();
-
-  if (attemptError || !attempt) throw new Error("Failed to start quiz");
-
-  const { data: questions, error: questionsError } = await supabase
-    .from("quiz_questions_public")
-    .select("id, sort_order, prompt, options, points, image_url")
-    .eq("quiz_id", quizId)
-    .order("sort_order");
-
-  if (questionsError) throw new Error(questionsError.message);
-
-  const questionIds = (questions ?? []).map((q) => q.id as string);
-  const { data: keys } = await supabase
-    .from("quiz_question_keys")
-    .select("question_id, correct_option_id")
-    .in("question_id", questionIds);
-
-  const keyMap = new Map(
-    (keys ?? []).map((k) => [k.question_id as string, k.correct_option_id as string])
-  );
-
-  const mappedQuestions = (questions ?? []).map((q) => ({
-    id: q.id as string,
-    sort_order: q.sort_order as number,
-    prompt: q.prompt as string,
-    options: parseQuizOptions(q.options),
-    points: q.points as number,
-    image_url: (q.image_url as string | null) ?? null,
-    correct_option_id: keyMap.get(q.id as string) ?? "",
-  }));
-
-  return {
-    attempt_id: attempt.id as string,
-    expires_at: expiresAt,
-    resumed: false,
-    quiz: {
-      id: quiz.id,
-      title: quiz.title,
-      quiz_date: quiz.quiz_date,
-      kind: quiz.kind,
-      scoring_mode: quiz.scoring_mode,
-      max_points: quiz.max_points,
-    },
-    questions: mappedQuestions,
-  };
+  return session;
 }
 
 export async function startQuizDrillSession(
