@@ -12,6 +12,7 @@ import {
 import { todayQuizDate } from "@/lib/quiz/date";
 import type { QuizDayHub, QuizResultResponse, QuizStartSession } from "@/lib/quiz/types";
 import { assertPoolMembership } from "@/lib/pool/active-pool";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { trackUsageAction } from "@/lib/usage/track-action";
 
@@ -134,7 +135,8 @@ export async function startQuiz(
     const isPastQuiz = Boolean(quizRow?.quiz_date && quizRow.quiz_date < todayQuizDate());
 
     if (isHector && isPastQuiz) {
-      await supabase
+      const admin = createAdminClient();
+      await admin
         .from("quizzes")
         .update({ closes_at: new Date(Date.now() + 3600_000).toISOString() })
         .eq("id", quizId);
