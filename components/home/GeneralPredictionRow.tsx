@@ -39,11 +39,11 @@ export function GeneralPredictionRow({
   }
 
   return (
-    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_2rem_0.875rem] items-center gap-0.5">
+    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_5rem_auto] items-center gap-1">
       <span className="flex min-w-0 items-center text-[clamp(7px,2cqw,9px)] font-semibold uppercase leading-tight tracking-wide text-white/50">
         {label}
       </span>
-      <div className="flex min-w-0 items-center justify-end overflow-visible px-1 w-full">
+      <div className="flex min-w-0 items-center justify-end overflow-visible w-full">
         {hasValue ? (
           valueNode ?? (
             <span
