@@ -32,10 +32,10 @@ export function GeneralPredictionRow({
   }
 
   function getProbabilityColor(prob: number) {
-    if (prob < 10) return "bg-[#ff4d4d]";
-    if (prob < 25) return "bg-[#ff9900]";
-    if (prob < 50) return "bg-[#CCFF00] text-black";
-    return "bg-[#00ffcc] text-black";
+    if (prob < 10) return "bg-[#c0392b]";
+    if (prob < 25) return "bg-[#e67e22]";
+    if (prob < 50) return "bg-[#d35400]";
+    return "bg-[#16a085]";
   }
 
   return (
@@ -83,10 +83,7 @@ export function GeneralPredictionRow({
               className={cn("absolute bottom-0 left-0 top-0 transition-all", getProbabilityColor(probability))}
               style={{ width: `${Math.min(100, Math.max(0, probability))}%` }}
             />
-            <span className={cn(
-              "absolute inset-0 flex items-center justify-center text-[7px] font-bold tabular-nums mix-blend-difference drop-shadow-sm",
-              "text-white"
-            )}>
+            <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold tabular-nums text-white drop-shadow-sm">
               {probability.toFixed(1)}%
             </span>
           </div>
