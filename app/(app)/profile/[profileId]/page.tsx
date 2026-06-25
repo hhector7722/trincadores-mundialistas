@@ -31,6 +31,7 @@ export default async function PublicProfilePage({
   }
 
   const isSelf = user!.id === profileId;
+  const isHector = isSelf && standing.username?.toLowerCase() === "hector";
 
   return (
     <div className="space-y-4 p-4 pb-4">
@@ -43,6 +44,15 @@ export default async function PublicProfilePage({
         </h1>
       </div>
       <MemberStandingCard standing={standing} isSelf={isSelf} />
+      {isHector && (
+        <Link
+          id="hector-stars-config-btn"
+          href="/hector/stars-config"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#CCFF00]/30 bg-[#CCFF00]/5 py-3 text-sm font-semibold text-[#CCFF00] transition-colors hover:bg-[#CCFF00]/10"
+        >
+          ⭐ Configurar jugadores estrella
+        </Link>
+      )}
     </div>
   );
 }
