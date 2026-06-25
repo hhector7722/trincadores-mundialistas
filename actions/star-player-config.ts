@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/scripts/supabase-admin";
 import { revalidatePath } from "next/cache";
 
 export type StarPlayerConfigRow = {
@@ -29,7 +30,6 @@ async function assertHector() {
   if (profile?.username?.toLowerCase() !== "hector") {
     throw new Error("No autorizado.");
   }
-  return supabase;
 }
 
 export async function getStarPlayerConfigsAction(): Promise<{
@@ -37,8 +37,9 @@ export async function getStarPlayerConfigsAction(): Promise<{
   data: StarPlayerConfigRow[];
 } | { ok: false; error: string }> {
   try {
-    const supabase = await assertHector();
-    const { data, error } = await supabase
+    await assertHector();
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from("star_player_config")
       .select("*")
       .order("player_name", { ascending: true });
@@ -58,8 +59,9 @@ export async function upsertStarPlayerConfigAction(
   goldenGloveProb: number | null
 ): Promise<{ ok: boolean; error?: string }> {
   try {
-    const supabase = await assertHector();
-    const { error } = await supabase.from("star_player_config").upsert(
+    await assertHector();
+    const admin = createAdminClient();
+    const { error } = await admin.from("star_player_config").upsert(
       {
         player_name: playerName,
         team_name: teamName,
@@ -82,8 +84,9 @@ export async function deleteStarPlayerConfigAction(
   playerName: string
 ): Promise<{ ok: boolean; error?: string }> {
   try {
-    const supabase = await assertHector();
-    const { error } = await supabase
+    await assertHector();
+    const admin = createAdminClient();
+    const { error } = await admin
       .from("star_player_config")
       .delete()
       .eq("player_name", playerName);
