@@ -6,6 +6,7 @@ import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { UsageAnalyticsButton } from "@/components/profile/UsageAnalyticsButton";
 import { canAccessQuizLab } from "@/lib/quiz/lab-access";
 import { canAccessUsageAnalytics } from "@/lib/usage/access";
+import { addQuizDays, todayQuizDate } from "@/lib/quiz/date";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  await requireActivePoolContext();
+  const ctx = await requireActivePoolContext();
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,6 +31,39 @@ export default async function ProfilePage() {
   const showUsage = canAccessUsageAnalytics(profile?.username);
   const showActions = showUsage || showLab;
   const isHector = profile?.username?.toLowerCase() === "hector";
+
+  let yesterdayQuizPlayed = false;
+  let yesterdayQuizExists = false;
+  let yesterdayDateStr = "";
+
+  if (isHector) {
+    yesterdayDateStr = addQuizDays(todayQuizDate(), -1);
+
+    const { data: yesterdayQuiz } = await supabase
+      .from("quizzes")
+      .select("id")
+      .eq("quiz_date", yesterdayDateStr)
+      .eq("pool_id", ctx.activePoolId)
+      .maybeSingle();
+
+    yesterdayQuizExists = !!yesterdayQuiz;
+
+    if (yesterdayQuiz) {
+      const { data: attempt } = await supabase
+        .from("quiz_attempts")
+        .select("id")
+        .eq("quiz_id", yesterdayQuiz.id)
+        .eq("profile_id", user!.id)
+        .eq("status", "submitted")
+        .eq("counts_for_score", true)
+        .maybeSingle();
+
+      yesterdayQuizPlayed = !!attempt;
+    }
+  }
+
+  const yesterdayDisabled = !yesterdayQuizExists || yesterdayQuizPlayed;
+  const yesterdayDayMonth = yesterdayDateStr.slice(5);
 
   return (
     <div className="space-y-3 p-4 pb-4">
@@ -64,18 +98,32 @@ export default async function ProfilePage() {
 
       {isHector && (
         <div className="flex flex-col gap-2 w-full">
-          <Link
-            href="/quiz/play-hector-yesterday"
-            className={cn(
-              "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
-              "border border-[var(--tm-primary)] bg-[var(--tm-primary)]/10",
-              "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-primary)]",
-              "transition-colors hover:bg-[var(--tm-primary)]/20"
-            )}
-          >
-            <Play className="size-4 shrink-0" aria-hidden />
-            Quiz ayer (21/06)
-          </Link>
+          {yesterdayDisabled ? (
+            <span
+              className={cn(
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+                "border border-[var(--tm-border)] bg-[var(--tm-surface)]/30",
+                "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-muted)]",
+                "cursor-not-allowed"
+              )}
+            >
+              <Play className="size-4 shrink-0" aria-hidden />
+              Quiz ayer ({yesterdayDayMonth})
+            </span>
+          ) : (
+            <Link
+              href="/quiz/play-hector-yesterday"
+              className={cn(
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl",
+                "border border-[var(--tm-primary)] bg-[var(--tm-primary)]/10",
+                "font-display text-sm uppercase tracking-[0.12em] text-[var(--tm-primary)]",
+                "transition-colors hover:bg-[var(--tm-primary)]/20"
+              )}
+            >
+              <Play className="size-4 shrink-0" aria-hidden />
+              Quiz ayer ({yesterdayDayMonth})
+            </Link>
+          )}
           <Link
             href="/hector/stars-config"
             className={cn(

@@ -1,5 +1,6 @@
 import { QuizPageShell } from "@/components/quiz/QuizPageShell";
 import { QuizPlaySession } from "@/components/quiz/QuizPlaySession";
+import { addQuizDays, todayQuizDate } from "@/lib/quiz/date";
 import { createClient } from "@/lib/supabase/server";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 
@@ -30,11 +31,12 @@ export default async function HectorYesterdayQuizPage() {
     );
   }
 
-  // Get the quiz for 2026-06-21
+  // Get yesterday's quiz dynamically
+  const yesterdayDate = addQuizDays(todayQuizDate(), -1);
   const { data: quiz } = await supabase
     .from("quizzes")
     .select("id")
-    .eq("quiz_date", "2026-06-21")
+    .eq("quiz_date", yesterdayDate)
     .eq("pool_id", ctx.activePoolId)
     .maybeSingle();
 
