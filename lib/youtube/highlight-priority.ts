@@ -5,13 +5,13 @@ export type HighlightSourceCode =
   | "youtube_rtve_teledeporte";
 
 export const SOURCE_PRIORITY: Record<HighlightSourceCode, number> = {
-  youtube_fifa: 4,
-  youtube_replay: 3,
-  youtube_rtve_teledeporte: 2,
+  youtube_rtve_teledeporte: 4,
+  youtube_fifa: 3,
+  youtube_replay: 2,
   youtube_dazn_es: 1,
 };
 
-/** FIFA > Replay > Teledeporte > DAZN ES; misma fuente solo si la fecha de publicación es igual o posterior. */
+/** Teledeporte RTVE > FIFA > Replay > DAZN ES; misma fuente solo si la fecha de publicación es igual o posterior. */
 export function shouldReplaceMatchHighlight(
   existingSource: HighlightSourceCode | null,
   existingPublishedAt: string | null,
