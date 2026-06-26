@@ -1,5 +1,11 @@
 import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 
+export type AlternativeSource = {
+  videoId: string;
+  source: HighlightSourceCode;
+  publishedAt: string;
+};
+
 export type MatchHighlightView = {
   matchId: string;
   homeTeam: string;
@@ -10,4 +16,5 @@ export type MatchHighlightView = {
   publishedAt: string;
   source: HighlightSourceCode;
   headline: string | null;
+  alternativeSources: AlternativeSource[];
 };

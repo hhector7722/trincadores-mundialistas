@@ -16,12 +16,18 @@ export type YTPlayerEvent = {
   target: YTPlayer;
 };
 
+export type YTPlayerErrorEvent = {
+  data: number;
+  target: YTPlayer;
+};
+
 export type YTPlayerOptions = {
   videoId: string;
   playerVars?: YTPlayerVars;
   events?: {
     onReady?: (event: YTPlayerEvent) => void;
     onStateChange?: (event: YTPlayerEvent) => void;
+    onError?: (event: YTPlayerErrorEvent) => void;
   };
 };
 

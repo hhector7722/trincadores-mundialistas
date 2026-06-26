@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { MatchHighlightView } from "@/lib/highlights/types";
+import type { AlternativeSource, MatchHighlightView } from "@/lib/highlights/types";
 import type { HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 
 type HighlightRow = {
@@ -13,12 +13,21 @@ type HighlightRow = {
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
 };
 
+type ExternalIdMapRow = {
+  external_key: string;
+  source_code: HighlightSourceCode;
+  metadata: { published_at: string } | null;
+};
+
 function firstRelation<T>(value: T | T[] | null | undefined): T | null {
   if (!value) return null;
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-function rowToHighlightView(row: HighlightRow): MatchHighlightView | null {
+function rowToHighlightView(
+  row: HighlightRow,
+  alternatives: AlternativeSource[],
+): MatchHighlightView | null {
   const result = firstRelation(row.match_results);
   const live = firstRelation(row.match_live_state);
 
@@ -37,6 +46,7 @@ function rowToHighlightView(row: HighlightRow): MatchHighlightView | null {
     publishedAt: row.highlight_published_at,
     source: row.highlight_source,
     headline: row.highlight_headline?.trim() || null,
+    alternativeSources: alternatives,
   };
 }
 
@@ -78,8 +88,38 @@ export async function getMatchHighlightsForPool(poolId: string): Promise<MatchHi
 
   if (error || !data?.length) return [];
 
-  return data
-    .map((row) => rowToHighlightView(row as unknown as HighlightRow))
+  const rows = data as unknown as HighlightRow[];
+  const matchIds = rows.map((r) => r.id);
+
+  const { data: externalRefs } = await supabase
+    .from("external_id_map")
+    .select("external_key, source_code, metadata, internal_id")
+    .in("internal_id", matchIds)
+    .eq("internal_table", "matches")
+    .in("source_code", ["youtube_fifa", "youtube_replay", "youtube_rtve_teledeporte", "youtube_dazn_es"]);
+
+  const alternativesByMatch = new Map<string, AlternativeSource[]>();
+  for (const ref of (externalRefs ?? []) as (ExternalIdMapRow & { internal_id: string })[]) {
+    if (!ref.metadata?.published_at) continue;
+    const list = alternativesByMatch.get(ref.internal_id);
+    const alt: AlternativeSource = {
+      videoId: ref.external_key,
+      source: ref.source_code,
+      publishedAt: ref.metadata.published_at,
+    };
+    if (list) {
+      list.push(alt);
+    } else {
+      alternativesByMatch.set(ref.internal_id, [alt]);
+    }
+  }
+
+  return rows
+    .map((row) => {
+      const alternatives = alternativesByMatch.get(row.id) ?? [];
+      const filtered = alternatives.filter((a) => a.videoId !== row.highlight_youtube_id);
+      return rowToHighlightView(row, filtered);
+    })
     .filter((highlight): highlight is MatchHighlightView => highlight != null);
 }
 

@@ -43,6 +43,7 @@ type EntityModalControllerProps = {
   onCarouselTeamChange?: (teamName: string) => void;
   onMvpSaved?: (playerName: string, teamName: string, shirtNumber?: number | null) => void;
   opaque?: boolean;
+  stackElevated?: boolean;
   possibleLineupsTitleOverride?: string;
   possibleLineupsConfirmedOverride?: boolean;
   matchIsLive?: boolean;
@@ -131,6 +132,7 @@ export function EntityModalController({
   onCarouselTeamChange,
   onMvpSaved,
   opaque = false,
+  stackElevated,
   possibleLineupsTitleOverride,
   possibleLineupsConfirmedOverride,
   matchIsLive = false,
@@ -297,6 +299,7 @@ export function EntityModalController({
         wrapperClassName
       )}
       opaque={opaque}
+      stackElevated={stackElevated}
       onSwipeLeft={
         canSwipeTeams && atLineupCarousel && !activePanelSlide ? () => startTeamSlide(1) : undefined
       }

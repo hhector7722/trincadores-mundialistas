@@ -30,6 +30,7 @@ function highlightToSlideBody(highlight: MatchHighlightView) {
       youtubeVideoId={highlight.youtubeVideoId}
       highlightSource={highlight.source}
       headline={highlight.headline}
+      alternativeSources={highlight.alternativeSources}
     />
   );
 }

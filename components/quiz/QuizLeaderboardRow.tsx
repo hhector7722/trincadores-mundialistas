@@ -15,13 +15,13 @@ export function QuizLeaderboardRow({
 }) {
   const bonusText =
     row.position === 1
-      ? "+ 5 pts"
+      ? "+5 pts"
       : row.position === 2
-      ? "+ 3 pts"
+      ? "+3 pts"
       : row.position === 3
-      ? "+ 2 pts"
+      ? "+2 pts"
       : row.position === 4
-      ? "+ 1 pts"
+      ? "+1 pts"
       : "";
 
   return (

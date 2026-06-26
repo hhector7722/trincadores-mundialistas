@@ -1,10 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
-  daznEsRssUrl,
   fifaChannelRssUrl,
   HIGHLIGHT_SOURCE_CODES,
   replayRssUrl,
   teledeporteRssUrl,
+  daznEsRssUrl,
 } from "@/lib/youtube/constants";
 import {
   hasLowerHighlightPriority,
@@ -36,10 +36,10 @@ export type SyncYoutubeHighlightsResult = {
 };
 
 export type SyncAllMatchHighlightsResult = {
-  dazn: SyncYoutubeHighlightsResult;
   fifa: SyncYoutubeHighlightsResult;
   replay: SyncYoutubeHighlightsResult;
   teledeporte: SyncYoutubeHighlightsResult;
+  dazn: SyncYoutubeHighlightsResult;
 };
 
 type MatchHighlightRow = {
@@ -63,13 +63,6 @@ type ChannelSyncConfig = {
 
 const CHANNEL_CONFIGS: ChannelSyncConfig[] = [
   {
-    sourceCode: HIGHLIGHT_SOURCE_CODES.dazn,
-    feedUrl: daznEsRssUrl(),
-    channelLabel: "DAZN ES",
-    isHighlightTitle: isDaznHighlightTitle,
-    parseTeams: parseTeamsFromDaznTitle,
-  },
-  {
     sourceCode: HIGHLIGHT_SOURCE_CODES.fifa,
     feedUrl: fifaChannelRssUrl(),
     channelLabel: "FIFA",
@@ -89,6 +82,13 @@ const CHANNEL_CONFIGS: ChannelSyncConfig[] = [
     channelLabel: "Teledeporte",
     isHighlightTitle: isTeledeporteHighlightTitle,
     parseTeams: parseTeamsFromTeledeporteTitle,
+  },
+  {
+    sourceCode: HIGHLIGHT_SOURCE_CODES.dazn,
+    feedUrl: daznEsRssUrl(),
+    channelLabel: "DAZN ES",
+    isHighlightTitle: isDaznHighlightTitle,
+    parseTeams: parseTeamsFromDaznTitle,
   },
 ];
 
@@ -340,28 +340,28 @@ export async function syncAllMatchHighlights(
   ];
   const aliasIndex = buildTeamAliasIndex(teamNames);
 
-  const dazn = await syncChannelHighlights(
+  const fifa = await syncChannelHighlights(
     admin,
     CHANNEL_CONFIGS[0]!,
     candidates,
     aliasIndex,
     siteOrigin,
   );
-  const fifa = await syncChannelHighlights(
+  const replay = await syncChannelHighlights(
     admin,
     CHANNEL_CONFIGS[1]!,
     candidates,
     aliasIndex,
     siteOrigin,
   );
-  const replay = await syncChannelHighlights(
+  const teledeporte = await syncChannelHighlights(
     admin,
     CHANNEL_CONFIGS[2]!,
     candidates,
     aliasIndex,
     siteOrigin,
   );
-  const teledeporte = await syncChannelHighlights(
+  const dazn = await syncChannelHighlights(
     admin,
     CHANNEL_CONFIGS[3]!,
     candidates,
@@ -398,7 +398,7 @@ export async function syncAllMatchHighlights(
     );
   }
 
-  return { dazn, fifa, replay, teledeporte };
+  return { fifa, replay, teledeporte, dazn };
 }
 
 /** @deprecated Usar syncAllMatchHighlights. Mantiene compatibilidad con scripts existentes. */
@@ -410,25 +410,25 @@ export async function syncYoutubeFifaHighlights(
   void feedUrl;
   return {
     scanned:
-      result.dazn.scanned +
       result.fifa.scanned +
       result.replay.scanned +
-      result.teledeporte.scanned,
+      result.teledeporte.scanned +
+      result.dazn.scanned,
     matched:
-      result.dazn.matched +
       result.fifa.matched +
       result.replay.matched +
-      result.teledeporte.matched,
+      result.teledeporte.matched +
+      result.dazn.matched,
     skipped:
-      result.dazn.skipped +
       result.fifa.skipped +
       result.replay.skipped +
-      result.teledeporte.skipped,
+      result.teledeporte.skipped +
+      result.dazn.skipped,
     errors: [
-      ...result.dazn.errors,
       ...result.fifa.errors,
       ...result.replay.errors,
       ...result.teledeporte.errors,
+      ...result.dazn.errors,
     ],
   };
 }

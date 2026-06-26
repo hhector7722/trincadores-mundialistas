@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
 import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
+import type { AlternativeSource } from "@/lib/highlights/types";
 
 type MatchHighlightBlockProps = {
   homeTeam: string;
@@ -19,6 +20,7 @@ type MatchHighlightBlockProps = {
   variant?: "hero" | "modal";
   compactThumbnail?: boolean;
   className?: string;
+  alternativeSources?: AlternativeSource[];
 };
 
 export function MatchHighlightBlock({
@@ -33,10 +35,43 @@ export function MatchHighlightBlock({
   variant = "modal",
   compactThumbnail = false,
   className,
+  alternativeSources = [],
 }: MatchHighlightBlockProps) {
   const [playerOpen, setPlayerOpen] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
+
+  const allSources = useMemo(() => {
+    const sources: { videoId: string; source: HighlightSourceCode | null }[] = [
+      { videoId: youtubeVideoId, source: highlightSource },
+      ...alternativeSources.map((a) => ({ videoId: a.videoId, source: a.source })),
+    ];
+    return sources;
+  }, [youtubeVideoId, highlightSource, alternativeSources]);
+
+  const currentSource = allSources[currentVideoIndex] ?? allSources[0];
+
+  const handlePlayerError = useCallback(() => {
+    setCurrentVideoIndex((prev) => {
+      const next = prev + 1;
+      if (next >= allSources.length) {
+        setPlayerOpen(false);
+        return 0;
+      }
+      return next;
+    });
+  }, [allSources.length]);
+
+  const handlePlay = useCallback(() => {
+    setCurrentVideoIndex(0);
+    setPlayerOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setPlayerOpen(false);
+    setCurrentVideoIndex(0);
+  }, []);
 
   return (
     <>
@@ -65,7 +100,7 @@ export function MatchHighlightBlock({
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={() => setPlayerOpen(true)}
+              onPlay={handlePlay}
               compact
               className="mx-0 w-full max-w-none"
             />
@@ -78,7 +113,7 @@ export function MatchHighlightBlock({
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}
-              onPlay={() => setPlayerOpen(true)}
+              onPlay={handlePlay}
               reduced={compactThumbnail}
               className="max-w-none"
             />
@@ -88,10 +123,11 @@ export function MatchHighlightBlock({
 
       <MatchHighlightPlayerModal
         open={playerOpen}
-        onClose={() => setPlayerOpen(false)}
-        videoId={youtubeVideoId}
+        onClose={handleClose}
+        videoId={currentSource.videoId}
         title={title}
         matchId={matchId}
+        onError={handlePlayerError}
       />
     </>
   );

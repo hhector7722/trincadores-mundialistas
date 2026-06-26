@@ -6,12 +6,15 @@ import { Modal } from "@/components/ui/modal";
 import { trackUsageHighlightOpen, trackUsageHighlightWatch } from "@/lib/usage/client";
 import { loadYouTubeIframeApi, type YTPlayer } from "@/lib/youtube/iframe-api";
 
+const EMBED_DISABLED_CODES = new Set([101, 150]);
+
 type MatchHighlightPlayerModalProps = {
   open: boolean;
   onClose: () => void;
   videoId: string;
   title: string;
   matchId?: string;
+  onError?: () => void;
 };
 
 export function MatchHighlightPlayerModal({
@@ -20,6 +23,7 @@ export function MatchHighlightPlayerModal({
   videoId,
   title,
   matchId,
+  onError,
 }: MatchHighlightPlayerModalProps) {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -89,6 +93,11 @@ export function MatchHighlightPlayerModal({
                 flushPlayingTime();
               }
             },
+            onError: (event) => {
+              if (EMBED_DISABLED_CODES.has(event.data)) {
+                onError?.();
+              }
+            },
           },
         });
       })
@@ -106,7 +115,7 @@ export function MatchHighlightPlayerModal({
       videoDurationSecRef.current = 0;
       openTrackedRef.current = false;
     };
-  }, [flushPlayingTime, matchId, open, pathname, reportWatchSession, usageLabel, videoId]);
+  }, [flushPlayingTime, matchId, onError, open, pathname, reportWatchSession, usageLabel, videoId]);
 
   return (
     <Modal

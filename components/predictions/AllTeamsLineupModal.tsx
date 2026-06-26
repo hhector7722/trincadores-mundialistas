@@ -57,6 +57,7 @@ export function AllTeamsLineupModal({
         <EntityModalController
           open
           opaque
+          stackElevated={stackElevated}
           onClose={handleCloseLineup}
           initialView={buildLineupView(selectedTeam)}
           carouselTeams={teams}
