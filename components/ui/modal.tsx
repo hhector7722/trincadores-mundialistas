@@ -475,12 +475,12 @@ export function Modal({
         className={cn(
           "tm-modal-backdrop absolute inset-0 overscroll-none",
           opaque ? "bg-[#2a1058]/40 backdrop-blur-md" : "bg-[#2a1058]/40 backdrop-blur-sm",
-          hasSwipe ? "touch-manipulation" : "touch-none",
+          "touch-none",
           visible ? "tm-modal-backdrop--visible" : "tm-modal-backdrop--hidden",
           !opaque && backdropClassName
         )}
         onClick={onBackdropClick}
-        onTouchMove={hasSwipe ? undefined : (event) => event.preventDefault()}
+        onTouchMove={(event) => event.preventDefault()}
       />
       <div
         className={cn(
