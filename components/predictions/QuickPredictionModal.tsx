@@ -714,11 +714,8 @@ export function QuickPredictionModal({
             highlight={
               highlightVideoId ? (
                 <MatchHighlightBlock
-                  matchId={targetMatch.id}
                   homeTeam={targetMatch.home_team}
                   awayTeam={targetMatch.away_team}
-                  homeGoals={finishedHomeGoals}
-                  awayGoals={finishedAwayGoals}
                   youtubeVideoId={highlightVideoId}
                   highlightSource={targetMatch.highlightSource}
                   compactThumbnail

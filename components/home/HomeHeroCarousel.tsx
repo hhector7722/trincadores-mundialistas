@@ -22,15 +22,11 @@ function highlightToSlideBody(highlight: MatchHighlightView) {
     <MatchHighlightBlock
       variant="hero"
       className="w-full"
-      matchId={highlight.matchId}
       homeTeam={highlight.homeTeam}
       awayTeam={highlight.awayTeam}
-      homeGoals={highlight.homeGoals}
-      awayGoals={highlight.awayGoals}
       youtubeVideoId={highlight.youtubeVideoId}
       highlightSource={highlight.source}
       headline={highlight.headline}
-      alternativeSources={highlight.alternativeSources}
     />
   );
 }

@@ -83,7 +83,21 @@ function lockPageScroll() {
     main.style.overflow = "hidden";
   }
 
+  const preventScroll = (e: TouchEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-modal-scroll="true"]')) {
+      return;
+    }
+    // Permitir pinch-zoom si se hace multitouch (aunque en modales suele bloquearse)
+    if (e.touches.length > 1) return;
+    
+    e.preventDefault();
+  };
+
+  document.addEventListener("touchmove", preventScroll, { passive: false });
+
   return () => {
+    document.removeEventListener("touchmove", preventScroll);
     html.removeAttribute("data-modal-open");
     html.style.overflow = state.htmlOverflow;
     document.body.style.overflow = state.bodyOverflow;
@@ -260,6 +274,7 @@ function ModalPanelShell({
       </div>
       )}
       <div
+        data-modal-scroll={scrollContent ? "true" : undefined}
         className={cn(
           "relative flex flex-col",
           scrollContent

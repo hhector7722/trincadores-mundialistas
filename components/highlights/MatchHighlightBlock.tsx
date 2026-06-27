@@ -1,77 +1,40 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
+import { useCallback } from "react";
 import { MatchHighlightThumbnail } from "@/components/highlights/MatchHighlightThumbnail";
 import { highlightSourceLabel, type HighlightSourceCode } from "@/lib/youtube/highlight-priority";
 import { teamAbbr } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
-import type { AlternativeSource } from "@/lib/highlights/types";
 
 type MatchHighlightBlockProps = {
   homeTeam: string;
   awayTeam: string;
-  homeGoals: number;
-  awayGoals: number;
   youtubeVideoId: string;
-  matchId?: string;
   highlightSource?: HighlightSourceCode | null;
   headline?: string | null;
   variant?: "hero" | "modal";
   compactThumbnail?: boolean;
   className?: string;
-  alternativeSources?: AlternativeSource[];
 };
 
 export function MatchHighlightBlock({
   homeTeam,
   awayTeam,
-  homeGoals,
-  awayGoals,
   youtubeVideoId,
-  matchId,
   highlightSource = null,
   headline = null,
   variant = "modal",
   compactThumbnail = false,
   className,
-  alternativeSources = [],
 }: MatchHighlightBlockProps) {
-  const [playerOpen, setPlayerOpen] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const title = `${teamAbbr(homeTeam)} - ${teamAbbr(awayTeam)}`;
   const sourceLabel = highlightSourceLabel(highlightSource);
 
-  const allSources = useMemo(() => {
-    const sources: { videoId: string; source: HighlightSourceCode | null }[] = [
-      { videoId: youtubeVideoId, source: highlightSource },
-      ...alternativeSources.map((a) => ({ videoId: a.videoId, source: a.source })),
-    ];
-    return sources;
-  }, [youtubeVideoId, highlightSource, alternativeSources]);
-
-  const currentSource = allSources[currentVideoIndex] ?? allSources[0];
-
-  const handlePlayerError = useCallback(() => {
-    setCurrentVideoIndex((prev) => {
-      const next = prev + 1;
-      if (next >= allSources.length) {
-        setPlayerOpen(false);
-        return 0;
-      }
-      return next;
-    });
-  }, [allSources.length]);
-
   const handlePlay = useCallback(() => {
-    setCurrentVideoIndex(0);
-    setPlayerOpen(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setPlayerOpen(false);
-    setCurrentVideoIndex(0);
-  }, []);
+    if (window.confirm("¿Estás seguro de que quieres abrir este vídeo en YouTube?")) {
+      window.open(`https://www.youtube.com/watch?v=${youtubeVideoId}`, "_blank");
+    }
+  }, [youtubeVideoId]);
 
   return (
     <>
@@ -120,15 +83,6 @@ export function MatchHighlightBlock({
           </>
         )}
       </div>
-
-      <MatchHighlightPlayerModal
-        open={playerOpen}
-        onClose={handleClose}
-        videoId={currentSource.videoId}
-        title={title}
-        matchId={matchId}
-        onError={handlePlayerError}
-      />
     </>
   );
 }

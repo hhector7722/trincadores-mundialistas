@@ -49,12 +49,12 @@ test("shouldReplaceMatchHighlight prioriza FIFA sobre Teledeporte", () => {
   );
 });
 
-test("shouldReplaceMatchHighlight prioriza Replay sobre Teledeporte y FIFA sobre Replay", () => {
+test("shouldReplaceMatchHighlight prioriza Teledeporte sobre Replay y FIFA sobre Teledeporte", () => {
   assert.equal(
     shouldReplaceMatchHighlight(
-      "youtube_rtve_teledeporte",
-      "2026-06-12T01:00:00.000Z",
       "youtube_replay",
+      "2026-06-12T01:00:00.000Z",
+      "youtube_rtve_teledeporte",
       "2026-06-12T02:00:00.000Z",
     ),
     true,
@@ -62,7 +62,7 @@ test("shouldReplaceMatchHighlight prioriza Replay sobre Teledeporte y FIFA sobre
 
   assert.equal(
     shouldReplaceMatchHighlight(
-      "youtube_replay",
+      "youtube_rtve_teledeporte",
       "2026-06-12T02:00:00.000Z",
       "youtube_fifa",
       "2026-06-12T03:00:00.000Z",
@@ -72,9 +72,9 @@ test("shouldReplaceMatchHighlight prioriza Replay sobre Teledeporte y FIFA sobre
 
   assert.equal(
     shouldReplaceMatchHighlight(
-      "youtube_replay",
-      "2026-06-12T03:00:00.000Z",
       "youtube_rtve_teledeporte",
+      "2026-06-12T03:00:00.000Z",
+      "youtube_replay",
       "2026-06-12T04:00:00.000Z",
     ),
     false,

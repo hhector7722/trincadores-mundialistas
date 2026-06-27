@@ -1,23 +1,15 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { fetchMatchHighlightModalContextAction } from "@/actions/notifications";
-import { MatchHighlightPlayerModal } from "@/components/highlights/MatchHighlightPlayerModal";
 import { HIGHLIGHT_NOTIFICATION_QUERY } from "@/lib/push/urls";
-import { teamAbbr } from "@/lib/teams/display";
 
 function HighlightNotificationOpenerInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const matchId = searchParams.get(HIGHLIGHT_NOTIFICATION_QUERY);
-  const [player, setPlayer] = useState<{
-    open: boolean;
-    videoId: string;
-    title: string;
-    matchId: string;
-  } | null>(null);
 
   useEffect(() => {
     if (!matchId) return;
@@ -35,13 +27,9 @@ function HighlightNotificationOpenerInner() {
 
       if (!result.ok || !result.data.highlightYoutubeId) return;
 
-      const title = `${teamAbbr(result.data.homeTeam)} - ${teamAbbr(result.data.awayTeam)}`;
-      setPlayer({
-        open: true,
-        videoId: result.data.highlightYoutubeId,
-        title,
-        matchId,
-      });
+      if (window.confirm("¿Estás seguro de que quieres abrir este vídeo en YouTube?")) {
+        window.open(`https://www.youtube.com/watch?v=${result.data.highlightYoutubeId}`, "_blank");
+      }
     })();
 
     return () => {
@@ -49,17 +37,7 @@ function HighlightNotificationOpenerInner() {
     };
   }, [matchId, pathname, router, searchParams]);
 
-  if (!player?.open) return null;
-
-  return (
-    <MatchHighlightPlayerModal
-      open={player.open}
-      onClose={() => setPlayer(null)}
-      videoId={player.videoId}
-      title={player.title}
-      matchId={player.matchId}
-    />
-  );
+  return null;
 }
 
 export function HighlightNotificationOpener() {
