@@ -148,6 +148,13 @@ export async function setMatchLive(
   return { ok: true };
 }
 
+export async function checkIsAdmin(poolId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  return isPoolAdmin(poolId, user.id);
+}
+
 export type TournamentOfficialAwardsPayload = {
   championTeam?: string | null;
   finalistTeamA?: string | null;

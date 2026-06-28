@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type 
 import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
 import { deleteMvpPrediction, saveMvpPrediction } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
+import { checkIsAdmin, setMatchLive } from "@/actions/admin";
 import {
   buildLineupView,
   buildMvpView,
@@ -227,6 +228,13 @@ export function QuickPredictionModal({
     [match, matches]
   );
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSettingLive, setIsSettingLive] = useState(false);
+
+  useEffect(() => {
+    checkIsAdmin(poolId).then(setIsAdmin);
+  }, [poolId]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
   const [possibleLineupsTitle, setPossibleLineupsTitle] = useState<string | undefined>();
@@ -256,6 +264,14 @@ export function QuickPredictionModal({
   );
   const isLiveMatch = viewMatch.status === "live";
   const isFinishedMatch = viewMatch.status === "finished";
+
+  const handleSetLive = async () => {
+    setIsSettingLive(true);
+    await setMatchLive(poolId, viewMatch.id);
+    setIsSettingLive(false);
+    onClose();
+  };
+
   const hidePossibleLineupsForView = isFinishedMatch;
   const shouldLoadLiveSnapshot = open && (isLiveMatch || isFinishedMatch);
   const { snapshot: liveSnapshot } = useMatchLiveSnapshot(viewMatch.id, shouldLoadLiveSnapshot);
@@ -682,6 +698,20 @@ export function QuickPredictionModal({
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
+
+              {isAdmin && !isLiveMatch && !isFinishedMatch && (
+                <div className="flex justify-center -mt-2 mb-2 relative z-10">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleSetLive}
+                    disabled={isSettingLive}
+                    className="h-7 text-xs border-[var(--tm-danger)] text-[var(--tm-danger)] hover:bg-[var(--tm-danger)] hover:text-white"
+                  >
+                    {isSettingLive ? "Marcando..." : "ADMIN: Forzar EN JUEGO"}
+                  </Button>
+                </div>
+              )}
 
               <FinishedMatchScoreRow
                 homeGoals={finishedHomeGoals}
