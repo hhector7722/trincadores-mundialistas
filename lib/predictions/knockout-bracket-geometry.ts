@@ -363,7 +363,6 @@ function connectChildToParent(
 
 function connectSemiToFinal(
   semi: BracketMatchGeometry,
-  anchorX: number,
   finalCenterY: number
 ): string {
   const isLeft = semi.side === "left";
@@ -374,7 +373,7 @@ function connectSemiToFinal(
     Math.max(semi.column, finalCol)
   );
 
-  return `M ${xStart} ${semi.midY} H ${xVertical} V ${finalCenterY} H ${anchorX}`;
+  return `M ${xStart} ${semi.midY} H ${xVertical} V ${finalCenterY} H ${FINAL_CENTER_X}`;
 }
 
 export type BracketConnectorSegment = {
@@ -441,28 +440,15 @@ export function buildBracketConnectorPaths(
   const rightSemi = byNumber.get(RIGHT_SF[0]);
   if (leftSemi) {
     segments.push({
-      d: connectSemiToFinal(leftSemi, FINAL_ANCHOR_LEFT_X, finalCenterY),
+      d: connectSemiToFinal(leftSemi, finalCenterY),
       variant: "final",
     });
   }
   if (rightSemi) {
     segments.push({
-      d: connectSemiToFinal(rightSemi, FINAL_ANCHOR_RIGHT_X, finalCenterY),
+      d: connectSemiToFinal(rightSemi, finalCenterY),
       variant: "final",
     });
-  }
-
-  const final = byNumber.get(104);
-  if (final?.homeX != null && final.awayX != null) {
-    const homeEdge = connectorEdgeX(final.homeX, "right", final.layoutScale);
-    const awayEdge = connectorEdgeX(final.awayX, "left", final.layoutScale);
-    // Línea horizontal entre los equipos de la final
-    if (Math.abs(homeEdge - awayEdge) > 0.05) {
-      segments.push({
-        d: `M ${homeEdge} ${final.midY} H ${awayEdge}`,
-        variant: "final",
-      });
-    }
   }
 
   return segments;

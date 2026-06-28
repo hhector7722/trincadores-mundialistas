@@ -127,7 +127,7 @@ function BracketTeamOrb({
           <TeamFlagBadge 
             name={teamName} 
             size="sm" 
-            className={cn("tm-ko-orb-flag", isFinished && "brightness-75 opacity-90")} 
+            className="tm-ko-orb-flag"
           />
           <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
             {fullName}
