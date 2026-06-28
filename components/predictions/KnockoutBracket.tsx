@@ -162,6 +162,8 @@ function BracketMatchNode({
   const displayAway = isFinished ? match?.officialAway : savedAway;
   const hasScoreToDisplay = displayHome != null && displayAway != null;
   const scoreSummary = hasScoreToDisplay ? formatListScore(displayHome, displayAway) : " ";
+  const isSaved = state === "saved";
+  const isFinal = geom.round === "final";
   // Colocar los marcadores individuales debajo de cada bandera
   const homeScoreY = geom.homeY + 3.8;
   const awayScoreY = geom.awayY + 3.8;
