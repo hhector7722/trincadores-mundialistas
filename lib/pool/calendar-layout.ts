@@ -123,8 +123,6 @@ function syncMatchCardMetrics(
   grid: HTMLElement,
   layoutRoot?: HTMLElement | null
 ): number {
-  calendar.style.setProperty("--tm-cal-match-gap", `${MATCH_CARD_GAP_PX}px`);
-
   const refCell = findBusiestMatchCell(grid);
   if (!refCell) return 0;
 
@@ -140,8 +138,10 @@ function syncMatchCardMetrics(
   let listHeight = matchList.clientHeight;
   let layoutMatchCount = matchCount;
 
+  const isJuly = calendar.classList.contains("tm-porra-calendar--july-view");
+
   // JULIO HACK: Si es julio, simulamos matemáticamente el espacio de junio (4 partidos).
-  if (calendar.classList.contains("tm-porra-calendar--july-view") && layoutRoot) {
+  if (isJuly && layoutRoot) {
     layoutMatchCount = 4;
     const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
     const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
@@ -152,13 +152,15 @@ function syncMatchCardMetrics(
     listHeight = Math.max(0, theoreticalRowHeight - chromeCellHeight);
   }
 
-  const totalGap = MATCH_CARD_GAP_PX * Math.max(0, layoutMatchCount - 1);
+  const gapPx = isJuly ? 1 : MATCH_CARD_GAP_PX;
+  const totalGap = gapPx * Math.max(0, layoutMatchCount - 1);
   const cardHeight = Math.max(
     MIN_MATCH_CARD_HEIGHT_PX,
     Math.floor((listHeight - totalGap) / layoutMatchCount)
   );
 
   calendar.style.setProperty("--tm-cal-match-card-h", `${cardHeight}px`);
+  calendar.style.setProperty("--tm-cal-match-gap", `${isJuly ? gapPx : MATCH_CARD_GAP_PX}px`);
   return cardHeight;
 }
 
