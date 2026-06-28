@@ -120,7 +120,7 @@ function findBusiestMatchCell(grid: HTMLElement): HTMLElement | null {
 }
 
 /** Altura uniforme de tarjetas según la celda con más partidos. */
-function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number {
+function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement, layoutRoot?: HTMLElement | null): number {
   calendar.style.setProperty("--tm-cal-match-gap", `${MATCH_CARD_GAP_PX}px`);
 
   const refCell = findBusiestMatchCell(grid);
@@ -136,7 +136,18 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
     return 0;
   }
 
-  const listHeight = matchList.clientHeight;
+  let listHeight = matchList.clientHeight;
+
+  if (calendar.classList.contains("tm-porra-calendar--auto-rows") && layoutRoot) {
+    const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
+    const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
+    const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
+    const theoreticalGridHeight = Math.max(0, layoutRoot.clientHeight - chromeHeight);
+    const theoreticalRowHeight = theoreticalGridHeight / 5; // Junio siempre tiene 5 semanas
+    const chromeCellHeight = refCell.clientHeight - matchList.clientHeight;
+    listHeight = theoreticalRowHeight - chromeCellHeight;
+  }
+
   // Usar siempre al menos 4 partidos (el máximo del torneo en fase de grupos)
   // para que las tarjetas de Julio (con menos partidos) sean idénticas a las de Junio.
   const layoutMatchCount = Math.max(4, matchCount);
@@ -576,7 +587,7 @@ export function fitCalendarLayout(
     void calendar.offsetHeight;
   }
 
-  let matchCardHeight = syncMatchCardMetrics(calendar, grid);
+  let matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
   syncSidebarAccessSpacing(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
@@ -588,7 +599,7 @@ export function fitCalendarLayout(
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
-    matchCardHeight = syncMatchCardMetrics(calendar, grid);
+    matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
