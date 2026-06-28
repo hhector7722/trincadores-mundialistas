@@ -565,6 +565,7 @@ export function fitCalendarLayout(
   const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
   const simulateJune = isAutoRows && layoutRoot != null;
   const siblingsToHide: HTMLElement[] = [];
+  const dummyCards: HTMLElement[] = [];
 
   if (simulateJune) {
     calendar.classList.remove("tm-porra-calendar--auto-rows");
@@ -586,6 +587,25 @@ export function fitCalendarLayout(
         sibling.style.display = "none";
       }
       sibling = sibling.previousElementSibling;
+    }
+
+    // Insertar tarjetas falsas para simular el día más ocupado de Junio (4 partidos)
+    const refCell = findBusiestMatchCell(grid);
+    if (refCell) {
+      const matchList = refCell.querySelector<HTMLElement>(".tm-cal-match-list");
+      if (matchList) {
+        const cards = matchList.querySelectorAll(".tm-cal-match-card");
+        const matchCount = cards.length;
+        if (matchCount > 0 && matchCount < 4) {
+          const cardToClone = cards[0];
+          for (let i = matchCount; i < 4; i++) {
+            const clone = cardToClone.cloneNode(true) as HTMLElement;
+            clone.style.visibility = "hidden";
+            matchList.appendChild(clone);
+            dummyCards.push(clone);
+          }
+        }
+      }
     }
   }
 
@@ -634,6 +654,9 @@ export function fitCalendarLayout(
     
     for (const sibling of siblingsToHide) {
       sibling.style.display = "";
+    }
+    for (const clone of dummyCards) {
+      clone.remove();
     }
     void calendar.offsetHeight;
   }
