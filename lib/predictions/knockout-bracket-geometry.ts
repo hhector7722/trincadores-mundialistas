@@ -352,14 +352,13 @@ function connectChildToParent(
   parent: BracketMatchGeometry
 ): string {
   const isLeft = child.side === "left";
-  const xVertical =
-    parent.round === "sf"
-      ? parent.columnX
-      : gutterX(Math.min(child.column, parent.column), Math.max(child.column, parent.column));
+  const xVertical = gutterX(
+    Math.min(child.column, parent.column),
+    Math.max(child.column, parent.column)
+  );
   const xStart = connectorEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
-  const xEnd = connectorEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
-  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY}`;
 }
 
 function connectSemiToFinal(
@@ -369,8 +368,13 @@ function connectSemiToFinal(
 ): string {
   const isLeft = semi.side === "left";
   const xStart = connectorEdgeX(semi.columnX, isLeft ? "right" : "left", semi.layoutScale);
+  const finalCol = isLeft ? 4 : 5; // COL_FINAL_HOME y COL_FINAL_AWAY
+  const xVertical = gutterX(
+    Math.min(semi.column, finalCol),
+    Math.max(semi.column, finalCol)
+  );
 
-  return `M ${xStart} ${semi.midY} H ${semi.columnX} V ${finalCenterY} H ${anchorX}`;
+  return `M ${xStart} ${semi.midY} H ${xVertical} V ${finalCenterY} H ${anchorX}`;
 }
 
 export type BracketConnectorSegment = {
@@ -392,8 +396,29 @@ export function buildBracketConnectorPaths(
       const isLeft = geom.side === "left";
       const leftEdge = connectorEdgeX(geom.columnX, "left", geom.layoutScale);
       const rightEdge = connectorEdgeX(geom.columnX, "right", geom.layoutScale);
+      
+      let startX = leftEdge;
+      let endX = rightEdge;
+
+      if (geom.childMatches) {
+        const childA = byNumber.get(geom.childMatches[0]);
+        if (childA) {
+          const xVertical = gutterX(
+            Math.min(childA.column, geom.column),
+            Math.max(childA.column, geom.column)
+          );
+          if (isLeft) {
+            startX = xVertical;
+            endX = rightEdge;
+          } else {
+            startX = leftEdge;
+            endX = xVertical;
+          }
+        }
+      }
+
       segments.push({
-        d: `M ${leftEdge} ${geom.midY} H ${rightEdge}`,
+        d: `M ${startX} ${geom.midY} H ${endX}`,
         variant: "pair",
       });
     }
