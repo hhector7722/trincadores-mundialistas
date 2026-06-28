@@ -519,7 +519,6 @@ export function syncCalendarGridHeight(
   layoutRoot: HTMLElement
 ): number {
   void layoutRoot;
-  calendar.style.flex = "1 1 0%";
   calendar.style.minHeight = "0";
   prepareCalendarGridFlex(grid);
   void calendar.offsetHeight;
