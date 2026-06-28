@@ -63,7 +63,6 @@ export function AdminResultForm({
         <Button
           type="button"
           variant="outline"
-          size="sm"
           onClick={onSetLive}
           disabled={pending}
           className={cn("h-7 text-xs", pending && "opacity-60")}
