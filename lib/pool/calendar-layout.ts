@@ -80,10 +80,9 @@ function gridHasOverflow(grid: HTMLElement): boolean {
   return false;
 }
 
-function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
-  const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
+function searchMaxScale(calendar: HTMLElement, grid: HTMLElement, isJune: boolean): number {
   let lo = MIN_UI_SCALE;
-  let hi = isAutoRows ? 1.0 : MAX_UI_SCALE; // No escalar hacia arriba si no hay límite vertical
+  let hi = !isJune ? 1.0 : MAX_UI_SCALE; // No escalar hacia arriba en Julio para mantener coherencia con Junio
   let best = MIN_UI_SCALE;
 
   for (let i = 0; i < SCALE_SEARCH_ITERATIONS; i++) {
@@ -562,62 +561,23 @@ export function fitCalendarLayout(
 ): CalendarLayoutResult | null {
   if (rowCount <= 0) return null;
 
-  const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
-  const simulateJune = isAutoRows && layoutRoot != null;
-  const siblingsToHide: HTMLElement[] = [];
-  const dummyCards: HTMLElement[] = [];
+export function fitCalendarLayout(
+  calendar: HTMLElement,
+  grid: HTMLElement,
+  rowCount: number,
+  layoutRoot?: HTMLElement | null,
+  isJune: boolean = true
+): CalendarLayoutResult | null {
+  if (rowCount <= 0) return null;
 
-  if (simulateJune) {
-    calendar.classList.remove("tm-porra-calendar--auto-rows");
-    calendar.classList.remove("shrink-0");
-    calendar.classList.add("flex-1");
-
-    let sibling = calendar.nextElementSibling;
-    while (sibling) {
-      if (sibling instanceof HTMLElement && sibling.style.display !== "none") {
-        siblingsToHide.push(sibling);
-        sibling.style.display = "none";
-      }
-      sibling = sibling.nextElementSibling;
-    }
-    sibling = calendar.previousElementSibling;
-    while (sibling) {
-      if (sibling instanceof HTMLElement && sibling.style.display !== "none") {
-        siblingsToHide.push(sibling);
-        sibling.style.display = "none";
-      }
-      sibling = sibling.previousElementSibling;
-    }
-
-    // Insertar tarjetas falsas para simular el día más ocupado de Junio (4 partidos)
-    const refCell = findBusiestMatchCell(grid);
-    if (refCell) {
-      const matchList = refCell.querySelector<HTMLElement>(".tm-cal-match-list");
-      if (matchList) {
-        const cards = matchList.querySelectorAll(".tm-cal-match-card");
-        const matchCount = cards.length;
-        if (matchCount > 0 && matchCount < 4) {
-          const cardToClone = cards[0];
-          for (let i = matchCount; i < 4; i++) {
-            const clone = cardToClone.cloneNode(true) as HTMLElement;
-            clone.style.visibility = "hidden";
-            matchList.appendChild(clone);
-            dummyCards.push(clone);
-          }
-        }
-      }
-    }
-  }
-
-  const effectiveRowCount = simulateJune ? 5 : rowCount;
-  calendar.style.setProperty("--tm-cal-weeks", String(effectiveRowCount));
+  calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
 
   const gridHeight =
     layoutRoot != null ? syncCalendarGridHeight(calendar, grid, layoutRoot) : grid.clientHeight;
 
   void grid.offsetHeight;
 
-  let uiScale = searchMaxScale(calendar, grid);
+  let uiScale = searchMaxScale(calendar, grid, isJune);
 
   while (uiScale > MIN_UI_SCALE && gridHasOverflow(grid)) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
@@ -633,7 +593,7 @@ export function fitCalendarLayout(
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
-  for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
+  for (let pass = 0; pass < 6 && gridHasOverflow(grid)) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
@@ -644,21 +604,7 @@ export function fitCalendarLayout(
     syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
-  }
-
-  if (simulateJune) {
-    calendar.classList.add("tm-porra-calendar--auto-rows");
-    calendar.classList.add("shrink-0");
-    calendar.classList.remove("flex-1");
-    calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
-    
-    for (const sibling of siblingsToHide) {
-      sibling.style.display = "";
-    }
-    for (const clone of dummyCards) {
-      clone.remove();
-    }
-    void calendar.offsetHeight;
+    pass++;
   }
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
