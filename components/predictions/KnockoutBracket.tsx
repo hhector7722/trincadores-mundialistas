@@ -224,7 +224,7 @@ function BracketMatchNode({
               "tm-ko-match-score",
               !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
             )}
-            style={{ left: `${geom.columnX}%`, top: `${homeScoreY}%` }}
+            style={{ left: `${slots.home.x}%`, top: `${homeScoreY}%` }}
             aria-hidden
           >
             {displayHome}
@@ -234,7 +234,7 @@ function BracketMatchNode({
               "tm-ko-match-score",
               !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
             )}
-            style={{ left: `${geom.columnX}%`, top: `${awayScoreY}%` }}
+            style={{ left: `${slots.away.x}%`, top: `${awayScoreY}%` }}
             aria-hidden
           >
             {displayAway}
