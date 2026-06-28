@@ -329,9 +329,11 @@ export function Modal({
   const titleId = useId();
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
+  const touchId = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const swipeHandledRef = useRef(false);
+  const isSwipeCanceled = useRef(false);
   const hasSwipe = Boolean(onSwipeLeft || onSwipeRight);
   const openedAtRef = useRef<number | null>(null);
   const trackedLabelRef = useRef<string | null>(null);
@@ -429,34 +431,77 @@ export function Modal({
   if (!mounted) return null;
 
   function onTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-    if (panelSlide || !hasSwipe) return;
-    swipeHandledRef.current = false;
-    touchStartX.current = event.touches[0]?.clientX ?? null;
-    touchStartY.current = event.touches[0]?.clientY ?? null;
-  }
-
-  function onTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
-    if (panelSlide || !hasSwipe) return;
-    if (touchStartX.current === null || touchStartY.current === null) return;
+    if (touchId.current !== null) return;
+    
+    const target = event.target as HTMLElement;
+    if (target.closest('[data-swipe-ignore="true"]')) {
+      return;
+    }
 
     const touch = event.changedTouches[0];
     if (!touch) return;
 
+    touchId.current = touch.identifier;
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+    swipeHandledRef.current = false;
+    isSwipeCanceled.current = false;
+  }
+
+  function onTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    if (touchId.current === null) return;
+    
+    const touch = Array.from(event.changedTouches).find(t => t.identifier === touchId.current);
+    if (!touch || touchStartX.current === null || touchStartY.current === null) return;
+
     const deltaX = touch.clientX - touchStartX.current;
     const deltaY = touch.clientY - touchStartY.current;
 
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+      swipeHandledRef.current = true;
+    }
+
+    if (!isSwipeCanceled.current && Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      isSwipeCanceled.current = true;
+    }
+  }
+
+  function onTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    if (touchId.current === null) return;
+
+    const touch = Array.from(event.changedTouches).find(t => t.identifier === touchId.current);
+    if (!touch) return;
+
+    const startX = touchStartX.current ?? 0;
+    const startY = touchStartY.current ?? 0;
+    
+    touchId.current = null;
     touchStartX.current = null;
     touchStartY.current = null;
+
+    if (panelSlide || !hasSwipe || isSwipeCanceled.current) return;
+
+    const deltaX = touch.clientX - startX;
+    const deltaY = touch.clientY - startY;
 
     if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
 
     event.preventDefault();
-    swipeHandledRef.current = true;
 
     if (deltaX < 0) {
       onSwipeLeft?.();
     } else {
       onSwipeRight?.();
+    }
+  }
+
+  function onTouchCancel(event: React.TouchEvent<HTMLDivElement>) {
+    if (touchId.current === null) return;
+    const touch = Array.from(event.changedTouches).find(t => t.identifier === touchId.current);
+    if (touch) {
+      touchId.current = null;
+      touchStartX.current = null;
+      touchStartY.current = null;
     }
   }
 
@@ -481,8 +526,10 @@ export function Modal({
         slideActive && "touch-none",
         containerClassName
       )}
-      onTouchStart={hasSwipe ? onTouchStart : undefined}
-      onTouchEnd={hasSwipe ? onTouchEnd : undefined}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchCancel}
     >
       <button
         type="button"
