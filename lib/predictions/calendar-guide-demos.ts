@@ -72,7 +72,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: `+${MATCH_SCORE_POINTS.exact + MVP_PREDICTION_POINTS} pts`,
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p1", home_goals: 2, away_goals: 1, points_awarded: MATCH_SCORE_POINTS.exact, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p1", home_goals: 2, away_goals: 1, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.exact, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_HIT,
     }),
   },
@@ -82,7 +82,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: `+${MATCH_SCORE_POINTS.exact} pts`,
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p2", home_goals: 2, away_goals: 1, points_awarded: MATCH_SCORE_POINTS.exact, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p2", home_goals: 2, away_goals: 1, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.exact, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_MISS,
     }),
   },
@@ -92,7 +92,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: `+${MATCH_SCORE_POINTS.sign + MVP_PREDICTION_POINTS} pts`,
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p4", home_goals: 3, away_goals: 0, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p4", home_goals: 3, away_goals: 0, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_HIT,
     }),
   },
@@ -102,7 +102,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: `+${MATCH_SCORE_POINTS.sign} pts`,
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p3", home_goals: 3, away_goals: 0, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p3", home_goals: 3, away_goals: 0, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.sign, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_MISS,
     }),
   },
@@ -112,7 +112,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: `+${MVP_PREDICTION_POINTS} pt`,
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p5", home_goals: 0, away_goals: 2, points_awarded: MATCH_SCORE_POINTS.miss, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p5", home_goals: 0, away_goals: 2, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.miss, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_HIT,
     }),
   },
@@ -122,7 +122,7 @@ export const CALENDAR_GUIDE_ENTRIES: CalendarGuideEntry[] = [
     pointsLabel: "0 pts",
     match: baseDemoMatch({
       ...OFFICIAL,
-      prediction: { id: "p6", home_goals: 0, away_goals: 2, points_awarded: MATCH_SCORE_POINTS.miss, updated_at: DEMO_KICKOFF },
+      prediction: { id: "p6", home_goals: 0, away_goals: 2, advancing_team: null, points_awarded: MATCH_SCORE_POINTS.miss, updated_at: DEMO_KICKOFF },
       mvpPrediction: MVP_MISS,
     }),
   },
