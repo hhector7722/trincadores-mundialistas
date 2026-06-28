@@ -22,9 +22,11 @@ export function resolvePredictionOutcomeIcons({
 }: ResolvePredictionOutcomeIconsInput): PredictionOutcomeIconVariant[] {
   const icons: PredictionOutcomeIconVariant[] = [];
 
-  if (scoreOutcome === "exact") {
+  if (scoreOutcome === "exact_and_advancing") {
+    icons.push("success", "success", "success");
+  } else if (scoreOutcome === "exact") {
     icons.push("success", "success");
-  } else if (scoreOutcome === "sign" && showSignOutcomeTicks) {
+  } else if (scoreOutcome === "advancing" || (scoreOutcome === "sign" && showSignOutcomeTicks)) {
     icons.push("success");
   } else if (showMissIndicator && hasScorePrediction && scoreOutcome === "miss") {
     icons.push("error");

@@ -30,11 +30,13 @@ export function MatchPredictionsBoardRow({
   isCurrentUser,
   showOutcomes,
   showSignOutcomeTicks = false,
+  isKnockout = false,
 }: {
   row: MatchPredictionsBoardRowType;
   isCurrentUser: boolean;
   showOutcomes: boolean;
   showSignOutcomeTicks?: boolean;
+  isKnockout?: boolean;
 }) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const canPreview = Boolean(row.avatarUrl);
@@ -86,6 +88,7 @@ export function MatchPredictionsBoardRow({
               <MatchPredictionsBoardPointsLabel
                 scoreOutcome={row.scoreOutcome}
                 mvpCorrect={row.mvpCorrect}
+                isKnockout={isKnockout}
               />
             </div>
             <div className="flex h-full items-center justify-start">
@@ -93,6 +96,7 @@ export function MatchPredictionsBoardRow({
                 scoreOutcome={row.scoreOutcome}
                 mvpCorrect={row.mvpCorrect}
                 showSignOutcomeTicks={showSignOutcomeTicks}
+                isKnockout={isKnockout}
               />
             </div>
           </>

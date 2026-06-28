@@ -1,3 +1,5 @@
+import type { ScoreOutcome } from "@/lib/predictions/prediction-outcome";
+
 /** Debe coincidir con `match_*_points()` y `mvp_prediction_points()` en SQL. */
 export const MATCH_SCORE_POINTS = {
   exact: 5,
@@ -12,16 +14,23 @@ export function formatMvpPointsLabel(): string {
   return `+${MVP_PREDICTION_POINTS} pt`;
 }
 
-export type BoardScoreOutcome = "exact" | "sign" | "miss" | null;
-
 /** Suma marcador + MVP para la columna de aciertos del modal de pronósticos. */
 export function computeBoardRowTotalPoints(
-  scoreOutcome: BoardScoreOutcome,
-  mvpCorrect: boolean
+  scoreOutcome: ScoreOutcome | null,
+  mvpCorrect: boolean,
+  isKnockout: boolean = false
 ): number {
   let total = 0;
-  if (scoreOutcome === "exact") total += MATCH_SCORE_POINTS.exact;
-  else if (scoreOutcome === "sign") total += MATCH_SCORE_POINTS.sign;
+  
+  if (isKnockout) {
+    if (scoreOutcome === "exact_and_advancing") total += 5;
+    else if (scoreOutcome === "exact") total += 3;
+    else if (scoreOutcome === "advancing") total += 2;
+  } else {
+    if (scoreOutcome === "exact") total += MATCH_SCORE_POINTS.exact;
+    else if (scoreOutcome === "sign") total += MATCH_SCORE_POINTS.sign;
+  }
+
   if (mvpCorrect) total += MVP_PREDICTION_POINTS;
   return total;
 }

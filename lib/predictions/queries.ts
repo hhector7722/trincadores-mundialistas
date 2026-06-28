@@ -413,6 +413,7 @@ export type MatchPredictionsBoard = {
   officialMvpTeamName: string | null;
   showOutcomes: boolean;
   playerIncidents: MatchPlayerIncident[];
+  isKnockout: boolean;
   rows: MatchPredictionsBoardRow[];
 };
 
@@ -469,12 +470,12 @@ export async function getMatchPredictionsBoard(
     await Promise.all([
       admin
         .from("matches")
-        .select("id, home_team, away_team, status, kickoff_at")
+        .select("id, home_team, away_team, status, kickoff_at, matchday_id")
         .eq("id", matchId)
         .maybeSingle(),
       admin
         .from("match_results")
-        .select("home_goals, away_goals, mvp_player_name, mvp_team_name")
+        .select("home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
         .eq("match_id", matchId)
         .maybeSingle(),
     ]);
@@ -530,6 +531,7 @@ export async function getMatchPredictionsBoard(
       officialMvpTeamName: result?.mvp_team_name ?? null,
       showOutcomes,
       playerIncidents,
+      isKnockout: isKnockoutMatchdayKey(match.matchday_id),
       rows: [],
     };
   }
@@ -579,8 +581,12 @@ export async function getMatchPredictionsBoard(
         ? resolveScoreOutcome({
             predictedHome: homeGoals,
             predictedAway: awayGoals,
+            predictedAdvancing: prediction?.advancing_team as "home" | "away" | null,
             resultHome: result!.home_goals,
             resultAway: result!.away_goals,
+            resultPenaltyHome: result?.penalty_home,
+            resultPenaltyAway: result?.penalty_away,
+            isKnockout: isKnockoutMatchdayKey(match.matchday_id),
           })
         : null;
 
@@ -643,6 +649,7 @@ export async function getMatchPredictionsBoard(
     officialMvpTeamName: result?.mvp_team_name ?? null,
     showOutcomes,
     playerIncidents,
+    isKnockout: isKnockoutMatchdayKey(match.matchday_id),
     rows,
   };
 }

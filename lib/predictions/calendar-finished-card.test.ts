@@ -22,7 +22,7 @@ function finishedMatch(overrides: Partial<MatchWithPrediction> = {}): MatchWithP
     highlightYoutubeId: null,
     highlightPublishedAt: null,
     highlightSource: null,
-    prediction: { id: "p1", home_goals: 2, away_goals: 1, points_awarded: 5, updated_at: "" },
+    prediction: { id: "p1", home_goals: 2, away_goals: 1, advancing_team: null, points_awarded: 5, updated_at: "" },
     mvpPrediction: null,
     playerIncidents: [],
     serverEditable: false,
@@ -60,7 +60,7 @@ describe("resolveCalendarFinishedCard", () => {
   it("solo signo", () => {
     const state = resolveCalendarFinishedCard(
       finishedMatch({
-        prediction: { id: "p1", home_goals: 2, away_goals: 0, points_awarded: 2, updated_at: "" },
+        prediction: { id: "p1", home_goals: 2, away_goals: 0, advancing_team: null, points_awarded: 2, updated_at: "" },
       }),
     );
     assert.equal(state?.variant, "sign");
@@ -71,7 +71,7 @@ describe("resolveCalendarFinishedCard", () => {
   it("signo y mvp", () => {
     const state = resolveCalendarFinishedCard(
       finishedMatch({
-        prediction: { id: "p1", home_goals: 2, away_goals: 0, points_awarded: 2, updated_at: "" },
+        prediction: { id: "p1", home_goals: 2, away_goals: 0, advancing_team: null, points_awarded: 2, updated_at: "" },
         mvpPrediction: {
           id: "mvp1",
           player_name: "Lamine Yamal",
@@ -90,7 +90,7 @@ describe("resolveCalendarFinishedCard", () => {
   it("solo mvp", () => {
     const state = resolveCalendarFinishedCard(
       finishedMatch({
-        prediction: { id: "p1", home_goals: 0, away_goals: 2, points_awarded: 0, updated_at: "" },
+        prediction: { id: "p1", home_goals: 0, away_goals: 2, advancing_team: null, points_awarded: 0, updated_at: "" },
         mvpPrediction: {
           id: "mvp1",
           player_name: "Lamine Yamal",
@@ -109,7 +109,7 @@ describe("resolveCalendarFinishedCard", () => {
   it("fallo total", () => {
     const state = resolveCalendarFinishedCard(
       finishedMatch({
-        prediction: { id: "p1", home_goals: 0, away_goals: 0, points_awarded: 0, updated_at: "" },
+        prediction: { id: "p1", home_goals: 0, away_goals: 0, advancing_team: null, points_awarded: 0, updated_at: "" },
       }),
     );
     assert.equal(state?.variant, "miss");

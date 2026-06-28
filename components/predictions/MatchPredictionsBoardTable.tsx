@@ -96,7 +96,8 @@ export function MatchPredictionsBoardTable({
   showOutcomes = false,
   showSignOutcomeTicks = false,
   loading = false,
-}: MatchPredictionsBoardTableProps) {
+  isKnockout = false,
+}: MatchPredictionsBoardTableProps & { isKnockout?: boolean }) {
   const dataRows = loading ? [] : rows;
   const slotCount = loading
     ? MATCH_PREDICTIONS_ROW_COUNT
@@ -128,6 +129,7 @@ export function MatchPredictionsBoardTable({
                   isCurrentUser={row.profileId === currentProfileId}
                   showOutcomes={showOutcomes}
                   showSignOutcomeTicks={showSignOutcomeTicks}
+                  isKnockout={isKnockout}
                 />
               );
             })}

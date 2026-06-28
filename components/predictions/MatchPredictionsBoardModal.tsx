@@ -62,7 +62,10 @@ function MatchPredictionsBoardContent({
       />
       {board.showOutcomes ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">
-          <MatchPredictionsBoardLegend showSignOutcomeTicks={showSignOutcomeTicks} />
+          <MatchPredictionsBoardLegend 
+            showSignOutcomeTicks={showSignOutcomeTicks} 
+            isKnockout={board.isKnockout}
+          />
         </div>
       ) : null}
     </>

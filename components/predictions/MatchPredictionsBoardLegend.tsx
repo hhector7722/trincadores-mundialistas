@@ -17,35 +17,67 @@ function LegendItem({ icons, label }: { icons: ReactNode; label: string }) {
 export function MatchPredictionsBoardLegend({
   className,
   showSignOutcomeTicks = false,
+  isKnockout = false,
 }: {
   className?: string;
   showSignOutcomeTicks?: boolean;
+  isKnockout?: boolean;
 }) {
   return (
     <div className={cn("shrink-0 px-3", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] leading-tight text-[var(--tm-muted)]">
-        <LegendItem
-          icons={
-            showSignOutcomeTicks ? (
-              <PredictionOutcomeIcon variant="success" className="text-[10px]" />
-            ) : (
-              <span
-                className="inline-block h-3 w-1 rounded-full bg-[var(--tm-cal-outcome-sign)]"
-                aria-hidden
-              />
-            )
-          }
-          label="Signo 1 x 2"
-        />
-        <LegendItem
-          icons={
-            <>
-              <PredictionOutcomeIcon variant="success" className="text-[10px]" />
-              <PredictionOutcomeIcon variant="success" className="text-[10px]" />
-            </>
-          }
-          label="Marcador exacto"
-        />
+        {isKnockout ? (
+          <>
+            <LegendItem
+              icons={<PredictionOutcomeIcon variant="success" className="text-[10px]" />}
+              label="Clasificado"
+            />
+            <LegendItem
+              icons={
+                <>
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                </>
+              }
+              label="Marcador"
+            />
+            <LegendItem
+              icons={
+                <>
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                </>
+              }
+              label="Marcador + Clasificado"
+            />
+          </>
+        ) : (
+          <>
+            <LegendItem
+              icons={
+                showSignOutcomeTicks ? (
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                ) : (
+                  <span
+                    className="inline-block h-3 w-1 rounded-full bg-[var(--tm-cal-outcome-sign)]"
+                    aria-hidden
+                  />
+                )
+              }
+              label="Signo 1 x 2"
+            />
+            <LegendItem
+              icons={
+                <>
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                  <PredictionOutcomeIcon variant="success" className="text-[10px]" />
+                </>
+              }
+              label="Marcador exacto"
+            />
+          </>
+        )}
         <LegendItem icons={<PredictionOutcomeIcon variant="mvp" />} label="MVP" />
       </ul>
     </div>
