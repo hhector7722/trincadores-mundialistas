@@ -47,7 +47,7 @@ export const KO_CARD_SIZE_SCALE = 0.92;
 const ORB_HALF_Y = 1.3;
 
 /** Holgura mínima entre bordes de dos orbes del mismo enfrentamiento (% canvas Y). */
-const ORB_INNER_EDGE_GAP_Y = 0.4;
+const ORB_INNER_EDGE_GAP_Y = 1.8;
 
 /** Mitad de la separación centro-a-centro dentro de un enfrentamiento (% canvas Y). */
 export const ORB_PAIR_INNER_HALF_Y = ORB_HALF_Y + ORB_INNER_EDGE_GAP_Y / 2;
@@ -214,13 +214,21 @@ function pushR32Side(
 ) {
   matchNumbers.forEach((matchNumber, slotIndex) => {
     const row = bracketGridRowCenter(0, slotIndex);
+    const { midY } = yFromGridRow(row);
+    const columnX = mapColumnX(column);
+    const offsetX = 2.2;
+    
     out.push({
       matchNumber,
       round: "r32",
       side,
       column,
-      ...yFromGridRow(row),
-      columnX: mapColumnX(column),
+      midY,
+      homeY: midY,
+      awayY: midY,
+      homeX: side === "left" ? columnX - offsetX : columnX + offsetX,
+      awayX: side === "left" ? columnX + offsetX : columnX - offsetX,
+      columnX,
       layoutScale: ROUND_LAYOUT_SCALE.r32,
     });
   });
