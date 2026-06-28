@@ -377,6 +377,42 @@ function useCalendarViewportLayout(
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
+function resolveKnockoutTeams(matches: MatchWithPrediction[]): MatchWithPrediction[] {
+  const sorted = [...matches].sort((a, b) => a.match_number - b.match_number);
+  const matchMap = new Map<number, MatchWithPrediction>();
+
+  for (const m of sorted) {
+    const resolveTeam = (raw: string | undefined | null): string => {
+      const rawTrimmed = (raw ?? "").trim();
+      if ((rawTrimmed.startsWith("W") || rawTrimmed.startsWith("L")) && !isNaN(Number(rawTrimmed.slice(1)))) {
+        const isLoser = rawTrimmed.startsWith("L");
+        const prevMatchNumber = Number(rawTrimmed.slice(1));
+        const prevMatch = matchMap.get(prevMatchNumber);
+        if (prevMatch && prevMatch.status === "finished" && prevMatch.officialHome != null && prevMatch.officialAway != null) {
+          if (prevMatch.officialHome > prevMatch.officialAway) {
+            return isLoser ? prevMatch.away_team : prevMatch.home_team;
+          } else if (prevMatch.officialAway > prevMatch.officialHome) {
+            return isLoser ? prevMatch.home_team : prevMatch.away_team;
+          }
+        }
+      }
+      return rawTrimmed;
+    };
+
+    const resolvedHome = resolveTeam(m.home_team);
+    const resolvedAway = resolveTeam(m.away_team);
+
+    const updatedMatch = {
+      ...m,
+      home_team: resolvedHome || m.home_team,
+      away_team: resolvedAway || m.away_team,
+    };
+    matchMap.set(m.match_number, updatedMatch);
+  }
+
+  return matches.map(m => matchMap.get(m.match_number) || m);
+}
+
 export function PredictionsCalendar({
   poolId,
   matches,
@@ -385,17 +421,19 @@ export function PredictionsCalendar({
 }: PredictionsCalendarProps) {
   const [layoutReady, setLayoutReady] = useState(false);
   const [currentMonthView, setCurrentMonthView] = useState<MonthYear>({ year: 2026, month: 7 });
+  const resolvedSourceMatches = useMemo(() => resolveKnockoutTeams(matches), [matches]);
+
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
-    items: matches,
+    items: resolvedSourceMatches,
   }));
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
 
   if (localMatchState.source !== matches) {
-    setLocalMatchState({ source: matches, items: matches });
+    setLocalMatchState({ source: matches, items: resolvedSourceMatches });
   }
 
-  const localMatches = localMatchState.source === matches ? localMatchState.items : matches;
+  const localMatches = localMatchState.source === matches ? localMatchState.items : resolvedSourceMatches;
 
   const matchesByDate = useMemo(() => indexMatchesByDate(localMatches), [localMatches]);
   const [activeGroupCode, setActiveGroupCode] = useState<string | null>(null);
