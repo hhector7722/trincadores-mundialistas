@@ -272,7 +272,7 @@ export async function syncKnockoutBracket(): Promise<{ updated: number; skipped:
 
   const { data: matches, error } = await admin
     .from("matches")
-    .select("id, match_number, home_team, away_team")
+    .select("id, match_number, home_team, away_team, status")
     .gte("match_number", 73);
 
   if (error || !matches) return { updated: 0, skipped: 0 };
@@ -316,9 +316,16 @@ export async function syncKnockoutBracket(): Promise<{ updated: number; skipped:
     }
 
     if (newHome !== home_team || newAway !== away_team) {
+      const isNowFullyResolved = !isPlaceholder(newHome) && !isPlaceholder(newAway);
+      const updateData: any = { home_team: newHome, away_team: newAway };
+      
+      if (isNowFullyResolved && match.status === "pending") {
+        updateData.status = "scheduled";
+      }
+
       await admin
         .from("matches")
-        .update({ home_team: newHome, away_team: newAway })
+        .update(updateData)
         .eq("id", id);
       updatedCount++;
     } else {
