@@ -52,7 +52,7 @@ const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 const KO_MASCOT_SRC = "/icons/psoe.png";
-const RULES_IMG_SRC = "/icons/normas.jpeg";
+const RULES_IMG_SRC = "/icons/normas.png";
 
 const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
 const NORMAS_CENTER_Y = gridRowToPercentY(12.8);

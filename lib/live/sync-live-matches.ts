@@ -28,7 +28,7 @@ async function loadCandidateMatches(admin: AdminClient, nowMs: number): Promise<
     admin
       .from("matches")
       .select("id, home_team, away_team, kickoff_at, status")
-      .in("status", ["pending", "scheduled", "live"])
+      .in("status", ["scheduled", "live"])
       .gte("kickoff_at", fromIso)
       .lte("kickoff_at", toIso),
     admin

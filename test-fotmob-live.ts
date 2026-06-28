@@ -3,17 +3,17 @@ import { syncLiveMatches } from "./lib/live/sync-live-matches";
 import { createAdminClient } from "./lib/scripts/supabase-admin";
 
 async function run() {
-  console.log("Fetching bundle for 4653705...");
-  const bundle = await fetchFotmobLiveBundle(4653705);
-  console.log(JSON.stringify(bundle, null, 2));
-
   console.log("Running syncLiveMatches...");
   try {
     const admin = createAdminClient();
     const res = await syncLiveMatches(admin, Date.now());
     console.log("Sync Results:", res);
+    
+    if (res.errors && res.errors.length > 0) {
+      console.error("Errors encountered:", res.errors);
+    }
   } catch(e) {
-    console.error("Sync Error:", e);
+    console.error("Fatal Sync Error:", e);
   }
 }
 
