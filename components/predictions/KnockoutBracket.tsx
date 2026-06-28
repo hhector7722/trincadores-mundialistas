@@ -35,6 +35,7 @@ import {
   teamAbbr,
   teamNameEs,
 } from "@/lib/teams/display";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { cn } from "@/lib/utils";
 
 type KnockoutBracketProps = {
@@ -84,17 +85,20 @@ function BracketTeamOrb({
   isWinner,
   isLive,
   isSaved,
+  side,
 }: {
   teamName: string;
   layout: TeamSlotLayout;
   isWinner?: boolean;
   isLive?: boolean;
   isSaved?: boolean;
+  side: "left" | "right" | "center";
 }) {
   const trimmed = teamName.trim();
   const isPlaceholder = !trimmed || isPlaceholderTeam(trimmed);
   const label = isPlaceholder ? knockoutBracketSlotLabel(teamName) : teamAbbr(teamName);
   const title = isPlaceholder ? label : teamNameEs(teamName);
+  const fullName = isPlaceholder ? label : teamNameEs(teamName);
 
   return (
     <div
@@ -108,7 +112,16 @@ function BracketTeamOrb({
       title={title}
       aria-hidden
     >
-      <span className="tm-ko-orb-label">{label}</span>
+      {isPlaceholder ? (
+        <span className="tm-ko-orb-label">{label}</span>
+      ) : (
+        <>
+          <TeamFlagBadge name={teamName} size="sm" className="tm-ko-orb-flag" />
+          <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
+            {fullName}
+          </span>
+        </>
+      )}
     </div>
   );
 }
@@ -187,6 +200,7 @@ function BracketMatchNode({
         isWinner={homeWins}
         isLive={isLive}
         isSaved={isSaved}
+        side={geom.side}
       />
       <BracketTeamOrb
         teamName={awayName}
@@ -194,6 +208,7 @@ function BracketMatchNode({
         isWinner={awayWins}
         isLive={isLive}
         isSaved={isSaved}
+        side={geom.side}
       />
       {hasScore ? (
         <span
