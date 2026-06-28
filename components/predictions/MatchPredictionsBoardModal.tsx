@@ -59,6 +59,7 @@ function MatchPredictionsBoardContent({
         awayTeam={board.awayTeam}
         showOutcomes={board.showOutcomes}
         showSignOutcomeTicks={showSignOutcomeTicks}
+        isKnockout={board.isKnockout}
       />
       {board.showOutcomes ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">

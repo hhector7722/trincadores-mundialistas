@@ -101,7 +101,9 @@ function BracketTeamOrb({
   side: "left" | "right" | "center";
 }) {
   const trimmed = teamName.trim();
-  const isPlaceholder = !trimmed || isPlaceholderTeam(trimmed);
+  if (!trimmed) return null;
+
+  const isPlaceholder = isPlaceholderTeam(trimmed);
   const label = isPlaceholder ? knockoutBracketSlotLabel(teamName) : teamAbbr(teamName);
   const title = isPlaceholder ? label : teamNameEs(teamName);
   const fullName = isPlaceholder ? label : teamNameEs(teamName);
