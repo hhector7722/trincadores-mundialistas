@@ -470,7 +470,7 @@ export async function getMatchPredictionsBoard(
     await Promise.all([
       admin
         .from("matches")
-        .select("id, home_team, away_team, status, kickoff_at, matchday_id")
+        .select("id, home_team, away_team, status, kickoff_at, matchday_id, matchdays(external_key)")
         .eq("id", matchId)
         .maybeSingle(),
       admin
@@ -531,7 +531,7 @@ export async function getMatchPredictionsBoard(
       officialMvpTeamName: result?.mvp_team_name ?? null,
       showOutcomes,
       playerIncidents,
-      isKnockout: isKnockoutMatchdayKey(match.matchday_id),
+      isKnockout: isKnockoutMatchdayKey((match.matchdays as any)?.external_key),
       rows: [],
     };
   }
@@ -586,7 +586,7 @@ export async function getMatchPredictionsBoard(
             resultAway: result!.away_goals,
             resultPenaltyHome: result?.penalty_home,
             resultPenaltyAway: result?.penalty_away,
-            isKnockout: isKnockoutMatchdayKey(match.matchday_id),
+            isKnockout: isKnockoutMatchdayKey((match.matchdays as any)?.external_key),
           })
         : null;
 
@@ -649,7 +649,7 @@ export async function getMatchPredictionsBoard(
     officialMvpTeamName: result?.mvp_team_name ?? null,
     showOutcomes,
     playerIncidents,
-    isKnockout: isKnockoutMatchdayKey(match.matchday_id),
+    isKnockout: isKnockoutMatchdayKey((match.matchdays as any)?.external_key),
     rows,
   };
 }

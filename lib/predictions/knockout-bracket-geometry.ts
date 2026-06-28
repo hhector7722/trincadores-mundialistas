@@ -387,13 +387,13 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    // Eliminado: línea que unía las banderas de los equipos enfrentados
-    // if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
-    //   segments.push({
-    //     d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
-    //     variant: "pair",
-    //   });
-    // }
+    // Línea que une las banderas de los equipos enfrentados
+    if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
+      segments.push({
+        d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
+        variant: "pair",
+      });
+    }
 
     if (!geom.childMatches) continue;
 
@@ -428,13 +428,13 @@ export function buildBracketConnectorPaths(
   if (final?.homeX != null && final.awayX != null) {
     const homeEdge = connectorEdgeX(final.homeX, "right", final.layoutScale);
     const awayEdge = connectorEdgeX(final.awayX, "left", final.layoutScale);
-    // Eliminado: línea horizontal entre los equipos de la final
-    // if (Math.abs(homeEdge - awayEdge) > 0.05) {
-    //   segments.push({
-    //     d: `M ${homeEdge} ${final.midY} H ${awayEdge}`,
-    //     variant: "final",
-    //   });
-    // }
+    // Línea horizontal entre los equipos de la final
+    if (Math.abs(homeEdge - awayEdge) > 0.05) {
+      segments.push({
+        d: `M ${homeEdge} ${final.midY} H ${awayEdge}`,
+        variant: "final",
+      });
+    }
   }
 
   return segments;
