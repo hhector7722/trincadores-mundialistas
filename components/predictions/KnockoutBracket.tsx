@@ -42,6 +42,7 @@ type KnockoutBracketProps = {
   poolId: string;
   matches: MatchWithPrediction[];
   currentProfileId: string;
+  onOpenMatch?: (match: MatchWithPrediction) => void;
 };
 
 const BRACKET_GEOMETRY = buildBracketGeometry();
@@ -221,13 +222,14 @@ function BracketMatchNode({
   );
 }
 
-export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutBracketProps) {
+export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const { navigate } = useAppNavigation();
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
+  const handleOpenMatch = onOpenMatch ?? setActiveMatch;
 
   useEffect(() => {
     setLocalMatches(matches);
@@ -320,7 +322,7 @@ export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutB
                 key={geom.matchNumber}
                 geom={geom}
                 match={resolveBracketMatch(matchMap, geom.matchNumber)}
-                onOpen={setActiveMatch}
+                onOpen={handleOpenMatch}
               />
             ))}
           </div>
@@ -333,7 +335,7 @@ export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutB
         src={KO_MASCOT_SRC}
       />
 
-      {activeMatch ? (
+      {!onOpenMatch && activeMatch ? (
         <QuickPredictionModal
           key={`${activeMatch.id}:${activeMatch.prediction?.updated_at ?? "none"}:${activeMatch.mvpPrediction?.updated_at ?? "no-mvp"}`}
           open

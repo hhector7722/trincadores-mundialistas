@@ -548,6 +548,7 @@ export function PredictionsCalendar({
             poolId={poolId}
             matches={localMatches}
             currentProfileId={currentProfileId}
+            onOpenMatch={setActiveMatch}
           />
         </div>
       )}
