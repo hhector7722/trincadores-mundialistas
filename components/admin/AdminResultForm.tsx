@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { submitMatchResult } from "@/actions/admin";
+import { submitMatchResult, setMatchLive } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -44,9 +44,34 @@ export function AdminResultForm({
     });
   }
 
+  function onSetLive() {
+    setError(null);
+    startTransition(async () => {
+      const result = await setMatchLive(poolId, matchId);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-2 border-b border-[var(--tm-border)] py-3">
-      <p className="text-sm font-medium text-[var(--tm-fg)]">{label}</p>
+    <div className="space-y-2 border-b border-[var(--tm-border)] py-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-[var(--tm-fg)]">{label}</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onSetLive}
+          disabled={pending}
+          className={cn("h-7 text-xs", pending && "opacity-60")}
+        >
+          {pending ? "..." : "Marcar EN JUEGO"}
+        </Button>
+      </div>
+      <form onSubmit={onSubmit} className="space-y-2">
       <div className="flex gap-2">
         <Input
           type="number"
@@ -94,6 +119,7 @@ export function AdminResultForm({
           {error}
         </p>
       )}
-    </form>
+      </form>
+    </div>
   );
 }

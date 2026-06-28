@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider";
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
+import { usePathname } from "next/navigation";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { ImageLightboxModal } from "@/components/ui/image-lightbox-modal";
+import { trackUsageModalOpen } from "@/lib/usage/client";
 
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -160,11 +162,10 @@ function BracketMatchNode({
   const displayAway = isFinished ? match?.officialAway : savedAway;
   const hasScoreToDisplay = displayHome != null && displayAway != null;
   const scoreSummary = hasScoreToDisplay ? formatListScore(displayHome, displayAway) : " ";
-  const isSaved = state === "saved";
-  const isFinal = geom.round === "final";
+  // Colocar los marcadores individuales debajo de cada bandera
+  const homeScoreY = geom.homeY + 3.8;
+  const awayScoreY = geom.awayY + 3.8;
 
-  // Colocar el marcador debajo de la bandera inferior (awayY)
-  const scoreY = geom.awayY ? geom.awayY + 3.2 : geom.midY + 4.8;
   const hitStyle: CSSProperties = isFinal
     ? {
         left: `${geom.columnX}%`,
@@ -214,22 +215,35 @@ function BracketMatchNode({
         side={geom.side}
       />
       {hasScoreToDisplay ? (
-        <span
-          className={cn(
-            "tm-ko-match-score",
-            !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
-          )}
-          style={{ left: `${geom.columnX}%`, top: `${scoreY}%` }}
-          aria-hidden
-        >
-          {scoreSummary}
-        </span>
+        <>
+          <span
+            className={cn(
+              "tm-ko-match-score",
+              !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
+            )}
+            style={{ left: `${geom.columnX}%`, top: `${homeScoreY}%` }}
+            aria-hidden
+          >
+            {displayHome}
+          </span>
+          <span
+            className={cn(
+              "tm-ko-match-score",
+              !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
+            )}
+            style={{ left: `${geom.columnX}%`, top: `${awayScoreY}%` }}
+            aria-hidden
+          >
+            {displayAway}
+          </span>
+        </>
       ) : null}
     </>
   );
 }
 
 export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch }: KnockoutBracketProps) {
+  const pathname = usePathname();
   const pageRef = useRef<HTMLDivElement>(null);
   const { navigate } = useAppNavigation();
   const [localMatches, setLocalMatches] = useState(matches);
@@ -273,7 +287,10 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
             <button
               type="button"
               className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md"
-              onClick={() => setMascotPreviewOpen(true)}
+              onClick={() => {
+                trackUsageModalOpen("ampliar-mascota", "Ampliar mascota KO", pathname || "");
+                setMascotPreviewOpen(true);
+              }}
               aria-label="Ampliar imagen"
             >
               <Image
@@ -297,7 +314,10 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
             <button
               type="button"
               className="tm-ko-normas-frame tm-ko-normas-trigger tm-circle-depth overflow-hidden rounded-md"
-              onClick={() => setRulesPreviewOpen(true)}
+              onClick={() => {
+                trackUsageModalOpen("ampliar-normas", "Ver normas eliminatorias", pathname || "");
+                setRulesPreviewOpen(true);
+              }}
               aria-label="Ver normas de eliminatorias"
             >
               <Image

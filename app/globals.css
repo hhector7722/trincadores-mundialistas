@@ -2200,8 +2200,8 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-ko-normas-frame {
-  max-width: min(25cqw, 5rem);
-  max-height: 6rem;
+  max-width: min(20cqw, 4.25rem);
+  max-height: 5rem;
   display: flex;
   justify-content: center;
 }
@@ -2218,7 +2218,7 @@ html:has(.tm-app-shell) body {
   display: block;
   width: auto;
   max-width: 100%;
-  max-height: 6rem;
+  max-height: 5rem;
   object-fit: contain;
 }
 
@@ -2227,7 +2227,7 @@ html:has(.tm-app-shell) body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.4);
+  color: #CCFF00;
 }
 
 .tm-ko-groups-nav {

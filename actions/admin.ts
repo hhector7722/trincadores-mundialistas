@@ -113,6 +113,41 @@ export async function submitMatchResult(
   return { ok: true };
 }
 
+export async function setMatchLive(
+  poolId: string,
+  matchId: string
+): Promise<AdminActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesion no valida." };
+  }
+
+  const admin = await isPoolAdmin(poolId, user.id);
+  if (!admin) {
+    return { ok: false, error: "No tienes permisos de administrador en esta porra." };
+  }
+
+  const { error } = await supabase
+    .from("matches")
+    .update({ status: "live" })
+    .eq("id", matchId)
+    .eq("status", "pending");
+
+  if (error) {
+    return { ok: false, error: error.message || "No se pudo marcar el partido como en juego." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/predictions");
+  revalidatePath(`/predictions/${matchId}`);
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export type TournamentOfficialAwardsPayload = {
   championTeam?: string | null;
   finalistTeamA?: string | null;
