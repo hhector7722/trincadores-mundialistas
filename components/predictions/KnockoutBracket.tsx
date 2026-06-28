@@ -52,7 +52,7 @@ const KO_MASCOT_SRC = "/icons/psoe.png";
 const RULES_IMG_SRC = "/icons/normas.jpeg";
 
 const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
-const NORMAS_CENTER_Y = gridRowToPercentY(13.8);
+const NORMAS_CENTER_Y = gridRowToPercentY(12.8);
 
 type TeamSlotLayout = {
   x: number;
@@ -155,14 +155,16 @@ function BracketMatchNode({
     : "empty";
   const isLive = match?.status === "live";
   const slots = teamSlotLayouts(geom);
-  const hasScore = savedHome != null && savedAway != null;
-  const homeWins = hasScore && savedHome > savedAway;
-  const awayWins = hasScore && savedAway > savedHome;
-  const scoreSummary = match ? formatListScore(savedHome, savedAway) : " ";
+  const isFinished = match?.status === "finished";
+  const displayHome = isFinished ? match?.officialHome : savedHome;
+  const displayAway = isFinished ? match?.officialAway : savedAway;
+  const hasScoreToDisplay = displayHome != null && displayAway != null;
+  const scoreSummary = hasScoreToDisplay ? formatListScore(displayHome, displayAway) : " ";
   const isSaved = state === "saved";
   const isFinal = geom.round === "final";
 
-  const scoreY = geom.midY;
+  // Colocar el marcador debajo de la bandera inferior (awayY)
+  const scoreY = geom.awayY ? geom.awayY + 3.2 : geom.midY + 4.8;
   const hitStyle: CSSProperties = isFinal
     ? {
         left: `${geom.columnX}%`,
@@ -198,7 +200,7 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={homeName}
         layout={slots.home}
-        isWinner={homeWins}
+        isWinner={isFinished ? (match?.officialHome != null && match?.officialAway != null && match.officialHome > match.officialAway) : (savedHome != null && savedAway != null && savedHome > savedAway)}
         isLive={isLive}
         isSaved={isSaved}
         side={geom.side}
@@ -206,14 +208,17 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={awayName}
         layout={slots.away}
-        isWinner={awayWins}
+        isWinner={isFinished ? (match?.officialHome != null && match?.officialAway != null && match.officialAway > match.officialHome) : (savedHome != null && savedAway != null && savedAway > savedHome)}
         isLive={isLive}
         isSaved={isSaved}
         side={geom.side}
       />
-      {hasScore ? (
+      {hasScoreToDisplay ? (
         <span
-          className="tm-ko-match-score"
+          className={cn(
+            "tm-ko-match-score",
+            !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
+          )}
           style={{ left: `${geom.columnX}%`, top: `${scoreY}%` }}
           aria-hidden
         >

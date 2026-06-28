@@ -2398,9 +2398,7 @@ html:has(.tm-app-shell) body {
   transform: translate(-50%, -50%);
   font-family: var(--font-display, inherit);
   font-size: clamp(5px, 1.35cqw, 7px);
-  font-weight: 800;
   line-height: 1;
-  color: var(--tm-fg);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
 }
 
