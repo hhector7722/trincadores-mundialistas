@@ -47,7 +47,7 @@ export const KO_CARD_SIZE_SCALE = 0.92;
 const ORB_HALF_Y = 1.3;
 
 /** Holgura mínima entre bordes de dos orbes del mismo enfrentamiento (% canvas Y). */
-const ORB_INNER_EDGE_GAP_Y = 4.8;
+const ORB_INNER_EDGE_GAP_Y = 3.0;
 
 /** Mitad de la separación centro-a-centro dentro de un enfrentamiento (% canvas Y). */
 export const ORB_PAIR_INNER_HALF_Y = ORB_HALF_Y + ORB_INNER_EDGE_GAP_Y / 2;
@@ -226,14 +226,14 @@ function pushR32Side(
     const { midY } = yFromGridRow(row);
     let columnX = mapColumnX(column);
     
-    // Las banderas mucho más juntas sin tocarse
-    const offsetX = 2.8; 
+    // Banderas interiores al límite antes de tocarse
+    const offsetX = 1.8; 
     
-    // Compensamos columnX para que la bandera exterior no se mueva respecto al offsetX anterior (3.8)
+    // Compensamos columnX para que la bandera exterior no se mueva (offset original era 3.8)
     if (side === "left") {
-      columnX -= 1.0;
+      columnX -= 2.0;
     } else {
-      columnX += 1.0;
+      columnX += 2.0;
     }
     
     out.push({

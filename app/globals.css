@@ -2811,7 +2811,8 @@ html:has(.tm-app-shell) body {
   margin-inline: auto;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-access-btn {
+.tm-porra-calendar .tm-cal-sidebar-access-btn,
+.tm-ko-page .tm-cal-sidebar-access-btn {
   display: flex;
   box-sizing: border-box;
   width: 100%;
@@ -2838,7 +2839,8 @@ html:has(.tm-app-shell) body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.tm-porra-calendar .tm-cal-sidebar-access-btn:hover {
+.tm-porra-calendar .tm-cal-sidebar-access-btn:hover,
+.tm-ko-page .tm-cal-sidebar-access-btn:hover {
   transform: translateY(-0.5px);
   box-shadow: 0 2px 10px rgba(204, 255, 0, 0.28);
 }
