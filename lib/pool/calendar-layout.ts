@@ -120,7 +120,7 @@ function findBusiestMatchCell(grid: HTMLElement): HTMLElement | null {
 }
 
 /** Altura uniforme de tarjetas según la celda con más partidos. */
-function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement, layoutRoot?: HTMLElement | null): number {
+function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number {
   calendar.style.setProperty("--tm-cal-match-gap", `${MATCH_CARD_GAP_PX}px`);
 
   const refCell = findBusiestMatchCell(grid);
@@ -136,17 +136,7 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement, layoutRo
     return 0;
   }
 
-  let listHeight = matchList.clientHeight;
-
-  if (calendar.classList.contains("tm-porra-calendar--auto-rows") && layoutRoot) {
-    const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
-    const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
-    const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
-    const theoreticalGridHeight = Math.max(0, layoutRoot.clientHeight - chromeHeight);
-    const theoreticalRowHeight = theoreticalGridHeight / 5; // Junio siempre tiene 5 semanas
-    const chromeCellHeight = refCell.clientHeight - matchList.clientHeight;
-    listHeight = theoreticalRowHeight - chromeCellHeight;
-  }
+  const listHeight = matchList.clientHeight;
 
   // Usar siempre al menos 4 partidos (el máximo del torneo en fase de grupos)
   // para que las tarjetas de Julio (con menos partidos) sean idénticas a las de Junio.
@@ -572,7 +562,35 @@ export function fitCalendarLayout(
 ): CalendarLayoutResult | null {
   if (rowCount <= 0) return null;
 
-  calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+  const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
+  const simulateJune = isAutoRows && layoutRoot != null;
+  const siblingsToHide: HTMLElement[] = [];
+
+  if (simulateJune) {
+    calendar.classList.remove("tm-porra-calendar--auto-rows");
+    calendar.classList.remove("shrink-0");
+    calendar.classList.add("flex-1");
+
+    let sibling = calendar.nextElementSibling;
+    while (sibling) {
+      if (sibling instanceof HTMLElement && sibling.style.display !== "none") {
+        siblingsToHide.push(sibling);
+        sibling.style.display = "none";
+      }
+      sibling = sibling.nextElementSibling;
+    }
+    sibling = calendar.previousElementSibling;
+    while (sibling) {
+      if (sibling instanceof HTMLElement && sibling.style.display !== "none") {
+        siblingsToHide.push(sibling);
+        sibling.style.display = "none";
+      }
+      sibling = sibling.previousElementSibling;
+    }
+  }
+
+  const effectiveRowCount = simulateJune ? 5 : rowCount;
+  calendar.style.setProperty("--tm-cal-weeks", String(effectiveRowCount));
 
   const gridHeight =
     layoutRoot != null ? syncCalendarGridHeight(calendar, grid, layoutRoot) : grid.clientHeight;
@@ -587,7 +605,7 @@ export function fitCalendarLayout(
     void calendar.offsetHeight;
   }
 
-  let matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
+  let matchCardHeight = syncMatchCardMetrics(calendar, grid);
   syncSidebarAccessSpacing(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
@@ -599,13 +617,25 @@ export function fitCalendarLayout(
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
-    matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
+    matchCardHeight = syncMatchCardMetrics(calendar, grid);
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
+  }
+
+  if (simulateJune) {
+    calendar.classList.add("tm-porra-calendar--auto-rows");
+    calendar.classList.add("shrink-0");
+    calendar.classList.remove("flex-1");
+    calendar.style.setProperty("--tm-cal-weeks", String(rowCount));
+    
+    for (const sibling of siblingsToHide) {
+      sibling.style.display = "";
+    }
+    void calendar.offsetHeight;
   }
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
