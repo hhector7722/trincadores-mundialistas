@@ -82,6 +82,7 @@ function gridHasOverflow(grid: HTMLElement): boolean {
 
 function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
   const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
+  let lo = MIN_UI_SCALE;
   let hi = isAutoRows ? 1.0 : MAX_UI_SCALE; // No escalar hacia arriba si no hay límite vertical
   let best = MIN_UI_SCALE;
 
