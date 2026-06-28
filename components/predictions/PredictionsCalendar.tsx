@@ -479,7 +479,7 @@ export function PredictionsCalendar({
           <button
             className={cn(
               "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
-              !isJune && "invisible pointer-events-none"
+              isJune && "invisible pointer-events-none"
             )}
             onClick={() => setCurrentMonthView({ year: 2026, month: 6 })}
           >
@@ -491,7 +491,7 @@ export function PredictionsCalendar({
           <button
             className={cn(
               "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
-              isJune && "invisible pointer-events-none"
+              !isJune && "invisible pointer-events-none"
             )}
             onClick={() => setCurrentMonthView({ year: 2026, month: 7 })}
           >
