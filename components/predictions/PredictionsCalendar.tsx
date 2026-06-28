@@ -260,7 +260,9 @@ function DayCell({
   hideDayNumber?: boolean;
   dockSurface?: boolean;
 }) {
-  if (!cell.inMonth) {
+  const forceShow = cell.dateKey === "2026-06-29" || cell.dateKey === "2026-06-30";
+  
+  if (!cell.inMonth && !forceShow) {
     return (
       <div
         style={style}
@@ -271,6 +273,7 @@ function DayCell({
   }
 
   const hasMatches = cell.matches.length > 0;
+  const isOutMonth = !cell.inMonth;
 
   return (
     <div
@@ -278,16 +281,19 @@ function DayCell({
       className={cn(
         "tm-cal-cell relative flex h-full min-h-0 flex-col",
         dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "tm-cal-cell-surface",
-        hasMatches && !dockSurface && "tm-cal-cell--matches"
+        hasMatches && !dockSurface && "tm-cal-cell--matches",
+        isOutMonth && "opacity-80"
       )}
     >
       {!hideDayNumber ? (
         <span
           className={cn(
-            "tm-cal-day-num shrink-0 font-semibold tabular-nums text-black"
+            "tm-cal-day-num shrink-0 font-semibold tabular-nums",
+            isOutMonth ? "text-[var(--tm-muted)] text-[0.7rem]" : "text-black"
           )}
         >
           {cell.dayNumber}
+          {isOutMonth && " Jun"}
         </span>
       ) : null}
       <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col justify-start">
