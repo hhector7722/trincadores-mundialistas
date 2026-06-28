@@ -247,7 +247,7 @@ function BracketMatchNode({
         <>
           <span
             className={cn(
-              "tm-ko-match-score",
+              "tm-ko-match-score font-normal",
               !isFinished ? "text-[#CCFF00]" : "text-white"
             )}
             style={{ left: `${slots.home.x}%`, top: `${homeScoreY}%` }}
@@ -257,7 +257,7 @@ function BracketMatchNode({
           </span>
           <span
             className={cn(
-              "tm-ko-match-score",
+              "tm-ko-match-score font-normal",
               !isFinished ? "text-[#CCFF00]" : "text-white"
             )}
             style={{ left: `${slots.away.x}%`, top: `${awayScoreY}%` }}
