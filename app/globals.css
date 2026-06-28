@@ -2285,11 +2285,11 @@ html:has(.tm-app-shell) body {
 @keyframes tm-ko-cup-float {
   0%,
   100% {
-    transform: translate(-50%, -100%) translateY(0);
+    transform: translate(-50%, -100%) translateY(-2px);
   }
 
   50% {
-    transform: translate(-50%, -100%) translateY(-0.35rem);
+    transform: translate(-50%, -100%) translateY(-0.5rem);
   }
 }
 

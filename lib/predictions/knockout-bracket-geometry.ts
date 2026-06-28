@@ -94,7 +94,7 @@ function yFromPairCenter(midY: number) {
 }
 
 /** Copa flotante: distancia sobre el centro de la final (% canvas). */
-export const FINAL_CUP_OFFSET_ABOVE_FINAL = 5.5;
+export const FINAL_CUP_OFFSET_ABOVE_FINAL = 0;
 
 /** Escalado visual por ronda (progresión suave). */
 export const ROUND_LAYOUT_SCALE: Record<BracketRoundKey, number> = {
