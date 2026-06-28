@@ -287,7 +287,7 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenAllGr
           >
             <button
               type="button"
-              className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-xl"
+              className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md"
               onClick={() => setMascotPreviewOpen(true)}
               aria-label="Ampliar imagen"
             >
