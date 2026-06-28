@@ -244,8 +244,8 @@ function pushR32Side(
       midY,
       homeY: midY,
       awayY: midY,
-      homeX: side === "left" ? columnX - offsetX : columnX + offsetX,
-      awayX: side === "left" ? columnX + offsetX : columnX - offsetX,
+      homeX: columnX - offsetX,
+      awayX: columnX + offsetX,
       columnX,
       layoutScale: ROUND_LAYOUT_SCALE.r32,
     });

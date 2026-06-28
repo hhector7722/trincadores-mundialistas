@@ -87,6 +87,7 @@ function BracketTeamOrb({
   teamName,
   layout,
   isWinner,
+  isFinished,
   isLive,
   isSaved,
   side,
@@ -94,6 +95,7 @@ function BracketTeamOrb({
   teamName: string;
   layout: TeamSlotLayout;
   isWinner?: boolean;
+  isFinished?: boolean;
   isLive?: boolean;
   isSaved?: boolean;
   side: "left" | "right" | "center";
@@ -120,7 +122,11 @@ function BracketTeamOrb({
         <span className="tm-ko-orb-label">{label}</span>
       ) : (
         <>
-          <TeamFlagBadge name={teamName} size="sm" className="tm-ko-orb-flag" />
+          <TeamFlagBadge 
+            name={teamName} 
+            size="sm" 
+            className={cn("tm-ko-orb-flag", isFinished && "opacity-40 grayscale-[40%]")} 
+          />
           <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
             {fullName}
           </span>
@@ -133,16 +139,34 @@ function BracketTeamOrb({
 function BracketMatchNode({
   geom,
   match,
+  matchMap,
   onOpen,
 }: {
   geom: BracketMatchGeometry;
   match: MatchWithPrediction | null;
+  matchMap: Map<number, MatchWithPrediction>;
   onOpen: (match: MatchWithPrediction) => void;
 }) {
   const fallback =
     geom.round === "r32" ? placeholderPairForMatchNumber(geom.matchNumber) : null;
-  const homeName = bracketSlotTeamName(match?.home_team ?? fallback?.home, geom.round);
-  const awayName = bracketSlotTeamName(match?.away_team ?? fallback?.away, geom.round);
+    
+  function resolveDynamicTeamName(raw: string | undefined | null): string {
+    let name = bracketSlotTeamName(raw, geom.round);
+    // Si es un W__ o L__, intentamos autocompletarlo localmente buscando el resultado del partido previo
+    if ((name.startsWith("W") || name.startsWith("L")) && !isNaN(Number(name.slice(1)))) {
+      const isLoser = name.startsWith("L");
+      const prevMatchNumber = Number(name.slice(1));
+      const prevMatch = matchMap.get(prevMatchNumber);
+      if (prevMatch && prevMatch.status === "finished" && prevMatch.officialHome != null && prevMatch.officialAway != null) {
+        if (prevMatch.officialHome > prevMatch.officialAway) name = isLoser ? prevMatch.away_team : prevMatch.home_team;
+        else if (prevMatch.officialAway > prevMatch.officialHome) name = isLoser ? prevMatch.home_team : prevMatch.away_team;
+      }
+    }
+    return name;
+  }
+
+  const homeName = resolveDynamicTeamName(match?.home_team ?? fallback?.home);
+  const awayName = resolveDynamicTeamName(match?.away_team ?? fallback?.away);
   const savedHome = match?.prediction?.home_goals ?? null;
   const savedAway = match?.prediction?.away_goals ?? null;
   const state = match
@@ -204,7 +228,8 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={homeName}
         layout={slots.home}
-        isWinner={isFinished ? (match?.officialHome != null && match?.officialAway != null && match.officialHome > match.officialAway) : (savedHome != null && savedAway != null && savedHome > savedAway)}
+        isWinner={!isFinished && savedHome != null && savedAway != null && savedHome > savedAway}
+        isFinished={isFinished}
         isLive={isLive}
         isSaved={isSaved}
         side={geom.side}
@@ -212,7 +237,8 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={awayName}
         layout={slots.away}
-        isWinner={isFinished ? (match?.officialHome != null && match?.officialAway != null && match.officialAway > match.officialHome) : (savedHome != null && savedAway != null && savedAway > savedHome)}
+        isWinner={!isFinished && savedHome != null && savedAway != null && savedAway > savedHome}
+        isFinished={isFinished}
         isLive={isLive}
         isSaved={isSaved}
         side={geom.side}
@@ -222,7 +248,7 @@ function BracketMatchNode({
           <span
             className={cn(
               "tm-ko-match-score",
-              !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
+              !isFinished ? "text-[#CCFF00]" : "text-white"
             )}
             style={{ left: `${slots.home.x}%`, top: `${homeScoreY}%` }}
             aria-hidden
@@ -232,7 +258,7 @@ function BracketMatchNode({
           <span
             className={cn(
               "tm-ko-match-score",
-              !isFinished ? "text-[#CCFF00] font-normal" : "text-white font-extrabold"
+              !isFinished ? "text-[#CCFF00]" : "text-white"
             )}
             style={{ left: `${slots.away.x}%`, top: `${awayScoreY}%` }}
             aria-hidden
@@ -337,7 +363,7 @@ export function KnockoutBracket({
                 className="tm-ko-normas-img"
               />
             </button>
-            <span className="tm-ko-normas-text">NORMAS</span>
+            <span className="tm-ko-normas-text">PUNTUACIÓN</span>
           </div>
 
           <svg
@@ -383,6 +409,7 @@ export function KnockoutBracket({
                 key={geom.matchNumber}
                 geom={geom}
                 match={resolveBracketMatch(matchMap, geom.matchNumber)}
+                matchMap={matchMap}
                 onOpen={handleOpenMatch}
               />
             ))}
