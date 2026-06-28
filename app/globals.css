@@ -2069,9 +2069,9 @@ html:has(.tm-app-shell) body {
 
 /* Cuadro KO premium móvil vertical */
 .tm-ko-page {
-  --tm-ko-wire: #00ffff;
-  --tm-ko-wire-pair: #00ffff;
-  --tm-ko-wire-final: #00ffff;
+  --tm-ko-wire: #d4b4ff;
+  --tm-ko-wire-pair: #d4b4ff;
+  --tm-ko-wire-final: #d4b4ff;
   --tm-ko-orb-size: min(4cqw, 1rem);
   --tm-ko-orb-pair-gap: min(2.5cqh, 0.6rem);
   --tm-ko-header-band: 10%;
@@ -2148,19 +2148,19 @@ html:has(.tm-app-shell) body {
 .tm-ko-wire {
   fill: none;
   stroke: var(--tm-ko-wire);
-  stroke-width: 1px;
+  stroke-width: 0.5px;
   stroke-linecap: square;
   stroke-linejoin: miter;
 }
 
 .tm-ko-wire--pair {
   stroke: var(--tm-ko-wire-pair);
-  stroke-width: 1px;
+  stroke-width: 0.5px;
 }
 
 .tm-ko-wire--final {
   stroke: var(--tm-ko-wire-final);
-  stroke-width: 1px;
+  stroke-width: 0.5px;
 }
 
 .tm-ko-perrete {
