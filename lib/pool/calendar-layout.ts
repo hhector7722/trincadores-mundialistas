@@ -81,8 +81,8 @@ function gridHasOverflow(grid: HTMLElement): boolean {
 }
 
 function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
-  let lo = MIN_UI_SCALE;
-  let hi = MAX_UI_SCALE;
+  const isAutoRows = calendar.classList.contains("tm-porra-calendar--auto-rows");
+  let hi = isAutoRows ? 1.0 : MAX_UI_SCALE; // No escalar hacia arriba si no hay límite vertical
   let best = MIN_UI_SCALE;
 
   for (let i = 0; i < SCALE_SEARCH_ITERATIONS; i++) {
@@ -136,10 +136,13 @@ function syncMatchCardMetrics(calendar: HTMLElement, grid: HTMLElement): number 
   }
 
   const listHeight = matchList.clientHeight;
-  const totalGap = MATCH_CARD_GAP_PX * Math.max(0, matchCount - 1);
+  // Usar siempre al menos 4 partidos (el máximo del torneo en fase de grupos)
+  // para que las tarjetas de Julio (con menos partidos) sean idénticas a las de Junio.
+  const layoutMatchCount = Math.max(4, matchCount);
+  const totalGap = MATCH_CARD_GAP_PX * Math.max(0, layoutMatchCount - 1);
   const cardHeight = Math.max(
     MIN_MATCH_CARD_HEIGHT_PX,
-    Math.floor((listHeight - totalGap) / matchCount)
+    Math.floor((listHeight - totalGap) / layoutMatchCount)
   );
 
   calendar.style.setProperty("--tm-cal-match-card-h", `${cardHeight}px`);

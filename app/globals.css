@@ -2370,20 +2370,21 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-porra-calendar--auto-rows .tm-cal-body {
-  /* Mismo tamaño exacto que las filas de Junio (3 semanas restando cabeceras) */
-  grid-template-rows: repeat(var(--tm-cal-weeks, 1), calc((100cqh - 75px) / 3));
+  grid-template-rows: repeat(var(--tm-cal-weeks, 1), auto);
   align-content: start;
   overflow-y: hidden;
 }
 
 .tm-porra-calendar--auto-rows .tm-cal-body > * {
-  height: 100%;
+  height: auto;
   min-height: 0;
 }
 
 .tm-porra-calendar--auto-rows .tm-cal-cell {
-  height: 100%;
+  height: auto;
 }
+
+
 
 .tm-porra-calendar .tm-cal-body > * {
   min-height: 0;
