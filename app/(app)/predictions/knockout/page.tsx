@@ -2,6 +2,7 @@ import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
 import { getPoolKnockoutMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
+import { isPoolAdmin } from "@/lib/pool/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,10 @@ export default async function KnockoutPredictionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const matches = await getPoolKnockoutMatchesWithPredictions(ctx.activePoolId, user!.id);
+  const [matches, isAdmin] = await Promise.all([
+    getPoolKnockoutMatchesWithPredictions(ctx.activePoolId, user!.id),
+    isPoolAdmin(ctx.activePoolId, user!.id)
+  ]);
 
   return (
     <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
@@ -26,6 +30,7 @@ export default async function KnockoutPredictionsPage() {
         poolId={ctx.activePoolId}
         matches={matches}
         currentProfileId={user!.id}
+        isAdminUser={isAdmin}
       />
     </div>
   );

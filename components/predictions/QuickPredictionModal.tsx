@@ -99,6 +99,8 @@ type QuickPredictionModalProps = {
   flagPlaceholderStyle?: "default" | "knockout";
   /** Necesario para abrir el tablero de pronósticos rivales (live/finalizado). */
   currentProfileId?: string;
+  /** Permite forzar el estado del partido a EN JUEGO (solo admins) */
+  isAdminUser?: boolean;
 };
 
 type DotPosition = "start" | "middle" | "end";
@@ -221,6 +223,7 @@ export function QuickPredictionModal({
   opaque = false,
   flagPlaceholderStyle = "default",
   currentProfileId,
+  isAdminUser = false,
 }: QuickPredictionModalProps) {
   const router = useRouter();
   const orderedMatches = useMemo(
@@ -228,12 +231,7 @@ export function QuickPredictionModal({
     [match, matches]
   );
 
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isSettingLive, setIsSettingLive] = useState(false);
-
-  useEffect(() => {
-    checkIsAdmin(poolId).then(setIsAdmin);
-  }, [poolId]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
@@ -699,7 +697,7 @@ export function QuickPredictionModal({
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
 
-              {isAdmin && !isLiveMatch && !isFinishedMatch && (
+              {isAdminUser && !isLiveMatch && !isFinishedMatch && (
                 <div className="flex justify-center -mt-2 mb-2 relative z-10">
                   <Button
                     type="button"

@@ -68,6 +68,7 @@ type PredictionsCalendarProps = {
   poolId: string;
   matches: MatchWithPrediction[];
   currentProfileId: string;
+  isAdminUser?: boolean;
 };
 
 function isSidebarCardAnchorMatch(match: MatchWithPrediction): boolean {
@@ -376,11 +377,11 @@ function useCalendarViewportLayout(
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
-
 export function PredictionsCalendar({
   poolId,
   matches,
   currentProfileId,
+  isAdminUser = false,
 }: PredictionsCalendarProps) {
   const [layoutReady, setLayoutReady] = useState(false);
   const [currentMonthView, setCurrentMonthView] = useState<MonthYear>({ year: 2026, month: 7 });
@@ -644,6 +645,7 @@ export function PredictionsCalendar({
           match={activeMatch}
           matches={localMatches}
           currentProfileId={currentProfileId}
+          isAdminUser={isAdminUser}
           onMatchChange={setActiveMatch}
           onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>

@@ -4,6 +4,7 @@ import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-acce
 import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
+import { isPoolAdmin } from "@/lib/pool/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,10 @@ export default async function PredictionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const matches = await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id);
+  const [matches, isAdmin] = await Promise.all([
+    getPoolMatchesWithPredictions(ctx.activePoolId, user!.id),
+    isPoolAdmin(ctx.activePoolId, user!.id)
+  ]);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -30,6 +34,7 @@ export default async function PredictionsPage() {
           poolId={ctx.activePoolId}
           matches={matches}
           currentProfileId={user!.id}
+          isAdminUser={isAdmin}
         />
       </div>
     </div>

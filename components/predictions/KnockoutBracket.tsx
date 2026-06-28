@@ -43,7 +43,8 @@ import { cn } from "@/lib/utils";
 type KnockoutBracketProps = {
   poolId: string;
   matches: MatchWithPrediction[];
-  currentProfileId: string;
+  currentProfileId?: string;
+  isAdminUser?: boolean;
   onOpenMatch?: (match: MatchWithPrediction) => void;
 };
 
@@ -244,7 +245,13 @@ function BracketMatchNode({
   );
 }
 
-export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch }: KnockoutBracketProps) {
+export function KnockoutBracket({ 
+  poolId, 
+  matches, 
+  currentProfileId, 
+  isAdminUser = false,
+  onOpenMatch 
+}: KnockoutBracketProps) {
   const pathname = usePathname();
   const pageRef = useRef<HTMLDivElement>(null);
   const { navigate } = useAppNavigation();
@@ -403,6 +410,7 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
           poolId={poolId}
           match={activeMatch}
           currentProfileId={currentProfileId}
+          isAdminUser={isAdminUser}
           flagPlaceholderStyle="knockout"
           onMvpSaved={(matchId, playerName, teamName, shirtNumber) => {
             const patch = (current: MatchWithPrediction) =>
