@@ -28,14 +28,13 @@ function generateHeadline(highlight: MatchHighlightView): string {
   if (isPenalty) {
     const homeWon = penaltyHome > penaltyAway;
     const winnerName = homeWon ? homeName : awayName;
-    const loserName = homeWon ? awayName : homeName;
-    return `${winnerName} gana en la tanda de penaltis a ${loserName} y pasa a la siguiente ronda.`;
+    return `${winnerName} gana en la tanda de penaltis y pasa a la siguiente ronda.`;
   }
 
   if (homeGoals > awayGoals) {
-    return `${homeName} gana ${homeGoals} - ${awayGoals} a ${awayName} y pasa a la siguiente ronda.`;
+    return `${homeName} gana ${homeGoals} - ${awayGoals} y pasa a la siguiente ronda.`;
   } else if (awayGoals > homeGoals) {
-    return `${awayName} gana ${awayGoals} - ${homeGoals} a ${homeName} y pasa a la siguiente ronda.`;
+    return `${awayName} gana ${awayGoals} - ${homeGoals} y pasa a la siguiente ronda.`;
   } else {
     return `Resumen del partido entre ${homeName} y ${awayName}`;
   }

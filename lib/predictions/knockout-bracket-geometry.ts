@@ -349,8 +349,7 @@ export function buildPairCentersInBand(matchCount: number): readonly number[] {
 
 function connectChildToParent(
   child: BracketMatchGeometry,
-  parent: BracketMatchGeometry,
-  targetY: number
+  parent: BracketMatchGeometry
 ): string {
   const isLeft = child.side === "left";
   const xVertical =
@@ -360,7 +359,7 @@ function connectChildToParent(
   const xStart = connectorEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = connectorEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
-  return `M ${xStart} ${child.midY} H ${xVertical} V ${targetY} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
 }
 
 function connectSemiToFinal(
@@ -388,30 +387,27 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    // Eliminado: línea que unía las banderas de los equipos enfrentados verticalmente
-    // if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
-    //   segments.push({
-    //     d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
-    //     variant: "pair",
-    //   });
-    // }
-
-    if (!geom.childMatches) continue;
-
-    const childA = byNumber.get(geom.childMatches[0]);
-    if (childA) {
+    // Línea horizontal que cruza el nodo para dar continuidad al bracket
+    if (geom.round !== "r32") {
+      const isLeft = geom.side === "left";
+      const leftEdge = connectorEdgeX(geom.columnX, "left", geom.layoutScale);
+      const rightEdge = connectorEdgeX(geom.columnX, "right", geom.layoutScale);
       segments.push({
-        d: connectChildToParent(childA, geom, geom.homeY),
-        variant: "default",
+        d: `M ${leftEdge} ${geom.midY} H ${rightEdge}`,
+        variant: "pair",
       });
     }
 
-    const childB = byNumber.get(geom.childMatches[1]);
-    if (childB) {
-      segments.push({
-        d: connectChildToParent(childB, geom, geom.awayY),
-        variant: "default",
-      });
+    if (!geom.childMatches) continue;
+
+    for (const childNumber of geom.childMatches) {
+      const child = byNumber.get(childNumber);
+      if (child) {
+        segments.push({
+          d: connectChildToParent(child, geom),
+          variant: "default",
+        });
+      }
     }
   }
 

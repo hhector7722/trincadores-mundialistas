@@ -24,7 +24,7 @@ export function MatchPredictionsBoardLegend({
   isKnockout?: boolean;
 }) {
   return (
-    <div className={cn("shrink-0 px-3", className)}>
+    <div className={cn("shrink-0 px-3 flex flex-col items-center justify-center gap-y-1.5", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] leading-tight text-[var(--tm-muted)]">
         {isKnockout ? (
           <>
@@ -78,6 +78,8 @@ export function MatchPredictionsBoardLegend({
             />
           </>
         )}
+      </ul>
+      <ul className="flex items-center justify-center text-[10px] leading-tight text-[var(--tm-muted)]">
         <LegendItem icons={<PredictionOutcomeIcon variant="mvp" />} label="MVP" />
       </ul>
     </div>
