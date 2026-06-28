@@ -48,9 +48,11 @@ type KnockoutBracketProps = {
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
-/** Posición superior para la mascota, justo sin pisar el límite. */
-const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
 const KO_MASCOT_SRC = "/icons/psoe.png";
+const RULES_IMG_SRC = "/images/normas-eliminatorias.png";
+
+const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
+const NORMAS_CENTER_Y = gridRowToPercentY(13.8);
 
 type TeamSlotLayout = {
   x: number;
@@ -228,6 +230,7 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
+  const [rulesPreviewOpen, setRulesPreviewOpen] = useState(false);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
   const handleOpenMatch = onOpenMatch ?? setActiveMatch;
 
@@ -277,6 +280,30 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
                 priority
               />
             </button>
+          </div>
+
+          <div
+            className="tm-ko-normas"
+            style={{
+              left: "50%",
+              top: `${NORMAS_CENTER_Y}%`,
+            }}
+          >
+            <button
+              type="button"
+              className="tm-ko-normas-frame tm-ko-normas-trigger tm-circle-depth overflow-hidden rounded-md"
+              onClick={() => setRulesPreviewOpen(true)}
+              aria-label="Ver normas de eliminatorias"
+            >
+              <Image
+                src={RULES_IMG_SRC}
+                alt="Normas de Eliminatorias"
+                width={1080}
+                height={1920}
+                className="tm-ko-normas-img"
+              />
+            </button>
+            <span className="tm-ko-normas-text">NORMAS</span>
           </div>
 
           <svg
@@ -333,6 +360,12 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenMatch
         open={mascotPreviewOpen}
         onClose={() => setMascotPreviewOpen(false)}
         src={KO_MASCOT_SRC}
+      />
+
+      <ImageLightboxModal
+        open={rulesPreviewOpen}
+        onClose={() => setRulesPreviewOpen(false)}
+        src={RULES_IMG_SRC}
       />
 
       {!onOpenMatch && activeMatch ? (

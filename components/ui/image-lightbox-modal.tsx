@@ -37,14 +37,6 @@ export function ImageLightboxModal({
       )}
     >
       <div className="relative inline-block max-w-full">
-        <button
-          type="button"
-          aria-label="Cerrar modal"
-          onClick={onClose}
-          className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/65"
-        >
-          <X className="h-5 w-5" aria-hidden />
-        </button>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} className={LIGHTBOX_IMAGE_CLASS} />
       </div>
