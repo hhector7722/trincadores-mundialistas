@@ -2370,6 +2370,21 @@ html:has(.tm-app-shell) body {
   border-left: var(--tm-cal-grid-line-width) solid var(--tm-cal-grid-line);
 }
 
+.tm-porra-calendar--auto-rows .tm-cal-body {
+  grid-template-rows: repeat(var(--tm-cal-weeks, 1), auto);
+  align-content: start;
+  overflow-y: auto;
+}
+
+.tm-porra-calendar--auto-rows .tm-cal-body > * {
+  height: auto;
+  min-height: 100px; /* Minimum cell height to look decent */
+}
+
+.tm-porra-calendar--auto-rows .tm-cal-cell {
+  height: auto;
+}
+
 .tm-porra-calendar .tm-cal-body > * {
   min-height: 0;
   height: 100%;

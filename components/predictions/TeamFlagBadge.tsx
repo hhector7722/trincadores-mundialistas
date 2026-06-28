@@ -81,9 +81,11 @@ export function TeamFlagBadge({
         shape === "rect" ? "rounded-[2px]" : "rounded-full",
         size === "text" && shape === "circle"
           ? "border border-white/30 bg-white"
-          : shape === "rect"
-            ? "tm-rect-flag-depth"
-            : "tm-circle-depth",
+          : !flagCode
+            ? "bg-transparent border border-dashed border-[var(--tm-border)]"
+            : shape === "rect"
+              ? "tm-rect-flag-depth"
+              : "tm-circle-depth",
         dim,
         className
       )}
