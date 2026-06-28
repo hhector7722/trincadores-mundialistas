@@ -226,14 +226,14 @@ function pushR32Side(
     const { midY } = yFromGridRow(row);
     let columnX = mapColumnX(column);
     
-    // Banderas interiores al límite antes de tocarse
-    const offsetX = 1.8; 
+    // Ajuste: movemos las banderas exteriores más hacia el borde sin que se corten (3.55% del borde),
+    // y mantenemos las banderas interiores exactamente en la posición que tenían.
+    const offsetX = 2.2; 
     
-    // Compensamos columnX para que la bandera exterior no se mueva (offset original era 3.8)
     if (side === "left") {
-      columnX -= 2.0;
+      columnX -= 2.4;
     } else {
-      columnX += 2.0;
+      columnX += 2.4;
     }
     
     out.push({
