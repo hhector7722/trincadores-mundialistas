@@ -2279,13 +2279,12 @@ html:has(.tm-app-shell) body {
   display: block;
   width: min(11cqw, 2.6rem);
   height: auto;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
 }
 
 @keyframes tm-ko-cup-float {
   0%,
   100% {
-    transform: translate(-50%, -100%) translateY(-2px);
+    transform: translate(-50%, -100%) translateY(1px);
   }
 
   50% {

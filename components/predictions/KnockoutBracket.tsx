@@ -54,7 +54,7 @@ const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 const KO_MASCOT_SRC = "/icons/psoe.png";
 const RULES_IMG_SRC = "/icons/normas.png";
 
-const PERRETE_CENTER_Y = gridRowToPercentY(1.3);
+const PERRETE_CENTER_Y = gridRowToPercentY(1.7);
 const NORMAS_CENTER_Y = gridRowToPercentY(12.8);
 
 type TeamSlotLayout = {
@@ -127,7 +127,7 @@ function BracketTeamOrb({
           <TeamFlagBadge 
             name={teamName} 
             size="sm" 
-            className={cn("tm-ko-orb-flag", isFinished && "opacity-50 saturate-50")}
+            className={cn("tm-ko-orb-flag", isFinished && "brightness-[0.4] contrast-125 grayscale-[0.5]")}
           />
           <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
             {fullName}
