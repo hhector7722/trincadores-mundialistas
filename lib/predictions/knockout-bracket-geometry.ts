@@ -25,15 +25,15 @@ export const COL_R32_RIGHT = 9;
 
 /**
  * Banda superior equivalente a la cabecera del calendario (mes + días de la semana).
- * Se reduce a 0 para que empiece inmediatamente.
+ * Los dieciseisavos no deben invadir esta zona.
  */
-export const BRACKET_HEADER_BAND_Y = 0;
+export const BRACKET_HEADER_BAND_Y = 10;
 
 /** Banda inferior del canvas reservada para el botón «Ver fase Prévia». */
-export const BRACKET_FOOTER_BAND_Y = 4;
+export const BRACKET_FOOTER_BAND_Y = 10;
 
 /** Margen extra bajo la cabecera para que la tarjeta no se recorte (translate -50%). */
-const R32_TOP_CLEARANCE_Y = 3.5;
+const R32_TOP_CLEARANCE_Y = 2;
 
 /** Ancla inferior: fila 15 de la rejilla guía. */
 export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;

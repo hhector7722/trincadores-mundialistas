@@ -2150,7 +2150,7 @@ html:has(.tm-app-shell) body {
 }
 
 .tm-ko-perrete-frame {
-  width: min(24cqw, 6rem);
+  width: min(34cqw, 8rem);
 }
 
 .tm-ko-perrete-trigger {
@@ -2378,7 +2378,7 @@ html:has(.tm-app-shell) body {
 
 .tm-porra-calendar--auto-rows .tm-cal-body > * {
   height: auto;
-  min-height: 60px; /* Reducido para optimizar espacio */
+  min-height: 100px; /* Minimum cell height to look decent */
 }
 
 .tm-porra-calendar--auto-rows .tm-cal-cell {
@@ -2859,10 +2859,6 @@ html:has(.tm-app-shell) body {
   overflow: hidden;
   justify-content: flex-start;
   align-content: flex-start;
-}
-
-.tm-porra-calendar--auto-rows .tm-cal-match-list {
-  gap: 2px;
 }
 
 .tm-porra-calendar .tm-cal-groups-panel {
