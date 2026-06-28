@@ -2069,9 +2069,9 @@ html:has(.tm-app-shell) body {
 
 /* Cuadro KO premium móvil vertical */
 .tm-ko-page {
-  --tm-ko-wire: rgba(255, 255, 255, 0.24);
-  --tm-ko-wire-pair: rgba(255, 255, 255, 0.2);
-  --tm-ko-wire-final: rgba(255, 255, 255, 0.3);
+  --tm-ko-wire: #00ffff;
+  --tm-ko-wire-pair: #00ffff;
+  --tm-ko-wire-final: #00ffff;
   --tm-ko-orb-size: min(4cqw, 1rem);
   --tm-ko-orb-pair-gap: min(2.5cqh, 0.6rem);
   --tm-ko-header-band: 10%;
