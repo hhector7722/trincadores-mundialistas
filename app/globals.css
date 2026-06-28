@@ -296,10 +296,6 @@ html:has(.tm-app-header--compact) {
 .tm-app-tabbar {
   box-sizing: border-box;
   bottom: 0;
-  transform: translate3d(0, calc(-1 * var(--tm-chrome-bottom, 0px)), 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: transform;
   transition: filter var(--tm-modal-exit-ms) var(--tm-ios-ease-out),
               opacity var(--tm-modal-exit-ms) var(--tm-ios-ease-out);
 }
