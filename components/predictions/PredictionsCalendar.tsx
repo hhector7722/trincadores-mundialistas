@@ -378,7 +378,7 @@ function useCalendarViewportLayout(
   }, [rootRef, calendarRef, gridRef, rowCount]);
 }
 function resolveKnockoutTeams(matches: MatchWithPrediction[]): MatchWithPrediction[] {
-  const sorted = [...matches].sort((a, b) => a.match_number - b.match_number);
+  const sorted = [...matches].sort((a, b) => (a.match_number || 0) - (b.match_number || 0));
   const matchMap = new Map<number, MatchWithPrediction>();
 
   for (const m of sorted) {
@@ -407,10 +407,12 @@ function resolveKnockoutTeams(matches: MatchWithPrediction[]): MatchWithPredicti
       home_team: resolvedHome || m.home_team,
       away_team: resolvedAway || m.away_team,
     };
-    matchMap.set(m.match_number, updatedMatch);
+    if (m.match_number != null) {
+      matchMap.set(m.match_number, updatedMatch);
+    }
   }
 
-  return matches.map(m => matchMap.get(m.match_number) || m);
+  return matches.map(m => (m.match_number != null ? matchMap.get(m.match_number) : undefined) || m);
 }
 
 export function PredictionsCalendar({
