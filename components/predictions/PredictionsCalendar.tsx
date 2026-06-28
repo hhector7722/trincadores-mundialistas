@@ -259,7 +259,10 @@ function DayCell({
   hideDayNumber?: boolean;
   dockSurface?: boolean;
 }) {
-  if (!cell.inMonth) {
+  const isPad = !cell.inMonth;
+  const hasMatches = cell.matches.length > 0;
+
+  if (isPad && !hasMatches) {
     return (
       <div
         style={style}
@@ -269,21 +272,21 @@ function DayCell({
     );
   }
 
-  const hasMatches = cell.matches.length > 0;
-
   return (
     <div
       style={style}
       className={cn(
         "tm-cal-cell relative flex h-full min-h-0 flex-col",
         dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "tm-cal-cell-surface",
-        hasMatches && !dockSurface && "tm-cal-cell--matches"
+        hasMatches && !dockSurface && "tm-cal-cell--matches",
+        isPad && "opacity-80"
       )}
     >
-      {!hideDayNumber ? (
+      {!hideDayNumber && cell.dayNumber != null ? (
         <span
           className={cn(
-            "tm-cal-day-num shrink-0 font-semibold tabular-nums text-black"
+            "tm-cal-day-num shrink-0 font-semibold tabular-nums",
+            isPad ? "text-[var(--tm-muted)]" : "text-black"
           )}
         >
           {cell.dayNumber}

@@ -173,8 +173,14 @@ export function buildMonthGrid<T extends CalendarMatchLike>(
   const daysInMonth = new Date(year, month, 0).getDate();
   const cells: CalendarCell<T>[] = [];
 
+  const prevMonthDays = new Date(year, month - 1, 0).getDate();
   for (let i = 0; i < firstWeekday; i++) {
-    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] as T[] });
+    const prevDay = prevMonthDays - firstWeekday + i + 1;
+    const prevMonth = month - 1;
+    const prevYear = prevMonth === 0 ? year - 1 : year;
+    const m = prevMonth === 0 ? 12 : prevMonth;
+    const dateKey = `${prevYear}-${String(m).padStart(2, "0")}-${String(prevDay).padStart(2, "0")}`;
+    cells.push({ dateKey, dayNumber: prevDay, inMonth: false, matches: matchesByDate.get(dateKey) ?? [] });
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -187,8 +193,14 @@ export function buildMonthGrid<T extends CalendarMatchLike>(
     });
   }
 
+  let nextDay = 1;
   while (cells.length % 7 !== 0) {
-    cells.push({ dateKey: null, dayNumber: null, inMonth: false, matches: [] as T[] });
+    const nextMonth = month + 1;
+    const nextYear = nextMonth === 13 ? year + 1 : year;
+    const m = nextMonth === 13 ? 1 : nextMonth;
+    const dateKey = `${nextYear}-${String(m).padStart(2, "0")}-${String(nextDay).padStart(2, "0")}`;
+    cells.push({ dateKey, dayNumber: nextDay, inMonth: false, matches: matchesByDate.get(dateKey) ?? [] });
+    nextDay++;
   }
 
   const weeks: CalendarWeek<T>[] = [];
@@ -221,22 +233,12 @@ export function trimEmptyMatchWeeks<T extends CalendarMatchLike>(
     end--;
   }
 
-  // Junio: eliminar la última fila sin partidos de fase de grupos.
-  if (viewMonth?.month === 6) {
-    let juneEnd = weeks.length;
-    let removed = 0;
-
-    while (removed < 1 && juneEnd > start) {
-      const week = weeks[juneEnd - 1]!;
-      if (!weekHasMatches(week)) {
-        juneEnd--;
-        removed++;
-      } else {
-        break;
-      }
-    }
-
-    end = Math.min(end, juneEnd);
+  // Junio: eliminar explícitamente la semana que empieza el 29 de junio
+  if (viewMonth?.month === 6 && viewMonth?.year === 2026) {
+    const filteredWeeks = weeks.slice(start, end).filter(week => {
+      return week.cells[0]?.dateKey !== "2026-06-29";
+    });
+    return filteredWeeks;
   }
 
   return weeks.slice(start, end);
