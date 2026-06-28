@@ -148,11 +148,13 @@ export async function setMatchLive(
   return { ok: true };
 }
 
-export async function checkIsAdmin(poolId: string): Promise<boolean> {
+export async function checkIsHector(): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
-  return isPoolAdmin(poolId, user.id);
+  const { data } = await supabase.from("profiles").select("username").eq("id", user.id).single();
+  const username = data?.username?.toLowerCase();
+  return username === "hector" || username === "hhector7722";
 }
 
 export type TournamentOfficialAwardsPayload = {

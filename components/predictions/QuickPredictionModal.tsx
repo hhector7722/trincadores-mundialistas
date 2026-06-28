@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type 
 import { fetchMatchLineupsStatusAction } from "@/actions/lineup";
 import { deleteMvpPrediction, saveMvpPrediction } from "@/actions/mvp-predictions";
 import { savePrediction } from "@/actions/predictions";
-import { checkIsAdmin, setMatchLive } from "@/actions/admin";
+import { setMatchLive, checkIsHector } from "@/actions/admin";
 import {
   buildLineupView,
   buildMvpView,
@@ -231,7 +231,12 @@ export function QuickPredictionModal({
     [match, matches]
   );
 
+  const [isHector, setIsHector] = useState(false);
   const [isSettingLive, setIsSettingLive] = useState(false);
+
+  useEffect(() => {
+    checkIsHector().then(setIsHector);
+  }, []);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lineupFormation, setLineupFormation] = useState<string | undefined>();
@@ -697,7 +702,7 @@ export function QuickPredictionModal({
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
 
-              {isAdminUser && !isLiveMatch && !isFinishedMatch && (
+              {isHector && (
                 <div className="flex justify-center -mt-2 mb-2 relative z-10">
                   <Button
                     type="button"
@@ -706,7 +711,7 @@ export function QuickPredictionModal({
                     disabled={isSettingLive}
                     className="h-7 text-xs border-[var(--tm-danger)] text-[var(--tm-danger)] hover:bg-[var(--tm-danger)] hover:text-white"
                   >
-                    {isSettingLive ? "Marcando..." : "ADMIN: Forzar EN JUEGO"}
+                    {isSettingLive ? "Marcando..." : "HECTOR: Forzar EN JUEGO"}
                   </Button>
                 </div>
               )}
