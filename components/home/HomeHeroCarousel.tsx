@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { MatchHighlightBlock } from "@/components/highlights/MatchHighlightBlock";
 import type { MatchHighlightView } from "@/lib/highlights/types";
 import { cn } from "@/lib/utils";
+import { teamNameEs } from "@/lib/teams/display";
 
 type HomeHeroCarouselProps = {
   matchHighlights: MatchHighlightView[];
@@ -17,6 +18,29 @@ function resolveActiveDotIndex(activeIndex: number, focusIndex: number): number 
   return 1;
 }
 
+function generateHeadline(highlight: MatchHighlightView): string {
+  const { homeTeam, awayTeam, homeGoals, awayGoals, penaltyHome, penaltyAway } = highlight;
+  const homeName = teamNameEs(homeTeam);
+  const awayName = teamNameEs(awayTeam);
+
+  const isPenalty = penaltyHome != null && penaltyAway != null && penaltyHome !== penaltyAway;
+
+  if (isPenalty) {
+    const homeWon = penaltyHome > penaltyAway;
+    const winnerName = homeWon ? homeName : awayName;
+    const loserName = homeWon ? awayName : homeName;
+    return `${winnerName} gana en la tanda de penaltis a ${loserName} y pasa a la siguiente ronda.`;
+  }
+
+  if (homeGoals > awayGoals) {
+    return `${homeName} gana ${homeGoals} - ${awayGoals} a ${awayName} y pasa a la siguiente ronda.`;
+  } else if (awayGoals > homeGoals) {
+    return `${awayName} gana ${awayGoals} - ${homeGoals} a ${homeName} y pasa a la siguiente ronda.`;
+  } else {
+    return `Resumen del partido entre ${homeName} y ${awayName}`;
+  }
+}
+
 function highlightToSlideBody(highlight: MatchHighlightView) {
   return (
     <MatchHighlightBlock
@@ -26,7 +50,7 @@ function highlightToSlideBody(highlight: MatchHighlightView) {
       awayTeam={highlight.awayTeam}
       youtubeVideoId={highlight.youtubeVideoId}
       highlightSource={highlight.source}
-      headline={highlight.headline}
+      headline={generateHeadline(highlight)}
     />
   );
 }

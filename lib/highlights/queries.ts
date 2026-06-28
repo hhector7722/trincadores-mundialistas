@@ -9,7 +9,7 @@ type HighlightRow = {
   highlight_youtube_id: string;
   highlight_published_at: string;
   highlight_source: HighlightSourceCode;  highlight_headline: string | null;
-  match_results: { home_goals: number; away_goals: number } | { home_goals: number; away_goals: number }[] | null;
+  match_results: { home_goals: number; away_goals: number; penalty_home: number | null; penalty_away: number | null } | { home_goals: number; away_goals: number; penalty_home: number | null; penalty_away: number | null }[] | null;
   match_live_state: { home_score: number; away_score: number } | { home_score: number; away_score: number }[] | null;
 };
 
@@ -42,6 +42,8 @@ function rowToHighlightView(
     awayTeam: row.away_team,
     homeGoals,
     awayGoals,
+    penaltyHome: result?.penalty_home ?? null,
+    penaltyAway: result?.penalty_away ?? null,
     youtubeVideoId: row.highlight_youtube_id,
     publishedAt: row.highlight_published_at,
     source: row.highlight_source,
@@ -77,7 +79,7 @@ export async function getMatchHighlightsForPool(poolId: string): Promise<MatchHi
       highlight_published_at,
       highlight_source,
       highlight_headline,
-      match_results ( home_goals, away_goals ),
+      match_results ( home_goals, away_goals, penalty_home, penalty_away ),
       match_live_state ( home_score, away_score )
     `,
     )

@@ -12,6 +12,8 @@ export type MatchHighlightView = {
   awayTeam: string;
   homeGoals: number;
   awayGoals: number;
+  penaltyHome: number | null;
+  penaltyAway: number | null;
   youtubeVideoId: string;
   publishedAt: string;
   source: HighlightSourceCode;

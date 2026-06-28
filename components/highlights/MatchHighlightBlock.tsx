@@ -41,7 +41,7 @@ export function MatchHighlightBlock({
       <div className={cn("flex flex-col", className)}>
         {variant === "hero" ? (
           <div className="flex w-full min-w-0 flex-col gap-1">
-            <div className="tm-hero-highlight-meta-row w-full min-w-0 mb-1">
+            <div className="tm-hero-highlight-meta-row w-full min-w-0">
               <span className="tm-hero-highlight-pill whitespace-nowrap">
                 <img
                   src="/icons/youtube-play.png"
@@ -55,14 +55,9 @@ export function MatchHighlightBlock({
                 <span className="tm-hero-highlight-pill-label">HIGHLIGHTS</span>
               </span>
             </div>
-            <p className="text-left text-[clamp(11px,3cqw,13px)] font-bold text-white mb-0.5 leading-tight">
-              {title}
+            <p className="line-clamp-2 text-left text-[clamp(8px,2.2cqw,9px)] font-medium leading-snug text-white/75">
+              {headline?.trim() || `Resumen del partido`}
             </p>
-            {headline?.trim() ? (
-              <p className="line-clamp-2 text-left text-[clamp(8px,2.2cqw,9px)] font-medium leading-snug text-white/75 mb-1.5">
-                {headline.trim()}
-              </p>
-            ) : null}
             <MatchHighlightThumbnail
               videoId={youtubeVideoId}
               title={title}

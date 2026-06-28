@@ -349,7 +349,8 @@ export function buildPairCentersInBand(matchCount: number): readonly number[] {
 
 function connectChildToParent(
   child: BracketMatchGeometry,
-  parent: BracketMatchGeometry
+  parent: BracketMatchGeometry,
+  targetY: number
 ): string {
   const isLeft = child.side === "left";
   const xVertical =
@@ -359,7 +360,7 @@ function connectChildToParent(
   const xStart = connectorEdgeX(child.columnX, isLeft ? "right" : "left", child.layoutScale);
   const xEnd = connectorEdgeX(parent.columnX, isLeft ? "left" : "right", parent.layoutScale);
 
-  return `M ${xStart} ${child.midY} H ${xVertical} V ${parent.midY} H ${xEnd}`;
+  return `M ${xStart} ${child.midY} H ${xVertical} V ${targetY} H ${xEnd}`;
 }
 
 function connectSemiToFinal(
@@ -387,24 +388,30 @@ export function buildBracketConnectorPaths(
   for (const geom of geoms) {
     if (geom.round === "final") continue;
 
-    // Línea que une las banderas de los equipos enfrentados
-    if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
-      segments.push({
-        d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
-        variant: "pair",
-      });
-    }
+    // Eliminado: línea que unía las banderas de los equipos enfrentados verticalmente
+    // if (Math.abs(geom.homeY - geom.awayY) > 0.01) {
+    //   segments.push({
+    //     d: `M ${geom.columnX} ${geom.homeY} V ${geom.awayY}`,
+    //     variant: "pair",
+    //   });
+    // }
 
     if (!geom.childMatches) continue;
 
-    for (const childNumber of geom.childMatches) {
-      const child = byNumber.get(childNumber);
-      if (child) {
-        segments.push({
-          d: connectChildToParent(child, geom),
-          variant: "default",
-        });
-      }
+    const childA = byNumber.get(geom.childMatches[0]);
+    if (childA) {
+      segments.push({
+        d: connectChildToParent(childA, geom, geom.homeY),
+        variant: "default",
+      });
+    }
+
+    const childB = byNumber.get(geom.childMatches[1]);
+    if (childB) {
+      segments.push({
+        d: connectChildToParent(childB, geom, geom.awayY),
+        variant: "default",
+      });
     }
   }
 
