@@ -2606,6 +2606,7 @@ html:has(.tm-app-shell) body {
   font-size: 0.4375rem;
   line-height: 1;
   flex-shrink: 0;
+  padding-top: 1px;
 }
 
 .tm-porra-calendar .tm-cal-prediction {

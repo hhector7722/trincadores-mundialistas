@@ -6,8 +6,7 @@ import { useAppNavigation } from "@/components/layout/NavigationLoadingProvider"
 import { useKnockoutViewportLayout } from "@/components/predictions/useKnockoutViewportLayout";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { ImageLightboxModal } from "@/components/ui/image-lightbox-modal";
-import { CalendarDataAccessModal } from "@/components/predictions/CalendarDataAccessModal";
-import type { CalendarModalOpener } from "@/lib/predictions/calendar-data-access";
+
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
 import {
@@ -15,7 +14,6 @@ import {
   resolvePredictionUiState,
 } from "@/lib/predictions/edit-state";
 import {
-  BRACKET_GRID_ROWS,
   buildBracketConnectorPaths,
   buildBracketGeometry,
   FINAL_CENTER_X,
@@ -44,35 +42,13 @@ type KnockoutBracketProps = {
   poolId: string;
   matches: MatchWithPrediction[];
   currentProfileId: string;
-  onOpenAllGroups?: CalendarModalOpener;
-  onOpenStats?: CalendarModalOpener;
-  onOpenSquads?: CalendarModalOpener;
 };
-
-function wrapDataAccessOpen(
-  setDataAccessOpen: (open: boolean) => void,
-  openChild: CalendarModalOpener
-): CalendarModalOpener {
-  return (options) => {
-    setDataAccessOpen(false);
-    queueMicrotask(() => {
-      openChild({
-        fromDataAccess: true,
-        reopenDataAccess: () => setDataAccessOpen(true),
-        stackElevated: true,
-        ...options,
-      });
-    });
-  };
-}
 
 const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 /** Posición superior para la mascota, justo sin pisar el límite. */
 const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
-/** Simétrico a la mascota superior (fila 2 ↔ fila 14 en rejilla de 15 filas). */
-const GROUPS_NAV_CENTER_Y = gridRowToPercentY(BRACKET_GRID_ROWS - 1.2);
 const KO_MASCOT_SRC = "/icons/psoe.png";
 
 type TeamSlotLayout = {
@@ -245,13 +221,12 @@ function BracketMatchNode({
   );
 }
 
-export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenAllGroups, onOpenStats, onOpenSquads }: KnockoutBracketProps) {
+export function KnockoutBracket({ poolId, matches, currentProfileId }: KnockoutBracketProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const { navigate } = useAppNavigation();
   const [localMatches, setLocalMatches] = useState(matches);
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
-  const [dataAccessOpen, setDataAccessOpen] = useState(false);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
 
   useEffect(() => {
@@ -299,22 +274,6 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenAllGr
                 className="tm-ko-perrete-img"
                 priority
               />
-            </button>
-          </div>
-
-          <div
-            className="tm-ko-groups-nav"
-            style={{
-              left: "50%",
-              top: `${GROUPS_NAV_CENTER_Y}%`,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setDataAccessOpen(true)}
-              className="tm-cal-sidebar-access-btn"
-            >
-              Ver datos
             </button>
           </div>
 
@@ -372,14 +331,6 @@ export function KnockoutBracket({ poolId, matches, currentProfileId, onOpenAllGr
         open={mascotPreviewOpen}
         onClose={() => setMascotPreviewOpen(false)}
         src={KO_MASCOT_SRC}
-      />
-
-      <CalendarDataAccessModal
-        open={dataAccessOpen}
-        onClose={() => setDataAccessOpen(false)}
-        onOpenAllGroups={onOpenAllGroups ? wrapDataAccessOpen(setDataAccessOpen, onOpenAllGroups) : () => {}}
-        onOpenStats={onOpenStats ? wrapDataAccessOpen(setDataAccessOpen, onOpenStats) : () => {}}
-        onOpenSquads={onOpenSquads ? wrapDataAccessOpen(setDataAccessOpen, onOpenSquads) : () => {}}
       />
 
       {activeMatch ? (

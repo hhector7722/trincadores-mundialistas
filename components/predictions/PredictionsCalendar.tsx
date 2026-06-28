@@ -274,6 +274,7 @@ function DayCell({
 
   const hasMatches = cell.matches.length > 0;
   const isOutMonth = !cell.inMonth;
+  const treatAsInMonth = forceShow;
 
   return (
     <div
@@ -282,18 +283,18 @@ function DayCell({
         "tm-cal-cell relative flex h-full min-h-0 flex-col",
         dockSurface ? "tm-cal-dock-surface tm-surface-fade backdrop-blur-xl" : "tm-cal-cell-surface",
         hasMatches && !dockSurface && "tm-cal-cell--matches",
-        isOutMonth && "opacity-80"
+        isOutMonth && !treatAsInMonth && "opacity-80"
       )}
     >
       {!hideDayNumber ? (
         <span
           className={cn(
             "tm-cal-day-num shrink-0 font-semibold tabular-nums",
-            isOutMonth ? "text-[var(--tm-muted)] text-[0.7rem]" : "text-black"
+            isOutMonth && !treatAsInMonth ? "text-[var(--tm-muted)] text-[0.7rem]" : "text-black"
           )}
         >
           {cell.dayNumber}
-          {isOutMonth && " Jun"}
+          {isOutMonth && !treatAsInMonth && " Jun"}
         </span>
       ) : null}
       <div className="tm-cal-match-list mt-0.5 flex min-h-0 min-w-0 flex-1 flex-col justify-start">
