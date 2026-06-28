@@ -26,13 +26,13 @@ export const COL_R32_RIGHT = 9;
 /**
  * Banda superior reducida al mínimo.
  */
-export const BRACKET_HEADER_BAND_Y = 0;
+export const BRACKET_HEADER_BAND_Y = 4;
 
 /** Banda inferior del canvas reservada para el botón «Ver fase Prévia». */
-export const BRACKET_FOOTER_BAND_Y = 4;
+export const BRACKET_FOOTER_BAND_Y = 12;
 
 /** Margen extra bajo la cabecera para que la tarjeta no se recorte (translate -50%). */
-const R32_TOP_CLEARANCE_Y = 3;
+const R32_TOP_CLEARANCE_Y = 4;
 
 /** Ancla inferior: fila 15 de la rejilla guía. */
 export const R32_BOTTOM_ANCHOR_Y = 100 - BRACKET_FOOTER_BAND_Y / 2;
@@ -47,7 +47,7 @@ export const KO_CARD_SIZE_SCALE = 0.92;
 const ORB_HALF_Y = 1.3;
 
 /** Holgura mínima entre bordes de dos orbes del mismo enfrentamiento (% canvas Y). */
-const ORB_INNER_EDGE_GAP_Y = 1.8;
+const ORB_INNER_EDGE_GAP_Y = 4.8;
 
 /** Mitad de la separación centro-a-centro dentro de un enfrentamiento (% canvas Y). */
 export const ORB_PAIR_INNER_HALF_Y = ORB_HALF_Y + ORB_INNER_EDGE_GAP_Y / 2;
@@ -216,7 +216,7 @@ function pushR32Side(
     const row = bracketGridRowCenter(0, slotIndex);
     const { midY } = yFromGridRow(row);
     const columnX = mapColumnX(column);
-    const offsetX = 2.2;
+    const offsetX = 3.8;
     
     out.push({
       matchNumber,

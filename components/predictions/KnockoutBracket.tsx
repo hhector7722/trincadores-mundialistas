@@ -48,9 +48,9 @@ const BRACKET_GEOMETRY = buildBracketGeometry();
 const BRACKET_CONNECTORS = buildBracketConnectorPaths(BRACKET_GEOMETRY);
 const FINAL_CENTER_Y = finalCenterYFromGeometry(BRACKET_GEOMETRY);
 /** Posición superior para la mascota, justo sin pisar el límite. */
-const PERRETE_CENTER_Y = gridRowToPercentY(1.3);
+const PERRETE_CENTER_Y = gridRowToPercentY(2.2);
 /** Simétrico a la mascota superior (fila 2 ↔ fila 14 en rejilla de 15 filas). */
-const GROUPS_NAV_CENTER_Y = gridRowToPercentY(BRACKET_GRID_ROWS - 1);
+const GROUPS_NAV_CENTER_Y = gridRowToPercentY(BRACKET_GRID_ROWS - 1.2);
 const KO_MASCOT_SRC = "/icons/psoe.png";
 
 type TeamSlotLayout = {
