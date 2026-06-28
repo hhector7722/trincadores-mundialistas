@@ -1,11 +1,4 @@
-import { BSD_SOURCE_CODE } from "@/lib/lineup/sources/bsd-constants";
-import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
-import {
-  fetchBsdLiveBundle,
-  fetchBsdLiveLeagueEvents,
-  isBsdEventFinished,
-  isBsdEventLive,
-} from "@/lib/live/sources/bsd-live";
+import { fetchFotmobLiveBundle } from "@/lib/live/sources/fotmob-live";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
 type MatchRow = {
@@ -63,7 +56,7 @@ async function loadBsdEventMap(
   const { data, error } = await admin
     .from("external_id_map")
     .select("internal_id, external_key")
-    .in("source_code", [BSD_SOURCE_CODE, "fotmob"])
+    .in("source_code", ["fotmob", "bsd"])
     .eq("entity_type", "match")
     .eq("match_status", "mapped")
     .in("internal_id", matchIds);
@@ -125,8 +118,8 @@ export async function syncLiveMatches(
     errors: [],
   };
 
-  if (!isBsdConfigured()) return result;
-
+  // No necesitamos checkear isBsdConfigured
+  
   const matches = await loadCandidateMatches(admin, nowMs);
   result.scanned = matches.length;
   if (!matches.length) return result;
@@ -135,8 +128,6 @@ export async function syncLiveMatches(
     admin,
     matches.map((match) => match.id),
   );
-  const liveRows = await fetchBsdLiveLeagueEvents();
-  const liveByEventId = new Map(liveRows.map((row) => [row.id, row]));
 
   // Paralelizamos las llamadas externas y escrituras a BD
   const updates = await Promise.allSettled(
@@ -147,15 +138,13 @@ export async function syncLiveMatches(
       const eventId = Number(externalKey);
       if (!Number.isFinite(eventId)) return;
 
-      const bundle = await fetchBsdLiveBundle(eventId, match.home_team, match.away_team);
-      const liveRow = liveByEventId.get(eventId);
-      const status =
-        liveRow?.status ??
-        (bundle.isLive ? "inprogress" : bundle.finished ? "finished" : "notstarted");
-      const isFinished = bundle.finished || isBsdEventFinished(status);
+      const bundle = await fetchFotmobLiveBundle(eventId);
+      if (!bundle) return;
+      
+      const isFinished = bundle.finished;
 
       const shouldPersist =
-        isBsdEventLive(status) ||
+        bundle.isLive ||
         isFinished ||
         bundle.homeScore > 0 ||
         bundle.awayScore > 0;
@@ -185,7 +174,7 @@ export async function syncLiveMatches(
       let markedFinished = false;
       let resultsPersisted = false;
 
-      if (isBsdEventLive(status) && match.status !== "live") {
+      if (bundle.isLive && match.status !== "live") {
         const { error: liveError } = await admin
           .from("matches")
           .update({ status: "live" })
