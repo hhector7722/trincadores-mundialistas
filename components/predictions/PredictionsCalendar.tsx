@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
+import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
 import { CalendarSidebarSlot } from "@/components/predictions/CalendarSidebarSlot";
 import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
@@ -477,8 +478,8 @@ export function PredictionsCalendar({
         ref={calendarRef}
         style={{ "--tm-cal-weeks": weeks.length, opacity: layoutReady ? 1 : 0 } as CSSProperties}
         className={cn(
-          "tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0",
-          !isJune && "tm-porra-calendar--auto-rows"
+          "tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-col p-0",
+          isJune ? "flex-1" : "shrink-0 tm-porra-calendar--auto-rows"
         )}
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
