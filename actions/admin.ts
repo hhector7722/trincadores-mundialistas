@@ -135,7 +135,7 @@ export async function setMatchLive(
     .from("matches")
     .update({ status: "live" })
     .eq("id", matchId)
-    .eq("status", "pending");
+    .in("status", ["pending", "scheduled"]);
 
   if (error) {
     return { ok: false, error: error.message || "No se pudo marcar el partido como en juego." };

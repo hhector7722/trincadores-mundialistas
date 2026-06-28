@@ -363,7 +363,7 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
     .from("matches")
     .select("id, home_team, away_team, kickoff_at, status")
     .in("matchday_id", dayIds)
-    .in("status", ["scheduled", "live"])
+    .in("status", ["pending", "scheduled", "live"])
     .order("kickoff_at", { ascending: true });
 
   if (!matches?.length) return [];
