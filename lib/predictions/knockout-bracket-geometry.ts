@@ -144,7 +144,16 @@ export function buildColumnCenters(): readonly number[] {
 const COLUMN_CENTERS = buildColumnCenters();
 
 export function mapColumnX(column: number): number {
-  return COLUMN_CENTERS[column] ?? 50;
+  let x = COLUMN_CENTERS[column] ?? 50;
+  
+  // Ajustes finos: acercar los octavos un poco más a los dieciseisavos
+  if (column === 1) {
+    x -= 1.5; // Segunda columna (izq) ligeramente a la izquierda
+  } else if (column === 8) {
+    x += 1.5; // Penúltima columna (der) ligeramente a la derecha
+  }
+  
+  return x;
 }
 
 /** Centro horizontal entre columnas E y F (copa + eje de la final). */
