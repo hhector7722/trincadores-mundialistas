@@ -63,7 +63,7 @@ async function loadBsdEventMap(
   const { data, error } = await admin
     .from("external_id_map")
     .select("internal_id, external_key")
-    .eq("source_code", BSD_SOURCE_CODE)
+    .in("source_code", [BSD_SOURCE_CODE, "fotmob"])
     .eq("entity_type", "match")
     .eq("match_status", "mapped")
     .in("internal_id", matchIds);

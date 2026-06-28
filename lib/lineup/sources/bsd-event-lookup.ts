@@ -10,7 +10,7 @@ async function getBsdEventExternalKey(
   const { data, error } = await supabase
     .from("external_id_map")
     .select("external_key")
-    .eq("source_code", BSD_SOURCE_CODE)
+    .in("source_code", [BSD_SOURCE_CODE, "fotmob"])
     .eq("entity_type", "match")
     .eq("internal_id", matchId)
     .eq("match_status", "mapped")
