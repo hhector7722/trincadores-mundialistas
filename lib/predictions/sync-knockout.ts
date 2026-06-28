@@ -32,7 +32,7 @@ export async function resolveGroupPlaceholder(placeholder: string): Promise<stri
 
   const { data: results } = await admin
     .from("match_results")
-    .select("match_id, home_score, away_score")
+    .select("match_id, home_goals, away_goals")
     .in("match_id", matches.map((m) => m.id));
 
   const resultsMap = new Map((results ?? []).map((r) => [r.match_id, r]));
@@ -60,19 +60,19 @@ export async function resolveGroupPlaceholder(placeholder: string): Promise<stri
     const result = resultsMap.get(id);
     if (!result) continue; // Should not happen if status == 'finished'
 
-    const { home_score, away_score } = result;
+    const { home_goals, away_goals } = result;
 
     const homeStats = stats.get(home_team)!;
     const awayStats = stats.get(away_team)!;
 
-    homeStats.goalsFor += home_score;
-    awayStats.goalsFor += away_score;
-    homeStats.goalDiff += home_score - away_score;
-    awayStats.goalDiff += away_score - home_score;
+    homeStats.goalsFor += home_goals;
+    awayStats.goalsFor += away_goals;
+    homeStats.goalDiff += home_goals - away_goals;
+    awayStats.goalDiff += away_goals - home_goals;
 
-    if (home_score > away_score) {
+    if (home_goals > away_goals) {
       homeStats.points += 3;
-    } else if (away_score > home_score) {
+    } else if (away_goals > home_goals) {
       awayStats.points += 3;
     } else {
       homeStats.points += 1;
@@ -115,7 +115,7 @@ export async function resolveBestThirdPlaceholder(placeholder: string): Promise<
 
   const { data: results } = await admin
     .from("match_results")
-    .select("match_id, home_score, away_score");
+    .select("match_id, home_goals, away_goals");
     
   if (!matches || !results) return null;
 
@@ -148,14 +148,14 @@ export async function resolveBestThirdPlaceholder(placeholder: string): Promise<
     const homeStats = stats.get(home_team)!;
     const awayStats = stats.get(away_team)!;
 
-    homeStats.goalsFor += result.home_score;
-    awayStats.goalsFor += result.away_score;
-    homeStats.goalDiff += result.home_score - result.away_score;
-    awayStats.goalDiff += result.away_score - result.home_score;
+    homeStats.goalsFor += result.home_goals;
+    awayStats.goalsFor += result.away_goals;
+    homeStats.goalDiff += result.home_goals - result.away_goals;
+    awayStats.goalDiff += result.away_goals - result.home_goals;
 
-    if (result.home_score > result.away_score) {
+    if (result.home_goals > result.away_goals) {
       homeStats.points += 3;
-    } else if (result.away_score > result.home_score) {
+    } else if (result.away_goals > result.home_goals) {
       awayStats.points += 3;
     } else {
       homeStats.points += 1;
@@ -239,18 +239,18 @@ export async function resolveWinnerPlaceholder(placeholder: string): Promise<str
 
   const { data: targetResult } = await admin
     .from("match_results")
-    .select("home_score, away_score, penalty_home, penalty_away")
+    .select("home_goals, away_goals, penalty_home, penalty_away")
     .eq("match_id", targetMatch.id)
     .maybeSingle();
 
   if (!targetResult) return null;
 
-  const { home_score, away_score, penalty_home, penalty_away } = targetResult;
+  const { home_goals, away_goals, penalty_home, penalty_away } = targetResult;
 
   let homeWins = false;
-  if (home_score > away_score) {
+  if (home_goals > away_goals) {
     homeWins = true;
-  } else if (away_score > home_score) {
+  } else if (away_goals > home_goals) {
     homeWins = false;
   } else if (penalty_home != null && penalty_away != null) {
     homeWins = penalty_home > penalty_away;

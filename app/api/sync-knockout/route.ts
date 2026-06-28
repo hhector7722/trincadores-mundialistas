@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { syncKnockoutBracket } from "@/lib/predictions/sync-knockout";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -9,6 +10,11 @@ export async function GET(request: Request) {
 
   try {
     const result = await syncKnockoutBracket();
+    
+    if (result.updated > 0) {
+      revalidatePath("/", "layout");
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error syncing knockout bracket:", error);
