@@ -303,7 +303,8 @@ function useCalendarViewportLayout(
   rootRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
-  rowCount: number
+  rowCount: number,
+  onReady?: () => void
 ) {
   useLayoutEffect(() => {
     const calendar = calendarRef.current;
@@ -335,6 +336,7 @@ function useCalendarViewportLayout(
       syncFrameRef.current = requestAnimationFrame(() => {
         syncFrameRef.current = requestAnimationFrame(() => {
           syncLayout();
+          if (onReady) onReady();
           syncFrameRef.current = null;
         });
       });
@@ -373,6 +375,7 @@ export function PredictionsCalendar({
   matches,
   currentProfileId,
 }: PredictionsCalendarProps) {
+  const [layoutReady, setLayoutReady] = useState(false);
   const [currentMonthView, setCurrentMonthView] = useState<MonthYear>(GROUP_STAGE_VIEW);
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
@@ -448,7 +451,9 @@ export function PredictionsCalendar({
     [groupMatchRows]
   );
 
-  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length, () => {
+    setLayoutReady(true);
+  });
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(currentMonthView.year, currentMonthView.month);
@@ -468,6 +473,7 @@ export function PredictionsCalendar({
         ref={calendarRef}
         style={{ 
           "--tm-cal-weeks": weeks.length,
+          opacity: layoutReady ? 1 : 0,
           flex: isJune ? undefined : "47 1 0%"
         } as CSSProperties}
         className={cn(
