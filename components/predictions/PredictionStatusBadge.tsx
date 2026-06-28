@@ -11,7 +11,9 @@ const EDIT_LABELS: Record<PredictionUiState, string> = {
 };
 
 const OUTCOME_BORDER_CLASS: Record<ScoreOutcome, string> = {
+  exact_and_advancing: "bg-[var(--tm-cal-outcome-exact)]",
   exact: "bg-[var(--tm-cal-outcome-exact)]",
+  advancing: "bg-[var(--tm-cal-outcome-sign)]",
   sign: "bg-[var(--tm-cal-outcome-sign)]",
   miss: "bg-[var(--tm-cal-outcome-miss)]",
 };
