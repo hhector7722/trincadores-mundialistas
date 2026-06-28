@@ -479,12 +479,9 @@ export function PredictionsCalendar({
         style={{ 
           "--tm-cal-weeks": weeks.length, 
           opacity: layoutReady ? 1 : 0,
-          flex: isJune ? "1 1 0%" : "0 0 auto"
+          flex: isJune ? "1 1 0%" : "47 1 0%"
         } as CSSProperties}
-        className={cn(
-          "tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-col p-0",
-          !isJune && "tm-porra-calendar--auto-rows"
-        )}
+        className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-col p-0"
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
           <button
@@ -539,7 +536,8 @@ export function PredictionsCalendar({
 
       {!isJune && (
         <div 
-          className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+          className="relative flex min-h-0 flex-col overflow-hidden"
+          style={{ flex: "53 1 0%" }}
         >
           <KnockoutBracket
             poolId={poolId}
