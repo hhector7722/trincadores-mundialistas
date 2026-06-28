@@ -42,7 +42,7 @@ export type MatchWithPrediction = {
   prediction:
     | Pick<
         Prediction,
-        "id" | "home_goals" | "away_goals" | "points_awarded" | "updated_at"
+        "id" | "home_goals" | "away_goals" | "advancing_team" | "points_awarded" | "updated_at"
       >
     | null;
   mvpPrediction: MvpPrediction | null;
@@ -117,7 +117,7 @@ async function fetchPoolMatchesWithPredictions(
   const matchIds = matches.map((m) => m.id);
   const { data: predictions } = await supabase
     .from("predictions")
-    .select("id, match_id, home_goals, away_goals, points_awarded, updated_at")
+    .select("id, match_id, home_goals, away_goals, advancing_team, points_awarded, updated_at")
     .eq("pool_id", poolId)
     .eq("profile_id", profileId)
     .in("match_id", matchIds);
@@ -173,6 +173,7 @@ async function fetchPoolMatchesWithPredictions(
             id: pred.id,
             home_goals: pred.home_goals,
             away_goals: pred.away_goals,
+            advancing_team: pred.advancing_team,
             points_awarded: pred.points_awarded,
             updated_at: pred.updated_at,
           }
@@ -269,7 +270,7 @@ export async function getMatchPredictionDetail(
 
   const { data: prediction } = await supabase
     .from("predictions")
-    .select("id, home_goals, away_goals, points_awarded, updated_at")
+    .select("id, home_goals, away_goals, advancing_team, points_awarded, updated_at")
     .eq("pool_id", poolId)
     .eq("profile_id", profileId)
     .eq("match_id", matchId)
@@ -309,6 +310,7 @@ export async function getMatchPredictionDetail(
           id: prediction.id,
           home_goals: prediction.home_goals,
           away_goals: prediction.away_goals,
+          advancing_team: prediction.advancing_team,
           points_awarded: prediction.points_awarded,
           updated_at: prediction.updated_at,
         }
@@ -541,7 +543,7 @@ export async function getMatchPredictionsBoard(
       .in("id", profileIds),
     admin
       .from("predictions")
-      .select("profile_id, home_goals, away_goals")
+      .select("profile_id, home_goals, away_goals, advancing_team")
       .eq("pool_id", poolId)
       .eq("match_id", matchId),
     admin
@@ -662,7 +664,7 @@ export async function getPeerPredictionsForMatch(
   const supabase = await createClient();
   const { data: predictions, error } = await supabase
     .from("predictions")
-    .select("profile_id, home_goals, away_goals, points_awarded")
+    .select("profile_id, home_goals, away_goals, advancing_team, points_awarded")
     .eq("pool_id", poolId)
     .eq("match_id", matchId)
     .neq("profile_id", viewerProfileId);

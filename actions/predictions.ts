@@ -78,7 +78,8 @@ export async function savePrediction(
   poolId: string,
   matchId: string,
   homeGoals: number,
-  awayGoals: number
+  awayGoals: number,
+  advancingTeam?: "home" | "away"
 ): Promise<PredictionActionResult> {
   const validated = validatePredictionGoals(homeGoals, awayGoals);
   if (!validated.ok) {
@@ -137,6 +138,7 @@ export async function savePrediction(
       .update({
         home_goals: validated.home,
         away_goals: validated.away,
+        advancing_team: advancingTeam ?? null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", existing.id)
@@ -152,6 +154,7 @@ export async function savePrediction(
       profile_id: user.id,
       home_goals: validated.home,
       away_goals: validated.away,
+      advancing_team: advancingTeam ?? null,
     });
 
     if (insertError) {

@@ -354,8 +354,10 @@ export function QuickPredictionModal({
 
   const savedHome = viewMatch.prediction?.home_goals ?? null;
   const savedAway = viewMatch.prediction?.away_goals ?? null;
+  const savedAdvancingTeam = (viewMatch.prediction?.advancing_team as "home" | "away" | null) ?? null;
   const [home, setHome] = useState<number | null>(savedHome);
   const [away, setAway] = useState<number | null>(savedAway);
+  const [advancingTeam, setAdvancingTeam] = useState<"home" | "away" | null>(savedAdvancingTeam);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -367,10 +369,11 @@ export function QuickPredictionModal({
     reset({ kind: "prediction" });
     setHome(savedHome);
     setAway(savedAway);
+    setAdvancingTeam(savedAdvancingTeam);
     setError(null);
-  }, [viewMatch.id, savedHome, savedAway, reset]);
+  }, [viewMatch.id, savedHome, savedAway, savedAdvancingTeam, reset]);
 
-  const draftDirty = home !== savedHome || away !== savedAway;
+  const draftDirty = home !== savedHome || away !== savedAway || advancingTeam !== savedAdvancingTeam;
   const mvpDirty = mvpDraftDirty(baseViewMatch, mvpOverrides[baseViewMatch.id]);
   const scoreFilled =
     hasFilledPredictionScore(savedHome, savedAway) ||
@@ -417,6 +420,10 @@ export function QuickPredictionModal({
     if (!hasScore || !hasMvp) {
       return;
     }
+    if (!viewMatch.group_code && hasScore && home === away && !advancingTeam) {
+      setError("Al pronosticar empate en eliminatorias, debes elegir qué equipo pasa de ronda.");
+      return;
+    }
 
     startTransition(async () => {
       const mvpSnap =
@@ -429,7 +436,7 @@ export function QuickPredictionModal({
             }
           : null);
 
-      const result = await savePrediction(poolId, viewMatch.id, home!, away!);
+      const result = await savePrediction(poolId, viewMatch.id, home!, away!, advancingTeam ?? undefined);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -883,6 +890,42 @@ export function QuickPredictionModal({
             </div>
 
           </div>
+
+          <div className="mt-1 px-4 text-center">
+            <p className="text-[10px] text-white/50 uppercase tracking-wide">
+              Marcador a los 90 minutos
+            </p>
+          </div>
+
+          {!targetMatch.group_code && home !== null && away !== null && home === away && (
+            <div className="mt-3 px-4 flex flex-col items-center">
+              <p className="text-[11px] font-semibold text-[var(--tm-accent)] mb-2 uppercase tracking-wide">
+                ¿Quién pasa en penaltis/prórroga?
+              </p>
+              <div className="flex gap-1 w-full max-w-[260px] bg-white/5 p-1 rounded-full border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setAdvancingTeam("home")}
+                  className={cn(
+                    "flex-1 py-1.5 rounded-full text-xs font-semibold transition-all truncate px-2",
+                    advancingTeam === "home" ? "bg-[var(--tm-accent)] text-black shadow-[0_0_10px_rgba(204,255,0,0.4)]" : "text-white/70 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {targetMatch.home_team}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdvancingTeam("away")}
+                  className={cn(
+                    "flex-1 py-1.5 rounded-full text-xs font-semibold transition-all truncate px-2",
+                    advancingTeam === "away" ? "bg-[var(--tm-accent)] text-black shadow-[0_0_10px_rgba(204,255,0,0.4)]" : "text-white/70 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {targetMatch.away_team}
+                </button>
+              </div>
+            </div>
+          )}
 
           {targetMatch.group_code ? (
             <div className="flex justify-center px-4 pt-3">
