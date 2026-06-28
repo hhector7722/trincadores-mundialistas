@@ -2096,6 +2096,27 @@ html:has(.tm-app-shell) body {
   padding: 0.15rem 0.35rem 0.1rem;
 }
 
+.tm-july-knockout-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 8%,
+    #d4a017 20%,
+    #e8b830 50%,
+    #d4a017 80%,
+    transparent 92%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
 .tm-ko-canvas {
   position: relative;
   flex: 1 1 auto;

@@ -383,7 +383,7 @@ export function PredictionsCalendar({
   currentProfileId,
 }: PredictionsCalendarProps) {
   const [layoutReady, setLayoutReady] = useState(false);
-  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>(GROUP_STAGE_VIEW);
+  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>({ year: 2026, month: 7 });
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
     items: matches,
@@ -541,7 +541,7 @@ export function PredictionsCalendar({
 
       {!isJune && (
         <div 
-          className="relative flex min-h-0 flex-col overflow-hidden"
+          className="relative flex min-h-0 flex-col overflow-hidden tm-july-knockout-wrap"
           style={{ flex: "53 1 0%" }}
         >
           <KnockoutBracket
