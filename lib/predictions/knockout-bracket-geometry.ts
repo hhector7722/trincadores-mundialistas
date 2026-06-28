@@ -224,8 +224,17 @@ function pushR32Side(
   matchNumbers.forEach((matchNumber, slotIndex) => {
     const row = bracketGridRowCenter(0, slotIndex);
     const { midY } = yFromGridRow(row);
-    const columnX = mapColumnX(column);
-    const offsetX = 3.8;
+    let columnX = mapColumnX(column);
+    
+    // Las banderas mucho más juntas sin tocarse
+    const offsetX = 2.8; 
+    
+    // Compensamos columnX para que la bandera exterior no se mueva respecto al offsetX anterior (3.8)
+    if (side === "left") {
+      columnX -= 1.0;
+    } else {
+      columnX += 1.0;
+    }
     
     out.push({
       matchNumber,

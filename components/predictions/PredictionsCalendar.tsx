@@ -380,7 +380,7 @@ export function PredictionsCalendar({
   matches,
   currentProfileId,
 }: PredictionsCalendarProps) {
-  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>(GROUP_STAGE_CALENDAR_MONTH);
+  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>({ year: 2026, month: 7 });
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
     items: matches,
