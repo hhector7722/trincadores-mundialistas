@@ -2284,7 +2284,7 @@ html:has(.tm-app-shell) body {
 @keyframes tm-ko-cup-float {
   0%,
   100% {
-    transform: translate(-50%, -100%) translateY(4px);
+    transform: translate(-50%, -100%) translateY(2px);
   }
 
   50% {

@@ -324,10 +324,7 @@ export function KnockoutBracket({
             <button
               type="button"
               className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md"
-              onClick={() => {
-                trackUsageModalOpen("ampliar-mascota", "Ampliar mascota KO", pathname || "");
-                setMascotPreviewOpen(true);
-              }}
+              onClick={() => setMascotPreviewOpen(true)}
               aria-label="Ampliar imagen"
             >
               <Image
@@ -351,10 +348,7 @@ export function KnockoutBracket({
             <button
               type="button"
               className="tm-ko-normas-frame tm-ko-normas-trigger tm-circle-depth overflow-hidden rounded-md"
-              onClick={() => {
-                trackUsageModalOpen("ampliar-normas", "Ver normas eliminatorias", pathname || "");
-                setRulesPreviewOpen(true);
-              }}
+              onClick={() => setRulesPreviewOpen(true)}
               aria-label="Ver normas de eliminatorias"
             >
               <Image
@@ -423,12 +417,14 @@ export function KnockoutBracket({
         open={mascotPreviewOpen}
         onClose={() => setMascotPreviewOpen(false)}
         src={KO_MASCOT_SRC}
+        ariaLabel="Mascota KO"
       />
 
       <ImageLightboxModal
         open={rulesPreviewOpen}
         onClose={() => setRulesPreviewOpen(false)}
         src={RULES_IMG_SRC}
+        ariaLabel="Normas de eliminatorias"
       />
 
       {!onOpenMatch && activeMatch ? (
