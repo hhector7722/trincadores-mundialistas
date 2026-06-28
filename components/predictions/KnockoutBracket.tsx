@@ -125,7 +125,7 @@ function BracketTeamOrb({
           <TeamFlagBadge 
             name={teamName} 
             size="sm" 
-            className={cn("tm-ko-orb-flag", isFinished && "opacity-40 grayscale-[40%]")} 
+            className={cn("tm-ko-orb-flag", isFinished && "brightness-75 opacity-90")} 
           />
           <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
             {fullName}
@@ -147,22 +147,22 @@ function BracketMatchNode({
   matchMap: Map<number, MatchWithPrediction>;
   onOpen: (match: MatchWithPrediction) => void;
 }) {
-  const fallback =
-    geom.round === "r32" ? placeholderPairForMatchNumber(geom.matchNumber) : null;
+  const fallback = placeholderPairForMatchNumber(geom.matchNumber);
     
   function resolveDynamicTeamName(raw: string | undefined | null): string {
-    let name = bracketSlotTeamName(raw, geom.round);
+    const rawTrimmed = (raw ?? "").trim();
     // Si es un W__ o L__, intentamos autocompletarlo localmente buscando el resultado del partido previo
-    if ((name.startsWith("W") || name.startsWith("L")) && !isNaN(Number(name.slice(1)))) {
-      const isLoser = name.startsWith("L");
-      const prevMatchNumber = Number(name.slice(1));
+    if ((rawTrimmed.startsWith("W") || rawTrimmed.startsWith("L")) && !isNaN(Number(rawTrimmed.slice(1)))) {
+      const isLoser = rawTrimmed.startsWith("L");
+      const prevMatchNumber = Number(rawTrimmed.slice(1));
       const prevMatch = matchMap.get(prevMatchNumber);
       if (prevMatch && prevMatch.status === "finished" && prevMatch.officialHome != null && prevMatch.officialAway != null) {
-        if (prevMatch.officialHome > prevMatch.officialAway) name = isLoser ? prevMatch.away_team : prevMatch.home_team;
-        else if (prevMatch.officialAway > prevMatch.officialHome) name = isLoser ? prevMatch.home_team : prevMatch.away_team;
+        if (prevMatch.officialHome > prevMatch.officialAway) return isLoser ? prevMatch.away_team : prevMatch.home_team;
+        else if (prevMatch.officialAway > prevMatch.officialHome) return isLoser ? prevMatch.home_team : prevMatch.away_team;
       }
     }
-    return name;
+    // Si no pudimos autocompletar, aplicamos la regla de display normal
+    return bracketSlotTeamName(rawTrimmed, geom.round);
   }
 
   const homeName = resolveDynamicTeamName(match?.home_team ?? fallback?.home);
