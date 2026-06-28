@@ -557,14 +557,6 @@ export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
   rowCount: number,
-  layoutRoot?: HTMLElement | null
-): CalendarLayoutResult | null {
-  if (rowCount <= 0) return null;
-
-export function fitCalendarLayout(
-  calendar: HTMLElement,
-  grid: HTMLElement,
-  rowCount: number,
   layoutRoot?: HTMLElement | null,
   isJune: boolean = true
 ): CalendarLayoutResult | null {
@@ -593,7 +585,7 @@ export function fitCalendarLayout(
   syncGroupsPanelMetrics(calendar, grid);
   syncPredictionLabelMetrics(grid);
 
-  for (let pass = 0; pass < 6 && gridHasOverflow(grid)) {
+  for (let pass = 0; pass < 6 && gridHasOverflow(grid); pass++) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
@@ -604,7 +596,6 @@ export function fitCalendarLayout(
     syncSidebarAccessDockMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);
     syncPredictionLabelMetrics(grid);
-    pass++;
   }
 
   const rowHeight = grid.clientHeight > 0 ? grid.clientHeight / rowCount : 0;
