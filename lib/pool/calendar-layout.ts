@@ -80,9 +80,9 @@ function gridHasOverflow(grid: HTMLElement): boolean {
   return false;
 }
 
-function searchMaxScale(calendar: HTMLElement, grid: HTMLElement, isJune: boolean): number {
+function searchMaxScale(calendar: HTMLElement, grid: HTMLElement): number {
   let lo = MIN_UI_SCALE;
-  let hi = !isJune ? 1.0 : MAX_UI_SCALE; // No escalar hacia arriba en Julio para mantener coherencia con Junio
+  let hi = MAX_UI_SCALE;
   let best = MIN_UI_SCALE;
 
   for (let i = 0; i < SCALE_SEARCH_ITERATIONS; i++) {
@@ -118,33 +118,31 @@ function findBusiestMatchCell(grid: HTMLElement): HTMLElement | null {
   return best;
 }
 
-/** Altura uniforme de tarjetas según la celda con más partidos. */
 function syncMatchCardMetrics(
   calendar: HTMLElement,
   grid: HTMLElement,
-  isJune: boolean = true,
   layoutRoot?: HTMLElement | null
 ): number {
   calendar.style.setProperty("--tm-cal-match-gap", `${MATCH_CARD_GAP_PX}px`);
 
   const refCell = findBusiestMatchCell(grid);
-  if (!refCell) {
-    calendar.style.removeProperty("--tm-cal-match-card-h");
-    return 0;
-  }
+  if (!refCell) return 0;
 
-  const matchCount = refCell.querySelectorAll(".tm-cal-match-card").length;
   const matchList = refCell.querySelector<HTMLElement>(".tm-cal-match-list");
-  if (!matchList || matchCount <= 0) {
-    calendar.style.removeProperty("--tm-cal-match-card-h");
+  if (!matchList) return 0;
+
+  const matchCount = matchList.querySelectorAll(".tm-cal-match-card").length;
+  if (matchCount === 0) {
+    calendar.style.setProperty("--tm-cal-match-card-h", `0px`);
     return 0;
   }
 
   let listHeight = matchList.clientHeight;
-  const layoutMatchCount = Math.max(4, matchCount);
+  let layoutMatchCount = matchCount;
 
-  if (!isJune && layoutRoot) {
-    // Calcular teóricamente lo que mediría la lista en Junio para forzar ese mismo tamaño de tarjeta
+  // JULIO HACK: Si es julio, simulamos matemáticamente el espacio de junio (4 partidos).
+  if (calendar.classList.contains("tm-porra-calendar--july-view") && layoutRoot) {
+    layoutMatchCount = 4;
     const header = calendar.querySelector<HTMLElement>(".tm-cal-header");
     const weekdays = calendar.querySelector<HTMLElement>(".tm-cal-weekdays");
     const chromeHeight = (header?.offsetHeight ?? 0) + (weekdays?.offsetHeight ?? 0);
@@ -533,6 +531,9 @@ export function syncCalendarGridHeight(
   layoutRoot: HTMLElement
 ): number {
   void layoutRoot;
+  if (!calendar.classList.contains("tm-porra-calendar--july-view")) {
+    calendar.style.flex = "1 1 0%";
+  }
   calendar.style.minHeight = "0";
   prepareCalendarGridFlex(grid);
   void calendar.offsetHeight;
@@ -570,8 +571,7 @@ export function fitCalendarLayout(
   calendar: HTMLElement,
   grid: HTMLElement,
   rowCount: number,
-  layoutRoot?: HTMLElement | null,
-  isJune: boolean = true
+  layoutRoot?: HTMLElement | null
 ): CalendarLayoutResult | null {
   if (rowCount <= 0) return null;
 
@@ -582,7 +582,7 @@ export function fitCalendarLayout(
 
   void grid.offsetHeight;
 
-  let uiScale = searchMaxScale(calendar, grid, isJune);
+  let uiScale = searchMaxScale(calendar, grid);
 
   while (uiScale > MIN_UI_SCALE && gridHasOverflow(grid)) {
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
@@ -590,7 +590,7 @@ export function fitCalendarLayout(
     void calendar.offsetHeight;
   }
 
-  let matchCardHeight = syncMatchCardMetrics(calendar, grid, isJune, layoutRoot);
+  let matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
   syncSidebarAccessSpacing(calendar, grid);
   syncSidebarCardMetrics(calendar, grid);
   syncGroupsPanelMetrics(calendar, grid);
@@ -602,7 +602,7 @@ export function fitCalendarLayout(
     uiScale = Math.max(MIN_UI_SCALE, uiScale * 0.94);
     calendar.style.setProperty("--tm-cal-ui-scale", uiScale.toFixed(4));
     void calendar.offsetHeight;
-    matchCardHeight = syncMatchCardMetrics(calendar, grid, isJune, layoutRoot);
+    matchCardHeight = syncMatchCardMetrics(calendar, grid, layoutRoot);
     syncSidebarAccessSpacing(calendar, grid);
     syncSidebarCardMetrics(calendar, grid);
     syncGroupsPanelMetrics(calendar, grid);

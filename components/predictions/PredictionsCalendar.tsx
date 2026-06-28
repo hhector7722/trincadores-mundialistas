@@ -9,10 +9,10 @@ import {
   type RefObject,
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
-import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
 import { CalendarSidebarSlot } from "@/components/predictions/CalendarSidebarSlot";
 import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
@@ -260,10 +260,7 @@ function DayCell({
   hideDayNumber?: boolean;
   dockSurface?: boolean;
 }) {
-  const isPad = !cell.inMonth;
-  const hasMatches = cell.matches.length > 0;
-
-  if (isPad && !hasMatches) {
+  if (!cell.inMonth) {
     return (
       <div
         style={style}
@@ -272,6 +269,8 @@ function DayCell({
       />
     );
   }
+
+  const hasMatches = cell.matches.length > 0;
 
   return (
     <div
@@ -282,11 +281,10 @@ function DayCell({
         hasMatches && !dockSurface && "tm-cal-cell--matches"
       )}
     >
-      {!hideDayNumber && cell.dayNumber != null ? (
+      {!hideDayNumber ? (
         <span
           className={cn(
-            "tm-cal-day-num shrink-0 font-semibold tabular-nums",
-            isPad ? "text-[var(--tm-muted)]" : "text-black"
+            "tm-cal-day-num shrink-0 font-semibold tabular-nums text-black"
           )}
         >
           {cell.dayNumber}
@@ -305,12 +303,8 @@ function useCalendarViewportLayout(
   rootRef: RefObject<HTMLElement | null>,
   calendarRef: RefObject<HTMLElement | null>,
   gridRef: RefObject<HTMLDivElement | null>,
-  rowCount: number,
-  onReady?: () => void
+  rowCount: number
 ) {
-  const onReadyRef = useRef(onReady);
-  onReadyRef.current = onReady;
-
   useLayoutEffect(() => {
     const calendar = calendarRef.current;
     const grid = gridRef.current;
@@ -331,9 +325,6 @@ function useCalendarViewportLayout(
       fitCalendarLayout(calendar, grid, rowCount, layoutEl);
     };
 
-    syncLayout();
-    onReadyRef.current?.();
-
     const syncFrameRef = { current: null as number | null };
 
     const scheduleSync = () => {
@@ -348,6 +339,8 @@ function useCalendarViewportLayout(
         });
       });
     };
+
+    scheduleSync();
 
     const observer = new ResizeObserver(scheduleSync);
     if (layout instanceof HTMLElement) observer.observe(layout);
@@ -380,7 +373,7 @@ export function PredictionsCalendar({
   matches,
   currentProfileId,
 }: PredictionsCalendarProps) {
-  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>({ year: 2026, month: 7 });
+  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>(GROUP_STAGE_VIEW);
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
     items: matches,
@@ -429,7 +422,6 @@ export function PredictionsCalendar({
   const rootRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [layoutReady, setLayoutReady] = useState(false);
 
   const weeks = useMemo(() => {
     const grid = buildMonthGrid(
@@ -456,9 +448,7 @@ export function PredictionsCalendar({
     [groupMatchRows]
   );
 
-  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length, () => {
-    setLayoutReady(true);
-  });
+  useCalendarViewportLayout(rootRef, calendarRef, gridRef, weeks.length);
 
   const todayKey = kickoffDateKey(new Date().toISOString());
   const monthLabel = formatMonthLabel(currentMonthView.year, currentMonthView.month);
@@ -477,17 +467,19 @@ export function PredictionsCalendar({
       <section
         ref={calendarRef}
         style={{ 
-          "--tm-cal-weeks": weeks.length, 
-          opacity: layoutReady ? 1 : 0,
-          flex: isJune ? "1 1 0%" : "47 1 0%"
+          "--tm-cal-weeks": weeks.length,
+          flex: isJune ? undefined : "47 1 0%"
         } as CSSProperties}
-        className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-col p-0"
+        className={cn(
+          "tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-col p-0",
+          isJune ? "flex-1" : "tm-porra-calendar--july-view tm-porra-calendar--auto-rows"
+        )}
       >
         <div className="tm-cal-header flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
           <button
             className={cn(
               "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
-              currentMonthView.month !== 7 && "invisible pointer-events-none"
+              !isJune && "invisible pointer-events-none"
             )}
             onClick={() => setCurrentMonthView({ year: 2026, month: 6 })}
           >
@@ -499,7 +491,7 @@ export function PredictionsCalendar({
           <button
             className={cn(
               "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
-              currentMonthView.month !== 6 && "invisible pointer-events-none"
+              isJune && "invisible pointer-events-none"
             )}
             onClick={() => setCurrentMonthView({ year: 2026, month: 7 })}
           >
