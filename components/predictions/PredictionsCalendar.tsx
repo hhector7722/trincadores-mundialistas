@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type RefObject,
 } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
@@ -170,7 +171,8 @@ function CalendarMatchCard({
   );
 }
 
-function weekHasGroupsPanel(week: CalendarWeek<MatchWithPrediction>): boolean {
+function weekHasGroupsPanel(week: CalendarWeek<MatchWithPrediction>, isJune: boolean): boolean {
+  if (!isJune) return false;
   const sidebarDays = week.cells.filter(
     (cell) => cell.inMonth && isCalendarSidebarDay(cell.dayNumber)
   );
@@ -185,12 +187,13 @@ function renderCalendarGridCells(
   onGroupClick: (groupCode: string) => void,
   onOpenAllGroups: CalendarModalOpener,
   onOpenStats: CalendarModalOpener,
-  onOpenSquads: CalendarModalOpener
+  onOpenSquads: CalendarModalOpener,
+  isJune: boolean
 ) {
   return weeks.flatMap((week, weekIndex) => {
     const row = weekIndex + 1;
 
-    if (weekHasGroupsPanel(week)) {
+    if (weekHasGroupsPanel(week, isJune)) {
       const sidebarStartCol = week.cells.findIndex(
         (cell) => cell.inMonth && cell.dayNumber === CALENDAR_SIDEBAR_DAYS[0]
       );
@@ -374,6 +377,7 @@ export function PredictionsCalendar({
   matches,
   currentProfileId,
 }: PredictionsCalendarProps) {
+  const [currentMonthView, setCurrentMonthView] = useState<MonthYear>(GROUP_STAGE_CALENDAR_MONTH);
   const [localMatchState, setLocalMatchState] = useState(() => ({
     source: matches,
     items: matches,
@@ -426,13 +430,13 @@ export function PredictionsCalendar({
 
   const weeks = useMemo(() => {
     const grid = buildMonthGrid(
-      GROUP_STAGE_VIEW.year,
-      GROUP_STAGE_VIEW.month,
+      currentMonthView.year,
+      currentMonthView.month,
       matchesByDate
     );
-    const trimmed = trimEmptyMatchWeeks(grid, GROUP_STAGE_VIEW);
+    const trimmed = trimEmptyMatchWeeks(grid, currentMonthView);
     return trimmed.length > 0 ? trimmed : grid;
-  }, [matchesByDate]);
+  }, [matchesByDate, currentMonthView]);
 
   const groupMatchRows = useMemo(() => toGroupMatchRows(localMatches), [localMatches]);
 
@@ -454,7 +458,8 @@ export function PredictionsCalendar({
   });
 
   const todayKey = kickoffDateKey(new Date().toISOString());
-  const monthLabel = formatMonthLabel(GROUP_STAGE_VIEW.year, GROUP_STAGE_VIEW.month);
+  const monthLabel = formatMonthLabel(currentMonthView.year, currentMonthView.month);
+  const isJune = currentMonthView.month === 6;
 
   if (!localMatches.length) {
     return (
@@ -471,10 +476,28 @@ export function PredictionsCalendar({
         style={{ "--tm-cal-weeks": weeks.length, opacity: layoutReady ? 1 : 0 } as CSSProperties}
         className="tm-porra-calendar tm-porra-calendar--fullbleed flex min-h-0 flex-1 flex-col p-0"
       >
-        <div className="tm-cal-header flex shrink-0 items-center justify-center px-2 py-1 sm:px-3">
+        <div className="tm-cal-header flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
+          <button
+            className={cn(
+              "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
+              currentMonthView.month !== 7 && "invisible pointer-events-none"
+            )}
+            onClick={() => setCurrentMonthView({ year: 2026, month: 6 })}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
           <h2 className="tm-cal-month-title text-center font-display font-semibold uppercase tracking-wide text-[var(--tm-fg)]">
             {monthLabel}
           </h2>
+          <button
+            className={cn(
+              "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
+              currentMonthView.month !== 6 && "invisible pointer-events-none"
+            )}
+            onClick={() => setCurrentMonthView({ year: 2026, month: 7 })}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
         </div>
 
         <div className="tm-cal-weekdays grid shrink-0 grid-cols-7">
@@ -498,7 +521,8 @@ export function PredictionsCalendar({
             setActiveGroupCode,
             openAllGroupsModal,
             openStatsModal,
-            openSquadsModal
+            openSquadsModal,
+            isJune
           )}
         </div>
       </section>

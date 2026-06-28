@@ -1,7 +1,7 @@
 import { PredictionsCalendar } from "@/components/predictions/PredictionsCalendar";
 import { predictionEditOpenHint } from "@/lib/predictions/deadline";
 import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
-import { getPoolGroupStageMatchesWithPredictions } from "@/lib/predictions/queries";
+import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,7 +14,7 @@ export default async function PredictionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const matches = await getPoolGroupStageMatchesWithPredictions(ctx.activePoolId, user!.id);
+  const matches = await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id);
 
   const { data: profile } = await supabase
     .from("profiles")
