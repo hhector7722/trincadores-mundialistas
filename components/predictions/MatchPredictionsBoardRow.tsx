@@ -48,8 +48,8 @@ export function MatchPredictionsBoardRow({
   }
 
   const isDrawPrediction = row.homeGoals !== null && row.homeGoals === row.awayGoals;
-  const homeGoalsClassName = isDrawPrediction && row.advancingTeam === "home" ? "text-yellow-500 font-bold" : undefined;
-  const awayGoalsClassName = isDrawPrediction && row.advancingTeam === "away" ? "text-yellow-500 font-bold" : undefined;
+  const homeGoalsClassName = isDrawPrediction && row.advancingTeam === "home" ? "text-green-500 font-bold" : undefined;
+  const awayGoalsClassName = isDrawPrediction && row.advancingTeam === "away" ? "text-green-500 font-bold" : undefined;
 
   return (
     <>
