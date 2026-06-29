@@ -115,6 +115,20 @@ function CalendarMatchCard({
   onOpen: () => void;
 }) {
   const time = formatCalendarKickoffHour(match.kickoff_at);
+
+  function formatKnockoutStage(matchNum: number | null): string | null {
+    if (!matchNum || matchNum <= 72) return null;
+    if (matchNum >= 73 && matchNum <= 88) return "1/16";
+    if (matchNum >= 89 && matchNum <= 96) return "1/8";
+    if (matchNum >= 97 && matchNum <= 100) return "1/4";
+    if (matchNum === 101 || matchNum === 102) return "SF";
+    if (matchNum === 103) return "TP";
+    if (matchNum === 104) return "F";
+    return null;
+  }
+
+  const koStage = formatKnockoutStage(match.match_number);
+
   const predictionLabel = formatCalendarPrediction(match);
   const officialLabel = formatCalendarOfficialScore(match);
   const finishedState = resolveCalendarFinishedCard(match);
@@ -160,6 +174,11 @@ function CalendarMatchCard({
       )}
     >
       <CalendarMatchGroupBadge groupCode={match.group_code} />
+      {koStage && (
+        <span className="pointer-events-none absolute right-[4px] top-[4px] z-[6] text-[0.6rem] font-bold leading-none text-[var(--tm-muted-fg)]/80">
+          {koStage}
+        </span>
+      )}
       <CalendarMatchMvpLine underScore={upcomingUnderScore} />
       <div className="tm-cal-match-card-body">
         <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">

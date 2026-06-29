@@ -9,7 +9,6 @@ type GeneralPredictionRowProps = {
   label: string;
   value?: string | null;
   valueNode?: ReactNode;
-  probability?: number | null;
   editable: boolean;
   onAdd: () => void;
   onEdit: () => void;
@@ -19,7 +18,6 @@ export function GeneralPredictionRow({
   label,
   value = null,
   valueNode,
-  probability = null,
   editable,
   onAdd,
   onEdit,
@@ -31,16 +29,8 @@ export function GeneralPredictionRow({
     event.stopPropagation();
   }
 
-  function getProbabilityColor(prob: number) {
-    if (prob < 10) return "bg-[#c0392b]";
-    if (prob < 25) return "bg-[#e67e22]";
-    if (prob < 50) return "bg-[#d35400]";
-    if (prob < 75) return "bg-[#6ab04c]";
-    return "bg-[#16a085]";
-  }
-
   return (
-    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_minmax(3.5rem,1fr)_auto] items-center gap-1">
+    <div className="tm-general-prediction-row grid h-full w-full grid-cols-[minmax(0,3.1rem)_minmax(0,1fr)_auto] items-center gap-1">
       <span className="flex min-w-0 items-center text-[clamp(7px,2cqw,9px)] font-semibold uppercase leading-tight tracking-wide text-white/50">
         {label}
       </span>
@@ -74,22 +64,6 @@ export function GeneralPredictionRow({
           </button>
         ) : (
           <span className="text-[10px] text-white/30 text-right w-full">—</span>
-        )}
-      </div>
-      
-      <div className="flex w-full items-center">
-        {probability !== null ? (
-          <div className="relative h-3 w-full overflow-hidden rounded-sm bg-white/10 ring-1 ring-white/5">
-            <div
-              className={cn("absolute bottom-0 left-0 top-0 transition-all", getProbabilityColor(probability))}
-              style={{ width: `${Math.min(100, Math.max(0, probability))}%` }}
-            />
-            <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold tabular-nums text-white drop-shadow-sm">
-              {probability.toFixed(1)}%
-            </span>
-          </div>
-        ) : (
-          <div className="h-3 w-full" />
         )}
       </div>
 
