@@ -18,7 +18,7 @@ const EASTER_EGG_SCENES = [
   { id: "12", x: 890, y: 542, w: 260, h: 203, hideRealTrophy: false },
 ];
 
-export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y: number; onToggleCup?: (hidden: boolean) => void; forceShow?: boolean }) {
+export function EasterEggScene({ x, y, onToggleCup, forceShow, manualEggKey }: { x: number; y: number; onToggleCup?: (hidden: boolean) => void; forceShow?: boolean; manualEggKey?: number }) {
   const [activeScene, setActiveScene] = useState<typeof EASTER_EGG_SCENES[0] | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -37,26 +37,37 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
     }
 
     if (shouldShow) {
-      const scene = EASTER_EGG_SCENES[Math.floor(Math.random() * EASTER_EGG_SCENES.length)];
+      // Si se invoca manualmente con el botón EGG, mostramos los stickers en orden para facilitar su identificación.
+      let scene;
+      if (forceShow && manualEggKey) {
+        scene = EASTER_EGG_SCENES[(manualEggKey - 1) % EASTER_EGG_SCENES.length];
+      } else {
+        scene = EASTER_EGG_SCENES[Math.floor(Math.random() * EASTER_EGG_SCENES.length)];
+      }
+      
       setActiveScene(scene);
 
       const delay = 400; // Espera inicial
       
       const startTimer = setTimeout(() => {
         if (onToggleCup) {
-          onToggleCup(true);
+          onToggleCup(true); // Oculta la copa (tarda 200ms)
         }
         
         setIsStarted(true);
         setIsAnimating(true);
         
-        // Duración de la animación: 2.7s (350ms in + 2000ms vis + 350ms out)
+        // A los 2500ms comenzamos a mostrar la copa de nuevo (para que haga crossfade con la salida del sticker)
         setTimeout(() => {
-          setIsAnimating(false);
-          setActiveScene(null);
           if (onToggleCup) {
             onToggleCup(false);
           }
+        }, 2500);
+
+        // A los 2700ms termina la animación y desmontamos
+        setTimeout(() => {
+          setIsAnimating(false);
+          setActiveScene(null);
         }, 2700);
       }, delay);
       
@@ -64,7 +75,7 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
         clearTimeout(startTimer);
       };
     }
-  }, []);
+  }, [manualEggKey]); // Añadimos manualEggKey para que cambie si pulsamos rápido
 
   if (!activeScene || !isStarted) return null;
 
@@ -79,23 +90,23 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
         @keyframes easterEggEntrance {
           0% {
             opacity: 0;
-            transform: translate(-50%, -100%) translateY(-15px);
+            transform: translate(-50%, -100%);
           }
-          13% { /* 350ms */
+          7.4% { /* 200ms (entrada coordinada con el fade-out de la copa) */
             opacity: 1;
-            transform: translate(-50%, -100%) translateY(0);
+            transform: translate(-50%, -100%);
           }
-          87% { /* 2350ms */
+          92.6% { /* 2500ms (comienza a desvanecerse junto al fade-in de la copa) */
             opacity: 1;
-            transform: translate(-50%, -100%) translateY(0);
+            transform: translate(-50%, -100%);
           }
           100% {
             opacity: 0;
-            transform: translate(-50%, -100%) translateY(0);
+            transform: translate(-50%, -100%);
           }
         }
         .animate-easter-egg {
-          animation: easterEggEntrance 2.7s ease-out forwards;
+          animation: easterEggEntrance 2.7s linear forwards;
         }
       `}} />
       <div
