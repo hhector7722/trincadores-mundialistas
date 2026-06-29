@@ -23,14 +23,21 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow, manualEggKey }: {
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    const hasSeen = localStorage.getItem("tm-easter-egg-seen");
+    let hasSeen = "1";
+    try {
+      hasSeen = localStorage.getItem("tm-easter-egg-seen") || "";
+    } catch (e) {
+      // Ignorar error en modo incógnito
+    }
     let shouldShow = false;
 
     if (forceShow) {
       shouldShow = true;
     } else if (!hasSeen) {
       shouldShow = true;
-      localStorage.setItem("tm-easter-egg-seen", "1");
+      try {
+        localStorage.setItem("tm-easter-egg-seen", "1");
+      } catch (e) {}
     } else {
       shouldShow = Math.random() < 0.1;
     }

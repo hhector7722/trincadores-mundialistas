@@ -406,7 +406,7 @@ export function KnockoutBracket({
           >
             <button
               type="button"
-              className="tm-ko-normas-frame tm-ko-normas-trigger tm-circle-depth overflow-hidden rounded-md"
+              className="tm-ko-normas-frame tm-ko-normas-trigger overflow-hidden rounded-xl border border-[rgba(255,255,255,0.15)] shadow-md transition-transform"
               onClick={() => setRulesPreviewOpen(true)}
               aria-label="Ver normas de eliminatorias"
             >

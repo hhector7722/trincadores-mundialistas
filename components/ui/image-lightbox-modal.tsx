@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
 const LIGHTBOX_IMAGE_CLASS =
-  "block max-h-[85dvh] max-w-full rounded-md object-contain";
+  "block max-h-[85dvh] max-w-full rounded-[1.25rem] object-contain";
 
 type ImageLightboxModalProps = {
   open: boolean;
