@@ -47,6 +47,7 @@ type KnockoutBracketProps = {
   currentProfileId?: string;
   isAdminUser?: boolean;
   withEasterEggs?: boolean;
+  manualEggKey?: number;
   onOpenMatch?: (match: MatchWithPrediction) => void;
 };
 
