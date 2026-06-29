@@ -9,7 +9,6 @@ const EASTER_EGG_SCENES = [
   { id: "3", x: 619, y: 27, w: 204, h: 214, hideRealTrophy: false },
   { id: "4", x: 894, y: 43, w: 251, h: 199, hideRealTrophy: false },
   { id: "5", x: 12, y: 273, w: 249, h: 220, hideRealTrophy: false },
-  { id: "6", x: 288, y: 304, w: 261, h: 191, hideRealTrophy: false },
   { id: "7", x: 596, y: 297, w: 247, h: 198, hideRealTrophy: false },
   { id: "8", x: 899, y: 317, w: 240, h: 180, hideRealTrophy: false },
   { id: "9", x: 17, y: 525, w: 234, h: 219, hideRealTrophy: false },

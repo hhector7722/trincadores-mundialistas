@@ -293,6 +293,38 @@ export function KnockoutBracket({
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
   const [rulesPreviewOpen, setRulesPreviewOpen] = useState(false);
   const [hideRealCup, setHideRealCup] = useState(false);
+
+  // Glitch effect state
+  const [mascotImage, setMascotImage] = useState<string>(KO_MASCOT_SRC);
+  const [isGlitching, setIsGlitching] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const runSequence = () => {
+      // psoe (7s)
+      timeoutId = setTimeout(() => {
+        setIsGlitching(true);
+        timeoutId = setTimeout(() => {
+          setMascotImage("/icons/fifagate.png");
+          setIsGlitching(false);
+          // fifagate (3s)
+          timeoutId = setTimeout(() => {
+            setIsGlitching(true);
+            timeoutId = setTimeout(() => {
+              setMascotImage(KO_MASCOT_SRC);
+              setIsGlitching(false);
+              runSequence();
+            }, 300);
+          }, 3000);
+        }, 300);
+      }, 7000);
+    };
+
+    runSequence();
+
+    return () => clearTimeout(timeoutId);
+  }, []);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
   const handleOpenMatch = onOpenMatch ?? setActiveMatch;
 
@@ -318,6 +350,24 @@ export function KnockoutBracket({
           role="img"
           aria-label="Cuadro de eliminatorias Mundial 2026"
         >
+          <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes signalGlitch {
+            0% { transform: translate(0); filter: hue-rotate(0deg); opacity: 1; }
+            10% { transform: translate(-3px, 2px); filter: hue-rotate(90deg) contrast(150%); opacity: 0.8; }
+            20% { transform: translate(3px, -2px); filter: hue-rotate(-90deg) invert(0.2); opacity: 0.9; }
+            30% { transform: translate(-2px, -3px); filter: hue-rotate(180deg) blur(1px); opacity: 0.7; }
+            40% { transform: translate(2px, 3px); filter: hue-rotate(45deg); opacity: 1; }
+            50% { transform: translate(-1px, 1px); filter: invert(0.8); opacity: 0.8; }
+            60% { transform: translate(1px, -1px); filter: saturate(300%) hue-rotate(-45deg); opacity: 0.9; }
+            70% { transform: translate(-2px, 2px); filter: contrast(200%); opacity: 0.7; }
+            80% { transform: translate(3px, -1px); filter: blur(2px) sepia(1); opacity: 1; }
+            90% { transform: translate(-1px, 3px); filter: hue-rotate(90deg) invert(0.5); opacity: 0.8; }
+            100% { transform: translate(0); filter: hue-rotate(0deg); opacity: 1; }
+          }
+          .tm-glitch-active {
+            animation: signalGlitch 0.15s linear infinite;
+          }
+        `}} />
           <div className="tm-ko-header-band" aria-hidden />
 
           <div
@@ -329,12 +379,15 @@ export function KnockoutBracket({
           >
             <button
               type="button"
-              className="tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md"
+              className={cn(
+                  "tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md transition-transform",
+                  isGlitching ? "tm-glitch-active" : ""
+                )}
               onClick={() => setMascotPreviewOpen(true)}
               aria-label="Ampliar imagen"
             >
               <Image
-                src={KO_MASCOT_SRC}
+                src={mascotImage}
                 alt=""
                 width={1326}
                 height={833}
@@ -432,7 +485,7 @@ export function KnockoutBracket({
       <ImageLightboxModal
         open={mascotPreviewOpen}
         onClose={() => setMascotPreviewOpen(false)}
-        src={KO_MASCOT_SRC}
+        src={mascotImage}
         ariaLabel="Mascota KO"
       />
 
