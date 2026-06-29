@@ -174,16 +174,18 @@ function CalendarMatchCard({
       )}
     >
       <CalendarMatchGroupBadge groupCode={match.group_code} />
-      {koStage && (
-        <span className="pointer-events-none absolute right-[2px] top-[2px] z-[6] text-[0.5rem] font-bold leading-none text-[var(--tm-muted-fg)]/60">
-          {koStage}
-        </span>
-      )}
       <CalendarMatchMvpLine underScore={upcomingUnderScore} />
       <div className="tm-cal-match-card-body">
-        <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
-          {time}
-        </span>
+        <div className="relative flex w-full items-center justify-center">
+          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
+            {time}
+          </span>
+          {koStage && (
+            <span className="tm-cal-kickoff pointer-events-none absolute right-1 font-bold leading-none text-[var(--tm-muted-fg)]/70">
+              {koStage}
+            </span>
+          )}
+        </div>
         <CalendarMatchCardFlagsRow
           homeTeam={match.home_team}
           awayTeam={match.away_team}

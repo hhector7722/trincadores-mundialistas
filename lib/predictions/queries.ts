@@ -399,6 +399,7 @@ export type MatchPredictionsBoardRow = {
   avatarUrl: string | null;
   homeGoals: number | null;
   awayGoals: number | null;
+  advancingTeam: "home" | "away" | null;
   mvpPlayerName: string | null;
   scoreOutcome: ScoreOutcome | null;
   mvpCorrect: boolean;
@@ -606,6 +607,7 @@ export async function getMatchPredictionsBoard(
       avatarUrl: profile.avatar_url,
       homeGoals,
       awayGoals,
+      advancingTeam: (prediction?.advancing_team as "home" | "away" | null) ?? null,
       mvpPlayerName: mvpPrediction?.player_name ?? null,
       scoreOutcome,
       mvpCorrect,
