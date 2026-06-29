@@ -20,7 +20,6 @@ const EASTER_EGG_SCENES = [
 
 export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y: number; onToggleCup?: (hidden: boolean) => void; forceShow?: boolean }) {
   const [activeScene, setActiveScene] = useState<typeof EASTER_EGG_SCENES[0] | null>(null);
-  const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -32,7 +31,6 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
       shouldShow = true;
     } else if (!hasSeen) {
       shouldShow = true;
-      setIsFirstVisit(true);
       localStorage.setItem("tm-easter-egg-seen", "1");
     } else {
       shouldShow = Math.random() < 0.1;
@@ -45,7 +43,7 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
       const delay = 400; // Espera inicial
       
       const startTimer = setTimeout(() => {
-        if (scene.hideRealTrophy && onToggleCup) {
+        if (onToggleCup) {
           onToggleCup(true);
         }
         
@@ -56,7 +54,7 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
         setTimeout(() => {
           setIsAnimating(false);
           setActiveScene(null);
-          if (scene.hideRealTrophy && onToggleCup) {
+          if (onToggleCup) {
             onToggleCup(false);
           }
         }, 2700);
@@ -67,15 +65,6 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
       };
     }
   }, []);
-
-  useEffect(() => {
-    if (isFirstVisit && isAnimating) {
-      document.body.style.pointerEvents = 'none';
-      return () => {
-        document.body.style.pointerEvents = '';
-      };
-    }
-  }, [isFirstVisit, isAnimating]);
 
   if (!activeScene || !isStarted) return null;
 
