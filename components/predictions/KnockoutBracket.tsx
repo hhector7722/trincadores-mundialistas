@@ -308,7 +308,7 @@ export function KnockoutBracket({
         timeoutId = setTimeout(() => {
           setMascotImage("/icons/fifagate.png");
           setIsGlitching(false);
-          // fifagate (3s)
+          // fifagate (1s)
           timeoutId = setTimeout(() => {
             setIsGlitching(true);
             timeoutId = setTimeout(() => {
@@ -316,7 +316,7 @@ export function KnockoutBracket({
               setIsGlitching(false);
               runSequence();
             }, 300);
-          }, 3000);
+          }, 1000);
         }, 300);
       }, 7000);
     };
