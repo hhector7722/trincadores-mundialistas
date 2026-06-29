@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const LIGHTBOX_IMAGE_CLASS =
   "block max-h-[85dvh] max-w-full rounded-[1.25rem] object-contain";
@@ -37,8 +38,12 @@ export function ImageLightboxModal({
       )}
     >
       <div className="relative inline-block max-w-full">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} className={LIGHTBOX_IMAGE_CLASS} />
+        <TransformWrapper centerZoomedOut centerOnInit>
+          <TransformComponent>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt={alt} className={LIGHTBOX_IMAGE_CLASS} />
+          </TransformComponent>
+        </TransformWrapper>
       </div>
     </Modal>
   );
