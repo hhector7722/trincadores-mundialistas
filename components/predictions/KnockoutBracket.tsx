@@ -380,7 +380,7 @@ export function KnockoutBracket({
             <button
               type="button"
               className={cn(
-                  "tm-ko-perrete-frame tm-ko-perrete-trigger tm-circle-depth overflow-hidden rounded-md transition-transform",
+                  "tm-ko-perrete-frame tm-ko-perrete-trigger bg-transparent transition-transform",
                   isGlitching ? "tm-glitch-active" : ""
                 )}
               onClick={() => setMascotPreviewOpen(true)}
@@ -406,7 +406,7 @@ export function KnockoutBracket({
           >
             <button
               type="button"
-              className="tm-ko-normas-frame tm-ko-normas-trigger overflow-hidden rounded-xl border border-[rgba(255,255,255,0.15)] shadow-md transition-transform"
+              className="tm-ko-normas-frame tm-ko-normas-trigger bg-transparent transition-transform"
               onClick={() => setRulesPreviewOpen(true)}
               aria-label="Ver normas de eliminatorias"
             >
