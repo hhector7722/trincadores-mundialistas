@@ -18,7 +18,7 @@ const EASTER_EGG_SCENES = [
   { id: "12", x: 890, y: 542, w: 260, h: 203, hideRealTrophy: false },
 ];
 
-export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; onToggleCup?: (hidden: boolean) => void }) {
+export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y: number; onToggleCup?: (hidden: boolean) => void; forceShow?: boolean }) {
   const [activeScene, setActiveScene] = useState<typeof EASTER_EGG_SCENES[0] | null>(null);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
@@ -28,7 +28,9 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
     const hasSeen = localStorage.getItem("tm-easter-egg-seen");
     let shouldShow = false;
 
-    if (!hasSeen) {
+    if (forceShow) {
+      shouldShow = true;
+    } else if (!hasSeen) {
       shouldShow = true;
       setIsFirstVisit(true);
       localStorage.setItem("tm-easter-egg-seen", "1");

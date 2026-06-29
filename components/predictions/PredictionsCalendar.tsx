@@ -68,6 +68,7 @@ type PredictionsCalendarProps = {
   poolId: string;
   matches: MatchWithPrediction[];
   currentProfileId: string;
+  currentProfileAlias?: string;
   isAdminUser?: boolean;
 };
 
@@ -419,6 +420,7 @@ export function PredictionsCalendar({
   poolId,
   matches,
   currentProfileId,
+  currentProfileAlias,
   isAdminUser = false,
 }: PredictionsCalendarProps) {
   const [layoutReady, setLayoutReady] = useState(false);
@@ -450,6 +452,7 @@ export function PredictionsCalendar({
   const [allGroupsStackElevated, setAllGroupsStackElevated] = useState(false);
   const [statsStackElevated, setStatsStackElevated] = useState(false);
   const [squadsStackElevated, setSquadsStackElevated] = useState(false);
+  const [manualEggKey, setManualEggKey] = useState(0);
 
   const openAllGroupsModal: CalendarModalOpener = (options) => {
     setAllGroupsDataAccessBack(
@@ -516,7 +519,7 @@ export function PredictionsCalendar({
   }
 
   return (
-    <div ref={rootRef} className="flex min-h-0 flex-1 flex-col">
+    <div ref={rootRef} className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <section
         ref={calendarRef}
         style={{ 
@@ -529,7 +532,7 @@ export function PredictionsCalendar({
           isJune ? "flex-1" : "tm-porra-calendar--july-view tm-porra-calendar--auto-rows"
         )}
       >
-        <div className="tm-cal-header flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
+        <div className="tm-cal-header relative flex shrink-0 items-center justify-center gap-2 px-2 py-1 sm:px-3">
           <button
             className={cn(
               "p-1 text-[var(--tm-muted)] hover:text-[var(--tm-fg)] transition-colors",
@@ -551,6 +554,15 @@ export function PredictionsCalendar({
           >
             <ChevronRight className="h-6 w-6" />
           </button>
+          
+          {currentProfileAlias?.toLowerCase() === "hector" && (
+            <button
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded border border-[var(--tm-muted)] px-2 py-0.5 text-[0.65rem] font-bold text-[var(--tm-muted)] hover:border-[var(--tm-fg)] hover:text-[var(--tm-fg)] transition-colors"
+              onClick={() => setManualEggKey(k => k + 1)}
+            >
+              EGG
+            </button>
+          )}
         </div>
 
         <div className="tm-cal-weekdays grid shrink-0 grid-cols-7">
@@ -593,6 +605,15 @@ export function PredictionsCalendar({
             withEasterEggs={!isJune}
           />
         </div>
+      )}
+
+      {manualEggKey > 0 && (
+        <EasterEggScene
+          key={`manual-egg-${manualEggKey}`}
+          x={50}
+          y={50}
+          forceShow
+        />
       )}
 
       {allGroupsOpen && (

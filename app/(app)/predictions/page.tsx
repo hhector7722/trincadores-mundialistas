@@ -34,6 +34,7 @@ export default async function PredictionsPage() {
           poolId={ctx.activePoolId}
           matches={matches}
           currentProfileId={user!.id}
+          currentProfileAlias={profile?.username || ""}
           isAdminUser={isAdmin}
         />
       </div>
