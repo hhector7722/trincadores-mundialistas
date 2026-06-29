@@ -194,7 +194,11 @@ export function resolveQuizWindow(quiz: QuizWindowLike): {
   };
 }
 
+export const GLOBAL_QUIZ_PAUSE = true;
+
 export function isQuizWindowOpen(quiz: QuizWindowLike, now = new Date()): boolean {
+  if (GLOBAL_QUIZ_PAUSE) return false;
+
   const { opensAt, closesAt } = resolveQuizWindow(quiz);
   const instant = now.getTime();
 
