@@ -175,7 +175,7 @@ function CalendarMatchCard({
     >
       <CalendarMatchGroupBadge groupCode={match.group_code} />
       {koStage && (
-        <span className="pointer-events-none absolute right-[4px] top-[4px] z-[6] text-[0.6rem] font-bold leading-none text-[var(--tm-muted-fg)]/80">
+        <span className="pointer-events-none absolute right-[2px] top-[2px] z-[6] text-[0.5rem] font-bold leading-none text-[var(--tm-muted-fg)]/60">
           {koStage}
         </span>
       )}
