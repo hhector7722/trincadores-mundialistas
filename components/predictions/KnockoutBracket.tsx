@@ -380,7 +380,7 @@ export function KnockoutBracket({
             <button
               type="button"
               className={cn(
-                  "tm-ko-perrete-frame tm-ko-perrete-trigger overflow-hidden rounded-md border-2 border-black bg-black/20 shadow-md transition-transform",
+                  "tm-ko-perrete-frame tm-ko-perrete-trigger overflow-hidden rounded-md border border-black/40 shadow-sm transition-transform",
                   isGlitching ? "tm-glitch-active" : ""
                 )}
               onClick={() => setMascotPreviewOpen(true)}
