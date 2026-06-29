@@ -33,7 +33,6 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
       setIsFirstVisit(true);
       localStorage.setItem("tm-easter-egg-seen", "1");
     } else {
-      // 10% chance
       shouldShow = Math.random() < 0.1;
     }
 
@@ -41,42 +40,32 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
       const scene = EASTER_EGG_SCENES[Math.floor(Math.random() * EASTER_EGG_SCENES.length)];
       setActiveScene(scene);
 
-      // Momento de aparición: Esperar entre 300ms y 500ms
-      const delay = 300 + Math.random() * 200;
+      const delay = 400; // Espera inicial
       
       const startTimer = setTimeout(() => {
         if (scene.hideRealTrophy && onToggleCup) {
           onToggleCup(true);
-          // Start easter egg animation after cup fades out
-          setTimeout(() => {
-            setIsStarted(true);
-            setIsAnimating(true);
-            
-            setTimeout(() => {
-              setIsAnimating(false);
-              setActiveScene(null);
-              onToggleCup(false);
-            }, 1500);
-          }, 200);
-        } else {
-          setIsStarted(true);
-          setIsAnimating(true);
-          
-          setTimeout(() => {
-            setIsAnimating(false);
-            setActiveScene(null);
-          }, 1500);
         }
+        
+        setIsStarted(true);
+        setIsAnimating(true);
+        
+        // Duración de la animación: 2.7s (350ms in + 2000ms vis + 350ms out)
+        setTimeout(() => {
+          setIsAnimating(false);
+          setActiveScene(null);
+          if (scene.hideRealTrophy && onToggleCup) {
+            onToggleCup(false);
+          }
+        }, 2700);
       }, delay);
       
       return () => {
         clearTimeout(startTimer);
-        // We don't restore cup immediately here to avoid glitches on unmount, but normally unmount means the whole bracket goes away anyway.
       };
     }
   }, []);
 
-  // Bloqueo de interacción de pantalla durante la primera visita
   useEffect(() => {
     if (isFirstVisit && isAnimating) {
       document.body.style.pointerEvents = 'none';
@@ -88,11 +77,10 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
 
   if (!activeScene || !isStarted) return null;
 
-  const scale = 0.6; 
-  const width = activeScene.w * scale;
-  const height = activeScene.h * scale;
-  const bgX = -activeScene.x * scale;
-  const bgY = -activeScene.y * scale;
+  const imgWidthPercent = (1176 / activeScene.w) * 100;
+  const imgHeightPercent = (750 / activeScene.h) * 100;
+  const leftOffsetPercent = -(activeScene.x / activeScene.w) * 100;
+  const topOffsetPercent = -(activeScene.y / activeScene.h) * 100;
 
   return (
     <>
@@ -100,27 +88,23 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
         @keyframes easterEggEntrance {
           0% {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translate(-50%, -100%) translateY(-15px);
           }
-          20% {
+          13% { /* 350ms */
             opacity: 1;
-            transform: translateY(2px);
+            transform: translate(-50%, -100%) translateY(0);
           }
-          30% {
+          87% { /* 2350ms */
             opacity: 1;
-            transform: translateY(0);
-          }
-          70% {
-            opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, -100%) translateY(0);
           }
           100% {
             opacity: 0;
-            transform: translateY(0);
+            transform: translate(-50%, -100%) translateY(0);
           }
         }
         .animate-easter-egg {
-          animation: easterEggEntrance 1.5s ease-in-out forwards;
+          animation: easterEggEntrance 2.7s ease-out forwards;
         }
       `}} />
       <div
@@ -129,17 +113,28 @@ export function EasterEggScene({ x, y, onToggleCup }: { x: number; y: number; on
           "animate-easter-egg"
         )}
         style={{
-          left: `calc(${x}% - ${width / 2}px)`,
-          top: `calc(${y}% + 52px)`,
-          width,
-          height,
-          backgroundImage: 'url(/easter-eggs.png)',
-          backgroundPosition: `${bgX}px ${bgY}px`,
-          backgroundSize: `${1176 * scale}px ${750 * scale}px`,
-          backgroundRepeat: 'no-repeat',
+          left: `${x}%`,
+          top: `${y}%`,
+          width: '38%',
+          aspectRatio: `${activeScene.w} / ${activeScene.h}`,
+          overflow: 'hidden',
+          transform: 'translate(-50%, -100%)' // Fallback
         }}
         aria-hidden
-      />
+      >
+        <img 
+          src="/easter-eggs.png"
+          style={{
+            position: 'absolute',
+            width: `${imgWidthPercent}%`,
+            height: `${imgHeightPercent}%`,
+            left: `${leftOffsetPercent}%`,
+            top: `${topOffsetPercent}%`,
+            maxWidth: 'none',
+          }}
+          alt=""
+        />
+      </div>
     </>
   );
 }
