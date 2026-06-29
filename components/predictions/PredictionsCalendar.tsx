@@ -590,6 +590,7 @@ export function PredictionsCalendar({
             matches={localMatches}
             currentProfileId={currentProfileId}
             onOpenMatch={setActiveMatch}
+            withEasterEggs={!isJune}
           />
         </div>
       )}

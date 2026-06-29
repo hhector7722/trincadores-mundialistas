@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { ImageLightboxModal } from "@/components/ui/image-lightbox-modal";
 import { trackUsageModalOpen } from "@/lib/usage/client";
+import { EasterEggScene } from "@/components/predictions/EasterEggScene";
 
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
@@ -45,6 +46,7 @@ type KnockoutBracketProps = {
   matches: MatchWithPrediction[];
   currentProfileId?: string;
   isAdminUser?: boolean;
+  withEasterEggs?: boolean;
   onOpenMatch?: (match: MatchWithPrediction) => void;
 };
 
@@ -278,6 +280,7 @@ export function KnockoutBracket({
   matches, 
   currentProfileId, 
   isAdminUser = false,
+  withEasterEggs = false,
   onOpenMatch 
 }: KnockoutBracketProps) {
   const pathname = usePathname();
@@ -287,6 +290,7 @@ export function KnockoutBracket({
   const [activeMatch, setActiveMatch] = useState<MatchWithPrediction | null>(null);
   const [mascotPreviewOpen, setMascotPreviewOpen] = useState(false);
   const [rulesPreviewOpen, setRulesPreviewOpen] = useState(false);
+  const [hideRealCup, setHideRealCup] = useState(false);
   const matchMap = useMemo(() => buildKnockoutMatchMap(localMatches), [localMatches]);
   const handleOpenMatch = onOpenMatch ?? setActiveMatch;
 
@@ -382,7 +386,7 @@ export function KnockoutBracket({
           </svg>
 
           <div
-            className="tm-ko-cup"
+            className={cn("tm-ko-cup z-10 transition-opacity duration-200", hideRealCup ? "opacity-0" : "opacity-100")}
             style={{
               left: `${FINAL_CENTER_X}%`,
               top: `${FINAL_CENTER_Y - FINAL_CUP_OFFSET_ABOVE_FINAL}%`,
@@ -398,6 +402,14 @@ export function KnockoutBracket({
               priority
             />
           </div>
+
+          {withEasterEggs && (
+            <EasterEggScene 
+              x={FINAL_CENTER_X} 
+              y={FINAL_CENTER_Y - FINAL_CUP_OFFSET_ABOVE_FINAL} 
+              onToggleCup={setHideRealCup}
+            />
+          )}
 
           <div className="tm-ko-nodes">
             {BRACKET_GEOMETRY.map((geom) => (
