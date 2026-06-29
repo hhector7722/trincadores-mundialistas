@@ -17,9 +17,9 @@ function formatGoalCell(value: number | null): string {
   return String(value);
 }
 
-function CellValue({ value }: { value: string }) {
+function CellValue({ value, className }: { value: string; className?: string }) {
   return (
-    <span className="flex h-full w-full items-center justify-center whitespace-nowrap text-center text-[10px] leading-none text-[var(--tm-fg)]">
+    <span className={cn("flex h-full w-full items-center justify-center whitespace-nowrap text-center text-[10px] leading-none", className || "text-[var(--tm-fg)]")}>
       {value}
     </span>
   );
@@ -46,6 +46,10 @@ export function MatchPredictionsBoardRow({
     if (!canPreview) return;
     setAvatarOpen(true);
   }
+
+  const isDrawPrediction = row.homeGoals !== null && row.homeGoals === row.awayGoals;
+  const homeGoalsClassName = isDrawPrediction && row.advancingTeam === "home" ? "text-yellow-500 font-bold" : undefined;
+  const awayGoalsClassName = isDrawPrediction && row.advancingTeam === "away" ? "text-yellow-500 font-bold" : undefined;
 
   return (
     <>
@@ -101,8 +105,8 @@ export function MatchPredictionsBoardRow({
             </div>
           </>
         ) : null}
-        <CellValue value={formatGoalCell(row.homeGoals)} />
-        <CellValue value={formatGoalCell(row.awayGoals)} />
+        <CellValue value={formatGoalCell(row.homeGoals)} className={homeGoalsClassName} />
+        <CellValue value={formatGoalCell(row.awayGoals)} className={awayGoalsClassName} />
         <MatchPredictionsBoardMvpLabel playerName={row.mvpPlayerName} />
       </div>
       {canPreview ? (

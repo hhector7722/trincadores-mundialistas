@@ -181,7 +181,7 @@ function CalendarMatchCard({
             {time}
           </span>
           {koStage && (
-            <span className="tm-cal-kickoff pointer-events-none absolute right-1 font-bold leading-none text-[var(--tm-muted-fg)]/70">
+            <span className="tm-cal-kickoff pointer-events-none absolute right-0 text-right font-bold leading-none text-[var(--tm-muted-fg)]/70">
               {koStage}
             </span>
           )}
