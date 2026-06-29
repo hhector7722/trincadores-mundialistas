@@ -111,13 +111,13 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
       `}} />
       <div
         className={cn(
-          "pointer-events-none absolute z-[5]",
+          "pointer-events-none absolute z-[20]",
           "animate-easter-egg"
         )}
         style={{
           left: `${x}%`,
           top: `${y}%`,
-          width: '38%',
+          width: '28%',
           aspectRatio: `${activeScene.w} / ${activeScene.h}`,
           overflow: 'hidden',
           transform: 'translate(-50%, -100%)' // Fallback
