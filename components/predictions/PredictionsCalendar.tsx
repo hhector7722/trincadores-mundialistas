@@ -176,8 +176,8 @@ function CalendarMatchCard({
       <CalendarMatchGroupBadge groupCode={match.group_code} />
       <CalendarMatchMvpLine underScore={upcomingUnderScore} />
       <div className="tm-cal-match-card-body">
-        <div className="relative flex w-full items-center justify-center">
-          <span className="tm-cal-kickoff shrink-0 text-center font-medium leading-none text-white">
+        <div className="relative flex w-full items-center justify-start">
+          <span className="tm-cal-kickoff shrink-0 text-left font-medium leading-none text-white">
             {time}
           </span>
           {koStage && (

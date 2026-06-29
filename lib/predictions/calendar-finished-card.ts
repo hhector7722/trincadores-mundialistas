@@ -45,14 +45,32 @@ export function resolveCalendarFinishedCard(
   if (match.status !== "finished" || !hasOfficialScore(match)) return null;
 
   const hasPrediction = hasSavedPrediction(match);
-  const scoreOutcome = hasPrediction
-    ? resolveScoreOutcome({
+  let scoreOutcome: ScoreOutcome | null = null;
+
+  if (hasPrediction) {
+    const isKnockout = match.match_number != null && match.match_number > 72;
+    const points = match.prediction!.points_awarded;
+
+    if (points != null) {
+      if (isKnockout) {
+        if (points === 5) scoreOutcome = "exact_and_advancing";
+        else if (points === 3) scoreOutcome = "exact";
+        else if (points === 2) scoreOutcome = "advancing";
+        else scoreOutcome = "miss";
+      } else {
+        if (points === 5) scoreOutcome = "exact";
+        else if (points === 2) scoreOutcome = "sign";
+        else scoreOutcome = "miss";
+      }
+    } else {
+      scoreOutcome = resolveScoreOutcome({
         predictedHome: match.prediction!.home_goals,
         predictedAway: match.prediction!.away_goals,
         resultHome: match.officialHome!,
         resultAway: match.officialAway!,
-      })
-    : null;
+      });
+    }
+  }
 
   const mvpCorrect =
     !!match.mvpPrediction?.player_name &&
