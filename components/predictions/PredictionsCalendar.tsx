@@ -10,6 +10,7 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
+import { EasterEggScene } from "@/components/predictions/EasterEggScene";
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import { AllGroupsStandingsModal } from "@/components/predictions/AllGroupsStandingsModal";
 import { AllTeamsLineupModal } from "@/components/predictions/AllTeamsLineupModal";
