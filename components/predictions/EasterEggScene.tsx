@@ -117,7 +117,7 @@ export function EasterEggScene({ x, y, onToggleCup, forceShow }: { x: number; y:
         style={{
           left: `${x}%`,
           top: `${y}%`,
-          width: '28%',
+          width: '18%',
           aspectRatio: `${activeScene.w} / ${activeScene.h}`,
           overflow: 'hidden',
           transform: 'translate(-50%, -100%)' // Fallback

@@ -281,6 +281,7 @@ export function KnockoutBracket({
   currentProfileId, 
   isAdminUser = false,
   withEasterEggs = false,
+  manualEggKey = 0,
   onOpenMatch 
 }: KnockoutBracketProps) {
   const pathname = usePathname();
@@ -405,9 +406,11 @@ export function KnockoutBracket({
 
           {withEasterEggs && (
             <EasterEggScene 
+              key={`easter-egg-${manualEggKey}`}
               x={FINAL_CENTER_X} 
               y={FINAL_CENTER_Y - FINAL_CUP_OFFSET_ABOVE_FINAL} 
               onToggleCup={setHideRealCup}
+              forceShow={manualEggKey > 0}
             />
           )}
 

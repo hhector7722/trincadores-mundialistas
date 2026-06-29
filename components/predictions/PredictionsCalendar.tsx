@@ -559,7 +559,12 @@ export function PredictionsCalendar({
           {currentProfileAlias?.toLowerCase() === "hector" && (
             <button
               className="absolute right-4 top-1/2 -translate-y-1/2 rounded border border-[var(--tm-muted)] px-2 py-0.5 text-[0.65rem] font-bold text-[var(--tm-muted)] hover:border-[var(--tm-fg)] hover:text-[var(--tm-fg)] transition-colors"
-              onClick={() => setManualEggKey(k => k + 1)}
+              onClick={() => {
+                if (isJune) {
+                  setCurrentMonthView({ year: 2026, month: 7 });
+                }
+                setManualEggKey(k => k + 1);
+              }}
             >
               EGG
             </button>
@@ -604,17 +609,9 @@ export function PredictionsCalendar({
             currentProfileId={currentProfileId}
             onOpenMatch={setActiveMatch}
             withEasterEggs={!isJune}
+            manualEggKey={manualEggKey}
           />
         </div>
-      )}
-
-      {manualEggKey > 0 && (
-        <EasterEggScene
-          key={`manual-egg-${manualEggKey}`}
-          x={50}
-          y={50}
-          forceShow
-        />
       )}
 
       {allGroupsOpen && (
