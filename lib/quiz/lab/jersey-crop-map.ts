@@ -544,3 +544,26 @@ export const JERSEY_CROP_MAP: Record<string, JerseyCrop> = {
   "Portugal-2018-home": {"file":"portugal.png","x":0,"y":0,"width":0,"height":0,"team":"Portugal","year":2018,"kit":"home","dominantColor":"#E42518","pX":0.3265,"pY":0.6193,"pWidth":0.1126,"pHeight":0.3313},
   "Portugal-2018-away": {"file":"portugal.png","x":0,"y":0,"width":0,"height":0,"team":"Portugal","year":2018,"kit":"away","dominantColor":"#FFFFFF","pX":0.8381,"pY":0.5983,"pWidth":0.1126,"pHeight":0.3189},
 };
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 0, g: 0, b: 0 };
+}
+
+function colorDistance(hex1: string, hex2: string) {
+  const rgb1 = hexToRgb(hex1);
+  const rgb2 = hexToRgb(hex2);
+  const rDiff = rgb1.r - rgb2.r;
+  const gDiff = rgb1.g - rgb2.g;
+  const bDiff = rgb1.b - rgb2.b;
+  return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+}
+
+export function findSimilarKits(dominantColor: string, excludeTeam: string, threshold = 60): JerseyCrop[] {
+  const similar: JerseyCrop[] = [];
+  for (const crop of Object.values(JERSEY_CROP_MAP)) {
+    if (crop.team === excludeTeam) continue;
+    const dist = colorDistance(dominantColor, crop.dominantColor);
+    if (dist <= threshold) similar.push(crop);
+  }
+  return similar;
+}
