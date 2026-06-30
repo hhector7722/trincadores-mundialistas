@@ -209,6 +209,7 @@ export async function publishQuizDay(
     poolId,
     payload: composed.payload,
     generated: true,
+    allowReseed: options.allowReseed,
     playFormats: composed.playFormats,
     publishWindow,
   });
