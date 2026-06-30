@@ -100,9 +100,7 @@ export function composeOfficialQuizDay(args: {
       sort_order: q.sort_order,
       format: "classic",
     };
-    if (classicQuizQuestionShowsImage(args.quizDate)) {
-      meta.image_url = q.image_url;
-    } else {
+    if (!classicQuizQuestionShowsImage(args.quizDate)) {
       q.image_url = null;
     }
     return meta;
