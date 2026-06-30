@@ -28,11 +28,13 @@ export type MatchPlayerIncident = {
 };
 
 export type MatchLivePayload = {
-  period?: string | null;
-  currentMinute?: number | null;
-  stats?: MatchLiveStats | null;
-  substitutions?: MatchSubstitution[];
-  playerIncidents?: MatchPlayerIncident[];
+  period: "Pre-Match" | "Live" | "FT";
+  currentMinute: number | null;
+  stats: MatchLiveStats | null;
+  substitutions: MatchSubstitution[];
+  playerIncidents: MatchPlayerIncident[];
+  penaltyHome?: number | null;
+  penaltyAway?: number | null;
 };
 
 export type MatchLiveSnapshot = {

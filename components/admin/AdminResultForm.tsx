@@ -19,6 +19,8 @@ export function AdminResultForm({
   const router = useRouter();
   const [home, setHome] = useState("0");
   const [away, setAway] = useState("0");
+  const [penaltyHome, setPenaltyHome] = useState("");
+  const [penaltyAway, setPenaltyAway] = useState("");
   const [mvpPlayer, setMvpPlayer] = useState("");
   const [mvpTeam, setMvpTeam] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,13 +30,18 @@ export function AdminResultForm({
     e.preventDefault();
     setError(null);
     startTransition(async () => {
+      const parsedPenaltyHome = penaltyHome.trim() !== "" ? Number(penaltyHome) : null;
+      const parsedPenaltyAway = penaltyAway.trim() !== "" ? Number(penaltyAway) : null;
+
       const result = await submitMatchResult(
         poolId,
         matchId,
         Number(home),
         Number(away),
         mvpPlayer || null,
-        mvpTeam || null
+        mvpTeam || null,
+        parsedPenaltyHome,
+        parsedPenaltyAway
       );
       if (!result.ok) {
         setError(result.error);
@@ -94,6 +101,29 @@ export function AdminResultForm({
         <Button type="submit" disabled={pending} className={cn(pending && "opacity-60")}>
           {pending ? "..." : "Cerrar"}
         </Button>
+      </div>
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          min={0}
+          max={20}
+          value={penaltyHome}
+          onChange={(e) => setPenaltyHome(e.target.value)}
+          placeholder="Pen local"
+          className="w-24 text-xs"
+          aria-label="Penaltis local"
+        />
+        <span className="self-center text-[var(--tm-muted)]">-</span>
+        <Input
+          type="number"
+          min={0}
+          max={20}
+          value={penaltyAway}
+          onChange={(e) => setPenaltyAway(e.target.value)}
+          placeholder="Pen vis"
+          className="w-24 text-xs"
+          aria-label="Penaltis visitante"
+        />
       </div>
       <div className="flex flex-wrap gap-2">
         <Input

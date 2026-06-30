@@ -71,6 +71,8 @@ async function persistOfficialResultFromLive(
   matchId: string,
   homeGoals: number,
   awayGoals: number,
+  penaltyHome?: number | null,
+  penaltyAway?: number | null
 ): Promise<boolean> {
   const { data: existing } = await admin
     .from("match_results")
@@ -86,7 +88,9 @@ async function persistOfficialResultFromLive(
   if (
     existing &&
     existing.home_goals === homeGoals &&
-    existing.away_goals === awayGoals
+    existing.away_goals === awayGoals &&
+    (existing as any).penalty_home === (penaltyHome ?? null) &&
+    (existing as any).penalty_away === (penaltyAway ?? null)
   ) {
     return false;
   }
@@ -96,6 +100,8 @@ async function persistOfficialResultFromLive(
       match_id: matchId,
       home_goals: homeGoals,
       away_goals: awayGoals,
+      penalty_home: penaltyHome ?? null,
+      penalty_away: penaltyAway ?? null,
       recorded_at: new Date().toISOString(),
     },
     { onConflict: "match_id" },
@@ -188,6 +194,8 @@ export async function syncLiveMatches(
           match.id,
           bundle.homeScore,
           bundle.awayScore,
+          bundle.payload?.penaltyHome,
+          bundle.payload?.penaltyAway
         );
         if (resultWritten) resultsPersisted = true;
 

@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/scripts/supabase-admin";
+import { loadFifaCalendarLookup } from "@/lib/live/sources/fifa-official-mvp";
+import { resolveOfficialMvp, loadBsdEventMap } from "@/lib/live/sync-official-mvp";
 
 export type AdminActionResult = { ok: true } | { ok: false; error: string };
 
@@ -90,4 +93,57 @@ export async function forceGlobalMatchResult(
 
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+export async function fetchLiveOfficialMvpAction(
+  matchId: string,
+  homeTeam: string,
+  awayTeam: string,
+  kickoffAt: string
+): Promise<{ ok: true; playerName: string; teamName: string } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "Sesión no válida." };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.username?.toLowerCase() !== "hector") {
+    return { ok: false, error: "Acceso denegado." };
+  }
+
+  const adminClient = createAdminClient();
+  
+  try {
+    const fifaLookup = await loadFifaCalendarLookup();
+    const bsdMap = await loadBsdEventMap(adminClient, [matchId]);
+    
+    const candidate = {
+      id: matchId,
+      home_team: homeTeam,
+      away_team: awayTeam,
+      kickoff_at: kickoffAt,
+      status: "finished"
+    };
+
+    const official = await resolveOfficialMvp(candidate, fifaLookup, bsdMap.get(matchId));
+
+    if (!official) {
+      return { ok: false, error: "No se encontró el MVP en las fuentes oficiales (FotMob, BSD, FIFA)." };
+    }
+
+    return { 
+      ok: true, 
+      playerName: official.playerName, 
+      teamName: official.teamName 
+    };
+  } catch (err: any) {
+    return { ok: false, error: err.message || "Error al conectar con las fuentes." };
+  }
 }

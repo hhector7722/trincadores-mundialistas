@@ -24,6 +24,8 @@ export type BsdLiveEventRow = {
   status?: string;
   period?: string | null;
   last_updated?: string;
+  penalty_home?: number | null;
+  penalty_away?: number | null;
 };
 
 type BsdLiveEventsResponse = {
@@ -204,12 +206,21 @@ export async function fetchBsdLiveBundle(eventId: number, homeTeam: string, away
     detail?.away_team_id ?? null,
   );
   const playerIncidents = mergePlayerIncidents(fromIncidents, fromPlayerStats);
+  let mappedPeriod: "Pre-Match" | "Live" | "FT" = "Pre-Match";
+  if (isBsdEventFinished(detail?.status)) {
+    mappedPeriod = "FT";
+  } else if (isBsdEventLive(detail?.status)) {
+    mappedPeriod = "Live";
+  }
+
   const payload: MatchLivePayload = {
-    period: detail?.period ?? null,
+    period: mappedPeriod,
     currentMinute: detail?.current_minute ?? null,
     stats: parsedStats,
     substitutions,
     playerIncidents,
+    penaltyHome: detail?.penalty_home ?? null,
+    penaltyAway: detail?.penalty_away ?? null,
   };
 
   return {

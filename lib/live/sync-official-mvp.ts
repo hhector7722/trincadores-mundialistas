@@ -43,7 +43,7 @@ export async function loadMatchesMissingOfficialMvp(
   return (data ?? []) as MatchMvpCandidate[];
 }
 
-async function loadBsdEventMap(
+export async function loadBsdEventMap(
   admin: AdminClient,
   matchIds: string[],
 ): Promise<Map<string, string>> {
@@ -173,7 +173,7 @@ type ResolvedOfficialMvp = {
 };
 
 /** Prioridad: crónica FIFA.com → api.fifa.com → BSD. FotMob excluido (nota, no POTM FIFA). */
-async function resolveOfficialMvp(
+export async function resolveOfficialMvp(
   match: MatchMvpCandidate,
   fifaLookup: Map<string, FifaResolvedMatch>,
   bsdEventId: string | undefined,

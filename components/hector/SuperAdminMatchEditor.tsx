@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { forceGlobalMatchResult } from "@/actions/super-admin";
+import { forceGlobalMatchResult, fetchLiveOfficialMvpAction } from "@/actions/super-admin";
 import { fetchMatchSquadsAction } from "@/actions/lineup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export function SuperAdminMatchEditor({ matches }: Props) {
   const [awayGoals, setAwayGoals] = useState<number | "">("");
   const [mvpTeamName, setMvpTeamName] = useState<string>("");
   const [mvpPlayerName, setMvpPlayerName] = useState<string>("");
+  const [isFetchingLive, setIsFetchingLive] = useState(false);
 
   const [squadsLoading, setSquadsLoading] = useState(false);
   const [squads, setSquads] = useState<{ home: TeamSquadWithPlayers | null; away: TeamSquadWithPlayers | null } | null>(null);
@@ -61,16 +62,41 @@ export function SuperAdminMatchEditor({ matches }: Props) {
     };
   }, [selectedMatch]);
 
-  // Reset mvp player if team changes
-  useEffect(() => {
-    setMvpPlayerName("");
-  }, [mvpTeamName]);
+
 
   const mvpTeamSquad = mvpTeamName === selectedMatch?.home_team
     ? squads?.home
     : mvpTeamName === selectedMatch?.away_team
       ? squads?.away
       : null;
+
+  async function handleAutoFetchMvp() {
+    if (!selectedMatch) return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setIsFetchingLive(true);
+    
+    try {
+      const res = await fetchLiveOfficialMvpAction(
+        selectedMatch.id,
+        selectedMatch.home_team,
+        selectedMatch.away_team,
+        selectedMatch.kickoff_at
+      );
+      
+      if (res.ok) {
+        setMvpTeamName(res.teamName);
+        setMvpPlayerName(res.playerName);
+        setSuccessMsg(`MVP encontrado en fuentes oficiales: ${res.playerName} (${res.teamName})`);
+      } else {
+        setErrorMsg(res.error);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "Error al conectar con las fuentes.");
+    } finally {
+      setIsFetchingLive(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -152,10 +178,24 @@ export function SuperAdminMatchEditor({ matches }: Props) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--tm-fg)]">Equipo del MVP</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-[var(--tm-fg)]">Equipo del MVP</label>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAutoFetchMvp}
+                disabled={isFetchingLive || isPending}
+                className="h-8 text-xs font-display uppercase tracking-wider"
+              >
+                {isFetchingLive ? "Conectando..." : "Autocompletar (FIFA/BSD)"}
+              </Button>
+            </div>
             <select
               value={mvpTeamName}
-              onChange={(e) => setMvpTeamName(e.target.value)}
+              onChange={(e) => {
+                setMvpTeamName(e.target.value);
+                setMvpPlayerName("");
+              }}
               className="flex h-11 w-full rounded-md border border-[var(--tm-border)] bg-[var(--tm-bg)] px-3 py-2 text-sm text-[var(--tm-fg)] ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--tm-primary)]"
             >
               <option value="">-- Ninguno --</option>
@@ -166,22 +206,32 @@ export function SuperAdminMatchEditor({ matches }: Props) {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-[var(--tm-fg)]">Jugador MVP</label>
-            <select
-              value={mvpPlayerName}
-              onChange={(e) => setMvpPlayerName(e.target.value)}
-              disabled={!mvpTeamName || squadsLoading || (!squadsLoading && !mvpTeamSquad)}
-              className="flex h-11 w-full rounded-md border border-[var(--tm-border)] bg-[var(--tm-bg)] px-3 py-2 text-sm text-[var(--tm-fg)] ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--tm-primary)] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">-- Seleccionar Jugador --</option>
-              {mvpTeamSquad?.players?.map((p) => (
-                <option key={p.player_name} value={p.player_name}>
-                  {p.player_name} {p.shirt_number ? `(#${p.shirt_number})` : ""}
-                </option>
-              ))}
-            </select>
+            {mvpTeamSquad ? (
+              <select
+                value={mvpPlayerName}
+                onChange={(e) => setMvpPlayerName(e.target.value)}
+                disabled={!mvpTeamName || squadsLoading}
+                className="flex h-11 w-full rounded-md border border-[var(--tm-border)] bg-[var(--tm-bg)] px-3 py-2 text-sm text-[var(--tm-fg)] ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--tm-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">-- Seleccionar Jugador --</option>
+                {mvpTeamSquad.players?.map((p) => (
+                  <option key={p.player_name} value={p.player_name}>
+                    {p.player_name} {p.shirt_number ? `(#${p.shirt_number})` : ""}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <Input
+                type="text"
+                value={mvpPlayerName}
+                onChange={(e) => setMvpPlayerName(e.target.value)}
+                disabled={!mvpTeamName || squadsLoading}
+                placeholder="Nombre del jugador (libre)"
+              />
+            )}
             {squadsLoading && <p className="text-xs text-[var(--tm-primary)] mt-1">Cargando plantillas...</p>}
             {!squadsLoading && mvpTeamName && !mvpTeamSquad && (
-              <p className="text-xs text-red-500 mt-1">No hay plantilla disponible en la BD para este equipo.</p>
+              <p className="text-xs text-[var(--tm-muted)] mt-1">No hay plantilla disponible en la BD. Introducir nombre manualmente.</p>
             )}
           </div>
 

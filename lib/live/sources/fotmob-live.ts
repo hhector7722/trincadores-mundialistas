@@ -119,12 +119,27 @@ export async function fetchFotmobLiveBundle(matchId: number) {
 
   let homeScore = 0;
   let awayScore = 0;
+  let penaltyHome: number | null = null;
+  let penaltyAway: number | null = null;
+
   if (st.scoreStr) {
-    const parts = st.scoreStr.split("-").map(p => parseInt(p.trim(), 10));
+    let rawScore = st.scoreStr;
+    const penMatch = rawScore.match(/\((.*?)-(.*?)\)/);
+    if (penMatch) {
+      penaltyHome = parseInt(penMatch[1].trim(), 10);
+      penaltyAway = parseInt(penMatch[2].trim(), 10);
+      rawScore = rawScore.replace(/\(.*?\)/, "");
+    }
+    const parts = rawScore.split("-").map(p => parseInt(p.trim(), 10));
     if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
       homeScore = parts[0];
       awayScore = parts[1];
     }
+  }
+
+  if (penaltyHome == null && (st.reason as any)?.penalties?.length === 2) {
+    penaltyHome = (st.reason as any).penalties[0];
+    penaltyAway = (st.reason as any).penalties[1];
   }
 
   const substitutions: MatchSubstitution[] = [];
@@ -164,6 +179,8 @@ export async function fetchFotmobLiveBundle(matchId: number) {
     stats: parseFotmobStats(details),
     substitutions,
     playerIncidents,
+    penaltyHome,
+    penaltyAway,
   };
 
   return {
