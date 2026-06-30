@@ -24,3 +24,5 @@ export default async function RankingPage() {
     </div>
   );
 }
+
+// force redeploy cache clear
