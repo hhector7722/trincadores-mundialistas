@@ -84,7 +84,7 @@ export function QuizJerseyPickStage({
           let imageGlow = "";
           if (isSelected && phase === "answering") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(212,255,0,0.8)] scale-105";
-          } else if (visualState === "correct") {
+          } else if (visualState === "correct" || visualState === "revealed") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(34,197,94,0.8)] scale-105";
           } else if (visualState === "wrong") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] scale-105";
