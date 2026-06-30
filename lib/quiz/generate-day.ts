@@ -86,24 +86,37 @@ export function selectFactsForDay(args: {
     rng
   );
 
-  const picked: QuizFact[] = [];
-  const usedCategories = new Set<string>();
+  const teamFacts = eligible.filter(
+    (f) =>
+      f.fact_type === "host_country" ||
+      f.fact_type === "first_winner" ||
+      f.category === "teams" ||
+      f.category === "hosts"
+  );
+  
+  const dataFacts = eligible.filter(
+    (f) =>
+      f.fact_type === "record_value" ||
+      f.fact_type === "titles_count" ||
+      f.fact_type === "curiosity" ||
+      f.category === "records"
+  );
 
+  const playerFacts = eligible.filter(
+    (f) => f.fact_type === "top_scorer" || f.category === "players"
+  );
+
+  const picked: QuizFact[] = [];
+  
+  if (teamFacts.length > 0) picked.push(teamFacts[0]);
+  if (dataFacts.length > 0) picked.push(dataFacts[0]);
+  if (playerFacts.length > 0) picked.push(playerFacts[0]);
+
+  // Fallback en caso de que falten categorías (rellenamos hasta count)
   for (const fact of eligible) {
     if (picked.length >= count) break;
-    if (usedCategories.has(fact.category) && picked.length < count - 1) {
-      continue;
-    }
+    if (picked.some((p) => p.id === fact.id)) continue;
     picked.push(fact);
-    usedCategories.add(fact.category);
-  }
-
-  if (picked.length < count) {
-    for (const fact of eligible) {
-      if (picked.length >= count) break;
-      if (picked.some((p) => p.id === fact.id)) continue;
-      picked.push(fact);
-    }
   }
 
   if (picked.length < count) {

@@ -89,35 +89,30 @@ function labQuestionToSeed(
 export function composeOfficialQuizDay(args: {
   quizDate: string;
   title?: string;
-  classicQuestion: GeneratedQuizQuestion;
-  labQuestions: LabQuestion[];
+  classicQuestions: GeneratedQuizQuestion[];
 }): ComposeOfficialQuizDayResult {
-  const labSlots = args.labQuestions.slice(0, 2);
-  if (labSlots.length < 2) {
-    throw new Error("Se necesitan 2 preguntas de laboratorio (imagen + silueta).");
-  }
+  const classicSeeds = args.classicQuestions.map((q, index) =>
+    toSeedQuestion({ ...q, sort_order: index + 1 })
+  );
 
-  const classicSeed = toSeedQuestion({ ...args.classicQuestion, sort_order: 1 });
-  if (!classicQuizQuestionShowsImage(args.quizDate)) {
-    classicSeed.image_url = null;
-  }
-  const playFormats: QuizPlayFormatMeta[] = [
-    { sort_order: 1, format: "classic" },
-  ];
-  const questions: SeedQuizQuestion[] = [classicSeed];
-
-  for (let index = 0; index < labSlots.length; index++) {
-    const sortOrder = index + 2;
-    const mapped = labQuestionToSeed(labSlots[index], sortOrder);
-    questions.push(mapped.question);
-    playFormats.push(mapped.playMeta);
-  }
+  const playFormats: QuizPlayFormatMeta[] = classicSeeds.map((q) => {
+    const meta: QuizPlayFormatMeta = {
+      sort_order: q.sort_order,
+      format: "classic",
+    };
+    if (classicQuizQuestionShowsImage(args.quizDate)) {
+      meta.image_url = q.image_url;
+    } else {
+      q.image_url = null;
+    }
+    return meta;
+  });
 
   return {
     payload: {
       quiz_date: args.quizDate,
       title: args.title ?? QUIZ_OFFICIAL_TITLE,
-      official: { questions },
+      official: { questions: classicSeeds },
     },
     playFormats,
   };
