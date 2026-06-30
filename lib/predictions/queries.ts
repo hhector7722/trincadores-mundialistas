@@ -36,6 +36,8 @@ export type MatchWithPrediction = {
   officialAway: number | null;
   officialMvpPlayerName: string | null;
   officialMvpTeamName: string | null;
+  officialPenaltyHome?: number | null;
+  officialPenaltyAway?: number | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
   highlightSource: HighlightSourceCode | null;
@@ -127,7 +129,7 @@ async function fetchPoolMatchesWithPredictions(
 
   const { data: results } = await supabase
     .from("match_results")
-    .select("match_id, home_goals, away_goals, mvp_player_name, mvp_team_name")
+    .select("match_id, home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
     .in("match_id", matchIds);
 
   const resultByMatch = new Map((results ?? []).map((r) => [r.match_id, r]));
@@ -162,6 +164,8 @@ async function fetchPoolMatchesWithPredictions(
       officialAway: result?.away_goals ?? null,
       officialMvpPlayerName: result?.mvp_player_name ?? null,
       officialMvpTeamName: result?.mvp_team_name ?? null,
+      officialPenaltyHome: result?.penalty_home ?? null,
+      officialPenaltyAway: result?.penalty_away ?? null,
       highlightYoutubeId:
         status === "finished" ? (m.highlight_youtube_id ?? null) : null,
       highlightPublishedAt:
@@ -278,7 +282,7 @@ export async function getMatchPredictionDetail(
 
   const { data: result } = await supabase
     .from("match_results")
-    .select("home_goals, away_goals, mvp_player_name, mvp_team_name")
+    .select("home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
     .eq("match_id", matchId)
     .maybeSingle();
 
@@ -323,6 +327,8 @@ export async function getMatchPredictionDetail(
     officialAway: result?.away_goals ?? null,
     officialMvpPlayerName: result?.mvp_player_name ?? null,
     officialMvpTeamName: result?.mvp_team_name ?? null,
+    officialPenaltyHome: result?.penalty_home ?? null,
+    officialPenaltyAway: result?.penalty_away ?? null,
     highlightYoutubeId:
       match.status === "finished" ? (match.highlight_youtube_id ?? null) : null,
     highlightPublishedAt:

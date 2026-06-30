@@ -416,6 +416,12 @@ function resolveKnockoutTeams(matches: MatchWithPrediction[]): MatchWithPredicti
             return isLoser ? prevMatch.away_team : prevMatch.home_team;
           } else if (prevMatch.officialAway > prevMatch.officialHome) {
             return isLoser ? prevMatch.home_team : prevMatch.away_team;
+          } else if (prevMatch.officialPenaltyHome != null && prevMatch.officialPenaltyAway != null) {
+            if (prevMatch.officialPenaltyHome > prevMatch.officialPenaltyAway) {
+              return isLoser ? prevMatch.away_team : prevMatch.home_team;
+            } else if (prevMatch.officialPenaltyAway > prevMatch.officialPenaltyHome) {
+              return isLoser ? prevMatch.home_team : prevMatch.away_team;
+            }
           }
         }
       }
