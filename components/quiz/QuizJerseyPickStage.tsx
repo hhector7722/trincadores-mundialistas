@@ -5,6 +5,29 @@ import type { QuizQuestionPlay } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+import { JERSEY_CROP_MAP } from "@/lib/quiz/lab/jersey-crop-map";
+
+const FILE_DIMENSIONS: Record<string, [number, number]> = {
+  'alemania.png': [1129, 877],
+  'argentina.png': [2400, 1603],
+  'belgica.png': [2400, 1427],
+  'brasil.png': [3323, 3029],
+  'corea.png': [2400, 1217],
+  'croacia.png': [2400, 830],
+  'españa.png': [2400, 1522],
+  'francia.png': [2400, 1416],
+  'inglaterra.png': [2400, 1308],
+  'japon.png': [2400, 797],
+  'marruecos.png': [2400, 816],
+  'mejico.png': [2400, 1392],
+  'peru.png': [2400, 915],
+  'portugal.png': [2400, 809],
+  'rusia.png': [2400, 1166],
+  'senegal.png': [2400, 695],
+  'suiza.png': [2400, 1072],
+  'uruguay.png': [2400, 1527],
+};
+
 type QuizJerseyPickStageProps = {
   question: QuizQuestionPlay;
   selectedOptionId: string | null;
@@ -69,33 +92,47 @@ export function QuizJerseyPickStage({
             imageGlow = "opacity-50 grayscale";
           }
 
+          const crop = JERSEY_CROP_MAP[option.imageKey];
+          let svgElement = null;
+
+          if (crop) {
+            const [w, h] = FILE_DIMENSIONS[crop.file] || [2400, 1500];
+            const cx = crop.pX * w;
+            const cy = crop.pY * h;
+            const cw = crop.pWidth * w;
+            const ch = crop.pHeight * h;
+
+            svgElement = (
+              <svg 
+                viewBox={`${cx} ${cy} ${cw} ${ch}`} 
+                width="100%" 
+                height="100%"
+                className={cn(
+                  "transition-all duration-300 mix-blend-multiply dark:mix-blend-screen",
+                  !locked && "group-hover:scale-110",
+                  imageGlow
+                )}
+              >
+                <image 
+                  href={encodeURI(`/images/equipaciones/${crop.file}`)} 
+                  width={w} 
+                  height={h} 
+                />
+              </svg>
+            );
+          }
+
           return (
             <button
               key={option.id}
               disabled={locked}
               onClick={() => onSelect(option.id)}
               className="relative group flex flex-col items-center justify-center transition-all duration-300 h-full min-h-0"
+              aria-label="Seleccionar esta camiseta"
             >
               <div className="relative w-full h-full p-2 flex items-center justify-center">
-                <Image
-                  src={`/api/laboratorio/jersey-crop?key=${option.imageKey}`}
-                  alt={`${option.team} ${option.year} ${option.kit}`}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  className={cn(
-                    "object-contain mix-blend-multiply dark:mix-blend-screen transition-all duration-300",
-                    !locked && "group-hover:scale-110",
-                    imageGlow
-                  )}
-                  // Using mix-blend-screen or multiply depends on background. 
-                  // If background is dark and image has white bg, multiply will hide the dark bg.
-                  // Since image has white background, multiply will keep white (which is transparent in multiply).
-                  // But wait, if container bg is dark, multiply(white, dark) = dark! So white becomes transparent!
-                  // That is exactly what we want.
-                />
+                {svgElement}
               </div>
-
             </button>
           );
         })}
