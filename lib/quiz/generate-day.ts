@@ -107,10 +107,29 @@ export function selectFactsForDay(args: {
   );
 
   const picked: QuizFact[] = [];
+  const usedTags = new Set<string>();
+
+  const pickWithVariety = (bucket: QuizFact[]) => {
+    // Attempt to find a fact with no overlapping tags and not already picked
+    for (const fact of bucket) {
+      if (picked.some(p => p.id === fact.id)) continue;
+      if (fact.tags.some(t => usedTags.has(t))) continue;
+      picked.push(fact);
+      fact.tags.forEach(t => usedTags.add(t));
+      return;
+    }
+    // Fallback: if all overlap, just take the first available that isn't picked
+    for (const fact of bucket) {
+      if (picked.some(p => p.id === fact.id)) continue;
+      picked.push(fact);
+      fact.tags.forEach(t => usedTags.add(t));
+      return;
+    }
+  };
   
-  if (teamFacts.length > 0) picked.push(teamFacts[0]);
-  if (dataFacts.length > 0) picked.push(dataFacts[0]);
-  if (playerFacts.length > 0) picked.push(playerFacts[0]);
+  pickWithVariety(teamFacts);
+  pickWithVariety(dataFacts);
+  pickWithVariety(playerFacts);
 
   // Fallback en caso de que falten categorías (rellenamos hasta count)
   for (const fact of eligible) {
