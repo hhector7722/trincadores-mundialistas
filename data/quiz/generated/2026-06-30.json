@@ -1,0 +1,128 @@
+{
+  "quiz_date": "2026-06-30",
+  "title": "¿Quién sabe más de Mundiales?",
+  "generated": true,
+  "official": {
+    "questions": [
+      {
+        "sort_order": 1,
+        "prompt": "¿En qué país se disputó el Mundial 1974?",
+        "image_url": "/images/quiz/historic/1974/wc1974-cruyff-penalty.jpg",
+        "options": [
+          {
+            "id": "a",
+            "label": "West Germany"
+          },
+          {
+            "id": "b",
+            "label": "Chile"
+          },
+          {
+            "id": "c",
+            "label": "México"
+          },
+          {
+            "id": "d",
+            "label": "Estados Unidos"
+          }
+        ],
+        "correct_option_id": "a",
+        "fact_id": "fj-wc1974-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "host_country",
+        "category": "hosts"
+      },
+      {
+        "sort_order": 2,
+        "prompt": "¿Quién fue el máximo goleador del Mundial 2006?",
+        "image_url": "/images/quiz/historic/2006/wc2006-grosso-penalty.jpg",
+        "options": [
+          {
+            "id": "a",
+            "label": "Oldřich Nejedlý"
+          },
+          {
+            "id": "b",
+            "label": "Miroslav Klose"
+          },
+          {
+            "id": "c",
+            "label": "Mario Kempes"
+          },
+          {
+            "id": "d",
+            "label": "Harry Kane"
+          }
+        ],
+        "correct_option_id": "b",
+        "fact_id": "fj-wc2006-golden-boot",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "top_scorer",
+        "category": "players"
+      },
+      {
+        "sort_order": 3,
+        "prompt": "¿En qué país se disputó el Mundial 2010?",
+        "image_url": "/images/quiz/historic/2010/wc2010-sneijder-action.jpg",
+        "options": [
+          {
+            "id": "a",
+            "label": "South Africa"
+          },
+          {
+            "id": "b",
+            "label": "Sweden"
+          },
+          {
+            "id": "c",
+            "label": "Argentina"
+          },
+          {
+            "id": "d",
+            "label": "West Germany"
+          }
+        ],
+        "correct_option_id": "a",
+        "fact_id": "fj-wc2010-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)",
+        "template_id": "host_country",
+        "category": "hosts"
+      }
+    ]
+  },
+  "_meta": {
+    "generated_at": "2026-06-30T12:21:51.257Z",
+    "fact_ids": [
+      "fj-wc1974-host",
+      "fj-wc2006-golden-boot",
+      "fj-wc2010-host"
+    ],
+    "templates": [
+      "host_country",
+      "top_scorer",
+      "host_country"
+    ],
+    "sources": [
+      {
+        "fact_id": "fj-wc1974-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      },
+      {
+        "fact_id": "fj-wc2006-golden-boot",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      },
+      {
+        "fact_id": "fj-wc2010-host",
+        "source_url": "https://github.com/jfjelstul/worldcup",
+        "source_label": "Fjelstul World Cup Database v1.2.0 (CC-BY-SA 4.0)"
+      }
+    ],
+    "facts_source": "quiz_facts_worldcup",
+    "facts_pool_size": 71
+  }
+}

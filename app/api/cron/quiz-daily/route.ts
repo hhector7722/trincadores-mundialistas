@@ -53,6 +53,16 @@ export async function GET(request: Request) {
       });
     }
 
+    const { count } = await admin.from("quiz_jersey_pick_bank").select("*", { count: "exact", head: true });
+    if (count === 0) {
+      const { generateNextJerseyPickQuestion } = await import("@/lib/quiz/lab/generate-jersey-pick-question");
+      try {
+        await generateNextJerseyPickQuestion(quizDate);
+      } catch (err) {
+        console.error("[cron/quiz-daily] Fallo en bootstrap de jersey_pick:", err);
+      }
+    }
+
     const { publishQuizDay } = await import("@/lib/quiz/publish-day");
     const result = await publishQuizDay({
       admin,

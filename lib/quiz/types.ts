@@ -19,13 +19,23 @@ export type QuizQuestionPublic = {
 export type QuizPlayQuestionFormat =
   | "classic"
   | "image_trivia"
-  | "guess_player_silhouette";
+  | "guess_player_silhouette"
+  | "score_gap"
+  | "jersey_pick";
 
 /** Pregunta en sesión de play: incluye clave correcta vía RPC start (solo intento activo). */
 export type QuizQuestionPlay = QuizQuestionPublic & {
   correct_option_id: string;
   format?: QuizPlayQuestionFormat;
   reveal_image_url?: string | null;
+  jerseyOptions?: Array<{
+    id: string;
+    team: string;
+    year: number;
+    kit: "home" | "away";
+    imageKey: string;
+    isCorrect?: boolean;
+  }>;
 };
 
 export type QuizSummary = {

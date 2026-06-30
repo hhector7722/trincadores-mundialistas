@@ -52,6 +52,37 @@ function labQuestionToSeed(
     };
   }
 
+  if (lab.format === "score_gap") {
+    return {
+      question: {
+        sort_order: sortOrder,
+        prompt: lab.prompt,
+        options,
+        correct_option_id,
+      },
+      playMeta: {
+        sort_order: sortOrder,
+        format: "score_gap",
+      },
+    };
+  }
+
+  if (lab.format === "jersey_pick") {
+    return {
+      question: {
+        sort_order: sortOrder,
+        prompt: lab.prompt,
+        options,
+        correct_option_id,
+      },
+      playMeta: {
+        sort_order: sortOrder,
+        format: "jersey_pick",
+        jerseyOptions: lab.jerseyOptions,
+      },
+    };
+  }
+
   throw new Error(`Formato de laboratorio no soportado en quiz oficial: ${lab.format}`);
 }
 

@@ -1,5 +1,8 @@
 "use client";
 
+
+import { QuizScoreGapStage } from "./QuizScoreGapStage";
+import { QuizJerseyPickStage } from "./QuizJerseyPickStage";
 import { QuizImage } from "@/components/quiz/QuizImage";
 import { QuizOptionButton } from "@/components/quiz/QuizOptionButton";
 import {
@@ -18,7 +21,23 @@ type QuizQuestionStageProps = {
   onSelect: (optionId: string) => void;
 };
 
-export function QuizQuestionStage({
+export function QuizQuestionStage(props: QuizQuestionStageProps) {
+  const { question, phase } = props;
+
+  if (question.format === "score_gap") {
+    return <QuizScoreGapStage {...props} />;
+  }
+
+  if (question.format === "jersey_pick") {
+    return <QuizJerseyPickStage {...props} />;
+  }
+
+
+
+  return <QuizTriviaStage {...props} />;
+}
+
+function QuizTriviaStage({
   question,
   selectedOptionId,
   phase,

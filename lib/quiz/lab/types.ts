@@ -5,19 +5,14 @@ import type { FormationId } from "@/lib/lineup/types";
 export const LAB_QUESTION_FORMATS = [
 
   "image_trivia",
-
   "guess_player_silhouette",
-
   "guess_player_hair",
-
   "guess_player_eyes",
-
   "guess_selection",
-
   "video_play_end",
-
   "multiple_choice",
-
+  "score_gap",
+  "jersey_pick",
 ] as const;
 
 
@@ -156,6 +151,25 @@ export type LabQuestionVideoPlayEnd = LabQuestionBase & {
   momentLabel?: string | null;
 };
 
+export type LabQuestionScoreGap = LabQuestionBase & {
+  format: "score_gap";
+  difficulty?: "easy" | "medium" | "hard" | null;
+};
+
+export type JerseyOption = {
+  id: string;
+  team: string;
+  year: number;
+  kit: "home" | "away";
+  imageKey: string;
+  isCorrect?: boolean;
+};
+
+export type LabQuestionJerseyPick = LabQuestionBase & {
+  format: "jersey_pick";
+  jerseyOptions: JerseyOption[];
+};
+
 
 
 export type LabQuestion =
@@ -167,10 +181,10 @@ export type LabQuestion =
   | LabQuestionGuessSelection
 
   | LabQuestionGuessPlayerCrop
-
   | LabQuestionGuessPlayerSilhouette
-
-  | LabQuestionVideoPlayEnd;
+  | LabQuestionVideoPlayEnd
+  | LabQuestionScoreGap
+  | LabQuestionJerseyPick;
 
 
 
@@ -197,10 +211,10 @@ export const LAB_FORMAT_LABELS: Record<LabQuestionFormat, string> = {
   guess_player_hair: "Adivina el jugador (peinado)",
 
   guess_player_eyes: "Adivina el jugador (ojos)",
-
   guess_player_silhouette: "Adivina la silueta",
-
   video_play_end: "¿Cómo acabó la jugada?",
+  score_gap: "Dato numérico (Score gap)",
+  jersey_pick: "Adivina la camiseta",
 
 };
 
@@ -217,10 +231,10 @@ export const LAB_FORMAT_DESCRIPTIONS: Record<LabQuestionFormat, string> = {
   guess_player_hair: "Primer plano del pelo; cabeza desde las cejas hacia arriba, sin mostrar cejas.",
 
   guess_player_eyes: "Primer plano de los ojos; sin pelo ni nariz.",
-
   guess_player_silhouette: "Varios jugadores en escena; uno en silueta negra opaca.",
-
   video_play_end: "Vídeo que se corta en seco; elige el desenlace.",
+  score_gap: "Pregunta factual cuantitativa con 4 opciones numéricas/texto.",
+  jersey_pick: "Adivina la camiseta exacta que vistió una selección en un partido icónico.",
 
 };
 

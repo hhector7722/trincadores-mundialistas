@@ -1,9 +1,10 @@
-import { quizDayClosesAt } from "@/lib/quiz/date";
+import { addQuizDays, quizDayClosesAt } from "@/lib/quiz/date";
 import {
   ensureQuizPool,
   findQuizForDate,
   type QuizAdminClient,
 } from "@/lib/quiz/seed-db";
+import { generateNextJerseyPickQuestion } from "@/lib/quiz/lab/generate-jersey-pick-question";
 
 export type CloseQuizDayResult = {
   quizDate: string;
@@ -55,6 +56,11 @@ export async function closeQuizDay(
     .select("id");
 
   if (expireError) throw expireError;
+
+  const nextDate = addQuizDays(options.quizDate, 1);
+  generateNextJerseyPickQuestion(nextDate).catch(err => {
+    console.error("[closeQuizDay] Fallo asíncrono al generar jersey pick para", nextDate, err);
+  });
 
   return {
     quizDate: options.quizDate,

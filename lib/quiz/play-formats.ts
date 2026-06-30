@@ -4,12 +4,22 @@ import { classicQuizQuestionShowsImage } from "@/lib/quiz/date";
 export type QuizPlayQuestionFormat =
   | "classic"
   | "image_trivia"
-  | "guess_player_silhouette";
+  | "guess_player_silhouette"
+  | "score_gap"
+  | "jersey_pick";
 
 export type QuizPlayFormatMeta = {
   sort_order: number;
   format: QuizPlayQuestionFormat;
   reveal_image_url?: string | null;
+  jerseyOptions?: Array<{
+    id: string;
+    team: string;
+    year: number;
+    kit: "home" | "away";
+    imageKey: string;
+    isCorrect?: boolean;
+  }>;
 };
 
 const OPTION_IDS = ["a", "b", "c", "d"] as const;
@@ -30,16 +40,23 @@ export function parsePlayFormats(settings: unknown): QuizPlayFormatMeta[] {
     if (
       format !== "classic" &&
       format !== "image_trivia" &&
-      format !== "guess_player_silhouette"
+      format !== "guess_player_silhouette" &&
+      format !== "score_gap" &&
+      format !== "jersey_pick"
     ) {
       continue;
     }
     const reveal =
       typeof entry.reveal_image_url === "string" ? entry.reveal_image_url.trim() || null : null;
+      
+    const jerseyOptionsRaw = entry.jerseyOptions;
+    const jerseyOptions = Array.isArray(jerseyOptionsRaw) ? jerseyOptionsRaw as any : undefined;
+
     parsed.push({
       sort_order: sortOrder,
       format,
       reveal_image_url: reveal,
+      jerseyOptions,
     });
   }
 
@@ -63,6 +80,7 @@ export function enrichQuestionsWithPlayFormats(
         ...question,
         format: meta.format,
         reveal_image_url: meta.reveal_image_url ?? null,
+        jerseyOptions: meta.jerseyOptions,
       };
     });
   })();
