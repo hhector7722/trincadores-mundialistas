@@ -1,3 +1,4 @@
+import { JERSEY_CROP_MAP } from "@/lib/quiz/lab/jersey-crop-map";
 import type { QuizQuestionPlay } from "@/lib/quiz/types";
 
 /** Debe coincidir con `sizes` de `QuizImage` (móvil ≈ 640px en deviceSizes de Next). */
@@ -15,6 +16,15 @@ export function collectQuizQuestionImageUrls(questions: QuizQuestionPlay[]): str
 
     const revealUrl = question.reveal_image_url?.trim();
     if (revealUrl) urls.add(revealUrl);
+
+    if (question.format === "jersey_pick" && question.jerseyOptions) {
+      for (const opt of question.jerseyOptions) {
+        const crop = JERSEY_CROP_MAP[opt.imageKey];
+        if (crop?.file) {
+          urls.add(`/images/equipaciones/${crop.file}`);
+        }
+      }
+    }
   }
 
   return [...urls];
