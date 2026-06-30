@@ -59,13 +59,13 @@ export function QuizJerseyPickStage({
 
           // Glow effects based on visual state
           let imageGlow = "";
-          if (visualState === "selected" && phase === "answering") {
+          if (isSelected && phase === "answering") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(212,255,0,0.8)] scale-105";
           } else if (visualState === "correct") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(34,197,94,0.8)] scale-105";
-          } else if (visualState === "incorrect" && isSelected) {
+          } else if (visualState === "wrong") {
             imageGlow = "drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] scale-105";
-          } else if (visualState === "dimmed") {
+          } else if (phase === "feedback" && visualState === "default") {
             imageGlow = "opacity-50 grayscale";
           }
 

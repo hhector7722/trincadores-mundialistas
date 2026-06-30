@@ -104,6 +104,22 @@ export function createLabQuestionStub(format: LabQuestionFormat): LabQuestion {
         momentId: null,
         momentLabel: null,
       };
+
+    case "score_gap":
+      return {
+        ...base,
+        format,
+        prompt: "Pulsa «Generar» para crear dato numérico",
+        difficulty: null,
+      };
+
+    case "jersey_pick":
+      return {
+        ...base,
+        format,
+        prompt: "Adivina la camiseta",
+        jerseyOptions: [],
+      };
   }
 }
 
@@ -121,6 +137,8 @@ export function createDefaultLabDraft(): LabDraft {
     "guess_player_hair",
     "guess_player_eyes",
     "video_play_end",
+    "score_gap",
+    "jersey_pick",
   ] as const satisfies readonly LabQuestionFormat[];
 
   return {

@@ -53,8 +53,8 @@ export async function generateNextJerseyPickQuestion(targetDate: string): Promis
     const candidates = (matches ?? []).filter(m => {
       if (usedMatches.has(m.external_id)) return false;
       
-      const homeName = m.home_team && !Array.isArray(m.home_team) ? m.home_team.name : null;
-      const awayName = m.away_team && !Array.isArray(m.away_team) ? m.away_team.name : null;
+      const homeName = m.home_team && !Array.isArray(m.home_team) ? (m.home_team as any).name : null;
+      const awayName = m.away_team && !Array.isArray(m.away_team) ? (m.away_team as any).name : null;
       
       return homeName && awayName && teamsWithCrops.includes(homeName) && teamsWithCrops.includes(awayName);
     });
@@ -65,9 +65,9 @@ export async function generateNextJerseyPickQuestion(targetDate: string): Promis
 
     for (let attempt = 0; attempt < Math.min(3, candidates.length); attempt++) {
       const match = candidates[attempt];
-      const homeName = match.home_team && !Array.isArray(match.home_team) ? match.home_team.name : "";
-      const awayName = match.away_team && !Array.isArray(match.away_team) ? match.away_team.name : "";
-      const year = match.tournament && !Array.isArray(match.tournament) ? match.tournament.year : 0;
+      const homeName = match.home_team && !Array.isArray(match.home_team) ? (match.home_team as any).name : "";
+      const awayName = match.away_team && !Array.isArray(match.away_team) ? (match.away_team as any).name : "";
+      const year = match.tournament && !Array.isArray(match.tournament) ? (match.tournament as any).year : 0;
       
       try {
         const parsed = await geminiGenerateJson<{
