@@ -2,7 +2,7 @@ import { JERSEY_CROP_MAP } from "@/lib/quiz/lab/jersey-crop-map";
 import type { QuizQuestionPlay } from "@/lib/quiz/types";
 
 /** Debe coincidir con `sizes` de `QuizImage` (móvil ≈ 640px en deviceSizes de Next). */
-export const QUIZ_IMAGE_PREFETCH_WIDTH = 640;
+export const QUIZ_IMAGE_PREFETCH_WIDTH = 1080;
 
 const prefetched = new Set<string>();
 

@@ -114,7 +114,7 @@ export function QuizJerseyPickStage({
                 )}
               >
                 <image 
-                  href={`/_next/image?url=${encodeURIComponent(`/images/equipaciones/${crop.file}`)}&w=640&q=75`} 
+                  href={`/_next/image?url=${encodeURIComponent(`/images/equipaciones/${crop.file}`)}&w=1080&q=75`} 
                   width={w} 
                   height={h} 
                 />
