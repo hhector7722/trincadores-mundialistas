@@ -11,20 +11,40 @@ export function AdminResultForm({
   poolId,
   matchId,
   label,
+  status,
+  initialHomeGoals,
+  initialAwayGoals,
+  initialMvpPlayer,
+  initialMvpTeam,
+  initialPenaltyHome,
+  initialPenaltyAway,
 }: {
   poolId: string;
   matchId: string;
   label: string;
+  status?: string;
+  initialHomeGoals?: number | null;
+  initialAwayGoals?: number | null;
+  initialMvpPlayer?: string | null;
+  initialMvpTeam?: string | null;
+  initialPenaltyHome?: number | null;
+  initialPenaltyAway?: number | null;
 }) {
   const router = useRouter();
-  const [home, setHome] = useState("0");
-  const [away, setAway] = useState("0");
-  const [penaltyHome, setPenaltyHome] = useState("");
-  const [penaltyAway, setPenaltyAway] = useState("");
-  const [mvpPlayer, setMvpPlayer] = useState("");
-  const [mvpTeam, setMvpTeam] = useState("");
+  const [home, setHome] = useState(initialHomeGoals != null ? String(initialHomeGoals) : "0");
+  const [away, setAway] = useState(initialAwayGoals != null ? String(initialAwayGoals) : "0");
+  const [penaltyHome, setPenaltyHome] = useState(
+    initialPenaltyHome != null ? String(initialPenaltyHome) : ""
+  );
+  const [penaltyAway, setPenaltyAway] = useState(
+    initialPenaltyAway != null ? String(initialPenaltyAway) : ""
+  );
+  const [mvpPlayer, setMvpPlayer] = useState(initialMvpPlayer ?? "");
+  const [mvpTeam, setMvpTeam] = useState(initialMvpTeam ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const isFinished = status === "finished";
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,15 +87,20 @@ export function AdminResultForm({
     <div className="space-y-2 border-b border-[var(--tm-border)] py-3">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-[var(--tm-fg)]">{label}</p>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onSetLive}
-          disabled={pending}
-          className={cn("h-7 text-xs", pending && "opacity-60")}
-        >
-          {pending ? "..." : "Marcar EN JUEGO"}
-        </Button>
+        {!isFinished && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onSetLive}
+            disabled={pending}
+            className={cn("h-7 text-xs", pending && "opacity-60")}
+          >
+            {pending ? "..." : "Marcar EN JUEGO"}
+          </Button>
+        )}
+        {isFinished && (
+          <span className="text-xs text-[var(--tm-muted)] italic">Finalizado — editar MVP/resultado</span>
+        )}
       </div>
       <form onSubmit={onSubmit} className="space-y-2">
       <div className="flex gap-2">
@@ -99,7 +124,7 @@ export function AdminResultForm({
           aria-label="Goles visitante"
         />
         <Button type="submit" disabled={pending} className={cn(pending && "opacity-60")}>
-          {pending ? "..." : "Cerrar"}
+          {pending ? "..." : "Guardar"}
         </Button>
       </div>
       <div className="flex gap-2">

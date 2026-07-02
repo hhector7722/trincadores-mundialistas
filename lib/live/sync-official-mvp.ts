@@ -1,5 +1,6 @@
 import { fetchOfficialMvpFromBsd } from "@/lib/live/sources/bsd-official-mvp";
 import { fetchOfficialMvpFromFifaMatchReport } from "@/lib/live/sources/fifa-match-report-mvp";
+import { fetchOfficialMvpFromFotmob } from "@/lib/live/sources/fotmob-official-mvp";
 import {
   fetchOfficialMvpFromFifa,
   loadFifaCalendarLookup,
@@ -58,6 +59,25 @@ export async function loadBsdEventMap(
     .in("internal_id", matchIds);
 
   if (error) throw new Error(`external_id_map bsd: ${error.message}`);
+
+  return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
+}
+
+export async function loadFotmobEventMap(
+  admin: AdminClient,
+  matchIds: string[],
+): Promise<Map<string, string>> {
+  if (!matchIds.length) return new Map();
+
+  const { data, error } = await admin
+    .from("external_id_map")
+    .select("internal_id, external_key")
+    .eq("source_code", "fotmob")
+    .eq("entity_type", "match")
+    .eq("match_status", "mapped")
+    .in("internal_id", matchIds);
+
+  if (error) throw new Error(`external_id_map fotmob: ${error.message}`);
 
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
 }
@@ -271,11 +291,23 @@ export async function syncOfficialMvps(
   const fifaLookup = await loadFifaCalendarLookup();
   const matchIds = [...new Set(matches.map((match) => match.id))];
   const bsdMap = await loadBsdEventMap(admin, matchIds);
+  const fotmobMap = await loadFotmobEventMap(admin, matchIds);
   const missingIds = new Set(missing.map((match) => match.id));
 
   for (const match of matches) {
     try {
-      const official = await resolveOfficialMvp(match, fifaLookup, bsdMap.get(match.id));
+      let official = await resolveOfficialMvp(match, fifaLookup, bsdMap.get(match.id));
+
+      if (!official) {
+        const fotmobId = fotmobMap.get(match.id);
+        if (fotmobId) {
+          const fotmobMvp = await fetchOfficialMvpFromFotmob(Number(fotmobId), match.home_team);
+          if (fotmobMvp) {
+            official = { playerName: fotmobMvp.playerName, teamName: fotmobMvp.teamName };
+          }
+        }
+      }
+
       if (!official) continue;
 
       await applyOfficialMvp(admin, match, official, result, poolsToRebuild, {

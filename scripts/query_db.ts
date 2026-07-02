@@ -13,7 +13,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 async function run() {
   const { data, error } = await supabase
     .from("match_results")
-    .update({ penalty_home: 4, penalty_away: 3 })
+    .update({ penalty_home: 3, penalty_away: 4 })
     .eq("match_id", "704d9d32-1f9e-41a2-ad65-c1a356687216");
 
   if (error) {

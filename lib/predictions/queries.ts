@@ -358,6 +358,12 @@ export type AdminOpenMatch = {
   kickoff_at: string;
   status: MatchStatus;
   hasResult: boolean;
+  currentHomeGoals: number | null;
+  currentAwayGoals: number | null;
+  currentMvpPlayerName: string | null;
+  currentMvpTeamName: string | null;
+  currentPenaltyHome: number | null;
+  currentPenaltyAway: number | null;
 };
 
 export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatch[]> {
@@ -369,27 +375,38 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
     .from("matches")
     .select("id, home_team, away_team, kickoff_at, status")
     .in("matchday_id", dayIds)
-    .in("status", ["pending", "scheduled", "live"])
-    .order("kickoff_at", { ascending: true });
+    .in("status", ["pending", "scheduled", "live", "finished"])
+    .order("kickoff_at", { ascending: false });
 
   if (!matches?.length) return [];
 
   const ids = matches.map((m) => m.id);
   const { data: results } = await supabase
     .from("match_results")
-    .select("match_id")
+    .select("match_id, home_goals, away_goals, mvp_player_name, mvp_team_name, penalty_home, penalty_away")
     .in("match_id", ids);
 
-  const withResult = new Set((results ?? []).map((r) => r.match_id));
+  const resultMap = new Map(
+    (results ?? []).map((r) => [r.match_id, r])
+  );
 
-  return matches.map((m) => ({
-    id: m.id,
-    home_team: m.home_team,
-    away_team: m.away_team,
-    kickoff_at: m.kickoff_at,
-    status: m.status as MatchStatus,
-    hasResult: withResult.has(m.id),
-  }));
+  return matches.map((m) => {
+    const result = resultMap.get(m.id);
+    return {
+      id: m.id,
+      home_team: m.home_team,
+      away_team: m.away_team,
+      kickoff_at: m.kickoff_at,
+      status: m.status as MatchStatus,
+      hasResult: Boolean(result),
+      currentHomeGoals: result?.home_goals ?? null,
+      currentAwayGoals: result?.away_goals ?? null,
+      currentMvpPlayerName: result?.mvp_player_name ?? null,
+      currentMvpTeamName: result?.mvp_team_name ?? null,
+      currentPenaltyHome: result?.penalty_home ?? null,
+      currentPenaltyAway: result?.penalty_away ?? null,
+    };
+  });
 }
 export type PeerPredictionRow = {
   profileId: string;
