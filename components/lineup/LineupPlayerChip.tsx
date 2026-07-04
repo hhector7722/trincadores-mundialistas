@@ -82,10 +82,10 @@ export function LineupPlayerChip({
             className={cn(
               "block shrink-0 drop-shadow-md",
               isMatch
-                ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
+                ? "h-[3.2rem] w-[2.4rem] sm:h-[3.5rem] sm:w-[2.6rem]"
                 : isModal
                   ? "h-[2.2rem] w-[1.9rem]"
-                  : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
+                  : "h-[5rem] w-[3.75rem] sm:h-[5.3rem] sm:w-[4rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -98,7 +98,7 @@ export function LineupPlayerChip({
               // Ajustar tamaño del texto según el contenedor
               style={{
                 color: dorsalColor,
-                fontSize: isMatch ? "1rem" : isModal ? "0.8rem" : "1.3rem",
+                fontSize: isMatch ? "0.9rem" : isModal ? "0.8rem" : "1.15rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -113,10 +113,10 @@ export function LineupPlayerChip({
           className={cn(
             "block shrink-0",
             isMatch
-              ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
+              ? "h-[3.2rem] w-[2.4rem] sm:h-[3.5rem] sm:w-[2.6rem]"
               : isModal
                 ? "h-[2.2rem] w-[1.9rem]"
-                : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
+                : "h-[5rem] w-[3.75rem] sm:h-[5.3rem] sm:w-[4rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
