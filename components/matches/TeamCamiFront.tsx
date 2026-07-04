@@ -64,6 +64,17 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
   let boxX = config?.left ?? 0;
   let boxY = config?.top ?? 0;
 
+  // Si tenemos config (caja exacta), añadimos un 8% de padding para que 
+  // la camiseta respire y no toque los bordes del contenedor CSS.
+  if (config) {
+    const padW = boxW * 0.08;
+    const padH = boxH * 0.08;
+    boxX -= padW;
+    boxY -= padH;
+    boxW += padW * 2;
+    boxH += padH * 2;
+  }
+
   // Forzar que el bounding box tenga exactamente ratio 3:4 (0.75) para que no se deforme
   // al inyectarlo en el contenedor CSS que hemos ajustado a 3:4
   const targetRatio = 0.75;

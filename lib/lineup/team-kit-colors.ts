@@ -73,15 +73,15 @@ const MANUAL_DORSAL_COLORS: Record<string, string> = {
   switzerland: "#FFFFFF",
   canada: "#FFFFFF",
   egypt: "#FFFFFF",
-  spain: "#FFCD00", // amarillo
-  brazil: "#008000", // verde
+  portugal: "#FFFFFF",
+  spain: "#FFD100", // amarillo más brillante
+  belgium: "#FDB913", // amarillo belga
+  brazil: "#00873E", // verde brasil
   argentina: "#000000", // negro
-  colombia: "#0000FF", // azul
-  paraguay: "#0000FF", // azul
-  england: "#FF0000", // rojo
-  belgium: "#FFCD00", // amarillo
   usa: "#000000", // negro
-  portugal: "#FFFFFF", // blanco
+  colombia: "#002B7F", // azul oscuro colombia
+  paraguay: "#0038A8", // azul paraguay
+  england: "#CE1126", // rojo inglaterra
 };
 
 /** Sincroniza colores de camiseta cargados desde `teams.primary_kit_hex`. */

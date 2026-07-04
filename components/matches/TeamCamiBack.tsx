@@ -59,6 +59,15 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
   let boxX = config?.left ?? (nativeWidth / 2); // Default to right half
   let boxY = config?.top ?? 0;
 
+  if (config) {
+    const padW = boxW * 0.08;
+    const padH = boxH * 0.08;
+    boxX -= padW;
+    boxY -= padH;
+    boxW += padW * 2;
+    boxH += padH * 2;
+  }
+
   // Enforce exactly 3:4 (0.75) ratio
   const targetRatio = 0.75;
   const currentRatio = boxW / boxH;

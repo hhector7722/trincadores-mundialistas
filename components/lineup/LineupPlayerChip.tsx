@@ -91,7 +91,6 @@ export function LineupPlayerChip({
             style={{ paddingTop: "10%" }} // Ajuste vertical para centrar el dorsal
           >
             <span
-              style={{ color: dorsalColor }}
               className="font-bold text-center leading-none"
               // Ajustar tamaño del texto según el contenedor
               style={{
