@@ -25,7 +25,7 @@ type LineupPlayerChipProps = {
   stickerUrl?: string | null;
 };
 
-import { TeamCamiBack } from "@/components/matches/TeamCamiBack";
+import { TeamCamiFront } from "@/components/matches/TeamCamiFront";
 
 export function LineupPlayerChip({
   slot,
@@ -74,7 +74,7 @@ export function LineupPlayerChip({
     <>
       {hasCami && !slot.isPlaceholder ? (
         <div className="relative">
-          <TeamCamiBack
+          <TeamCamiFront
             team={teamName}
             className={cn(
               "block shrink-0 drop-shadow-md",
