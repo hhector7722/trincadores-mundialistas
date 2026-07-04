@@ -10,9 +10,9 @@ interface TeamCamiFrontProps {
 }
 
 const sizeClasses = {
-  sm: "h-6 w-6",
-  md: "h-8 w-8",
-  lg: "h-11 w-11 sm:h-12 sm:w-12",
+  sm: "h-8 w-6",
+  md: "h-12 w-9",
+  lg: "h-16 w-12 sm:h-[4.5rem] sm:w-[3.375rem]",
 };
 
 /**
@@ -74,7 +74,7 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full shadow-sm ring-1 ring-black/10",
+        "relative shrink-0 overflow-hidden",
         sizeClasses[size],
         className
       )}
