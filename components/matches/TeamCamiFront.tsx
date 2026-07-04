@@ -20,18 +20,36 @@ const sizeClasses = {
  * Se apoya en la tabla de calibración (teamCutConfig) para calcular el recorte 
  * o asume un corte perfecto al 50% izquierdo por defecto.
  */
+const dbTeamsToCamiKey: Record<string, string> = {
+  'Argentina': 'argentina',
+  'Belgium': 'belgica',
+  'Brazil': 'brasil',
+  'Canada': 'canada',
+  'Colombia': 'colombia',
+  'Egypt': 'egipto',
+  'Spain': 'españa',
+  'France': 'francia',
+  'England': 'inglaterra',
+  'Morocco': 'marruecos',
+  'Mexico': 'mejico',
+  'Norway': 'noruega',
+  'Paraguay': 'paraguay',
+  'Portugal': 'potugal',
+  'Switzerland': 'suiza',
+  'USA': 'usa',
+  'United States': 'usa'
+};
+
 export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFrontProps) {
-  let camiFileName = `${team}-cami.png`;
-  if (team === 'españa') camiFileName = 'españa-cami.png';
-  if (team === 'potugal') camiFileName = 'potugal-cami.png';
-  if (team === 'suiza') camiFileName = 'suiza.cami.png';
-  if (team === 'usa') camiFileName = 'usa-cami.png';
+  const internalKey = dbTeamsToCamiKey[team] || team.toLowerCase();
+  let camiFileName = `${internalKey}-cami.png`;
+  if (internalKey === 'suiza') camiFileName = 'suiza.cami.png';
 
   const src = `/camis/${camiFileName}`;
 
   // Fallbacks: assume standard 1536x1024 if not provided, though the image might differ.
   // Ideally, the config should provide full dimensions. If the user fills it out, we use it.
-  const config = TEAM_CUT_CONFIGS[team]?.front;
+  const config = TEAM_CUT_CONFIGS[internalKey]?.front;
   
   // Since we don't know the image dimensions in CSS unless provided,
   // the CSS trick requires knowing percentages.
