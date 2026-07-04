@@ -1,0 +1,48 @@
+{
+  "team": "brasil",
+  "font_source": "own",
+  "font_used": "brasil",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 121,
+      "height": 512
+    },
+    "1": {
+      "width": 153,
+      "height": 512
+    },
+    "2": {
+      "width": 153,
+      "height": 512
+    },
+    "3": {
+      "width": 153,
+      "height": 512
+    },
+    "4": {
+      "width": 153,
+      "height": 512
+    },
+    "5": {
+      "width": 137,
+      "height": 512
+    },
+    "6": {
+      "width": 149,
+      "height": 512
+    },
+    "7": {
+      "width": 153,
+      "height": 512
+    },
+    "8": {
+      "width": 153,
+      "height": 512
+    },
+    "9": {
+      "width": 123,
+      "height": 512
+    }
+  }
+}

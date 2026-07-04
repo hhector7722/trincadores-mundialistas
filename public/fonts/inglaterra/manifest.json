@@ -1,0 +1,48 @@
+{
+  "team": "inglaterra",
+  "font_source": "own",
+  "font_used": "inglaterra",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 138,
+      "height": 448
+    },
+    "1": {
+      "width": 175,
+      "height": 448
+    },
+    "2": {
+      "width": 130,
+      "height": 448
+    },
+    "3": {
+      "width": 175,
+      "height": 448
+    },
+    "4": {
+      "width": 168,
+      "height": 448
+    },
+    "5": {
+      "width": 143,
+      "height": 448
+    },
+    "6": {
+      "width": 142,
+      "height": 448
+    },
+    "7": {
+      "width": 116,
+      "height": 448
+    },
+    "8": {
+      "width": 142,
+      "height": 448
+    },
+    "9": {
+      "width": 143,
+      "height": 448
+    }
+  }
+}

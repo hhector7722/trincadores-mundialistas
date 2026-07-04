@@ -1,0 +1,48 @@
+{
+  "team": "usa",
+  "font_source": "own",
+  "font_used": "usa",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 18,
+      "height": 228
+    },
+    "1": {
+      "width": 100,
+      "height": 228
+    },
+    "2": {
+      "width": 100,
+      "height": 228
+    },
+    "3": {
+      "width": 82,
+      "height": 228
+    },
+    "4": {
+      "width": 93,
+      "height": 228
+    },
+    "5": {
+      "width": 100,
+      "height": 228
+    },
+    "6": {
+      "width": 100,
+      "height": 228
+    },
+    "7": {
+      "width": 100,
+      "height": 228
+    },
+    "8": {
+      "width": 100,
+      "height": 228
+    },
+    "9": {
+      "width": 12,
+      "height": 228
+    }
+  }
+}

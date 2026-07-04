@@ -1,0 +1,48 @@
+{
+  "team": "belgica",
+  "font_source": "own",
+  "font_used": "belgica",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 167,
+      "height": 333
+    },
+    "1": {
+      "width": 145,
+      "height": 333
+    },
+    "2": {
+      "width": 200,
+      "height": 333
+    },
+    "3": {
+      "width": 200,
+      "height": 333
+    },
+    "4": {
+      "width": 200,
+      "height": 333
+    },
+    "5": {
+      "width": 200,
+      "height": 333
+    },
+    "6": {
+      "width": 124,
+      "height": 333
+    },
+    "7": {
+      "width": 191,
+      "height": 333
+    },
+    "8": {
+      "width": 200,
+      "height": 333
+    },
+    "9": {
+      "width": 159,
+      "height": 333
+    }
+  }
+}

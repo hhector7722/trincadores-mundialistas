@@ -1,0 +1,48 @@
+{
+  "team": "colombia",
+  "font_source": "own",
+  "font_used": "colombia",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 136,
+      "height": 440
+    },
+    "1": {
+      "width": 178,
+      "height": 440
+    },
+    "2": {
+      "width": 178,
+      "height": 440
+    },
+    "3": {
+      "width": 153,
+      "height": 440
+    },
+    "4": {
+      "width": 161,
+      "height": 440
+    },
+    "5": {
+      "width": 159,
+      "height": 440
+    },
+    "6": {
+      "width": 158,
+      "height": 440
+    },
+    "7": {
+      "width": 104,
+      "height": 440
+    },
+    "8": {
+      "width": 171,
+      "height": 440
+    },
+    "9": {
+      "width": 136,
+      "height": 440
+    }
+  }
+}

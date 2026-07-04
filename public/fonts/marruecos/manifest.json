@@ -1,0 +1,48 @@
+{
+  "team": "marruecos",
+  "font_source": "own",
+  "font_used": "marruecos",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 141,
+      "height": 444
+    },
+    "1": {
+      "width": 177,
+      "height": 444
+    },
+    "2": {
+      "width": 177,
+      "height": 444
+    },
+    "3": {
+      "width": 177,
+      "height": 444
+    },
+    "4": {
+      "width": 177,
+      "height": 444
+    },
+    "5": {
+      "width": 177,
+      "height": 444
+    },
+    "6": {
+      "width": 177,
+      "height": 444
+    },
+    "7": {
+      "width": 177,
+      "height": 444
+    },
+    "8": {
+      "width": 177,
+      "height": 444
+    },
+    "9": {
+      "width": 152,
+      "height": 444
+    }
+  }
+}

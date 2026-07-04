@@ -1,0 +1,48 @@
+{
+  "team": "paraguay",
+  "font_source": "own",
+  "font_used": "paraguay",
+  "note": "Letters (names) are out of scope for this iteration as a permanent product decision. Only digits are processed.",
+  "digits": {
+    "0": {
+      "width": 147,
+      "height": 412
+    },
+    "1": {
+      "width": 186,
+      "height": 412
+    },
+    "2": {
+      "width": 174,
+      "height": 412
+    },
+    "3": {
+      "width": 191,
+      "height": 412
+    },
+    "4": {
+      "width": 170,
+      "height": 412
+    },
+    "5": {
+      "width": 191,
+      "height": 412
+    },
+    "6": {
+      "width": 170,
+      "height": 412
+    },
+    "7": {
+      "width": 153,
+      "height": 412
+    },
+    "8": {
+      "width": 191,
+      "height": 412
+    },
+    "9": {
+      "width": 149,
+      "height": 412
+    }
+  }
+}

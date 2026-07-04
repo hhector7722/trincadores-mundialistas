@@ -194,9 +194,14 @@ function BracketMatchNode({
   const scoreSummary = hasScoreToDisplay ? formatListScore(displayHome, displayAway) : " ";
   const isSaved = state === "saved";
   const isFinal = geom.round === "final";
-  // Colocar los marcadores individuales debajo de cada bandera
-  const homeScoreY = geom.homeY + 3.8;
+  // Colocar los marcadores individuales debajo de cada bandera por defecto
+  let homeScoreY = geom.homeY + 3.8;
   const awayScoreY = geom.awayY + 3.8;
+
+  // En octavos y cuartos, el equipo superior (home) tiene su marcador encima de su bandera
+  if (geom.round === "r16" || geom.round === "qf") {
+    homeScoreY = geom.homeY - 3.8;
+  }
 
   const hitStyle: CSSProperties = isFinal
     ? {
