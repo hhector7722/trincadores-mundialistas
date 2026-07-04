@@ -59,14 +59,7 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
   let boxX = config?.left ?? (nativeWidth / 2); // Default to right half
   let boxY = config?.top ?? 0;
 
-  if (config) {
-    const padW = boxW * 0.08;
-    const padH = boxH * 0.08;
-    boxX -= padW;
-    boxY -= padH;
-    boxW += padW * 2;
-    boxH += padH * 2;
-  }
+  const scaleInner = config ? "scale(0.84)" : "scale(1)";
 
   // Enforce exactly 3:4 (0.75) ratio
   const targetRatio = 0.75;
@@ -86,7 +79,10 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
 
   return (
     <div className={cn("relative overflow-hidden flex items-center justify-center", sizeClasses[size], className)} title={alt}>
-      <div className="absolute inset-0 w-full h-full">
+      <div 
+        className="absolute inset-0 w-full h-full flex items-center justify-center"
+        style={{ transform: scaleInner }}
+      >
          <Image
             src={`/camis/${camiFileName}`}
             alt={alt || team}
