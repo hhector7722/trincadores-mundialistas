@@ -82,10 +82,10 @@ export function LineupPlayerChip({
             className={cn(
               "block shrink-0 drop-shadow-md",
               isMatch
-                ? "h-[3.2rem] w-[2.4rem] sm:h-[3.5rem] sm:w-[2.6rem]"
+                ? "h-[2.8rem] w-[2.1rem] sm:h-[3rem] sm:w-[2.25rem]"
                 : isModal
-                  ? "h-[2.2rem] w-[1.9rem]"
-                  : "h-[5rem] w-[3.75rem] sm:h-[5.3rem] sm:w-[4rem]",
+                  ? "h-[2.2rem] w-[1.65rem]"
+                  : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -98,7 +98,7 @@ export function LineupPlayerChip({
               // Ajustar tamaño del texto según el contenedor
               style={{
                 color: dorsalColor,
-                fontSize: isMatch ? "0.9rem" : isModal ? "0.8rem" : "1.15rem",
+                fontSize: isMatch ? "0.85rem" : isModal ? "0.7rem" : "1.1rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -113,10 +113,10 @@ export function LineupPlayerChip({
           className={cn(
             "block shrink-0",
             isMatch
-              ? "h-[3.2rem] w-[2.4rem] sm:h-[3.5rem] sm:w-[2.6rem]"
+              ? "h-[2.8rem] w-[2.1rem] sm:h-[3rem] sm:w-[2.25rem]"
               : isModal
-                ? "h-[2.2rem] w-[1.9rem]"
-                : "h-[5rem] w-[3.75rem] sm:h-[5.3rem] sm:w-[4rem]",
+                ? "h-[2.2rem] w-[1.65rem]"
+                : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
