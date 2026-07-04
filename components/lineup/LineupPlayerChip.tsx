@@ -25,6 +25,8 @@ type LineupPlayerChipProps = {
   stickerUrl?: string | null;
 };
 
+import { TeamCamiBack } from "@/components/matches/TeamCamiBack";
+
 export function LineupPlayerChip({
   slot,
   teamName,
@@ -40,7 +42,7 @@ export function LineupPlayerChip({
   const isModal = variant === "modal";
   const isMatch = variant === "match";
   const kit = getTeamKitColors(teamName);
-  const dorsal = slot.shirtNumber != null && slot.shirtNumber > 0 ? String(slot.shirtNumber) : "—";
+  const dorsal = slot.shirtNumber != null && slot.shirtNumber > 0 ? String(slot.shirtNumber) : "?";
   const interactive = Boolean(onClick) && !slot.isPlaceholder && !disabled;
   const useKitColors = !slot.isPlaceholder;
   const jerseyFill = useKitColors ? kit.kit : "rgba(0,0,0,0.3)";
@@ -59,21 +61,49 @@ export function LineupPlayerChip({
       ? displayNameInSquad(slot.name, squadPlayerNames)
       : shirtPlayerName(slot.name);
 
+  // Determinar si tenemos cami real
+  const dbTeamsToCamiKey: Record<string, string> = {
+    'Argentina': 'argentina', 'Belgium': 'belgica', 'Brazil': 'brasil', 'Canada': 'canada',
+    'Colombia': 'colombia', 'Egypt': 'egipto', 'Spain': 'españa', 'France': 'francia',
+    'England': 'inglaterra', 'Morocco': 'marruecos', 'Mexico': 'mejico', 'Norway': 'noruega',
+    'Paraguay': 'paraguay', 'Portugal': 'potugal', 'Switzerland': 'suiza', 'USA': 'usa'
+  };
+  const hasCami = !!dbTeamsToCamiKey[teamName];
+
   const content = (
     <>
-      {stickerUrl && !slot.isPlaceholder ? (
-        <PlayerSticker 
-          player={{ sticker_url: stickerUrl, player_name: slot.name }}
-          className={cn(
-            "block shrink-0 drop-shadow-md",
-            isMatch
-              ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
-              : isModal
-                ? "h-[2.2rem] w-[1.9rem]"
-                : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
-            interactive && "transition-transform active:scale-95"
-          )}
-        />
+      {hasCami && !slot.isPlaceholder ? (
+        <div className="relative">
+          <TeamCamiBack
+            team={teamName}
+            className={cn(
+              "block shrink-0 drop-shadow-md",
+              isMatch
+                ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
+                : isModal
+                  ? "h-[2.2rem] w-[1.9rem]"
+                  : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
+              interactive && "transition-transform active:scale-95"
+            )}
+          />
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ paddingTop: "10%" }} // Ajuste vertical para centrar el dorsal
+          >
+            <span
+              style={{ color: dorsalColor }}
+              className="font-bold text-center leading-none"
+              // Ajustar tamaño del texto según el contenedor
+              style={{
+                color: dorsalColor,
+                fontSize: isMatch ? "1rem" : isModal ? "0.8rem" : "1.3rem",
+                textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
+              }}
+            >
+              {dorsal}
+            </span>
+          </div>
+        </div>
       ) : (
         <svg
           viewBox="0 3 48 45"

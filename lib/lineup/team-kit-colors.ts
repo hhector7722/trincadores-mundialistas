@@ -65,6 +65,25 @@ const DEFAULT_KIT = "#2A1058";
 
 let dbKitHexBySlug: Record<string, string> | null = null;
 
+const MANUAL_DORSAL_COLORS: Record<string, string> = {
+  norway: "#FFFFFF",
+  france: "#FFFFFF",
+  mexico: "#FFFFFF",
+  morocco: "#FFFFFF",
+  switzerland: "#FFFFFF",
+  canada: "#FFFFFF",
+  egypt: "#FFFFFF",
+  spain: "#FFCD00", // amarillo
+  brazil: "#008000", // verde
+  argentina: "#000000", // negro
+  colombia: "#0000FF", // azul
+  paraguay: "#0000FF", // azul
+  england: "#FF0000", // rojo
+  belgium: "#FFCD00", // amarillo
+  usa: "#000000", // negro
+  portugal: "#FFFFFF", // blanco
+};
+
 /** Sincroniza colores de camiseta cargados desde `teams.primary_kit_hex`. */
 export function setTeamKitHexFromDb(map: Record<string, string>) {
   dbKitHexBySlug = map;
@@ -147,10 +166,11 @@ export function teamKitColorsClash(homeTeam: string, awayTeam: string): boolean 
 }
 
 export function getTeamKitColors(teamName: string): TeamKitColors {
+  const slug = toSlug(teamName);
   const kit = getTeamKitHex(teamName);
   return {
     kit,
-    dorsal: contrastingTextColor(kit),
+    dorsal: MANUAL_DORSAL_COLORS[slug] ?? contrastingTextColor(kit),
     border: contrastingBorderColor(kit),
   };
 }
