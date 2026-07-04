@@ -6,7 +6,6 @@ import { getDailyFactsHistory } from "@/lib/home/daily-fact";
 import {
   getPoolMatchesWithPredictions,
 } from "@/lib/predictions/queries";
-import { isPlaceholderTeam } from "@/lib/openfootball/slug";
 import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import {
   getPoolTournamentGeneralPredictionsBoard,
@@ -40,10 +39,6 @@ export default async function HomePage() {
 
   const dailyFacts = getDailyFactsHistory();
 
-  const visibleMatches = matchCarouselMatches.filter(
-    (m) => !isPlaceholderTeam(m.home_team) && !isPlaceholderTeam(m.away_team),
-  );
-
   return (
     <HomeViewportShell
       hero={
@@ -58,7 +53,7 @@ export default async function HomePage() {
           generalPredictionsEditable={generalPredictionsBundle.editable}
           generalPredictionsBoard={generalPredictionsBoard}
           dailyFacts={dailyFacts}
-          matchCarouselMatches={visibleMatches}
+          matchCarouselMatches={matchCarouselMatches}
         />
       }
     />
