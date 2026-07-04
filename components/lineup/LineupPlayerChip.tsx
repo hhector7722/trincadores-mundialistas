@@ -26,6 +26,7 @@ type LineupPlayerChipProps = {
 };
 
 import { TeamCamiFront } from "@/components/matches/TeamCamiFront";
+import { TeamCamiBack } from "@/components/matches/TeamCamiBack";
 
 export function LineupPlayerChip({
   slot,
@@ -70,11 +71,13 @@ export function LineupPlayerChip({
   };
   const hasCami = !!dbTeamsToCamiKey[teamName];
 
+  const CamiComponent = isModal ? TeamCamiFront : TeamCamiBack;
+
   const content = (
     <>
       {hasCami && !slot.isPlaceholder ? (
         <div className="relative">
-          <TeamCamiFront
+          <CamiComponent
             team={teamName}
             className={cn(
               "block shrink-0 drop-shadow-md",
