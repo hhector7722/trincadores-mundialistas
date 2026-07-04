@@ -59,10 +59,27 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
   const nativeWidth = 1536; 
   const nativeHeight = 1024;
 
-  const boxW = config?.width ?? (nativeWidth / 2);
-  const boxH = config?.height ?? nativeHeight;
-  const boxX = config?.left ?? 0;
-  const boxY = config?.top ?? 0;
+  let boxW = config?.width ?? (nativeWidth / 2);
+  let boxH = config?.height ?? nativeHeight;
+  let boxX = config?.left ?? 0;
+  let boxY = config?.top ?? 0;
+
+  // Forzar que el bounding box tenga exactamente ratio 3:4 (0.75) para que no se deforme
+  // al inyectarlo en el contenedor CSS que hemos ajustado a 3:4
+  const targetRatio = 0.75;
+  const currentRatio = boxW / boxH;
+
+  if (currentRatio > targetRatio) {
+    // Es más ancha de la cuenta: rellenar altura por arriba y abajo
+    const newH = boxW / targetRatio;
+    boxY = boxY - (newH - boxH) / 2;
+    boxH = newH;
+  } else if (currentRatio < targetRatio) {
+    // Es más alta de la cuenta: rellenar anchura por los lados
+    const newW = boxH * targetRatio;
+    boxX = boxX - (newW - boxW) / 2;
+    boxW = newW;
+  }
 
   // Cuánto hay que escalar la imagen original para que 'boxW' llene el contenedor (100%)
   const scale = 1 / (boxW / nativeWidth);

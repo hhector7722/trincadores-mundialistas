@@ -123,15 +123,24 @@ export async function generateSticker(team: string, squadNumber: number): Promis
     .png()
     .toBuffer();
 
-  // 5. Center the combined number on the normalized shirt back
+  // 5. Scale the combined number to a proportional size relative to the shirt height
+  const targetNumberHeight = Math.round(targetHeight * 0.28);
+  const numberScale = targetNumberHeight / maxDigitHeight;
+  const scaledNumberWidth = Math.round(totalDigitsWidth * numberScale);
+
+  const scaledNumberBuf = await sharp(combinedNumberBuf)
+    .resize(scaledNumberWidth, targetNumberHeight)
+    .toBuffer();
+
+  // 6. Center the scaled number on the normalized shirt back
   // Now using NORMALIZED_CANVAS dimensions for placing the number
-  const overlayX = Math.floor((NORMALIZED_CANVAS.width - totalDigitsWidth) / 2);
+  const overlayX = Math.floor((NORMALIZED_CANVAS.width - scaledNumberWidth) / 2);
   const overlayY = Math.floor(NORMALIZED_CANVAS.height * 0.35);
 
   const finalSticker = await sharp(shirtBack)
     .composite([
       {
-        input: combinedNumberBuf,
+        input: scaledNumberBuf,
         left: overlayX,
         top: overlayY,
       }

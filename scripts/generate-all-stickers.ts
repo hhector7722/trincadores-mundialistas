@@ -86,7 +86,7 @@ async function runBatch() {
     const squadNumber = player.shirt_number;
     
     // Calculate expected hash
-    const hash = crypto.createHash("sha256").update(`${teamKey}-${squadNumber}`).digest("hex");
+    const hash = crypto.createHash("sha256").update(`${teamKey}-${squadNumber}-v2`).digest("hex");
 
     if (player.sticker_hash === hash) {
       skipped++;
@@ -118,7 +118,7 @@ async function runBatch() {
       const { error: updateError } = await supabase
         .from("team_squad_players")
         .update({
-          sticker_url: publicUrl,
+          sticker_url: `${publicUrl}?v=2`,
           sticker_hash: hash,
         })
         .eq("id", player.id);
