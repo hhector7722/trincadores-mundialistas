@@ -11,7 +11,7 @@ interface TeamCamiFrontProps {
 const sizeClasses = {
   sm: "h-8 w-6",
   md: "h-12 w-9",
-  lg: "h-16 w-12 sm:h-[4.5rem] sm:w-[3.375rem]",
+  lg: "h-[5rem] w-[3.75rem] sm:h-[5.5rem] sm:w-[4.125rem]",
 };
 
 const dbTeamsToCamiKey: Record<string, string> = {

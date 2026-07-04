@@ -80,7 +80,7 @@ export function LineupPlayerChip({
             team={teamName}
             className={cn(
               "block shrink-0 drop-shadow-md",
-              "h-[2.4rem] w-[1.8rem] sm:h-[2.7rem] sm:w-[2.025rem]",
+              "h-[2.2rem] w-[1.65rem] sm:h-[2.5rem] sm:w-[1.875rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -107,7 +107,7 @@ export function LineupPlayerChip({
           aria-hidden
           className={cn(
             "block shrink-0",
-            "h-[2.4rem] w-[1.8rem] sm:h-[2.7rem] sm:w-[2.025rem]",
+            "h-[2.2rem] w-[1.65rem] sm:h-[2.5rem] sm:w-[1.875rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
