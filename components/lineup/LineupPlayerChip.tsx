@@ -25,7 +25,6 @@ type LineupPlayerChipProps = {
   stickerUrl?: string | null;
 };
 
-import { TeamCamiFront } from "@/components/matches/TeamCamiFront";
 import { TeamCamiBack } from "@/components/matches/TeamCamiBack";
 
 export function LineupPlayerChip({
@@ -71,7 +70,7 @@ export function LineupPlayerChip({
   };
   const hasCami = !!dbTeamsToCamiKey[teamName];
 
-  const CamiComponent = isModal ? TeamCamiFront : TeamCamiBack;
+  const CamiComponent = TeamCamiBack;
 
   const content = (
     <>
@@ -81,11 +80,7 @@ export function LineupPlayerChip({
             team={teamName}
             className={cn(
               "block shrink-0 drop-shadow-md",
-              isMatch
-                ? "h-[2.6rem] w-[1.95rem] sm:h-[2.8rem] sm:w-[2.1rem]"
-                : isModal
-                  ? "h-[2.2rem] w-[1.65rem]"
-                  : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
+              "h-[2.4rem] w-[1.8rem] sm:h-[2.7rem] sm:w-[2.025rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -98,7 +93,7 @@ export function LineupPlayerChip({
               // Ajustar tamaño del texto según el contenedor
               style={{
                 color: dorsalColor,
-                fontSize: isMatch ? "0.8rem" : isModal ? "0.7rem" : "1.1rem",
+                fontSize: "0.8rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -112,11 +107,7 @@ export function LineupPlayerChip({
           aria-hidden
           className={cn(
             "block shrink-0",
-            isMatch
-              ? "h-[2.6rem] w-[1.95rem] sm:h-[2.8rem] sm:w-[2.1rem]"
-              : isModal
-                ? "h-[2.2rem] w-[1.65rem]"
-                : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
+            "h-[2.4rem] w-[1.8rem] sm:h-[2.7rem] sm:w-[2.025rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
