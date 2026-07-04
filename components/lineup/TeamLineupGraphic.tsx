@@ -14,11 +14,10 @@ type TeamLineupGraphicProps = {
   className?: string;
   /** Suplentes encima del terreno, mismo ancho que el campo. */
   benchAbove?: ReactNode;
-  /** `modal`: campo ampliado dentro del panel. */
   size?: "default" | "modal";
   onPlayerClick?: (playerName: string) => void;
   onFieldReady?: () => void;
-  squadPlayerNames?: string[];
+  squadPlayers?: { player_name: string; sticker_url?: string | null }[];
   widthPx?: number;
   heightPx?: number;
   chipScale?: number;
@@ -32,7 +31,7 @@ export function TeamLineupGraphic({
   size = "default",
   onPlayerClick,
   onFieldReady,
-  squadPlayerNames,
+  squadPlayers,
   widthPx,
   heightPx,
   chipScale = 1,
@@ -60,7 +59,8 @@ export function TeamLineupGraphic({
           <LineupPlayerChip
             slot={slot}
             teamName={teamName}
-            squadPlayerNames={squadPlayerNames}
+            squadPlayerNames={squadPlayers?.map(p => p.player_name)}
+            stickerUrl={squadPlayers?.find((p) => p.player_name === slot.name)?.sticker_url ?? null}
             variant={isModal ? "modal" : "default"}
             onClick={
               onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined

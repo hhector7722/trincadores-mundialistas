@@ -4,6 +4,7 @@ import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
 import type { BenchLayoutConfig } from "@/lib/lineup/fit-field-modal-layout";
 import { squadDisplayNames } from "@/lib/lineup/short-player-name";
+import { PlayerSticker } from "@/components/players/player-sticker";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
@@ -205,22 +206,31 @@ export function BenchPlayersStrip({
                   : undefined
               }
             >
-              <span
-                className={cn(
-                  "font-display font-bold leading-none",
-                  !(useFitGrid || isMvp) && (isMinimal ? "text-[7px]" : isCompact ? "text-[8px]" : "text-[9px]"),
-                  active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
-                )}
-                style={
-                  useFitGrid
-                    ? { fontSize: gridLayout!.numberFontPx }
-                    : isMvp
-                      ? { fontSize: 10 }
-                      : undefined
-                }
-              >
-                {player.shirtNumber ?? "—"}
-              </span>
+              {player.stickerUrl ? (
+                <PlayerSticker 
+                  player={{ sticker_url: player.stickerUrl, player_name: player.name }}
+                  className="mb-0.5"
+                  width={isMinimal ? 24 : 32}
+                  height={isMinimal ? 24 : 32}
+                />
+              ) : (
+                <span
+                  className={cn(
+                    "font-display font-bold leading-none",
+                    !(useFitGrid || isMvp) && (isMinimal ? "text-[7px]" : isCompact ? "text-[8px]" : "text-[9px]"),
+                    active ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
+                  )}
+                  style={
+                    useFitGrid
+                      ? { fontSize: gridLayout!.numberFontPx }
+                      : isMvp
+                        ? { fontSize: 10 }
+                        : undefined
+                  }
+                >
+                  {player.shirtNumber ?? "—"}
+                </span>
+              )}
               <span
                 className={cn(
                   "whitespace-normal text-center leading-tight",

@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
+import { TEAM_CUT_CONFIGS, NORMALIZED_CANVAS } from './teamCutConfig';
 
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
@@ -8,7 +9,7 @@ const PUBLIC_DIR = path.join(process.cwd(), 'public');
  * Generates a sticker (back of shirt with squad number) for a player.
  * @param team Team name (normalized for files, e.g. 'españa')
  * @param squadNumber Number to print on the back
- * @returns PNG buffer of the sticker
+ * @returns PNG buffer of the sticker (normalized to 600x800)
  */
 export async function generateSticker(team: string, squadNumber: number): Promise<Buffer> {
   // Fix naming typos / conventions if passed raw team name
@@ -26,10 +27,48 @@ export async function generateSticker(team: string, squadNumber: number): Promis
     throw new Error(`Invalid cami image for team ${team}`);
   }
 
-  // 1. Extract the back of the shirt (right half)
-  const halfWidth = Math.floor(camiMeta.width / 2);
-  const shirtBack = await camiImage
-    .extract({ left: halfWidth, top: 0, width: camiMeta.width - halfWidth, height: camiMeta.height })
+  // 1. Extract the back of the shirt using config or 50% default
+  const config = TEAM_CUT_CONFIGS[team]?.back;
+  let extractBox = { left: 0, top: 0, width: 0, height: 0 };
+  
+  if (config) {
+    extractBox = config;
+  } else {
+    const halfWidth = Math.floor(camiMeta.width / 2);
+    extractBox = { left: halfWidth, top: 0, width: camiMeta.width - halfWidth, height: camiMeta.height };
+  }
+
+  // Extraer la trasera original
+  const extractedBack = await camiImage
+    .extract(extractBox)
+    .toBuffer();
+
+  // Trim the transparent pixels to get the real bounding box of the shirt
+  const { data: trimmedBack, info: trimInfo } = await sharp(extractedBack)
+    .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .toBuffer({ resolveWithObject: true });
+
+  // Scale the bounding box to match targetHeight (85% of normalized canvas)
+  const targetHeight = NORMALIZED_CANVAS.height * 0.85;
+  const scale = targetHeight / trimInfo.height;
+  const resizedHeight = Math.round(targetHeight);
+  const resizedWidth = Math.round(trimInfo.width * scale);
+
+  const resizedShirtBack = await sharp(trimmedBack)
+    .resize(resizedWidth, resizedHeight)
+    .toBuffer();
+
+  // Center the resized shirt inside the normalized canvas
+  const shirtBack = await sharp({
+    create: {
+      width: NORMALIZED_CANVAS.width,
+      height: NORMALIZED_CANVAS.height,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 }
+    }
+  })
+    .composite([{ input: resizedShirtBack, gravity: 'center' }])
+    .png()
     .toBuffer();
 
   // 2. Load the font manifest and glyphs
@@ -55,12 +94,10 @@ export async function generateSticker(team: string, squadNumber: number): Promis
   );
 
   // 4. Calculate total width of the combined digits and spacing
-  // Use a small spacing gap between digits, e.g., 5% of a digit's width
   const gap = digitBuffers.length > 1 ? Math.floor(digitBuffers[0].width * 0.05) : 0;
   const totalDigitsWidth = digitBuffers.reduce((sum, d) => sum + d.width, 0) + gap * (digits.length - 1);
   const maxDigitHeight = Math.max(...digitBuffers.map(d => d.height));
 
-  // Create a transparent canvas to hold the combined number
   const numberCanvas = sharp({
     create: {
       width: totalDigitsWidth,
@@ -86,11 +123,10 @@ export async function generateSticker(team: string, squadNumber: number): Promis
     .png()
     .toBuffer();
 
-  // 5. Center the combined number on the shirt back
-  // Vertically, we place it roughly at the upper-middle section (e.g. 35% from the top)
-  const shirtHalfWidth = camiMeta.width - halfWidth;
-  const overlayX = Math.floor((shirtHalfWidth - totalDigitsWidth) / 2);
-  const overlayY = Math.floor(camiMeta.height * 0.35);
+  // 5. Center the combined number on the normalized shirt back
+  // Now using NORMALIZED_CANVAS dimensions for placing the number
+  const overlayX = Math.floor((NORMALIZED_CANVAS.width - totalDigitsWidth) / 2);
+  const overlayY = Math.floor(NORMALIZED_CANVAS.height * 0.35);
 
   const finalSticker = await sharp(shirtBack)
     .composite([
@@ -98,9 +134,6 @@ export async function generateSticker(team: string, squadNumber: number): Promis
         input: combinedNumberBuf,
         left: overlayX,
         top: overlayY,
-        // Since fonts were black-on-white and we made white transparent,
-        // we can apply them directly. Depending on the team colors, some fonts might be light.
-        // We assume the font image colors are correct as provided.
       }
     ])
     .png()

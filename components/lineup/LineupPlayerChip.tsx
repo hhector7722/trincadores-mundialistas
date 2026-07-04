@@ -7,6 +7,7 @@ import {
 } from "@/lib/lineup/short-player-name";
 import type { LineupSlot } from "@/lib/lineup/types";
 import { cn } from "@/lib/utils";
+import { PlayerSticker } from "@/components/players/player-sticker";
 
 type LineupPlayerChipProps = {
   slot: LineupSlot;
@@ -20,6 +21,8 @@ type LineupPlayerChipProps = {
   /** Nombres completos de la plantilla para desambiguar apellidos repetidos. */
   squadPlayerNames?: string[];
   substitutionMarker?: "in" | "out" | null;
+  /** URL de la imagen generada de la camiseta trasera con el dorsal */
+  stickerUrl?: string | null;
 };
 
 export function LineupPlayerChip({
@@ -32,6 +35,7 @@ export function LineupPlayerChip({
   awayKitClashBorder = false,
   squadPlayerNames,
   substitutionMarker = null,
+  stickerUrl = null,
 }: LineupPlayerChipProps) {
   const isModal = variant === "modal";
   const isMatch = variant === "match";
@@ -57,50 +61,65 @@ export function LineupPlayerChip({
 
   const content = (
     <>
-      <svg
-        viewBox="0 3 48 45"
-        aria-hidden
-        className={cn(
-          "block shrink-0",
-          isMatch
-            ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
-            : isModal
-              ? "h-[2.2rem] w-[1.9rem]"
-              : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
-          interactive && "transition-transform active:scale-95"
-        )}
-      >
-        {clashOutline ? (
+      {stickerUrl && !slot.isPlaceholder ? (
+        <PlayerSticker 
+          player={{ sticker_url: stickerUrl, player_name: slot.name }}
+          className={cn(
+            "block shrink-0 drop-shadow-md",
+            isMatch
+              ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
+              : isModal
+                ? "h-[2.2rem] w-[1.9rem]"
+                : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
+            interactive && "transition-transform active:scale-95"
+          )}
+        />
+      ) : (
+        <svg
+          viewBox="0 3 48 45"
+          aria-hidden
+          className={cn(
+            "block shrink-0",
+            isMatch
+              ? "h-[2.8rem] w-[2.4rem] sm:h-[2.9rem] sm:w-[2.5rem]"
+              : isModal
+                ? "h-[2.2rem] w-[1.9rem]"
+                : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
+            interactive && "transition-transform active:scale-95"
+          )}
+        >
+          {clashOutline ? (
+            <path
+              d="M24 4.5C18.8 4.5 15 7 13.4 10.6L6.8 13.2 3 21.8 8.4 23.4V47.5H39.6V23.4L45 21.8 41.2 13.2 34.6 10.6C33 7 29.2 4.5 24 4.5Zm0 3.2c2.6 0 4.7 1 5.9 2.7-1.4-.8-3-1.2-5.9-1.2s-4.5.4-5.9 1.2c1.2-1.7 3.3-2.7 5.9-2.7Z"
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth={3.2}
+              strokeLinejoin="round"
+              opacity={0.92}
+            />
+          ) : null}
           <path
             d="M24 4.5C18.8 4.5 15 7 13.4 10.6L6.8 13.2 3 21.8 8.4 23.4V47.5H39.6V23.4L45 21.8 41.2 13.2 34.6 10.6C33 7 29.2 4.5 24 4.5Zm0 3.2c2.6 0 4.7 1 5.9 2.7-1.4-.8-3-1.2-5.9-1.2s-4.5.4-5.9 1.2c1.2-1.7 3.3-2.7 5.9-2.7Z"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth={3.2}
+            fill={jerseyFill}
+            stroke={jerseyStroke}
+            strokeWidth={jerseyStrokeWidth}
             strokeLinejoin="round"
-            opacity={0.92}
+            strokeDasharray={slot.isPlaceholder ? "2.5 2" : undefined}
           />
-        ) : null}
-        <path
-          d="M24 4.5C18.8 4.5 15 7 13.4 10.6L6.8 13.2 3 21.8 8.4 23.4V47.5H39.6V23.4L45 21.8 41.2 13.2 34.6 10.6C33 7 29.2 4.5 24 4.5Zm0 3.2c2.6 0 4.7 1 5.9 2.7-1.4-.8-3-1.2-5.9-1.2s-4.5.4-5.9 1.2c1.2-1.7 3.3-2.7 5.9-2.7Z"
-          fill={jerseyFill}
-          stroke={jerseyStroke}
-          strokeWidth={jerseyStrokeWidth}
-          strokeLinejoin="round"
-          strokeDasharray={slot.isPlaceholder ? "2.5 2" : undefined}
-        />
-        <text
-          x="24"
-          y="29"
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill={dorsalColor}
-          fontSize={isMatch ? "15.5" : isModal ? "12" : "20"}
-          fontWeight="700"
-          fontFamily="system-ui, -apple-system, sans-serif"
-        >
-          {dorsal}
-        </text>
-      </svg>
+          <text
+            x="24"
+            y="29"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={dorsalColor}
+            fontSize={isMatch ? "15.5" : isModal ? "12" : "20"}
+            fontWeight="700"
+            fontFamily="system-ui, -apple-system, sans-serif"
+          >
+            {dorsal}
+          </text>
+        </svg>
+      )}
       <div
         className={cn(
           "w-full rounded border text-center",

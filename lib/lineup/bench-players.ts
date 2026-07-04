@@ -9,6 +9,7 @@ export type BenchPlayer = {
   shirtNumber: number | null;
   position: string | null;
   club: string | null;
+  stickerUrl: string | null;
 };
 
 function uniqueSquadPlayers(squad: TeamSquadWithPlayers) {
@@ -42,5 +43,6 @@ export function getBenchPlayers(
       shirtNumber: player.shirt_number,
       position: player.position,
       club: player.club,
+      stickerUrl: (player as any).sticker_url ?? null,
     }));
 }

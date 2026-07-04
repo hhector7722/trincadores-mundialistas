@@ -12,8 +12,8 @@ interface PlayerStickerProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function PlayerSticker({ 
   player, 
-  width = 120, 
-  height = 120, 
+  width, 
+  height, 
   className,
   ...props 
 }: PlayerStickerProps) {
@@ -24,7 +24,7 @@ export function PlayerSticker({
   return (
     <div 
       className={cn("relative overflow-hidden flex items-center justify-center", className)}
-      style={{ width, height }}
+      style={{ ...(width ? { width } : {}), ...(height ? { height } : {}) }}
       {...props}
     >
       <Image
@@ -32,7 +32,7 @@ export function PlayerSticker({
         alt={`Sticker dorsal de ${player.player_name || "jugador"}`}
         fill
         className="object-contain"
-        sizes={`${width}px`}
+        sizes={width ? `${width}px` : "120px"}
       />
     </div>
   );

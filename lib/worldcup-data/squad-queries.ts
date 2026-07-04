@@ -18,6 +18,7 @@ export type TeamSquadWithPlayers = {
     shirt_number: number | null;
     club: string | null;
     status: string;
+    sticker_url?: string | null;
   }>;
 };
 
@@ -59,7 +60,7 @@ async function querySquadRow(
 async function loadPlayers(client: SupabaseClient, squadId: string) {
   const { data: players, error } = await client
     .from("team_squad_players")
-    .select("player_name, position, shirt_number, club, status")
+    .select("player_name, position, shirt_number, club, status, sticker_url")
     .eq("squad_id", squadId)
     .order("shirt_number", { ascending: true, nullsFirst: false });
   if (error) throw error;

@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactNode } from "react";
+import { TeamCamiFront, TeamCamiFrontButton } from "@/components/matches/TeamCamiFront";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
 import { teamNameEs } from "@/lib/teams/display";
@@ -180,6 +181,7 @@ function TeamBlock({
   footerSlot?: ReactNode;
   flagSize?: "sm" | "md" | "lg";
   compactName?: boolean;
+  useCamiFront?: boolean;
 }) {
   const displayName = teamNameEs(name);
 
@@ -187,7 +189,7 @@ function TeamBlock({
     if (!onClick) {
       return (
         <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
-          <TeamFlagCircle name={name} size={flagSize} />
+          {useCamiFront ? <TeamCamiFront team={name} size={flagSize} /> : <TeamFlagCircle name={name} size={flagSize} />}
           <TeamNameLabel name={name} compact={compactName} />
           {footerSlot}
         </div>
@@ -196,7 +198,7 @@ function TeamBlock({
 
     return (
       <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
-        <TeamFlagButton name={name} onClick={onClick} size={flagSize} />
+        {useCamiFront ? <TeamCamiFrontButton team={name} onClick={onClick} size={flagSize} /> : <TeamFlagButton name={name} onClick={onClick} size={flagSize} />}
         <TeamNameButton name={name} onClick={onClick} compact={compactName} />
         {footerSlot}
       </div>
@@ -206,7 +208,7 @@ function TeamBlock({
   if (!onClick) {
     return (
       <div className="inline-flex w-max flex-col items-center gap-1">
-        <TeamFlagCircle name={name} size={flagSize} />
+        {useCamiFront ? <TeamCamiFront team={name} size={flagSize} /> : <TeamFlagCircle name={name} size={flagSize} />}
         <TeamNameLabel name={name} compact={compactName} />
       </div>
     );
@@ -222,7 +224,7 @@ function TeamBlock({
       className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} size={flagSize} />
+      {useCamiFront ? <TeamCamiFront team={name} size={flagSize} /> : <TeamFlagCircle name={name} size={flagSize} />}
       <TeamNameLabel name={name} compact={compactName} />
     </button>
   );
@@ -300,11 +302,11 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <TeamFlagButton
-            name={homeTeam}
-            onClick={onHomeTeamClick}
-            placeholderStyle={flagPlaceholderStyle}
-          />
+          {onHomeTeamClick ? (
+            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} />
+          ) : (
+            <TeamCamiFront team={homeTeam} />
+          )}
           {onHomeTeamClick ? (
             <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
           ) : (
@@ -326,11 +328,11 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          <TeamFlagButton
-            name={awayTeam}
-            onClick={onAwayTeamClick}
-            placeholderStyle={flagPlaceholderStyle}
-          />
+          {onAwayTeamClick ? (
+            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} />
+          ) : (
+            <TeamCamiFront team={awayTeam} />
+          )}
           {onAwayTeamClick ? (
             <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
           ) : (
