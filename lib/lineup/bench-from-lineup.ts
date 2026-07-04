@@ -3,21 +3,6 @@ import { getBenchPlayers, type BenchPlayer } from "@/lib/lineup/bench-players";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 
-function toBenchPlayer(player: {
-  key: string;
-  name: string;
-  shirtNumber: number | null;
-  position: string | null;
-  club?: string | null;
-}): BenchPlayer {
-  return {
-    key: player.key,
-    name: player.name,
-    shirtNumber: player.shirtNumber,
-    position: player.position,
-    club: player.club ?? null,
-  };
-}
 
 /**
  * Convocatoria visible = plantilla FIFA menos titulares.
