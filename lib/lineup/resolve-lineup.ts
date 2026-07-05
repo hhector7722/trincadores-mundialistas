@@ -158,7 +158,9 @@ export async function resolveTeamLineup(
     matchMeta?.status
   );
 
-  const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
+  const cachedDb = await loadCachedTeamLineup(supabase, matchId, context.teamName);
+  const cached = cachedDb?.sourceKind === "predicted" ? null : cachedDb;
+
   const nowMs = Date.now();
   const fetchedMs = cached?.fetchedAt ? Date.parse(cached.fetchedAt) : 0;
   const isRecentlyFetched = Number.isFinite(fetchedMs) && nowMs - fetchedMs < 5 * 60 * 1000;

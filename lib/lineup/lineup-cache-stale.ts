@@ -61,6 +61,7 @@ export function isConfirmedLineupCacheStale(
   nowMs: number = Date.now()
 ): boolean {
   if (lineup.sourceKind !== "confirmed") return false;
+  if (status === "finished") return false; // Never stale if finished
   if (status === "live") return true;
   if (hasPlaceholderStarters(lineup)) return true;
 

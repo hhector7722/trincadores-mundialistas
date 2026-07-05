@@ -64,7 +64,8 @@ async function prewarmTeamLineup(
     players,
   };
 
-  const cached = await loadCachedTeamLineup(supabase, match.id, teamName);
+  const cachedDb = await loadCachedTeamLineup(supabase, match.id, teamName);
+  const cached = cachedDb?.sourceKind === "predicted" ? null : cachedDb;
   if (
     cached?.sourceKind === "confirmed" &&
     !isConfirmedLineupCacheStale(cached, match.kickoff_at, match.status)
