@@ -178,16 +178,13 @@ export function TacticalVerticalField({
             const originalSlot = resolveVisualLineupSlots(awayLineup).find(s => s.key === pos.id);
             if (!originalSlot) return null;
             
-            const pixelX = (pos.x / 100) * pitchBounds.width;
-            const pixelY = (pos.y / 100) * pitchBounds.height;
-
             return (
               <div
                 key={pos.id}
                 className="absolute z-10"
                 style={{
-                  left: `${pixelX}px`,
-                  top: `${pixelY}px`,
+                  left: `${pos.x}%`,
+                  top: `${pos.y}%`,
                   transform: `translate(-50%, -50%) scale(${awayResult.chipScale})`,
                 }}
               >
