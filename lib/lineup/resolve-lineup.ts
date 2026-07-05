@@ -125,14 +125,22 @@ export async function buildFallbackWithKnownFormation(
   const teamKey = context.teamName.toLowerCase().trim();
   const hardcoded = HARDCODED_DEFAULT_LINEUPS[teamKey];
 
+  let resolved: ResolvedLineup;
+
   if (hardcoded) {
     // Usar la lógica exacta de hardcoded para saltarse la heurística que causa "Por confirmar"
-    return buildExactHardcodedLineup(context.players, hardcoded.formation, hardcoded.startingNumbers);
+    resolved = buildExactHardcodedLineup(context.players, hardcoded.formation, hardcoded.startingNumbers);
+  } else {
+    const knownFormation =
+      context.formationOverride ?? (await loadLastKnownFormation(supabase, context.teamName)) ?? undefined;
+    resolved = buildFallbackLineup(context.players, { knownFormation });
   }
 
-  const knownFormation =
-    context.formationOverride ?? (await loadLastKnownFormation(supabase, context.teamName)) ?? undefined;
-  return buildFallbackLineup(context.players, { knownFormation });
+  // Populate bench correctly since we bypassed the DB persistence step
+  resolved.bench = benchPlayersExcludingStarters(resolved, context.players);
+  resolved.benchCount = resolved.bench.length;
+  
+  return resolved;
 }
 
 /**
@@ -145,59 +153,9 @@ export async function resolveTeamLineup(
   supabase: SupabaseClient,
   context: LineupResolveContext
 ): Promise<ResolvedLineup> {
-  const matchId = await resolveContextMatchId(supabase, context);
-  if (!matchId) {
-    return buildFallbackWithKnownFormation(supabase, context);
-  }
-
-  const matchMeta = await loadMatchMeta(supabase, matchId);
-  const tryConfirmed = shouldFetchConfirmedLineup(
-    matchMeta?.kickoff_at,
-    matchMeta?.status
-  );
-
-  const cachedDb = await loadCachedTeamLineup(supabase, matchId, context.teamName);
-  const cached = cachedDb?.sourceKind === "predicted" ? null : cachedDb;
-
-  const nowMs = Date.now();
-  const fetchedMs = cached?.fetchedAt ? Date.parse(cached.fetchedAt) : 0;
-  const isRecentlyFetched = Number.isFinite(fetchedMs) && nowMs - fetchedMs < 5 * 60 * 1000;
-
-  // 1. Rate limit global: si se ha hecho fetch hace menos de 5 min, se devuelve la caché
-  // independientemente de si es live o scheduled, para no ahogar los servidores.
-  if (cached && isRecentlyFetched) {
-    return cached;
-  }
-
-  // 2. Si la caché no está stale según sus reglas específicas, la devolvemos.
-  if (
-    cached?.sourceKind === "confirmed" &&
-    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status, nowMs)
-  ) {
-    return cached;
-  }
-
-  // 3. Eliminamos el fetch de confirmadas externas a petición del usuario.
-  // if (tryConfirmed) { ... }
-  // if (cached && cached.sourceKind === "confirmed") { ... }
-
-  // 5. Fallback logic: Usamos Alineaciones Hardcodeadas o Fallback genérico
-  // ELIMINAMOS por completo fetchPredictedLineup para maximizar el rendimiento.
-  const fallback = await buildFallbackWithKnownFormation(supabase, context);
-  const shouldPersist =
-    !cached ||
-    isBetterLineupSource(fallback.sourceKind, cached.sourceKind) ||
-    !cached.formationLabel ||
-    cached.formation !== fallback.formation;
-
-  if (shouldPersist) {
-    await upsertTeamLineup(
-      supabase, matchId, context.teamName, fallback,
-      benchFromSquadExcludingStarters(fallback, context)
-    );
-  }
-
-  return fallback;
+  // Eliminamos completamente todas las consultas a la base de datos (caché, matchId, etc.)
+  // y forzamos el uso directo de las alineaciones hardcodeadas para todo.
+  return buildFallbackWithKnownFormation(supabase, context);
 }
 
 function benchFromSquadExcludingStarters(
