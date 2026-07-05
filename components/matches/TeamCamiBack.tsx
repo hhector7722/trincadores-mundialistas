@@ -4,7 +4,7 @@ import { toSlug } from "@/lib/openfootball/slug";
 
 export type TeamCamiBackProps = {
   team: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "custom";
   className?: string;
   alt?: string;
 };
@@ -14,6 +14,7 @@ const sizeClasses = {
   md: "h-[4.5rem] w-[3.375rem]",   // 72x54 (ratio 0.75)
   lg: "h-[5rem] w-[3.75rem]",      // 80x60 (ratio 0.75)
   xl: "h-[7rem] w-[5.25rem]",
+  custom: "", // Allows LineupPlayerChip to safely override sizes via className
 };
 
 export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBackProps) {

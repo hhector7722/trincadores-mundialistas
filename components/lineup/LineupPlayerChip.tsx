@@ -78,6 +78,7 @@ export function LineupPlayerChip({
         <div className="relative">
           <CamiComponent
             team={teamName}
+            size="custom"
             className={cn(
               "block shrink-0 drop-shadow-md",
               isMatch
