@@ -38,13 +38,13 @@ export function TeamLineupGraphic({
 
   // Re-build a ResolvedLineup mock for the TacticalVerticalField
   // since it requires a ResolvedLineup
-  const resolvedLineup: ResolvedLineup = {
+  const resolvedLineup = {
     slots: slots,
     formationLabel: "",
     formation: "4-4-2",
     benchCount: 0,
     isProbable: false,
-  };
+  } as ResolvedLineup;
 
   const fieldContent = (
     <TacticalVerticalField
