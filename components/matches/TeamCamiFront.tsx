@@ -61,6 +61,7 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
             fill
             className="object-contain"
             sizes="96px"
+            unoptimized={true}
           />
       </div>
     </div>
