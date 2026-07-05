@@ -241,10 +241,6 @@ export function TacticalVerticalField({
           {homeResult.positions.map(pos => {
             const originalSlot = resolveVisualLineupSlots(homeLineup).find(s => s.key === pos.id);
             if (!originalSlot) return null;
-            
-            const pixelX = (pos.x / 100) * pitchBounds.width;
-            const pixelY = (pos.y / 100) * pitchBounds.height;
-
             return (
               <div
                 key={pos.id}

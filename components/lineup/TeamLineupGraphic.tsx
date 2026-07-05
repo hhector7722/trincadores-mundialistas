@@ -48,6 +48,7 @@ export function TeamLineupGraphic({
 
   const fieldContent = (
     <TacticalVerticalField
+      className="w-full h-full"
       homeLineup={resolvedLineup}
       awayLineup={null}
       homeTeam={teamName}

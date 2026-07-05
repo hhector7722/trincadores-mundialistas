@@ -70,6 +70,7 @@ export function MvpTacticalFieldBody({
     >
       <div className="relative flex w-full h-full min-h-0 items-center justify-center">
         <TacticalVerticalField
+          className="w-full h-full"
           homeLineup={resolvedHomeLineup}
           awayLineup={resolvedAwayLineup}
           homeTeam={homeTeam}
