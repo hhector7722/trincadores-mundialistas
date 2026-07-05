@@ -130,15 +130,15 @@ export function LineupModalPanel({
   }
 
   return (
-    <div className="flex flex-col flex-1 h-full">
+    <div className="flex flex-col w-full h-auto">
       {selectionMode === "pick" && selectionBlockedMessage ? (
         <p className="shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-center text-[10px] text-[var(--tm-muted)]">
           {selectionBlockedMessage}
         </p>
       ) : null}
-      <LineupFieldGate className="flex flex-col flex-1">
+      <LineupFieldGate className="flex flex-col w-full">
         {(markFieldReady) => (
-          <div className="flex w-full flex-col flex-1 pt-0.5 pb-1">
+          <div className="flex w-full flex-col pt-0.5 pb-1">
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}
