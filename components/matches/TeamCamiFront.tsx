@@ -54,16 +54,11 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
         className
       )}
     >
-      <div className="absolute inset-0 w-full h-full">
-         <Image
+         <img
             src={src}
             alt={alt ?? `Camiseta de ${team}`}
-            fill
-            className="object-contain"
-            sizes="96px"
-            unoptimized={true}
+            className="absolute inset-0 w-full h-full object-contain"
           />
-      </div>
     </div>
   );
 }

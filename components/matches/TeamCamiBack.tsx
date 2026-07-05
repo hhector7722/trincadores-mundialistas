@@ -45,16 +45,11 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
 
   return (
     <div className={cn("relative overflow-hidden flex items-center justify-center shrink-0", sizeClasses[size], className)} title={alt}>
-      <div className="absolute inset-0 w-full h-full">
-         <Image
+         <img
             src={`/camis/${camiFileName}`}
             alt={alt || team}
-            fill
-            className="object-contain"
-            unoptimized={true}
-            priority={true}
+            className="absolute inset-0 w-full h-full object-contain"
          />
-      </div>
     </div>
   );
 }
