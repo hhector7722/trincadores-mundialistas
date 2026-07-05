@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface TeamCamiFrontProps {
   team: string;
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "custom";
+  size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl" | "custom";
   className?: string;
   alt?: string;
 }
@@ -11,6 +11,7 @@ interface TeamCamiFrontProps {
 const sizeClasses = {
   sm: "h-8 w-6",
   md: "h-12 w-9",
+  "md-lg": "h-[4.5rem] w-[3.375rem] sm:h-[5rem] sm:w-[3.75rem]",
   lg: "h-[5rem] w-[3.75rem] sm:h-[5.5rem] sm:w-[4.125rem]",
   xl: "h-[5.5rem] w-[4.125rem] sm:h-[6rem] sm:w-[4.5rem]",
   "2xl": "h-[7rem] w-[5.25rem] sm:h-[7.5rem] sm:w-[5.625rem]",

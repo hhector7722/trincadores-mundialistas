@@ -86,7 +86,7 @@ function TeamFlagCircle({
 }: {
   name: string;
   placeholderStyle?: "default" | "knockout";
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+  size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
 }) {
   return (
     <div className="relative flex shrink-0 items-center justify-center">
@@ -120,7 +120,7 @@ function TeamFlagButton({
   name: string;
   onClick?: () => void;
   placeholderStyle?: "default" | "knockout";
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+  size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
 }) {
   const displayName = teamNameEs(name);
 
@@ -180,7 +180,7 @@ function TeamBlock({
   name: string;
   onClick?: () => void;
   footerSlot?: ReactNode;
-  flagSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+  flagSize?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
   compactName?: boolean;
   hideName?: boolean;
 }) {
@@ -292,7 +292,7 @@ export function MatchTeamsDisplay({
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
   const awayAnchor = isPredictionModal ? "90%" : "85%";
-  const teamFlagSize = "lg";
+  const teamFlagSize = "md-lg";
   const teamColumnCompact = compactTeamColumn || Boolean(homeFooterSlot || awayFooterSlot);
 
   if (isPredictionModal) {
