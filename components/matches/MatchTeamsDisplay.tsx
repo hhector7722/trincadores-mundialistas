@@ -24,7 +24,7 @@ export const PREDICTION_MODAL_TEAMS_BLOCK_MIN_H_CLASS = "min-h-[10.5rem]";
 
 /** Card inicio: borde inferior de la fila de nombres de equipo (ancla MVP). */
 export const HOME_CARD_NAMES_BOTTOM_CLASS =
-  "top-[calc(7rem+0.25rem+0.625rem)] sm:top-[calc(7.5rem+0.25rem+0.625rem)]";
+  "top-[calc(6rem+0.25rem+0.625rem)] sm:top-[calc(6.5rem+0.25rem+0.625rem)]";
 
 /** Card inicio: plantilla + MVP arriba, posibles alineaciones abajo. */
 export const HOME_CARD_ACTIONS_STACKED_CLASS = "h-[4.5rem]";
@@ -46,15 +46,15 @@ export const HOME_CARD_SCHEDULED_MI_PRONOSTICO_TOP_CLASS =
 export const HOME_CARD_CAROUSEL_INDICATORS_OFFSET = "0.875rem";
 
 /** Card próximo partido: bloque equipos compacto (carrusel home). */
-export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-1 h-[calc(10.75rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-hidden`;
+export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-1 h-[calc(9.75rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-hidden`;
 
 /** Card próximo partido (sin carrusel): altura estándar fuera del carrusel. */
-export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = "relative mt-2 h-[calc(11.5rem-0.875rem)] overflow-hidden";
+export const HOME_CARD_SCHEDULED_TEAMS_BLOCK_CLASS = "relative mt-2 h-[calc(10.5rem-0.875rem)] overflow-hidden";
 
 /** Card inicio: bloque equipos + acciones apiladas (altura mínima, crece con goleadores). */
-export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 min-h-[13rem] overflow-visible";
+export const HOME_CARD_TEAMS_BLOCK_CLASS = "relative mt-2 min-h-[12rem] overflow-visible";
 
-export const HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-2 min-h-[calc(13rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-visible`;
+export const HOME_CARD_TEAMS_BLOCK_CAROUSEL_CLASS = `relative mt-2 min-h-[calc(12rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})] overflow-visible`;
 
 /** Card inicio: cabecera fija (badge EN JUEGO / Próximo partido). */
 export const HOME_CARD_HEADER_CLASS =
@@ -65,19 +65,19 @@ export const HOME_CARD_CAROUSEL_INDICATORS_SLOT_CLASS =
   "mt-2 flex h-1.5 shrink-0 items-center justify-center gap-1.5";
 
 /** Card inicio: altura mínima del cuerpo (cabecera + mt-2 + bloque equipos). */
-export const HOME_CARD_BODY_MIN_H_CLASS = "min-h-[calc(1.5rem+0.5rem+13rem)]";
+export const HOME_CARD_BODY_MIN_H_CLASS = "min-h-[calc(1.5rem+0.5rem+12rem)]";
 
 /** Card inicio: altura fija del cuerpo (evita que el slide crezca con el contenido). */
-export const HOME_CARD_BODY_H_CLASS = "h-[calc(1.5rem+0.5rem+13rem)]";
+export const HOME_CARD_BODY_H_CLASS = "h-[calc(1.5rem+0.5rem+12rem)]";
 
 /** Card próximo partido en carrusel: cabecera + bloque equipos compacto. */
-export const HOME_CARD_SCHEDULED_BODY_H_CLASS = `h-[calc(1.5rem+0.25rem+10.75rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
+export const HOME_CARD_SCHEDULED_BODY_H_CLASS = `h-[calc(1.5rem+0.25rem+9.75rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
 
 /** Card inicio en carrusel: cabecera + bloque equipos compacto (indicadores fuera del slide). */
-export const HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS = `min-h-[calc(1.5rem+0.5rem+13rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
+export const HOME_CARD_BODY_MIN_H_CAROUSEL_CLASS = `min-h-[calc(1.5rem+0.5rem+12rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
 
 /** Card inicio en carrusel: altura fija del slide. */
-export const HOME_CARD_BODY_H_CAROUSEL_CLASS = `h-[calc(1.5rem+0.5rem+13rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
+export const HOME_CARD_BODY_H_CAROUSEL_CLASS = `h-[calc(1.5rem+0.5rem+12rem-${HOME_CARD_CAROUSEL_INDICATORS_OFFSET})]`;
 
 function TeamFlagCircle({
   name,
@@ -392,7 +392,7 @@ export function MatchTeamsDisplay({
         {homeScoreSlot ? (
           <div
             className={cn(
-              "absolute left-[32.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[2.25rem] sm:top-[2.5rem]",
+              "absolute left-[32.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1.75rem] sm:top-[2rem]",
               teamBlocksTopClass,
             )}
           >
@@ -403,7 +403,7 @@ export function MatchTeamsDisplay({
         {awayScoreSlot ? (
           <div
             className={cn(
-              "absolute left-[67.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[2.25rem] sm:top-[2.5rem]",
+              "absolute left-[67.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1.75rem] sm:top-[2rem]",
               teamBlocksTopClass,
             )}
           >
@@ -435,7 +435,7 @@ export function MatchTeamsDisplay({
           {centerSlotAlign === "default" ? centerSlot : null}
         </div>
         {centerSlot && centerSlotAlign === "teamNames" ? (
-          <div className="absolute left-1/2 top-[calc(7rem+0.25rem+0.375rem)] -translate-x-1/2 -translate-y-1/2 sm:top-[calc(7.5rem+0.25rem+0.375rem)]">
+          <div className="absolute left-1/2 top-[calc(6rem+0.25rem+0.375rem)] -translate-x-1/2 -translate-y-1/2 sm:top-[calc(6.5rem+0.25rem+0.375rem)]">
             {centerSlot}
           </div>
         ) : null}
