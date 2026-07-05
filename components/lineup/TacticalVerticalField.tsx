@@ -58,7 +58,7 @@ const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
  * @param lineup     Alineación del equipo
  * @param fieldBounds  Porción del campo que ocupa esta mitad
  */
-function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"]) {
+function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"], fixedScale: number) {
   if (!lineup) return null;
   const slots = resolveVisualLineupSlots(lineup);
   const inputs: LayoutElementInput[] = slots.map(s => {
@@ -70,7 +70,12 @@ function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints
       referenceY: refY,
     };
   });
-  return LayoutEngine.calculate(inputs, { ...BASE_HALF_CONSTRAINTS, fieldBounds });
+  const dynamicConstraints = {
+    ...BASE_HALF_CONSTRAINTS,
+    chipSize: { minScale: fixedScale, maxScale: fixedScale, baseWidth: 10, baseHeight: 12 },
+    fieldBounds
+  };
+  return LayoutEngine.calculate(inputs, dynamicConstraints);
 }
 
 export function TacticalVerticalField({
@@ -104,7 +109,6 @@ export function TacticalVerticalField({
   useEffect(() => {
     const node = containerRef.current;
     if (!node || widthPx != null || heightPx != null) return;
-
     function measure() {
       const parent = node!.parentElement;
       if (!parent) return;
@@ -156,16 +160,19 @@ export function TacticalVerticalField({
     height: finalH,
   };
 
+  const isFaced = !!awayLineup;
+  const fixedScale = isFaced ? 0.85 : 1.0;
+
   // ── Optimización independiente: visitante (mitad superior, ataca hacia abajo) ──
   const awayResult = useMemo(
-    () => solveHalf(awayLineup, { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: true }),
-    [awayLineup]
+    () => solveHalf(awayLineup, { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: true }, fixedScale),
+    [awayLineup, fixedScale]
   );
 
   // ── Optimización independiente: local (mitad inferior, ataca hacia arriba) ──
   const homeResult = useMemo(
-    () => solveHalf(homeLineup, { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }),
-    [homeLineup]
+    () => solveHalf(homeLineup, { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }, fixedScale),
+    [homeLineup, fixedScale]
   );
 
   // Unificar la escala para que ambos equipos tengan el mismo tamaño de camiseta
