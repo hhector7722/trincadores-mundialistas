@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getAvatarBadgeObjectPosition } from "@/lib/avatars/presets";
 import { cn } from "@/lib/utils";
 
@@ -27,11 +28,15 @@ export function ProfileAvatar({
   if (variant === "profile") {
     if (avatarUrl) {
       return (
-        <img
-          src={avatarUrl}
-          alt=""
-          className={cn("block shrink-0 rounded-xl object-contain", className)}
-        />
+        <div className={cn("relative shrink-0 overflow-hidden rounded-xl", className)}>
+          <Image
+            src={avatarUrl}
+            alt=""
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 200px"
+          />
+        </div>
       );
     }
 
@@ -52,15 +57,17 @@ export function ProfileAvatar({
     return (
       <div
         className={cn(
-          "tm-circle-depth flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+          "tm-circle-depth relative flex shrink-0 items-center justify-center overflow-hidden rounded-full",
           className
         )}
       >
-        <img
+        <Image
           src={avatarUrl}
           alt=""
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
           style={{ objectPosition: getAvatarBadgeObjectPosition(avatarUrl) }}
+          sizes="48px"
         />
       </div>
     );
