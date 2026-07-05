@@ -288,7 +288,7 @@ export function MatchTeamsDisplay({
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
   const awayAnchor = isPredictionModal ? "90%" : "85%";
-  const teamFlagSize = "xl";
+  const teamFlagSize = "lg";
   const teamColumnCompact = compactTeamColumn || Boolean(homeFooterSlot || awayFooterSlot);
 
   if (isPredictionModal) {

@@ -12,36 +12,36 @@ export const TACTICAL_X = {
   /** Muy abierto izquierda */
   UL: 10,
   /** Extremo izquierdo */
-  L: 15,
+  L: 12,
   /** Interior izquierdo */
-  IL: 35,
+  IL: 32,
   /** Centro */
   C: 50,
   /** Interior derecho */
-  IR: 65,
+  IR: 68,
   /** Extremo derecho */
-  R: 85,
+  R: 88,
   /** Muy abierto derecha */
   UR: 90,
   /** Carril defensivo izquierdo (5 at the back) */
-  DL: 25,
+  DL: 28,
   /** Carril defensivo derecho (5 at the back) */
-  DR: 75,
+  DR: 72,
 } as const;
 
 export const TACTICAL_Y = {
-  /** Delanteros (18–25 %) */
-  FORWARD: 20,
-  /** Mediapuntas (35–45 %) */
-  ATTACK: 40,
-  /** Centrocampistas (45–55 %) */
-  MIDFIELD: 50,
-  /** Pivotes (55–65 %) */
-  HOLDING: 60,
-  /** Defensas (70–80 %) */
-  DEFENSE: 75,
-  /** Portero (90–95 %) */
-  GOALKEEPER: 92,
+  /** Delanteros */
+  FORWARD: 16,
+  /** Mediapuntas */
+  ATTACK: 32,
+  /** Centrocampistas */
+  MIDFIELD: 48,
+  /** Pivotes */
+  HOLDING: 64,
+  /** Defensas */
+  DEFENSE: 80,
+  /** Portero */
+  GOALKEEPER: 94,
 } as const;
 
 /** Alias usado por field-layout y proyección MVP. */
