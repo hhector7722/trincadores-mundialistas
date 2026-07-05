@@ -85,7 +85,7 @@ export function LineupPlayerChip({
                 ? "h-[4rem] w-[3rem] sm:h-[4.2rem] sm:w-[3.15rem]"
                 : isModal
                   ? "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]"
-                  : "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]",
+                  : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -116,7 +116,7 @@ export function LineupPlayerChip({
               ? "h-[4rem] w-[3rem] sm:h-[4.2rem] sm:w-[3.15rem]"
               : isModal
                 ? "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]"
-                : "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]",
+                : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
