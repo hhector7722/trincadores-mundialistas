@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 
 interface TeamCamiFrontProps {
   team: string;
@@ -40,12 +44,21 @@ const dbTeamsToCamiKey: Record<string, string> = {
 };
 
 export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFrontProps) {
+  const [imgError, setImgError] = useState(false);
   const internalKey = dbTeamsToCamiKey[team] || team.toLowerCase();
   let camiFileName = `${internalKey}-cami.png`;
   if (internalKey === 'suiza') camiFileName = 'suiza.cami.png';
 
   const src = `/camis/${camiFileName}`;
   
+  if (imgError) {
+    return (
+      <div className={cn("relative flex shrink-0 items-center justify-center", sizeClasses[size], className)}>
+        <TeamFlagBadge name={team} size={size === "sm" ? "sm" : size === "md" ? "md" : "lg"} />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -58,6 +71,7 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
             src={src}
             alt={alt ?? `Camiseta de ${team}`}
             className="absolute inset-0 w-full h-full object-contain"
+            onError={() => setImgError(true)}
           />
     </div>
   );

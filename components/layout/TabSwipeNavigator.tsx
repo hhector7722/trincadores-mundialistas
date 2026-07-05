@@ -55,7 +55,11 @@ function setSwipeNavigating(active: boolean) {
 }
 
 function isModalOpen() {
-  return typeof document !== "undefined" && document.documentElement.hasAttribute("data-modal-open");
+  if (typeof document === "undefined") return false;
+  return (
+    document.documentElement.hasAttribute("data-modal-open") ||
+    document.querySelector('[role="dialog"]') !== null
+  );
 }
 
 function canStartSwipe(target: EventTarget | null) {
