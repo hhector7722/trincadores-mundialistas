@@ -185,22 +185,29 @@ export async function resolveTeamLineup(
   );
 
   const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
+  
+  // Rate limit global: si intentamos hacer fetch (incluso si falló y guardamos predicted)
+  // hace menos de 5 minutos, no volvemos a golpear las APIs.
+  const nowMs = Date.now();
+  const fetchedMs = cached?.fetchedAt ? Date.parse(cached.fetchedAt) : 0;
+  const isRecentlyFetched = Number.isFinite(fetchedMs) && nowMs - fetchedMs < 5 * 60 * 1000;
+
   if (
     cached?.sourceKind === "confirmed" &&
-    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status)
+    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status, nowMs)
   ) {
     return cached;
   }
 
   if (
     cached?.sourceKind === "predicted" &&
-    !tryConfirmed &&
+    (!tryConfirmed || isRecentlyFetched) &&
     !isPredictedLineupCacheStale(cached)
   ) {
     return cached;
   }
 
-  if (tryConfirmed) {
+  if (tryConfirmed && !isRecentlyFetched) {
     const confirmed = await fetchConfirmedLineup(supabase, {
       ...context,
       matchId,
@@ -221,10 +228,10 @@ export async function resolveTeamLineup(
     return cached;
   }
 
-  const predicted = await fetchPredictedLineup(supabase, {
+  const predicted = !isRecentlyFetched ? await fetchPredictedLineup(supabase, {
     ...context,
     matchId,
-  });
+  }) : null;
   if (predicted) {
     await upsertTeamLineup(
       supabase,

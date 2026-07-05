@@ -61,7 +61,6 @@ export function isConfirmedLineupCacheStale(
   nowMs: number = Date.now()
 ): boolean {
   if (lineup.sourceKind !== "confirmed") return false;
-  if (status === "live") return true;
   if (hasPlaceholderStarters(lineup)) return true;
 
   const starters = lineup.slots.filter((slot) => !slot.isPlaceholder);
