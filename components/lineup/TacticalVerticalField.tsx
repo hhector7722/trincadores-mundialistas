@@ -29,14 +29,40 @@ type TacticalVerticalFieldProps = {
   awaySubstitutionMarkers?: any;
 };
 
-const DEFAULT_CONSTRAINTS: LayoutConstraints = {
-  margins: { side: 0.5, vertical: 0.5 },
+/* ------------------------------------------------------------------ */
+/*  Constantes de layout — CADA MITAD ES UN CANVAS INDEPENDIENTE      */
+/*  El motor nunca mezcla los 22 jugadores en un mismo espacio.       */
+/*  Primero se optimiza el visitante (mitad superior),                */
+/*  luego el local (mitad inferior), y al final se superponen.        */
+/* ------------------------------------------------------------------ */
+
+/** Márgenes compartidos por ambas mitades. */
+const HALF_MARGINS = { side: 0.5, vertical: 0.25 };
+
+const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
+  margins: HALF_MARGINS,
   spacing: { minHorizontal: 5, minVertical: 5 },
   chipSize: { minScale: 0.6, maxScale: 1.4, baseWidth: 10, baseHeight: 12 },
   nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
-  fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: false },
 };
+
+/**
+ * Optimiza una mitad del campo de forma completamente aislada.
+ * @param lineup     Alineación del equipo
+ * @param fieldBounds  Porción del campo que ocupa esta mitad
+ */
+function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"]) {
+  if (!lineup) return null;
+  const slots = resolveVisualLineupSlots(lineup);
+  const inputs: LayoutElementInput[] = slots.map(s => ({
+    id: s.key,
+    role: s.role,
+    referenceX: s.x,
+    referenceY: s.y,
+  }));
+  return LayoutEngine.calculate(inputs, { ...BASE_HALF_CONSTRAINTS, fieldBounds });
+}
 
 export function TacticalVerticalField({
   homeLineup,
@@ -57,37 +83,17 @@ export function TacticalVerticalField({
   awaySubstitutionMarkers,
 }: TacticalVerticalFieldProps) {
   
-  // Procesamos visitante (mitad superior, ataca hacia abajo)
-  const awayResult = useMemo(() => {
-    if (!awayLineup) return null;
-    const slots = resolveVisualLineupSlots(awayLineup);
-    const inputs: LayoutElementInput[] = slots.map(s => ({
-      id: s.key,
-      role: s.role,
-      referenceX: s.x,
-      referenceY: s.y,
-    }));
-    return LayoutEngine.calculate(inputs, {
-      ...DEFAULT_CONSTRAINTS,
-      fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: true }
-    });
-  }, [awayLineup]);
+  // ── Optimización independiente: visitante (mitad superior, ataca hacia abajo) ──
+  const awayResult = useMemo(
+    () => solveHalf(awayLineup, { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: true }),
+    [awayLineup]
+  );
 
-  // Procesamos local (mitad inferior, ataca hacia arriba)
-  const homeResult = useMemo(() => {
-    if (!homeLineup) return null;
-    const slots = resolveVisualLineupSlots(homeLineup);
-    const inputs: LayoutElementInput[] = slots.map(s => ({
-      id: s.key,
-      role: s.role,
-      referenceX: s.x,
-      referenceY: s.y,
-    }));
-    return LayoutEngine.calculate(inputs, {
-      ...DEFAULT_CONSTRAINTS,
-      fieldBounds: { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }
-    });
-  }, [homeLineup]);
+  // ── Optimización independiente: local (mitad inferior, ataca hacia arriba) ──
+  const homeResult = useMemo(
+    () => solveHalf(homeLineup, { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }),
+    [homeLineup]
+  );
 
   const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
   const vbWidth = 100;

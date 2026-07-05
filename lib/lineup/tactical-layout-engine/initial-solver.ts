@@ -1,6 +1,15 @@
 import { LayoutConstraints, LayoutElementInput, LayoutPosition } from "./types";
 import { TacticalStructure } from "./tactical-structure";
 
+/**
+ * Genera posiciones iniciales para una mitad del campo.
+ * Cada equipo se optimiza de forma completamente independiente:
+ * el layout de una mitad nunca depende del de la otra.
+ *
+ * Las posiciones de los jugadores se reparten para ocupar
+ * ~90–95 % de la profundidad disponible, con el portero
+ * ligeramente más cerca de la defensa que el resto de líneas.
+ */
 export function solveInitialLayout(
   structure: TacticalStructure,
   constraints: LayoutConstraints
@@ -13,11 +22,9 @@ export function solveInitialLayout(
   const maxV = constraints.fieldBounds.yMax - constraints.margins.vertical;
   const vRange = maxV - minV;
   const numBands = bands.length;
-  
-  // We want the forwards to be at the halfway line (or maxV),
-  // and the GK to be at minV. But GK should be closer to defense.
-  // We'll calculate a base spread for field players, and attach GK.
-  const gkGap = vRange * 0.10; // 10% of the half height — GK closer to defense
+
+  // Espacio que separa al portero de la defensa (menor que entre el resto de líneas)
+  const gkGap = vRange * 0.05;
   const fieldMinV = constraints.fieldBounds.isAwayHalf ? minV + gkGap : minV;
   const fieldMaxV = constraints.fieldBounds.isAwayHalf ? maxV : maxV - gkGap;
   const fieldVRange = fieldMaxV - fieldMinV;
@@ -26,15 +33,13 @@ export function solveInitialLayout(
 
   bands.forEach((band, bandIndex) => {
     let bandY = 50;
-    
+
     if (numBands === 1) {
       bandY = (minV + maxV) / 2;
     } else {
       if (bandIndex === 0) {
-        // GK
         bandY = constraints.fieldBounds.isAwayHalf ? minV : maxV;
       } else {
-        // Field players
         const fieldIndex = bandIndex - 1;
         if (constraints.fieldBounds.isAwayHalf) {
           bandY = fieldMinV + fieldIndex * vStep;
@@ -45,15 +50,18 @@ export function solveInitialLayout(
     }
 
     const numElements = band.elements.length;
-    
-    // Maximizar el ancho disponible basado en los márgenes
-    const availableWidth = 100 - (constraints.margins.side * 2);
-    
+
+    // Ancho disponible teniendo en cuenta el tamaño aproximado del chip
+    const approxScale = (constraints.chipSize.minScale + constraints.chipSize.maxScale) / 2;
+    const approxChipW = constraints.chipSize.baseWidth * approxScale;
+    const effectiveSideMargin = Math.max(constraints.margins.side, approxChipW * 0.15);
+    const availableWidth = 100 - effectiveSideMargin * 2;
+
     let hSpread = 0;
     if (numElements === 1) hSpread = 0;
-    else if (numElements === 2) hSpread = availableWidth * 0.75; // 75% — ocupar bandas
-    else if (numElements === 3) hSpread = availableWidth * 0.90;
-    else hSpread = availableWidth; // 4 o 5 jugadores usan todo el ancho
+    else if (numElements === 2) hSpread = availableWidth * 0.85;
+    else if (numElements === 3) hSpread = availableWidth * 0.95;
+    else hSpread = availableWidth;
 
     const actualMinX = 50 - hSpread / 2;
     const actualMaxX = 50 + hSpread / 2;
