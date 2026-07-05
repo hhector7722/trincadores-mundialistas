@@ -46,7 +46,7 @@ export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFro
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden",
+        "relative shrink-0",
         sizeClasses[size],
         className
       )}
