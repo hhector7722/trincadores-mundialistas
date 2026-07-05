@@ -89,10 +89,12 @@ function TeamFlagCircle({
   size?: "sm" | "md" | "lg" | "xl";
 }) {
   return (
-    <TeamCamiFront
-      team={name}
-      size={size}
-    />
+    <div className="relative flex shrink-0 items-center justify-center">
+      <TeamCamiFront
+        team={name}
+        size={size}
+      />
+    </div>
   );
 }
 

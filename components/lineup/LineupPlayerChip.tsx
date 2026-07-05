@@ -82,10 +82,10 @@ export function LineupPlayerChip({
             className={cn(
               "block shrink-0 drop-shadow-md",
               isMatch
-                ? "h-[3.2rem] w-[2.4rem] sm:h-[3.4rem] sm:w-[2.55rem]"
+                ? "h-[3.6rem] w-[2.7rem] sm:h-[3.8rem] sm:w-[2.85rem]"
                 : isModal
-                  ? "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]"
-                  : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
+                  ? "h-[4.8rem] w-[3.6rem] sm:h-[5.2rem] sm:w-[3.9rem]"
+                  : "h-[4.8rem] w-[3.6rem] sm:h-[5.2rem] sm:w-[3.9rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -113,10 +113,10 @@ export function LineupPlayerChip({
           className={cn(
             "block shrink-0",
             isMatch
-              ? "h-[3.2rem] w-[2.4rem] sm:h-[3.4rem] sm:w-[2.55rem]"
+              ? "h-[3.6rem] w-[2.7rem] sm:h-[3.8rem] sm:w-[2.85rem]"
               : isModal
-                ? "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]"
-                : "h-[4.4rem] w-[3.3rem] sm:h-[4.8rem] sm:w-[3.6rem]",
+                ? "h-[4.8rem] w-[3.6rem] sm:h-[5.2rem] sm:w-[3.9rem]"
+                : "h-[4.8rem] w-[3.6rem] sm:h-[5.2rem] sm:w-[3.9rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
@@ -194,10 +194,10 @@ export function LineupPlayerChip({
   const shellClass = cn(
     "flex shrink-0 flex-col items-center gap-0",
     isMatch
-      ? "min-h-[4rem] w-[3.2rem] touch-manipulation"
+      ? "min-h-[4.2rem] w-[3.5rem] touch-manipulation"
       : isModal
-        ? "w-[4rem] min-h-[5rem]"
-        : "w-[4rem] min-h-[5rem] sm:w-[4.4rem]",
+        ? "w-[4.5rem] min-h-[5.5rem]"
+        : "w-[4.5rem] min-h-[5.5rem] sm:w-[4.9rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"
   );
