@@ -80,7 +80,11 @@ export function LineupPlayerChip({
             team={teamName}
             className={cn(
               "block shrink-0 drop-shadow-md",
-              "h-[2.2rem] w-[1.65rem] sm:h-[2.5rem] sm:w-[1.875rem]",
+              isMatch
+                ? "h-[2.6rem] w-[1.95rem] sm:h-[2.8rem] sm:w-[2.1rem]"
+                : isModal
+                  ? "h-[4rem] w-[3rem] sm:h-[4.4rem] sm:w-[3.3rem]"
+                  : "h-[4rem] w-[3rem] sm:h-[4.4rem] sm:w-[3.3rem]",
               interactive && "transition-transform active:scale-95"
             )}
           />
@@ -93,7 +97,7 @@ export function LineupPlayerChip({
               // Ajustar tamaño del texto según el contenedor
               style={{
                 color: dorsalColor,
-                fontSize: "0.8rem",
+                fontSize: isMatch ? "1rem" : isModal ? "1.2rem" : "1.3rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -107,7 +111,11 @@ export function LineupPlayerChip({
           aria-hidden
           className={cn(
             "block shrink-0",
-            "h-[2.2rem] w-[1.65rem] sm:h-[2.5rem] sm:w-[1.875rem]",
+            isMatch
+              ? "h-[2.6rem] w-[1.95rem] sm:h-[2.8rem] sm:w-[2.1rem]"
+              : isModal
+                ? "h-[4rem] w-[3rem] sm:h-[4.4rem] sm:w-[3.3rem]"
+                : "h-[4rem] w-[3rem] sm:h-[4.4rem] sm:w-[3.3rem]",
             interactive && "transition-transform active:scale-95"
           )}
         >
@@ -187,8 +195,8 @@ export function LineupPlayerChip({
     isMatch
       ? "min-h-[3.4rem] w-[3.05rem] touch-manipulation"
       : isModal
-        ? "w-[3rem] min-h-10"
-        : "w-[4.75rem] min-h-12 sm:w-[5.5rem]",
+        ? "w-[4rem] min-h-[4.5rem]"
+        : "w-[4rem] min-h-[4.5rem] sm:w-[4.4rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"
   );
