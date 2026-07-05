@@ -1,4 +1,4 @@
-import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import { buildFallbackLineup, buildExactHardcodedLineup } from "@/lib/lineup/build-fallback-lineup";
 import { HARDCODED_DEFAULT_LINEUPS } from "@/lib/lineup/hardcoded-lineups";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
 import { isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
@@ -116,6 +116,8 @@ function benchFromResolved(lineup: ResolvedLineup, context: LineupResolveContext
     }));
 }
 
+
+
 export async function buildFallbackWithKnownFormation(
   supabase: SupabaseClient,
   context: LineupResolveContext
@@ -124,12 +126,8 @@ export async function buildFallbackWithKnownFormation(
   const hardcoded = HARDCODED_DEFAULT_LINEUPS[teamKey];
 
   if (hardcoded) {
-    const starters = context.players.filter((p) =>
-      p.shirt_number !== null && hardcoded.startingNumbers.includes(p.shirt_number)
-    );
-    const resolved = buildFallbackLineup(starters, { knownFormation: hardcoded.formation });
-    resolved.sourceKind = "fallback"; // Or maybe "hardcoded" but fallback is safer for existing types
-    return resolved;
+    // Usar la lógica exacta de hardcoded para saltarse la heurística que causa "Por confirmar"
+    return buildExactHardcodedLineup(context.players, hardcoded.formation, hardcoded.startingNumbers);
   }
 
   const knownFormation =
@@ -179,23 +177,9 @@ export async function resolveTeamLineup(
     return cached;
   }
 
-  // 3. Intentamos fetchear confirmada si corresponde
-  if (tryConfirmed) {
-    const confirmed = await fetchConfirmedLineup(supabase, { ...context, matchId });
-    if (confirmed) {
-      await upsertTeamLineup(
-        supabase, matchId, context.teamName, confirmed,
-        confirmed.bench ?? benchFromSquadExcludingStarters(confirmed, context)
-      );
-      return confirmed;
-    }
-  }
-
-  // 4. Si TODO ha fallado, verificamos si tenemos CACHÉ (confirmada)
-  if (cached && cached.sourceKind === "confirmed") {
-    await upsertTeamLineup(supabase, matchId, context.teamName, { ...cached, fetchedAt: new Date().toISOString() }, cached.bench ?? []);
-    return cached;
-  }
+  // 3. Eliminamos el fetch de confirmadas externas a petición del usuario.
+  // if (tryConfirmed) { ... }
+  // if (cached && cached.sourceKind === "confirmed") { ... }
 
   // 5. Fallback logic: Usamos Alineaciones Hardcodeadas o Fallback genérico
   // ELIMINAMOS por completo fetchPredictedLineup para maximizar el rendimiento.
