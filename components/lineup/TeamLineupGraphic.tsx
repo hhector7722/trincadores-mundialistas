@@ -41,6 +41,9 @@ export function TeamLineupGraphic({
   const resolvedLineup: ResolvedLineup = {
     slots: slots,
     formationLabel: "",
+    formation: "4-4-2",
+    benchCount: 0,
+    isProbable: false,
   };
 
   const fieldContent = (
