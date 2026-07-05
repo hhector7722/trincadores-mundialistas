@@ -1,23 +1,32 @@
-import { TacticalVerticalField } from "@/components/match-center/tactical/TacticalVerticalField";
+import { TacticalVerticalField } from "@/components/lineup/TacticalVerticalField";
 import { LayoutEngine } from "@/lib/lineup/tactical-layout-engine";
 
 const FORMATIONS = ["4-3-3", "4-4-2", "4-2-3-1", "4-1-4-1", "3-4-3", "3-4-2-1", "3-5-2", "5-3-2", "5-4-1", "5-2-3"];
 
+import type { ResolvedLineup, PositionRole, FormationId } from "@/lib/lineup/types";
+
 // A mock lineup creator for the gallery
-function generateLineup(formation: string, isAway = false) {
+function generateLineup(formation: string, isAway = false): ResolvedLineup {
   const positions = parseFormation(formation);
   
   return {
-    teamName: isAway ? "Away Team" : "Home Team",
-    color: isAway ? "#E11D48" : "#2563EB", // rose-600 vs blue-600
-    players: positions.map((pos, i) => ({
-      id: `P${i}`,
+    formation: formation as FormationId,
+    formationLabel: formation,
+    slots: positions.map((pos, i) => ({
+      key: `P${i}`,
       name: pos.role + (i + 1),
-      number: i + 1,
-      role: pos.role,
-      referenceX: pos.x,
-      referenceY: pos.y
-    }))
+      shirtNumber: i + 1,
+      positionLabel: pos.role,
+      role: pos.role as PositionRole,
+      isPlaceholder: false,
+      x: pos.x,
+      y: pos.y
+    })),
+    benchCount: 0,
+    isProbable: false,
+    sourceKind: "fallback",
+    dataSourceCode: null,
+    fetchedAt: null
   };
 }
 
@@ -65,8 +74,10 @@ export default function TacticalGallery() {
             <h2 className="text-xl font-semibold text-zinc-200">{formation}</h2>
             <div className="w-full max-w-sm aspect-[2/3] bg-green-900/20 rounded-lg overflow-hidden border border-green-900/50 relative">
               <TacticalVerticalField 
-                home={generateLineup(formation, false) as any}
-                away={generateLineup("4-3-3", true) as any}
+                homeLineup={generateLineup(formation, false)}
+                awayLineup={generateLineup("4-3-3", true)}
+                homeTeam="Home Team"
+                awayTeam="Away Team"
               />
             </div>
           </div>
