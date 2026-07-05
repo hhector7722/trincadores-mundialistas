@@ -68,6 +68,22 @@ export function calculateMetrics(
   const usefulSpacePercentage = Math.min(100, ((chipArea * positions.length) / totalArea) * 100 * 5); // Multiplier to make it a more readable metric
   const wastedSpace = 100 - usefulSpacePercentage;
 
+  // Calculate vertical field usage percentage
+  const chipH = constraints.chipSize.baseHeight * chipScale;
+  const textH = constraints.nameAreaBounds.height * chipScale;
+  const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
+  const b = constraints.fieldBounds || { xMin: 0, xMax: 100, yMin: 0, yMax: 100 };
+  const minY = b.yMin + (chipH / 2) + dynamicVertMargin;
+  const maxY = b.yMax - (chipH / 2) - textH - dynamicVertMargin;
+  const usableHeight = maxY - minY;
+
+  let verticalFieldUsage = 0;
+  if (usableHeight > 0 && positions.length > 0) {
+    const yValues = positions.map(p => p.y);
+    const occupiedHeight = Math.max(...yValues) - Math.min(...yValues);
+    verticalFieldUsage = (occupiedHeight / usableHeight) * 100;
+  }
+
   return {
     chipScale,
     fieldCoverage: usefulSpacePercentage, // Keeping old field for compatibility if any
@@ -82,6 +98,7 @@ export function calculateMetrics(
     iterations,
     adjustmentsMade: iterations, // Rough proxy for adjustments
     collisionsResolved,
+    verticalFieldUsage,
     stopReason
   };
 }

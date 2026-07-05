@@ -33,6 +33,7 @@ export class LayoutEngine {
           iterations: 0,
           adjustmentsMade: 0,
           collisionsResolved: 0,
+          verticalFieldUsage: 0,
           stopReason: "empty"
         },
       };
@@ -101,10 +102,29 @@ export class LayoutEngine {
     }
 
     if (orderIsValid) {
-      console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!\n`);
+      console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!`);
     } else {
-      console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.\n`);
+      console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.`);
     }
+
+    const chipH = constraints.chipSize.baseHeight * finalScale;
+    const textH = constraints.nameAreaBounds.height * finalScale;
+    const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
+    const b = constraints.fieldBounds || { xMin: 0, xMax: 100, yMin: 0, yMax: 100 };
+    const minY = b.yMin + (chipH / 2) + dynamicVertMargin;
+    const maxY = b.yMax - (chipH / 2) - textH - dynamicVertMargin;
+    const usableHeight = maxY - minY;
+
+    let occupiedHeight = 0;
+    if (positions.length > 0) {
+      const yValues = positions.map(p => p.y);
+      occupiedHeight = Math.max(...yValues) - Math.min(...yValues);
+    }
+
+    console.log(`[TACTICAL SPACE USAGE AUDIT]`);
+    console.log(`- Usable height: ${usableHeight.toFixed(2)}`);
+    console.log(`- Occupied height: ${occupiedHeight.toFixed(2)}`);
+    console.log(`- Vertical field usage: ${metrics.verticalFieldUsage.toFixed(1)}%\n`);
 
     return {
       positions,

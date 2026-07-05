@@ -166,6 +166,45 @@ function refineLayoutAesthetics(
     }
   }
 
+  // ── SPACE EXPANSION PHASE ──
+  // Calculate boundaries minY and maxY
+  const chipH = constraints.chipSize.baseHeight * scale;
+  const textH = constraints.nameAreaBounds.height * scale;
+  const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
+  const b = constraints.fieldBounds || { xMin: 0, xMax: 100, yMin: 0, yMax: 100 };
+  const minY = b.yMin + (chipH / 2) + dynamicVertMargin;
+  const maxY = b.yMax - (chipH / 2) - textH - dynamicVertMargin;
+  const usableHeight = maxY - minY;
+
+  if (usableHeight > 0 && currentPositions.length > 0) {
+    const yValues = currentPositions.map(p => p.y);
+    const minCurrentY = Math.min(...yValues);
+    const maxCurrentY = Math.max(...yValues);
+    const currentHeight = maxCurrentY - minCurrentY;
+
+    if (currentHeight > 0) {
+      const targetUsage = 0.925; // Target 92.5% vertical field usage
+      const targetHeight = usableHeight * targetUsage;
+
+      let newMinY = minY;
+      let newMaxY = maxY;
+
+      if (b.isAwayHalf) {
+        // Away: goalkeeper is at top (near minY), strikers at bottom (near maxY)
+        newMinY = minY + (0.015 * usableHeight);
+        newMaxY = newMinY + targetHeight;
+      } else {
+        // Home: goalkeeper is at bottom (near maxY), strikers at top (near minY)
+        newMaxY = maxY - (0.015 * usableHeight);
+        newMinY = newMaxY - targetHeight;
+      }
+
+      currentPositions.forEach(p => {
+        p.y = newMinY + ((p.y - minCurrentY) / currentHeight) * (newMaxY - newMinY);
+      });
+    }
+  }
+
   // Re-run containment and spacing to maintain bounds and tactical layout
   if (constraints.chipSize) {
     applyContainmentForces(currentPositions, scale, constraints);

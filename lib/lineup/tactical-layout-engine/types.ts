@@ -58,6 +58,7 @@ export type LayoutMetrics = {
   iterations: number;
   adjustmentsMade: number;
   collisionsResolved: number;
+  verticalFieldUsage: number;
   stopReason: string;
 };
 
