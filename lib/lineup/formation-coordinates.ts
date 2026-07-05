@@ -112,7 +112,7 @@ export const FORMATION_SLOT_ANCHORS: Record<FormationId, FormationSlotAnchor[]> 
     { key: "LDM", accept: ["DM", "CDM", "LDM", "MCD"], coord: { x: X.IL, y: Y.HOLDING } },
     { key: "RDM", accept: ["DM", "CDM", "RDM", "MCD"], coord: { x: X.IR, y: Y.HOLDING } },
     { key: "LW", accept: ["LW"], coord: { x: X.L, y: Y.ATTACK } },
-    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.C, y: Y.ATTACK } },
+    { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.C, y: Y.MIDFIELD } },
     { key: "RW", accept: ["RW"], coord: { x: X.R, y: Y.ATTACK } },
     { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: 0 } },
   ],
