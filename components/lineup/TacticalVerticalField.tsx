@@ -8,6 +8,7 @@ import { type ResolvedLineup } from "@/lib/lineup/types";
 import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import { mvpSelectionKey, mvpPlayersMatch } from "@/lib/lineup/mvp-selection-key";
 import { substitutionMarkerForPlayer } from "@/lib/live/substitution-markers";
+import { Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type TacticalVerticalFieldProps = {
@@ -27,6 +28,10 @@ type TacticalVerticalFieldProps = {
   onSelect?: (key: string) => void;
   homeSubstitutionMarkers?: any;
   awaySubstitutionMarkers?: any;
+  onAwayBenchClick?: () => void;
+  onHomeBenchClick?: () => void;
+  awayBenchCount?: number;
+  homeBenchCount?: number;
   children?: React.ReactNode;
 };
 
@@ -85,6 +90,10 @@ export function TacticalVerticalField({
   onSelect,
   homeSubstitutionMarkers,
   awaySubstitutionMarkers,
+  onAwayBenchClick,
+  onHomeBenchClick,
+  awayBenchCount = 0,
+  homeBenchCount = 0,
   children,
 }: TacticalVerticalFieldProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -232,6 +241,19 @@ export function TacticalVerticalField({
               </div>
             );
           })}
+          
+          {/* Botón Suplentes Visitante (Esquina superior derecha) */}
+          {onAwayBenchClick && awayBenchCount > 0 && (
+            <button
+              type="button"
+              onClick={onAwayBenchClick}
+              className="absolute top-2 right-2 z-20 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
+              aria-label={`Ver suplentes visitante (${awayBenchCount})`}
+            >
+              <Users className="h-3.5 w-3.5 opacity-80" />
+              <span className="opacity-90 tracking-wide">SUPLENTES</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -295,8 +317,23 @@ export function TacticalVerticalField({
               </div>
             );
           })}
+          
+          {/* Botón Suplentes Local (Esquina inferior derecha) */}
+          {onHomeBenchClick && homeBenchCount > 0 && (
+            <button
+              type="button"
+              onClick={onHomeBenchClick}
+              className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
+              aria-label={`Ver suplentes local (${homeBenchCount})`}
+            >
+              <Users className="h-3.5 w-3.5 opacity-80" />
+              <span className="opacity-90 tracking-wide">SUPLENTES</span>
+            </button>
+          )}
         </div>
       )}
+
+      {children}
     </div>
   );
 }

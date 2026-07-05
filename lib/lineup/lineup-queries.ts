@@ -2,7 +2,6 @@ import { isFormationId } from "@/lib/lineup/formation-coordinates";
 import { isPredictedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import { normalizeFormationId, normalizeFormationTemplate } from "@/lib/lineup/formation-templates";
 import { relayoutLineupSlots } from "@/lib/lineup/relayout-lineup";
-import { lineupUsesSourceLayout } from "@/lib/lineup/visual-lineup-slots";
 import type {
   FormationId,
   LineupBenchPlayer,
@@ -48,11 +47,6 @@ function rowToResolved(row: StoredLineupRow): ResolvedLineup {
     dataSourceCode: row.data_source_code,
     fetchedAt: row.fetched_at,
   };
-
-  if (lineupUsesSourceLayout(resolved)) {
-    return resolved;
-  }
-
   return relayoutLineupSlots(resolved);
 }
 
@@ -214,10 +208,7 @@ export async function upsertTeamLineup(
   ) {
     return;
   }
-
-  const normalized = lineupUsesSourceLayout(lineup)
-    ? { ...lineup, bench, benchCount: bench.length }
-    : relayoutLineupSlots({ ...lineup, bench, benchCount: bench.length });
+  const normalized = relayoutLineupSlots({ ...lineup, bench, benchCount: bench.length });
 
   const payload = {
     match_id: matchId,
