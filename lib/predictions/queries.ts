@@ -290,7 +290,7 @@ export async function getMatchPredictionDetail(
 
   const editUntilKickoff = canEditPredictionsUntilKickoff(username);
 
-  const livePayload = (liveState.data?.live_payload ?? {}) as MatchLivePayload;
+  const livePayload = (liveState?.live_payload ?? {}) as MatchLivePayload;
 
   const md = Array.isArray(match.matchdays) ? match.matchdays[0] : match.matchdays;
 
