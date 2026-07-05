@@ -96,7 +96,7 @@ export function MvpTacticalFieldBody({
               <LineupFormationInfo
                 teamName={awayTeam}
                 formationLabel={resolvedAwayLineup?.formationLabel}
-                align="right"
+                align="left"
               />
             </div>
 
