@@ -16,6 +16,10 @@ import { LineupModalFieldShell } from "@/components/lineup/LineupModalFieldShell
 import { teamNameEs } from "@/lib/teams/display";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 import { LoadingCenter } from "@/components/ui/spinner";
+import { Modal } from "@/components/ui/modal";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
+import { normalizePositionRole, positionLabelEs } from "@/lib/lineup/position-map";
 
 type LineupModalPanelProps = {
   teamName: string;
@@ -40,6 +44,7 @@ export function LineupModalPanel({
   const [lineup, setLineup] = useState<ResolvedLineup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBenchModal, setShowBenchModal] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,7 +138,7 @@ export function LineupModalPanel({
       ) : null}
       <LineupFieldGate className="flex flex-col flex-1">
         {(markFieldReady) => (
-          <div className="flex w-full flex-col flex-1 pt-0.5 pb-2.5">
+          <div className="flex w-full flex-col flex-1 pt-0.5 pb-1">
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}
@@ -141,23 +146,69 @@ export function LineupModalPanel({
               size="modal"
               onPlayerClick={handlePlayerInteraction}
               onFieldReady={markFieldReady}
-              benchAbove={
-                bench.length > 0 ? (
-                  <BenchPlayersStrip
-                    teamName={teamName}
-                    players={bench}
-                    density="inline"
-                    showTeamHeader={false}
-                    position="none"
-                    gridLayout={benchLayout}
-                    onPlayerClick={(player) => handlePlayerInteraction(player.name)}
-                  />
-                ) : null
-              }
+              benchAbove={null}
             />
+            {bench.length > 0 && (
+              <div className="flex justify-center mt-2 mb-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowBenchModal(true)}
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--tm-accent)] backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 active:scale-95"
+                >
+                  Suplentes ({bench.length})
+                </button>
+              </div>
+            )}
           </div>
         )}
       </LineupFieldGate>
+
+      {/* Bench Modal */}
+      {showBenchModal && (
+        <Modal
+          open={showBenchModal}
+          onClose={() => setShowBenchModal(false)}
+          title={
+            <span className="flex items-center gap-2">
+              <TeamFlagBadge name={teamName} size="xs" />
+              <span>Suplentes — {displayName}</span>
+            </span>
+          }
+          opaque
+          stackElevated
+          containerClassName="p-4"
+          className="max-w-sm max-h-[75dvh]"
+        >
+          <div className="p-4 flex flex-col items-center">
+            <div className="grid grid-cols-4 gap-x-2 gap-y-3 w-full justify-items-center max-h-[50dvh] overflow-y-auto pr-1" data-modal-scroll="true">
+              {bench.map((player) => {
+                const role = normalizePositionRole(player.position);
+                return (
+                  <LineupPlayerChip
+                    key={player.name}
+                    slot={{
+                      key: player.name,
+                      name: player.name,
+                      shirtNumber: player.shirtNumber,
+                      role,
+                      positionLabel: positionLabelEs(role, player.position),
+                      isPlaceholder: false,
+                      x: 0,
+                      y: 0
+                    }}
+                    teamName={teamName}
+                    variant="modal"
+                    onClick={() => {
+                      handlePlayerInteraction(player.name);
+                      setShowBenchModal(false);
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

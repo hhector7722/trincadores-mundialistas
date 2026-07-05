@@ -65,29 +65,29 @@ export function FootballPitchSurface({
         {/* Línea central */}
         <line x1="0" y1="52.5" x2="68" y2="52.5" />
         
-        {/* Círculo central (reducido) */}
-        <circle cx="34" cy="52.5" r="5" />
+        {/* Círculo central (proporcional y protagonista) */}
+        <circle cx="34" cy="52.5" r="9.15" />
         <circle cx="34" cy="52.5" r="0.6" fill="rgba(255,255,255,0.22)" />
 
         {/* Mitad Superior (Visitante) */}
         {/* Área Grande */}
-        <rect x="22" y="0" width="24" height="10" />
+        <rect x="13.85" y="0" width="40.3" height="16.5" />
         {/* Área Chica */}
-        <rect x="28" y="0" width="12" height="4" />
+        <rect x="24.85" y="0" width="18.3" height="5.5" />
         {/* Punto de penalty */}
         <circle cx="34" cy="11" r="0.6" fill="rgba(255,255,255,0.22)" />
         {/* Arco de área */}
-        <path d="M 30 10 A 4 4 0 0 0 38 10" />
+        <path d="M 26.7 16.5 A 9.15 9.15 0 0 0 41.3 16.5" />
 
         {/* Mitad Inferior (Local) */}
         {/* Área Grande */}
-        <rect x="22" y="95" width="24" height="10" />
+        <rect x="13.85" y="88.5" width="40.3" height="16.5" />
         {/* Área Chica */}
-        <rect x="28" y="101" width="12" height="4" />
+        <rect x="24.85" y="99.5" width="18.3" height="5.5" />
         {/* Punto de penalty */}
         <circle cx="34" cy="94" r="0.6" fill="rgba(255,255,255,0.22)" />
         {/* Arco de área */}
-        <path d="M 30 95 A 4 4 0 0 1 38 95" />
+        <path d="M 26.7 88.5 A 9.15 9.15 0 0 1 41.3 88.5" />
       </g>
     </svg>
   );

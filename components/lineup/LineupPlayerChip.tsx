@@ -91,14 +91,14 @@ export function LineupPlayerChip({
           />
           <div 
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            style={{ paddingTop: "10%" }} // Ajuste vertical para centrar el dorsal
+            style={{ paddingBottom: "12%" }} // Subir dorsal 12% verticalmente
           >
             <span
               className="font-bold text-center leading-none"
-              // Ajustar tamaño del texto según el contenedor
+              // Ajustar tamaño del texto para mejor proporción
               style={{
                 color: dorsalColor,
-                fontSize: isMatch ? "1.05rem" : isModal ? "1.4rem" : "1.4rem",
+                fontSize: isMatch ? "0.95rem" : isModal ? "1.2rem" : "1.2rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -140,11 +140,11 @@ export function LineupPlayerChip({
           />
           <text
             x="24"
-            y="29"
+            y="24" // Subir dorsal verticalmente
             textAnchor="middle"
             dominantBaseline="middle"
             fill={dorsalColor}
-            fontSize={isMatch ? "15.5" : isModal ? "12" : "20"}
+            fontSize={isMatch ? "13.5" : isModal ? "10.5" : "17.5"} // Reducir tamaño ligeramente
             fontWeight="700"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -182,11 +182,6 @@ export function LineupPlayerChip({
           <span>{displayName}</span>
           {substitutionMarker ? <SubstitutionMarkerIcon kind={substitutionMarker} /> : null}
         </p>
-        {!isModal && !isMatch ? (
-          <p className="text-[8px] font-medium uppercase tracking-wide text-white/55 sm:text-[9px]">
-            {slot.positionLabel}
-          </p>
-        ) : null}
       </div>
     </>
   );

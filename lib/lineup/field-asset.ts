@@ -13,7 +13,7 @@ export const LINEUP_MODAL_FIELD_WIDTH_PX = 448; // max-w-md is 448px
 export const LINEUP_MODAL_WRAPPER_CLASS = "w-[min(100vw-1rem,28rem)]";
 
 /** Panel plantilla: altura flexible, ocupa toda la pantalla disponible. */
-export const LINEUP_MODAL_PANEL_CLASS = `h-[85vh] min-h-[500px] w-full max-w-md flex flex-col`;
+export const LINEUP_MODAL_PANEL_CLASS = `h-auto max-h-[calc(100dvh-2rem)] w-full max-w-md flex flex-col`;
 
 export const LINEUP_MODAL_PANEL_HOST_CLASS = "w-full max-w-md";
 

@@ -376,9 +376,14 @@ function enforceBandOrderAndSpacing(
   if (bands.length <= 1) return;
 
   const isAwayHalf = constraints.fieldBounds.isAwayHalf;
-  // Dynamic minimum Y spacing between bands (in 0-100 coordinates)
-  // Let's use 6.5 units, which guarantees clear visual separation on any screen
-  const minSpacing = 6.5;
+  
+  // Enforce a larger spacing (11.5) for the striker/forward band to separate it from midfielders
+  const getMinSpacing = (index: number) => {
+    if (index === bands.length - 1) {
+      return 11.5;
+    }
+    return 6.5;
+  };
 
   // Perform 3 iterations of sequential adjustments to satisfy spacing and boundaries
   for (let iter = 0; iter < 3; iter++) {
@@ -398,7 +403,8 @@ function enforceBandOrderAndSpacing(
       // Away half: Goalkeeper (band 0) is at the top (low Y), Strikers (last band) at the bottom (high Y)
       // We must satisfy: Y(band i) >= Y(band i-1) + minSpacing
       for (let i = 1; i < bandYs.length; i++) {
-        const targetMinY = bandYs[i - 1].y + minSpacing;
+        const spacing = getMinSpacing(i);
+        const targetMinY = bandYs[i - 1].y + spacing;
         if (bandYs[i].y < targetMinY) {
           const shift = targetMinY - bandYs[i].y;
           bandYs[i].y = targetMinY;
@@ -412,7 +418,8 @@ function enforceBandOrderAndSpacing(
       // Home half: Goalkeeper (band 0) is at the bottom (high Y), Strikers (last band) at the top (low Y)
       // We must satisfy: Y(band i) <= Y(band i-1) - minSpacing
       for (let i = 1; i < bandYs.length; i++) {
-        const targetMaxY = bandYs[i - 1].y - minSpacing;
+        const spacing = getMinSpacing(i);
+        const targetMaxY = bandYs[i - 1].y - spacing;
         if (bandYs[i].y > targetMaxY) {
           const shift = targetMaxY - bandYs[i].y;
           bandYs[i].y = targetMaxY;
@@ -445,13 +452,19 @@ function checkBandOrder(
     return bandPositions.length > 0 ? sumY / bandPositions.length : 0;
   });
 
-  const minSpacing = 6.0;
+  const getMinSpacing = (index: number) => {
+    if (index === bands.length - 1) {
+      return 11.0;
+    }
+    return 6.0;
+  };
 
   for (let i = 0; i < bandYs.length - 1; i++) {
+    const spacing = getMinSpacing(i + 1);
     if (isAwayHalf) {
-      if (bandYs[i + 1] < bandYs[i] + minSpacing) return false;
+      if (bandYs[i + 1] < bandYs[i] + spacing) return false;
     } else {
-      if (bandYs[i + 1] > bandYs[i] - minSpacing) return false;
+      if (bandYs[i + 1] > bandYs[i] - spacing) return false;
     }
   }
   return true;
