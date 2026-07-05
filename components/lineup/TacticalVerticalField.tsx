@@ -168,6 +168,14 @@ export function TacticalVerticalField({
     [homeLineup]
   );
 
+  // Unificar la escala para que ambos equipos tengan el mismo tamaño de camiseta
+  const unifiedScale = useMemo(() => {
+    if (awayResult && homeResult) {
+      return Math.min(awayResult.chipScale, homeResult.chipScale);
+    }
+    return awayResult?.chipScale || homeResult?.chipScale || 1;
+  }, [awayResult, homeResult]);
+
   const style = pitchBounds.width > 0 && pitchBounds.height > 0 ? { width: pitchBounds.width, height: pitchBounds.height } : { aspectRatio: "68/105" };
 
   return (
@@ -194,7 +202,7 @@ export function TacticalVerticalField({
                 style={{
                   left: `${pos.x}%`,
                   top: `${pos.y}%`,
-                  transform: `translate(-50%, -50%) scale(${awayResult.chipScale})`,
+                  transform: `translate(-50%, -50%) scale(${unifiedScale})`,
                 }}
               >
                 <LineupPlayerChip
@@ -270,7 +278,7 @@ export function TacticalVerticalField({
                 style={{
                   left: `${pos.x}%`,
                   top: `${pos.y}%`,
-                  transform: `translate(-50%, -50%) scale(${homeResult.chipScale})`,
+                  transform: `translate(-50%, -50%) scale(${unifiedScale})`,
                 }}
               >
                 <LineupPlayerChip
