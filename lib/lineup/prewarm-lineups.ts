@@ -1,13 +1,10 @@
-import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
 import {
   loadCachedTeamLineup,
-  loadLastKnownFormation,
   upsertTeamLineup,
 } from "@/lib/lineup/lineup-queries";
-import { isPredictedLineupCacheStale, isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
+import { isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
-  isPrewarmCacheFresh,
   PREWARM_HORIZON_MS,
   type PrewarmLineupsResult,
   type PrewarmTeamOutcome,
@@ -15,7 +12,7 @@ import {
 import {
   benchPlayersExcludingStarters,
   fetchConfirmedLineup,
-  fetchPredictedLineup,
+  buildFallbackWithKnownFormation,
 } from "@/lib/lineup/resolve-lineup";
 import { isBsdConfigured } from "@/lib/lineup/sources/bsd-client";
 import { isFotmobLineupConfigured } from "@/lib/lineup/sources/fotmob-confirmed";
@@ -90,26 +87,11 @@ async function prewarmTeamLineup(
     }
   }
 
-  if (
-    cached?.sourceKind === "predicted" &&
-    isPrewarmCacheFresh(cached.fetchedAt) &&
-    !isPredictedLineupCacheStale(cached)
-  ) {
-    return { status: "skipped", reason: "predicted_fresh" };
-  }
-
-  const predicted = await fetchPredictedLineup(supabase, context);
-  if (predicted) {
-    await upsertTeamLineup(supabase, match.id, teamName, predicted, predicted.bench ?? []);
-    return { status: "updated", sourceKind: "predicted" };
-  }
-
   if (cached) {
     return { status: "unchanged", reason: "no_external_data" };
   }
 
-  const knownFormation = await loadLastKnownFormation(supabase, teamName);
-  const fallback = buildFallbackLineup(players, { knownFormation: knownFormation ?? undefined });
+  const fallback = await buildFallbackWithKnownFormation(supabase, context);
   await upsertTeamLineup(
     supabase,
     match.id,
