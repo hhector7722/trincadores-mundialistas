@@ -5,7 +5,7 @@ import { TacticalVerticalField } from "@/components/lineup/TacticalVerticalField
 import { MvpBenchColumn } from "@/components/lineup/MvpBenchColumn";
 import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
 import { Modal } from "@/components/ui/modal";
-import { TeamFlagBadge } from "@/components/matches/TeamFlagBadge";
+import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { X } from "lucide-react";
 import type { FitMvpHorizontalLayout } from "@/lib/lineup/tactical-modal-layout";
 import {
