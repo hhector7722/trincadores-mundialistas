@@ -185,9 +185,20 @@ export async function resolveTeamLineup(
   );
 
   const cached = await loadCachedTeamLineup(supabase, matchId, context.teamName);
+  const nowMs = Date.now();
+  const fetchedMs = cached?.fetchedAt ? Date.parse(cached.fetchedAt) : 0;
+  const isRecentlyFetched = Number.isFinite(fetchedMs) && nowMs - fetchedMs < 5 * 60 * 1000;
+
+  // 1. Rate limit global: si se ha hecho fetch hace menos de 5 min, se devuelve la caché
+  // independientemente de si es live o scheduled, para no ahogar los servidores.
+  if (cached && isRecentlyFetched) {
+    return cached;
+  }
+
+  // 2. Si la caché no está stale según sus reglas específicas, la devolvemos.
   if (
     cached?.sourceKind === "confirmed" &&
-    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status)
+    !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status, nowMs)
   ) {
     return cached;
   }
@@ -200,40 +211,37 @@ export async function resolveTeamLineup(
     return cached;
   }
 
+  // 3. Intentamos fetchear confirmada si corresponde
   if (tryConfirmed) {
-    const confirmed = await fetchConfirmedLineup(supabase, {
-      ...context,
-      matchId,
-    });
+    const confirmed = await fetchConfirmedLineup(supabase, { ...context, matchId });
     if (confirmed) {
       await upsertTeamLineup(
-        supabase,
-        matchId,
-        context.teamName,
-        confirmed,
+        supabase, matchId, context.teamName, confirmed,
         confirmed.bench ?? benchFromSquadExcludingStarters(confirmed, context)
       );
       return confirmed;
     }
   }
 
+  // 4. Intentamos fetchear predicted si no está en caché o si está stale
   if (cached?.sourceKind === "predicted" && !isPredictedLineupCacheStale(cached)) {
     return cached;
   }
 
-  const predicted = await fetchPredictedLineup(supabase, {
-    ...context,
-    matchId,
-  });
+  const predicted = await fetchPredictedLineup(supabase, { ...context, matchId });
   if (predicted) {
     await upsertTeamLineup(
-      supabase,
-      matchId,
-      context.teamName,
-      predicted,
-      predicted.bench ?? []
+      supabase, matchId, context.teamName, predicted, predicted.bench ?? []
     );
     return predicted;
+  }
+
+  // 5. Fallback logic: Si todo ha fallado, pero TENÍAMOS CACHÉ (confirmed o predicted), devolvemos la caché.
+  // Solo devolvemos fallback si realmente no tenemos nada mejor.
+  if (cached && (cached.sourceKind === "confirmed" || cached.sourceKind === "predicted")) {
+    // Para que no vuelva a intentarlo constantemente, actualizamos el fetched_at de la caché guardando el mismo objeto.
+    await upsertTeamLineup(supabase, matchId, context.teamName, { ...cached, fetchedAt: new Date().toISOString() }, cached.bench ?? []);
+    return cached;
   }
 
   const fallback = await buildFallbackWithKnownFormation(supabase, context);
@@ -243,10 +251,7 @@ export async function resolveTeamLineup(
     cached.formation !== fallback.formation;
   if (shouldPersist) {
     await upsertTeamLineup(
-      supabase,
-      matchId,
-      context.teamName,
-      fallback,
+      supabase, matchId, context.teamName, fallback,
       benchFromSquadExcludingStarters(fallback, context)
     );
   }
