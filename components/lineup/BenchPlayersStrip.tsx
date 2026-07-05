@@ -2,7 +2,7 @@
 
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
 import { mvpSelectionKey } from "@/lib/lineup/mvp-selection-key";
-import type { BenchLayoutConfig } from "@/lib/lineup/fit-field-modal-layout";
+import type { BenchLayoutConfig } from "@/lib/lineup/tactical-modal-layout";
 import { squadDisplayNames } from "@/lib/lineup/short-player-name";
 import { PlayerSticker } from "@/components/players/player-sticker";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";

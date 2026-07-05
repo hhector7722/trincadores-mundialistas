@@ -76,32 +76,46 @@ export function TeamLineupGraphic({
         <div ref={(el) => { if (el) onFieldReady(); }} className="hidden" />
       ) : null}
 
-      {layoutResult.positions.map((pos) => {
-        const slot = slots.find(s => s.key === pos.id);
-        if (!slot) return null;
-        return (
-          <div
-            key={slot.key}
-            className="absolute z-10"
-            style={{
-              left: `${pos.x}%`,
-              top: `${pos.y}%`,
-              transform: `translate(-50%, -50%) scale(${finalChipScale})`,
-            }}
-          >
-          <LineupPlayerChip
-            slot={slot}
-            teamName={teamName}
-            squadPlayerNames={squadPlayers?.map(p => p.player_name)}
-            stickerUrl={squadPlayers?.find((p) => p.player_name === slot.name)?.sticker_url ?? null}
-            variant={isModal ? "modal" : "default"}
-            onClick={
-              onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined
-            }
-          />
-          </div>
-        );
-      })}
+      {(() => {
+        console.log(`[AUDIT] TeamLineupGraphic (${teamName}) - calculated positions:`, layoutResult.positions.map(p => ({ id: p.id, x: p.x, y: p.y })));
+        return layoutResult.positions.map((pos) => {
+          const slot = slots.find(s => s.key === pos.id);
+          if (!slot) return null;
+          
+          console.log(`[AUDIT] TeamLineupGraphic (${teamName}) - Rendering slot ${pos.id} (${slot.name}) at calculated: (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), slot values: (${slot.x.toFixed(2)}, ${slot.y.toFixed(2)})`);
+          
+          return (
+            <div
+              key={slot.key}
+              className="absolute z-10"
+              style={{
+                left: `${pos.x}%`,
+                top: `${pos.y}%`,
+                transform: `translate(-50%, -50%) scale(${finalChipScale})`,
+              }}
+            >
+              {/* Visual debug overlay displaying engine coordinates */}
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black/85 text-[9px] font-mono text-cyan-400 px-1 py-0.5 rounded border border-cyan-500/40 shadow z-50 pointer-events-none">
+                {pos.x.toFixed(1)},{pos.y.toFixed(1)}
+              </div>
+              <LineupPlayerChip
+                slot={{
+                  ...slot,
+                  x: pos.x,
+                  y: pos.y
+                }}
+                teamName={teamName}
+                squadPlayerNames={squadPlayers?.map(p => p.player_name)}
+                stickerUrl={squadPlayers?.find((p) => p.player_name === slot.name)?.sticker_url ?? null}
+                variant={isModal ? "modal" : "default"}
+                onClick={
+                  onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined
+                }
+              />
+            </div>
+          );
+        });
+      })()}
     </>
   );
 

@@ -113,10 +113,12 @@ function attemptLayoutAtScale(
     applySeparationForces(positions, issues, scale, constraints);
     applyTacticalForces(positions, initialPositions, issues.length === 0);
     applyContainmentForces(positions, scale, constraints);
+    enforceBandOrderAndSpacing(positions, structure, scale, constraints);
   }
 
-  // Ensure containment is strictly enforced at the very end
+  // Ensure containment and band spacing are strictly enforced at the very end
   applyContainmentForces(positions, scale, constraints);
+  enforceBandOrderAndSpacing(positions, structure, scale, constraints);
 
   // Re-check final state
   const finalIssues = detectCollisions(positions, scale, constraints);
@@ -164,9 +166,10 @@ function refineLayoutAesthetics(
     }
   }
 
-  // Re-run containment to maintain bounds
+  // Re-run containment and spacing to maintain bounds and tactical layout
   if (constraints.chipSize) {
     applyContainmentForces(currentPositions, scale, constraints);
+    enforceBandOrderAndSpacing(currentPositions, structure, scale, constraints);
   }
 
   return {
@@ -309,4 +312,67 @@ function applyTacticalForces(positions: LayoutPosition[], initialPositions: Layo
       }
     }
   });
+}
+
+function enforceBandOrderAndSpacing(
+  positions: LayoutPosition[],
+  structure: TacticalStructure,
+  scale: number,
+  constraints: LayoutConstraints
+) {
+  const bands = structure.bands;
+  if (bands.length <= 1) return;
+
+  const isAwayHalf = constraints.fieldBounds.isAwayHalf;
+  // Dynamic minimum Y spacing between bands (in 0-100 coordinates)
+  // Let's use 6.5 units, which guarantees clear visual separation on any screen
+  const minSpacing = 6.5;
+
+  // Perform 3 iterations of sequential adjustments to satisfy spacing and boundaries
+  for (let iter = 0; iter < 3; iter++) {
+    // 1. Calculate current average Y of each band
+    const bandYs = bands.map(band => {
+      const bandPositions = band.elements
+        .map(id => positions.find(p => p.id === id))
+        .filter((p): p is LayoutPosition => p != null);
+      const sumY = bandPositions.reduce((acc, p) => acc + p.y, 0);
+      return {
+        band,
+        y: bandPositions.length > 0 ? sumY / bandPositions.length : 0
+      };
+    });
+
+    if (isAwayHalf) {
+      // Away half: Goalkeeper (band 0) is at the top (low Y), Strikers (last band) at the bottom (high Y)
+      // We must satisfy: Y(band i) >= Y(band i-1) + minSpacing
+      for (let i = 1; i < bandYs.length; i++) {
+        const targetMinY = bandYs[i - 1].y + minSpacing;
+        if (bandYs[i].y < targetMinY) {
+          const shift = targetMinY - bandYs[i].y;
+          bandYs[i].y = targetMinY;
+          bandYs[i].band.elements.forEach(id => {
+            const p = positions.find(el => el.id === id);
+            if (p) p.y += shift;
+          });
+        }
+      }
+    } else {
+      // Home half: Goalkeeper (band 0) is at the bottom (high Y), Strikers (last band) at the top (low Y)
+      // We must satisfy: Y(band i) <= Y(band i-1) - minSpacing
+      for (let i = 1; i < bandYs.length; i++) {
+        const targetMaxY = bandYs[i - 1].y - minSpacing;
+        if (bandYs[i].y > targetMaxY) {
+          const shift = targetMaxY - bandYs[i].y;
+          bandYs[i].y = targetMaxY;
+          bandYs[i].band.elements.forEach(id => {
+            const p = positions.find(el => el.id === id);
+            if (p) p.y += shift;
+          });
+        }
+      }
+    }
+
+    // After shifting, run containment to keep elements within field boundary constraints
+    applyContainmentForces(positions, scale, constraints);
+  }
 }

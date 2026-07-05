@@ -18,15 +18,21 @@ export function solveInitialLayout(
   const { bands } = structure;
   if (bands.length === 0) return positions;
 
-  const minV = constraints.fieldBounds.yMin + constraints.margins.vertical;
-  const maxV = constraints.fieldBounds.yMax - constraints.margins.vertical;
-  const vRange = maxV - minV;
+  const approxScale = 1.0;
+  const chipH = constraints.chipSize.baseHeight * approxScale;
+  const textH = constraints.nameAreaBounds.height * approxScale;
+  const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
+
+  const b = constraints.fieldBounds || { xMin: 0, xMax: 100, yMin: 0, yMax: 100 };
+  const minY = b.yMin + (chipH / 2) + dynamicVertMargin;
+  const maxY = b.yMax - (chipH / 2) - textH - dynamicVertMargin;
+  const vRange = maxY - minY;
   const numBands = bands.length;
 
   // Espacio que separa al portero de la defensa (menor que entre el resto de líneas)
-  const gkGap = vRange * 0.05;
-  const fieldMinV = constraints.fieldBounds.isAwayHalf ? minV + gkGap : minV;
-  const fieldMaxV = constraints.fieldBounds.isAwayHalf ? maxV : maxV - gkGap;
+  const gkGap = vRange * 0.08;
+  const fieldMinV = constraints.fieldBounds.isAwayHalf ? minY + gkGap : minY;
+  const fieldMaxV = constraints.fieldBounds.isAwayHalf ? maxY : maxY - gkGap;
   const fieldVRange = fieldMaxV - fieldMinV;
   const fieldBandsCount = Math.max(1, numBands - 1);
   const vStep = fieldBandsCount > 1 ? fieldVRange / (fieldBandsCount - 1) : 0;
@@ -35,10 +41,10 @@ export function solveInitialLayout(
     let bandY = 50;
 
     if (numBands === 1) {
-      bandY = (minV + maxV) / 2;
+      bandY = (minY + maxY) / 2;
     } else {
       if (bandIndex === 0) {
-        bandY = constraints.fieldBounds.isAwayHalf ? minV : maxV;
+        bandY = constraints.fieldBounds.isAwayHalf ? minY : maxY;
       } else {
         const fieldIndex = bandIndex - 1;
         if (constraints.fieldBounds.isAwayHalf) {

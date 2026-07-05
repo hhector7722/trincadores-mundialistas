@@ -7,7 +7,7 @@ import { TeamLineupGraphic } from "@/components/lineup/TeamLineupGraphic";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
 import { LINEUP_MODAL_FIELD_WIDTH_PX } from "@/lib/lineup/field-asset";
-import { estimateMvpInlineBenchLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
+import { estimateMvpInlineBenchLayout } from "@/lib/lineup/tactical-modal-layout";
 import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";

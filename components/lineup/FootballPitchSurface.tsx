@@ -1,18 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 type FootballPitchSurfaceProps = {
   className?: string;
+  onReady?: () => void;
   /** Ancho lógico del viewBox (define la relación de aspecto junto a vbHeight). */
   vbWidth?: number;
   /** Alto lógico del viewBox. */
   vbHeight?: number;
 };
-
-function pct(value: number, of: number) {
-  return (value / 100) * of;
-}
 
 /**
  * Campo dibujado en un SVG con viewBox adaptable.
@@ -23,22 +21,17 @@ function pct(value: number, of: number) {
  */
 export function FootballPitchSurface({
   className,
-  vbWidth = 100,
-  vbHeight = 100,
+  onReady,
+  vbWidth = 68,
+  vbHeight = 105,
 }: FootballPitchSurfaceProps) {
-  const Vw = vbWidth;
-  const Vh = vbHeight;
-
-  const sx = (x: number) => pct(x, Vw);
-  const sy = (y: number) => pct(y, Vh);
-  const sw = (d: number) => pct(d, Vw);
-  const pt = (x: number, y: number) => `${sx(x)} ${sy(y)}`;
-
-  const strokeW = Math.max(0.5, sw(0.6));
+  useEffect(() => {
+    onReady?.();
+  }, [onReady]);
 
   return (
     <svg
-      viewBox={`0 0 ${Vw} ${Vh}`}
+      viewBox={`0 0 ${vbWidth} ${vbHeight}`}
       aria-hidden
       className={cn("h-full w-full", className)}
       preserveAspectRatio="xMidYMid meet"
@@ -55,31 +48,46 @@ export function FootballPitchSurface({
         </linearGradient>
       </defs>
 
-      <rect x="0" y="0" width={Vw} height={Vh} fill="url(#pitch-grass)" />
-      <rect x="0" y="0" width={Vw} height={sy(50)} fill="url(#pitch-stripe-a)" />
-      <rect x="0" y={sy(50)} width={Vw} height={sy(50)} fill="url(#pitch-stripe-a)" opacity="0.55" />
+      {/* Terreno de juego principal */}
+      <rect x="0" y="0" width="68" height="105" fill="url(#pitch-grass)" />
+      <rect x="0" y="0" width="68" height="52.5" fill="url(#pitch-stripe-a)" />
+      <rect x="0" y="52.5" width="68" height="52.5" fill="url(#pitch-stripe-a)" opacity="0.55" />
 
       <g
         fill="none"
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth={strokeW}
+        stroke="rgba(255,255,255,0.35)"
+        strokeWidth="0.6"
         strokeLinejoin="round"
       >
-        <rect x={sx(2)} y={sy(2)} width={sw(96)} height={sy(96)} rx={sw(1)} />
-        <line x1={sx(2)} y1={sy(50)} x2={sx(98)} y2={sy(50)} />
+        {/* Línea perimetral externa: x=0 es banda izquierda, x=68 es banda derecha, y=0/105 son fondos */}
+        <rect x="0" y="0" width="68" height="105" rx="0.5" />
+        
+        {/* Línea central */}
+        <line x1="0" y1="52.5" x2="68" y2="52.5" />
+        
+        {/* Círculo central (reducido) */}
+        <circle cx="34" cy="52.5" r="5" />
+        <circle cx="34" cy="52.5" r="0.6" fill="rgba(255,255,255,0.35)" />
 
-        <circle cx={sx(50)} cy={sy(50)} r={sw(7)} />
-        <circle cx={sx(50)} cy={sy(50)} r={sw(0.4)} fill="rgba(255,255,255,0.4)" />
+        {/* Mitad Superior (Visitante) */}
+        {/* Área Grande */}
+        <rect x="22" y="0" width="24" height="10" />
+        {/* Área Chica */}
+        <rect x="28" y="0" width="12" height="4" />
+        {/* Punto de penalty */}
+        <circle cx="34" cy="11" r="0.6" fill="rgba(255,255,255,0.35)" />
+        {/* Arco de área */}
+        <path d="M 30 10 A 4 4 0 0 0 38 10" />
 
-        <rect x={sx(25)} y={sy(2)} width={sw(50)} height={sy(16)} />
-        <rect x={sx(30)} y={sy(2)} width={sw(40)} height={sy(8)} />
-        <circle cx={sx(50)} cy={sy(13)} r={sw(0.4)} fill="rgba(255,255,255,0.4)" />
-        <path d={`M ${pt(30, 18)} A ${sw(7)} ${sw(7)} 0 0 0 ${pt(70, 18)}`} />
-
-        <rect x={sx(25)} y={sy(82)} width={sw(50)} height={sy(16)} />
-        <rect x={sx(30)} y={sy(90)} width={sw(40)} height={sy(8)} />
-        <circle cx={sx(50)} cy={sy(87)} r={sw(0.4)} fill="rgba(255,255,255,0.4)" />
-        <path d={`M ${pt(30, 82)} A ${sw(7)} ${sw(7)} 0 0 1 ${pt(70, 82)}`} />
+        {/* Mitad Inferior (Local) */}
+        {/* Área Grande */}
+        <rect x="22" y="95" width="24" height="10" />
+        {/* Área Chica */}
+        <rect x="28" y="101" width="12" height="4" />
+        {/* Punto de penalty */}
+        <circle cx="34" cy="94" r="0.6" fill="rgba(255,255,255,0.35)" />
+        {/* Arco de área */}
+        <path d="M 30 95 A 4 4 0 0 1 38 95" />
       </g>
     </svg>
   );

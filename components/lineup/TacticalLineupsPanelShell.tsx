@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { TACTICAL_SHELL_BODY_MIN_HEIGHT_PX } from "@/lib/lineup/tactical-modal-layout";
 import { cn } from "@/lib/utils";
 import { LoadingCenter } from "@/components/ui/spinner";
 
@@ -12,7 +11,7 @@ type TacticalLineupsPanelShellProps = {
   className?: string;
 };
 
-/** Shell compartido: altura fija en carga y con contenido; pie opcional bajo las reservas. */
+/** Shell compartido: altura flexible en carga y con contenido; pie opcional bajo las reservas. */
 export function TacticalLineupsPanelShell({
   loading,
   footer,
@@ -20,10 +19,9 @@ export function TacticalLineupsPanelShell({
   className,
 }: TacticalLineupsPanelShellProps) {
   return (
-    <div className={cn("flex w-full flex-col", className)}>
+    <div className={cn("flex w-full flex-col flex-1 min-h-0", className)}>
       <div
-        className="relative min-h-0 w-full flex-1 px-1 pt-0.5"
-        style={{ minHeight: TACTICAL_SHELL_BODY_MIN_HEIGHT_PX }}
+        className="relative min-h-[350px] w-full flex-1 px-1 pt-0.5"
       >
         {loading ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--tm-shell-bg-hex)]">

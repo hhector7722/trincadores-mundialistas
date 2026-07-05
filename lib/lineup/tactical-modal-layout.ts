@@ -1,38 +1,62 @@
-import {
-  computeFitMvpHorizontalLayout,
-  estimateMvpInlineBenchLayout,
-  type FitMvpHorizontalLayout,
-} from "@/lib/lineup/fit-mvp-horizontal-layout";
+/**
+ * Configuración de rejilla simplificada para los suplentes.
+ * El campo táctico se auto-mide en el cliente de forma dinámica.
+ */
 
-import { MVP_MODAL_FIELD_BODY_HEIGHT_REM } from "@/lib/lineup/field-asset";
+export type BenchLayoutConfig = {
+  columns: number;
+  rows: number;
+  heightPx: number;
+  rowHeightPx: number;
+  nameFontPx: number;
+  numberFontPx: number;
+};
 
-/** Ancho útil del modal táctico (32rem − padding). */
+export type FitMvpHorizontalLayout = {
+  homeBench: BenchLayoutConfig;
+  awayBench: BenchLayoutConfig;
+};
+
+const MVP_BENCH_INLINE = {
+  fontPx: 10,
+  lineHeightPx: 11,
+  lineGapPx: 0,
+  avgPlayerPx: 58,
+};
+
+export function estimateMvpInlineBenchLayout(
+  count: number,
+  fieldWidthPx: number
+): BenchLayoutConfig {
+  if (count <= 0) {
+    return {
+      columns: 0,
+      rows: 0,
+      heightPx: 0,
+      rowHeightPx: 0,
+      nameFontPx: 0,
+      numberFontPx: 0,
+    };
+  }
+
+  const playersPerRow = Math.max(2, Math.floor(fieldWidthPx / MVP_BENCH_INLINE.avgPlayerPx));
+  const rows = Math.ceil(count / playersPerRow);
+
+  return {
+    columns: playersPerRow,
+    rows,
+    heightPx:
+      rows * MVP_BENCH_INLINE.lineHeightPx +
+      Math.max(0, rows - 1) * MVP_BENCH_INLINE.lineGapPx,
+    rowHeightPx: MVP_BENCH_INLINE.lineHeightPx,
+    nameFontPx: MVP_BENCH_INLINE.fontPx,
+    numberFontPx: MVP_BENCH_INLINE.fontPx,
+  };
+}
+
 export const TACTICAL_MODAL_LAYOUT_WIDTH_PX = 480;
-
-/** Reservas de referencia para altura estable del shell durante la carga. */
 export const TACTICAL_SHELL_BENCH_PLACEHOLDER = 12;
 
-const MVP_FORMATION_ROW_PX = 22;
-const MVP_CHIP_BLEED_PX = 14;
-const MVP_LAYOUT_GAP_PX = 2;
-const TACTICAL_BODY_PAD_PX = 12;
-
-const REFERENCE_LAYOUT = computeFitMvpHorizontalLayout({
-  widthPx: TACTICAL_MODAL_LAYOUT_WIDTH_PX,
-  heightPx: MVP_MODAL_FIELD_BODY_HEIGHT_REM * 16,
-  awayBenchCount: TACTICAL_SHELL_BENCH_PLACEHOLDER,
-  homeBenchCount: TACTICAL_SHELL_BENCH_PLACEHOLDER,
-  footerPx: MVP_CHIP_BLEED_PX,
-  formationRowPx: MVP_FORMATION_ROW_PX,
-  gapPx: MVP_LAYOUT_GAP_PX,
-});
-
-/** Campo fijo compartido por MVP y posibles alineaciones del mismo partido. */
-export const TACTICAL_FIELD_WIDTH_PX = REFERENCE_LAYOUT.fieldWidthPx;
-export const TACTICAL_FIELD_HEIGHT_PX = REFERENCE_LAYOUT.fieldHeightPx;
-
-
-/** Layout táctico: campo idéntico; banco local arriba, visitante abajo. */
 export function buildTacticalModalLayout(
   homeBenchCount: number,
   awayBenchCount: number
@@ -41,30 +65,7 @@ export function buildTacticalModalLayout(
   const away = awayBenchCount > 0 ? awayBenchCount : TACTICAL_SHELL_BENCH_PLACEHOLDER;
 
   return {
-    fieldWidthPx: TACTICAL_FIELD_WIDTH_PX,
-    fieldHeightPx: TACTICAL_FIELD_HEIGHT_PX,
-    homeBench: estimateMvpInlineBenchLayout(home, TACTICAL_FIELD_WIDTH_PX),
-    awayBench: estimateMvpInlineBenchLayout(away, TACTICAL_FIELD_WIDTH_PX),
+    homeBench: estimateMvpInlineBenchLayout(home, TACTICAL_MODAL_LAYOUT_WIDTH_PX),
+    awayBench: estimateMvpInlineBenchLayout(away, TACTICAL_MODAL_LAYOUT_WIDTH_PX),
   };
 }
-
-export function computeTacticalBodyMinHeightPx(layout: FitMvpHorizontalLayout): number {
-  return (
-    MVP_FORMATION_ROW_PX +
-    layout.homeBench.heightPx +
-    MVP_LAYOUT_GAP_PX +
-    layout.fieldHeightPx +
-    MVP_LAYOUT_GAP_PX +
-    MVP_FORMATION_ROW_PX +
-    layout.awayBench.heightPx +
-    MVP_CHIP_BLEED_PX +
-    TACTICAL_BODY_PAD_PX
-  );
-}
-
-export const TACTICAL_SHELL_BODY_MIN_HEIGHT_PX = computeTacticalBodyMinHeightPx(
-  buildTacticalModalLayout(
-    TACTICAL_SHELL_BENCH_PLACEHOLDER,
-    TACTICAL_SHELL_BENCH_PLACEHOLDER
-  )
-);

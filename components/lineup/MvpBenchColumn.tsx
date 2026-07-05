@@ -8,7 +8,7 @@ import {
   mvpSelectionKey,
   type MvpSelectablePlayer,
 } from "@/lib/lineup/mvp-selection-key";
-import type { BenchLayoutConfig } from "@/lib/lineup/fit-mvp-horizontal-layout";
+import type { BenchLayoutConfig } from "@/lib/lineup/tactical-modal-layout";
 import { squadDisplayNames } from "@/lib/lineup/short-player-name";
 import type { BenchPlayer } from "@/lib/lineup/bench-players";
 import { cn } from "@/lib/utils";

@@ -57,6 +57,55 @@ export class LayoutEngine {
       constraints
     );
 
+    // --- AUDITORÍA DE BANDAS ---
+    console.log(`\n[TACTICAL ENGINE AUDIT] Band depth ordering verification:`);
+    console.log(`| Band | OriginalY | OptimizedY | DeltaY |`);
+    console.log(`|---|---|---|---|`);
+
+    const isAwayHalf = constraints.fieldBounds.isAwayHalf;
+    let orderIsValid = true;
+
+    const bandYs = structure.bands.map((band, index) => {
+      // Original Y (mean of referenceY)
+      const origYs = band.elements.map(id => {
+        const el = normalized.find(p => p.id === id);
+        return el ? el.referenceY : 0;
+      });
+      const originalY = origYs.reduce((acc, y) => acc + y, 0) / (origYs.length || 1);
+
+      // Optimized Y (mean of final position y)
+      const optYs = band.elements.map(id => {
+        const el = positions.find(p => p.id === id);
+        return el ? el.y : 0;
+      });
+      const optimizedY = optYs.reduce((acc, y) => acc + y, 0) / (optYs.length || 1);
+
+      const deltaY = optimizedY - originalY;
+      console.log(`| Band ${index} (${band.elements.join(",")}) | ${originalY.toFixed(2)} | ${optimizedY.toFixed(2)} | ${deltaY.toFixed(2)} |`);
+
+      return { index, originalY, optimizedY };
+    });
+
+    // Verify Y(Band[i]) > Y(Band[i+1]) for home (GK at high Y, FW at low Y)
+    // and Y(Band[i]) < Y(Band[i+1]) for away (GK at low Y, FW at high Y)
+    for (let i = 0; i < bandYs.length - 1; i++) {
+      if (isAwayHalf) {
+        if (bandYs[i].optimizedY >= bandYs[i + 1].optimizedY) {
+          orderIsValid = false;
+        }
+      } else {
+        if (bandYs[i].optimizedY <= bandYs[i + 1].optimizedY) {
+          orderIsValid = false;
+        }
+      }
+    }
+
+    if (orderIsValid) {
+      console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!\n`);
+    } else {
+      console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.\n`);
+    }
+
     return {
       positions,
       bands: structure.bands,

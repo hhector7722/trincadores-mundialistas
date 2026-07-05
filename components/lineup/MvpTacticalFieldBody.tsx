@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { TacticalVerticalField } from "@/components/lineup/TacticalVerticalField";
 import { MvpBenchColumn } from "@/components/lineup/MvpBenchColumn";
 import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
-import type { FitMvpHorizontalLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
+import type { FitMvpHorizontalLayout } from "@/lib/lineup/tactical-modal-layout";
 import {
   mvpSelectionKey,
   type MvpSelectablePlayer,
@@ -107,8 +107,6 @@ export function MvpTacticalFieldBody({
           onSelect={onSelect ?? (() => {})}
           homeSubstitutionMarkers={homeSubstitutionMarkers}
           awaySubstitutionMarkers={awaySubstitutionMarkers}
-          widthPx={layout.fieldWidthPx}
-          heightPx={layout.fieldHeightPx}
         />
       </div>
 
