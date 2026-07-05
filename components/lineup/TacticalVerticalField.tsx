@@ -161,7 +161,7 @@ export function TacticalVerticalField({
   };
 
   const isFaced = !!awayLineup;
-  const fixedScale = isFaced ? 0.85 : 1.0;
+  const fixedScale = isFaced ? 0.80 : 1.0;
 
   // ── Optimización independiente: visitante (mitad superior, ataca hacia abajo) ──
   const awayResult = useMemo(
