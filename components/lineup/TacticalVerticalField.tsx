@@ -102,7 +102,7 @@ export function TacticalVerticalField({
       
       {/* Visitante */}
       {awayResult && awayLineup && (
-        <div className="absolute inset-0 h-1/2">
+        <div className="absolute inset-0">
           {awayResult.positions.map(pos => {
             const originalSlot = resolveVisualLineupSlots(awayLineup).find(s => s.key === pos.id);
             if (!originalSlot) return null;
@@ -161,7 +161,7 @@ export function TacticalVerticalField({
 
       {/* Local */}
       {homeResult && homeLineup && (
-        <div className="absolute top-1/2 bottom-0 left-0 right-0 h-1/2">
+        <div className="absolute inset-0">
           {homeResult.positions.map(pos => {
             const originalSlot = resolveVisualLineupSlots(homeLineup).find(s => s.key === pos.id);
             if (!originalSlot) return null;
