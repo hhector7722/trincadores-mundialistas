@@ -1,6 +1,7 @@
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
+import { HARDCODED_DEFAULT_LINEUPS } from "@/lib/lineup/hardcoded-lineups";
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
-import { isPredictedLineupCacheStale, isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
+import { isConfirmedLineupCacheStale } from "@/lib/lineup/lineup-cache-stale";
 import {
   findPrimaryMatchIdForTeam,
   isBetterLineupSource,
@@ -11,7 +12,6 @@ import {
 import { apiFootballConfirmedProvider } from "@/lib/lineup/sources/api-football";
 import { bsdConfirmedProvider } from "@/lib/lineup/sources/bsd-confirmed";
 import { fotmobConfirmedProvider } from "@/lib/lineup/sources/fotmob-confirmed";
-import { bsdPredictedProvider } from "@/lib/lineup/sources/bsd-predicted";
 import { maybeNotifyConfirmedLineup } from "@/lib/notifications/confirmed-lineup-notifications";
 import type { LineupBenchPlayer, LineupResolveContext, LineupSourceKind, ResolvedLineup } from "@/lib/lineup/types";
 import { createAdminClient } from "@/lib/scripts/supabase-admin";
@@ -28,7 +28,6 @@ const CONFIRMED_PROVIDERS = [
   bsdConfirmedProvider,
   apiFootballConfirmedProvider,
 ];
-const PREDICTED_PROVIDERS = [bsdPredictedProvider];
 
 export async function fetchConfirmedLineup(
   supabase: SupabaseClient,
@@ -48,23 +47,6 @@ export async function fetchConfirmedLineup(
   return null;
 }
 
-export async function fetchPredictedLineup(
-  supabase: SupabaseClient,
-  context: LineupResolveContext & { matchId: string }
-): Promise<ResolvedLineup | null> {
-  const params = {
-    supabase,
-    matchId: context.matchId,
-    teamName: context.teamName,
-    players: context.players,
-  };
-
-  for (const provider of PREDICTED_PROVIDERS) {
-    const lineup = await provider.fetchPredictedLineup(params);
-    if (lineup) return lineup;
-  }
-  return null;
-}
 
 /** Indica qué fuente se usaría sin persistir ni construir el fallback completo. */
 async function resolveContextMatchId(
@@ -115,27 +97,6 @@ export async function getLineupSource(
       };
     }
 
-    if (cached?.sourceKind === "predicted") {
-      return {
-        kind: "predicted",
-        dataSourceCode: cached.dataSourceCode,
-        fromCache: true,
-      };
-    }
-
-    const predicted = await fetchPredictedLineup(supabase, {
-      ...context,
-      matchId,
-    });
-    if (predicted) {
-      return {
-        kind: "predicted",
-        dataSourceCode: predicted.dataSourceCode,
-        fromCache: false,
-      };
-    }
-  }
-
   return { kind: "fallback", dataSourceCode: null, fromCache: false };
 }
 
@@ -152,12 +113,22 @@ function benchFromResolved(lineup: ResolvedLineup, context: LineupResolveContext
       shirtNumber: player.shirt_number,
       position: player.position,
     }));
-}
-
 async function buildFallbackWithKnownFormation(
   supabase: SupabaseClient,
   context: LineupResolveContext
 ): Promise<ResolvedLineup> {
+  const teamKey = context.teamName.toLowerCase().trim();
+  const hardcoded = HARDCODED_DEFAULT_LINEUPS[teamKey];
+
+  if (hardcoded) {
+    const starters = context.players.filter((p) =>
+      p.shirt_number !== null && hardcoded.startingNumbers.includes(p.shirt_number)
+    );
+    const resolved = buildFallbackLineup(starters, { knownFormation: hardcoded.formation });
+    resolved.sourceKind = "fallback"; // Or maybe "hardcoded" but fallback is safer for existing types
+    return resolved;
+  }
+
   const knownFormation =
     context.formationOverride ?? (await loadLastKnownFormation(supabase, context.teamName)) ?? undefined;
   return buildFallbackLineup(context.players, { knownFormation });
@@ -223,32 +194,21 @@ export async function resolveTeamLineup(
     }
   }
 
-  // 4. Intentamos fetchear predicted si no está en caché o si está stale
-  if (cached?.sourceKind === "predicted" && !isPredictedLineupCacheStale(cached)) {
-    return cached;
-  }
-
-  const predicted = await fetchPredictedLineup(supabase, { ...context, matchId });
-  if (predicted) {
-    await upsertTeamLineup(
-      supabase, matchId, context.teamName, predicted, predicted.bench ?? []
-    );
-    return predicted;
-  }
-
-  // 5. Fallback logic: Si todo ha fallado, pero TENÍAMOS CACHÉ (confirmed o predicted), devolvemos la caché.
-  // Solo devolvemos fallback si realmente no tenemos nada mejor.
-  if (cached && (cached.sourceKind === "confirmed" || cached.sourceKind === "predicted")) {
-    // Para que no vuelva a intentarlo constantemente, actualizamos el fetched_at de la caché guardando el mismo objeto.
+  // 4. Si TODO ha fallado, verificamos si tenemos CACHÉ (confirmada)
+  if (cached && cached.sourceKind === "confirmed") {
     await upsertTeamLineup(supabase, matchId, context.teamName, { ...cached, fetchedAt: new Date().toISOString() }, cached.bench ?? []);
     return cached;
   }
 
+  // 5. Fallback logic: Usamos Alineaciones Hardcodeadas o Fallback genérico
+  // ELIMINAMOS por completo fetchPredictedLineup para maximizar el rendimiento.
   const fallback = await buildFallbackWithKnownFormation(supabase, context);
   const shouldPersist =
     !cached ||
     isBetterLineupSource(fallback.sourceKind, cached.sourceKind) ||
+    !cached.formationLabel ||
     cached.formation !== fallback.formation;
+
   if (shouldPersist) {
     await upsertTeamLineup(
       supabase, matchId, context.teamName, fallback,
