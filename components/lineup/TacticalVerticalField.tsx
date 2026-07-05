@@ -170,8 +170,11 @@ export function TacticalVerticalField({
 
   // Unificar la escala para que ambos equipos tengan el mismo tamaño de camiseta
   const unifiedScale = useMemo(() => {
+    let scale = 1;
     if (awayResult && homeResult) {
-      return Math.max(awayResult.chipScale, homeResult.chipScale);
+      scale = Math.max(awayResult.chipScale, homeResult.chipScale);
+      // Reducción ligera cuando hay dos equipos para evitar saturación visual
+      return scale * 0.9;
     }
     return awayResult?.chipScale || homeResult?.chipScale || 1;
   }, [awayResult, homeResult]);
