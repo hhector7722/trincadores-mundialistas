@@ -48,7 +48,7 @@ const HALF_MARGINS = { side: 0.5, vertical: 0.25 };
 const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
   margins: HALF_MARGINS,
   spacing: { minHorizontal: 5, minVertical: 5 },
-  chipSize: { minScale: 1.0, maxScale: 1.0, baseWidth: 10, baseHeight: 12 },
+  chipSize: { minScale: 0.85, maxScale: 0.85, baseWidth: 10, baseHeight: 12 },
   nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
 };
@@ -173,8 +173,7 @@ export function TacticalVerticalField({
     let scale = 1;
     if (awayResult && homeResult) {
       scale = Math.max(awayResult.chipScale, homeResult.chipScale);
-      // Reducción ligera cuando hay dos equipos para evitar saturación visual
-      return scale * 0.9;
+      return scale;
     }
     return awayResult?.chipScale || homeResult?.chipScale || 1;
   }, [awayResult, homeResult]);
