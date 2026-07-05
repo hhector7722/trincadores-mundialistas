@@ -15,7 +15,7 @@ const VB_TACTICAL_H = 105;
 const DEFAULT_CONSTRAINTS: LayoutConstraints = {
   margins: { side: 1, vertical: 1 },
   spacing: { minHorizontal: 5, minVertical: 5 },
-  chipSize: { minScale: 0.65, maxScale: 1.5, baseWidth: 10, baseHeight: 12 },
+  chipSize: { minScale: 1.0, maxScale: 1.0, baseWidth: 10, baseHeight: 12 },
   nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
   fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 100, isAwayHalf: false },

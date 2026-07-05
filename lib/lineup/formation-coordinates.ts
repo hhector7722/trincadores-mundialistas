@@ -114,7 +114,7 @@ export const FORMATION_SLOT_ANCHORS: Record<FormationId, FormationSlotAnchor[]> 
     { key: "LW", accept: ["LW"], coord: { x: X.L, y: Y.ATTACK } },
     { key: "AM", accept: ["AM", "CAM", "SS"], coord: { x: X.C, y: Y.ATTACK } },
     { key: "RW", accept: ["RW"], coord: { x: X.R, y: Y.ATTACK } },
-    { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: Y.FORWARD } },
+    { key: "ST", accept: ["ST", "CF"], coord: { x: X.C, y: 0 } },
   ],
   "4-1-4-1": [
     { key: "GK", accept: ["GK"], coord: { x: X.C, y: Y.GOALKEEPER } },

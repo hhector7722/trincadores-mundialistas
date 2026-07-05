@@ -5,22 +5,24 @@ const FORMATIONS = ["4-3-3", "4-4-2", "4-2-3-1", "4-1-4-1", "3-4-3", "3-4-2-1", 
 
 import type { ResolvedLineup, PositionRole, FormationId } from "@/lib/lineup/types";
 
+import { FORMATION_SLOT_ANCHORS } from "@/lib/lineup/formation-coordinates";
+
 // A mock lineup creator for the gallery
 function generateLineup(formation: string, isAway = false): ResolvedLineup {
-  const positions = parseFormation(formation);
+  const anchors = FORMATION_SLOT_ANCHORS[formation as FormationId] || [];
   
   return {
     formation: formation as FormationId,
     formationLabel: formation,
-    slots: positions.map((pos, i) => ({
+    slots: anchors.map((pos, i) => ({
       key: `P${i}`,
-      name: pos.role + (i + 1),
+      name: pos.key + (i + 1),
       shirtNumber: i + 1,
-      positionLabel: pos.role,
-      role: pos.role as PositionRole,
+      positionLabel: pos.key,
+      role: (pos.key === "GK" ? "GK" : pos.key.includes("ST") ? "FW" : pos.key.includes("B") ? "DF" : "MF") as PositionRole,
       isPlaceholder: false,
-      x: pos.x,
-      y: pos.y
+      x: pos.coord.x,
+      y: pos.coord.y
     })),
     benchCount: 0,
     isProbable: false,
@@ -28,36 +30,6 @@ function generateLineup(formation: string, isAway = false): ResolvedLineup {
     dataSourceCode: null,
     fetchedAt: null
   };
-}
-
-function parseFormation(formation: string) {
-  const parts = formation.split("-").map(Number);
-  
-  let positions = [
-    { role: "GK", x: 50, y: 90 } // GK always at bottom
-  ];
-  
-  let currentY = 70;
-  
-  parts.forEach(count => {
-    const stepX = 100 / (count + 1);
-    for (let i = 0; i < count; i++) {
-      positions.push({
-        role: getRoleByRow(currentY),
-        x: stepX * (i + 1),
-        y: currentY
-      });
-    }
-    currentY -= 20;
-  });
-
-  return positions;
-}
-
-function getRoleByRow(y: number) {
-  if (y >= 65) return "DF";
-  if (y >= 35) return "MF";
-  return "FW";
 }
 
 export default function TacticalGallery() {
