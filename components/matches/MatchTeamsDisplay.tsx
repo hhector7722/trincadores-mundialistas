@@ -177,7 +177,7 @@ function TeamBlock({
   name: string;
   onClick?: () => void;
   footerSlot?: ReactNode;
-  flagSize?: "sm" | "md" | "lg";
+  flagSize?: "sm" | "md" | "lg" | "xl";
   compactName?: boolean;
 }) {
   const displayName = teamNameEs(name);
@@ -286,7 +286,7 @@ export function MatchTeamsDisplay({
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
   const awayAnchor = isPredictionModal ? "90%" : "85%";
-  const teamFlagSize = compactTeamColumn ? "sm" : "lg";
+  const teamFlagSize = compactTeamColumn ? "lg" : "xl";
   const teamColumnCompact = compactTeamColumn || Boolean(homeFooterSlot || awayFooterSlot);
 
   if (isPredictionModal) {
