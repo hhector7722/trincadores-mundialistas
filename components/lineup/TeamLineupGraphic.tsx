@@ -9,6 +9,9 @@ import type { LineupSlot } from "@/lib/lineup/types";
 import { LayoutEngine, LayoutElementInput, LayoutConstraints } from "@/lib/lineup/tactical-layout-engine";
 import { cn } from "@/lib/utils";
 
+const VB_TACTICAL_W = 68;
+const VB_TACTICAL_H = 105;
+
 const DEFAULT_CONSTRAINTS: LayoutConstraints = {
   margins: { side: 1, vertical: 1 },
   spacing: { minHorizontal: 5, minVertical: 5 },
@@ -22,7 +25,6 @@ type TeamLineupGraphicProps = {
   slots: LineupSlot[];
   teamName: string;
   className?: string;
-  /** Suplentes encima del terreno, mismo ancho que el campo. */
   benchAbove?: ReactNode;
   size?: "default" | "modal";
   onPlayerClick?: (playerName: string) => void;
@@ -62,11 +64,17 @@ export function TeamLineupGraphic({
 
   const finalChipScale = chipScale * layoutResult.chipScale;
 
+  const vbWidth = sized ? Math.round((100 * widthPx) / heightPx) : VB_TACTICAL_W;
+  const vbHeight = sized ? 100 : VB_TACTICAL_H;
+
   const fieldContent = (
     <>
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <FootballPitchSurface onReady={onFieldReady} />
+      <div className="pointer-events-none absolute inset-0 overflow-visible">
+        <FootballPitchSurface vbWidth={vbWidth} vbHeight={vbHeight} />
       </div>
+      {onFieldReady ? (
+        <div ref={(el) => { if (el) onFieldReady(); }} className="hidden" />
+      ) : null}
 
       {layoutResult.positions.map((pos) => {
         const slot = slots.find(s => s.key === pos.id);
@@ -97,10 +105,14 @@ export function TeamLineupGraphic({
     </>
   );
 
+  const pitchContainerClass = sized ? "" : PITCH_ASPECT_CLASS;
+
   if (isModal && !sized) {
     return (
       <LineupModalFieldShell className={className} benchAbove={benchAbove}>
-        {fieldContent}
+        <div className="relative w-full overflow-visible" style={{ aspectRatio: `${VB_TACTICAL_W}/${VB_TACTICAL_H}` }}>
+          {fieldContent}
+        </div>
       </LineupModalFieldShell>
     );
   }
@@ -112,15 +124,11 @@ export function TeamLineupGraphic({
         <div
           className={cn(
             "relative w-full shrink-0 overflow-visible",
-            !sized && (isModal ? "flex-1" : PITCH_ASPECT_CLASS)
+            !sized && pitchContainerClass
           )}
           style={
             sized
-              ? {
-                  width: widthPx,
-                  height: heightPx,
-                  maxWidth: "100%",
-                }
+              ? { width: widthPx, height: heightPx, maxWidth: "100%" }
               : undefined
           }
         >

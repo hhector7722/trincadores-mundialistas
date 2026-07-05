@@ -3,10 +3,6 @@
 import type { ReactNode } from "react";
 import { PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import { LINEUP_MODAL_FIELD_WIDTH_CLASS } from "@/lib/lineup/field-asset";
-import {
-  MODAL_FIELD_WRAPPER_SCALE,
-  modalFieldScaleBottomTrim,
-} from "@/lib/lineup/modal-field-scale";
 import { cn } from "@/lib/utils";
 
 type LineupModalFieldShellProps = {

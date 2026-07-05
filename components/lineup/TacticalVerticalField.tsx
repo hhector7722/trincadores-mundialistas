@@ -90,14 +90,16 @@ export function TacticalVerticalField({
   }, [homeLineup]);
 
   const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
+  const vbWidth = 100;
+  const vbHeight = sized ? Math.round((100 * heightPx) / widthPx) : 150;
   
   return (
     <div
-      className={cn("relative w-full overflow-hidden", className)}
+      className={cn("relative w-full overflow-visible", className)}
       style={sized ? { width: widthPx, height: heightPx } : { aspectRatio: "2/3" }}
     >
-      <div className="pointer-events-none absolute inset-0">
-        <FootballPitchSurface />
+      <div className="pointer-events-none absolute inset-0 overflow-visible">
+        <FootballPitchSurface vbWidth={vbWidth} vbHeight={vbHeight} />
       </div>
       
       {/* Visitante */}
