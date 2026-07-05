@@ -26,7 +26,7 @@ export function LineupFieldGate({
           <LoadingCenter label={label} minHeightClassName="min-h-0" />
         </div>
       ) : null}
-      <div className={cn(!fieldReady && "invisible pointer-events-none")}>
+      <div className={cn("flex flex-col flex-1", !fieldReady && "invisible pointer-events-none")}>
         {children(markFieldReady)}
       </div>
     </div>

@@ -10,10 +10,10 @@ import { LayoutEngine, LayoutElementInput, LayoutConstraints } from "@/lib/lineu
 import { cn } from "@/lib/utils";
 
 const DEFAULT_CONSTRAINTS: LayoutConstraints = {
-  margins: { side: 6, vertical: 8 },
-  spacing: { minHorizontal: 8, minVertical: 8 },
-  chipSize: { minScale: 0.8, maxScale: 1.4, baseWidth: 10, baseHeight: 12 },
-  nameAreaBounds: { width: 14, height: 4 },
+  margins: { side: 1, vertical: 1 },
+  spacing: { minHorizontal: 5, minVertical: 5 },
+  chipSize: { minScale: 0.65, maxScale: 1.5, baseWidth: 10, baseHeight: 12 },
+  nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
   fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 100, isAwayHalf: false },
 };
@@ -106,11 +106,14 @@ export function TeamLineupGraphic({
   }
 
   return (
-    <div className={cn("flex w-full flex-col", className)}>
-      <div className={cn("flex w-full shrink-0 flex-col items-stretch", !sized && pitchMaxW)}>
+    <div className={cn("flex w-full flex-col flex-1", className)}>
+      <div className={cn("flex w-full shrink-0 flex-col flex-1 items-stretch", !sized && pitchMaxW)}>
         {benchAbove ? <div className="mb-1 w-full min-w-0 shrink-0">{benchAbove}</div> : null}
         <div
-          className={cn("relative w-full shrink-0 overflow-visible", !sized && PITCH_ASPECT_CLASS)}
+          className={cn(
+            "relative w-full shrink-0 overflow-visible",
+            !sized && (isModal ? "flex-1" : PITCH_ASPECT_CLASS)
+          )}
           style={
             sized
               ? {

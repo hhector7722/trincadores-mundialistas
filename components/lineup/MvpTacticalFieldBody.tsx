@@ -60,7 +60,7 @@ export function MvpTacticalFieldBody({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full min-w-0 shrink-0 flex-col",
+        "mx-auto flex w-full flex-1 h-full min-w-0 shrink-0 flex-col",
         className
       )}
     >

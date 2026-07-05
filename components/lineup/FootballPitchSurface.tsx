@@ -43,24 +43,24 @@ export function FootballPitchSurface({ className, onReady }: FootballPitchSurfac
 
       <g
         fill="none"
-        stroke="rgba(255,255,255,0.55)"
+        stroke="rgba(255,255,255,0.4)"
         strokeWidth="0.6"
         strokeLinejoin="round"
       >
         <rect x="6" y="6" width="56" height="93" rx="1" />
         <line x1="6" y1="52.5" x2="62" y2="52.5" />
-        <circle cx="34" cy="52.5" r="8" />
-        <circle cx="34" cy="52.5" r="0.8" fill="rgba(255,255,255,0.55)" />
+        <circle cx="34" cy="52.5" r="4.5" />
+        <circle cx="34" cy="52.5" r="0.6" fill="rgba(255,255,255,0.4)" />
 
-        <rect x="18" y="6" width="32" height="14" />
-        <rect x="24" y="6" width="20" height="6" />
-        <circle cx="34" cy="14" r="0.8" fill="rgba(255,255,255,0.55)" />
-        <path d="M 30 20 A 4 4 0 0 0 38 20" />
+        <rect x="23" y="6" width="22" height="9" />
+        <rect x="28" y="6" width="12" height="4" />
+        <circle cx="34" cy="12" r="0.6" fill="rgba(255,255,255,0.4)" />
+        <path d="M 30.5 15 A 4.5 4.5 0 0 0 37.5 15" />
 
-        <rect x="18" y="85" width="32" height="14" />
-        <rect x="24" y="93" width="20" height="6" />
-        <circle cx="34" cy="91" r="0.8" fill="rgba(255,255,255,0.55)" />
-        <path d="M 30 85 A 4 4 0 0 1 38 85" />
+        <rect x="23" y="90" width="22" height="9" />
+        <rect x="28" y="95" width="12" height="4" />
+        <circle cx="34" cy="93" r="0.6" fill="rgba(255,255,255,0.4)" />
+        <path d="M 30.5 90 A 4.5 4.5 0 0 1 37.5 90" />
       </g>
     </svg>
   );

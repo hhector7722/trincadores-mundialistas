@@ -141,9 +141,34 @@ function refineLayoutAesthetics(
   constraints: LayoutConstraints,
   structure: TacticalStructure
 ): { positions: LayoutPosition[]; debug: LayoutDebug } {
-  // A final pass to explicitly improve symmetry and alignment if possible
   let currentPositions = positions.map(p => ({ ...p }));
-  
+  const tolerance = 3;
+
+  // Final symmetry alignment: average mirror pairs within the same band
+  for (const band of structure.bands) {
+    const bandPositions = band.elements
+      .map(id => currentPositions.find(p => p.id === id))
+      .filter((p): p is LayoutPosition => p != null);
+
+    for (let i = 0; i < bandPositions.length; i++) {
+      for (let j = i + 1; j < bandPositions.length; j++) {
+        const a = bandPositions[i];
+        const b = bandPositions[j];
+        const mirrorDiff = Math.abs((100 - a.x) - b.x);
+        if (mirrorDiff < tolerance && Math.abs(a.y - b.y) < tolerance) {
+          const avgX = (a.x + (100 - b.x)) / 2;
+          a.x = avgX;
+          b.x = 100 - avgX;
+        }
+      }
+    }
+  }
+
+  // Re-run containment to maintain bounds
+  if (constraints.chipSize) {
+    applyContainmentForces(currentPositions, scale, constraints);
+  }
+
   return {
     positions: currentPositions,
     debug: {
@@ -195,7 +220,8 @@ function calculateAestheticScore(positions: LayoutPosition[], scale: number, str
 }
 
 function applySeparationForces(positions: LayoutPosition[], issues: CollisionIssue[], scale: number, constraints: LayoutConstraints) {
-  const pushFactor = 0.5;
+  const pushFactor = 0.3;
+  const damping = 0.85;
 
   issues.forEach(issue => {
     if (issue.type === "overlap") {
@@ -204,17 +230,16 @@ function applySeparationForces(positions: LayoutPosition[], issues: CollisionIss
       if (p1 && p2) {
         const dx = p1.x - p2.x;
         const dy = p1.y - p2.y;
-        
-        // Push apart slightly more horizontally than vertically if they are side by side
-        if (Math.abs(dx) > Math.abs(dy)) {
-          const push = dx > 0 ? pushFactor : -pushFactor;
-          p1.x += push;
-          p2.x -= push;
-        } else {
-          const push = dy > 0 ? pushFactor : -pushFactor;
-          p1.y += push;
-          p2.y -= push;
-        }
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        // Normalize direction, apply damping
+        const nx = dx / dist;
+        const ny = dy / dist;
+
+        p1.x += nx * pushFactor * damping;
+        p2.x -= nx * pushFactor * damping;
+        p1.y += ny * pushFactor * damping;
+        p2.y -= ny * pushFactor * damping;
       }
     }
   });
@@ -226,46 +251,61 @@ function applyContainmentForces(positions: LayoutPosition[], scale: number, cons
   const chipH = constraints.chipSize.baseHeight * scale;
   
   const b = constraints.fieldBounds || { xMin: 0, xMax: 100, yMin: 0, yMax: 100 };
+  // Use a dynamic margin that adapts to the chip size, ensuring the field edges are never too tight
+  const dynamicSideMargin = Math.max(constraints.margins.side, chipW * 0.15);
+  const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
 
   positions.forEach(pos => {
-    const minX = b.xMin + (chipW / 2) + constraints.margins.side;
-    const maxX = b.xMax - (chipW / 2) - constraints.margins.side;
+    const minX = b.xMin + (chipW / 2) + dynamicSideMargin;
+    const maxX = b.xMax - (chipW / 2) - dynamicSideMargin;
     if (pos.x < minX) pos.x = minX;
     if (pos.x > maxX) pos.x = maxX;
 
-    const minY = b.yMin + (chipH / 2) + constraints.margins.vertical;
-    const maxY = b.yMax - (chipH / 2) - textH - constraints.margins.vertical;
+    const minY = b.yMin + (chipH / 2) + dynamicVertMargin;
+    const maxY = b.yMax - (chipH / 2) - textH - dynamicVertMargin;
     if (pos.y < minY) pos.y = minY;
     if (pos.y > maxY) pos.y = maxY;
   });
 }
 
 function applyTacticalForces(positions: LayoutPosition[], initialPositions: LayoutPosition[], isValid: boolean) {
-  // If the layout is valid, pull very gently towards tactical positions.
-  // If it's invalid, pull slightly stronger to retain shape during separation.
-  // We reduce the pull factor to prioritize aesthetics/separation over precise tactical positions.
   const pullFactor = isValid ? 0.02 : 0.05;
-  
+  const expandFactor = 0.01;
+  const centerThreshold = 50;
+
   positions.forEach(pos => {
     const initial = initialPositions.find(p => p.id === pos.id);
     if (initial) {
+      // Pull towards tactical position (gentle when valid)
       pos.x += (initial.x - pos.x) * pullFactor;
       pos.y += (initial.y - pos.y) * pullFactor;
-      
-      // Additional symmetry force: pull towards mirror position if one exists in initial layout
-      const initialMirrorX = 100 - initial.x;
-      const hasMirror = initialPositions.some(p => p.id !== initial.id && Math.abs(p.x - initialMirrorX) < 5 && Math.abs(p.y - initial.y) < 5);
-      
-      if (hasMirror) {
-        // Find current mirror partner and align them
-        const partner = positions.find(p => p.id !== pos.id && Math.abs(initialPositions.find(ip => ip.id === p.id)!.x - initialMirrorX) < 5);
+
+      // Horizontal expansion: push away from center to fill the wings
+      // Only apply if the player isn't meant to be central
+      if (Math.abs(initial.x - centerThreshold) > 8) {
+        const direction = initial.x > centerThreshold ? 1 : -1;
+        pos.x += direction * expandFactor;
+      }
+
+      // Central pull for central players
+      if (Math.abs(initial.x - centerThreshold) <= 8) {
+        pos.x += (centerThreshold - pos.x) * pullFactor;
+      }
+
+      // Mirror symmetry: if initial positions have a mirror pair, maintain it
+      const mirrorX = 100 - initial.x;
+      const hasMirrorInInitial = initialPositions.some(p =>
+        p.id !== initial.id &&
+        Math.abs(p.x - mirrorX) < 5 &&
+        Math.abs(p.y - initial.y) < 10
+      );
+
+      if (hasMirrorInInitial) {
+        const partner = positions.find(p => p.id !== pos.id && Math.abs(initialPositions.find(ip => ip.id === p.id)!.x - mirrorX) < 5);
         if (partner) {
-          const targetX = 100 - partner.x;
-          pos.x += (targetX - pos.x) * (pullFactor * 0.5);
+          const mirroredTarget = 100 - partner.x;
+          pos.x += (mirroredTarget - pos.x) * (pullFactor * 0.3);
         }
-      } else if (Math.abs(initial.x - 50) < 5) {
-        // If it's a central player, gently pull towards center
-        pos.x += (50 - pos.x) * (pullFactor * 0.5);
       }
     }
   });

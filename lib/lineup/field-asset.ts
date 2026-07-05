@@ -4,18 +4,18 @@ export const GOYA_FIELD_ASSET_VERSION = "20260608";
 export const GOYA_FIELD_SRC = `/icons/goya.png?v=${GOYA_FIELD_ASSET_VERSION}`;
 
 /** Ancho fijo del campo táctico en modal (evita colapso de `w-max` durante carga). */
-export const LINEUP_MODAL_FIELD_WIDTH_CLASS = "w-[min(98vw,18.5rem)]";
+export const LINEUP_MODAL_FIELD_WIDTH_CLASS = "w-[min(98vw,28rem)]";
 
-/** Ancho nominal del campo en modal plantilla (18.5rem @ 16px). */
-export const LINEUP_MODAL_FIELD_WIDTH_PX = 296;
+/** Ancho nominal del campo en modal plantilla. */
+export const LINEUP_MODAL_FIELD_WIDTH_PX = 448; // max-w-md is 448px
 
-/** Modal plantilla: mismo ancho que el campo (~18.5rem). */
-export const LINEUP_MODAL_WRAPPER_CLASS = LINEUP_MODAL_FIELD_WIDTH_CLASS;
+/** Modal plantilla: mismo ancho que el campo. */
+export const LINEUP_MODAL_WRAPPER_CLASS = "w-[min(100vw-1rem,28rem)]";
 
-/** Panel plantilla: altura al contenido, ancho fijo al campo. */
-export const LINEUP_MODAL_PANEL_CLASS = `h-auto ${LINEUP_MODAL_FIELD_WIDTH_CLASS}`;
+/** Panel plantilla: altura flexible, ocupa toda la pantalla disponible. */
+export const LINEUP_MODAL_PANEL_CLASS = `h-[85vh] min-h-[500px] w-full max-w-md flex flex-col`;
 
-export const LINEUP_MODAL_PANEL_HOST_CLASS = LINEUP_MODAL_FIELD_WIDTH_CLASS;
+export const LINEUP_MODAL_PANEL_HOST_CLASS = "w-full max-w-md";
 
 /** Modal detalle jugador: mismo ancho que plantilla para layout homogéneo. */
 export const PLAYER_MODAL_WRAPPER_CLASS = LINEUP_MODAL_WRAPPER_CLASS;

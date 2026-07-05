@@ -30,10 +30,10 @@ type TacticalVerticalFieldProps = {
 };
 
 const DEFAULT_CONSTRAINTS: LayoutConstraints = {
-  margins: { side: 6, vertical: 4 },
-  spacing: { minHorizontal: 8, minVertical: 8 },
-  chipSize: { minScale: 0.6, maxScale: 1.2, baseWidth: 10, baseHeight: 12 },
-  nameAreaBounds: { width: 14, height: 4 },
+  margins: { side: 0.5, vertical: 0.5 },
+  spacing: { minHorizontal: 5, minVertical: 5 },
+  chipSize: { minScale: 0.6, maxScale: 1.4, baseWidth: 10, baseHeight: 12 },
+  nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
   fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 50, isAwayHalf: false },
 };

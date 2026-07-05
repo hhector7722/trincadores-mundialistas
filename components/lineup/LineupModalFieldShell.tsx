@@ -15,27 +15,16 @@ type LineupModalFieldShellProps = {
   benchAbove?: ReactNode;
 };
 
-/** Marco táctico del modal de alineación: ancho y alto idénticos al campo cargado. */
 export function LineupModalFieldShell({
   children,
   className,
   benchAbove,
 }: LineupModalFieldShellProps) {
   return (
-    <div className={cn("flex w-full flex-col items-center", className)}>
-      <div
-        className={cn(
-          "flex w-full shrink-0 flex-col items-stretch",
-          LINEUP_MODAL_FIELD_WIDTH_CLASS
-        )}
-        style={{
-          transform: `scale(${MODAL_FIELD_WRAPPER_SCALE})`,
-          transformOrigin: "top center",
-          marginBottom: modalFieldScaleBottomTrim(),
-        }}
-      >
+    <div className={cn("flex w-full flex-1 flex-col items-center", className)}>
+      <div className="flex w-full max-w-md flex-1 shrink-0 flex-col items-stretch">
         {benchAbove ? <div className="mb-1 w-full min-w-0 shrink-0">{benchAbove}</div> : null}
-        <div className={cn("relative w-full shrink-0 overflow-visible", PITCH_ASPECT_CLASS)}>
+        <div className="relative flex-1 w-full shrink-0 overflow-visible">
           {children}
         </div>
       </div>
