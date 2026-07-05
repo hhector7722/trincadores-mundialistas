@@ -366,6 +366,37 @@ function applyTacticalForces(
   });
 }
 
+function enforce4231VerticalConstraint(positions: LayoutPosition[], isAwayHalf: boolean) {
+  const st = positions.find(p => p.id === "ST");
+  const am = positions.find(p => p.id === "AM");
+  if (!st || !am) return;
+
+  const ldm = positions.find(p => p.id === "LDM") || positions.find(p => p.id === "LCM") || positions.find(p => p.id === "DM");
+  const rdm = positions.find(p => p.id === "RDM") || positions.find(p => p.id === "RCM") || positions.find(p => p.id === "DM");
+  if (!ldm && !rdm) return;
+
+  const pivots = [ldm, rdm].filter((p): p is LayoutPosition => p != null);
+  const pivotY = pivots.reduce((acc, p) => acc + p.y, 0) / pivots.length;
+
+  const distST_AM = Math.abs(st.y - am.y);
+  const distAM_pivot = Math.abs(am.y - pivotY);
+
+  // We want: distST_AM >= distAM_pivot + 2.5 (ST is clearly further from AM than AM is from pivot)
+  const targetGap = distAM_pivot + 2.5;
+  if (distST_AM < targetGap) {
+    const diff = targetGap - distST_AM;
+    if (isAwayHalf) {
+      // ldm.y < am.y < st.y
+      st.y += diff * 0.4;
+      am.y -= diff * 0.6;
+    } else {
+      // st.y < am.y < ldm.y
+      st.y -= diff * 0.4;
+      am.y += diff * 0.6;
+    }
+  }
+}
+
 function enforceBandOrderAndSpacing(
   positions: LayoutPosition[],
   structure: TacticalStructure,
@@ -431,6 +462,9 @@ function enforceBandOrderAndSpacing(
       }
     }
 
+    // Apply specific 4-2-3-1 vertical separation rule
+    enforce4231VerticalConstraint(positions, isAwayHalf);
+
     // After shifting, run containment to keep elements within field boundary constraints
     applyContainmentForces(positions, scale, constraints);
   }
@@ -467,5 +501,25 @@ function checkBandOrder(
       if (bandYs[i + 1] > bandYs[i] - spacing) return false;
     }
   }
+
+  // Enforce specific 4-2-3-1 vertical spacing check: distance(ST, AM) > distance(AM, double_pivot)
+  const st = positions.find(p => p.id === "ST");
+  const am = positions.find(p => p.id === "AM");
+  if (st && am) {
+    const ldm = positions.find(p => p.id === "LDM") || positions.find(p => p.id === "LCM") || positions.find(p => p.id === "DM");
+    const rdm = positions.find(p => p.id === "RDM") || positions.find(p => p.id === "RCM") || positions.find(p => p.id === "DM");
+    if (ldm || rdm) {
+      const pivots = [ldm, rdm].filter((p): p is LayoutPosition => p != null);
+      const pivotY = pivots.reduce((acc, p) => acc + p.y, 0) / pivots.length;
+
+      const distST_AM = Math.abs(st.y - am.y);
+      const distAM_pivot = Math.abs(am.y - pivotY);
+
+      if (distST_AM < distAM_pivot - 0.2) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
