@@ -41,7 +41,7 @@ export const TACTICAL_Y = {
   /** Defensas */
   DEFENSE: 79,
   /** Portero */
-  GOALKEEPER: 96,
+  GOALKEEPER: 115,
 } as const;
 
 /** Alias usado por field-layout y proyección MVP. */
