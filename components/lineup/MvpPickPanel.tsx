@@ -266,7 +266,7 @@ export function MvpPickPanel({
               inactive={!selectedOption}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
-              className="!px-5 !py-2 !text-xs"
+              className="!px-2 !py-1 !text-xs leading-none"
             >
               {savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
             </MatchAddPillButton>
@@ -275,7 +275,7 @@ export function MvpPickPanel({
               inactive={!selectedOption || pending}
               onClick={onSave}
               title={selectedOption ? `MVP: ${selectedOption.name}` : undefined}
-              className="!px-5 !py-2 !text-xs"
+              className="!px-2 !py-1 !text-xs leading-none"
             >
               {pending ? "Guardando…" : savedPlayerName ? "Actualizar MVP" : "Guardar MVP"}
             </MatchAddPillButton>

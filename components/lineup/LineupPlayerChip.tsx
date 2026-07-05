@@ -84,7 +84,7 @@ export function LineupPlayerChip({
               isMatch
                 ? "h-[4rem] w-[3rem] sm:h-[4.2rem] sm:w-[3.15rem]"
                 : isModal
-                  ? "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]"
+                  ? "h-[3rem] w-[2.2rem]"
                   : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
               interactive && "transition-transform active:scale-95"
             )}
@@ -98,7 +98,7 @@ export function LineupPlayerChip({
               // Ajustar tamaño del texto para mejor proporción
               style={{
                 color: dorsalColor,
-                fontSize: isMatch ? "0.95rem" : isModal ? "1.2rem" : "1.2rem",
+                fontSize: isMatch ? "0.95rem" : isModal ? "0.8rem" : "1.2rem",
                 textShadow: "0px 1px 2px rgba(0,0,0,0.4)"
               }}
             >
@@ -115,7 +115,7 @@ export function LineupPlayerChip({
             isMatch
               ? "h-[4rem] w-[3rem] sm:h-[4.2rem] sm:w-[3.15rem]"
               : isModal
-                ? "h-[5.2rem] w-[3.9rem] sm:h-[5.6rem] sm:w-[4.2rem]"
+                ? "h-[3rem] w-[2.2rem]"
                 : "h-[4.5rem] w-[3.4rem] sm:h-[5rem] sm:w-[3.75rem]",
             interactive && "transition-transform active:scale-95"
           )}
@@ -144,7 +144,7 @@ export function LineupPlayerChip({
             textAnchor="middle"
             dominantBaseline="middle"
             fill={dorsalColor}
-            fontSize={isMatch ? "13.5" : isModal ? "10.5" : "17.5"} // Reducir tamaño ligeramente
+            fontSize={isMatch ? "13.5" : isModal ? "10" : "17.5"} // Reducir tamaño ligeramente
             fontWeight="700"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -166,20 +166,20 @@ export function LineupPlayerChip({
       >
         <p
           className={cn(
-            "flex items-center justify-center gap-0.5 whitespace-normal text-center",
+            "flex items-center justify-center gap-0.5 whitespace-nowrap overflow-hidden text-center",
             isMatch && selected
-              ? "text-[11px] font-bold leading-none tracking-tight text-[var(--tm-primary-fg)]"
+              ? "text-[12px] font-bold leading-none tracking-tighter text-[var(--tm-primary-fg)]"
               : cn(
                   "text-white",
                   isMatch
-                    ? "text-[11px] font-bold leading-none tracking-tight"
+                    ? "text-[12px] font-bold leading-none tracking-tighter"
                     : isModal
-                      ? "text-[9.5px] font-semibold leading-none"
-                      : "text-[11px] font-semibold leading-tight sm:text-[12px]"
+                      ? "text-[9px] font-semibold leading-none tracking-tight"
+                      : "text-[12px] font-semibold leading-none tracking-tight sm:text-[13px]"
                 )
           )}
         >
-          <span>{displayName}</span>
+          <span className="truncate">{displayName}</span>
           {substitutionMarker ? <SubstitutionMarkerIcon kind={substitutionMarker} /> : null}
         </p>
       </div>
@@ -191,7 +191,7 @@ export function LineupPlayerChip({
     isMatch
       ? "min-h-[4.5rem] w-[3.8rem] touch-manipulation"
       : isModal
-        ? "w-[4.8rem] min-h-[5.8rem]"
+        ? "w-[3rem] min-h-[4rem]"
         : "w-[4.8rem] min-h-[5.8rem] sm:w-[5.2rem]",
     slot.isPlaceholder && "opacity-70",
     disabled && "opacity-60"

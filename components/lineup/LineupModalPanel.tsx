@@ -186,26 +186,25 @@ export function LineupModalPanel({
               {bench.map((player) => {
                 const role = normalizePositionRole(player.position);
                 return (
-                  <div key={player.name} className="scale-[0.7] origin-top" style={{ height: "4.5rem", width: "3.5rem" }}>
-                    <LineupPlayerChip
-                      slot={{
-                        key: player.name,
-                        name: player.name,
-                        shirtNumber: player.shirtNumber,
-                        role,
-                        positionLabel: positionLabelEs(role, player.position),
-                        isPlaceholder: false,
-                        x: 0,
-                        y: 0
-                      }}
-                      teamName={teamName}
-                      variant="modal"
-                      onClick={() => {
-                        handlePlayerInteraction(player.name);
-                        setShowBenchModal(false);
-                      }}
-                    />
-                  </div>
+                  <LineupPlayerChip
+                    key={player.name}
+                    slot={{
+                      key: player.name,
+                      name: player.name,
+                      shirtNumber: player.shirtNumber,
+                      role,
+                      positionLabel: positionLabelEs(role, player.position),
+                      isPlaceholder: false,
+                      x: 0,
+                      y: 0
+                    }}
+                    teamName={teamName}
+                    variant="modal"
+                    onClick={() => {
+                      handlePlayerInteraction(player.name);
+                      setShowBenchModal(false);
+                    }}
+                  />
                 );
               })}
             </div>
