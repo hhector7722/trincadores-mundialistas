@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface TeamCamiFrontProps {
   team: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   alt?: string;
 }
@@ -12,6 +12,7 @@ const sizeClasses = {
   sm: "h-8 w-6",
   md: "h-12 w-9",
   lg: "h-[5rem] w-[3.75rem] sm:h-[5.5rem] sm:w-[4.125rem]",
+  xl: "h-[7rem] w-[5.25rem] sm:h-[7.5rem] sm:w-[5.625rem]",
 };
 
 const dbTeamsToCamiKey: Record<string, string> = {
