@@ -31,17 +31,17 @@ export const TACTICAL_X = {
 
 export const TACTICAL_Y = {
   /** Delanteros */
-  FORWARD: 16,
+  FORWARD: 9,
   /** Mediapuntas */
-  ATTACK: 32,
+  ATTACK: 26,
   /** Centrocampistas */
-  MIDFIELD: 48,
+  MIDFIELD: 44,
   /** Pivotes */
-  HOLDING: 64,
+  HOLDING: 61,
   /** Defensas */
-  DEFENSE: 80,
+  DEFENSE: 79,
   /** Portero */
-  GOALKEEPER: 94,
+  GOALKEEPER: 96,
 } as const;
 
 /** Alias usado por field-layout y proyección MVP. */

@@ -15,10 +15,10 @@ const SOURCE_Y_GK = TACTICAL_Y.GOALKEEPER;
 const SOURCE_Y_SPAN = SOURCE_Y_GK - SOURCE_Y_ATTACK;
 
 /** Mitad izquierda: local (portero en borde izquierdo, ataque hacia el centro). */
-export const HOME_HALF_X = { MIN: 8, MAX: 46 } as const;
+export const HOME_HALF_X = { MIN: 5, MAX: 46 } as const;
 
 /** Mitad derecha: visitante (portero en borde derecho, ataque hacia el centro). */
-export const AWAY_HALF_X = { MIN: 54, MAX: 92 } as const;
+export const AWAY_HALF_X = { MIN: 54, MAX: 95 } as const;
 
 const HOME_X_SPAN = HOME_HALF_X.MAX - HOME_HALF_X.MIN;
 const AWAY_X_SPAN = AWAY_HALF_X.MAX - AWAY_HALF_X.MIN;
@@ -28,8 +28,8 @@ const AWAY_X_SPAN = AWAY_HALF_X.MAX - AWAY_HALF_X.MIN;
  * Margen interior para que camiseta + nombre no sobresalgan del verde
  * (anclaje centrado con translate -50%, -50%).
  */
-export const PLAYABLE_Y_MIN = 20;
-export const PLAYABLE_Y_MAX = 78;
+export const PLAYABLE_Y_MIN = 12;
+export const PLAYABLE_Y_MAX = 88;
 
 function sourceDepth(y: number): number {
   return (SOURCE_Y_GK - y) / SOURCE_Y_SPAN;

@@ -367,6 +367,7 @@ export function HomeMatchCard({
             hideKickoff
             compactTeamColumn
             teamBlocksTopClass="top-0"
+            hideTeamNames={true}
             homeFooterSlot={
               <HomeSquadFooterLink
                 onClick={() =>

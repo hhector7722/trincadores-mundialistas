@@ -86,7 +86,7 @@ function TeamFlagCircle({
 }: {
   name: string;
   placeholderStyle?: "default" | "knockout";
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 }) {
   return (
     <div className="relative flex shrink-0 items-center justify-center">
@@ -120,7 +120,7 @@ function TeamFlagButton({
   name: string;
   onClick?: () => void;
   placeholderStyle?: "default" | "knockout";
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 }) {
   const displayName = teamNameEs(name);
 
@@ -175,12 +175,14 @@ function TeamBlock({
   footerSlot,
   flagSize = "lg",
   compactName = false,
+  hideName = false,
 }: {
   name: string;
   onClick?: () => void;
   footerSlot?: ReactNode;
-  flagSize?: "sm" | "md" | "lg" | "xl";
+  flagSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   compactName?: boolean;
+  hideName?: boolean;
 }) {
   const displayName = teamNameEs(name);
 
@@ -189,7 +191,7 @@ function TeamBlock({
       return (
         <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
           <TeamFlagCircle name={name} size={flagSize} />
-          <TeamNameLabel name={name} compact={compactName} />
+          {!hideName && <TeamNameLabel name={name} compact={compactName} />}
           {footerSlot}
         </div>
       );
@@ -198,7 +200,7 @@ function TeamBlock({
     return (
       <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
         <TeamFlagButton name={name} onClick={onClick} size={flagSize} />
-        <TeamNameButton name={name} onClick={onClick} compact={compactName} />
+        {!hideName && <TeamNameButton name={name} onClick={onClick} compact={compactName} />}
         {footerSlot}
       </div>
     );
@@ -208,7 +210,7 @@ function TeamBlock({
     return (
       <div className="inline-flex w-max flex-col items-center gap-1">
         <TeamFlagCircle name={name} size={flagSize} />
-        <TeamNameLabel name={name} compact={compactName} />
+        {!hideName && <TeamNameLabel name={name} compact={compactName} />}
       </div>
     );
   }
@@ -224,7 +226,7 @@ function TeamBlock({
       aria-label={`Ver plantilla de ${displayName}`}
     >
       <TeamFlagCircle name={name} size={flagSize} />
-      <TeamNameLabel name={name} compact={compactName} />
+      {!hideName && <TeamNameLabel name={name} compact={compactName} />}
     </button>
   );
 }
@@ -247,6 +249,7 @@ type MatchTeamsDisplayProps = {
   flagPlaceholderStyle?: "default" | "knockout";
   predictionLabel?: string;
   hidePredictionLabel?: boolean;
+  hideTeamNames?: boolean;
   homeScoreSlot?: ReactNode;
   awayScoreSlot?: ReactNode;
   /** Desplazamiento vertical solo de bandera + nombre (p. ej. card inicio). */
@@ -284,11 +287,12 @@ export function MatchTeamsDisplay({
   homeFooterSlot,
   awayFooterSlot,
   compactTeamColumn = false,
+  hideTeamNames = false,
 }: MatchTeamsDisplayProps) {
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
   const awayAnchor = isPredictionModal ? "90%" : "85%";
-  const teamFlagSize = "md";
+  const teamFlagSize = "2xl";
   const teamColumnCompact = compactTeamColumn || Boolean(homeFooterSlot || awayFooterSlot);
 
   if (isPredictionModal) {
@@ -375,6 +379,7 @@ export function MatchTeamsDisplay({
             footerSlot={homeFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}
+            hideName={hideTeamNames}
           />
         </div>
 
@@ -388,6 +393,7 @@ export function MatchTeamsDisplay({
             footerSlot={awayFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}
+            hideName={hideTeamNames}
           />
         </div>
 
