@@ -400,7 +400,7 @@ export function MatchTeamsDisplay({
         {homeScoreSlot ? (
           <div
             className={cn(
-              "absolute left-[32.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1.75rem] sm:top-[2rem]",
+              "absolute left-[32.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1rem] sm:top-[1.125rem]",
               teamBlocksTopClass,
             )}
           >
@@ -411,7 +411,7 @@ export function MatchTeamsDisplay({
         {awayScoreSlot ? (
           <div
             className={cn(
-              "absolute left-[67.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1.75rem] sm:top-[2rem]",
+              "absolute left-[67.5%] flex h-10 -translate-x-1/2 items-center sm:h-11 top-[1rem] sm:top-[1.125rem]",
               teamBlocksTopClass,
             )}
           >
