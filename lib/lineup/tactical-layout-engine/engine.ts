@@ -105,6 +105,30 @@ export class LayoutEngine {
       console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!`);
     } else {
       console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.`);
+      throw new Error("Invalid layout: Band depth ordering is violated.");
+    }
+
+    // --- VALIDACIÓN DE ORIENTACIÓN ---
+    const gkIds = normalized.filter(p => p.role === "GK").map(p => p.id);
+    const fwIds = normalized.filter(p => p.role === "FW").map(p => p.id);
+
+    if (gkIds.length > 0 && fwIds.length > 0) {
+      const gkPosList = positions.filter(p => gkIds.includes(p.id));
+      const fwPosList = positions.filter(p => fwIds.includes(p.id));
+
+      const gkYMean = gkPosList.reduce((acc, p) => acc + p.y, 0) / gkPosList.length;
+      const fwYMean = fwPosList.reduce((acc, p) => acc + p.y, 0) / fwPosList.length;
+
+      if (isAwayHalf) {
+        if (gkYMean >= fwYMean) {
+          throw new Error(`Orientation error: Goalkeeper Y (${gkYMean}) must be less than Forward Y (${fwYMean}) on Away half.`);
+        }
+      } else {
+        if (gkYMean <= fwYMean) {
+          throw new Error(`Orientation error: Goalkeeper Y (${gkYMean}) must be greater than Forward Y (${fwYMean}) on Home half.`);
+        }
+      }
+      console.log(`[TACTICAL ORIENTATION VALIDATOR] SUCCESS: Goalkeeper and Forward orientation is correct!`);
     }
 
     const chipH = constraints.chipSize.baseHeight * finalScale;

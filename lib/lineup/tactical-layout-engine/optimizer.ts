@@ -166,8 +166,7 @@ function refineLayoutAesthetics(
     }
   }
 
-  // ── SPACE EXPANSION PHASE ──
-  // Calculate boundaries minY and maxY
+  // ── SPACE EXPANSION PHASE (DYNAMIC MAXIMUM) ──
   const chipH = constraints.chipSize.baseHeight * scale;
   const textH = constraints.nameAreaBounds.height * scale;
   const dynamicVertMargin = Math.max(constraints.margins.vertical, chipH * 0.15);
@@ -177,32 +176,40 @@ function refineLayoutAesthetics(
   const usableHeight = maxY - minY;
 
   if (usableHeight > 0 && currentPositions.length > 0) {
-    const yValues = currentPositions.map(p => p.y);
-    const minCurrentY = Math.min(...yValues);
-    const maxCurrentY = Math.max(...yValues);
-    const currentHeight = maxCurrentY - minCurrentY;
+    // We expand progressively from the goalkeeper's Y coordinate (band 0) as anchor
+    const gkId = structure.bands[0]?.elements[0];
+    const gkPos = currentPositions.find(p => p.id === gkId);
+    const anchorY = gkPos ? gkPos.y : (b.isAwayHalf ? minY : maxY);
 
-    if (currentHeight > 0) {
-      const targetUsage = 0.925; // Target 92.5% vertical field usage
-      const targetHeight = usableHeight * targetUsage;
+    let bestExpandedPositions = currentPositions.map(p => ({ ...p }));
+    let currentFactor = 1.0;
+    const factorStep = 0.01;
+    const maxFactor = 2.5;
 
-      let newMinY = minY;
-      let newMaxY = maxY;
-
-      if (b.isAwayHalf) {
-        // Away: goalkeeper is at top (near minY), strikers at bottom (near maxY)
-        newMinY = minY + (0.015 * usableHeight);
-        newMaxY = newMinY + targetHeight;
-      } else {
-        // Home: goalkeeper is at bottom (near maxY), strikers at top (near minY)
-        newMaxY = maxY - (0.015 * usableHeight);
-        newMinY = newMaxY - targetHeight;
-      }
-
-      currentPositions.forEach(p => {
-        p.y = newMinY + ((p.y - minCurrentY) / currentHeight) * (newMaxY - newMinY);
+    while (currentFactor < maxFactor) {
+      const nextFactor = currentFactor + factorStep;
+      const testPositions = currentPositions.map(p => {
+        const nextY = anchorY + (p.y - anchorY) * nextFactor;
+        return { ...p, y: nextY };
       });
+
+      // Run containment and spacing to let them adapt
+      applyContainmentForces(testPositions, scale, constraints);
+      enforceBandOrderAndSpacing(testPositions, structure, scale, constraints);
+
+      // Verify constraints: no collisions and correct band ordering
+      const collisions = detectCollisions(testPositions, scale, constraints);
+      const orderValid = checkBandOrder(testPositions, structure, b.isAwayHalf);
+
+      if (collisions.length === 0 && orderValid) {
+        bestExpandedPositions = testPositions.map(p => ({ ...p }));
+        currentFactor = nextFactor;
+      } else {
+        break; // Stop when any constraint is violated
+      }
     }
+
+    currentPositions = bestExpandedPositions;
   }
 
   // Re-run containment and spacing to maintain bounds and tactical layout
@@ -414,4 +421,32 @@ function enforceBandOrderAndSpacing(
     // After shifting, run containment to keep elements within field boundary constraints
     applyContainmentForces(positions, scale, constraints);
   }
+}
+
+function checkBandOrder(
+  positions: LayoutPosition[],
+  structure: TacticalStructure,
+  isAwayHalf: boolean
+): boolean {
+  const bands = structure.bands;
+  if (bands.length <= 1) return true;
+
+  const bandYs = bands.map(band => {
+    const bandPositions = band.elements
+      .map(id => positions.find(p => p.id === id))
+      .filter((p): p is LayoutPosition => p != null);
+    const sumY = bandPositions.reduce((acc, p) => acc + p.y, 0);
+    return bandPositions.length > 0 ? sumY / bandPositions.length : 0;
+  });
+
+  const minSpacing = 6.0;
+
+  for (let i = 0; i < bandYs.length - 1; i++) {
+    if (isAwayHalf) {
+      if (bandYs[i + 1] < bandYs[i] + minSpacing) return false;
+    } else {
+      if (bandYs[i + 1] > bandYs[i] - minSpacing) return false;
+    }
+  }
+  return true;
 }
