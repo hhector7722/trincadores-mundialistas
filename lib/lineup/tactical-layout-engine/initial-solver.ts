@@ -65,8 +65,8 @@ export function solveInitialLayout(
 
     let hSpread = 0;
     if (numElements === 1) hSpread = 0;
-    else if (numElements === 2) hSpread = availableWidth * 0.85;
-    else if (numElements === 3) hSpread = availableWidth * 0.95;
+    else if (numElements === 2) hSpread = availableWidth * 0.92;
+    else if (numElements === 3) hSpread = availableWidth * 0.98;
     else hSpread = availableWidth;
 
     const actualMinX = 50 - hSpread / 2;

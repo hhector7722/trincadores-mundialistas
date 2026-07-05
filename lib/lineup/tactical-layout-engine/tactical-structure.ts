@@ -26,7 +26,7 @@ export function buildTacticalStructure(
   if (inputs.length === 0) return { bands: [], elements: new Map() };
 
   const sorted = [...inputs].sort((a, b) => {
-    return isAwayHalf ? a.referenceY - b.referenceY : b.referenceY - a.referenceY;
+    return b.referenceY - a.referenceY;
   });
 
   const bands: TacticalBand[] = [];

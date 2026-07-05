@@ -111,7 +111,7 @@ function attemptLayoutAtScale(
     }
 
     applySeparationForces(positions, issues, scale, constraints);
-    applyTacticalForces(positions, initialPositions, issues.length === 0);
+    applyTacticalForces(positions, initialPositions, structure, issues.length === 0);
     applyContainmentForces(positions, scale, constraints);
     enforceBandOrderAndSpacing(positions, structure, scale, constraints);
   }
@@ -317,40 +317,46 @@ function applyContainmentForces(positions: LayoutPosition[], scale: number, cons
   });
 }
 
-function applyTacticalForces(positions: LayoutPosition[], initialPositions: LayoutPosition[], isValid: boolean) {
-  const pullFactor = isValid ? 0.02 : 0.05;
-  const expandFactor = 0.01;
+function applyTacticalForces(
+  positions: LayoutPosition[],
+  initialPositions: LayoutPosition[],
+  structure: TacticalStructure,
+  isValid: boolean
+) {
+  const pullFactor = isValid ? 0.025 : 0.06;
+  const expandFactor = 0.015;
   const centerThreshold = 50;
 
   positions.forEach(pos => {
     const initial = initialPositions.find(p => p.id === pos.id);
-    if (initial) {
-      // Pull towards tactical position (gentle when valid)
-      pos.x += (initial.x - pos.x) * pullFactor;
+    const element = structure.elements.get(pos.id);
+    if (initial && element) {
+      // Pull X towards original tactical reference width
+      pos.x += (element.referenceX - pos.x) * pullFactor;
+      // Pull Y towards resolved Y depth (which preserves band separation)
       pos.y += (initial.y - pos.y) * pullFactor;
 
       // Horizontal expansion: push away from center to fill the wings
       // Only apply if the player isn't meant to be central
-      if (Math.abs(initial.x - centerThreshold) > 8) {
-        const direction = initial.x > centerThreshold ? 1 : -1;
+      if (Math.abs(element.referenceX - centerThreshold) > 8) {
+        const direction = element.referenceX > centerThreshold ? 1 : -1;
         pos.x += direction * expandFactor;
       }
 
       // Central pull for central players
-      if (Math.abs(initial.x - centerThreshold) <= 8) {
+      if (Math.abs(element.referenceX - centerThreshold) <= 8) {
         pos.x += (centerThreshold - pos.x) * pullFactor;
       }
 
       // Mirror symmetry: if initial positions have a mirror pair, maintain it
-      const mirrorX = 100 - initial.x;
-      const hasMirrorInInitial = initialPositions.some(p =>
-        p.id !== initial.id &&
-        Math.abs(p.x - mirrorX) < 5 &&
-        Math.abs(p.y - initial.y) < 10
-      );
+      const mirrorX = 100 - element.referenceX;
+      const partnerId = Array.from(structure.elements.keys()).find(id => {
+        const el = structure.elements.get(id);
+        return id !== pos.id && el && Math.abs(el.referenceX - mirrorX) < 5 && Math.abs(el.referenceY - element.referenceY) < 5;
+      });
 
-      if (hasMirrorInInitial) {
-        const partner = positions.find(p => p.id !== pos.id && Math.abs(initialPositions.find(ip => ip.id === p.id)!.x - mirrorX) < 5);
+      if (partnerId) {
+        const partner = positions.find(p => p.id === partnerId);
         if (partner) {
           const mirroredTarget = 100 - partner.x;
           pos.x += (mirroredTarget - pos.x) * (pullFactor * 0.3);

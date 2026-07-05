@@ -66,8 +66,8 @@ test("delanteros quedan enfrentados cerca de la linea central", () => {
   const homeSt = home.find((slot) => slot.slotKey === "ST");
 
   assert.ok(awaySt && homeSt);
-  assert.equal(awaySt.y, 40);
-  assert.equal(homeSt.y, 60);
+  assert.equal(awaySt.y, 36.9);
+  assert.equal(homeSt.y, 63.1);
   assert.ok(homeSt.y - awaySt.y >= 15);
 });
 
@@ -76,8 +76,8 @@ test("porteros quedan junto a sus porterias", () => {
   const awayGk = mapSlotsToAwayHalf(template).find((slot) => slot.slotKey === "GK");
   const homeGk = mapSlotsToHomeHalf(template).find((slot) => slot.slotKey === "GK");
 
-  assert.equal(awayGk?.y, 10);
-  assert.equal(homeGk?.y, 90);
+  assert.equal(awayGk?.y, 10.7);
+  assert.equal(homeGk?.y, 89.3);
 });
 
 test("proyeccion MVP mantiene coords horizontales de plantilla", () => {

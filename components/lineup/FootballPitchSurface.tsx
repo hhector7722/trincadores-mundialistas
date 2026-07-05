@@ -55,8 +55,8 @@ export function FootballPitchSurface({
 
       <g
         fill="none"
-        stroke="rgba(255,255,255,0.35)"
-        strokeWidth="0.6"
+        stroke="rgba(255,255,255,0.22)"
+        strokeWidth="0.4"
         strokeLinejoin="round"
       >
         {/* Línea perimetral externa: x=0 es banda izquierda, x=68 es banda derecha, y=0/105 son fondos */}
@@ -67,7 +67,7 @@ export function FootballPitchSurface({
         
         {/* Círculo central (reducido) */}
         <circle cx="34" cy="52.5" r="5" />
-        <circle cx="34" cy="52.5" r="0.6" fill="rgba(255,255,255,0.35)" />
+        <circle cx="34" cy="52.5" r="0.6" fill="rgba(255,255,255,0.22)" />
 
         {/* Mitad Superior (Visitante) */}
         {/* Área Grande */}
@@ -75,7 +75,7 @@ export function FootballPitchSurface({
         {/* Área Chica */}
         <rect x="28" y="0" width="12" height="4" />
         {/* Punto de penalty */}
-        <circle cx="34" cy="11" r="0.6" fill="rgba(255,255,255,0.35)" />
+        <circle cx="34" cy="11" r="0.6" fill="rgba(255,255,255,0.22)" />
         {/* Arco de área */}
         <path d="M 30 10 A 4 4 0 0 0 38 10" />
 
@@ -85,7 +85,7 @@ export function FootballPitchSurface({
         {/* Área Chica */}
         <rect x="28" y="101" width="12" height="4" />
         {/* Punto de penalty */}
-        <circle cx="34" cy="94" r="0.6" fill="rgba(255,255,255,0.35)" />
+        <circle cx="34" cy="94" r="0.6" fill="rgba(255,255,255,0.22)" />
         {/* Arco de área */}
         <path d="M 30 95 A 4 4 0 0 1 38 95" />
       </g>

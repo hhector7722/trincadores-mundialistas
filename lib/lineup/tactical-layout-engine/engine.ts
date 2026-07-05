@@ -58,10 +58,14 @@ export class LayoutEngine {
       constraints
     );
 
+    const isDev = process.env.NODE_ENV === "development";
+
     // --- AUDITORÍA DE BANDAS ---
-    console.log(`\n[TACTICAL ENGINE AUDIT] Band depth ordering verification:`);
-    console.log(`| Band | OriginalY | OptimizedY | DeltaY |`);
-    console.log(`|---|---|---|---|`);
+    if (isDev) {
+      console.log(`\n[TACTICAL ENGINE AUDIT] Band depth ordering verification:`);
+      console.log(`| Band | OriginalY | OptimizedY | DeltaY |`);
+      console.log(`|---|---|---|---|`);
+    }
 
     const isAwayHalf = constraints.fieldBounds.isAwayHalf;
     let orderIsValid = true;
@@ -82,7 +86,9 @@ export class LayoutEngine {
       const optimizedY = optYs.reduce((acc, y) => acc + y, 0) / (optYs.length || 1);
 
       const deltaY = optimizedY - originalY;
-      console.log(`| Band ${index} (${band.elements.join(",")}) | ${originalY.toFixed(2)} | ${optimizedY.toFixed(2)} | ${deltaY.toFixed(2)} |`);
+      if (isDev) {
+        console.log(`| Band ${index} (${band.elements.join(",")}) | ${originalY.toFixed(2)} | ${optimizedY.toFixed(2)} | ${deltaY.toFixed(2)} |`);
+      }
 
       return { index, originalY, optimizedY };
     });
@@ -102,9 +108,13 @@ export class LayoutEngine {
     }
 
     if (orderIsValid) {
-      console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!`);
+      if (isDev) {
+        console.log(`[TACTICAL ENGINE AUDIT] SUCCESS: Band order and minimum spacing are strictly preserved!`);
+      }
     } else {
-      console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.`);
+      if (isDev) {
+        console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.`);
+      }
       throw new Error("Invalid layout: Band depth ordering is violated.");
     }
 
@@ -128,7 +138,9 @@ export class LayoutEngine {
           throw new Error(`Orientation error: Goalkeeper Y (${gkYMean}) must be greater than Forward Y (${fwYMean}) on Home half.`);
         }
       }
-      console.log(`[TACTICAL ORIENTATION VALIDATOR] SUCCESS: Goalkeeper and Forward orientation is correct!`);
+      if (isDev) {
+        console.log(`[TACTICAL ORIENTATION VALIDATOR] SUCCESS: Goalkeeper and Forward orientation is correct!`);
+      }
     }
 
     const chipH = constraints.chipSize.baseHeight * finalScale;
@@ -145,10 +157,12 @@ export class LayoutEngine {
       occupiedHeight = Math.max(...yValues) - Math.min(...yValues);
     }
 
-    console.log(`[TACTICAL SPACE USAGE AUDIT]`);
-    console.log(`- Usable height: ${usableHeight.toFixed(2)}`);
-    console.log(`- Occupied height: ${occupiedHeight.toFixed(2)}`);
-    console.log(`- Vertical field usage: ${metrics.verticalFieldUsage.toFixed(1)}%\n`);
+    if (isDev) {
+      console.log(`[TACTICAL SPACE USAGE AUDIT]`);
+      console.log(`- Usable height: ${usableHeight.toFixed(2)}`);
+      console.log(`- Occupied height: ${occupiedHeight.toFixed(2)}`);
+      console.log(`- Vertical field usage: ${metrics.verticalFieldUsage.toFixed(1)}%\n`);
+    }
 
     return {
       positions,

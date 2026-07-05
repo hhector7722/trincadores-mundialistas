@@ -166,167 +166,137 @@ export function TacticalVerticalField({
         <FootballPitchSurface />
       </div>
 
-      {/* Visual verification indicators in pixels relative to PitchBounds */}
-      <div className="absolute w-2.5 h-2.5 bg-red-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: '0px', top: '0px' }} title="Corner 0,0" />
-      <div className="absolute w-2.5 h-2.5 bg-red-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: `${pitchBounds.width}px`, top: '0px' }} title="Corner 100,0" />
-      <div className="absolute w-2.5 h-2.5 bg-red-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: '0px', top: `${pitchBounds.height}px` }} title="Corner 0,100" />
-      <div className="absolute w-2.5 h-2.5 bg-red-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: `${pitchBounds.width}px`, top: `${pitchBounds.height}px` }} title="Corner 100,100" />
-
-      <div className="absolute w-2.5 h-2.5 bg-blue-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: `${pitchBounds.width / 2}px`, top: '0px' }} title="Verification 50,0" />
-      <div className="absolute w-2.5 h-2.5 bg-blue-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: `${pitchBounds.width / 2}px`, top: `${pitchBounds.height / 2}px` }} title="Verification 50,50" />
-      <div className="absolute w-2.5 h-2.5 bg-blue-600 rounded-full z-50 transform -translate-x-1/2 -translate-y-1/2 border border-white" style={{ left: `${pitchBounds.width / 2}px`, top: `${pitchBounds.height}px` }} title="Verification 50,100" />
-
       {/* Visitante */}
       {awayResult && awayLineup && (
         <div className="absolute inset-0">
-          {(() => {
-            console.log("[AUDIT] TacticalVerticalField - Away calculated positions:", awayResult.positions.map(p => ({ id: p.id, x: p.x, y: p.y })));
-            return awayResult.positions.map(pos => {
-              const originalSlot = resolveVisualLineupSlots(awayLineup).find(s => s.key === pos.id);
-              if (!originalSlot) return null;
-              
-              const pixelX = (pos.x / 100) * pitchBounds.width;
-              const pixelY = (pos.y / 100) * pitchBounds.height;
+          {awayResult.positions.map(pos => {
+            const originalSlot = resolveVisualLineupSlots(awayLineup).find(s => s.key === pos.id);
+            if (!originalSlot) return null;
+            
+            const pixelX = (pos.x / 100) * pitchBounds.width;
+            const pixelY = (pos.y / 100) * pitchBounds.height;
 
-              // Print coordinates received by TacticalVerticalField for this slot
-              console.log(`[AUDIT] TacticalVerticalField - Rendering slot ${pos.id} (${originalSlot.name}) at calculated pixels: (${pixelX.toFixed(1)}px, ${pixelY.toFixed(1)}px), slot values: (${originalSlot.x.toFixed(2)}, ${originalSlot.y.toFixed(2)})`);
-              
-              return (
-                <div
-                  key={pos.id}
-                  className="absolute z-10"
-                  style={{
-                    left: `${pixelX}px`,
-                    top: `${pixelY}px`,
-                    transform: `translate(-50%, -50%) scale(${awayResult.chipScale})`,
+            return (
+              <div
+                key={pos.id}
+                className="absolute z-10"
+                style={{
+                  left: `${pixelX}px`,
+                  top: `${pixelY}px`,
+                  transform: `translate(-50%, -50%) scale(${awayResult.chipScale})`,
+                }}
+              >
+                <LineupPlayerChip
+                  slot={{
+                    ...originalSlot,
+                    x: pos.x,
+                    y: pos.y
                   }}
-                >
-                  {/* Visual debug overlay displaying engine coordinates */}
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black/85 text-[9px] font-mono text-cyan-400 px-1 py-0.5 rounded border border-cyan-500/40 shadow z-50 pointer-events-none">
-                    {pos.x.toFixed(1)},{pos.y.toFixed(1)}
-                  </div>
-                  <LineupPlayerChip
-                    slot={{
-                      ...originalSlot,
-                      x: pos.x,
-                      y: pos.y
-                    }}
-                    teamName={awayTeam}
-                    squadPlayerNames={awaySquadPlayerNames}
-                    variant="default"
-                    onClick={
-                      onSelect && !originalSlot.isPlaceholder && !disabled
-                        ? () =>
-                            onSelect(
-                              mvpSelectionKey(awayTeam, {
-                                name: originalSlot.name,
-                                shirtNumber: originalSlot.shirtNumber,
-                              })
-                            )
-                        : undefined
-                    }
-                    selected={
-                      selectedPlayer
-                        ? mvpPlayersMatch(awayTeam, originalSlot, selectedPlayer)
-                        : selectedKey ===
-                          mvpSelectionKey(awayTeam, {
-                            name: originalSlot.name,
-                            shirtNumber: originalSlot.shirtNumber,
-                          })
-                    }
-                    disabled={disabled}
-                    substitutionMarker={
-                      awaySubstitutionMarkers
-                        ? substitutionMarkerForPlayer(
-                            originalSlot.name,
-                            originalSlot.shirtNumber,
-                            awaySubstitutionMarkers
+                  teamName={awayTeam}
+                  squadPlayerNames={awaySquadPlayerNames}
+                  variant="default"
+                  onClick={
+                    onSelect && !originalSlot.isPlaceholder && !disabled
+                      ? () =>
+                          onSelect(
+                            mvpSelectionKey(awayTeam, {
+                              name: originalSlot.name,
+                              shirtNumber: originalSlot.shirtNumber,
+                            })
                           )
-                        : null
-                    }
-                    stickerUrl={selectedPlayer?.sticker_url ?? null}
-                  />
-                </div>
-              );
-            });
-          })()}
+                      : undefined
+                  }
+                  selected={
+                    selectedPlayer
+                      ? mvpPlayersMatch(awayTeam, originalSlot, selectedPlayer)
+                      : selectedKey ===
+                        mvpSelectionKey(awayTeam, {
+                          name: originalSlot.name,
+                          shirtNumber: originalSlot.shirtNumber,
+                        })
+                  }
+                  disabled={disabled}
+                  substitutionMarker={
+                    awaySubstitutionMarkers
+                      ? substitutionMarkerForPlayer(
+                          originalSlot.name,
+                          originalSlot.shirtNumber,
+                          awaySubstitutionMarkers
+                        )
+                      : null
+                  }
+                  stickerUrl={selectedPlayer?.sticker_url ?? null}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 
       {/* Local */}
       {homeResult && homeLineup && (
         <div className="absolute inset-0">
-          {(() => {
-            console.log("[AUDIT] TacticalVerticalField - Home calculated positions:", homeResult.positions.map(p => ({ id: p.id, x: p.x, y: p.y })));
-            return homeResult.positions.map(pos => {
-              const originalSlot = resolveVisualLineupSlots(homeLineup).find(s => s.key === pos.id);
-              if (!originalSlot) return null;
-              
-              const pixelX = (pos.x / 100) * pitchBounds.width;
-              const pixelY = (pos.y / 100) * pitchBounds.height;
+          {homeResult.positions.map(pos => {
+            const originalSlot = resolveVisualLineupSlots(homeLineup).find(s => s.key === pos.id);
+            if (!originalSlot) return null;
+            
+            const pixelX = (pos.x / 100) * pitchBounds.width;
+            const pixelY = (pos.y / 100) * pitchBounds.height;
 
-              // Print coordinates received by TacticalVerticalField for this slot
-              console.log(`[AUDIT] TacticalVerticalField - Rendering slot ${pos.id} (${originalSlot.name}) at calculated pixels: (${pixelX.toFixed(1)}px, ${pixelY.toFixed(1)}px), slot values: (${originalSlot.x.toFixed(2)}, ${originalSlot.y.toFixed(2)})`);
-              
-              return (
-                <div
-                  key={pos.id}
-                  className="absolute z-10"
-                  style={{
-                    left: `${pixelX}px`,
-                    top: `${pixelY}px`,
-                    transform: `translate(-50%, -50%) scale(${homeResult.chipScale})`,
+            return (
+              <div
+                key={pos.id}
+                className="absolute z-10"
+                style={{
+                  left: `${pixelX}px`,
+                  top: `${pixelY}px`,
+                  transform: `translate(-50%, -50%) scale(${homeResult.chipScale})`,
+                }}
+              >
+                <LineupPlayerChip
+                  slot={{
+                    ...originalSlot,
+                    x: pos.x,
+                    y: pos.y
                   }}
-                >
-                  {/* Visual debug overlay displaying engine coordinates */}
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black/85 text-[9px] font-mono text-cyan-400 px-1 py-0.5 rounded border border-cyan-500/40 shadow z-50 pointer-events-none">
-                    {pos.x.toFixed(1)},{pos.y.toFixed(1)}
-                  </div>
-                  <LineupPlayerChip
-                    slot={{
-                      ...originalSlot,
-                      x: pos.x,
-                      y: pos.y
-                    }}
-                    teamName={homeTeam}
-                    squadPlayerNames={homeSquadPlayerNames}
-                    variant="default"
-                    onClick={
-                      onSelect && !originalSlot.isPlaceholder && !disabled
-                        ? () =>
-                            onSelect(
-                              mvpSelectionKey(homeTeam, {
-                                name: originalSlot.name,
-                                shirtNumber: originalSlot.shirtNumber,
-                              })
-                            )
-                        : undefined
-                    }
-                    selected={
-                      selectedPlayer
-                        ? mvpPlayersMatch(homeTeam, originalSlot, selectedPlayer)
-                        : selectedKey ===
-                          mvpSelectionKey(homeTeam, {
-                            name: originalSlot.name,
-                            shirtNumber: originalSlot.shirtNumber,
-                          })
-                    }
-                    disabled={disabled}
-                    substitutionMarker={
-                      homeSubstitutionMarkers
-                        ? substitutionMarkerForPlayer(
-                            originalSlot.name,
-                            originalSlot.shirtNumber,
-                            homeSubstitutionMarkers
+                  teamName={homeTeam}
+                  squadPlayerNames={homeSquadPlayerNames}
+                  variant="default"
+                  onClick={
+                    onSelect && !originalSlot.isPlaceholder && !disabled
+                      ? () =>
+                          onSelect(
+                            mvpSelectionKey(homeTeam, {
+                              name: originalSlot.name,
+                              shirtNumber: originalSlot.shirtNumber,
+                            })
                           )
-                        : null
-                    }
-                    stickerUrl={selectedPlayer?.sticker_url ?? null}
-                  />
-                </div>
-              );
-            });
-          })()}
+                      : undefined
+                  }
+                  selected={
+                    selectedPlayer
+                      ? mvpPlayersMatch(homeTeam, originalSlot, selectedPlayer)
+                      : selectedKey ===
+                        mvpSelectionKey(homeTeam, {
+                          name: originalSlot.name,
+                          shirtNumber: originalSlot.shirtNumber,
+                        })
+                  }
+                  disabled={disabled}
+                  substitutionMarker={
+                    homeSubstitutionMarkers
+                      ? substitutionMarkerForPlayer(
+                          originalSlot.name,
+                          originalSlot.shirtNumber,
+                          homeSubstitutionMarkers
+                        )
+                      : null
+                  }
+                  stickerUrl={selectedPlayer?.sticker_url ?? null}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

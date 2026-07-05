@@ -75,7 +75,7 @@ export default function TacticalGallery() {
             <div className="w-full max-w-sm aspect-[2/3] bg-green-900/20 rounded-lg overflow-hidden border border-green-900/50 relative">
               <TacticalVerticalField 
                 homeLineup={generateLineup(formation, false)}
-                awayLineup={generateLineup("4-3-3", true)}
+                awayLineup={generateLineup(formation, true)}
                 homeTeam="Home Team"
                 awayTeam="Away Team"
               />

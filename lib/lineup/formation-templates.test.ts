@@ -78,7 +78,7 @@ test("plantilla ancla portero en porteria y defensa en borde del area", () => {
   assert.ok(gk);
   assert.ok(gk.y >= 90, `portero demasiado adelantado (y=${gk.y})`);
   for (const defender of defenders) {
-    assert.ok(defender.y >= 73 && defender.y <= 77, `defensa fuera de línea (y=${defender.y})`);
+    assert.ok(defender.y >= 77 && defender.y <= 81, `defensa fuera de línea (y=${defender.y})`);
   }
 });
 

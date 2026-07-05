@@ -56,7 +56,7 @@ export function getFormationTemplate(formation: FormationId): FormationSlotAncho
 }
 
 export function getFormationTemplateCoordinates(formation: FormationId): FieldCoordinate[] {
-  return getFormationCoordinates(formation);
+  return getFormationCoordinates(formation).map(clampToPlayable);
 }
 
 function roleForFormationSlot(formation: FormationId, slotKey: string): PositionRole {
@@ -83,7 +83,7 @@ export function getRoleCoordinatesFromTemplate(
 
   for (const anchor of anchors) {
     const role = roleForFormationSlot(templateId, anchor.key);
-    buckets[role].push(anchor.coord);
+    buckets[role].push(clampToPlayable(anchor.coord));
   }
 
   return buckets;

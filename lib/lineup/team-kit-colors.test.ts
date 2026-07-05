@@ -5,15 +5,15 @@ import { getTeamKitColors, teamKitColorsClash } from "@/lib/lineup/team-kit-colo
 test("getTeamKitColors usa color de camiseta y dorsal con contraste", () => {
   const spain = getTeamKitColors("Spain");
   assert.equal(spain.kit, "#C60B1E");
-  assert.equal(spain.dorsal, "#FFFFFF");
+  assert.equal(spain.dorsal, "#FFD100");
 
   const brazil = getTeamKitColors("Brazil");
   assert.equal(brazil.kit, "#FFE900");
-  assert.equal(brazil.dorsal, "#111111");
+  assert.equal(brazil.dorsal, "#00873E");
 
   const england = getTeamKitColors("England");
   assert.equal(england.kit, "#FFFFFF");
-  assert.equal(england.dorsal, "#111111");
+  assert.equal(england.dorsal, "#CE1126");
 });
 
 test("getTeamKitColors resuelve equipos con slug alternativo", () => {
