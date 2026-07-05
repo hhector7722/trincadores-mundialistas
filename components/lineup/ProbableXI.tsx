@@ -123,6 +123,7 @@ export function ProbableXI({
               <TeamLineupGraphic
                 slots={formationSlots}
                 teamName={teamName}
+                formation={activeFormation}
                 onFieldReady={markFieldReady}
                 benchAbove={
                   bench.length > 0 ? (

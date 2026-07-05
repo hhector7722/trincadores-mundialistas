@@ -10,6 +10,7 @@ import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
 type TeamLineupGraphicProps = {
   slots: LineupSlot[];
   teamName: string;
+  formation?: string;
   className?: string;
   benchAbove?: ReactNode;
   size?: "default" | "modal";
@@ -24,6 +25,7 @@ type TeamLineupGraphicProps = {
 export function TeamLineupGraphic({
   slots,
   teamName,
+  formation,
   className,
   benchAbove,
   size = "default",
@@ -40,8 +42,8 @@ export function TeamLineupGraphic({
   // since it requires a ResolvedLineup
   const resolvedLineup = {
     slots: slots,
-    formationLabel: "",
-    formation: "4-4-2",
+    formationLabel: formation ?? "4-4-2",
+    formation: (formation ?? "4-4-2") as any,
     benchCount: 0,
     isProbable: false,
   } as ResolvedLineup;

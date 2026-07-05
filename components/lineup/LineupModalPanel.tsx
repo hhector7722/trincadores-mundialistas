@@ -142,6 +142,7 @@ export function LineupModalPanel({
             <TeamLineupGraphic
               slots={formationSlots}
               teamName={teamName}
+              formation={resolvedLineup.formation}
               squadPlayers={squad.players}
               size="modal"
               onPlayerClick={handlePlayerInteraction}
