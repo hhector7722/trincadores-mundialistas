@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
-import { LayoutEngine, LayoutConstraints, LayoutElementInput } from "@/lib/lineup/tactical-layout-engine";
+import { LayoutEngine, LayoutConstraints, LayoutElementInput, LayoutResult, LayoutPosition } from "@/lib/lineup/tactical-layout-engine";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { type ResolvedLineup } from "@/lib/lineup/types";
@@ -48,6 +48,46 @@ const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
 };
 
 /**
+ * Post-process para formaciones 4-2-3-1: garantiza que la distancia vertical
+ * entre ST y AM sea mayor que la distancia entre AM y el doble pivote (LDM/RDM),
+ * creando tres alturas ofensivas claramente diferenciadas.
+ * Solo aplica en el modal comparativo; la vista individual no lo usa.
+ */
+function apply4231VerticalSeparation(
+  result: LayoutResult,
+  isAwayHalf: boolean
+): LayoutResult {
+  const positions = result.positions;
+  const st = positions.find(p => p.id === "ST");
+  const am = positions.find(p => p.id === "AM");
+  if (!st || !am) return result;
+
+  const ldm = positions.find(p => p.id === "LDM") || positions.find(p => p.id === "LCM") || positions.find(p => p.id === "DM");
+  const rdm = positions.find(p => p.id === "RDM") || positions.find(p => p.id === "RCM") || positions.find(p => p.id === "DM");
+  if (!ldm && !rdm) return result;
+
+  const pivots = [ldm, rdm].filter((p): p is LayoutPosition => p != null);
+  const pivotY = pivots.reduce((acc, p) => acc + p.y, 0) / pivots.length;
+
+  const distST_AM = Math.abs(st.y - am.y);
+  const distAM_pivot = Math.abs(am.y - pivotY);
+
+  const targetGap = distAM_pivot + 2.5;
+  if (distST_AM < targetGap) {
+    const diff = targetGap - distST_AM;
+    if (isAwayHalf) {
+      st.y += diff * 0.4;
+      am.y -= diff * 0.6;
+    } else {
+      st.y -= diff * 0.4;
+      am.y += diff * 0.6;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Optimiza una mitad del campo de forma completamente aislada.
  * @param lineup     Alineación del equipo
  * @param fieldBounds  Porción del campo que ocupa esta mitad
@@ -61,7 +101,8 @@ function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints
     referenceX: s.x,
     referenceY: s.y,
   }));
-  return LayoutEngine.calculate(inputs, { ...BASE_HALF_CONSTRAINTS, fieldBounds });
+  const result = LayoutEngine.calculate(inputs, { ...BASE_HALF_CONSTRAINTS, fieldBounds });
+  return apply4231VerticalSeparation(result, fieldBounds.isAwayHalf);
 }
 
 export function TacticalVerticalField({
