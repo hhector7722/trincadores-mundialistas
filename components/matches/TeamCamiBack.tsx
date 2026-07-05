@@ -52,6 +52,7 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
             fill
             className="object-contain"
             unoptimized={true}
+            priority={true}
          />
       </div>
     </div>
