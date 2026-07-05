@@ -5,7 +5,8 @@ import { TacticalVerticalField } from "@/components/lineup/TacticalVerticalField
 import { MvpBenchColumn } from "@/components/lineup/MvpBenchColumn";
 import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
 import { Modal } from "@/components/ui/modal";
-import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { TeamFlagBadge } from "@/components/matches/TeamFlagBadge";
+import { X } from "lucide-react";
 import type { FitMvpHorizontalLayout } from "@/lib/lineup/tactical-modal-layout";
 import {
   mvpSelectionKey,
@@ -108,89 +109,81 @@ export function MvpTacticalFieldBody({
                 align="left"
               />
             </div>
+
+            {/* Home Bench Overlay (Opens in Away's top half) */}
+            {showHomeBench && (
+              <div className="absolute top-0 left-0 right-0 h-1/2 bg-black/60 backdrop-blur-md z-30 p-3 flex flex-col pointer-events-auto border-b border-white/20">
+                <div className="flex items-center justify-between mb-3 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <TeamFlagBadge name={homeTeam} size="xs" />
+                    <span className="font-display font-bold uppercase text-white/90 tracking-wide text-sm">Suplentes — {homeTeam}</span>
+                  </div>
+                  <button onClick={() => setShowHomeBench(false)} className="text-white/60 hover:text-white p-1 rounded-full transition-colors bg-white/10 hover:bg-white/20">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1 w-full scale-[0.85] origin-top">
+                  <MvpBenchColumn
+                    teamName={homeTeam}
+                    players={homeBench}
+                    substitutionMarkers={homeSubstitutionMarkers}
+                    selectedKey={selectedKey}
+                    selectedPlayer={selectedPlayer}
+                    disabled={pickDisabled}
+                    align="left"
+                    gridLayout={layout.homeBench}
+                    readOnly={!interactive}
+                    onPlayerClick={
+                      interactive && onSelect
+                        ? (player) => {
+                            onSelect(mvpSelectionKey(homeTeam, player));
+                            setShowHomeBench(false);
+                          }
+                        : () => {}
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Away Bench Overlay (Opens in Home's bottom half) */}
+            {showAwayBench && (
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-black/60 backdrop-blur-md z-30 p-3 flex flex-col pointer-events-auto border-t border-white/20">
+                <div className="flex items-center justify-between mb-3 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <TeamFlagBadge name={awayTeam} size="xs" />
+                    <span className="font-display font-bold uppercase text-white/90 tracking-wide text-sm">Suplentes — {awayTeam}</span>
+                  </div>
+                  <button onClick={() => setShowAwayBench(false)} className="text-white/60 hover:text-white p-1 rounded-full transition-colors bg-white/10 hover:bg-white/20">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1 w-full scale-[0.85] origin-top">
+                  <MvpBenchColumn
+                    teamName={awayTeam}
+                    players={awayBench}
+                    substitutionMarkers={awaySubstitutionMarkers}
+                    selectedKey={selectedKey}
+                    selectedPlayer={selectedPlayer}
+                    disabled={pickDisabled}
+                    align="left"
+                    gridLayout={layout.awayBench}
+                    readOnly={!interactive}
+                    onPlayerClick={
+                      interactive && onSelect
+                        ? (player) => {
+                            onSelect(mvpSelectionKey(awayTeam, player));
+                            setShowAwayBench(false);
+                          }
+                        : () => {}
+                    }
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </TacticalVerticalField>
       </div>
-
-      {/* Home Bench Modal */}
-      {showHomeBench && (
-        <Modal
-          open={showHomeBench}
-          onClose={() => setShowHomeBench(false)}
-          title={
-            <span className="flex items-center gap-2">
-              <TeamFlagBadge name={homeTeam} size="xs" />
-              <span>Suplentes — {homeTeam}</span>
-            </span>
-          }
-          opaque
-          stackElevated
-          containerClassName="p-4"
-          className="max-w-sm max-h-[75dvh]"
-        >
-          <div className="overflow-y-auto w-full pb-4">
-            <MvpBenchColumn
-              teamName={homeTeam}
-              players={homeBench}
-              substitutionMarkers={homeSubstitutionMarkers}
-              selectedKey={selectedKey}
-              selectedPlayer={selectedPlayer}
-              disabled={pickDisabled}
-              align="left"
-              gridLayout={layout.homeBench}
-              readOnly={!interactive}
-              onPlayerClick={
-                interactive && onSelect
-                  ? (player) => {
-                      onSelect(mvpSelectionKey(homeTeam, player));
-                      setShowHomeBench(false);
-                    }
-                  : () => {}
-              }
-            />
-          </div>
-        </Modal>
-      )}
-
-      {/* Away Bench Modal */}
-      {showAwayBench && (
-        <Modal
-          open={showAwayBench}
-          onClose={() => setShowAwayBench(false)}
-          title={
-            <span className="flex items-center gap-2">
-              <TeamFlagBadge name={awayTeam} size="xs" />
-              <span>Suplentes — {awayTeam}</span>
-            </span>
-          }
-          opaque
-          stackElevated
-          containerClassName="p-4"
-          className="max-w-sm max-h-[75dvh]"
-        >
-          <div className="overflow-y-auto w-full pb-4">
-            <MvpBenchColumn
-              teamName={awayTeam}
-              players={awayBench}
-              substitutionMarkers={awaySubstitutionMarkers}
-              selectedKey={selectedKey}
-              selectedPlayer={selectedPlayer}
-              disabled={pickDisabled}
-              align="left"
-              gridLayout={layout.awayBench}
-              readOnly={!interactive}
-              onPlayerClick={
-                interactive && onSelect
-                  ? (player) => {
-                      onSelect(mvpSelectionKey(awayTeam, player));
-                      setShowAwayBench(false);
-                    }
-                  : () => {}
-              }
-            />
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }
