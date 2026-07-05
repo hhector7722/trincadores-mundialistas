@@ -267,7 +267,6 @@ export function TacticalVerticalField({
               className="absolute top-2 right-2 z-20 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
               aria-label={`Ver suplentes visitante (${awayBenchCount})`}
             >
-              <Users className="h-3.5 w-3.5 opacity-80" />
               <span className="opacity-90 tracking-wide">SUPLENTES</span>
             </button>
           )}
@@ -343,7 +342,6 @@ export function TacticalVerticalField({
               className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/40"
               aria-label={`Ver suplentes local (${homeBenchCount})`}
             >
-              <Users className="h-3.5 w-3.5 opacity-80" />
               <span className="opacity-90 tracking-wide">SUPLENTES</span>
             </button>
           )}

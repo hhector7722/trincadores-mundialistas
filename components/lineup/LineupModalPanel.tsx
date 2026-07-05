@@ -177,33 +177,35 @@ export function LineupModalPanel({
           }
           opaque
           stackElevated
+          hideCloseButton
           containerClassName="p-4"
-          className="max-w-sm max-h-[75dvh]"
+          className="max-w-sm"
         >
           <div className="p-4 flex flex-col items-center">
-            <div className="grid grid-cols-4 gap-x-2 gap-y-3 w-full justify-items-center max-h-[50dvh] overflow-y-auto pr-1" data-modal-scroll="true">
+            <div className="grid grid-cols-5 gap-x-0 gap-y-1 w-full justify-items-center">
               {bench.map((player) => {
                 const role = normalizePositionRole(player.position);
                 return (
-                  <LineupPlayerChip
-                    key={player.name}
-                    slot={{
-                      key: player.name,
-                      name: player.name,
-                      shirtNumber: player.shirtNumber,
-                      role,
-                      positionLabel: positionLabelEs(role, player.position),
-                      isPlaceholder: false,
-                      x: 0,
-                      y: 0
-                    }}
-                    teamName={teamName}
-                    variant="modal"
-                    onClick={() => {
-                      handlePlayerInteraction(player.name);
-                      setShowBenchModal(false);
-                    }}
-                  />
+                  <div key={player.name} className="scale-[0.7] origin-top" style={{ height: "4.5rem", width: "3.5rem" }}>
+                    <LineupPlayerChip
+                      slot={{
+                        key: player.name,
+                        name: player.name,
+                        shirtNumber: player.shirtNumber,
+                        role,
+                        positionLabel: positionLabelEs(role, player.position),
+                        isPlaceholder: false,
+                        x: 0,
+                        y: 0
+                      }}
+                      teamName={teamName}
+                      variant="modal"
+                      onClick={() => {
+                        handlePlayerInteraction(player.name);
+                        setShowBenchModal(false);
+                      }}
+                    />
+                  </div>
                 );
               })}
             </div>

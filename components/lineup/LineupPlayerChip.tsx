@@ -168,14 +168,14 @@ export function LineupPlayerChip({
           className={cn(
             "flex items-center justify-center gap-0.5 whitespace-normal text-center",
             isMatch && selected
-              ? "text-[9.5px] font-bold leading-none tracking-tight text-[var(--tm-primary-fg)]"
+              ? "text-[11px] font-bold leading-none tracking-tight text-[var(--tm-primary-fg)]"
               : cn(
                   "text-white",
                   isMatch
-                    ? "text-[9.5px] font-bold leading-none tracking-tight"
+                    ? "text-[11px] font-bold leading-none tracking-tight"
                     : isModal
-                      ? "text-[8px] font-semibold leading-none"
-                      : "text-[9px] font-semibold leading-tight sm:text-[10px]"
+                      ? "text-[9.5px] font-semibold leading-none"
+                      : "text-[11px] font-semibold leading-tight sm:text-[12px]"
                 )
           )}
         >
