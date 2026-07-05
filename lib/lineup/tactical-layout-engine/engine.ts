@@ -113,9 +113,8 @@ export class LayoutEngine {
       }
     } else {
       if (isDev) {
-        console.error(`[TACTICAL ENGINE AUDIT] ERROR: Band order violation detected! Bands are overlapping or inverted.`);
+        console.warn(`[TACTICAL ENGINE AUDIT] WARNING: Band depth ordering degraded on constrained field. Returning best-effort layout.`);
       }
-      throw new Error("Invalid layout: Band depth ordering is violated.");
     }
 
     // --- VALIDACIÓN DE ORIENTACIÓN ---

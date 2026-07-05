@@ -1,4 +1,4 @@
-import { LayoutConstraints, LayoutElementInput, LayoutPosition } from "./types";
+import { LayoutConstraints, LayoutPosition } from "./types";
 import { TacticalStructure } from "./tactical-structure";
 
 /**
@@ -6,9 +6,11 @@ import { TacticalStructure } from "./tactical-structure";
  * Cada equipo se optimiza de forma completamente independiente:
  * el layout de una mitad nunca depende del de la otra.
  *
- * Las posiciones de los jugadores se reparten para ocupar
- * ~90–95 % de la profundidad disponible, con el portero
- * ligeramente más cerca de la defensa que el resto de líneas.
+ * Las bandas de campo se distribuyen proporcionalmente a la distancia
+ * táctica original (referenceY) entre líneas consecutivas.
+ * Si DEF→MID era el doble que MID→FW, tras la expansión sigue siéndolo.
+ * No hay reglas específicas por formación: las proporciones emergen
+ * de las coordenadas de entrada.
  */
 export function solveInitialLayout(
   structure: TacticalStructure,
@@ -34,24 +36,52 @@ export function solveInitialLayout(
   const fieldMinV = constraints.fieldBounds.isAwayHalf ? minY + gkGap : minY;
   const fieldMaxV = constraints.fieldBounds.isAwayHalf ? maxY : maxY - gkGap;
   const fieldVRange = fieldMaxV - fieldMinV;
-  const fieldBandsCount = Math.max(1, numBands - 1);
-  const vStep = fieldBandsCount > 1 ? fieldVRange / (fieldBandsCount - 1) : 0;
+
+  // Calcular referenceY promedio de cada banda de campo (bandas 1..n-1)
+  const bandRefYs: number[] = [];
+  for (let b = 1; b < numBands; b++) {
+    const elements = bands[b].elements;
+    let sumRefY = 0;
+    for (const id of elements) {
+      const el = structure.elements.get(id);
+      if (el) sumRefY += el.referenceY;
+    }
+    const avgRefY = elements.length > 0 ? sumRefY / elements.length : 0;
+    bandRefYs.push(avgRefY);
+  }
+
+  // Distancias proporcionales entre bandas consecutivas
+  const proportionalDistances: number[] = [];
+  for (let i = 0; i < bandRefYs.length - 1; i++) {
+    proportionalDistances.push(Math.abs(bandRefYs[i] - bandRefYs[i + 1]));
+  }
+  const totalPropDist = proportionalDistances.reduce((a, b) => a + b, 0);
 
   bands.forEach((band, bandIndex) => {
     let bandY = 50;
 
     if (numBands === 1) {
       bandY = (minY + maxY) / 2;
-    } else {
-      if (bandIndex === 0) {
-        bandY = constraints.fieldBounds.isAwayHalf ? minY : maxY;
+    } else if (bandIndex === 0) {
+      bandY = constraints.fieldBounds.isAwayHalf ? minY : maxY;
+    } else if (totalPropDist === 0 || proportionalDistances.length === 0) {
+      // Una sola banda de campo — colocar al extremo opuesto
+      if (constraints.fieldBounds.isAwayHalf) {
+        bandY = fieldMinV;
       } else {
-        const fieldIndex = bandIndex - 1;
-        if (constraints.fieldBounds.isAwayHalf) {
-          bandY = fieldMinV + fieldIndex * vStep;
-        } else {
-          bandY = fieldMaxV - fieldIndex * vStep;
-        }
+        bandY = fieldMaxV;
+      }
+    } else {
+      const fieldIndex = bandIndex - 1;
+      let cumulativeDist = 0;
+      for (let i = 0; i < fieldIndex; i++) {
+        cumulativeDist += proportionalDistances[i];
+      }
+      const proportion = cumulativeDist / totalPropDist;
+      if (constraints.fieldBounds.isAwayHalf) {
+        bandY = fieldMinV + proportion * fieldVRange;
+      } else {
+        bandY = fieldMaxV - proportion * fieldVRange;
       }
     }
 
