@@ -73,7 +73,7 @@ function FinishedInlineMvpCorrect({
   );
 }
 
-/** La cruz roja queda en el centro de la card; pronóstico a la izquierda y MVP oficial a la derecha. */
+/** Pronosticado e icono arriba; MVP oficial debajo. Ambos centrados. */
 function FinishedInlineMvpIncorrect({
   savedLabel,
   officialLabel,
@@ -84,17 +84,16 @@ function FinishedInlineMvpIncorrect({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "grid w-full grid-cols-[1fr_auto_1fr] items-center gap-1 text-[9px] font-semibold leading-none",
-        className,
-      )}
-    >
-      <span className="min-w-0 truncate text-right text-[var(--tm-accent)] line-through">
-        {savedLabel}
+    <div className={cn("flex w-full flex-col items-center gap-0.5 text-[9px] font-semibold leading-none", className)}>
+      <div className="flex max-w-full items-center justify-center gap-1">
+        <span className="min-w-0 truncate text-[var(--tm-accent)] line-through">
+          {savedLabel}
+        </span>
+        <PredictionOutcomeIcon variant="error" className="shrink-0" />
+      </div>
+      <span className="max-w-full truncate text-center text-white">
+        {officialLabel}
       </span>
-      <PredictionOutcomeIcon variant="error" className="shrink-0 justify-self-center" />
-      <span className="min-w-0 truncate text-left text-white">{officialLabel}</span>
     </div>
   );
 }
