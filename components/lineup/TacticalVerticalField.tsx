@@ -27,6 +27,7 @@ type TacticalVerticalFieldProps = {
   onSelect?: (key: string) => void;
   homeSubstitutionMarkers?: any;
   awaySubstitutionMarkers?: any;
+  children?: React.ReactNode;
 };
 
 /* ------------------------------------------------------------------ */
@@ -55,12 +56,25 @@ const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
 function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"]) {
   if (!lineup) return null;
   const slots = resolveVisualLineupSlots(lineup);
-  const inputs: LayoutElementInput[] = slots.map(s => ({
-    id: s.key,
-    role: s.role,
-    referenceX: s.x,
-    referenceY: s.y,
-  }));
+  const inputs: LayoutElementInput[] = slots.map(s => {
+    // Si es delantero centro (ST) puro en el local, lo subimos un poco (yY=90)
+    // Para que no se pise con los mediapuntas (yY=80)
+    let refY = s.y;
+    if (!fieldBounds.isAwayHalf && s.role === "ST" && s.y === 80) {
+      refY = 90;
+    }
+    // Si es delantero centro (ST) puro en el visitante, lo bajamos un poco (yY=10)
+    if (fieldBounds.isAwayHalf && s.role === "ST" && s.y === 20) {
+      refY = 10;
+    }
+
+    return {
+      id: s.key,
+      role: s.role,
+      referenceX: s.x,
+      referenceY: refY,
+    };
+  });
   return LayoutEngine.calculate(inputs, { ...BASE_HALF_CONSTRAINTS, fieldBounds });
 }
 
@@ -81,6 +95,7 @@ export function TacticalVerticalField({
   onSelect,
   homeSubstitutionMarkers,
   awaySubstitutionMarkers,
+  children,
 }: TacticalVerticalFieldProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
@@ -244,51 +259,6 @@ export function TacticalVerticalField({
             const pixelY = (pos.y / 100) * pitchBounds.height;
 
             return (
-              <div
-                key={pos.id}
-                className="absolute z-10"
-                style={{
-                  left: `${pixelX}px`,
-                  top: `${pixelY}px`,
-                  transform: `translate(-50%, -50%) scale(${homeResult.chipScale})`,
-                }}
-              >
-                <LineupPlayerChip
-                  slot={{
-                    ...originalSlot,
-                    x: pos.x,
-                    y: pos.y
-                  }}
-                  teamName={homeTeam}
-                  squadPlayerNames={homeSquadPlayerNames}
-                  variant="default"
-                  onClick={
-                    onSelect && !originalSlot.isPlaceholder && !disabled
-                      ? () =>
-                          onSelect(
-                            mvpSelectionKey(homeTeam, {
-                              name: originalSlot.name,
-                              shirtNumber: originalSlot.shirtNumber,
-                            })
-                          )
-                      : undefined
-                  }
-                  selected={
-                    selectedPlayer
-                      ? mvpPlayersMatch(homeTeam, originalSlot, selectedPlayer)
-                      : selectedKey ===
-                        mvpSelectionKey(homeTeam, {
-                          name: originalSlot.name,
-                          shirtNumber: originalSlot.shirtNumber,
-                        })
-                  }
-                  disabled={disabled}
-                  substitutionMarker={
-                    homeSubstitutionMarkers
-                      ? substitutionMarkerForPlayer(
-                          originalSlot.name,
-                          originalSlot.shirtNumber,
-                          homeSubstitutionMarkers
                         )
                       : null
                   }

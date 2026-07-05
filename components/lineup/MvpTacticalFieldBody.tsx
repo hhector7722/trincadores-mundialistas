@@ -68,28 +68,7 @@ export function MvpTacticalFieldBody({
         className
       )}
     >
-      {homeBench.length > 0 || resolvedHomeLineup?.formationLabel ? (
-        <div className="w-full shrink-0 pb-0.5">
-          <LineupFormationInfo
-            teamName={homeTeam}
-            formationLabel={resolvedHomeLineup?.formationLabel}
-            align="left"
-          />
-          {homeBench.length > 0 && (
-            <div className="flex justify-center mt-2 mb-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowHomeBench(true)}
-                className="flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--tm-accent)] backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 active:scale-95"
-              >
-                Suplentes
-              </button>
-            </div>
-          )}
-        </div>
-      ) : null}
-
-      <div className="flex shrink-0 items-center justify-center pb-1">
+      <div className="relative flex w-full h-full min-h-0 items-center justify-center">
         <TacticalVerticalField
           homeLineup={resolvedHomeLineup}
           awayLineup={resolvedAwayLineup}
@@ -104,29 +83,51 @@ export function MvpTacticalFieldBody({
           onSelect={onSelect ?? (() => {})}
           homeSubstitutionMarkers={homeSubstitutionMarkers}
           awaySubstitutionMarkers={awaySubstitutionMarkers}
-        />
-      </div>
-
-      {awayBench.length > 0 || resolvedAwayLineup?.formationLabel ? (
-        <div className="w-full shrink-0 pt-0.5 pb-1">
-          <LineupFormationInfo
-            teamName={awayTeam}
-            formationLabel={resolvedAwayLineup?.formationLabel}
-            align="right"
-          />
-          {awayBench.length > 0 && (
-            <div className="flex justify-center mt-2 mb-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowAwayBench(true)}
-                className="flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--tm-accent)] backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 active:scale-95"
-              >
-                Suplentes
-              </button>
+        >
+          {/* Overlays Absolutos */}
+          <div className="absolute inset-0 pointer-events-none flex flex-col justify-between">
+            {/* Top Overlay */}
+            <div className="w-full shrink-0 pt-0.5 pointer-events-auto">
+              <LineupFormationInfo
+                teamName={awayTeam}
+                formationLabel={resolvedAwayLineup?.formationLabel}
+                align="right"
+              />
+              {awayBench.length > 0 && (
+                <div className="flex justify-center mt-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowAwayBench(true)}
+                    className="flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--tm-accent)] backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 active:scale-95"
+                  >
+                    Suplentes
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ) : null}
+
+            {/* Bottom Overlay */}
+            <div className="w-full shrink-0 pb-0.5 pointer-events-auto">
+              {homeBench.length > 0 && (
+                <div className="flex justify-center mb-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowHomeBench(true)}
+                    className="flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--tm-accent)] backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/20 active:scale-95"
+                  >
+                    Suplentes
+                  </button>
+                </div>
+              )}
+              <LineupFormationInfo
+                teamName={homeTeam}
+                formationLabel={resolvedHomeLineup?.formationLabel}
+                align="left"
+              />
+            </div>
+          </div>
+        </TacticalVerticalField>
+      </div>
 
       {/* Home Bench Modal */}
       {showHomeBench && (
