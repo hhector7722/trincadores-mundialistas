@@ -48,7 +48,7 @@ const HALF_MARGINS = { side: 0.5, vertical: 0.25 };
 const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
   margins: HALF_MARGINS,
   spacing: { minHorizontal: 5, minVertical: 5 },
-  chipSize: { minScale: 0.6, maxScale: 1.4, baseWidth: 10, baseHeight: 12 },
+  chipSize: { minScale: 1.0, maxScale: 1.0, baseWidth: 10, baseHeight: 12 },
   nameAreaBounds: { width: 16, height: 4 },
   optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
 };
