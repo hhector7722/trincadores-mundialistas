@@ -1,12 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { MvpHorizontalFieldGraphic } from "@/components/lineup/MvpHorizontalFieldGraphic";
+import { TacticalVerticalField } from "@/components/lineup/TacticalVerticalField";
 import { MvpBenchColumn } from "@/components/lineup/MvpBenchColumn";
 import { LineupFormationInfo } from "@/components/lineup/LineupFormationInfo";
-import { computeMvpFieldChipScale } from "@/lib/lineup/mvp-field-chip-scale";
 import type { FitMvpHorizontalLayout } from "@/lib/lineup/fit-mvp-horizontal-layout";
-import type { MvpHorizontalSlot } from "@/lib/lineup/mvp-horizontal-geometry";
 import {
   mvpSelectionKey,
   type MvpSelectablePlayer,
@@ -20,8 +18,6 @@ import { cn } from "@/lib/utils";
 type MvpTacticalFieldBodyProps = {
   awayTeam: string;
   homeTeam: string;
-  awaySlots: MvpHorizontalSlot[];
-  homeSlots: MvpHorizontalSlot[];
   awayBench: BenchPlayer[];
   homeBench: BenchPlayer[];
   resolvedAwayLineup: ResolvedLineup | null;
@@ -42,8 +38,6 @@ type MvpTacticalFieldBodyProps = {
 export function MvpTacticalFieldBody({
   awayTeam,
   homeTeam,
-  awaySlots,
-  homeSlots,
   awayBench,
   homeBench,
   resolvedAwayLineup,
@@ -60,14 +54,6 @@ export function MvpTacticalFieldBody({
   homeSubstitutionMarkers = null,
   awaySubstitutionMarkers = null,
 }: MvpTacticalFieldBodyProps) {
-  const chipScale = useMemo(
-    () =>
-      computeMvpFieldChipScale(layout.fieldWidthPx, layout.fieldHeightPx, [
-        ...homeSlots,
-        ...awaySlots,
-      ]),
-    [layout, homeSlots, awaySlots]
-  );
 
   const pickDisabled = interactive && disabled;
 
@@ -107,9 +93,9 @@ export function MvpTacticalFieldBody({
       ) : null}
 
       <div className="flex shrink-0 items-center justify-center pb-1">
-        <MvpHorizontalFieldGraphic
-          homeSlots={homeSlots}
-          awaySlots={awaySlots}
+        <TacticalVerticalField
+          homeLineup={resolvedHomeLineup}
+          awayLineup={resolvedAwayLineup}
           homeTeam={homeTeam}
           awayTeam={awayTeam}
           homeSquadPlayerNames={homeSquad?.players.map((player) => player.player_name)}
@@ -119,11 +105,10 @@ export function MvpTacticalFieldBody({
           disabled={pickDisabled}
           readOnly={!interactive}
           onSelect={onSelect ?? (() => {})}
-          widthPx={layout.fieldWidthPx}
-          heightPx={layout.fieldHeightPx}
-          chipScale={chipScale}
           homeSubstitutionMarkers={homeSubstitutionMarkers}
           awaySubstitutionMarkers={awaySubstitutionMarkers}
+          widthPx={layout.fieldWidthPx}
+          heightPx={layout.fieldHeightPx}
         />
       </div>
 

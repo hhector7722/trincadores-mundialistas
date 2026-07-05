@@ -6,10 +6,6 @@ import { setTeamKitHexFromDb } from "@/lib/lineup/team-kit-colors";
 import { resolveBenchPlayers } from "@/lib/lineup/bench-from-lineup";
 import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import { buildFallbackLineup } from "@/lib/lineup/build-fallback-lineup";
-import {
-  mapSlotsToAwayRight,
-  mapSlotsToHomeLeft,
-} from "@/lib/lineup/mvp-horizontal-geometry";
 import type { ResolvedLineup } from "@/lib/lineup/types";
 import type { TeamSquadWithPlayers } from "@/lib/worldcup-data/squad-queries";
 
@@ -86,21 +82,6 @@ export function useMatchTacticalLineupData(
     [awayLineup, awaySquad]
   );
 
-  const awaySlots = useMemo(
-    () =>
-      resolvedAwayLineup
-        ? mapSlotsToAwayRight(resolveVisualLineupSlots(resolvedAwayLineup))
-        : [],
-    [resolvedAwayLineup]
-  );
-  const homeSlots = useMemo(
-    () =>
-      resolvedHomeLineup
-        ? mapSlotsToHomeLeft(resolveVisualLineupSlots(resolvedHomeLineup))
-        : [],
-    [resolvedHomeLineup]
-  );
-
   const homeBench = useMemo(
     () =>
       sortBenchByShirt(
@@ -120,7 +101,7 @@ export function useMatchTacticalLineupData(
     [awaySquad, resolvedAwayLineup]
   );
 
-  const tacticalReady = homeSlots.length + awaySlots.length >= 22;
+  const tacticalReady = (resolvedHomeLineup?.slots?.length ?? 0) + (resolvedAwayLineup?.slots?.length ?? 0) >= 22;
   const ready = !loading && kitColorsReady && tacticalReady;
 
   return {
@@ -128,8 +109,6 @@ export function useMatchTacticalLineupData(
     awaySquad,
     resolvedHomeLineup,
     resolvedAwayLineup,
-    awaySlots,
-    homeSlots,
     homeBench,
     awayBench,
     loading,

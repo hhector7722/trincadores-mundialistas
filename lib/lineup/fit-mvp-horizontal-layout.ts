@@ -4,14 +4,12 @@ export const HORIZONTAL_PITCH_ASPECT = 105 / 68;
 export type { BenchLayoutConfig } from "./bench-grid-layout";
 export { EMPTY_BENCH, pickBenchGrid } from "./bench-grid-layout";
 
-import { computeMvpFieldChipScale } from "./mvp-field-chip-scale";
 import type { BenchLayoutConfig } from "./bench-grid-layout";
 import { EMPTY_BENCH } from "./bench-grid-layout";
 
 export type FitMvpHorizontalLayout = {
   fieldWidthPx: number;
   fieldHeightPx: number;
-  chipScale: number;
   awayBench: import("./bench-grid-layout").BenchLayoutConfig;
   homeBench: import("./bench-grid-layout").BenchLayoutConfig;
 };
@@ -105,7 +103,6 @@ export function computeFitMvpHorizontalLayout(
   return {
     fieldWidthPx,
     fieldHeightPx,
-    chipScale: computeMvpFieldChipScale(fieldWidthPx, fieldHeightPx),
     awayBench: awayBenchFinal,
     homeBench: homeBenchFinal,
   };

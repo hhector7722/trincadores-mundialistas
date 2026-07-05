@@ -3,7 +3,7 @@
  * Uso: npx tsx --env-file=.env.local scripts/debug-spain-lineup.ts
  */
 import { fetchBsdPredictedLineup } from "@/lib/lineup/sources/bsd-client";
-import { separateOverlappingSlots } from "@/lib/lineup/field-layout";
+
 import { parseBsdPredictedTeamLineup } from "@/lib/lineup/sources/bsd-lineup-parse";
 import { createClient } from "@supabase/supabase-js";
 import { getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
@@ -44,11 +44,14 @@ async function main() {
   );
 
   if (!parsed) return;
-  const visual = separateOverlappingSlots(parsed.slots);
-  console.log("PARSED (y asc = ataque arriba)");
-  for (const slot of [...visual].sort((a, b) => a.y - b.y || a.x - b.x)) {
-    console.log(`x=${slot.x} y=${slot.y}`, slot.shirtNumber, slot.name, slot.positionLabel);
-  }
+  console.table(
+    parsed.slots.map((s) => ({
+      Key: s.key,
+      Name: s.name,
+      Role: s.role,
+      "Base Y": Math.round(s.y),
+    }))
+  );
 }
 
 main().catch(console.error);

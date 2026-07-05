@@ -1,12 +1,22 @@
 "use client";
 
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupModalFieldShell } from "@/components/lineup/LineupModalFieldShell";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
 import { PITCH_ASPECT_CLASS } from "@/lib/lineup/field-layout";
 import type { LineupSlot } from "@/lib/lineup/types";
+import { LayoutEngine, LayoutElementInput, LayoutConstraints } from "@/lib/lineup/tactical-layout-engine";
 import { cn } from "@/lib/utils";
+
+const DEFAULT_CONSTRAINTS: LayoutConstraints = {
+  margins: { side: 6, vertical: 8 },
+  spacing: { minHorizontal: 8, minVertical: 8 },
+  chipSize: { minScale: 0.8, maxScale: 1.4, baseWidth: 10, baseHeight: 12 },
+  nameAreaBounds: { width: 14, height: 4 },
+  optimization: { mode: "balanced", maxIterations: 50, tolerance: 0.02 },
+  fieldBounds: { xMin: 0, xMax: 100, yMin: 0, yMax: 100, isAwayHalf: false },
+};
 
 type TeamLineupGraphicProps = {
   slots: LineupSlot[];
@@ -40,22 +50,37 @@ export function TeamLineupGraphic({
   const sized = widthPx != null && heightPx != null && widthPx > 0 && heightPx > 0;
   const pitchMaxW = "w-full max-w-[min(92vw,16.5rem)] sm:max-w-[17rem]";
 
+  const layoutResult = React.useMemo(() => {
+    const inputs: LayoutElementInput[] = slots.map(s => ({
+      id: s.key,
+      role: s.role,
+      referenceX: s.x,
+      referenceY: s.y,
+    }));
+    return LayoutEngine.calculate(inputs, DEFAULT_CONSTRAINTS);
+  }, [slots]);
+
+  const finalChipScale = chipScale * layoutResult.chipScale;
+
   const fieldContent = (
     <>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <FootballPitchSurface onReady={onFieldReady} />
       </div>
 
-      {slots.map((slot) => (
-        <div
-          key={slot.key}
-          className="absolute z-10"
-          style={{
-            left: `${slot.x}%`,
-            top: `${slot.y}%`,
-            transform: `translate(-50%, -50%) scale(${chipScale})`,
-          }}
-        >
+      {layoutResult.positions.map((pos) => {
+        const slot = slots.find(s => s.key === pos.id);
+        if (!slot) return null;
+        return (
+          <div
+            key={slot.key}
+            className="absolute z-10"
+            style={{
+              left: `${pos.x}%`,
+              top: `${pos.y}%`,
+              transform: `translate(-50%, -50%) scale(${finalChipScale})`,
+            }}
+          >
           <LineupPlayerChip
             slot={slot}
             teamName={teamName}
@@ -66,8 +91,9 @@ export function TeamLineupGraphic({
               onPlayerClick && !slot.isPlaceholder ? () => onPlayerClick(slot.name) : undefined
             }
           />
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </>
   );
 

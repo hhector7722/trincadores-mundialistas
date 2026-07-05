@@ -90,8 +90,6 @@ export function MvpPickPanel({
     awaySquad,
     resolvedHomeLineup,
     resolvedAwayLineup,
-    awaySlots,
-    homeSlots,
     homeBench,
     awayBench,
     loading,
@@ -117,22 +115,26 @@ export function MvpPickPanel({
 
   const lineupPlayers = useMemo(() => {
     const players: Array<{ name: string; shirtNumber: number | null; teamName: string }> = [];
-    for (const slot of awaySlots) {
-      if (!slot.isPlaceholder) {
-        players.push({
-          teamName: awayTeam,
-          name: slot.name,
-          shirtNumber: slot.shirtNumber,
-        });
+    if (resolvedAwayLineup) {
+      for (const slot of resolvedAwayLineup.slots) {
+        if (!slot.isPlaceholder && slot.name) {
+          players.push({
+            teamName: awayTeam,
+            name: slot.name,
+            shirtNumber: slot.shirtNumber,
+          });
+        }
       }
     }
-    for (const slot of homeSlots) {
-      if (!slot.isPlaceholder) {
-        players.push({
-          teamName: homeTeam,
-          name: slot.name,
-          shirtNumber: slot.shirtNumber,
-        });
+    if (resolvedHomeLineup) {
+      for (const slot of resolvedHomeLineup.slots) {
+        if (!slot.isPlaceholder && slot.name) {
+          players.push({
+            teamName: homeTeam,
+            name: slot.name,
+            shirtNumber: slot.shirtNumber,
+          });
+        }
       }
     }
     for (const player of awayBench) {
@@ -142,7 +144,7 @@ export function MvpPickPanel({
       players.push({ teamName: homeTeam, name: player.name, shirtNumber: player.shirtNumber });
     }
     return players;
-  }, [awaySlots, homeSlots, awayBench, homeBench, awayTeam, homeTeam]);
+  }, [resolvedAwayLineup, resolvedHomeLineup, awayBench, homeBench, awayTeam, homeTeam]);
 
   const onFormationsChangeRef = useRef(onFormationsChange);
   onFormationsChangeRef.current = onFormationsChange;
@@ -282,8 +284,6 @@ export function MvpPickPanel({
       <MvpTacticalFieldBody
         awayTeam={awayTeam}
         homeTeam={homeTeam}
-        awaySlots={awaySlots}
-        homeSlots={homeSlots}
         awayBench={awayBench}
         homeBench={homeBench}
         resolvedAwayLineup={resolvedAwayLineup}

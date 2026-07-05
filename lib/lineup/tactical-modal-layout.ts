@@ -3,7 +3,7 @@ import {
   estimateMvpInlineBenchLayout,
   type FitMvpHorizontalLayout,
 } from "@/lib/lineup/fit-mvp-horizontal-layout";
-import { computeMvpFieldChipScale } from "@/lib/lineup/mvp-field-chip-scale";
+
 import { MVP_MODAL_FIELD_BODY_HEIGHT_REM } from "@/lib/lineup/field-asset";
 
 /** Ancho útil del modal táctico (32rem − padding). */
@@ -30,10 +30,7 @@ const REFERENCE_LAYOUT = computeFitMvpHorizontalLayout({
 /** Campo fijo compartido por MVP y posibles alineaciones del mismo partido. */
 export const TACTICAL_FIELD_WIDTH_PX = REFERENCE_LAYOUT.fieldWidthPx;
 export const TACTICAL_FIELD_HEIGHT_PX = REFERENCE_LAYOUT.fieldHeightPx;
-export const TACTICAL_FIELD_CHIP_SCALE = computeMvpFieldChipScale(
-  TACTICAL_FIELD_WIDTH_PX,
-  TACTICAL_FIELD_HEIGHT_PX
-);
+
 
 /** Layout táctico: campo idéntico; banco local arriba, visitante abajo. */
 export function buildTacticalModalLayout(
@@ -46,7 +43,6 @@ export function buildTacticalModalLayout(
   return {
     fieldWidthPx: TACTICAL_FIELD_WIDTH_PX,
     fieldHeightPx: TACTICAL_FIELD_HEIGHT_PX,
-    chipScale: TACTICAL_FIELD_CHIP_SCALE,
     homeBench: estimateMvpInlineBenchLayout(home, TACTICAL_FIELD_WIDTH_PX),
     awayBench: estimateMvpInlineBenchLayout(away, TACTICAL_FIELD_WIDTH_PX),
   };

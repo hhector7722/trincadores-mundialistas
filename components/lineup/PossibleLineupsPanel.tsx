@@ -35,8 +35,6 @@ export function PossibleLineupsPanel({
     awaySquad,
     resolvedHomeLineup,
     resolvedAwayLineup,
-    awaySlots,
-    homeSlots,
     homeBench,
     awayBench,
     loading,
@@ -94,8 +92,6 @@ export function PossibleLineupsPanel({
       <MvpTacticalFieldBody
         awayTeam={awayTeam}
         homeTeam={homeTeam}
-        awaySlots={awaySlots}
-        homeSlots={homeSlots}
         awayBench={awayBench}
         homeBench={homeBench}
         resolvedAwayLineup={resolvedAwayLineup}

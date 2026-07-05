@@ -1,4 +1,3 @@
-import { separateOverlappingSlots } from "@/lib/lineup/field-layout";
 import { resolveFormationSlotsFromLineup } from "@/lib/lineup/resolve-formation-slots";
 import { FOTMOB_SOURCE_CODE } from "@/lib/lineup/sources/fotmob-client";
 import type { LineupSlot, ResolvedLineup } from "@/lib/lineup/types";
@@ -11,13 +10,11 @@ export function lineupUsesSourceLayout(lineup: ResolvedLineup): boolean {
 /** Slots listos para pintar: respeta layout de fuente o normaliza por formación. */
 export function resolveVisualLineupSlots(lineup: ResolvedLineup): LineupSlot[] {
   if (lineupUsesSourceLayout(lineup)) {
-    return separateOverlappingSlots(
-      lineup.slots.slice(0, 11).map((slot) => ({
-        ...slot,
-        slotKey: slot.slotKey?.trim() || "CM",
-      }))
-    );
+    return lineup.slots.slice(0, 11).map((slot) => ({
+      ...slot,
+      slotKey: slot.slotKey?.trim() || "CM",
+    }));
   }
 
-  return separateOverlappingSlots(resolveFormationSlotsFromLineup(lineup));
+  return resolveFormationSlotsFromLineup(lineup);
 }
