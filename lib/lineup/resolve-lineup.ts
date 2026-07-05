@@ -96,6 +96,7 @@ export async function getLineupSource(
         fromCache: false,
       };
     }
+  }
 
   return { kind: "fallback", dataSourceCode: null, fromCache: false };
 }
@@ -113,7 +114,9 @@ function benchFromResolved(lineup: ResolvedLineup, context: LineupResolveContext
       shirtNumber: player.shirt_number,
       position: player.position,
     }));
-async function buildFallbackWithKnownFormation(
+}
+
+export async function buildFallbackWithKnownFormation(
   supabase: SupabaseClient,
   context: LineupResolveContext
 ): Promise<ResolvedLineup> {
@@ -170,14 +173,6 @@ export async function resolveTeamLineup(
   if (
     cached?.sourceKind === "confirmed" &&
     !isConfirmedLineupCacheStale(cached, matchMeta?.kickoff_at, matchMeta?.status, nowMs)
-  ) {
-    return cached;
-  }
-
-  if (
-    cached?.sourceKind === "predicted" &&
-    !tryConfirmed &&
-    !isPredictedLineupCacheStale(cached)
   ) {
     return cached;
   }
