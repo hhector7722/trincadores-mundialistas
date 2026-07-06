@@ -259,7 +259,6 @@ type MatchTeamsDisplayProps = {
   awayFooterSlot?: ReactNode;
   /** Bandera más compacta (card inicio con plantilla bajo el nombre). */
   compactTeamColumn?: boolean;
-  hideTeamNames?: boolean;
 };
 
 export function MatchTeamsDisplay({

@@ -695,6 +695,7 @@ export function QuickPredictionModal({
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
+                isLive={false}
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
