@@ -304,16 +304,18 @@ export function MatchTeamsDisplay({
           </p>
         ) : null}
 
-        <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
+        <div className="absolute left-[15%] sm:left-[18%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onHomeTeamClick ? (
-            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" />
+            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" size="2xl" />
           ) : (
-            <TeamCamiFront team={homeTeam} variant="player" />
+            <TeamCamiFront team={homeTeam} variant="player" size="2xl" />
           )}
-          {onHomeTeamClick ? (
-            <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
-          ) : (
-            <TeamNameLabel name={homeTeam} />
+          {!hideTeamNames && (
+            onHomeTeamClick ? (
+              <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
+            ) : (
+              <TeamNameLabel name={homeTeam} />
+            )
           )}
           {homeFooterSlot}
         </div>
@@ -330,16 +332,18 @@ export function MatchTeamsDisplay({
           </div>
         ) : null}
 
-        <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
+        <div className="absolute left-[85%] sm:left-[82%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onAwayTeamClick ? (
-            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" />
+            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" size="2xl" />
           ) : (
-            <TeamCamiFront team={awayTeam} variant="player" />
+            <TeamCamiFront team={awayTeam} variant="player" size="2xl" />
           )}
-          {onAwayTeamClick ? (
-            <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
-          ) : (
-            <TeamNameLabel name={awayTeam} />
+          {!hideTeamNames && (
+            onAwayTeamClick ? (
+              <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
+            ) : (
+              <TeamNameLabel name={awayTeam} />
+            )
           )}
           {awayFooterSlot}
         </div>

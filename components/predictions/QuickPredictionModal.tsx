@@ -691,6 +691,7 @@ export function QuickPredictionModal({
               <MatchTeamsDisplay
                 layout="predictionModal"
                 hidePredictionLabel
+                hideTeamNames
                 flagPlaceholderStyle={flagPlaceholderStyle}
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
@@ -790,6 +791,7 @@ export function QuickPredictionModal({
               <MatchTeamsDisplay
                 layout="predictionModal"
                 hidePredictionLabel
+                hideTeamNames
                 flagPlaceholderStyle={flagPlaceholderStyle}
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
@@ -872,6 +874,7 @@ export function QuickPredictionModal({
             >
               <MatchTeamsDisplay
                 layout="predictionModal"
+                hideTeamNames
                 flagPlaceholderStyle={flagPlaceholderStyle}
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
@@ -911,6 +914,7 @@ export function QuickPredictionModal({
                   homeAnchor="10%"
                   awayAnchor="90%"
                   className="h-full"
+                  hideLineupButtons
                   centerSlot={renderMvpCenterSlot(targetMatch)}
                   hidePossibleLineups={hidePossibleLineups}
                   onOpenHomeLineup={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
