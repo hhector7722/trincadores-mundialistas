@@ -15,10 +15,10 @@ async function run() {
     { match: 81, home: "USA", away: "Bosnia and Herzegovina", time: "2026-07-02T00:00:00Z" },
     { match: 84, home: "Spain", away: "Austria", time: "2026-07-02T19:00:00Z" },
     { match: 83, home: "Portugal", away: "Croatia", time: "2026-07-02T23:00:00Z" },
-    { match: 87, home: "Switzerland", away: "Colombia", time: "2026-07-03T03:00:00Z" },
-    { match: 86, home: "Australia", away: "Cape Verde", time: "2026-07-03T18:00:00Z" },
-    { match: 85, home: "Argentina", away: "Egypt", time: "2026-07-03T22:00:00Z" },
-    { match: 88, home: "Algeria", away: "Ghana", time: "2026-07-04T01:30:00Z" },
+    { match: 85, home: "Switzerland", away: "Colombia", time: "2026-07-03T22:00:00Z" },
+    { match: 86, home: "Argentina", away: "Egypt", time: "2026-07-03T18:00:00Z" },
+    { match: 87, home: "Algeria", away: "Ghana", time: "2026-07-03T03:00:00Z" },
+    { match: 88, home: "Australia", away: "Cape Verde", time: "2026-07-04T01:30:00Z" },
   ];
 
   for (const { match, home, away, time } of updates) {

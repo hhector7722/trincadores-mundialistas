@@ -10,6 +10,7 @@ interface TeamCamiFrontProps {
   size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl" | "custom";
   className?: string;
   alt?: string;
+  variant?: "jersey" | "player";
 }
 
 const sizeClasses = {
@@ -21,6 +22,17 @@ const sizeClasses = {
   "2xl": "h-[7rem] w-[5.25rem] sm:h-[7.5rem] sm:w-[5.625rem]",
   "3xl": "h-[8rem] w-[6rem] sm:h-[8.5rem] sm:w-[6.375rem]",
   custom: "", // Allows LineupPlayerChip to safely override sizes via className
+};
+
+const playerSizeClasses = {
+  sm: "h-[3.2rem] w-[3.2rem]",
+  md: "h-[4.8rem] w-[4.8rem]",
+  "md-lg": "h-[5.4rem] w-[5.4rem] sm:h-[6rem] sm:w-[6rem]",
+  lg: "h-[6rem] w-[6rem] sm:h-[6.6rem] sm:w-[6.6rem]",
+  xl: "h-[6.6rem] w-[6.6rem] sm:h-[7.2rem] sm:w-[7.2rem]",
+  "2xl": "h-[8.4rem] w-[8.4rem] sm:h-[9rem] sm:w-[9rem]",
+  "3xl": "h-[9.6rem] w-[9.6rem] sm:h-[10.2rem] sm:w-[10.2rem]",
+  custom: "",
 };
 
 const dbTeamsToCamiKey: Record<string, string> = {
@@ -43,8 +55,64 @@ const dbTeamsToCamiKey: Record<string, string> = {
   'United States': 'usa'
 };
 
-export function TeamCamiFront({ team, size = "lg", className, alt }: TeamCamiFrontProps) {
+const dbTeamsToPlayerKey: Record<string, string> = {
+  'argentina': 'argentina',
+  'belgium': 'belgica',
+  'belgica': 'belgica',
+  'colombia': 'colombia',
+  'egypt': 'egipto',
+  'egipto': 'egipto',
+  'spain': 'españa',
+  'españa': 'españa',
+  'france': 'fracia',
+  'francia': 'fracia',
+  'england': 'inglaterra',
+  'inglaterra': 'inglaterra',
+  'morocco': 'marruecos',
+  'marruecos': 'marruecos',
+  'mexico': 'mejico',
+  'mejico': 'mejico',
+  'norway': 'noruega',
+  'noruega': 'noruega',
+  'portugal': 'portugal',
+  'switzerland': 'suiza',
+  'suiza': 'suiza',
+  'usa': 'usa',
+  'united states': 'usa'
+};
+
+export function TeamCamiFront({ team, size = "lg", className, alt, variant = "jersey" }: TeamCamiFrontProps) {
   const [imgError, setImgError] = useState(false);
+  
+  if (variant === "player") {
+    const playerKey = dbTeamsToPlayerKey[team.toLowerCase()];
+    if (!playerKey || imgError) {
+      return (
+        <div className={cn("relative flex shrink-0 items-center justify-center", sizeClasses[size], className)}>
+          <TeamFlagBadge name={team} size={size === "sm" ? "sm" : size === "md" ? "md" : "lg"} />
+        </div>
+      );
+    }
+
+    const src = `/club_player/${playerKey}_player.png`;
+    return (
+      <div
+        className={cn(
+          "relative shrink-0",
+          playerSizeClasses[size],
+          className
+        )}
+      >
+           <img
+              src={src}
+              alt={alt ?? `Jugador de ${team}`}
+              className="absolute inset-0 w-full h-full object-contain"
+              onError={() => setImgError(true)}
+            />
+      </div>
+    );
+  }
+
   const internalKey = dbTeamsToCamiKey[team] || team.toLowerCase();
   let camiFileName = `${internalKey}-cami.png`;
   if (internalKey === 'suiza') camiFileName = 'suiza.cami.png';
@@ -81,6 +149,7 @@ export function TeamCamiFrontButton({
   team,
   onClick,
   size = "lg",
+  variant = "jersey",
 }: Omit<TeamCamiFrontProps, "alt"> & { onClick: () => void }) {
   return (
     <button
@@ -92,7 +161,7 @@ export function TeamCamiFrontButton({
       className="shrink-0 transition-transform active:scale-95"
       aria-label={`Ver plantilla de ${team}`}
     >
-      <TeamCamiFront team={team} size={size} />
+      <TeamCamiFront team={team} size={size} variant={variant} />
     </button>
   );
 }

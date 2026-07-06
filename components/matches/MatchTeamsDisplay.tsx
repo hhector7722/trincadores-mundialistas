@@ -306,9 +306,9 @@ export function MatchTeamsDisplay({
 
         <div className="absolute left-[10%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onHomeTeamClick ? (
-            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} />
+            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" />
           ) : (
-            <TeamCamiFront team={homeTeam} />
+            <TeamCamiFront team={homeTeam} variant="player" />
           )}
           {onHomeTeamClick ? (
             <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
@@ -332,9 +332,9 @@ export function MatchTeamsDisplay({
 
         <div className="absolute left-[90%] top-[1.15rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onAwayTeamClick ? (
-            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} />
+            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" />
           ) : (
-            <TeamCamiFront team={awayTeam} />
+            <TeamCamiFront team={awayTeam} variant="player" />
           )}
           {onAwayTeamClick ? (
             <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
