@@ -875,6 +875,14 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
+                onHomeTeamClick={() => {
+                  if (controlsDisabled || home === null) return;
+                  setHome(home === 0 ? null : home - 1);
+                }}
+                onAwayTeamClick={() => {
+                  if (controlsDisabled) return;
+                  setAway(away === null ? 0 : Math.min(20, away + 1));
+                }}
                 homeScoreSlot={
                   <ScoreStepper
                     label={targetMatch.home_team}
