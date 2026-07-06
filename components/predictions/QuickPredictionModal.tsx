@@ -695,9 +695,6 @@ export function QuickPredictionModal({
                 homeTeam={targetMatch.home_team}
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
-                isLive={false}
-                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
@@ -796,8 +793,6 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive
-                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
                 centerSlotAlign="teamNames"
@@ -879,8 +874,6 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
-                onHomeTeamClick={() => push(buildLineupView(targetMatch.home_team, targetMatch.id))}
-                onAwayTeamClick={() => push(buildLineupView(targetMatch.away_team, targetMatch.id))}
                 homeScoreSlot={
                   <ScoreStepper
                     label={targetMatch.home_team}

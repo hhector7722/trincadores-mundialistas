@@ -368,26 +368,6 @@ export function HomeMatchCard({
             compactTeamColumn
             teamBlocksTopClass="top-0"
             hideTeamNames={true}
-            homeFooterSlot={
-              <HomeSquadFooterLink
-                onClick={() =>
-                  openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-                }
-              />
-            }
-            awayFooterSlot={
-              <HomeSquadFooterLink
-                onClick={() =>
-                  openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-                }
-              />
-            }
-            onHomeTeamClick={() =>
-              openEntityModal(buildLineupView(displayMatch.home_team, displayMatch.id))
-            }
-            onAwayTeamClick={() =>
-              openEntityModal(buildLineupView(displayMatch.away_team, displayMatch.id))
-            }
           />
 
         <div

@@ -254,14 +254,12 @@ type MatchTeamsDisplayProps = {
   awayScoreSlot?: ReactNode;
   /** Desplazamiento vertical solo de bandera + nombre (p. ej. card inicio). */
   teamBlocksTopClass?: string;
-  /** Enlace «Plantilla» bajo el nombre local. */
   homeFooterSlot?: ReactNode;
   /** Enlace «Plantilla» bajo el nombre visitante. */
   awayFooterSlot?: ReactNode;
   /** Bandera más compacta (card inicio con plantilla bajo el nombre). */
   compactTeamColumn?: boolean;
-  onHomeTeamClick?: () => void;
-  onAwayTeamClick?: () => void;
+  hideTeamNames?: boolean;
 };
 
 export function MatchTeamsDisplay({
@@ -281,8 +279,6 @@ export function MatchTeamsDisplay({
   hidePredictionLabel = false,
   homeScoreSlot,
   awayScoreSlot,
-  onHomeTeamClick,
-  onAwayTeamClick,
   teamBlocksTopClass,
   homeFooterSlot,
   awayFooterSlot,
@@ -305,18 +301,8 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[10%] sm:left-[12%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          {onHomeTeamClick ? (
-            <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" size="3xl" />
-          ) : (
-            <TeamCamiFront team={homeTeam} variant="player" size="3xl" />
-          )}
-          {!hideTeamNames && (
-            onHomeTeamClick ? (
-              <TeamNameButton name={homeTeam} onClick={onHomeTeamClick} />
-            ) : (
-              <TeamNameLabel name={homeTeam} />
-            )
-          )}
+          <TeamCamiFront team={homeTeam} variant="player" size="3xl" />
+          {!hideTeamNames && <TeamNameLabel name={homeTeam} />}
           {homeFooterSlot}
         </div>
 
@@ -333,18 +319,8 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[90%] sm:left-[88%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          {onAwayTeamClick ? (
-            <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" size="3xl" />
-          ) : (
-            <TeamCamiFront team={awayTeam} variant="player" size="3xl" />
-          )}
-          {!hideTeamNames && (
-            onAwayTeamClick ? (
-              <TeamNameButton name={awayTeam} onClick={onAwayTeamClick} />
-            ) : (
-              <TeamNameLabel name={awayTeam} />
-            )
-          )}
+          <TeamCamiFront team={awayTeam} variant="player" size="3xl" />
+          {!hideTeamNames && <TeamNameLabel name={awayTeam} />}
           {awayFooterSlot}
         </div>
 
@@ -379,7 +355,6 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={homeTeam}
-            onClick={onHomeTeamClick}
             footerSlot={homeFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}
@@ -393,7 +368,6 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={awayTeam}
-            onClick={onAwayTeamClick}
             footerSlot={awayFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}

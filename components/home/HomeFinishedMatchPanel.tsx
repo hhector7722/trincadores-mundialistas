@@ -179,8 +179,6 @@ export function HomeFinishedMatchPanel({
         teamBlocksTopClass="top-0"
         homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} />}
         awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} />}
-        onHomeTeamClick={onOpenHomeLineup}
-        onAwayTeamClick={onOpenAwayLineup}
         homeScoreSlot={
           hasScore ? (
             <HomeFinishedOfficialGoal value={homeGoals} onOpenDetail={onOpenDetail} />

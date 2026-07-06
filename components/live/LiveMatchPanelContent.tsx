@@ -77,8 +77,6 @@ export function LiveMatchPanelContent({
           awayFooterSlot={
             <MatchGoalScorersList goals={goalScorers.away} align={isModalLayout ? "right" : "center"} />
           }
-          onHomeTeamClick={onOpenHomeLineup}
-          onAwayTeamClick={onOpenAwayLineup}
           homeScoreSlot={
             !isModalLayout && liveSnapshot ? (
               <LiveScoreDisplay score={liveSnapshot.homeScore} />
@@ -120,6 +118,7 @@ export function LiveMatchPanelContent({
             layout={useHomeCompactLayout ? "homeCardCompactStacked" : "homeCardStacked"}
             homeAnchor={actionsHomeAnchor}
             awayAnchor={actionsAwayAnchor}
+            hideLineupButtons
             className={cn("pointer-events-auto", useHomeCompactLayout ? "h-full" : undefined)}
             centerSlot={
               useHomeCompactLayout ? (
