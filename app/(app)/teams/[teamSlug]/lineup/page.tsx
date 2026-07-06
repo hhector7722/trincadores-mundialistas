@@ -1,10 +1,8 @@
-import { ProbableXI } from "@/components/lineup/ProbableXI";
 import { isFormationId } from "@/lib/lineup/formation-coordinates";
-import { resolveTeamLineup } from "@/lib/lineup/resolve-lineup";
 import { squadTeamNameFromSlug } from "@/lib/lineup/squad-name";
 import type { FormationId } from "@/lib/lineup/types";
-import { CURRENT_WORLD_CUP_YEAR, getTeamSquadByName } from "@/lib/worldcup-data/squad-queries";
-import { createClient } from "@/lib/supabase/server";
+import { CURRENT_WORLD_CUP_YEAR } from "@/lib/worldcup-data/squad-queries";
+import { AsyncTeamLineup } from "@/components/lineup/AsyncTeamLineup";
 
 export const dynamic = "force-dynamic";
 
@@ -22,26 +20,12 @@ export default async function TeamLineupPage({
   const year = Number.isInteger(parsedYear) ? parsedYear : CURRENT_WORLD_CUP_YEAR;
   const formation = isFormationId(query.formation ?? "") ? (query.formation as FormationId) : undefined;
 
-  const supabase = await createClient();
-  const squad = await getTeamSquadByName(supabase, teamName, { year });
-  const lineup =
-    squad && squad.players.length > 0
-      ? await resolveTeamLineup(supabase, {
-          teamName,
-          players: squad.players,
-          formationOverride: formation,
-        })
-      : null;
-
   return (
-    <ProbableXI
-      squad={squad}
+    <AsyncTeamLineup
       teamName={teamName}
       teamSlug={teamSlug}
-      lineup={lineup}
       year={year}
       formation={formation}
-      backHref="/predictions"
     />
   );
 }

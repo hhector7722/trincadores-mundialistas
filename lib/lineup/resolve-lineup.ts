@@ -131,8 +131,7 @@ export async function buildFallbackWithKnownFormation(
     // Usar la lógica exacta de hardcoded para saltarse la heurística que causa "Por confirmar"
     resolved = buildExactHardcodedLineup(context.players, hardcoded.formation, hardcoded.startingNumbers);
   } else {
-    const knownFormation =
-      context.formationOverride ?? (await loadLastKnownFormation(supabase, context.teamName)) ?? undefined;
+    const knownFormation = context.formationOverride ?? undefined;
     resolved = buildFallbackLineup(context.players, { knownFormation });
   }
 
