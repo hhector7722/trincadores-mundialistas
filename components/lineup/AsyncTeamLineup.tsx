@@ -23,16 +23,23 @@ export function AsyncTeamLineup({ teamName, teamSlug, year, formation }: AsyncTe
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetchTeamLineupBundleAction(teamName, { formation }).then((res) => {
-      if (cancelled) return;
-      if (res.ok) {
-        setSquad(res.data.squad);
-        setLineup(res.data.lineup);
-      } else {
-        setError(res.error);
-      }
-      setLoading(false);
-    });
+    fetchTeamLineupBundleAction(teamName, { formation })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.ok) {
+          setSquad(res.data.squad);
+          setLineup(res.data.lineup);
+        } else {
+          setError(res.error);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("fetchTeamLineupBundleAction error", err);
+        setError(err.message || "Error de red desconocido");
+        setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
