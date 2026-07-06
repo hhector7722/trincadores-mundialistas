@@ -304,7 +304,7 @@ export function MatchTeamsDisplay({
           </p>
         ) : null}
 
-        <div className="absolute left-[5%] sm:left-[8%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
+        <div className="absolute left-[10%] sm:left-[12%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onHomeTeamClick ? (
             <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" size="3xl" />
           ) : (
@@ -332,7 +332,7 @@ export function MatchTeamsDisplay({
           </div>
         ) : null}
 
-        <div className="absolute left-[95%] sm:left-[92%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
+        <div className="absolute left-[90%] sm:left-[88%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
           {onAwayTeamClick ? (
             <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" size="3xl" />
           ) : (
