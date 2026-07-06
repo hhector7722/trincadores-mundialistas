@@ -571,10 +571,9 @@ export function QuickPredictionModal({
       return;
     }
 
-    const idx = orderedMatches.findIndex((item) => item.id === match.id);
-    if (idx >= 0) setActiveIndex(idx);
-
     if (!wasOpenRef.current) {
+      const idx = orderedMatches.findIndex((item) => item.id === match.id);
+      if (idx >= 0) setActiveIndex(idx);
       wasOpenRef.current = true;
       reset({ kind: "prediction" });
       setMatchSlide(null);
