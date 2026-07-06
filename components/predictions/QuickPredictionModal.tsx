@@ -905,12 +905,12 @@ export function QuickPredictionModal({
               />
 
               <div
-                className={cn("absolute inset-x-0 bottom-0", predictionModalActionsClass)}
+                className="absolute inset-x-0 -bottom-6 h-[5.5rem]"
                 onClick={(event) => event.stopPropagation()}
               >
                 <MatchContextActionsRow
                   compact
-                  layout="homeCardStacked"
+                  layout="predictionModalLiveStacked"
                   homeAnchor="10%"
                   awayAnchor="90%"
                   className="h-full"

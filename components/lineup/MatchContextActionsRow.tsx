@@ -94,7 +94,7 @@ export function MatchContextActionsRow({
 
   if (layout === "predictionModalLiveStacked") {
     return (
-      <div className={cn("flex h-full w-full flex-col items-stretch justify-evenly gap-0 leading-none", className)}>
+      <div className={cn("flex h-full w-full flex-col items-stretch justify-center gap-3 leading-none", className)}>
         {centerSlot ? (
           <div className="flex w-full items-center justify-center px-1">{centerSlot}</div>
         ) : null}
