@@ -1,6 +1,5 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
 import { ConfirmedLineupCheckIcon } from "@/components/lineup/ConfirmedLineupCheckIcon";
 import { MatchContextActionButton } from "@/components/lineup/MatchContextActionButton";
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
@@ -8,9 +7,7 @@ import { isMvpPredictionCorrect } from "@/lib/predictions/prediction-outcome";
 import { shirtPlayerName } from "@/lib/lineup/short-player-name";
 import { cn } from "@/lib/utils";
 
-const FINISHED_INLINE_CHECK_GAP_PX = 4;
-
-/** Nombre centrado en el ancho de la card; el tick no desplaza el centro. */
+/** Nombre centrado en el ancho de la card; el tick centrado debajo. */
 function FinishedInlineMvpCorrect({
   savedLabel,
   className,
@@ -18,57 +15,17 @@ function FinishedInlineMvpCorrect({
   savedLabel: string;
   className?: string;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const labelRef = useRef<HTMLSpanElement>(null);
-  const [checkPos, setCheckPos] = useState<{ left: number; top: number } | null>(null);
-
-  useLayoutEffect(() => {
-    const update = () => {
-      const label = labelRef.current;
-      const container = containerRef.current;
-      if (!label || !container) return;
-
-      const labelRect = label.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      setCheckPos({
-        left: labelRect.right - containerRect.left + FINISHED_INLINE_CHECK_GAP_PX,
-        top: labelRect.top - containerRect.top + labelRect.height / 2,
-      });
-    };
-
-    update();
-
-    const label = labelRef.current;
-    if (!label) return;
-
-    const observer = new ResizeObserver(update);
-    observer.observe(label);
-    if (containerRef.current) observer.observe(containerRef.current);
-
-    return () => observer.disconnect();
-  }, [savedLabel]);
-
   return (
     <div
-      ref={containerRef}
       className={cn(
-        "relative w-full text-[10px] font-semibold leading-none sm:text-xs",
+        "flex w-full flex-col items-center gap-0.5 text-[10px] font-semibold leading-none sm:text-xs",
         className,
       )}
     >
-      <span className="block w-full text-center text-white">
-        <span ref={labelRef} className="inline-block max-w-full truncate whitespace-nowrap">
-          {savedLabel}
-        </span>
+      <span className="block w-full truncate text-center text-white">
+        {savedLabel}
       </span>
-      {checkPos != null ? (
-        <span
-          className="absolute -translate-y-1/2"
-          style={{ left: checkPos.left, top: checkPos.top }}
-        >
-          <ConfirmedLineupCheckIcon />
-        </span>
-      ) : null}
+      <ConfirmedLineupCheckIcon />
     </div>
   );
 }
