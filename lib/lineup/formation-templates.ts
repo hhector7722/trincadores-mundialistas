@@ -103,8 +103,17 @@ export function fallbackSlotKeyForRole(
     return index === 0 ? "LST" : "RST";
   }
 
-  if (formation === "5-3-2") {
+  if (formation === "5-3-2" || formation === "5-4-1" || formation === "5-2-3") {
     if (role === "DF") return (["LWB", "LCB", "CB", "RCB", "RWB"] as const)[index] ?? "CB";
+    if (formation === "5-4-1") {
+      if (role === "MF") return (["LM", "LCM", "RCM", "RM"] as const)[index] ?? "CM";
+      return "ST";
+    }
+    if (formation === "5-2-3") {
+      if (role === "MF") return (["LCM", "RCM"] as const)[index] ?? "CM";
+      return (["LW", "ST", "RW"] as const)[index] ?? "ST";
+    }
+    // 5-3-2
     if (role === "MF") return (["LCM", "CM", "RCM"] as const)[index] ?? "CM";
     return index === 0 ? "LST" : "RST";
   }
@@ -174,12 +183,12 @@ function expandedAccept(
     if (keys.has("DM")) keys.add("CM");
   }
 
-  if (formation === "3-5-2") {
-    if (keys.has("LWB")) keys.add("LB");
-    if (keys.has("RWB")) keys.add("RB");
+  if (formation === "3-5-2" || formation === "3-4-3" || formation === "3-4-2-1") {
+    if (keys.has("LWB") || keys.has("LM")) keys.add("LB");
+    if (keys.has("RWB") || keys.has("RM")) keys.add("RB");
   }
 
-  if (formation === "5-3-2") {
+  if (formation === "5-3-2" || formation === "5-4-1" || formation === "5-2-3") {
     if (keys.has("LWB")) keys.add("LB");
     if (keys.has("RWB")) keys.add("RB");
   }

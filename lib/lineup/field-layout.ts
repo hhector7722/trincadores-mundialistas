@@ -17,7 +17,7 @@ export const PLAYABLE_X_MIN = 10;
 export const PLAYABLE_X_MAX = 90;
 export const PLAYABLE_Y_MIN = 18;
 /** Permite anclar al portero en la portería inferior. */
-export const PLAYABLE_Y_MAX = 94;
+export const PLAYABLE_Y_MAX = 98;
 
 export type PlayableBounds = {
   xMin: number;
