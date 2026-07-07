@@ -8,7 +8,8 @@ type PendingTeamsConfig = {
 
 const PENDING_TEAMS_BY_DATE: Record<string, PendingTeamsConfig> = {
   "2026-07-12": {
-    awayTeams: ["Switzerland", "Colombia"],
+    homeTeams: ["Argentina"],
+    awayTeams: ["Switzerland"],
   },
   "2026-07-14": {
     homeTeams: ["France", "Morocco"],

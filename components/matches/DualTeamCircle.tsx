@@ -25,7 +25,7 @@ export function DualTeamCircle({ teams, size = "md" }: DualTeamCircleProps) {
         "relative flex items-center gap-0.5",
         size === "sm" ? "h-8" : "h-[3.25rem]"
       )}>
-        <div className="relative z-[1] -mr-1 -rotate-6">
+        <div className="relative z-[1] -mr-1">
           <TeamCamiFront team={displayTeams[0]} size={jerseySize} />
         </div>
         <span className={cn(
@@ -34,7 +34,7 @@ export function DualTeamCircle({ teams, size = "md" }: DualTeamCircleProps) {
         )}>
           VS
         </span>
-        <div className="relative z-[1] -ml-1 rotate-6">
+        <div className="relative z-[1] -ml-1">
           <TeamCamiFront team={displayTeams[1]} size={jerseySize} />
         </div>
       </div>

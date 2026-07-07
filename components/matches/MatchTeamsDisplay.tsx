@@ -92,9 +92,12 @@ function TeamFlagCircle({
   placeholderStyle?: "default" | "knockout";
   size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
 }) {
-  if (possibleTeams && possibleTeams.length >= 2 && isPlaceholderTeam(name)) {
-    const dualSize = size === "sm" || size === "md" ? "sm" : "md";
-    return <DualTeamCircle teams={possibleTeams} size={dualSize} />;
+  if (possibleTeams && possibleTeams.length >= 1 && isPlaceholderTeam(name)) {
+    if (possibleTeams.length >= 2) {
+      const dualSize = size === "sm" || size === "md" ? "sm" : "md";
+      return <DualTeamCircle teams={possibleTeams} size={dualSize} />;
+    }
+    return <TeamCamiFront team={possibleTeams[0]} size={size} />;
   }
 
   return (
