@@ -1,7 +1,9 @@
 import type { MouseEvent, ReactNode } from "react";
 import { TeamCamiFront, TeamCamiFrontButton } from "@/components/matches/TeamCamiFront";
 import { TeamFlagBadge } from "@/components/predictions/TeamFlagBadge";
+import { DualTeamCircle } from "@/components/matches/DualTeamCircle";
 import { formatKickoff } from "@/lib/pool/format-kickoff";
+import { isPlaceholderTeam } from "@/lib/openfootball/slug";
 import { teamNameEs } from "@/lib/teams/display";
 import { cn } from "@/lib/utils";
 
@@ -81,13 +83,20 @@ export const HOME_CARD_BODY_H_CAROUSEL_CLASS = `h-[calc(1.5rem+0.5rem+12rem-${HO
 
 function TeamFlagCircle({
   name,
+  possibleTeams,
   placeholderStyle,
   size = "xl",
 }: {
   name: string;
+  possibleTeams?: string[];
   placeholderStyle?: "default" | "knockout";
   size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
 }) {
+  if (possibleTeams && possibleTeams.length >= 2 && isPlaceholderTeam(name)) {
+    const dualSize = size === "sm" || size === "md" ? "sm" : "md";
+    return <DualTeamCircle teams={possibleTeams} size={dualSize} />;
+  }
+
   return (
     <div className="relative flex shrink-0 items-center justify-center">
       <TeamCamiFront
@@ -113,19 +122,21 @@ function TeamNameLabel({ name, compact }: { name: string; compact?: boolean }) {
 
 function TeamFlagButton({
   name,
+  possibleTeams,
   onClick,
   placeholderStyle,
   size = "xl",
 }: {
   name: string;
+  possibleTeams?: string[];
   onClick?: () => void;
   placeholderStyle?: "default" | "knockout";
   size?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
 }) {
   const displayName = teamNameEs(name);
 
-  if (!onClick) {
-    return <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} size={size} />;
+  if (possibleTeams || !onClick) {
+    return <TeamFlagCircle name={name} possibleTeams={possibleTeams} placeholderStyle={placeholderStyle} size={size} />;
   }
 
   return (
@@ -138,7 +149,7 @@ function TeamFlagButton({
       className="shrink-0 rounded-full transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} placeholderStyle={placeholderStyle} size={size} />
+      <TeamFlagCircle name={name} possibleTeams={possibleTeams} placeholderStyle={placeholderStyle} size={size} />
     </button>
   );
 }
@@ -171,6 +182,7 @@ function TeamNameButton({
 
 function TeamBlock({
   name,
+  possibleTeams,
   onClick,
   footerSlot,
   flagSize = "lg",
@@ -178,6 +190,7 @@ function TeamBlock({
   hideName = false,
 }: {
   name: string;
+  possibleTeams?: string[];
   onClick?: () => void;
   footerSlot?: ReactNode;
   flagSize?: "sm" | "md" | "md-lg" | "lg" | "xl" | "2xl" | "3xl";
@@ -190,7 +203,7 @@ function TeamBlock({
     if (!onClick) {
       return (
         <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
-          <TeamFlagCircle name={name} size={flagSize} />
+          <TeamFlagCircle name={name} possibleTeams={possibleTeams} size={flagSize} />
           {!hideName && <TeamNameLabel name={name} compact={compactName} />}
           {footerSlot}
         </div>
@@ -199,7 +212,7 @@ function TeamBlock({
 
     return (
       <div className="inline-flex w-max shrink-0 flex-col items-center gap-0.5">
-        <TeamFlagButton name={name} onClick={onClick} size={flagSize} />
+        <TeamFlagButton name={name} possibleTeams={possibleTeams} onClick={onClick} size={flagSize} />
         {!hideName && <TeamNameButton name={name} onClick={onClick} compact={compactName} />}
         {footerSlot}
       </div>
@@ -209,7 +222,7 @@ function TeamBlock({
   if (!onClick) {
     return (
       <div className="inline-flex w-max flex-col items-center gap-1">
-        <TeamFlagCircle name={name} size={flagSize} />
+        <TeamFlagCircle name={name} possibleTeams={possibleTeams} size={flagSize} />
         {!hideName && <TeamNameLabel name={name} compact={compactName} />}
       </div>
     );
@@ -225,7 +238,7 @@ function TeamBlock({
       className="inline-flex min-h-12 w-max shrink-0 flex-col items-center justify-center gap-1 rounded-lg transition-opacity hover:opacity-80 active:opacity-70"
       aria-label={`Ver plantilla de ${displayName}`}
     >
-      <TeamFlagCircle name={name} size={flagSize} />
+      <TeamFlagCircle name={name} possibleTeams={possibleTeams} size={flagSize} />
       {!hideName && <TeamNameLabel name={name} compact={compactName} />}
     </button>
   );
@@ -261,6 +274,10 @@ type MatchTeamsDisplayProps = {
   compactTeamColumn?: boolean;
   onHomeTeamClick?: () => void;
   onAwayTeamClick?: () => void;
+  /** Posibles equipos para la plaza local (pendiente de definirse). */
+  possibleHomeTeams?: string[];
+  /** Posibles equipos para la plaza visitante (pendiente de definirse). */
+  possibleAwayTeams?: string[];
 };
 
 export function MatchTeamsDisplay({
@@ -287,6 +304,8 @@ export function MatchTeamsDisplay({
   awayFooterSlot,
   compactTeamColumn = false,
   hideTeamNames = false,
+  possibleHomeTeams,
+  possibleAwayTeams,
 }: MatchTeamsDisplayProps) {
   const isPredictionModal = layout === "predictionModal";
   const homeAnchor = isPredictionModal ? "10%" : "15%";
@@ -366,6 +385,7 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={homeTeam}
+            possibleTeams={possibleHomeTeams}
             footerSlot={homeFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}
@@ -379,6 +399,7 @@ export function MatchTeamsDisplay({
         >
           <TeamBlock
             name={awayTeam}
+            possibleTeams={possibleAwayTeams}
             footerSlot={awayFooterSlot}
             flagSize={teamFlagSize}
             compactName={teamColumnCompact}

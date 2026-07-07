@@ -24,6 +24,7 @@ import {
   HOME_CARD_TEAMS_BLOCK_CLASS,
   MatchTeamsDisplay,
 } from "@/components/matches/MatchTeamsDisplay";
+import { getPendingTeamsForMatch } from "@/lib/home/pending-match-teams";
 import { AiPredictionTrigger } from "@/components/predictions/AiPredictionTrigger";
 import { MatchPredictionsBoardModal } from "@/components/predictions/MatchPredictionsBoardModal";
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
@@ -229,6 +230,10 @@ export function HomeMatchCard({
     onOpenChange?.(scoreModalOpen || entityModal.open || predictionsBoardOpen);
   }, [scoreModalOpen, entityModal.open, predictionsBoardOpen, onOpenChange]);
 
+  const pendingTeams = useMemo(
+    () => getPendingTeamsForMatch(displayMatch),
+    [displayMatch],
+  );
   const saved = hasSavedPrediction(displayMatch);
   const savedMvp = hasSavedMvp(displayMatch);
   const scoreText = formatListScore(
@@ -368,6 +373,8 @@ export function HomeMatchCard({
             compactTeamColumn
             teamBlocksTopClass="top-0"
             hideTeamNames={true}
+            possibleHomeTeams={pendingTeams?.homeTeams}
+            possibleAwayTeams={pendingTeams?.awayTeams}
           />
 
         <div
