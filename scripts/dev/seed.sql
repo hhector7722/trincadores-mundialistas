@@ -30,7 +30,8 @@ insert into public.matchdays (id, pool_id, name, sequence) values (
 insert into public.matches (id, matchday_id, home_team, away_team, kickoff_at, status, sort_order) values
   ('d0000000-0000-4000-8000-000000000001','c0000000-0000-4000-8000-000000000001','Espana','Francia',now()-interval '3 days','finished',1),
   ('d0000000-0000-4000-8000-000000000002','c0000000-0000-4000-8000-000000000001','Brasil','Argentina',now()-interval '1 hour','live',2),
-  ('d0000000-0000-4000-8000-000000000003','c0000000-0000-4000-8000-000000000001','Alemania','Italia',now()+interval '2 days','scheduled',3)
+  ('d0000000-0000-4000-8000-000000000003','c0000000-0000-4000-8000-000000000001','Alemania','Italia',now()+interval '2 days','scheduled',3),
+  ('d0000000-0000-4000-8000-000000000004','c0000000-0000-4000-8000-000000000001','Espana','Belgica','2026-07-10 21:00:00Z'::timestamptz,'scheduled',4)
 on conflict (id) do nothing;
 insert into public.match_results (match_id, home_goals, away_goals, recorded_by) values (
   'd0000000-0000-4000-8000-000000000001', 2, 1, 'b0000000-0000-4000-8000-000000000001'
