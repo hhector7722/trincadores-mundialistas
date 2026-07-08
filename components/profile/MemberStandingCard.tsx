@@ -1,6 +1,6 @@
 import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { Card } from "@/components/ui/card";
-import { MATCH_SCORE_POINTS } from "@/lib/predictions/scoring";
+import { MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS } from "@/lib/predictions/scoring";
 import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
 import type { MemberStanding } from "@/lib/ranking/queries";
 
@@ -45,6 +45,18 @@ export function MemberStandingCard({
             <p className="text-xs text-[var(--tm-muted)]">Signo ({MATCH_SCORE_POINTS.sign} pts)</p>
             <p className="text-lg font-medium text-[var(--tm-fg)]">
               {formatAggregateStat(standing.signHits)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-[var(--tm-muted)]">Clasif ({MATCH_SCORE_POINTS.sign} pts)</p>
+            <p className="text-lg font-medium text-[var(--tm-fg)]">
+              {formatAggregateStat(standing.clasifHits)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-[var(--tm-muted)]">MVP ({MVP_PREDICTION_POINTS} pt)</p>
+            <p className="text-lg font-medium text-[var(--tm-fg)]">
+              {formatAggregateStat(standing.mvpHits)}
             </p>
           </div>
         </div>

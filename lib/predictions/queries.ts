@@ -636,6 +636,7 @@ export async function getMatchPredictionsBoard(
           cumulativePoints: snapshotA?.cumulativePoints ?? 0,
           exactHits: snapshotA?.exactHits ?? 0,
           signHits: snapshotA?.signHits ?? 0,
+          clasifHits: snapshotA?.clasifHits ?? 0,
           mvpHits: snapshotA?.mvpHits ?? 0,
           globalHits: snapshotA?.globalHits ?? 0,
         },
@@ -644,6 +645,7 @@ export async function getMatchPredictionsBoard(
           cumulativePoints: snapshotB?.cumulativePoints ?? 0,
           exactHits: snapshotB?.exactHits ?? 0,
           signHits: snapshotB?.signHits ?? 0,
+          clasifHits: snapshotB?.clasifHits ?? 0,
           mvpHits: snapshotB?.mvpHits ?? 0,
           globalHits: snapshotB?.globalHits ?? 0,
         }

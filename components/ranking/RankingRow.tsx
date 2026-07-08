@@ -3,6 +3,7 @@ import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
+import { MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS } from "@/lib/predictions/scoring";
 import { formatReliabilityPct } from "@/lib/ranking/reliability";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,18 @@ export function RankingRow({
       />
       <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatPoints(row.cumulativePoints)}
+      </span>
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${row.exactHits} exactos (${MATCH_SCORE_POINTS.exact} pts c/u)`}>
+        {formatAggregateStat(row.exactHits)}
+      </span>
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${row.signHits} signos (${MATCH_SCORE_POINTS.sign} pts c/u)`}>
+        {formatAggregateStat(row.signHits)}
+      </span>
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${row.clasifHits} clasificados correctos (${MATCH_SCORE_POINTS.sign} pts c/u)`}>
+        {formatAggregateStat(row.clasifHits)}
+      </span>
+      <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${row.mvpHits} MVP (${MVP_PREDICTION_POINTS} pt c/u)`}>
+        {formatAggregateStat(row.mvpHits)}
       </span>
       <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]">
         {formatReliabilityPct(row.reliabilityPct)}

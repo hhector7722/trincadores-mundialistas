@@ -11,16 +11,20 @@ function RankingTableHeader() {
     <div
       className={cn(
         RANKING_GRID,
-        "shrink-0 border-b border-[var(--tm-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
+        "shrink-0 border-b border-[var(--tm-border)] px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
       <span aria-hidden="true" />
       <span className="text-left">Pos</span>
       <span className="text-left">Trincador</span>
-      <span className="text-center">Pts</span>
+      <span className="text-center" title="Puntos totales">Pts</span>
+      <span className="text-center" title="Marcador exacto (5 pts)">Exact</span>
+      <span className="text-center" title="Signo acertado (2 pts)">Signo</span>
+      <span className="text-center" title="Clasificado correcto en eliminatorias (2 pts)">Clasif</span>
+      <span className="text-center" title="MVP acertado (1 pt)">MVP</span>
       <span className="text-center">Fiab</span>
       <span className="text-center">Quiz</span>
-      <div className="flex items-center justify-end pr-1">
+      <div className="flex items-center justify-end">
         <QuizBonusToggle />
       </div>
     </div>
@@ -32,7 +36,7 @@ function RankingEmptyRow() {
     <div
       className={cn(
         RANKING_GRID,
-        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 last:border-0"
+        "tm-ranking-row w-full border-b border-[var(--tm-border)] px-2 last:border-0"
       )}
       aria-hidden="true"
     >
@@ -42,6 +46,9 @@ function RankingEmptyRow() {
         <span className="size-9 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
         <span className="min-w-0 flex-1 truncate">&nbsp;</span>
       </div>
+      <span />
+      <span />
+      <span />
       <span />
       <span />
       <span />

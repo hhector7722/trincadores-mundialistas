@@ -39,6 +39,7 @@ export type LeaderboardRow = {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  clasifHits: number;
   mvpHits: number;
   globalHits: number;
   matchPoints: number;
@@ -59,6 +60,7 @@ export type MemberStanding = {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  clasifHits: number;
   mvpHits: number;
   globalHits: number;
   matchPoints: number;
@@ -80,6 +82,7 @@ type MatchStatsRow = {
   match_points: number;
   exact_hits: number;
   sign_hits: number;
+  clasif_hits: number;
   mvp_hits: number;
 };
 
@@ -92,13 +95,15 @@ function sortKey(row: {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  clasifHits: number;
   mvpHits: number;
   globalHits: number;
-}): [number, number, number, number, number, string] {
+}): [number, number, number, number, number, number, string] {
   return [
     -row.cumulativePoints,
     -row.exactHits,
     -row.signHits,
+    -row.clasifHits,
     -row.mvpHits,
     -row.globalHits,
     row.label.toLowerCase(),
@@ -106,29 +111,30 @@ function sortKey(row: {
 }
 
 function compareRows(
-  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number },
-  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number }
+  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; clasifHits: number; mvpHits: number; globalHits: number },
+  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; clasifHits: number; mvpHits: number; globalHits: number }
 ): number {
   const ka = sortKey(a);
   const kb = sortKey(b);
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     if (ka[i] !== kb[i]) return (ka[i] as number) - (kb[i] as number);
   }
-  return (ka[5] as string).localeCompare(kb[5] as string, "es");
+  return (ka[6] as string).localeCompare(kb[6] as string, "es");
 }
 
 export type RankingSortSnapshot = {
   cumulativePoints: number;
   exactHits: number;
   signHits: number;
+  clasifHits: number;
   mvpHits: number;
   globalHits: number;
 };
 
-/** Misma regla de orden que `getPoolLeaderboard` (pts → exactos → signos → mvps → globales → nombre). */
+/** Misma regla de orden que `getPoolLeaderboard` (pts → exactos → signos → clasif → mvps → globales → nombre). */
 export function compareLeaderboardRows(
-  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number },
-  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; mvpHits: number; globalHits: number }
+  a: { label: string; cumulativePoints: number; exactHits: number; signHits: number; clasifHits: number; mvpHits: number; globalHits: number },
+  b: { label: string; cumulativePoints: number; exactHits: number; signHits: number; clasifHits: number; mvpHits: number; globalHits: number }
 ): number {
   return compareRows(a, b);
 }
@@ -174,6 +180,7 @@ export async function loadRankingSnapshotThroughKickoff(
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: scoreRow?.exact_hits ?? 0,
       signHits: scoreRow?.sign_hits ?? 0,
+      clasifHits: scoreRow?.clasif_hits ?? 0,
       mvpHits: scoreRow?.mvp_hits ?? 0,
       globalHits: gHits,
     });
@@ -252,19 +259,22 @@ function ingestMatchPoints(
   stats: Map<string, MatchStatsRow>,
   profileId: string,
   points: number,
-  type: "match" | "mvp"
+  type: "match" | "mvp",
+  isKnockout?: boolean
 ) {
   const current = stats.get(profileId) ?? {
     profile_id: profileId,
     match_points: 0,
     exact_hits: 0,
     sign_hits: 0,
+    clasif_hits: 0,
     mvp_hits: 0,
   };
   current.match_points += points;
   if (type === "match") {
     if (points === MATCH_SCORE_POINTS.exact) current.exact_hits += 1;
-    if (points === MATCH_SCORE_POINTS.sign) current.sign_hits += 1;
+    else if (points === MATCH_SCORE_POINTS.sign && !isKnockout) current.sign_hits += 1;
+    else if (points === MATCH_SCORE_POINTS.sign && isKnockout) current.clasif_hits += 1;
   } else if (type === "mvp") {
     if (points > 0) current.mvp_hits += 1;
   }
@@ -282,7 +292,7 @@ async function loadMatchStatsForMatchIds(
     await Promise.all([
       supabase
         .from("predictions")
-        .select("profile_id, points_awarded")
+        .select("profile_id, points_awarded, matches!inner(group_code)")
         .eq("pool_id", poolId)
         .in("match_id", matchIds)
         .not("points_awarded", "is", null),
@@ -299,7 +309,9 @@ async function loadMatchStatsForMatchIds(
 
   const stats = new Map<string, MatchStatsRow>();
   for (const row of predictions ?? []) {
-    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "match");
+    const matches = (row as any).matches as { group_code: string | null } | undefined;
+    const isKnockout = matches ? matches.group_code === null : false;
+    ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "match", isKnockout);
   }
   for (const row of mvps ?? []) {
     ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "mvp");
@@ -427,6 +439,7 @@ export function buildPositionsFromSnapshots(
       cumulativePoints: snap?.cumulativePoints ?? 0,
       exactHits: snap?.exactHits ?? 0,
       signHits: snap?.signHits ?? 0,
+      clasifHits: snap?.clasifHits ?? 0,
       mvpHits: snap?.mvpHits ?? 0,
       globalHits: snap?.globalHits ?? 0,
     };
@@ -550,6 +563,7 @@ function buildPositionMap(
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
+      clasifHits: s?.clasif_hits ?? 0,
       mvpHits: s?.mvp_hits ?? 0,
       globalHits: gHits,
     };
@@ -599,6 +613,7 @@ function buildLeaderboardRows(
       cumulativePoints: matchCumulative + general + quizBonus,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
+      clasifHits: s?.clasif_hits ?? 0,
       mvpHits: s?.mvp_hits ?? 0,
       globalHits: gHits,
       matchPoints: lastMatch?.match_points ?? 0,
@@ -734,6 +749,7 @@ export async function getMemberStanding(
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,
+    clasifHits: row.clasifHits,
     mvpHits: row.mvpHits,
     globalHits: row.globalHits,
     matchPoints: row.matchPoints,
@@ -760,6 +776,7 @@ export function memberStandingFromLeaderboard(
     cumulativePoints: row.cumulativePoints,
     exactHits: row.exactHits,
     signHits: row.signHits,
+    clasifHits: row.clasifHits,
     mvpHits: row.mvpHits,
     globalHits: row.globalHits,
     matchPoints: row.matchPoints,
