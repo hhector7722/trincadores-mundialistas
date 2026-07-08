@@ -3,7 +3,7 @@
 import { LineChart } from "lucide-react";
 import { useState } from "react";
 import { RankingEvolutionModal } from "@/components/ranking/RankingEvolutionModal";
-import { RankingTable } from "@/components/ranking/RankingTable";
+import { RankingLegend, RankingTable } from "@/components/ranking/RankingTable";
 import type { LeaderboardRow } from "@/lib/ranking/queries";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +30,8 @@ export function RankingTableShell({
   return (
     <div className="tm-ranking-shell flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <RankingTable rows={rows} currentProfileId={currentProfileId} />
+
+      <RankingLegend />
 
       <div className="tm-ranking-evolution-trigger flex shrink-0 justify-center pt-2">
         <button

@@ -1,6 +1,6 @@
-/** Grid: # | nombre | pts | ✅ | ✅✅ | ✅✅✅ | ⭐ | toggle */
+/** Grid: trend | # | nombre | pts | ✅ | ✅✅ | ✅✅✅ | ⭐ | quiz */
 export const RANKING_GRID =
-  "grid grid-cols-[1.5rem_minmax(0,1fr)_2.25rem_1.75rem_1.75rem_1.75rem_1.75rem_1.5rem] items-center gap-x-1";
+  "grid grid-cols-[0.75rem_1.25rem_minmax(0,1fr)_2.25rem_1.75rem_1.75rem_1.75rem_1.75rem_1.75rem] items-center gap-x-1";
 
 /** Card inicio: tendencia | pos | avatar | nombre | (relleno) | pts | fiab | quiz */
 export const MINI_RANKING_GRID =

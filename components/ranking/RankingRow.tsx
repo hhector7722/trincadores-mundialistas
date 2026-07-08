@@ -1,3 +1,4 @@
+import { PositionTrendIndicator } from "@/components/ranking/PositionTrendIndicator";
 import { RankingMemberCells } from "@/components/ranking/RankingMemberCells";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { useQuizBonusActive } from "@/components/ranking/quiz-bonus-store";
@@ -29,7 +30,8 @@ export function RankingRow({
         "tm-ranking-row w-full border-b border-[var(--tm-border)] px-3 text-left last:border-0"
       )}
     >
-      <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
+      <PositionTrendIndicator trend={row.positionTrend} />
+      <span className="font-display shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
         {formatAggregateStat(position)}
       </span>
       <RankingMemberCells
@@ -57,7 +59,7 @@ export function RankingRow({
         {formatAggregateStat(row.mvpHits)}
       </span>
       <span className="flex items-center justify-center text-[10px] whitespace-nowrap tabular-nums text-[#34C759]">
-        {quizBonusActive && row.quizFinalBonus > 0 ? `+${row.quizFinalBonus}` : ""}
+        {row.quizFinalBonus > 0 ? `+${row.quizFinalBonus}` : ""}
       </span>
     </div>
   );

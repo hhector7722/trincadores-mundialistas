@@ -43,7 +43,7 @@ function LegendItem({
   );
 }
 
-function RankingLegend() {
+export function RankingLegend() {
   return (
     <div className="flex shrink-0 items-center justify-center overflow-x-auto border-b border-[var(--tm-border)] px-3 py-1.5 text-[9px] leading-none text-[var(--tm-muted)] [scrollbar-width:none]">
       <ul className="inline-flex min-w-max items-center gap-x-3">
@@ -90,8 +90,10 @@ function RankingTableHeader() {
         "shrink-0 border-b border-[var(--tm-border)] px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tm-muted)]"
       )}
     >
-      <span className="text-left">#</span>
-      <span className="text-left">Nombre</span>
+      <span />
+      <span className="text-center" style={{ gridColumn: "span 2" }}>
+        TRINCADOR
+      </span>
       <span className="text-center" title="Puntos totales">Total</span>
       <div className="flex items-center justify-center" title={`Signo acertado en fase de grupos (${MATCH_SCORE_POINTS.sign} pts)`}>
         <PredictionOutcomeIcon variant="success" className="text-[8px] !min-h-0 !min-w-0" />
@@ -125,6 +127,7 @@ function RankingEmptyRow() {
       aria-hidden="true"
     >
       <span />
+      <span />
       <div className="flex min-w-0 items-center gap-2.5">
         <span className="size-9 shrink-0 rounded-full bg-[var(--tm-border)]/35" />
         <span className="min-w-0 flex-1 truncate">&nbsp;</span>
@@ -155,7 +158,6 @@ export function RankingTable({
   return (
     <div className="tm-ranking-table">
       <RankingTableHeader />
-      <RankingLegend />
       <div className="tm-ranking-body">
         {sortedRows.length === 0
           ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
