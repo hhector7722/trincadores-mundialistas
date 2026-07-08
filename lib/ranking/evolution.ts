@@ -43,7 +43,7 @@ async function loadMatchdayCutoffs(poolId: string): Promise<MatchdayCutoff[]> {
   const { data, error } = await supabase
     .from("matches")
     .select("kickoff_at, matchday_id, matchdays!inner(id, name, sequence, pool_id)")
-    .eq("status", "finished")
+    .eq("scoring_status", "completed")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: true });
 

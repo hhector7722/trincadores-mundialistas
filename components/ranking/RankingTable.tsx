@@ -50,13 +50,11 @@ function RankingEmptyRow() {
   );
 }
 
-export type EnhancedLeaderboardRow = LeaderboardRow & { quizBonusText?: string };
-
 export function RankingTable({
   rows,
   currentProfileId,
 }: {
-  rows: EnhancedLeaderboardRow[];
+  rows: LeaderboardRow[];
   currentProfileId: string;
 }) {
   return (
@@ -72,7 +70,6 @@ export function RankingTable({
                 key={row.profileId}
                 row={row}
                 isCurrentUser={row.profileId === currentProfileId}
-                quizBonusText={row.quizBonusText}
               />
             ))}
       </div>

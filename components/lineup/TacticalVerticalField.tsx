@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { LayoutEngine, LayoutConstraints, LayoutElementInput } from "@/lib/lineup/tactical-layout-engine";
 import { FootballPitchSurface } from "@/components/lineup/FootballPitchSurface";
 import { LineupPlayerChip } from "@/components/lineup/LineupPlayerChip";
-import { type ResolvedLineup } from "@/lib/lineup/types";
+import { type LineupSlot, type ResolvedLineup } from "@/lib/lineup/types";
 import { resolveVisualLineupSlots } from "@/lib/lineup/visual-lineup-slots";
 import { mvpSelectionKey, mvpPlayersMatch } from "@/lib/lineup/mvp-selection-key";
 import { substitutionMarkerForPlayer } from "@/lib/live/substitution-markers";
@@ -54,13 +54,41 @@ const BASE_HALF_CONSTRAINTS: Omit<LayoutConstraints, "fieldBounds"> = {
 };
 
 /**
+ * Invierte las coordenadas X dentro de cada línea (mismo Y),
+ * intercambiando izquierda ↔ derecha en cada línea.
+ */
+function mirrorHorizontalWithinLines(slots: LineupSlot[]): void {
+  const groups = new Map<number, LineupSlot[]>();
+  for (const s of slots) {
+    const yKey = Math.round(s.y);
+    if (!groups.has(yKey)) groups.set(yKey, []);
+    groups.get(yKey)!.push(s);
+  }
+  for (const group of groups.values()) {
+    if (group.length <= 1) continue;
+    group.sort((a, b) => a.x - b.x);
+    for (let i = 0; i < Math.floor(group.length / 2); i++) {
+      const tmp = group[i].x;
+      group[i].x = group[group.length - 1 - i].x;
+      group[group.length - 1 - i].x = tmp;
+    }
+  }
+}
+
+/**
  * Optimiza una mitad del campo de forma completamente aislada.
  * @param lineup     Alineación del equipo
  * @param fieldBounds  Porción del campo que ocupa esta mitad
+ * @param mirrorX    Si es true, invierte X izquierda↔derecha dentro de cada línea (para equipo local/inferior)
  */
-function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"], fixedScale: number) {
+function solveHalf(lineup: ResolvedLineup | null, fieldBounds: LayoutConstraints["fieldBounds"], fixedScale: number, mirrorX = false) {
   if (!lineup) return null;
   const slots = resolveVisualLineupSlots(lineup);
+
+  if (mirrorX) {
+    mirrorHorizontalWithinLines(slots);
+  }
+
   const inputs: LayoutElementInput[] = slots.map(s => {
     let refY = s.y;
     return {
@@ -170,8 +198,9 @@ export function TacticalVerticalField({
   );
 
   // ── Optimización independiente: local (mitad inferior, ataca hacia arriba) ──
+  // Se invierten las X dentro de cada línea (izquierda↔derecha) para el equipo inferior
   const homeResult = useMemo(
-    () => solveHalf(homeLineup, { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }, fixedScale),
+    () => solveHalf(homeLineup, { xMin: 0, xMax: 100, yMin: 50, yMax: 100, isAwayHalf: false }, fixedScale, true),
     [homeLineup, fixedScale]
   );
 

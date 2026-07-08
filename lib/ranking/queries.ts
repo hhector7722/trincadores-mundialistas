@@ -206,7 +206,7 @@ async function getFinishedMatchPair(poolId: string): Promise<{
   const { data, error } = await supabase
     .from("matches")
     .select("id, home_team, away_team, kickoff_at, matchday_id, matchdays!inner(pool_id)")
-    .eq("status", "finished")
+    .eq("scoring_status", "completed")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: false })
     .limit(2);
@@ -237,7 +237,7 @@ async function getFinishedMatchIdsThroughKickoff(
   const { data, error } = await supabase
     .from("matches")
     .select("id, kickoff_at, matchdays!inner(pool_id)")
-    .eq("status", "finished")
+    .eq("scoring_status", "completed")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: true });
 
