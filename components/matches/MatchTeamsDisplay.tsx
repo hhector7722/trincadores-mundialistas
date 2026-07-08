@@ -326,12 +326,21 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[10%] sm:left-[12%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          {onHomeTeamClick ? (
+          {possibleHomeTeams && possibleHomeTeams.length >= 1 && isPlaceholderTeam(homeTeam) ? (
+            possibleHomeTeams.length >= 2 ? (
+              <DualTeamCircle teams={possibleHomeTeams} size="md" />
+            ) : (
+              <>
+                <TeamCamiFront team={possibleHomeTeams[0]} variant="player" size="3xl" />
+                {!hideTeamNames && <TeamNameLabel name={possibleHomeTeams[0]} />}
+              </>
+            )
+          ) : onHomeTeamClick ? (
             <TeamCamiFrontButton team={homeTeam} onClick={onHomeTeamClick} variant="player" size="3xl" />
           ) : (
             <TeamCamiFront team={homeTeam} variant="player" size="3xl" />
           )}
-          {!hideTeamNames && <TeamNameLabel name={homeTeam} />}
+          {!hideTeamNames && !(possibleHomeTeams && possibleHomeTeams.length >= 1 && isPlaceholderTeam(homeTeam)) && <TeamNameLabel name={homeTeam} />}
           {homeFooterSlot}
         </div>
 
@@ -348,12 +357,21 @@ export function MatchTeamsDisplay({
         ) : null}
 
         <div className="absolute left-[90%] sm:left-[88%] top-[-1rem] sm:top-[-1.5rem] flex -translate-x-1/2 flex-col items-center gap-1">
-          {onAwayTeamClick ? (
+          {possibleAwayTeams && possibleAwayTeams.length >= 1 && isPlaceholderTeam(awayTeam) ? (
+            possibleAwayTeams.length >= 2 ? (
+              <DualTeamCircle teams={possibleAwayTeams} size="md" />
+            ) : (
+              <>
+                <TeamCamiFront team={possibleAwayTeams[0]} variant="player" size="3xl" />
+                {!hideTeamNames && <TeamNameLabel name={possibleAwayTeams[0]} />}
+              </>
+            )
+          ) : onAwayTeamClick ? (
             <TeamCamiFrontButton team={awayTeam} onClick={onAwayTeamClick} variant="player" size="3xl" />
           ) : (
             <TeamCamiFront team={awayTeam} variant="player" size="3xl" />
           )}
-          {!hideTeamNames && <TeamNameLabel name={awayTeam} />}
+          {!hideTeamNames && !(possibleAwayTeams && possibleAwayTeams.length >= 1 && isPlaceholderTeam(awayTeam)) && <TeamNameLabel name={awayTeam} />}
           {awayFooterSlot}
         </div>
 

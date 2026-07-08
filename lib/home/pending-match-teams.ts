@@ -16,8 +16,8 @@ const PENDING_TEAMS_BY_DATE: Record<string, PendingTeamsConfig> = {
     awayTeams: ["Spain", "Belgium"],
   },
   "2026-07-15": {
-    homeTeams: ["Norway", "Morocco"],
-    awayTeams: ["Switzerland", "Colombia"],
+    homeTeams: ["Norway", "England"],
+    awayTeams: ["Argentina", "Switzerland"],
   },
 };
 

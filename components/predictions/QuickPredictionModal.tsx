@@ -23,6 +23,7 @@ import { MvpPredictionButton } from "@/components/predictions/MvpPredictionButto
 import { PlayerDetailPanel } from "@/components/lineup/PlayerDetailPanel";
 import { entityModalTitleContent } from "@/components/lineup/EntityModalTitle";
 import type { EntityModalView } from "@/components/lineup/entity-modal-types";
+import { getPendingTeamsForMatch } from "@/lib/home/pending-match-teams";
 import {
   MatchTeamsDisplay,
   PREDICTION_MODAL_ACTIONS_ROW_CLASS,
@@ -672,6 +673,7 @@ export function QuickPredictionModal({
       targetMatch.playerIncidents,
       liveSnapshot?.playerIncidents,
     );
+    const pendingTeams = getPendingTeamsForMatch(targetMatch);
 
     if (
       view.kind === "prediction" &&
@@ -696,6 +698,8 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={false}
+                possibleHomeTeams={pendingTeams?.homeTeams}
+                possibleAwayTeams={pendingTeams?.awayTeams}
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
               />
@@ -794,6 +798,8 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive
+                possibleHomeTeams={pendingTeams?.homeTeams}
+                possibleAwayTeams={pendingTeams?.awayTeams}
                 homeFooterSlot={<MatchGoalScorersList goals={goalScorers.home} align="left" />}
                 awayFooterSlot={<MatchGoalScorersList goals={goalScorers.away} align="right" />}
                 centerSlotAlign="teamNames"
@@ -875,6 +881,8 @@ export function QuickPredictionModal({
                 awayTeam={targetMatch.away_team}
                 kickoffAt={targetMatch.kickoff_at}
                 isLive={targetMatch.status === "live"}
+                possibleHomeTeams={pendingTeams?.homeTeams}
+                possibleAwayTeams={pendingTeams?.awayTeams}
                 onHomeTeamClick={() => {
                   if (controlsDisabled || home === null) return;
                   setHome(home === 0 ? null : home - 1);

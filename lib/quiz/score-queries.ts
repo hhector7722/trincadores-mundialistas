@@ -29,10 +29,16 @@ function mapScoreRow(row: ScoreDbRow): QuizFinalRankingScoreRow {
   };
 }
 
+type QuizScoreRow = {
+  profile_id: string;
+  best_score: number;
+};
+
 export async function loadQuizFinalRankingBonusesByProfile(
   poolId: string
 ): Promise<Map<string, number>> {
   const supabase = await createClient();
+
   const { data, error } = await supabase
     .from("quiz_final_ranking_scores")
     .select("pool_id, profile_id, quiz_total_score, final_position, bonus_points, calculated_at")
@@ -40,12 +46,50 @@ export async function loadQuizFinalRankingBonusesByProfile(
 
   if (error) throw new Error(error.message);
 
-  return new Map(
-    (data ?? []).map((row) => [
-      row.profile_id as string,
-      (row.bonus_points as number) ?? 0,
-    ])
-  );
+  if (data && data.length > 0) {
+    return new Map(
+      data.map((row) => [
+        row.profile_id as string,
+        (row.bonus_points as number) ?? 0,
+      ])
+    );
+  }
+
+  const { data: quizzes, error: quizError } = await supabase
+    .from("quizzes")
+    .select("id")
+    .eq("pool_id", poolId)
+    .eq("kind", "official")
+    .eq("scoring_mode", "competitive");
+
+  if (quizError) throw new Error(quizError.message);
+  if (!quizzes?.length) return new Map();
+
+  const quizIds = quizzes.map((q) => q.id as string);
+  const { data: scores, error: scoreError } = await supabase
+    .from("quiz_leaderboard")
+    .select("profile_id, best_score")
+    .in("quiz_id", quizIds);
+
+  if (scoreError) throw new Error(scoreError.message);
+
+  const totalScores = new Map<string, number>();
+  for (const row of (scores ?? []) as QuizScoreRow[]) {
+    const profileId = row.profile_id;
+    totalScores.set(profileId, (totalScores.get(profileId) ?? 0) + (row.best_score ?? 0));
+  }
+
+  const sorted = [...totalScores.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
+  const bonuses = [5, 3, 2, 1];
+  const bonusMap = new Map<string, number>();
+  for (let i = 0; i < sorted.length; i++) {
+    bonusMap.set(sorted[i][0], bonuses[i]);
+  }
+
+  return bonusMap;
 }
 
 export async function getQuizFinalRankingScoreForProfile(
