@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const EMPTY_ROW_COUNT = 11;
 
 function RankingTableHeader() {
-  const iconClass = "text-[10px]";
+  const iconSM = "text-[8px] !min-h-0 !min-w-0";
   return (
     <div
       className={cn(
@@ -21,20 +21,20 @@ function RankingTableHeader() {
       <span className="text-left">Pos</span>
       <span className="text-left">Trincador</span>
       <span className="text-center" title="Puntos totales">Pts</span>
-      <div className="flex items-center justify-center gap-px" title={`Signo acertado en fase de grupos (${MATCH_SCORE_POINTS.sign} pts)`}>
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
+      <div className="flex items-center justify-center" title={`Signo acertado en fase de grupos (${MATCH_SCORE_POINTS.sign} pts)`}>
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
       </div>
-      <div className="flex items-center justify-center gap-px" title={`Clasificado correcto en eliminatorias (${MATCH_SCORE_POINTS.sign} pts)`}>
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
+      <div className="flex items-center justify-center" title={`Clasificado correcto en eliminatorias (${MATCH_SCORE_POINTS.sign} pts)`}>
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
       </div>
-      <div className="flex items-center justify-center gap-px" title={`Marcador exacto (${MATCH_SCORE_POINTS.exact} pts)`}>
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
-        <PredictionOutcomeIcon variant="success" className={iconClass} />
+      <div className="flex items-center justify-center" title={`Marcador exacto (${MATCH_SCORE_POINTS.exact} pts)`}>
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
+        <PredictionOutcomeIcon variant="success" className={iconSM} />
       </div>
       <div className="flex items-center justify-center" title={`MVP acertado (${MVP_PREDICTION_POINTS} pt)`}>
-        <PredictionOutcomeIcon variant="mvp" className={iconClass} />
+        <PredictionOutcomeIcon variant="mvp" className={iconSM} />
       </div>
       <div className="flex items-center justify-center">
         <QuizBonusToggle />
