@@ -303,32 +303,41 @@ async function loadMatchStatsForMatchIds(
   if (!matchIds.length) return new Map();
 
   const supabase = await createClient();
-  const [{ data: predictions, error: predictionError }, { data: mvps, error: mvpError }] =
-    await Promise.all([
+  const PAGE = 500;
+  const allPredictions: any[] = [];
+  const allMvps: any[] = [];
+
+  for (let page = 0; ; page++) {
+    const from = page * PAGE, to = from + PAGE - 1;
+    const [{ data: preds }, { data: mvps }] = await Promise.all([
       supabase
         .from("predictions")
         .select("profile_id, points_awarded, matches!inner(group_code)")
         .eq("pool_id", poolId)
         .in("match_id", matchIds)
-        .not("points_awarded", "is", null),
+        .not("points_awarded", "is", null)
+        .range(from, to) as any,
       supabase
         .from("match_mvp_predictions")
         .select("profile_id, points_awarded")
         .eq("pool_id", poolId)
         .in("match_id", matchIds)
-        .not("points_awarded", "is", null),
+        .not("points_awarded", "is", null)
+        .range(from, to) as any,
     ]);
-
-  if (predictionError) throw new Error(predictionError.message);
-  if (mvpError) throw new Error(mvpError.message);
+    if (!preds || preds.length === 0) break;
+    allPredictions.push(...preds);
+    allMvps.push(...(mvps ?? []));
+    if (preds.length < PAGE) break;
+  }
 
   const stats = new Map<string, MatchStatsRow>();
-  for (const row of predictions ?? []) {
+  for (const row of allPredictions ?? []) {
     const matches = (row as any).matches as { group_code: string | null } | undefined;
     const isKnockout = matches ? matches.group_code === null : false;
     ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "match", isKnockout);
   }
-  for (const row of mvps ?? []) {
+  for (const row of allMvps ?? []) {
     ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "mvp");
   }
 
