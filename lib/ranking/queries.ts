@@ -41,6 +41,8 @@ export type LeaderboardRow = {
   signHits: number;
   clasifHits: number;
   mvpHits: number;
+  koExactHits: number;
+  koExactOnlyHits: number;
   globalHits: number;
   matchPoints: number;
   generalPoints: number;
@@ -62,6 +64,8 @@ export type MemberStanding = {
   signHits: number;
   clasifHits: number;
   mvpHits: number;
+  koExactHits: number;
+  koExactOnlyHits: number;
   globalHits: number;
   matchPoints: number;
   generalPoints: number;
@@ -84,6 +88,8 @@ type MatchStatsRow = {
   sign_hits: number;
   clasif_hits: number;
   mvp_hits: number;
+  ko_exact_hits: number;
+  ko_exact_only_hits: number;
 };
 
 type ScoreRow = MatchStatsRow & {
@@ -269,12 +275,21 @@ function ingestMatchPoints(
     sign_hits: 0,
     clasif_hits: 0,
     mvp_hits: 0,
+    ko_exact_hits: 0,
+    ko_exact_only_hits: 0,
   };
   current.match_points += points;
   if (type === "match") {
-    if (points === MATCH_SCORE_POINTS.exact) current.exact_hits += 1;
-    else if (points === MATCH_SCORE_POINTS.sign && !isKnockout) current.sign_hits += 1;
-    else if (points === MATCH_SCORE_POINTS.sign && isKnockout) current.clasif_hits += 1;
+    if (points === MATCH_SCORE_POINTS.exact) {
+      current.exact_hits += 1;
+      if (isKnockout) current.ko_exact_hits += 1;
+    } else if (points === MATCH_SCORE_POINTS.sign && !isKnockout) {
+      current.sign_hits += 1;
+    } else if (points === MATCH_SCORE_POINTS.sign && isKnockout) {
+      current.clasif_hits += 1;
+    } else if (points === 3 && isKnockout) {
+      current.ko_exact_only_hits += 1;
+    }
   } else if (type === "mvp") {
     if (points > 0) current.mvp_hits += 1;
   }
@@ -615,6 +630,8 @@ function buildLeaderboardRows(
       signHits: s?.sign_hits ?? 0,
       clasifHits: s?.clasif_hits ?? 0,
       mvpHits: s?.mvp_hits ?? 0,
+      koExactHits: s?.ko_exact_hits ?? 0,
+      koExactOnlyHits: s?.ko_exact_only_hits ?? 0,
       globalHits: gHits,
       matchPoints: lastMatch?.match_points ?? 0,
       generalPoints: general,
@@ -751,6 +768,8 @@ export async function getMemberStanding(
     signHits: row.signHits,
     clasifHits: row.clasifHits,
     mvpHits: row.mvpHits,
+    koExactHits: row.koExactHits,
+    koExactOnlyHits: row.koExactOnlyHits,
     globalHits: row.globalHits,
     matchPoints: row.matchPoints,
     generalPoints: row.generalPoints,
@@ -778,6 +797,8 @@ export function memberStandingFromLeaderboard(
     signHits: row.signHits,
     clasifHits: row.clasifHits,
     mvpHits: row.mvpHits,
+    koExactHits: row.koExactHits,
+    koExactOnlyHits: row.koExactOnlyHits,
     globalHits: row.globalHits,
     matchPoints: row.matchPoints,
     generalPoints: row.generalPoints,
