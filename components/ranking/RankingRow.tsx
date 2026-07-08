@@ -9,12 +9,17 @@ import { cn } from "@/lib/utils";
 
 export function RankingRow({
   row,
+  position,
   isCurrentUser,
 }: {
   row: LeaderboardRow;
+  position: number;
   isCurrentUser: boolean;
 }) {
   const quizBonusActive = useQuizBonusActive();
+  const displayPts = quizBonusActive
+    ? row.cumulativePoints
+    : row.cumulativePoints - row.quizFinalBonus;
   const groupSignHits = row.exactHits - row.koExactHits + row.signHits;
   const exactoHits = row.exactHits + row.koExactOnlyHits;
 
@@ -27,7 +32,7 @@ export function RankingRow({
     >
       <PositionTrendIndicator trend={row.positionTrend} />
       <span className="font-display shrink-0 text-xs tabular-nums text-[var(--tm-fg)]">
-        {formatAggregateStat(row.position)}
+        {formatAggregateStat(position)}
       </span>
       <RankingMemberCells
         avatarUrl={row.avatarUrl}
@@ -38,16 +43,9 @@ export function RankingRow({
           isCurrentUser ? "text-[var(--tm-accent)]" : "text-[var(--tm-fg)]"
         )}
       />
-      <div className="flex items-center justify-center gap-0.5">
-        {quizBonusActive && row.quizFinalBonus > 0 && (
-          <span className="text-[10px] whitespace-nowrap tabular-nums text-[#34C759] leading-none">
-            +{row.quizFinalBonus}
-          </span>
-        )}
-        <span className="font-display text-xs tabular-nums text-[var(--tm-fg)]">
-          {formatPoints(row.cumulativePoints)}
-        </span>
-      </div>
+      <span className="font-display w-full shrink-0 text-center text-xs tabular-nums text-[var(--tm-fg)]">
+        {formatPoints(displayPts)}
+      </span>
       <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${groupSignHits} signos acertados en fase de grupos (${MATCH_SCORE_POINTS.sign} pts c/u)`}>
         {formatAggregateStat(groupSignHits)}
       </span>
@@ -60,7 +58,9 @@ export function RankingRow({
       <span className="w-full shrink-0 text-center text-[10px] tabular-nums text-[var(--tm-muted)]" title={`${row.mvpHits} MVP (${MVP_PREDICTION_POINTS} pt c/u)`}>
         {formatAggregateStat(row.mvpHits)}
       </span>
-      <span />
+      <span className="flex items-center justify-center text-[10px] whitespace-nowrap tabular-nums text-[#34C759]">
+        {quizBonusActive && row.quizFinalBonus > 0 ? `+${row.quizFinalBonus}` : ""}
+      </span>
     </div>
   );
 }
