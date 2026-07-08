@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { RankingRow } from "@/components/ranking/RankingRow";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
 import { useQuizBonusActive } from "@/components/ranking/quiz-bonus-store";
@@ -24,6 +24,69 @@ function sortRows(rows: LeaderboardRow[], useQuiz: boolean): LeaderboardRow[] {
     if (a.globalHits !== b.globalHits) return b.globalHits - a.globalHits;
     return a.label.toLowerCase().localeCompare(b.label.toLowerCase(), "es");
   });
+}
+
+function LegendItem({
+  icons,
+  label,
+  pts,
+}: {
+  icons: ReactNode;
+  label: string;
+  pts: string;
+}) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-[3px] whitespace-nowrap">
+      <span className="inline-flex shrink-0 items-center gap-[1px]" aria-hidden>
+        {icons}
+      </span>
+      <span>{label}</span>
+      <span className="font-semibold text-[var(--tm-fg)]">{pts}</span>
+    </span>
+  );
+}
+
+function RankingLegend() {
+  return (
+    <div className="flex shrink-0 items-center justify-center overflow-x-auto border-b border-[var(--tm-border)] px-3 py-1.5 text-[9px] leading-none text-[var(--tm-muted)] [scrollbar-width:none]">
+      <ul className="inline-flex min-w-max items-center gap-x-3">
+        <LegendItem
+          icons={<PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />}
+          label="Signo 1×2"
+          pts={`${MATCH_SCORE_POINTS.sign} pts`}
+        />
+        <span className="text-[var(--tm-border)]" aria-hidden>·</span>
+        <LegendItem
+          icons={
+            <>
+              <PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />
+              <PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />
+            </>
+          }
+          label="Clasificado (elim.)"
+          pts={`${MATCH_SCORE_POINTS.sign} pts`}
+        />
+        <span className="text-[var(--tm-border)]" aria-hidden>·</span>
+        <LegendItem
+          icons={
+            <>
+              <PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />
+              <PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />
+              <PredictionOutcomeIcon variant="success" className="size-[9px] !min-h-0 !min-w-0" />
+            </>
+          }
+          label="Marcador exacto"
+          pts={`${MATCH_SCORE_POINTS.exact} pts`}
+        />
+        <span className="text-[var(--tm-border)]" aria-hidden>·</span>
+        <LegendItem
+          icons={<PredictionOutcomeIcon variant="mvp" className="size-[9px] !min-h-0 !min-w-0" />}
+          label="MVP"
+          pts={`${MVP_PREDICTION_POINTS} pt`}
+        />
+      </ul>
+    </div>
+  );
 }
 
 function RankingTableHeader() {
@@ -99,6 +162,7 @@ export function RankingTable({
   return (
     <div className="tm-ranking-table">
       <RankingTableHeader />
+      <RankingLegend />
       <div className="tm-ranking-body">
         {sortedRows.length === 0
           ? Array.from({ length: EMPTY_ROW_COUNT }, (_, index) => (
