@@ -222,6 +222,7 @@ async function getFinishedMatchPair(poolId: string): Promise<{
     .eq("scoring_status", "completed")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: false })
+    .order("id", { ascending: false })
     .limit(2);
 
   if (error) throw new Error(error.message);
@@ -252,7 +253,8 @@ async function getFinishedMatchIdsThroughKickoff(
     .select("id, kickoff_at, matchdays!inner(pool_id)")
     .eq("scoring_status", "completed")
     .eq("matchdays.pool_id", poolId)
-    .order("kickoff_at", { ascending: true });
+    .order("kickoff_at", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) throw new Error(error.message);
 
@@ -307,28 +309,34 @@ async function loadMatchStatsForMatchIds(
   const allPredictions: any[] = [];
   const allMvps: any[] = [];
 
+  // Paginar predictions y mvps en loops independientes para que un múltiplo
+  // exacto de PAGE en una tabla no trunque la otra.
   for (let page = 0; ; page++) {
     const from = page * PAGE, to = from + PAGE - 1;
-    const [{ data: preds }, { data: mvps }] = await Promise.all([
-      supabase
-        .from("predictions")
-        .select("profile_id, points_awarded, matches!inner(group_code)")
-        .eq("pool_id", poolId)
-        .in("match_id", matchIds)
-        .not("points_awarded", "is", null)
-        .range(from, to) as any,
-      supabase
-        .from("match_mvp_predictions")
-        .select("profile_id, points_awarded")
-        .eq("pool_id", poolId)
-        .in("match_id", matchIds)
-        .not("points_awarded", "is", null)
-        .range(from, to) as any,
-    ]);
+    const { data: preds } = await supabase
+      .from("predictions")
+      .select("profile_id, points_awarded, matches!inner(group_code)")
+      .eq("pool_id", poolId)
+      .in("match_id", matchIds)
+      .not("points_awarded", "is", null)
+      .range(from, to) as any;
     if (!preds || preds.length === 0) break;
     allPredictions.push(...preds);
-    allMvps.push(...(mvps ?? []));
     if (preds.length < PAGE) break;
+  }
+
+  for (let page = 0; ; page++) {
+    const from = page * PAGE, to = from + PAGE - 1;
+    const { data: mvps } = await supabase
+      .from("match_mvp_predictions")
+      .select("profile_id, points_awarded")
+      .eq("pool_id", poolId)
+      .in("match_id", matchIds)
+      .not("points_awarded", "is", null)
+      .range(from, to) as any;
+    if (!mvps || mvps.length === 0) break;
+    allMvps.push(...mvps);
+    if (mvps.length < PAGE) break;
   }
 
   const stats = new Map<string, MatchStatsRow>();
