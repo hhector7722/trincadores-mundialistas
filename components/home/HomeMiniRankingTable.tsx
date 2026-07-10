@@ -14,7 +14,7 @@ import {
 } from "@/components/ranking/ranking-grid";
 import { formatQuizScore } from "@/lib/quiz/format";
 import { formatAggregateStat, formatPoints } from "@/lib/ranking/format";
-import { formatReliabilityPct } from "@/lib/ranking/reliability";
+
 import {
   getContextualLeaderboardStartIndex,
   VISIBLE_ROW_COUNT,
@@ -41,7 +41,6 @@ function MiniRankingHeader() {
       <span aria-hidden="true" />
       <span aria-hidden="true" />
       <span className={MINI_RANKING_STAT_COL}>Pts</span>
-      <span className={MINI_RANKING_STAT_COL}>Fiab</span>
       <span className={MINI_RANKING_STAT_COL}>Quiz</span>
     </div>
   );
@@ -79,9 +78,6 @@ function MiniRankingDataRow({
       <span aria-hidden="true" />
       <span className={cn(MINI_RANKING_STAT_COL, "font-display text-white/85")}>
         {formatPoints(row.cumulativePoints)}
-      </span>
-      <span className={cn(MINI_RANKING_STAT_COL, "text-white/45")}>
-        {formatReliabilityPct(row.reliabilityPct)}
       </span>
       <span className={cn(MINI_RANKING_STAT_COL, "font-display text-white/85")}>
         {formatQuizScore(row.quizPoints, row.hasQuizParticipated)}

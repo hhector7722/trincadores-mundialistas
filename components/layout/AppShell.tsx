@@ -14,7 +14,7 @@ import { TabBarWrapper } from "@/components/layout/TabBarWrapper";
 import { TabNavigationProvider } from "@/components/layout/TabNavigationProvider";
 import { PageStackNavigator } from "@/components/layout/PageStackNavigator";
 import { TabSwipeNavigator } from "@/components/layout/TabSwipeNavigator";
-import { PullToRefresh } from "@/components/layout/PullToRefresh";
+
 import { ViewportLayoutDebug } from "@/components/layout/ViewportLayoutDebug";
 import { VisualViewportSync } from "@/components/layout/VisualViewportSync";
 import { HighlightScorelineVisibilityProvider } from "@/components/highlights/HighlightScorelineVisibilityProvider";
@@ -68,7 +68,6 @@ export function AppShell({
                     </TabSwipeNavigator>
                   </AppMainWrapper>
                 </div>
-                <PullToRefresh />
                 <TabBarWrapper />
                 <UsagePageTracker />
                 <VisualViewportSync />
