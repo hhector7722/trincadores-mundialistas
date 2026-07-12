@@ -12,6 +12,7 @@ import { EasterEggScene } from "@/components/predictions/EasterEggScene";
 
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { resolveKnockoutPlaceholderTeam } from "@/lib/predictions/resolve-knockout-teams";
 import {
   formatListScore,
   resolvePredictionUiState,
@@ -156,17 +157,9 @@ function BracketMatchNode({
     
   function resolveDynamicTeamName(raw: string | undefined | null): string {
     const rawTrimmed = (raw ?? "").trim();
-    // Si es un W__ o L__, intentamos autocompletarlo localmente buscando el resultado del partido previo
-    if ((rawTrimmed.startsWith("W") || rawTrimmed.startsWith("L")) && !isNaN(Number(rawTrimmed.slice(1)))) {
-      const isLoser = rawTrimmed.startsWith("L");
-      const prevMatchNumber = Number(rawTrimmed.slice(1));
-      const prevMatch = matchMap.get(prevMatchNumber);
-      if (prevMatch && prevMatch.status === "finished" && prevMatch.officialHome != null && prevMatch.officialAway != null) {
-        if (prevMatch.officialHome > prevMatch.officialAway) return isLoser ? prevMatch.away_team : prevMatch.home_team;
-        else if (prevMatch.officialAway > prevMatch.officialHome) return isLoser ? prevMatch.home_team : prevMatch.away_team;
-      }
+    if (/^[WL]\d+$/i.test(rawTrimmed)) {
+      return resolveKnockoutPlaceholderTeam(rawTrimmed, matchMap) ?? bracketSlotTeamName(rawTrimmed, geom.round);
     }
-    // Si no pudimos autocompletar, aplicamos la regla de display normal
     return bracketSlotTeamName(rawTrimmed, geom.round);
   }
 

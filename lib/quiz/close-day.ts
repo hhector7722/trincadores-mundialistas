@@ -57,6 +57,14 @@ export async function closeQuizDay(
 
   if (expireError) throw expireError;
 
+  const { error: quizBonusError } = await options.admin.rpc(
+    "recalculate_quiz_final_ranking_scores",
+    { p_pool_id: poolId }
+  );
+  if (quizBonusError) {
+    console.error("[closeQuizDay] Fallo al persistir bonus quiz:", quizBonusError.message);
+  }
+
   const nextDate = addQuizDays(options.quizDate, 1);
   generateNextJerseyPickQuestion(nextDate).catch(err => {
     console.error("[closeQuizDay] Fallo asíncrono al generar jersey pick para", nextDate, err);

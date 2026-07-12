@@ -6,6 +6,7 @@ import { isPoolAdmin, isPoolOwner } from "@/lib/pool/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { assertMatchInPool } from "@/lib/predictions/queries";
 import { validatePredictionGoals } from "@/lib/predictions/validation";
+import { syncKnockoutBracket } from "@/lib/predictions/sync-knockout";
 import { createClient } from "@/lib/supabase/server";
 
 export type AdminActionResult = { ok: true } | { ok: false; error: string };
@@ -67,7 +68,11 @@ export async function submitMatchResult(
 
   const { error: statusError } = await supabase
     .from("matches")
-    .update({ status: "finished" })
+    .update({
+      status: "finished",
+      scoring_status: "completed",
+      scoring_completed_at: new Date().toISOString(),
+    })
     .eq("id", matchId);
 
   if (statusError) {
@@ -107,6 +112,12 @@ export async function submitMatchResult(
         quizBonusError.message ||
         "Ranking actualizado, pero fallo el bonus final del quiz.",
     };
+  }
+
+  try {
+    await syncKnockoutBracket();
+  } catch (syncError) {
+    console.error("[submitMatchResult] syncKnockoutBracket:", syncError);
   }
 
   revalidatePath("/admin");

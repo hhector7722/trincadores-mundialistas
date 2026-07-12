@@ -19,6 +19,7 @@ import { GroupStandingsModal } from "@/components/predictions/GroupStandingsModa
 import { QuickPredictionModal } from "@/components/predictions/QuickPredictionModal";
 import { TournamentStatsModal } from "@/components/predictions/TournamentStatsModal";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
+import { resolveKnockoutTeams } from "@/lib/predictions/resolve-knockout-teams";
 import { GROUP_STAGE_CALENDAR_MONTH } from "@/lib/predictions/stage-filter";
 import { CalendarMatchCardFlagsRow } from "@/components/predictions/CalendarMatchCardFlagsRow";
 import { teamNameEs } from "@/lib/teams/display";
@@ -399,49 +400,6 @@ function useCalendarViewportLayout(
       resetCalendarLayout(calendar, grid, layoutEl);
     };
   }, [rootRef, calendarRef, gridRef, rowCount]);
-}
-function resolveKnockoutTeams(matches: MatchWithPrediction[]): MatchWithPrediction[] {
-  const sorted = [...matches].sort((a, b) => (a.match_number || 0) - (b.match_number || 0));
-  const matchMap = new Map<number, MatchWithPrediction>();
-
-  for (const m of sorted) {
-    const resolveTeam = (raw: string | undefined | null): string => {
-      const rawTrimmed = (raw ?? "").trim();
-      if ((rawTrimmed.startsWith("W") || rawTrimmed.startsWith("L")) && !isNaN(Number(rawTrimmed.slice(1)))) {
-        const isLoser = rawTrimmed.startsWith("L");
-        const prevMatchNumber = Number(rawTrimmed.slice(1));
-        const prevMatch = matchMap.get(prevMatchNumber);
-        if (prevMatch && prevMatch.status === "finished" && prevMatch.officialHome != null && prevMatch.officialAway != null) {
-          if (prevMatch.officialHome > prevMatch.officialAway) {
-            return isLoser ? prevMatch.away_team : prevMatch.home_team;
-          } else if (prevMatch.officialAway > prevMatch.officialHome) {
-            return isLoser ? prevMatch.home_team : prevMatch.away_team;
-          } else if (prevMatch.officialPenaltyHome != null && prevMatch.officialPenaltyAway != null) {
-            if (prevMatch.officialPenaltyHome > prevMatch.officialPenaltyAway) {
-              return isLoser ? prevMatch.away_team : prevMatch.home_team;
-            } else if (prevMatch.officialPenaltyAway > prevMatch.officialPenaltyHome) {
-              return isLoser ? prevMatch.home_team : prevMatch.away_team;
-            }
-          }
-        }
-      }
-      return rawTrimmed;
-    };
-
-    const resolvedHome = resolveTeam(m.home_team);
-    const resolvedAway = resolveTeam(m.away_team);
-
-    const updatedMatch = {
-      ...m,
-      home_team: resolvedHome || m.home_team,
-      away_team: resolvedAway || m.away_team,
-    };
-    if (m.match_number != null) {
-      matchMap.set(m.match_number, updatedMatch);
-    }
-  }
-
-  return matches.map(m => (m.match_number != null ? matchMap.get(m.match_number) : undefined) || m);
 }
 
 export function PredictionsCalendar({

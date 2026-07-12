@@ -6,6 +6,7 @@ import { getDailyFactsHistory } from "@/lib/home/daily-fact";
 import {
   getPoolMatchesWithPredictions,
 } from "@/lib/predictions/queries";
+import { resolveKnockoutTeams } from "@/lib/predictions/resolve-knockout-teams";
 import { getPoolLeaderboard } from "@/lib/ranking/queries";
 import {
   getPoolTournamentGeneralPredictionsBoard,
@@ -39,6 +40,8 @@ export default async function HomePage() {
 
   const dailyFacts = getDailyFactsHistory();
 
+  const resolvedMatchCarouselMatches = resolveKnockoutTeams(matchCarouselMatches);
+
   return (
     <HomeViewportShell
       hero={
@@ -53,7 +56,7 @@ export default async function HomePage() {
           generalPredictionsEditable={generalPredictionsBundle.editable}
           generalPredictionsBoard={generalPredictionsBoard}
           dailyFacts={dailyFacts}
-          matchCarouselMatches={matchCarouselMatches}
+          matchCarouselMatches={resolvedMatchCarouselMatches}
         />
       }
     />

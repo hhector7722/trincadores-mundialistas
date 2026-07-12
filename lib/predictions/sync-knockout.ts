@@ -1,4 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  resolveKnockoutWinnerTeam,
+  snapshotFromDbMatch,
+} from "@/lib/predictions/resolve-knockout-teams";
 import { resolveThirdPlaceMatchup } from "@/lib/predictions/third-place-matrix";
 
 function getGroupCodeFromPlaceholder(placeholder: string): string | null {
@@ -239,32 +243,14 @@ export async function resolveWinnerPlaceholder(placeholder: string): Promise<str
 
   const { data: targetResult } = await admin
     .from("match_results")
-    .select("home_goals, away_goals, penalty_home, penalty_away")
+    .select("home_goals, away_goals, penalty_home, penalty_away, advancing_team")
     .eq("match_id", targetMatch.id)
     .maybeSingle();
 
   if (!targetResult) return null;
 
-  const { home_goals, away_goals, penalty_home, penalty_away } = targetResult;
-
-  let homeWins = false;
-  if (home_goals > away_goals) {
-    homeWins = true;
-  } else if (away_goals > home_goals) {
-    homeWins = false;
-  } else if (penalty_home != null && penalty_away != null) {
-    homeWins = penalty_home > penalty_away;
-  } else {
-    // Should not happen in a knockout match that is 'finished', but just in case
-    return null;
-  }
-
-  if (isWinner) {
-    return homeWins ? targetMatch.home_team : targetMatch.away_team;
-  } else {
-    // For "L101" (Loser of 101)
-    return homeWins ? targetMatch.away_team : targetMatch.home_team;
-  }
+  const snapshot = snapshotFromDbMatch(targetMatch, targetResult);
+  return resolveKnockoutWinnerTeam(snapshot, isWinner);
 }
 
 export async function syncKnockoutBracket(): Promise<{ updated: number; skipped: number }> {

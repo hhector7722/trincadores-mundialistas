@@ -1,5 +1,6 @@
 import { KnockoutBracket } from "@/components/predictions/KnockoutBracket";
 import { getPoolKnockoutMatchesWithPredictions } from "@/lib/predictions/queries";
+import { resolveKnockoutTeams } from "@/lib/predictions/resolve-knockout-teams";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 import { isPoolAdmin } from "@/lib/pool/admin";
@@ -18,6 +19,8 @@ export default async function KnockoutPredictionsPage() {
     isPoolAdmin(ctx.activePoolId, user!.id)
   ]);
 
+  const resolvedMatches = resolveKnockoutTeams(matches);
+
   return (
     <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
       <div className="sticky top-0 z-20 shrink-0 bg-[var(--tm-bg)] px-4 pb-2 pt-4 shadow-sm">
@@ -28,7 +31,7 @@ export default async function KnockoutPredictionsPage() {
 
       <KnockoutBracket
         poolId={ctx.activePoolId}
-        matches={matches}
+        matches={resolvedMatches}
         currentProfileId={user!.id}
         isAdminUser={isAdmin}
       />

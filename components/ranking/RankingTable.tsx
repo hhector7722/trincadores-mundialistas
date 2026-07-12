@@ -14,8 +14,8 @@ const EMPTY_ROW_COUNT = 11;
 
 function sortRows(rows: LeaderboardRow[], useQuiz: boolean): LeaderboardRow[] {
   return [...rows].sort((a, b) => {
-    const ptsA = useQuiz ? a.cumulativePoints : a.cumulativePoints - a.quizFinalBonus;
-    const ptsB = useQuiz ? b.cumulativePoints : b.cumulativePoints - b.quizFinalBonus;
+    const ptsA = useQuiz ? a.cumulativePoints + a.quizFinalBonus : a.cumulativePoints;
+    const ptsB = useQuiz ? b.cumulativePoints + b.quizFinalBonus : b.cumulativePoints;
     if (ptsA !== ptsB) return ptsB - ptsA;
     if (a.exactHits !== b.exactHits) return b.exactHits - a.exactHits;
     if (a.signHits !== b.signHits) return b.signHits - a.signHits;
@@ -150,10 +150,10 @@ export function RankingTable({
   currentProfileId: string;
 }) {
   const quizBonusActive = useQuizBonusActive();
-  const sortedRows = useMemo(
-    () => sortRows(rows, quizBonusActive),
-    [rows, quizBonusActive]
-  );
+  const sortedRows = useMemo(() => {
+    if (!quizBonusActive) return rows;
+    return sortRows(rows, true);
+  }, [rows, quizBonusActive]);
 
   return (
     <div className="tm-ranking-table">
@@ -167,7 +167,7 @@ export function RankingTable({
               <RankingRow
                 key={row.profileId}
                 row={row}
-                position={index + 1}
+                position={quizBonusActive ? index + 1 : row.position}
                 isCurrentUser={row.profileId === currentProfileId}
               />
             ))}

@@ -150,11 +150,10 @@ export async function loadRankingSnapshotThroughKickoff(
   poolId: string,
   throughKickoffAt: string
 ): Promise<Map<string, RankingSortSnapshot>> {
-  const [members, matchIds, generalScoreRows, quizFinalBonus] = await Promise.all([
+  const [members, matchIds, generalScoreRows] = await Promise.all([
     loadMembers(poolId),
     getFinishedMatchIdsThroughKickoff(poolId, throughKickoffAt),
     loadTournamentGeneralScoresByProfile(poolId),
-    loadQuizFinalRankingBonusesByProfile(poolId),
   ]);
 
   const matchStats = await loadMatchStatsForMatchIds(poolId, matchIds);
@@ -180,10 +179,9 @@ export async function loadRankingSnapshotThroughKickoff(
     const scoreRow = scores.get(member.profileId);
     const general = generalPoints.get(member.profileId) ?? 0;
     const gHits = generalHits.get(member.profileId) ?? 0;
-    const quizBonus = quizFinalBonus.get(member.profileId) ?? 0;
     const matchCumulative = scoreRow?.cumulative_points ?? 0;
     snapshot.set(member.profileId, {
-      cumulativePoints: matchCumulative + general + quizBonus,
+      cumulativePoints: matchCumulative + general,
       exactHits: scoreRow?.exact_hits ?? 0,
       signHits: scoreRow?.sign_hits ?? 0,
       clasifHits: scoreRow?.clasif_hits ?? 0,
@@ -219,7 +217,7 @@ async function getFinishedMatchPair(poolId: string): Promise<{
   const { data, error } = await supabase
     .from("matches")
     .select("id, home_team, away_team, kickoff_at, matchday_id, matchdays!inner(pool_id)")
-    .eq("scoring_status", "completed")
+    .eq("status", "finished")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: false })
     .order("id", { ascending: false })
@@ -251,7 +249,7 @@ async function getFinishedMatchIdsThroughKickoff(
   const { data, error } = await supabase
     .from("matches")
     .select("id, kickoff_at, matchdays!inner(pool_id)")
-    .eq("scoring_status", "completed")
+    .eq("status", "finished")
     .eq("matchdays.pool_id", poolId)
     .order("kickoff_at", { ascending: true })
     .order("id", { ascending: true });
@@ -580,19 +578,17 @@ function buildPositionMap(
   members: MemberRow[],
   scores: Map<string, ScoreRow>,
   generalPoints: Map<string, number>,
-  generalHits: Map<string, number>,
-  quizFinalBonus: Map<string, number>
+  generalHits: Map<string, number>
 ): Map<string, number> {
   const merged = members.map((m) => {
     const s = scores.get(m.profileId);
     const general = generalPoints.get(m.profileId) ?? 0;
     const gHits = generalHits.get(m.profileId) ?? 0;
-    const quizBonus = quizFinalBonus.get(m.profileId) ?? 0;
     const matchCumulative = s?.cumulative_points ?? 0;
     return {
       profileId: m.profileId,
       label: m.label,
-      cumulativePoints: matchCumulative + general + quizBonus,
+      cumulativePoints: matchCumulative + general,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
       clasifHits: s?.clasif_hits ?? 0,
@@ -642,7 +638,7 @@ function buildLeaderboardRows(
       label: m.label,
       username: m.username,
       avatarUrl: m.avatarUrl,
-      cumulativePoints: matchCumulative + general + quizBonus,
+      cumulativePoints: matchCumulative + general,
       exactHits: s?.exact_hits ?? 0,
       signHits: s?.sign_hits ?? 0,
       clasifHits: s?.clasif_hits ?? 0,
@@ -737,7 +733,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
   );
 
   const previousPositions = previousReferenceMatch
-    ? buildPositionMap(members, previousScores, generalPoints, generalHits, quizFinalBonus)
+    ? buildPositionMap(members, previousScores, generalPoints, generalHits)
     : null;
   const communityAvg = computeCommunityAvgFromStats(reliability);
   const sorted = buildLeaderboardRows(

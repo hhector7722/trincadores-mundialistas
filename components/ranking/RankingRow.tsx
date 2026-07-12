@@ -18,8 +18,8 @@ export function RankingRow({
 }) {
   const quizBonusActive = useQuizBonusActive();
   const displayPts = quizBonusActive
-    ? row.cumulativePoints
-    : row.cumulativePoints - row.quizFinalBonus;
+    ? row.cumulativePoints + row.quizFinalBonus
+    : row.cumulativePoints;
   const groupSignHits = row.exactHits - row.koExactHits + row.signHits;
   const exactoHits = row.exactHits + row.koExactOnlyHits;
 
