@@ -276,7 +276,7 @@ export async function getMatchPredictionDetail(
       .maybeSingle(),
     supabase
       .from("match_results")
-      .select("home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
+      .select("home_goals, away_goals, penalty_home, penalty_away, advancing_team, mvp_player_name, mvp_team_name")
       .eq("match_id", matchId)
       .maybeSingle(),
     fetchMatchEditableFromDb(matchId),
@@ -327,6 +327,7 @@ export async function getMatchPredictionDetail(
     officialMvpTeamName: result?.mvp_team_name ?? null,
     officialPenaltyHome: result?.penalty_home ?? null,
     officialPenaltyAway: result?.penalty_away ?? null,
+    officialAdvancingTeam: (result?.advancing_team as "home" | "away" | null) ?? null,
     highlightYoutubeId:
       match.status === "finished" ? (match.highlight_youtube_id ?? null) : null,
     highlightPublishedAt:
@@ -494,7 +495,7 @@ export async function getMatchPredictionsBoard(
       .maybeSingle(),
     admin
       .from("match_results")
-      .select("home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
+      .select("home_goals, away_goals, penalty_home, penalty_away, advancing_team, mvp_player_name, mvp_team_name")
       .eq("match_id", matchId)
       .maybeSingle(),
     admin
@@ -604,6 +605,7 @@ export async function getMatchPredictionsBoard(
             resultAway: result!.away_goals,
             resultPenaltyHome: result?.penalty_home,
             resultPenaltyAway: result?.penalty_away,
+            resultAdvancing: (result?.advancing_team as "home" | "away" | null) ?? null,
             isKnockout: isKnockoutMatchdayKey((match.matchdays as any)?.external_key),
           })
         : null;

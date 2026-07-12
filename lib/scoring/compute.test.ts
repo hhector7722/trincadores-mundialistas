@@ -50,3 +50,51 @@ describe("computeMatchPoints", () => {
     assert.equal(pts, MATCH_SCORE_POINTS.exact);
   });
 });
+
+describe("computeMatchPoints eliminatorias", () => {
+  const knockout = { isKnockout: true as const };
+
+  it("1-1 + clasificado correcto = 5 pts", () => {
+    assert.equal(
+      computeMatchPoints({
+        ...knockout,
+        predictedHome: 1,
+        predictedAway: 1,
+        predictedAdvancing: "away",
+        resultHome: 1,
+        resultAway: 1,
+        resultAdvancing: "away",
+      }),
+      5,
+    );
+  });
+
+  it("1-1 + clasificado incorrecto = 3 pts", () => {
+    assert.equal(
+      computeMatchPoints({
+        ...knockout,
+        predictedHome: 1,
+        predictedAway: 1,
+        predictedAdvancing: "home",
+        resultHome: 1,
+        resultAway: 1,
+        resultAdvancing: "away",
+      }),
+      3,
+    );
+  });
+
+  it("1-2 cuando el 90 min fue 1-1 = 2 pts (solo clasificado)", () => {
+    assert.equal(
+      computeMatchPoints({
+        ...knockout,
+        predictedHome: 1,
+        predictedAway: 2,
+        resultHome: 1,
+        resultAway: 1,
+        resultAdvancing: "away",
+      }),
+      2,
+    );
+  });
+});

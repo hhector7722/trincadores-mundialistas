@@ -71,7 +71,9 @@ function determineAdvancingTeam(
   awayGoals: number,
   penaltyHome?: number | null,
   penaltyAway?: number | null,
+  explicitAdvancing?: "home" | "away" | null,
 ): "home" | "away" | null {
+  if (explicitAdvancing) return explicitAdvancing;
   if (homeGoals > awayGoals) return "home";
   if (homeGoals < awayGoals) return "away";
   if (penaltyHome != null && penaltyAway != null) {
@@ -87,7 +89,8 @@ async function persistOfficialResultFromLive(
   homeGoals: number,
   awayGoals: number,
   penaltyHome?: number | null,
-  penaltyAway?: number | null
+  penaltyAway?: number | null,
+  advancingTeam?: "home" | "away" | null,
 ): Promise<boolean> {
   const { data: existing } = await admin
     .from("match_results")
@@ -100,12 +103,16 @@ async function persistOfficialResultFromLive(
     return false;
   }
 
+  const resolvedAdvancing =
+    advancingTeam ?? determineAdvancingTeam(homeGoals, awayGoals, penaltyHome, penaltyAway);
+
   if (
     existing &&
     existing.home_goals === homeGoals &&
     existing.away_goals === awayGoals &&
     (existing as any).penalty_home === (penaltyHome ?? null) &&
-    (existing as any).penalty_away === (penaltyAway ?? null)
+    (existing as any).penalty_away === (penaltyAway ?? null) &&
+    (existing as any).advancing_team === resolvedAdvancing
   ) {
     return false;
   }
@@ -117,7 +124,7 @@ async function persistOfficialResultFromLive(
       away_goals: awayGoals,
       penalty_home: penaltyHome ?? null,
       penalty_away: penaltyAway ?? null,
-      advancing_team: determineAdvancingTeam(homeGoals, awayGoals, penaltyHome, penaltyAway),
+      advancing_team: resolvedAdvancing,
       recorded_at: new Date().toISOString(),
     },
     { onConflict: "match_id" },
@@ -205,13 +212,16 @@ export async function syncLiveMatches(
       }
 
       if (isFinished) {
+        const officialHome = bundle.regulationHomeScore ?? bundle.homeScore;
+        const officialAway = bundle.regulationAwayScore ?? bundle.awayScore;
         const resultWritten = await persistOfficialResultFromLive(
           admin,
           match.id,
-          bundle.homeScore,
-          bundle.awayScore,
+          officialHome,
+          officialAway,
           bundle.payload?.penaltyHome,
-          bundle.payload?.penaltyAway
+          bundle.payload?.penaltyAway,
+          bundle.advancingTeam ?? null,
         );
         if (resultWritten) resultsPersisted = true;
 

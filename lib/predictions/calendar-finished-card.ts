@@ -66,8 +66,13 @@ export function resolveCalendarFinishedCard(
       scoreOutcome = resolveScoreOutcome({
         predictedHome: match.prediction!.home_goals,
         predictedAway: match.prediction!.away_goals,
+        predictedAdvancing: match.prediction!.advancing_team as "home" | "away" | null,
         resultHome: match.officialHome!,
         resultAway: match.officialAway!,
+        resultPenaltyHome: match.officialPenaltyHome,
+        resultPenaltyAway: match.officialPenaltyAway,
+        resultAdvancing: match.officialAdvancingTeam ?? null,
+        isKnockout,
       });
     }
   }

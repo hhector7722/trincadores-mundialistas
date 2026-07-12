@@ -1,4 +1,5 @@
 import { FOTMOB_SOURCE_CODE } from "@/lib/live/sources/fotmob-official-mvp";
+import { parseFotmobScoringOutcome } from "@/lib/live/sources/fotmob-regulation-score";
 import type { MatchLivePayload, MatchLiveStats, MatchSubstitution, MatchPlayerIncident } from "@/lib/live/types";
 
 export const FOTMOB_API_BASE = "https://www.fotmob.com/api";
@@ -119,10 +120,22 @@ export async function fetchFotmobLiveBundle(matchId: number) {
 
   let homeScore = 0;
   let awayScore = 0;
+  let regulationHomeScore: number | null = null;
+  let regulationAwayScore: number | null = null;
+  let advancingTeam: "home" | "away" | null = null;
   let penaltyHome: number | null = null;
   let penaltyAway: number | null = null;
 
-  if (st.scoreStr) {
+  const scoringOutcome = parseFotmobScoringOutcome(details.header);
+  if (scoringOutcome) {
+    homeScore = scoringOutcome.finalHome;
+    awayScore = scoringOutcome.finalAway;
+    regulationHomeScore = scoringOutcome.regulationHome;
+    regulationAwayScore = scoringOutcome.regulationAway;
+    penaltyHome = scoringOutcome.penaltyHome;
+    penaltyAway = scoringOutcome.penaltyAway;
+    advancingTeam = scoringOutcome.advancingTeam;
+  } else if (st.scoreStr) {
     let rawScore = st.scoreStr;
     const penMatch = rawScore.match(/\((.*?)-(.*?)\)/);
     if (penMatch) {
@@ -188,6 +201,9 @@ export async function fetchFotmobLiveBundle(matchId: number) {
     externalKey: String(matchId),
     homeScore,
     awayScore,
+    regulationHomeScore,
+    regulationAwayScore,
+    advancingTeam,
     timeElapsed,
     finished: isFinished,
     isLive,
