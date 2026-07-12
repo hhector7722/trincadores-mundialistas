@@ -65,12 +65,14 @@ export default async function AdminPage() {
               matchId={m.id}
               label={`${m.home_team} - ${m.away_team}${m.hasResult ? " (ya tiene resultado)" : ""}`}
               status={m.status}
+              groupCode={m.group_code}
               initialHomeGoals={m.currentHomeGoals}
               initialAwayGoals={m.currentAwayGoals}
               initialMvpPlayer={m.currentMvpPlayerName}
               initialMvpTeam={m.currentMvpTeamName}
               initialPenaltyHome={m.currentPenaltyHome}
               initialPenaltyAway={m.currentPenaltyAway}
+              initialAdvancingTeam={m.currentAdvancingTeam}
             />
           ))
         )}

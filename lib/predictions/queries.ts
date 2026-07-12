@@ -38,6 +38,7 @@ export type MatchWithPrediction = {
   officialMvpTeamName: string | null;
   officialPenaltyHome?: number | null;
   officialPenaltyAway?: number | null;
+  officialAdvancingTeam?: "home" | "away" | null;
   highlightYoutubeId: string | null;
   highlightPublishedAt: string | null;
   highlightSource: HighlightSourceCode | null;
@@ -119,7 +120,7 @@ async function fetchPoolMatchesWithPredictions(
     fetchMvpPredictionsForMatches(poolId, profileId, matchIds),
     supabase
       .from("match_results")
-      .select("match_id, home_goals, away_goals, penalty_home, penalty_away, mvp_player_name, mvp_team_name")
+      .select("match_id, home_goals, away_goals, penalty_home, penalty_away, advancing_team, mvp_player_name, mvp_team_name")
       .in("match_id", matchIds),
     supabase
       .from("match_live_state")
@@ -159,6 +160,7 @@ async function fetchPoolMatchesWithPredictions(
       officialMvpTeamName: result?.mvp_team_name ?? null,
       officialPenaltyHome: result?.penalty_home ?? null,
       officialPenaltyAway: result?.penalty_away ?? null,
+      officialAdvancingTeam: (result?.advancing_team as "home" | "away") ?? null,
       highlightYoutubeId:
         status === "finished" ? (m.highlight_youtube_id ?? null) : null,
       highlightPublishedAt:
@@ -353,6 +355,7 @@ export type AdminOpenMatch = {
   away_team: string;
   kickoff_at: string;
   status: MatchStatus;
+  group_code: string | null;
   hasResult: boolean;
   currentHomeGoals: number | null;
   currentAwayGoals: number | null;
@@ -360,6 +363,7 @@ export type AdminOpenMatch = {
   currentMvpTeamName: string | null;
   currentPenaltyHome: number | null;
   currentPenaltyAway: number | null;
+  currentAdvancingTeam: "home" | "away" | null;
 };
 
 export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatch[]> {
@@ -367,7 +371,7 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, home_team, away_team, kickoff_at, status, matchdays!inner(pool_id)")
+    .select("id, home_team, away_team, kickoff_at, status, group_code, matchdays!inner(pool_id)")
     .eq("matchdays.pool_id", poolId)
     .in("status", ["pending", "scheduled", "live", "finished"])
     .order("kickoff_at", { ascending: false });
@@ -377,7 +381,7 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
   const ids = matches.map((m) => m.id);
   const { data: results } = await supabase
     .from("match_results")
-    .select("match_id, home_goals, away_goals, mvp_player_name, mvp_team_name, penalty_home, penalty_away")
+    .select("match_id, home_goals, away_goals, mvp_player_name, mvp_team_name, penalty_home, penalty_away, advancing_team")
     .in("match_id", ids);
 
   const resultMap = new Map(
@@ -392,6 +396,7 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
       away_team: m.away_team,
       kickoff_at: m.kickoff_at,
       status: m.status as MatchStatus,
+      group_code: m.group_code ?? null,
       hasResult: Boolean(result),
       currentHomeGoals: result?.home_goals ?? null,
       currentAwayGoals: result?.away_goals ?? null,
@@ -399,6 +404,7 @@ export async function getAdminOpenMatches(poolId: string): Promise<AdminOpenMatc
       currentMvpTeamName: result?.mvp_team_name ?? null,
       currentPenaltyHome: result?.penalty_home ?? null,
       currentPenaltyAway: result?.penalty_away ?? null,
+      currentAdvancingTeam: (result?.advancing_team as "home" | "away") ?? null,
     };
   });
 }

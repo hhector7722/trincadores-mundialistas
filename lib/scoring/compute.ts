@@ -8,6 +8,7 @@ export type ScoreInput = {
   resultAway: number;
   resultPenaltyHome?: number | null;
   resultPenaltyAway?: number | null;
+  resultAdvancing?: "home" | "away" | null;
   isKnockout?: boolean;
 };
 
@@ -32,6 +33,7 @@ export function computeMatchPoints(input: ScoreInput): 0 | 2 | 3 | 5 {
     resultAway,
     resultPenaltyHome,
     resultPenaltyAway,
+    resultAdvancing,
     isKnockout,
   } = input;
 
@@ -49,11 +51,12 @@ export function computeMatchPoints(input: ScoreInput): 0 | 2 | 3 | 5 {
   const exactScore = predictedHome === resultHome && predictedAway === resultAway;
 
   let actualAdv: "home" | "away" | null = null;
-  if (resultHome > resultAway) actualAdv = "home";
+  if (resultAdvancing) actualAdv = resultAdvancing;
+  else if (resultHome > resultAway) actualAdv = "home";
   else if (resultHome < resultAway) actualAdv = "away";
   else if ((resultPenaltyHome || 0) > (resultPenaltyAway || 0)) actualAdv = "home";
   else if ((resultPenaltyHome || 0) < (resultPenaltyAway || 0)) actualAdv = "away";
-  // Si está empatado y no hay penaltis (por ejemplo partido en directo), actualAdv = null
+  // Si está empatado y no hay penaltis ni advancing explícito, actualAdv = null
 
   let predictedAdv: "home" | "away" | null = null;
   if (predictedHome > predictedAway) predictedAdv = "home";

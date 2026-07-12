@@ -12,23 +12,27 @@ export function AdminResultForm({
   matchId,
   label,
   status,
+  groupCode,
   initialHomeGoals,
   initialAwayGoals,
   initialMvpPlayer,
   initialMvpTeam,
   initialPenaltyHome,
   initialPenaltyAway,
+  initialAdvancingTeam,
 }: {
   poolId: string;
   matchId: string;
   label: string;
   status?: string;
+  groupCode?: string | null;
   initialHomeGoals?: number | null;
   initialAwayGoals?: number | null;
   initialMvpPlayer?: string | null;
   initialMvpTeam?: string | null;
   initialPenaltyHome?: number | null;
   initialPenaltyAway?: number | null;
+  initialAdvancingTeam?: "home" | "away" | null;
 }) {
   const router = useRouter();
   const [home, setHome] = useState(initialHomeGoals != null ? String(initialHomeGoals) : "0");
@@ -41,10 +45,14 @@ export function AdminResultForm({
   );
   const [mvpPlayer, setMvpPlayer] = useState(initialMvpPlayer ?? "");
   const [mvpTeam, setMvpTeam] = useState(initialMvpTeam ?? "");
+  const [advancingTeam, setAdvancingTeam] = useState<"home" | "away" | "">(
+    initialAdvancingTeam ?? ""
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const isFinished = status === "finished";
+  const isKnockout = !groupCode;
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,7 +69,8 @@ export function AdminResultForm({
         mvpPlayer || null,
         mvpTeam || null,
         parsedPenaltyHome,
-        parsedPenaltyAway
+        parsedPenaltyAway,
+        (advancingTeam || null) as "home" | "away" | null
       );
       if (!result.ok) {
         setError(result.error);
@@ -150,6 +159,20 @@ export function AdminResultForm({
           aria-label="Penaltis visitante"
         />
       </div>
+      {isKnockout && (
+        <div className="flex gap-2 items-center">
+          <label className="text-xs text-[var(--tm-muted)] shrink-0">Clasificado:</label>
+          <select
+            value={advancingTeam}
+            onChange={(e) => setAdvancingTeam(e.target.value as "home" | "away" | "")}
+            className="h-8 rounded-md border border-[var(--tm-border)] bg-[var(--tm-surface)] px-2 text-xs text-[var(--tm-fg)]"
+          >
+            <option value="">-- Por definir --</option>
+            <option value="home">Local</option>
+            <option value="away">Visitante</option>
+          </select>
+        </div>
+      )}
       <div className="flex flex-wrap gap-2">
         <Input
           type="text"

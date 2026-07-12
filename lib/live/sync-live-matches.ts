@@ -66,6 +66,21 @@ async function loadBsdEventMap(
   return new Map((data ?? []).map((row) => [row.internal_id as string, row.external_key as string]));
 }
 
+function determineAdvancingTeam(
+  homeGoals: number,
+  awayGoals: number,
+  penaltyHome?: number | null,
+  penaltyAway?: number | null,
+): "home" | "away" | null {
+  if (homeGoals > awayGoals) return "home";
+  if (homeGoals < awayGoals) return "away";
+  if (penaltyHome != null && penaltyAway != null) {
+    if (penaltyHome > penaltyAway) return "home";
+    if (penaltyHome < penaltyAway) return "away";
+  }
+  return null;
+}
+
 async function persistOfficialResultFromLive(
   admin: AdminClient,
   matchId: string,
@@ -102,6 +117,7 @@ async function persistOfficialResultFromLive(
       away_goals: awayGoals,
       penalty_home: penaltyHome ?? null,
       penalty_away: penaltyAway ?? null,
+      advancing_team: determineAdvancingTeam(homeGoals, awayGoals, penaltyHome, penaltyAway),
       recorded_at: new Date().toISOString(),
     },
     { onConflict: "match_id" },
