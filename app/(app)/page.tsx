@@ -3,6 +3,7 @@ import { HomeStandingCard } from "@/components/home/HomeStandingCard";
 import { HomeViewportShell } from "@/components/home/HomeViewportShell";
 import { getMatchHighlightsForPool } from "@/lib/highlights/queries";
 import { getDailyFactsHistory } from "@/lib/home/daily-fact";
+import { selectHomeCarouselMatches } from "@/lib/home/upcoming-matches";
 import {
   getPoolMatchesWithPredictions,
 } from "@/lib/predictions/queries";
@@ -40,7 +41,9 @@ export default async function HomePage() {
 
   const dailyFacts = getDailyFactsHistory();
 
-  const resolvedMatchCarouselMatches = resolveKnockoutTeams(matchCarouselMatches);
+  const resolvedMatchCarouselMatches = resolveKnockoutTeams(
+    selectHomeCarouselMatches(matchCarouselMatches)
+  );
 
   return (
     <HomeViewportShell

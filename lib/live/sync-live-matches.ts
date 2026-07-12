@@ -94,12 +94,21 @@ async function persistOfficialResultFromLive(
 ): Promise<boolean> {
   const { data: existing } = await admin
     .from("match_results")
-    .select("home_goals, away_goals, recorded_by")
+    .select("home_goals, away_goals, penalty_home, penalty_away, advancing_team, recorded_by")
     .eq("match_id", matchId)
     .maybeSingle();
 
   // No sobreescribir si el resultado fue introducido manualmente (recorded_by no es null)
   if (existing && existing.recorded_by !== null) {
+    return false;
+  }
+
+  // No pisar un resultado de prórroga ya corregido (90 min + advancing_team)
+  if (
+    existing &&
+    (existing as { advancing_team?: string | null }).advancing_team != null &&
+    (existing.home_goals !== homeGoals || existing.away_goals !== awayGoals)
+  ) {
     return false;
   }
 

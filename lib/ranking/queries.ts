@@ -10,7 +10,29 @@ import {
 import { loadQuizFinalRankingBonusesByProfile } from "@/lib/quiz/score-queries";
 import { loadTournamentGeneralScoresByProfile } from "@/lib/tournament-predictions/score-queries";
 import { TOURNAMENT_GENERAL_SCORE_POINTS } from "@/lib/tournament-predictions/scoring";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const RANKING_PAGE_SIZE = 500;
+
+function getRankingClient() {
+  return createAdminClient();
+}
+
+async function fetchAllRankingRows<T>(
+  fetchPage: (from: number, to: number) => Promise<{ data: T[] | null; error: { message: string } | null }>
+): Promise<T[]> {
+  const all: T[] = [];
+  for (let page = 0; ; page++) {
+    const from = page * RANKING_PAGE_SIZE;
+    const to = from + RANKING_PAGE_SIZE - 1;
+    const { data, error } = await fetchPage(from, to);
+    if (error) throw new Error(error.message);
+    if (!data?.length) break;
+    all.push(...data);
+    if (data.length < RANKING_PAGE_SIZE) break;
+  }
+  return all;
+}
 
 export type ReferenceMatch = {
   id: string;
@@ -213,7 +235,7 @@ async function getFinishedMatchPair(poolId: string): Promise<{
   current: ReferenceMatch | null;
   previous: ReferenceMatch | null;
 }> {
-  const supabase = await createClient();
+  const supabase = getRankingClient();
   const { data, error } = await supabase
     .from("matches")
     .select("id, home_team, away_team, kickoff_at, matchday_id, matchdays!inner(pool_id)")
@@ -245,7 +267,7 @@ async function getFinishedMatchIdsThroughKickoff(
   poolId: string,
   throughKickoffAt: string | null
 ): Promise<string[]> {
-  const supabase = await createClient();
+  const supabase = getRankingClient();
   const { data, error } = await supabase
     .from("matches")
     .select("id, kickoff_at, matchdays!inner(pool_id)")
@@ -302,40 +324,31 @@ async function loadMatchStatsForMatchIds(
 ): Promise<Map<string, MatchStatsRow>> {
   if (!matchIds.length) return new Map();
 
-  const supabase = await createClient();
-  const PAGE = 500;
-  const allPredictions: any[] = [];
-  const allMvps: any[] = [];
+  const supabase = getRankingClient();
 
-  // Paginar predictions y mvps en loops independientes para que un múltiplo
-  // exacto de PAGE en una tabla no trunque la otra.
-  for (let page = 0; ; page++) {
-    const from = page * PAGE, to = from + PAGE - 1;
-    const { data: preds } = await supabase
+  const allPredictions = await fetchAllRankingRows<any>((from, to) =>
+    supabase
       .from("predictions")
       .select("profile_id, points_awarded, matches!inner(group_code)")
       .eq("pool_id", poolId)
       .in("match_id", matchIds)
       .not("points_awarded", "is", null)
-      .range(from, to) as any;
-    if (!preds || preds.length === 0) break;
-    allPredictions.push(...preds);
-    if (preds.length < PAGE) break;
-  }
+      .order("match_id", { ascending: true })
+      .order("profile_id", { ascending: true })
+      .range(from, to) as any
+  );
 
-  for (let page = 0; ; page++) {
-    const from = page * PAGE, to = from + PAGE - 1;
-    const { data: mvps } = await supabase
+  const allMvps = await fetchAllRankingRows<any>((from, to) =>
+    supabase
       .from("match_mvp_predictions")
       .select("profile_id, points_awarded")
       .eq("pool_id", poolId)
       .in("match_id", matchIds)
       .not("points_awarded", "is", null)
-      .range(from, to) as any;
-    if (!mvps || mvps.length === 0) break;
-    allMvps.push(...mvps);
-    if (mvps.length < PAGE) break;
-  }
+      .order("match_id", { ascending: true })
+      .order("profile_id", { ascending: true })
+      .range(from, to) as any
+  );
 
   const stats = new Map<string, MatchStatsRow>();
   for (const row of allPredictions ?? []) {
@@ -373,7 +386,7 @@ export async function getReferenceMatchday(
   const referenceMatch = await getReferenceMatch(poolId);
   if (!referenceMatch) return null;
 
-  const supabase = await createClient();
+  const supabase = getRankingClient();
   const { data, error } = await supabase
     .from("matchdays")
     .select("id, name, sequence")
@@ -405,7 +418,7 @@ export type PoolRankingMember = {
 };
 
 async function loadMembers(poolId: string): Promise<MemberRow[]> {
-  const supabase = await createClient();
+  const supabase = getRankingClient();
   const { data: memberships } = await supabase
     .from("pool_members")
     .select("profile_id")
@@ -487,23 +500,32 @@ export function buildPositionsFromSnapshots(
 async function loadResolvedPredictionStats(
   poolId: string
 ): Promise<Map<string, ReliabilityStats>> {
-  const supabase = await createClient();
-  const [{ data: predictions, error: predictionError }, { data: mvps, error: mvpError }] =
-    await Promise.all([
-      supabase
-        .from("predictions")
-        .select("profile_id, match_id, points_awarded")
-        .eq("pool_id", poolId)
-        .not("points_awarded", "is", null),
-      supabase
-        .from("match_mvp_predictions")
-        .select("profile_id, match_id, points_awarded")
-        .eq("pool_id", poolId)
-        .not("points_awarded", "is", null),
-    ]);
+  const supabase = getRankingClient();
 
-  if (predictionError) throw new Error(predictionError.message);
-  if (mvpError) throw new Error(mvpError.message);
+  const [predictions, mvps] = await Promise.all([
+    fetchAllRankingRows<{ profile_id: string; match_id: string; points_awarded: number | null }>(
+      (from, to) =>
+        supabase
+          .from("predictions")
+          .select("profile_id, match_id, points_awarded")
+          .eq("pool_id", poolId)
+          .not("points_awarded", "is", null)
+          .order("match_id", { ascending: true })
+          .order("profile_id", { ascending: true })
+          .range(from, to)
+    ),
+    fetchAllRankingRows<{ profile_id: string; match_id: string; points_awarded: number | null }>(
+      (from, to) =>
+        supabase
+          .from("match_mvp_predictions")
+          .select("profile_id, match_id, points_awarded")
+          .eq("pool_id", poolId)
+          .not("points_awarded", "is", null)
+          .order("match_id", { ascending: true })
+          .order("profile_id", { ascending: true })
+          .range(from, to)
+    ),
+  ]);
 
   const mvpByProfileMatch = new Map<string, number>();
   for (const row of mvps ?? []) {
@@ -542,7 +564,7 @@ type QuizProfileStats = {
 async function loadQuizStatsByProfile(
   poolId: string
 ): Promise<Map<string, QuizProfileStats>> {
-  const supabase = await createClient();
+  const supabase = getRankingClient();
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
     .select("id")
@@ -688,7 +710,6 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
 
   const [
     currentMatchIds,
-    previousMatchIds,
     lastMatchStats,
     reliability,
     generalScoreRows,
@@ -696,9 +717,6 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     quizFinalBonus,
   ] = await Promise.all([
     getFinishedMatchIdsThroughKickoff(poolId, referenceMatch?.kickoffAt ?? null),
-    previousReferenceMatch
-      ? getFinishedMatchIdsThroughKickoff(poolId, previousReferenceMatch.kickoffAt)
-      : Promise.resolve([]),
     referenceMatch
       ? loadMatchStatsForMatchIds(poolId, [referenceMatch.id])
       : Promise.resolve(new Map<string, MatchStatsRow>()),
@@ -708,13 +726,9 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     loadQuizFinalRankingBonusesByProfile(poolId),
   ]);
 
-  const [currentMatchStats, previousMatchStats] = await Promise.all([
-    loadMatchStatsForMatchIds(poolId, currentMatchIds),
-    loadMatchStatsForMatchIds(poolId, previousMatchIds),
-  ]);
+  const currentMatchStats = await loadMatchStatsForMatchIds(poolId, currentMatchIds);
 
   const scores = toScoreRowMap(currentMatchStats);
-  const previousScores = toScoreRowMap(previousMatchStats);
 
   const generalPoints = new Map(
     [...generalScoreRows.entries()].map(([profileId, row]) => [profileId, row.totalPoints])
@@ -732,9 +746,6 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     })
   );
 
-  const previousPositions = previousReferenceMatch
-    ? buildPositionMap(members, previousScores, generalPoints, generalHits)
-    : null;
   const communityAvg = computeCommunityAvgFromStats(reliability);
   const sorted = buildLeaderboardRows(
     members,
@@ -746,7 +757,7 @@ export async function getPoolLeaderboard(poolId: string): Promise<{
     generalHits,
     quizStats,
     quizFinalBonus,
-    previousPositions
+    null
   );
 
   return {

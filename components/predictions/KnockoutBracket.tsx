@@ -12,7 +12,7 @@ import { EasterEggScene } from "@/components/predictions/EasterEggScene";
 
 import { patchMatchMvpPrediction } from "@/lib/predictions/mvp-match-state";
 import type { MatchWithPrediction } from "@/lib/predictions/queries";
-import { resolveKnockoutPlaceholderTeam } from "@/lib/predictions/resolve-knockout-teams";
+import { resolveKnockoutPlaceholderTeam, resolveKnockoutWinnerSide } from "@/lib/predictions/resolve-knockout-teams";
 import {
   formatListScore,
   resolvePredictionUiState,
@@ -131,7 +131,7 @@ function BracketTeamOrb({
           <TeamFlagBadge 
             name={teamName} 
             size="sm" 
-            className={cn("tm-ko-orb-flag", isFinished && "brightness-[0.6] grayscale-[0.5]")}
+            className={cn("tm-ko-orb-flag", isFinished && !isWinner && "brightness-[0.6] grayscale-[0.5]")}
           />
           <span className={cn("tm-ko-orb-name", `tm-ko-orb-name--${side}`)}>
             {fullName}
@@ -181,6 +181,19 @@ function BracketMatchNode({
   const isLive = match?.status === "live";
   const slots = teamSlotLayouts(geom);
   const isFinished = match?.status === "finished";
+  const winnerSide =
+    isFinished && match
+      ? resolveKnockoutWinnerSide({
+          homeTeam: match.home_team,
+          awayTeam: match.away_team,
+          status: match.status,
+          officialHome: match.officialHome ?? null,
+          officialAway: match.officialAway ?? null,
+          officialPenaltyHome: match.officialPenaltyHome ?? null,
+          officialPenaltyAway: match.officialPenaltyAway ?? null,
+          officialAdvancingTeam: match.officialAdvancingTeam ?? null,
+        })
+      : null;
   const displayHome = isFinished ? match?.officialHome : savedHome;
   const displayAway = isFinished ? match?.officialAway : savedAway;
   const hasScoreToDisplay = displayHome != null && displayAway != null;
@@ -231,7 +244,10 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={homeName}
         layout={slots.home}
-        isWinner={!isFinished && savedHome != null && savedAway != null && savedHome > savedAway}
+        isWinner={
+          winnerSide === "home" ||
+          (!isFinished && savedHome != null && savedAway != null && savedHome > savedAway)
+        }
         isFinished={isFinished}
         isLive={isLive}
         isSaved={isSaved}
@@ -240,7 +256,10 @@ function BracketMatchNode({
       <BracketTeamOrb
         teamName={awayName}
         layout={slots.away}
-        isWinner={!isFinished && savedHome != null && savedAway != null && savedAway > savedHome}
+        isWinner={
+          winnerSide === "away" ||
+          (!isFinished && savedAway != null && savedHome != null && savedAway > savedHome)
+        }
         isFinished={isFinished}
         isLive={isLive}
         isSaved={isSaved}

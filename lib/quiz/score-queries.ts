@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type QuizFinalRankingScoreRow = {
   poolId: string;
@@ -33,7 +33,7 @@ function mapScoreRow(row: ScoreDbRow): QuizFinalRankingScoreRow {
 export async function loadQuizFinalRankingBonusesByProfile(
   poolId: string
 ): Promise<Map<string, number>> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("quiz_final_ranking_scores")
@@ -54,7 +54,7 @@ export async function getQuizFinalRankingScoreForProfile(
   poolId: string,
   profileId: string
 ): Promise<QuizFinalRankingScoreRow | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("quiz_final_ranking_scores")
     .select("pool_id, profile_id, quiz_total_score, final_position, bonus_points, calculated_at")

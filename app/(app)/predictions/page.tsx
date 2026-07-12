@@ -2,6 +2,7 @@ import { PredictionsCalendar } from "@/components/predictions/PredictionsCalenda
 import { predictionEditOpenHint } from "@/lib/predictions/deadline";
 import { canEditPredictionsUntilKickoff } from "@/lib/predictions/late-edit-access";
 import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
+import { resolveKnockoutTeams } from "@/lib/predictions/resolve-knockout-teams";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 import { isPoolAdmin } from "@/lib/pool/admin";
@@ -26,13 +27,14 @@ export default async function PredictionsPage() {
     .eq("id", user!.id)
     .maybeSingle();
   const editUntilKickoff = canEditPredictionsUntilKickoff(profile?.username);
+  const resolvedMatches = resolveKnockoutTeams(matches);
 
   return (
     <div className="tm-porra-page flex min-h-0 flex-1 flex-col">
       <div className="tm-porra-calendar-wrap">
         <PredictionsCalendar
           poolId={ctx.activePoolId}
-          matches={matches}
+          matches={resolvedMatches}
           currentProfileId={user!.id}
           currentProfileAlias={profile?.username || ""}
           isAdminUser={isAdmin}

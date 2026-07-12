@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { TournamentGeneralScoreBreakdown } from "@/lib/tournament-predictions/scoring";
 
 export type TournamentGeneralPredictionScoreRow = TournamentGeneralScoreBreakdown & {
@@ -36,7 +36,7 @@ function mapScoreRow(row: ScoreDbRow): TournamentGeneralPredictionScoreRow {
 export async function loadTournamentGeneralScoresByProfile(
   poolId: string
 ): Promise<Map<string, TournamentGeneralPredictionScoreRow>> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tournament_general_prediction_scores")
     .select(
@@ -58,7 +58,7 @@ export async function getTournamentGeneralScoreForProfile(
   poolId: string,
   profileId: string
 ): Promise<TournamentGeneralPredictionScoreRow | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tournament_general_prediction_scores")
     .select(

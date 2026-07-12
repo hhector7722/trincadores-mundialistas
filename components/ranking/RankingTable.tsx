@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useEffect, type ReactNode } from "react";
 import { RankingRow } from "@/components/ranking/RankingRow";
 import { RANKING_GRID } from "@/components/ranking/ranking-grid";
-import { useQuizBonusActive } from "@/components/ranking/quiz-bonus-store";
+import { quizBonusStore, useQuizBonusActive } from "@/components/ranking/quiz-bonus-store";
 import { PredictionOutcomeIcon } from "@/components/predictions/PredictionOutcomeIcon";
 import { MATCH_SCORE_POINTS, MVP_PREDICTION_POINTS } from "@/lib/predictions/scoring";
 import { QuizBonusToggle } from "@/components/ranking/QuizBonusToggle";
@@ -150,6 +150,11 @@ export function RankingTable({
   currentProfileId: string;
 }) {
   const quizBonusActive = useQuizBonusActive();
+
+  useEffect(() => {
+    quizBonusStore.hydrateFromStorage();
+  }, []);
+
   const sortedRows = useMemo(() => {
     if (!quizBonusActive) return rows;
     return sortRows(rows, true);
