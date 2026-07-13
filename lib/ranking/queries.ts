@@ -326,8 +326,12 @@ async function loadMatchStatsForMatchIds(
 
   const supabase = getRankingClient();
 
-  const allPredictions = await fetchAllRankingRows<any>((from, to) =>
-    supabase
+  const allPredictions = await fetchAllRankingRows<{
+    profile_id: string;
+    points_awarded: number | null;
+    matches: { group_code: string | null } | { group_code: string | null }[];
+  }>(async (from, to) => {
+    const { data, error } = await supabase
       .from("predictions")
       .select("profile_id, points_awarded, matches!inner(group_code)")
       .eq("pool_id", poolId)
@@ -335,11 +339,15 @@ async function loadMatchStatsForMatchIds(
       .not("points_awarded", "is", null)
       .order("match_id", { ascending: true })
       .order("profile_id", { ascending: true })
-      .range(from, to) as any
-  );
+      .range(from, to);
+    return { data, error };
+  });
 
-  const allMvps = await fetchAllRankingRows<any>((from, to) =>
-    supabase
+  const allMvps = await fetchAllRankingRows<{
+    profile_id: string;
+    points_awarded: number | null;
+  }>(async (from, to) => {
+    const { data, error } = await supabase
       .from("match_mvp_predictions")
       .select("profile_id, points_awarded")
       .eq("pool_id", poolId)
@@ -347,16 +355,18 @@ async function loadMatchStatsForMatchIds(
       .not("points_awarded", "is", null)
       .order("match_id", { ascending: true })
       .order("profile_id", { ascending: true })
-      .range(from, to) as any
-  );
+      .range(from, to);
+    return { data, error };
+  });
 
   const stats = new Map<string, MatchStatsRow>();
-  for (const row of allPredictions ?? []) {
-    const matches = (row as any).matches as { group_code: string | null } | undefined;
-    const isKnockout = matches ? matches.group_code === null : false;
+  for (const row of allPredictions) {
+    const matches = row.matches;
+    const groupCode = Array.isArray(matches) ? matches[0]?.group_code : matches.group_code;
+    const isKnockout = groupCode === null;
     ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "match", isKnockout);
   }
-  for (const row of allMvps ?? []) {
+  for (const row of allMvps) {
     ingestMatchPoints(stats, row.profile_id, row.points_awarded ?? 0, "mvp");
   }
 
@@ -504,26 +514,30 @@ async function loadResolvedPredictionStats(
 
   const [predictions, mvps] = await Promise.all([
     fetchAllRankingRows<{ profile_id: string; match_id: string; points_awarded: number | null }>(
-      (from, to) =>
-        supabase
+      async (from, to) => {
+        const { data, error } = await supabase
           .from("predictions")
           .select("profile_id, match_id, points_awarded")
           .eq("pool_id", poolId)
           .not("points_awarded", "is", null)
           .order("match_id", { ascending: true })
           .order("profile_id", { ascending: true })
-          .range(from, to)
+          .range(from, to);
+        return { data, error };
+      }
     ),
     fetchAllRankingRows<{ profile_id: string; match_id: string; points_awarded: number | null }>(
-      (from, to) =>
-        supabase
+      async (from, to) => {
+        const { data, error } = await supabase
           .from("match_mvp_predictions")
           .select("profile_id, match_id, points_awarded")
           .eq("pool_id", poolId)
           .not("points_awarded", "is", null)
           .order("match_id", { ascending: true })
           .order("profile_id", { ascending: true })
-          .range(from, to)
+          .range(from, to);
+        return { data, error };
+      }
     ),
   ]);
 
