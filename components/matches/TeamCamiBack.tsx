@@ -48,7 +48,11 @@ export function TeamCamiBack({ team, size = "lg", className, alt }: TeamCamiBack
          <img
             src={`/camis/${camiFileName}`}
             alt={alt || team}
-            className="absolute inset-0 w-full h-full object-contain"
+            className={cn(
+              "absolute inset-0 w-full h-full object-contain",
+              // El asset de Argentina llena más el frame que España; igualar tamaño visual
+              internalKey === "argentina" && "scale-[0.92]"
+            )}
          />
     </div>
   );
