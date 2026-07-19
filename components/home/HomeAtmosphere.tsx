@@ -14,6 +14,8 @@ function shouldShowMainTabAtmosphere(pathname: string, swipeProgress: number | n
 }
 
 function getHomeAtmosphereOpacity(pathname: string, swipeProgress: number | null): number {
+  // Home final usa cielo + mock a pantalla: la atmósfera morada crea una franja oscura bajo la cabecera.
+  if (pathname === "/") return 0;
   return shouldShowMainTabAtmosphere(pathname, swipeProgress) ? 1 : 0;
 }
 

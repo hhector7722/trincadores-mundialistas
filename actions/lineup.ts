@@ -14,7 +14,6 @@ import {
   type TeamSquadWithPlayers,
 } from "@/lib/worldcup-data/squad-queries";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/scripts/supabase-admin";
 
 export type LineupActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -22,7 +21,7 @@ export async function fetchAllTournamentPlayersAction(): Promise<
   LineupActionResult<SearchablePlayer[]>
 > {
   try {
-    const supabase = createAdminClient();
+    const supabase = await createClient();
     const players = await getAllTournamentPlayers(supabase);
     return { ok: true, data: players };
   } catch (error) {
@@ -36,7 +35,7 @@ export async function fetchTeamSquadAction(
   teamName: string
 ): Promise<LineupActionResult<TeamSquadWithPlayers | null>> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await createClient();
     const squad = await getTeamSquadByName(supabase, teamName);
     return { ok: true, data: squad };
   } catch (error) {
@@ -79,8 +78,8 @@ async function loadTeamLineupBundle(
   teamName: string,
   options?: { matchId?: string; formation?: FormationId }
 ): Promise<{ squad: TeamSquadWithPlayers | null; lineup: ResolvedLineup }> {
-  const adminSupabase = createAdminClient();
-  const squad = await getTeamSquadByName(adminSupabase, teamName);
+  const supabase = await createClient();
+  const squad = await getTeamSquadByName(supabase, teamName);
 
   if (!squad || squad.players.length === 0) {
     return {
@@ -89,7 +88,6 @@ async function loadTeamLineupBundle(
     };
   }
 
-  const supabase = await createClient();
   const lineup = await resolveTeamLineup(supabase, {
     matchId: options?.matchId,
     teamName,
@@ -130,12 +128,11 @@ export async function fetchMatchLineupBundleAction(
   }>
 > {
   try {
-    const adminSupabase = createAdminClient();
-    const [homeSquad, awaySquad] = await Promise.all([
-      getTeamSquadByName(adminSupabase, homeTeam),
-      getTeamSquadByName(adminSupabase, awayTeam),
-    ]);
     const supabase = await createClient();
+    const [homeSquad, awaySquad] = await Promise.all([
+      getTeamSquadByName(supabase, homeTeam),
+      getTeamSquadByName(supabase, awayTeam),
+    ]);
     const [kitHexMap, lineups] = await Promise.all([
       loadTeamKitHexBySlug(supabase),
       resolveMatchLineups(

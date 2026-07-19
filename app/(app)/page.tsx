@@ -1,18 +1,7 @@
-import { HomeHero } from "@/components/home/HomeHero";
-import { HomeStandingCard } from "@/components/home/HomeStandingCard";
-import { HomeViewportShell } from "@/components/home/HomeViewportShell";
-import { getMatchHighlightsForPool } from "@/lib/highlights/queries";
-import { getDailyFactsHistory } from "@/lib/home/daily-fact";
-import { selectHomeCarouselMatches } from "@/lib/home/upcoming-matches";
-import {
-  getPoolMatchesWithPredictions,
-} from "@/lib/predictions/queries";
+import { FinalHomeScreen } from "@/components/home/final/FinalHomeScreen";
+import { selectFinalMatch } from "@/lib/home/select-final-match";
+import { getPoolMatchesWithPredictions } from "@/lib/predictions/queries";
 import { resolveKnockoutTeams } from "@/lib/predictions/resolve-knockout-teams";
-import { getPoolLeaderboard } from "@/lib/ranking/queries";
-import {
-  getPoolTournamentGeneralPredictionsBoard,
-  getTournamentGeneralPredictions,
-} from "@/lib/tournament-predictions/queries";
 import { requireActivePoolContext } from "@/lib/pool/require-context";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,43 +14,15 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [
-    matchCarouselMatches,
-    leaderboard,
-    generalPredictionsBundle,
-    generalPredictionsBoard,
-    matchHighlights,
-  ] = await Promise.all([
-    getPoolMatchesWithPredictions(ctx.activePoolId, user!.id),
-    getPoolLeaderboard(ctx.activePoolId),
-    getTournamentGeneralPredictions(ctx.activePoolId, user!.id),
-    getPoolTournamentGeneralPredictionsBoard(ctx.activePoolId),
-    getMatchHighlightsForPool(ctx.activePoolId),
-  ]);
-
-  const dailyFacts = getDailyFactsHistory();
-
-  const resolvedMatchCarouselMatches = resolveKnockoutTeams(
-    selectHomeCarouselMatches(matchCarouselMatches)
+  const matches = resolveKnockoutTeams(
+    await getPoolMatchesWithPredictions(ctx.activePoolId, user!.id)
   );
+  const finalMatch = selectFinalMatch(matches);
 
   return (
-    <HomeViewportShell
-      hero={
-        <HomeHero matchHighlights={matchHighlights} />
-      }
-      body={
-        <HomeStandingCard
-          leaderboardRows={leaderboard.rows}
-          currentProfileId={user!.id}
-          poolId={ctx.activePoolId}
-          generalPredictions={generalPredictionsBundle.predictions}
-          generalPredictionsEditable={generalPredictionsBundle.editable}
-          generalPredictionsBoard={generalPredictionsBoard}
-          dailyFacts={dailyFacts}
-          matchCarouselMatches={resolvedMatchCarouselMatches}
-        />
-      }
+    <FinalHomeScreen
+      poolId={ctx.activePoolId}
+      match={finalMatch}
     />
   );
 }
