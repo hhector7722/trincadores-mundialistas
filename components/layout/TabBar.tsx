@@ -24,7 +24,7 @@ const TAB_ICONS = {
 } as const;
 
 const TABBAR_NAV_CLASS =
-  "tm-app-tabbar fixed bottom-0 left-0 right-0 z-[95] flex min-h-[var(--tm-tabbar-shell)] items-end justify-around border-t border-[var(--tm-border)] bg-[var(--tm-tabbar-bg-hex)] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] backdrop-blur-md md:px-8";
+  "tm-app-tabbar fixed bottom-0 left-0 right-0 z-[95] flex h-[var(--tm-tabbar-core)] items-center justify-around border-t border-[var(--tm-border)] bg-[var(--tm-tabbar-bg-hex)] px-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] backdrop-blur-md md:px-8";
 
 export function TabBar() {
   const pathname = usePathname();
@@ -85,7 +85,7 @@ export function TabBar() {
             onClick={(event) => handleTabClick(event, href)}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex h-[var(--tm-tabbar-core)] min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
+              "flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center",
               "transition-[color,transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95",
               active ? "text-[var(--tm-accent)] drop-shadow-md" : "text-[var(--tm-muted)]",
               navigating && "opacity-80",
