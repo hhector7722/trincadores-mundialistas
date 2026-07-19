@@ -315,12 +315,12 @@ export function FinalPredictionModal({
         hideCloseButton
         scrollContent={false}
         opaque
-        className="flex h-[calc(100dvh-2rem)] max-h-[calc(100dvh-2rem)] w-full max-w-[min(26rem,94vw)] flex-col overflow-hidden rounded-[1.75rem] border-0 bg-black p-0 shadow-2xl"
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-[min(26rem,94vw)] flex-col overflow-hidden rounded-[1.75rem] border-0 bg-black p-0 shadow-2xl"
         panelHostClassName="w-full max-w-[min(26rem,94vw)]"
       >
-        <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-black">
-          {/* Frame 512×1024: % del arte coinciden sin letterboxing de object-contain */}
-          <div className="relative mx-auto aspect-[512/1024] h-full max-h-full w-auto max-w-full shrink-0">
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-black">
+          {/* Frame 512×1024: cabe en viewport (ancho o alto) y el Modal lo centra */}
+          <div className="relative aspect-[512/1024] w-[min(100%,calc((100dvh-2rem)*512/1024))] shrink-0">
             <Image
               src="/images/final/modal-v4.webp"
               alt=""

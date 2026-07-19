@@ -7,20 +7,23 @@ export function measureChromeBottomLift(): number {
   return 0;
 }
 
-/** Variables vv: altura útil del viewport + lift de la TabBar (iOS PWA / barra Safari). */
+/** Variables vv: offset del header + altura de layout (debe llegar a la TabBar en bottom:0). */
 export function applyVisualViewportChrome(): void {
   if (typeof document === "undefined") return;
 
   const vv = window.visualViewport;
-  const height = vv ? Math.round(vv.height) : window.innerHeight;
+  const vvHeight = vv ? Math.round(vv.height) : window.innerHeight;
   const offsetTop = vv ? Math.round(vv.offsetTop) : 0;
   const chromeBottom = measureChromeBottomLift();
+  // innerHeight: la TabBar fija usa el layout viewport (bottom:0). Si --tm-app-height
+  // se acorta al visualViewport, el contenido termina antes y queda hueco sobre la barra.
+  const appHeight = window.innerHeight;
   const root = document.documentElement;
 
-  root.style.setProperty("--tm-vv-height", `${height}px`);
+  root.style.setProperty("--tm-vv-height", `${vvHeight}px`);
   root.style.setProperty("--tm-vv-offset-top", `${offsetTop}px`);
   root.style.setProperty("--tm-chrome-bottom", `${chromeBottom}px`);
-  root.style.setProperty("--tm-app-height", `${height + offsetTop}px`);
+  root.style.setProperty("--tm-app-height", `${appHeight}px`);
 }
 
 export function resetVisualViewportChrome(): void {

@@ -47,8 +47,8 @@
   --tm-tabbar-indicators-row: 0.375rem;
   --tm-tabbar-indicators-gap: 0.625rem;
   --tm-tabbar-core: var(--tm-tabbar-height);
-  /* Solo 5rem: pb-safe ya vive dentro del h-20 (border-box). Sumar safe otra vez duplica la zona inferior. */
-  --tm-tabbar-shell: var(--tm-tabbar-height);
+  /* Altura total de la TabBar: fila de tabs + safe-area. El contenido debe reservar esto. */
+  --tm-tabbar-shell: calc(var(--tm-tabbar-height) + var(--tm-safe-bottom));
   --tm-chrome-bottom: 0px;
   --tab-bar-height: var(--tm-tabbar-shell);
   --tm-content-bottom: var(--tm-tabbar-shell);
@@ -297,14 +297,17 @@ html:has(.tm-app-header--compact) {
 
 @media (min-width: 768px) {
   :root {
-    --tm-tabbar-shell: var(--tm-tabbar-height-md);
     --tm-tabbar-core: var(--tm-tabbar-height-md);
+    --tm-tabbar-shell: calc(var(--tm-tabbar-height-md) + var(--tm-safe-bottom));
   }
 }
 
 .tm-app-tabbar {
   box-sizing: border-box;
   bottom: 0;
+  /* Cubre home indicator: altura = tabs + safe-area; padding empuja iconos hacia arriba. */
+  min-height: var(--tm-tabbar-shell);
+  padding-bottom: var(--tm-safe-bottom);
   transition: filter var(--tm-modal-exit-ms) var(--tm-ios-ease-out),
               opacity var(--tm-modal-exit-ms) var(--tm-ios-ease-out);
 }
