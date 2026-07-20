@@ -1,3 +1,4 @@
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { NOTIFICATION_KIND_MATCH_HIGHLIGHT } from "@/lib/notifications/kinds";
 import { highlightThumbNotificationUrl, matchHighlightNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
@@ -61,6 +62,18 @@ export async function maybeNotifyMatchHighlight(
   match: MatchRef,
   siteOrigin?: string,
 ): Promise<NotifyMatchHighlightResult> {
+  if (!NOTIFICATIONS_ENABLED) {
+    return {
+      notified: false,
+      recipients: 0,
+      skippedDuplicate: 0,
+      pushSent: 0,
+      pushSkipped: 0,
+      pushFailed: 0,
+      reason: "disabled",
+    };
+  }
+
   const { data: matchRow, error: matchError } = await admin
     .from("matches")
     .select("id, highlight_youtube_id, matchdays!inner(pool_id)")

@@ -1,3 +1,4 @@
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { NOTIFICATION_KIND_PREDICTION_REMINDER } from "@/lib/notifications/kinds";
 import { predictionReminderNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
@@ -69,8 +70,6 @@ export async function sendPredictionReminders(
   cronIntervalMs = PREDICTION_REMINDER_CRON_INTERVAL_MS,
   siteOrigin?: string,
 ): Promise<SendPredictionRemindersResult> {
-  const nowMs = now.getTime();
-  const pushEnabled = isVapidConfigured();
   const result: SendPredictionRemindersResult = {
     matchesChecked: 0,
     remindersSent: 0,
@@ -80,6 +79,11 @@ export async function sendPredictionReminders(
     pushSkipped: 0,
     pushFailed: 0,
   };
+
+  if (!NOTIFICATIONS_ENABLED) return result;
+
+  const nowMs = now.getTime();
+  const pushEnabled = isVapidConfigured();
 
   const horizonMin = new Date(nowMs + (PREDICTION_REMINDER_MINUTES - 2) * 60 * 1000).toISOString();
   const horizonMax = new Date(

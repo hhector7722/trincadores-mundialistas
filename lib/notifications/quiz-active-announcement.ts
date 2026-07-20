@@ -1,3 +1,4 @@
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { NOTIFICATION_KIND_QUIZ_ACTIVE } from "@/lib/notifications/kinds";
 import { buildQuizActiveAnnouncementCopy } from "@/lib/notifications/quiz-active-copy";
 import { quizActiveNotificationUrl } from "@/lib/push/urls";
@@ -17,9 +18,6 @@ export async function broadcastQuizActiveAnnouncement(
   admin: AdminClient,
   siteOrigin?: string,
 ): Promise<BroadcastQuizActiveAnnouncementResult> {
-  const copy = buildQuizActiveAnnouncementCopy();
-  const pushUrl = quizActiveNotificationUrl(siteOrigin);
-  const pushEnabled = isVapidConfigured();
   const result: BroadcastQuizActiveAnnouncementResult = {
     recipients: 0,
     skippedDuplicate: 0,
@@ -27,6 +25,12 @@ export async function broadcastQuizActiveAnnouncement(
     pushSkipped: 0,
     pushFailed: 0,
   };
+
+  if (!NOTIFICATIONS_ENABLED) return result;
+
+  const copy = buildQuizActiveAnnouncementCopy();
+  const pushUrl = quizActiveNotificationUrl(siteOrigin);
+  const pushEnabled = isVapidConfigured();
 
   const { data: members, error: membersError } = await admin
     .from("pool_members")

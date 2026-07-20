@@ -1,6 +1,7 @@
 import { shouldFetchConfirmedLineup } from "@/lib/lineup/confirmed-lineup-window";
 import { loadCachedTeamLineup } from "@/lib/lineup/lineup-queries";
 import { areMatchLineupsFullyConfirmed } from "@/lib/lineup/lineups-modal-copy";
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { NOTIFICATION_KIND_CONFIRMED_LINEUP } from "@/lib/notifications/kinds";
 import { confirmedLineupNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
@@ -64,6 +65,18 @@ export async function maybeNotifyConfirmedLineup(
   siteOrigin?: string,
   options?: { sendPush?: boolean },
 ): Promise<NotifyConfirmedLineupResult> {
+  if (!NOTIFICATIONS_ENABLED) {
+    return {
+      notified: false,
+      recipients: 0,
+      skippedDuplicate: 0,
+      pushSent: 0,
+      pushSkipped: 0,
+      pushFailed: 0,
+      reason: "disabled",
+    };
+  }
+
   const bothConfirmed = await areBothLineupsConfirmedInCache(admin, match);
   if (!bothConfirmed) {
     return {
@@ -197,6 +210,18 @@ export async function syncConfirmedLineupNotifications(
   now = new Date(),
   siteOrigin?: string,
 ): Promise<SyncConfirmedLineupNotificationsResult> {
+  const result: SyncConfirmedLineupNotificationsResult = {
+    matchesChecked: 0,
+    matchesNotified: 0,
+    recipients: 0,
+    skippedDuplicate: 0,
+    pushSent: 0,
+    pushSkipped: 0,
+    pushFailed: 0,
+  };
+
+  if (!NOTIFICATIONS_ENABLED) return result;
+
   const nowMs = now.getTime();
   const fromIso = new Date(nowMs).toISOString();
   const toIso = new Date(nowMs + 90 * 60 * 1000).toISOString();
@@ -211,16 +236,6 @@ export async function syncConfirmedLineupNotifications(
   if (error) {
     throw new Error(`matches: ${error.message}`);
   }
-
-  const result: SyncConfirmedLineupNotificationsResult = {
-    matchesChecked: 0,
-    matchesNotified: 0,
-    recipients: 0,
-    skippedDuplicate: 0,
-    pushSent: 0,
-    pushSkipped: 0,
-    pushFailed: 0,
-  };
 
   for (const match of matches ?? []) {
     if (!shouldFetchConfirmedLineup(match.kickoff_at, match.status, nowMs)) continue;

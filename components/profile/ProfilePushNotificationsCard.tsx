@@ -4,10 +4,13 @@ import { Bell, BellOff, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePushNotifications } from "@/components/push/PushNotificationProvider";
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { cn } from "@/lib/utils";
 
 export function ProfilePushNotificationsCard() {
   const { status, openPushPrompt, isSubscribed } = usePushNotifications();
+
+  if (!NOTIFICATIONS_ENABLED) return null;
 
   const title = isSubscribed
     ? "Notificaciones activadas"

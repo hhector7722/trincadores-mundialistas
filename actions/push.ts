@@ -1,5 +1,6 @@
 "use server";
 
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { createClient } from "@/lib/supabase/server";
 
 export type PushActionResult = { ok: true } | { ok: false; error: string };
@@ -13,6 +14,10 @@ type PushSubscriptionPayload = {
 export async function savePushSubscriptionAction(
   payload: PushSubscriptionPayload,
 ): Promise<PushActionResult> {
+  if (!NOTIFICATIONS_ENABLED) {
+    return { ok: false, error: "Las notificaciones push están desactivadas." };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

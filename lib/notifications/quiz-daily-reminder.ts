@@ -1,4 +1,5 @@
 import { isQuizPublishHeld, isQuizWindowOpen, todayQuizDate } from "@/lib/quiz/date";
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { NOTIFICATION_KIND_QUIZ_DAILY_REMINDER } from "@/lib/notifications/kinds";
 import { quizDailyReminderNotificationUrl } from "@/lib/push/urls";
 import { sendPushToProfile } from "@/lib/push/send";
@@ -39,8 +40,6 @@ export async function sendQuizDailyReminders(
   now = new Date(),
   siteOrigin?: string,
 ): Promise<SendQuizDailyRemindersResult> {
-  const pushEnabled = isVapidConfigured();
-  const pushUrl = quizDailyReminderNotificationUrl(siteOrigin);
   const result: SendQuizDailyRemindersResult = {
     quizDate,
     quizzesChecked: 0,
@@ -52,6 +51,11 @@ export async function sendQuizDailyReminders(
     pushSkipped: 0,
     pushFailed: 0,
   };
+
+  if (!NOTIFICATIONS_ENABLED) return result;
+
+  const pushEnabled = isVapidConfigured();
+  const pushUrl = quizDailyReminderNotificationUrl(siteOrigin);
 
   if (isQuizPublishHeld(quizDate)) return result;
 

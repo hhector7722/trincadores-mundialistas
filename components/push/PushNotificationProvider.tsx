@@ -14,6 +14,7 @@ import { Bell } from "lucide-react";
 import { savePushSubscriptionAction } from "@/actions/push";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import {
   getExistingPushSubscription,
   getPushClientStatus,
@@ -88,7 +89,17 @@ export function PushNotificationProvider({
   const [modalMode, setModalMode] = useState<ModalMode>("ask");
   const autoPromptCheckedRef = useRef(false);
 
+  const disabledValue = useMemo<PushNotificationContextValue>(
+    () => ({
+      status: "unsupported",
+      openPushPrompt: () => {},
+      isSubscribed: false,
+    }),
+    [],
+  );
+
   useEffect(() => {
+    if (!NOTIFICATIONS_ENABLED) return;
     if (vapidPublicKey) {
       setResolvedVapidKey(vapidPublicKey);
       return;
@@ -97,7 +108,7 @@ export function PushNotificationProvider({
   }, [vapidPublicKey]);
 
   const syncExistingSubscription = useCallback(async () => {
-    if (!resolvedVapidKey) return false;
+    if (!NOTIFICATIONS_ENABLED || !resolvedVapidKey) return false;
     const subscription = await getExistingPushSubscription();
     if (!subscription) return false;
 
@@ -112,7 +123,7 @@ export function PushNotificationProvider({
   }, [resolvedVapidKey]);
 
   const resolveModalMode = useCallback((): ModalMode | null => {
-    if (!resolvedVapidKey) return null;
+    if (!NOTIFICATIONS_ENABLED || !resolvedVapidKey) return null;
 
     if (!isPushSupported()) {
       if (isIosDevice() && !isStandalonePwa()) return "unsupported";
@@ -128,6 +139,7 @@ export function PushNotificationProvider({
   }, [resolvedVapidKey]);
 
   const openPushPromptFromProfile = useCallback(() => {
+    if (!NOTIFICATIONS_ENABLED) return;
     clearPushPromptDismissed();
     const mode = resolveModalMode();
     if (!mode) return;
@@ -136,7 +148,7 @@ export function PushNotificationProvider({
   }, [resolveModalMode]);
 
   useEffect(() => {
-    if (!resolvedVapidKey || autoPromptCheckedRef.current) return;
+    if (!NOTIFICATIONS_ENABLED || !resolvedVapidKey || autoPromptCheckedRef.current) return;
     autoPromptCheckedRef.current = true;
 
     void (async () => {
@@ -173,7 +185,7 @@ export function PushNotificationProvider({
   }, [resolvedVapidKey, syncExistingSubscription]);
 
   async function handleActivate() {
-    if (!resolvedVapidKey) return;
+    if (!NOTIFICATIONS_ENABLED || !resolvedVapidKey) return;
     setModalMode("activating");
 
     try {
@@ -210,13 +222,24 @@ export function PushNotificationProvider({
   }
 
   const contextValue = useMemo(
-    () => ({
-      status,
-      openPushPrompt: openPushPromptFromProfile,
-      isSubscribed,
-    }),
-    [isSubscribed, openPushPromptFromProfile, status],
+    () =>
+      NOTIFICATIONS_ENABLED
+        ? {
+            status,
+            openPushPrompt: openPushPromptFromProfile,
+            isSubscribed,
+          }
+        : disabledValue,
+    [disabledValue, isSubscribed, openPushPromptFromProfile, status],
   );
+
+  if (!NOTIFICATIONS_ENABLED) {
+    return (
+      <PushNotificationContext.Provider value={contextValue}>
+        {children}
+      </PushNotificationContext.Provider>
+    );
+  }
 
   const title =
     modalMode === "unsupported"

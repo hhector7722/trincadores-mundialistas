@@ -1,4 +1,5 @@
 import webpush from "web-push";
+import { NOTIFICATIONS_ENABLED } from "@/lib/notifications/enabled";
 import { assertVapidConfigured } from "@/lib/push/vapid";
 import type { AdminClient } from "@/lib/scripts/supabase-admin";
 
@@ -32,6 +33,11 @@ export async function sendPushToProfile(
   payload: PushPayload,
 ): Promise<SendPushResult> {
   const result: SendPushResult = { sent: 0, failed: 0, removed: 0, skipped: 0 };
+
+  if (!NOTIFICATIONS_ENABLED) {
+    result.skipped += 1;
+    return result;
+  }
 
   const { data: subscriptions, error } = await admin
     .from("push_subscriptions")
